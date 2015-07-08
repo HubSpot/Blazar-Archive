@@ -3,7 +3,9 @@
 Makes use of:
  - [gulp](https://github.com/gulpjs/gulp)
  - [stylus](https://github.com/LearnBoost/stylus)
- - [webpack](https://github.com/webpack/webpack). 
+ - [webpack](https://github.com/webpack/webpack)
+ - [React](https://github.com/facebook/react)
+ - [React Router](https://github.com/rackt/react-router)
  - [Reflux](https://github.com/spoike/refluxjs)
 
 ## Installation
@@ -33,12 +35,10 @@ $ gulp build --type production
 
 ## Testing
 
-We use [jest](http://facebook.github.io/jest/) to test our application.<br />
-Store test in [app/scripts/\_\_tests__](./app/scripts/__tests__)
+We use [jest](http://facebook.github.io/jest/) to test our application. Store test in [app/scripts/\_\_tests__](./app/scripts/__tests__)
 
 ```
 $ npm test
-
 ```
 
 ## Javascript
