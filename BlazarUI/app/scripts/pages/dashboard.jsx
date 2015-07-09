@@ -2,8 +2,7 @@ import React from 'react';
 import UIGrid from '../components/shared/grid/UIGrid.jsx'
 import UIGridItem from '../components/shared/grid/UIGridItem.jsx'
 
-
-import Sidebar from '../components/sidebar/Sidebar.jsx'
+import RequestSidebarContainer from '../components/sidebar/RequestSidebarContainer.jsx'
 import Dashboard from '../components/dashboard/Dashboard.jsx'
 
 class Home extends React.Component {
@@ -17,7 +16,7 @@ class Home extends React.Component {
       <UIGrid>
         
         <UIGridItem size={3}>
-          <Sidebar />
+          <RequestSidebarContainer/>
         </UIGridItem>
 
         <UIGridItem size={8}>
