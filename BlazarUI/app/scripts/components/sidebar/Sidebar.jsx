@@ -10,7 +10,7 @@ class Sidebar extends React.Component {
   render() {
     return (
       <div className='sidebar'>
-        <h2>{this.props.headline}</h2>
+        <h2 className='sidebar__headline'>{this.props.headline}</h2>
         {this.props.children}
       </div>
     );
