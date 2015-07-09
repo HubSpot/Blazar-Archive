@@ -2,7 +2,7 @@ import React from 'react';
 import ProjectsSidebar from './ProjectsSidebar.jsx';
 import ProjectsStore from '../../../stores/projectsStore';
 import ProjectsActions from '../../../actions/projectsActions';
-
+import Sidebar from '../../shared/Sidebar.jsx'
 
 class ProjectsSidebarContainer extends React.Component {
 
@@ -29,9 +29,10 @@ class ProjectsSidebarContainer extends React.Component {
   }
 
   render() {
-
     return (
-      <ProjectsSidebar projects={this.state.projects} loading={this.state.loading} />
+      <Sidebar headline='Projects'>
+        <ProjectsSidebar projects={this.state.projects} loading={this.state.loading} />
+      </Sidebar>
     );
   }
 }

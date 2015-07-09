@@ -14,8 +14,7 @@ class ProjectsSidebar extends React.Component {
     let loading = this.props.loading ? <div>Loading Projects...</div> : '';
 
     return (
-      <div className='sidebar'>
-        <h2>Projects</h2>
+      <div>
         {loading}
         {projects}
       </div>
