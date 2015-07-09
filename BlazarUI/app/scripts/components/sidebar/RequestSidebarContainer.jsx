@@ -1,13 +1,14 @@
 import React from 'react';
-import RequestList from './SidebarRequestList.jsx';
+import RequestSidebar from './RequestSidebar.jsx';
 import RequestStore from '../../stores/requestStore';
 import RequestActions from '../../actions/itemActions';
 
 
-class Sidebar extends React.Component {
+class RequestSidebarContainer extends React.Component {
   
   constructor(props){
     super(props);
+
     this.state = {
       requests : [],
       loading: false
@@ -30,12 +31,9 @@ class Sidebar extends React.Component {
   render() {
 
     return (
-      <div className='sidebar'>
-        <p>Sidebar</p>
-        <RequestList { ...this.state } />
-      </div>
+      <RequestSidebar requests={this.state.requests} loading={this.state.loading} />
     );
   }
 }
 
-export default Sidebar;
+export default RequestSidebarContainer;

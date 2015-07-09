@@ -10,7 +10,7 @@ RequestActions.loadRequests.preEmit = function(data){
   // we will put api call/ async stuff here
   // temporarily using setTimeout for faking async behaviour
   setTimeout(function(){
-    var Requests = ['Australia', 'New Zealand', 'Singapore', 'Tonga'];
+    var Requests = ['Australia', 'NewZealand', 'Singapore', 'Tonga'];
     RequestActions.loadRequestsSuccess(Requests);
 
     // on error

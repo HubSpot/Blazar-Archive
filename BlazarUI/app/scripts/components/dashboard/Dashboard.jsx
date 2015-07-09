@@ -7,9 +7,9 @@ class Dashboard extends React.Component{
   }
 
   render() {
-    return (  
+    return (
       <div className='primary-content'>
-        Dashboard content
+        <h2>Dashboard</h2>
       </div>
     );
   }
