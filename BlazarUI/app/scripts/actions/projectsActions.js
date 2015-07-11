@@ -1,21 +1,27 @@
 import Reflux from 'reflux';
+import $ from 'jQuery';
+import projectsData from './projectsData';
 
-var ProjectsActions = Reflux.createActions([
+let ProjectsActions = Reflux.createActions([
   'loadProjects',
   'loadProjectsSuccess',
   'loadProjectsError'
 ]);
 
 ProjectsActions.loadProjects.preEmit = function(data){
-  // we will put api call/ async stuff here
-  // temporarily using setTimeout for faking async behaviour
-  setTimeout(function(){
-    var Projects = ['Australia', 'NewZealand', 'Singapore', 'Tonga'];
-    ProjectsActions.loadProjectsSuccess(Projects);
+  let endpoint = "http://localhost:1337/js/app/mock.json";
+  let promise = $.ajax({ url: endpoint, type: 'GET', dataType: 'json' });
 
-    // on error
-    // ProjectsActions.loadProjectsError('an error occured');
-  },500);
+  promise.success( (resp) => {
+    projectsData.manageResponse(resp, function(data){
+      ProjectsActions.loadProjectsSuccess(data);
+    })
+  })
+
+  promise.error( ()=> {
+    ProjectsActions.loadProjectsError('an error occured');
+  })
+
 };
 
 export default ProjectsActions;
