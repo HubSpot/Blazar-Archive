@@ -10,10 +10,14 @@ class ProjectsSidebarContainer extends React.Component {
     super(props);
 
     this.state = {
-      projects : [],
+      projects: {
+        all: [],
+        buildingRepos: []
+      },
       loading: false
-    };
-  }
+    }
+
+  };
 
   componentDidMount() {
     this.unsubscribe = ProjectsStore.listen(this.onStatusChange.bind(this));
@@ -30,7 +34,7 @@ class ProjectsSidebarContainer extends React.Component {
 
   render() {
     return (
-      <Sidebar headline='Projects'>
+      <Sidebar>
         <ProjectsSidebar projects={this.state.projects} loading={this.state.loading} />
       </Sidebar>
     );
