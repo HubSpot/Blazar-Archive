@@ -10,7 +10,7 @@ var routes = (
   <Route name="app" path="/" handler={ App }>
     <Route name="dashboard" handler={ Dashboard } />
     <DefaultRoute handler={ Dashboard } />
-    <Route name="project" path="/project/:id" handler={Project}/>
+    <Route name="project" path="/project/:url/:org/:repo/:branch/:module/:buildNumber" handler={Project}/>
     <NotFoundRoute handler={ NotFound } />
   </Route>
 );
