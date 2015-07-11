@@ -4,6 +4,7 @@ var $ = require('gulp-load-plugins')();
 var del = require('del');
 var concatCss = require('gulp-concat-css');
 var eslint = require('gulp-eslint');
+var gulpCopy = require('gulp-copy');
 
 // set variable via $ gulp --type production
 var environment = $.util.env.type || 'development';
@@ -34,6 +35,12 @@ gulp.task('scripts', function() {
     .pipe(gulp.dest(dist + 'js/'))
     .pipe($.size({ title : 'js' }))
     .pipe($.connect.reload());
+});
+
+//for mock data
+gulp.task('copy', function() {
+return gulp.src('./app/mock.json')
+  .pipe($.copy('./dist/js'));
 });
 
 gulp.task('lint', function () {
@@ -109,5 +116,5 @@ gulp.task('default', ['build', 'serve', 'watch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
-  gulp.start(['images', 'html', 'lint', 'scripts','vendorStyles','styles']);
+  gulp.start(['images', 'html', 'copy', 'lint', 'scripts','vendorStyles','styles']);
 });
