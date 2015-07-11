@@ -8,8 +8,8 @@ class Navigation extends React.Component{
   }
 
   render() {
-    return (  
-        <nav className="navbar navbar-default" role="navigation">
+    return (
+        <nav className="navbar navbar-default navbar-dark" role="navigation">
           <div className="container-fluid">
             <div className="navbar-header">
               <a className="navbar-brand" href="/">
