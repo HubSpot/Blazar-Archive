@@ -6,11 +6,13 @@ class Sidebar extends React.Component {
     super(props);
   }
 
-
   render() {
+    if(this.props.headline){
+      var headline = <h2 className='sidebar__headline'>{this.props.headline}</h2>
+    }
     return (
       <div className='sidebar'>
-        <h2 className='sidebar__headline'>{this.props.headline}</h2>
+        {this.props.headline ? headline : null}
         {this.props.children}
       </div>
     );
@@ -19,4 +21,6 @@ class Sidebar extends React.Component {
 
 export default Sidebar;
 
-// add required props..
+Sidebar.propTypes = {
+  headline: React.PropTypes.string
+}
