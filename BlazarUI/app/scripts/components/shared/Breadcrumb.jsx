@@ -9,7 +9,7 @@ class Breadcrumb extends React.Component{
   render() {
 
     let crumbsep = "/";
-    let path = "<a href='/'>Dashboard</a> » ";
+    let path = "<a href='#'>Dashboard</a> » ";
 
     if(! this.props.links){
       return <div></div>

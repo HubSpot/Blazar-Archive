@@ -1,11 +1,13 @@
 import React from 'react';
 import _ from 'jQuery';
 import ComponentHelpers from '../../ComponentHelpers';
+import config from '../../../config';
 
 class Module extends React.Component {
   render(){
     let name = this.props.name;
-    let moduleLink = "#project/" + this.props.link;
+    let moduleLink = `${config.appRoot}/${this.props.link}`;
+
     return <a href={moduleLink} className='sidebar__repo-module'>{name}</a>
   }
 }
@@ -31,8 +33,8 @@ class ProjectSidebarListItem extends React.Component {
   render() {
     let modules = [];
     let repo = this.props.repo;
-    let moduleDetail = repo[0]
-    let repoLink = `${moduleDetail.host}/${moduleDetail.organization}/${moduleDetail.repository}`
+    let moduleDetail = repo[0];
+    let repoLink = `${moduleDetail.host}/${moduleDetail.organization}/${moduleDetail.repository}`;
 
     _.each(repo, (i) => {
       let moduleLink = `${repo[i].host}/${repo[i].organization}/${repo[i].repository}/${repo[i].branch}/${repo[i].module}/${repo[i].buildNumber}`
