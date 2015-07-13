@@ -59,7 +59,11 @@ gulp.task('html', function() {
 });
 
 gulp.task('vendorStyles', function () {
-  return gulp.src('./node_modules/bootstrap/dist/css/bootstrap.css')
+  var files = [
+    './node_modules/bootstrap/dist/css/bootstrap.css',
+    './node_modules/react-select/dist/default.css'
+  ];
+  return gulp.src(files)
     .pipe(concatCss('vendor.css'))
     .pipe(gulp.dest(dist + 'css'));
 });
