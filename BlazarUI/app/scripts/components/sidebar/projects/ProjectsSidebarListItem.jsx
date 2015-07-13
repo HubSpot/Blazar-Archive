@@ -6,7 +6,7 @@ class Module extends React.Component {
   render(){
     let name = this.props.name;
     let moduleLink = "#project/" + this.props.link;
-    return <a href={moduleLink} className='sidebar___repo-module'>{name}</a>
+    return <a href={moduleLink} className='sidebar__repo-module'>{name}</a>
   }
 }
 
@@ -44,7 +44,10 @@ class ProjectSidebarListItem extends React.Component {
     return (
       <div className='sidebar__repo-container'>
         <div className='sidebar__repo-url'>{repoLink}</div>
-        <div className='sidebar__repo' onClick={this.handleModuleExpand}>{repo.repository}</div>
+        <div className='sidebar__repo' onClick={this.handleModuleExpand}>
+          <div className="la-ball-scale la-sm sidebar__active-building-icon"><div></div></div>
+          {repo.repository}
+        </div>
         <div className={this.getModulesClassNames()}>{modules}</div>
       </div>
     );
