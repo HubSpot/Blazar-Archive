@@ -12,11 +12,11 @@ class ProjectsSidebarContainer extends React.Component {
     this.state = {
       projects: {
         all: [],
-        buildingRepos: []
+        buildingRepos: [],
+        modules: []
       },
       loading: false
     }
-
   };
 
   componentDidMount() {

@@ -2,10 +2,18 @@ import React from 'react';
 import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx'
 import SidebarFilter from '../SidebarFilter.jsx'
 
+import ComponentHelpers from '../../ComponentHelpers';
+
 class ProjectsSidebar extends React.Component {
 
   constructor(props){
     super(props);
+    ComponentHelpers.bindAll(this, ['updateResults'])
+  }
+
+  updateResults(input) {
+    // To do: expand repos to show modules searched for
+    console.log('input change: ', input);
   }
 
   render() {
@@ -23,6 +31,9 @@ class ProjectsSidebar extends React.Component {
         {loading}
         <SidebarFilter
           loading={this.props.loading}
+          buildingRepos={buildingRepos}
+          modules={this.props.projects.modules}
+          updateResults={this.updateResults}
         />
         <div className='sidebar__list'>
           {sidebarRepoList}
