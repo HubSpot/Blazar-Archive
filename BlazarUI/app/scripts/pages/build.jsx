@@ -1,5 +1,5 @@
 import React from 'react';
-import ProjectContainer from '../components/project/ProjectContainer.jsx'
+import BuildContainer from '../components/build/BuildContainer.jsx'
 
 class Project extends React.Component {
 
@@ -11,8 +11,8 @@ class Project extends React.Component {
     return (
       <div>
 
-        <ProjectContainer
-          project={this.props.params}
+        <BuildContainer
+          params={this.props.params}
         />
 
       </div>

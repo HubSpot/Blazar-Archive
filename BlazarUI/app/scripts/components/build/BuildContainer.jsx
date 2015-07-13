@@ -1,8 +1,8 @@
 import React from 'react';
-import Project from './Project.jsx';
+import Build from './Build.jsx';
 import PageContainer from '../layout/PageContainer.jsx'
 
-class ProjectContainer extends React.Component {
+class BuildContainer extends React.Component {
 
   constructor(props){
     super(props);
@@ -11,12 +11,12 @@ class ProjectContainer extends React.Component {
   render() {
     return (
       <PageContainer>
-        <Project
-          project={this.props.project}
+        <Build
+          params={this.props.params}
         />
       </PageContainer>
     );
   }
 }
 
-export default ProjectContainer;
+export default BuildContainer;
