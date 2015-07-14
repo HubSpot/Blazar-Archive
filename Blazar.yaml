@@ -1,0 +1,6 @@
+server:
+  type: simple
+  applicationContextPath: /blazar
+  connector:
+    type: http
+    port: 7099

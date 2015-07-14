@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.hubspot</groupId>
+    <artifactId>basepom</artifactId>
+    <version>10.7</version>
+  </parent>
+
+  <artifactId>Blazar</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <scm>
+    <connection>scm:git:git@github.com:HubSpot/Blazar.git</connection>
+    <developerConnection>scm:git:git@github.com:HubSpot/Blazar.git</developerConnection>
+    <url>git@github.com:HubSpot/Blazar.git</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Jonathan Haber</name>
+      <email>jhaber@hubspot.com</email>
+    </developer>
+  </developers>
+
+  <properties>
+    <dep.jersey.version>1.19</dep.jersey.version>
+  </properties>
+
+  <modules>
+    <module>BlazarBase</module>
+    <module>BlazarService</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.hubspot</groupId>
+        <artifactId>BlazarBase</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot</groupId>
+        <artifactId>BlazarService</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.ws.rs</groupId>
+        <artifactId>jsr311-api</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot.jackson</groupId>
+        <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
+        <version>0.7.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot.jackson</groupId>
+        <artifactId>jackson-datatype-protobuf</artifactId>
+        <version>0.8.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
