@@ -26,6 +26,7 @@
   </developers>
 
   <properties>
+    <basepom.git-id.skip>true</basepom.git-id.skip>
     <dep.jersey.version>1.19</dep.jersey.version>
   </properties>
 
