@@ -5,13 +5,13 @@ import PageSection from '../shared/PageSection.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-
+import BuildDetail from '../shared/BuildDetail.jsx';
+import Log from './log.jsx'
 class Build extends React.Component{
 
   constructor(props, context) {
    super(props);
   }
-
 
   render() {
     return (
@@ -22,10 +22,10 @@ class Build extends React.Component{
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            <PageSection headline='Build Detail Here'></PageSection>
+            <BuildDetail />
           </UIGridItem>
           <UIGridItem size={12}>
-            <PageSection headline='Log Tail here'></PageSection>
+            <Log />
           </UIGridItem>
         </UIGrid>
       </div>
