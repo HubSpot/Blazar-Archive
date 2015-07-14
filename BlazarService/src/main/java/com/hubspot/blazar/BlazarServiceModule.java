@@ -2,6 +2,7 @@ package com.hubspot.blazar;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
+import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 
 public class BlazarServiceModule extends AbstractModule {
 
