@@ -1,3 +1,4 @@
+// primary navigation
 .navbar
   margin-bottom 0
   border-radius 0
@@ -9,9 +10,17 @@
   left 0
 
 .navbar-dark
-  // background-color #444444
   background-color #000024
 
   .navbar-brand
     color: #fff
     font-weight bold
+
+// breadcrumbs
+.crumb
+  position relative
+
+  &:after
+    display inline-block
+    content '/'
+    padding: 0 2px

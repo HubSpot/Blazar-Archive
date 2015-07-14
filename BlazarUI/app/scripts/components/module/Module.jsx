@@ -12,23 +12,12 @@ class Module extends React.Component{
    super(props);
   }
 
-  getBreadcrumbs(){
-    let params = this.props.params;
-    return [
-      { title: `${params.url}`, link: `${config.appRoot}/${params.url}` },
-      { title: `${params.org}`, link: `${config.appRoot}/${params.url}/${params.org}` },
-      { title: `${params.repo}`, link: `${config.appRoot}/${params.url}/${params.org}/${params.repo}` },
-      { title: `${params.branch}`, link: `${config.appRoot}/${params.url}/${params.org}/${params.repo}/${params.branch}` },
-      { title: `${params.module}` }
-    ]
-  }
-
   render() {
     return (
       <div>
         <PageHeader>
-          <h2 className='header-primary'> {this.props.params.module} <span className='header-subheader'> / Build History  </span> </h2>
-          <Breadcrumb links={this.getBreadcrumbs()} />
+          <h2 className='header-primary'> {this.props.params.module} <span className='header-subheader'> Build History  </span> </h2>
+          <Breadcrumb />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
