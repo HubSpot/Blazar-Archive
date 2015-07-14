@@ -1,10 +1,12 @@
 import React from 'react';
 import config from '../../config.js';
-import PageHeader from '../shared/PageHeader.jsx'
-import PageSection from '../shared/PageSection.jsx'
-import Breadcrumb from '../shared/Breadcrumb.jsx'
-import UIGrid from '../shared/grid/UIGrid.jsx'
-import UIGridItem from '../shared/grid/UIGridItem.jsx'
+import PageHeader from '../shared/PageHeader.jsx';
+import PageSection from '../shared/PageSection.jsx';
+import Breadcrumb from '../shared/Breadcrumb.jsx';
+import UIGrid from '../shared/grid/UIGrid.jsx';
+import UIGridItem from '../shared/grid/UIGridItem.jsx';
+import LastBuild from '../shared/BuildDetail.jsx';
+import BuildHistoryTable from './BuildHistoryTable.jsx';
 
 class Module extends React.Component{
 
@@ -21,7 +23,8 @@ class Module extends React.Component{
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            <PageSection headline='Build History...'></PageSection>
+            <LastBuild />
+            <BuildHistoryTable />
           </UIGridItem>
         </UIGrid>
       </div>
