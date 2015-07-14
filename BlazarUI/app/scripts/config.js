@@ -1,6 +1,6 @@
 let config = {
 
-  appRoot: '#project'
+  appRoot: '/project'
 
 }
 
