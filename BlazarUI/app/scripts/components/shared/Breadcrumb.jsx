@@ -1,4 +1,7 @@
 import React from 'react';
+import config from '../../config';
+var Link = require('react-router').Link;
+
 
 class Breadcrumb extends React.Component{
 
@@ -7,28 +10,27 @@ class Breadcrumb extends React.Component{
   }
 
   render() {
+    let path = window.location.pathname.split('/');
+    let pages = path.slice(2, path.length);
+    let links = [];
+    links.push(<Link key='dashboard' className='crumb crumb-dashboard' to='dashboard'>Dashboard</Link>)
 
-    let crumbsep = "/";
-    let path = "<a href='#'>Dashboard</a> » ";
-
-    if(! this.props.links){
-      return <div></div>
-    }
-
-    this.props.links.forEach( (link, index) => {
-
-      if(index === this.props.links.length - 1){
-        path += `<span>${link.title}</span>`
+    pages.forEach(function(page, i){
+      let link, pageLink;
+      if(i !== pages.length - 1){
+        pageLink = pages.slice(0, i+1).join('/');
+        link = <Link key={page} className='crumb' to={`/project/${pageLink}`}>{page}</Link>
       }
       else{
-       path += `<a href='${link.link}'>${link.title}</a>${crumbsep}`
+        link = page
       }
-
+      links.push(link)
     })
 
     return (
-      <div className='breadcrumbs' dangerouslySetInnerHTML={{__html: path}}></div>
+      <div className='breadcrumbs'> {links} </div>
     );
+
   }
 }
 

@@ -2,15 +2,16 @@ import React from 'react';
 import _ from 'jQuery';
 import ComponentHelpers from '../../ComponentHelpers';
 import config from '../../../config';
+var Link = require('react-router').Link;
 
 class Module extends React.Component {
   render(){
     let name = this.props.name;
     let moduleLink = `${config.appRoot}/${this.props.link}`;
-
-    return <a href={moduleLink} className='sidebar__repo-module'>{name}</a>
+    return <Link to={moduleLink} className='sidebar__repo-module'>{name}</Link>
   }
 }
+
 
 class ProjectSidebarListItem extends React.Component {
 
@@ -42,6 +43,7 @@ class ProjectSidebarListItem extends React.Component {
         <Module key={i} name={repo[i].module} link={moduleLink} />
       )
     })
+
 
     return (
       <div className='sidebar__repo-container'>
