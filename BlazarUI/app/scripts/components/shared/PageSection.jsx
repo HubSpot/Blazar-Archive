@@ -8,9 +8,12 @@ class PageSection extends React.Component{
   }
 
   render() {
+    if(this.props.headline){
+      var sectionHeader = <SectionHeader>{this.props.headline}</SectionHeader>
+    }
     return (
       <div className='page-section'>
-        <SectionHeader>{this.props.headline}</SectionHeader>
+        {sectionHeader}
         {this.props.children}
       </div>
     );
