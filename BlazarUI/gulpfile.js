@@ -84,11 +84,14 @@ gulp.task('styles',function(cb) {
 
 });
 
-// add livereload on the given port
+// start server with livereload
 gulp.task('serve', function() {
   $.connect.server({
     root: dist,
     port: port,
+    livereload: {
+      port: 35729
+    },
     fallback: dist + 'index.html'
   });
 });
