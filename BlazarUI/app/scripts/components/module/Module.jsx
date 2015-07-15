@@ -5,10 +5,14 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import LastBuild from '../shared/BuildDetail.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
+import MockBuilds from './MockBuilds';
 
 class Module extends React.Component {
 
   render() {
+
+    let latestBuild = MockBuilds[0];
+
     return (
       <div>
         <PageHeader>
@@ -17,7 +21,9 @@ class Module extends React.Component {
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            <LastBuild />
+            <LastBuild
+              build={latestBuild}
+            />
             <BuildHistoryTable />
           </UIGridItem>
         </UIGrid>
