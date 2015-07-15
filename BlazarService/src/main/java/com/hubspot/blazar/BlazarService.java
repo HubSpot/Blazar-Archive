@@ -13,6 +13,7 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
   @Override
   public void initialize(final Bootstrap<T> bootstrap) {
     bootstrap.addBundle(buildGuiceBundle());
+    bootstrap.addBundle(new CorsBundle());
     bootstrap.getObjectMapper().registerModule(new ProtobufModule());
     bootstrap.getObjectMapper().setSerializationInclusion(Include.NON_NULL);
     bootstrap.getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
