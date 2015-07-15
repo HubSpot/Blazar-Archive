@@ -10,6 +10,6 @@ public class BlazarServiceModule extends AbstractModule {
   protected void configure() {
     bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 
-    bind(TestResource.class);
+    bind(BuildResource.class);
   }
 }

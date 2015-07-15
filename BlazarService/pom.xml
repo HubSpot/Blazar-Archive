@@ -12,6 +12,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.hubspot</groupId>
+      <artifactId>BlazarBase</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.hubspot.jackson</groupId>
       <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
     </dependency>
