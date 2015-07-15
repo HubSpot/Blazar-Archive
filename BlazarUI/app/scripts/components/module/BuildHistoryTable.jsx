@@ -22,7 +22,7 @@ class BuildHistoryTable extends React.Component {
   render() {
     // mock data
     let columnNames = [
-      {label: '', key: 'buildNumber'},
+      {label: 'Build', key: 'buildNumber'},
       {label: 'Start Time', key: 'startTime'},
       {label: 'Duration', key: 'duration'},
       {label: 'Commit', key: 'commit'}
