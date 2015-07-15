@@ -82,6 +82,10 @@
       <artifactId>dropwizard-lifecycle</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlets</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.codahale.metrics</groupId>
       <artifactId>metrics-healthchecks</artifactId>
     </dependency>
