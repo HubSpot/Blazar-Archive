@@ -2,6 +2,7 @@ package com.hubspot.blazar;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
+import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,6 +23,7 @@ public class BuildResource {
   public BuildResource() {}
 
   @GET
+  @PropertyFiltering
   public Set<ModuleBuildWithState> test() {
     Set<ModuleBuildWithState> builds = new HashSet<>();
 
