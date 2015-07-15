@@ -1,18 +1,11 @@
 import React from 'react';
-import config from '../../config.js';
-import PageHeader from '../shared/PageHeader.jsx'
-import PageSection from '../shared/PageSection.jsx'
-import Breadcrumb from '../shared/Breadcrumb.jsx'
-import UIGrid from '../shared/grid/UIGrid.jsx'
-import UIGridItem from '../shared/grid/UIGridItem.jsx'
-
+import PageHeader from '../shared/PageHeader.jsx';
+import PageSection from '../shared/PageSection.jsx';
+import Breadcrumb from '../shared/Breadcrumb.jsx';
+import UIGrid from '../shared/grid/UIGrid.jsx';
+import UIGridItem from '../shared/grid/UIGridItem.jsx';
 
 class Branch extends React.Component{
-
-  constructor(props, context) {
-   super(props);
-  }
-
 
   render() {
     return (
@@ -32,12 +25,10 @@ class Branch extends React.Component{
 
 }
 
-
-export default Branch;
-
-Branch.defaultProps = { loading: true }
+Branch.defaultProps = { loading: true };
 
 Branch.propTypes = {
-  params : React.PropTypes.object.isRequired
-}
+  params: React.PropTypes.object.isRequired
+};
 
+export default Branch;

@@ -1,10 +1,6 @@
 import React from 'react';
 
-class LastBuild extends React.Component{
-
-  constructor(props, context) {
-   super(props);
-  }
+class LastBuild extends React.Component {
 
   render() {
     return (
@@ -18,6 +14,5 @@ class LastBuild extends React.Component{
   }
 
 }
-
 
 export default LastBuild;

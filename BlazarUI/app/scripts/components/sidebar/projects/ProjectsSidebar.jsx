@@ -1,14 +1,13 @@
 import React from 'react';
-import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx'
-import SidebarFilter from '../SidebarFilter.jsx'
-
+import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx';
+import SidebarFilter from '../SidebarFilter.jsx';
 import ComponentHelpers from '../../ComponentHelpers';
 
 class ProjectsSidebar extends React.Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
-    ComponentHelpers.bindAll(this, ['updateResults'])
+    ComponentHelpers.bindAll(this, ['updateResults']);
   }
 
   updateResults(input) {
@@ -19,9 +18,7 @@ class ProjectsSidebar extends React.Component {
   render() {
     // To do: replcae loading text with animation
     let loading = this.props.loading ? <div>Loading Projects...</div> : '';
-    let repoList = this.props.projects.repos
     let buildingRepos = this.props.projects.buildingRepos;
-
     let sidebarRepoList = buildingRepos.map( (repo, i) =>
       <ProjectsSidebarListItem key={i} repo={repo} />
     );
@@ -44,8 +41,8 @@ class ProjectsSidebar extends React.Component {
 }
 
 ProjectsSidebar.propTypes = {
-  loading : React.PropTypes.bool,
-  projects : React.PropTypes.object
-}
+  loading: React.PropTypes.bool,
+  projects: React.PropTypes.object
+};
 
 export default ProjectsSidebar;

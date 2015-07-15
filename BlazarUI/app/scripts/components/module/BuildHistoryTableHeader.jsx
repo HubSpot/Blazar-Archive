@@ -1,16 +1,12 @@
 import React from 'react';
 import {map} from 'underscore';
 
-class BuildHistoryTableHeader extends React.Component{
+class BuildHistoryTableHeader extends React.Component {
 
-  constructor(props, context) {
-   super(props);
-  }
-
-  getColumns(){
+  getColumns() {
     return map(this.props.columnNames, (column) =>
       <th key={column.key}>{column.label}</th>
-    )
+    );
   }
 
   render() {
@@ -26,5 +22,8 @@ class BuildHistoryTableHeader extends React.Component{
 
 }
 
+BuildHistoryTableHeader.propTypes = {
+  columnNames: React.PropTypes.array.isRequired
+};
 
 export default BuildHistoryTableHeader;

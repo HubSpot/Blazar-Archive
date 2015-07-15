@@ -1,15 +1,9 @@
 import React from 'react';
-import {map} from 'underscore';
 
-class BuildHistoryTableRow extends React.Component{
-
-  constructor(props, context) {
-   super(props);
-  }
+class BuildHistoryTableRow extends React.Component {
 
   render() {
     let build = this.props.build;
-
     return (
       <tr>
         <td>{build.name}</td>
@@ -18,7 +12,10 @@ class BuildHistoryTableRow extends React.Component{
       </tr>
     );
   }
-
 }
+
+BuildHistoryTableRow.propTypes = {
+  build: React.PropTypes.object.isRequired
+};
 
 export default BuildHistoryTableRow;

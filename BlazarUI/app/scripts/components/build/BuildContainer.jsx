@@ -1,12 +1,8 @@
 import React from 'react';
 import Build from './Build.jsx';
-import PageContainer from '../layout/PageContainer.jsx'
+import PageContainer from '../layout/PageContainer.jsx';
 
 class BuildContainer extends React.Component {
-
-  constructor(props){
-    super(props);
-  }
 
   render() {
     return (
@@ -18,5 +14,9 @@ class BuildContainer extends React.Component {
     );
   }
 }
+
+BuildContainer.propTypes = {
+  params: React.PropTypes.object.isRequired
+};
 
 export default BuildContainer;

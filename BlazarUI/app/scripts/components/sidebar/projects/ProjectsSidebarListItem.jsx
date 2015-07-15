@@ -2,32 +2,43 @@ import React from 'react';
 import _ from 'jQuery';
 import ComponentHelpers from '../../ComponentHelpers';
 import config from '../../../config';
-var Link = require('react-router').Link;
+let Link = require('react-router').Link;
 
 class Module extends React.Component {
-  render(){
+  render() {
     let name = this.props.name;
     let moduleLink = `${config.appRoot}/${this.props.link}`;
-    return <Link to={moduleLink} className='sidebar__repo-module'>{name}</Link>
+    return <Link to={moduleLink} className='sidebar__repo-module'>{name}</Link>;
   }
 }
+
+Module.propTypes = {
+  name: React.PropTypes.string,
+  link: React.PropTypes.string
+};
 
 
 class ProjectSidebarListItem extends React.Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
-    this.state = { expanded: false}
-    ComponentHelpers.bindAll(this, ['handleModuleExpand'])
+
+    this.state = {
+      expanded: false
+    };
+
+    ComponentHelpers.bindAll(this, ['handleModuleExpand']);
   }
 
   handleModuleExpand() {
-    this.setState( { expanded: !this.state.expanded } )
+    this.setState( { expanded: !this.state.expanded } );
   }
 
   getModulesClassNames() {
     let classNames = 'sidebar__modules';
-    if (this.state.expanded) { classNames += ' expanded'}
+    if (this.state.expanded) {
+      classNames += ' expanded';
+    }
     return classNames;
   }
 
@@ -38,11 +49,11 @@ class ProjectSidebarListItem extends React.Component {
     let repoLink = `${moduleDetail.host}/${moduleDetail.organization}/${moduleDetail.repository}`;
 
     _.each(repo, (i) => {
-      let moduleLink = `${repo[i].host}/${repo[i].organization}/${repo[i].repository}/${repo[i].branch}/${repo[i].module}/${repo[i].buildNumber}`
+      let moduleLink = `${repo[i].host}/${repo[i].organization}/${repo[i].repository}/${repo[i].branch}/${repo[i].module}/${repo[i].buildNumber}`;
       modules.push(
         <Module key={i} name={repo[i].module} link={moduleLink} />
-      )
-    })
+      );
+    });
 
 
     return (
@@ -59,7 +70,8 @@ class ProjectSidebarListItem extends React.Component {
 }
 
 ProjectSidebarListItem.propTypes = {
+  repo: React.PropTypes.array,
   project: React.PropTypes.object
-}
+};
 
 export default ProjectSidebarListItem;

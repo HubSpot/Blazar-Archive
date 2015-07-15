@@ -1,6 +1,5 @@
 import React from 'react';
-import _ from 'underscore'
-import UIGridConstants from './UIGridConstants.jsx'
+import UIGridConstants from './UIGridConstants.jsx';
 
 const OFFSET_CLASSES = {
   0: '',
@@ -16,7 +15,7 @@ const OFFSET_CLASSES = {
   10: 'col-sm-offset-10',
   11: 'col-sm-offset-11',
   12: 'col-sm-offset-12'
-}
+};
 
 const SIZE_CLASSES = {
   1: 'col-sm-1',
@@ -31,16 +30,12 @@ const SIZE_CLASSES = {
   10: 'col-sm-10',
   11: 'col-sm-11',
   12: 'col-sm-12'
-}
+};
 
 class UIGridItem extends React.Component {
 
-  constructor(props){
-    super(props);
-  }
-
-  getClassName(){
-    return `${SIZE_CLASSES[this.props.size]} ${OFFSET_CLASSES[this.props.offset]} ${this.props.className}`
+  getClassName() {
+    return `${SIZE_CLASSES[this.props.size]} ${OFFSET_CLASSES[this.props.offset]} ${this.props.className}`;
   }
 
   render() {
@@ -52,10 +47,15 @@ class UIGridItem extends React.Component {
   }
 }
 
-UIGridItem.defaultProps = { className: '' };
-UIGridItem.propTypes = { 
+UIGridItem.defaultProps = {
+  className: ''
+};
+
+UIGridItem.propTypes = {
   offset: React.PropTypes.oneOf(UIGridConstants.OFFSET_RANGE),
-  size: React.PropTypes.oneOf(UIGridConstants.SIZE_RANGE).isRequired 
+  size: React.PropTypes.oneOf(UIGridConstants.SIZE_RANGE).isRequired,
+  className: React.PropTypes.string,
+  children: React.PropTypes.node
 };
 
 export default UIGridItem;

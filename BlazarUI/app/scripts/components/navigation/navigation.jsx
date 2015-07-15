@@ -1,11 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router';
 
-class Navigation extends React.Component{
-
-  constructor(props, context) {
-   super(props);
-  }
+class Navigation extends React.Component {
 
   render() {
     return (
@@ -23,9 +19,8 @@ class Navigation extends React.Component{
 
 }
 
-
 Navigation.contextTypes = {
   router: React.PropTypes.func.isRequired
-}
+};
 
 export default Navigation;

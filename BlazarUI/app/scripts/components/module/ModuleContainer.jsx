@@ -1,12 +1,8 @@
 import React from 'react';
 import Module from './Module.jsx';
-import PageContainer from '../layout/PageContainer.jsx'
+import PageContainer from '../layout/PageContainer.jsx';
 
 class ModuleContainer extends React.Component {
-
-  constructor(props){
-    super(props);
-  }
 
   render() {
     return (
@@ -18,5 +14,9 @@ class ModuleContainer extends React.Component {
     );
   }
 }
+
+ModuleContainer.propTypes = {
+  params: React.PropTypes.object.isRequired
+};
 
 export default ModuleContainer;

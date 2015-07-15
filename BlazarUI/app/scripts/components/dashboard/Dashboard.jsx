@@ -1,10 +1,6 @@
 import React from 'react';
 
-class Dashboard extends React.Component{
-
-  constructor(props, context) {
-   super(props);
-  }
+class Dashboard extends React.Component {
 
   render() {
     return (

@@ -2,7 +2,7 @@ import React from 'react';
 
 class PageContainer extends React.Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
   }
 
@@ -22,7 +22,8 @@ class PageContainer extends React.Component {
 
 PageContainer.propTypes = {
   headline: React.PropTypes.string,
-  classNames: React.PropTypes.string
-}
+  classNames: React.PropTypes.string,
+  children: React.PropTypes.node
+};
 
 export default PageContainer;

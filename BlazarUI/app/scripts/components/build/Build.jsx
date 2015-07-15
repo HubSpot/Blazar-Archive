@@ -1,17 +1,12 @@
 import React from 'react';
-import config from '../../config.js';
 import PageHeader from '../shared/PageHeader.jsx';
-import PageSection from '../shared/PageSection.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildDetail from '../shared/BuildDetail.jsx';
-import Log from './log.jsx'
-class Build extends React.Component{
+import Log from './log.jsx';
 
-  constructor(props, context) {
-   super(props);
-  }
+class Build extends React.Component{
 
   render() {
     return (
@@ -34,11 +29,10 @@ class Build extends React.Component{
 
 }
 
-
-export default Build;
-
-Build.defaultProps = { loading: true }
+Build.defaultProps = { loading: true };
 
 Build.propTypes = {
-  params : React.PropTypes.object.isRequired
-}
+  params: React.PropTypes.object.isRequired
+};
+
+export default Build;
