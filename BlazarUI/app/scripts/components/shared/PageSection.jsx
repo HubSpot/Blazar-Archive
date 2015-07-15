@@ -1,15 +1,12 @@
 import React from 'react';
-import SectionHeader from './SectionHeader.jsx'
+import SectionHeader from './SectionHeader.jsx';
 
 class PageSection extends React.Component{
 
-  constructor(props, context) {
-   super(props);
-  }
-
   render() {
-    if(this.props.headline){
-      var sectionHeader = <SectionHeader>{this.props.headline}</SectionHeader>
+    let sectionHeader;
+    if (this.props.headline) {
+      sectionHeader = <SectionHeader>{this.props.headline}</SectionHeader>;
     }
     return (
       <div className='page-section'>
@@ -20,5 +17,9 @@ class PageSection extends React.Component{
   }
 }
 
+PageSection.propTypes = {
+  headline: React.PropTypes.string,
+  children: React.PropTypes.node
+};
 
 export default PageSection;

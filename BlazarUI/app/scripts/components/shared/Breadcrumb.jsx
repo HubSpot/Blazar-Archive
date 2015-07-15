@@ -1,31 +1,27 @@
 import React from 'react';
-import config from '../../config';
-var Link = require('react-router').Link;
+let Link = require('react-router').Link;
 
 
-class Breadcrumb extends React.Component{
-
-  constructor(props, context) {
-   super(props);
-  }
+class Breadcrumb extends React.Component {
 
   render() {
     let path = window.location.pathname.split('/');
     let pages = path.slice(2, path.length);
     let links = [];
-    links.push(<Link key='dashboard' className='crumb crumb-dashboard' to='dashboard'>Dashboard</Link>)
+    links.push(
+      <Link key='dashboard' className='crumb crumb-dashboard' to='dashboard'>Dashboard</Link>
+    );
 
-    pages.forEach(function(page, i){
+    pages.forEach(function(page, i) {
       let link, pageLink;
-      if(i !== pages.length - 1){
-        pageLink = pages.slice(0, i+1).join('/');
-        link = <Link key={page} className='crumb' to={`/project/${pageLink}`}>{page}</Link>
+      if (i !== pages.length - 1) {
+        pageLink = pages.slice(0, i + 1).join('/');
+        link = <Link key={page} className='crumb' to={`/project/${pageLink}`}>{page}</Link>;
+      } else {
+        link = page;
       }
-      else{
-        link = page
-      }
-      links.push(link)
-    })
+      links.push(link);
+    });
 
     return (
       <div className='breadcrumbs'> {links} </div>

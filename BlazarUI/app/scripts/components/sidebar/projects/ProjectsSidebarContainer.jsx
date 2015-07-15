@@ -2,11 +2,11 @@ import React from 'react';
 import ProjectsSidebar from './ProjectsSidebar.jsx';
 import ProjectsStore from '../../../stores/projectsStore';
 import ProjectsActions from '../../../actions/projectsActions';
-import Sidebar from '../Sidebar.jsx'
+import Sidebar from '../Sidebar.jsx';
 
 class ProjectsSidebarContainer extends React.Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -16,8 +16,8 @@ class ProjectsSidebarContainer extends React.Component {
         modules: []
       },
       loading: false
-    }
-  };
+    };
+  }
 
   componentDidMount() {
     this.unsubscribe = ProjectsStore.listen(this.onStatusChange.bind(this));

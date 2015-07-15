@@ -1,10 +1,10 @@
 import React from 'react';
 import Branch from './Branch.jsx';
-import PageContainer from '../layout/PageContainer.jsx'
+import PageContainer from '../layout/PageContainer.jsx';
 
 class BranchContainer extends React.Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
   }
 
@@ -18,5 +18,10 @@ class BranchContainer extends React.Component {
     );
   }
 }
+
+
+BranchContainer.propTypes = {
+  params: React.PropTypes.object.isRequired
+};
 
 export default BranchContainer;

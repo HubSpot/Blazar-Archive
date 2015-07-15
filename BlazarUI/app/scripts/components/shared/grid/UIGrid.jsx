@@ -2,15 +2,11 @@ import React from 'react';
 
 class UIGrid extends React.Component {
 
-  constructor(props){
-    super(props);
-  }
-
-  getClassName(){
+  getClassName() {
     return `row ${this.props.className}`;
   }
 
-  getContainerClassName(){
+  getContainerClassName() {
     return `container-fluid ui-grid ${this.props.containerClassName}`;
   }
 
@@ -25,6 +21,15 @@ class UIGrid extends React.Component {
   }
 }
 
-UIGrid.defaultProps = {className: '', containerClassName: ''};
+UIGrid.defaultProps = {
+  className: '',
+  containerClassName: ''
+};
+
+UIGrid.propTypes = {
+  className: React.PropTypes.string,
+  containerClassName: React.PropTypes.string,
+  children: React.PropTypes.node
+};
 
 export default UIGrid;

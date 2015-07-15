@@ -2,26 +2,22 @@ import React from 'react';
 import BuildHistoryTableHeader from './BuildHistoryTableHeader.jsx';
 import BuildHistoryTableRow from './BuildHistoryTableRow.jsx';
 
-class BuildHistoryTable extends React.Component{
+class BuildHistoryTable extends React.Component {
 
-  constructor(props, context) {
-   super(props);
-  }
-
-  getRows(){
+  getRows() {
     // mock data
     let builds = [
       {name: 'Baragon', startTime: '2 days ago', duration: '4 minutes'},
       {name: 'Contacts', startTime: '1 hr ago', duration: '2 minutes'},
-      {name: 'Email', startTime: '1 day 2 hrs ago', duration: '6 minutes'},
-    ]
+      {name: 'Email', startTime: '1 day 2 hrs ago', duration: '6 minutes'}
+    ];
 
     return builds.map((build, i) =>
       <BuildHistoryTableRow
         build={builds[i]}
         key={i}
      />
-    )
+   );
 
   }
 
@@ -31,9 +27,10 @@ class BuildHistoryTable extends React.Component{
       {label: 'Name', key: 'name'},
       {label: 'Start Time', key: 'startTime'},
       {label: 'Duration', key: 'duration'}
-    ]
+    ];
+
     return (
-      <table className="table table-hover table-bordered roomy">
+      <table className="table table-hover table-striped roomy">
         <BuildHistoryTableHeader
           columnNames={columnNames}
         />
@@ -46,6 +43,5 @@ class BuildHistoryTable extends React.Component{
   }
 
 }
-
 
 export default BuildHistoryTable;

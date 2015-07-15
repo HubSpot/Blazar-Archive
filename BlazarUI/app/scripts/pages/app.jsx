@@ -1,9 +1,9 @@
 import React from 'react';
-import { RouteHandler } from 'react-router';
-import Navigation from '../components/navigation/navigation.jsx'
-import ProjectsSidebarContainer from '../components/sidebar/projects/ProjectsSidebarContainer.jsx'
+import {RouteHandler} from 'react-router';
+import Navigation from '../components/navigation/navigation.jsx';
+import ProjectsSidebarContainer from '../components/sidebar/projects/ProjectsSidebarContainer.jsx';
 
-class App extends React.Component {
+class App extends React.Component{
 
   render() {
     return (
