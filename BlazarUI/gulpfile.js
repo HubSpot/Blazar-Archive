@@ -49,6 +49,11 @@ gulp.task('lint', function () {
     .pipe($.eslint.failOnError());
 });
 
+// fonts
+gulp.task('fonts', function() {
+    return gulp.src([ './node_modules/font-awesome/fonts/fontawesome-webfont.*'])
+      .pipe(gulp.dest(dist + 'font-awesome/fonts/'));
+});
 // copy html from app to dist
 gulp.task('html', function() {
   return gulp.src(app + 'index.html')
@@ -60,6 +65,7 @@ gulp.task('html', function() {
 gulp.task('vendorStyles', function () {
   var files = [
     './node_modules/bootstrap/dist/css/bootstrap.css',
+    './node_modules/font-awesome/css/font-awesome.css',
     './node_modules/react-select/dist/default.css'
   ];
   return gulp.src(files)
@@ -120,5 +126,5 @@ gulp.task('default', ['build', 'serve', 'watch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
-  gulp.start(['images', 'html', 'copy', 'lint', 'scripts','vendorStyles','styles']);
+  gulp.start(['images', 'html', 'fonts', 'copy', 'lint', 'scripts','vendorStyles','styles']);
 });
