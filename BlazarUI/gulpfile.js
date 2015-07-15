@@ -3,7 +3,6 @@ var path = require('path');
 var $ = require('gulp-load-plugins')();
 var del = require('del');
 var concatCss = require('gulp-concat-css');
-var eslint = require('gulp-eslint');
 var gulpCopy = require('gulp-copy');
 
 // set variable via $ gulp --type production
@@ -44,10 +43,10 @@ return gulp.src('./app/mock.json')
 });
 
 gulp.task('lint', function () {
-  return gulp.src(['scripts/**/*.jsx'])
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failOnError());
+  return gulp.src(['./app/scripts/**/*.jsx'])
+    .pipe($.eslint())
+    .pipe($.eslint.format())
+    .pipe($.eslint.failOnError());
 });
 
 // copy html from app to dist
@@ -107,8 +106,8 @@ gulp.task('images', function(cb) {
 gulp.task('watch', function() {
   gulp.watch(app + 'stylus/**/*.styl', ['styles']);
   gulp.watch(app + 'index.html', ['html']);
-  gulp.watch(app + 'scripts/**/*.js', ['scripts']);
-  gulp.watch(app + 'scripts/**/*.jsx', ['scripts']);
+  gulp.watch(app + 'scripts/**/*.js', ['scripts', 'lint']);
+  gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
 });
 
 // remove bundels
