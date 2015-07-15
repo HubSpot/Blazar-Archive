@@ -27,7 +27,7 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
 
   public static void main(String... args) throws Exception {
     try {
-      new BlazarService<BlazarConfiguration>().run(args);
+      new BlazarService<>().run(args);
     } catch (Throwable t) {
       t.printStackTrace();
       System.exit(1);
