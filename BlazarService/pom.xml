@@ -10,6 +10,10 @@
 
   <artifactId>BlazarService</artifactId>
 
+  <properties>
+    <basepom.shaded.main-class>com.hubspot.blazar.BlazarService</basepom.shaded.main-class>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.hubspot</groupId>
