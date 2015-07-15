@@ -4,7 +4,7 @@ import { bindAll } from 'underscore';
 
 class Copyable extends React.Component {
 
-  constructor(props) {
+  constructor() {
     bindAll(this, 'handleClick', 'handleHover');
   }
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import Helpers from '../ComponentHelpers';
 import config from '../../config';
-import Label from '../shared/Label.jsx';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
@@ -21,6 +20,21 @@ class BuildHistoryTableRow extends React.Component {
     console.log('copy');
   }
 
+  getBuildResult() {
+    let result = this.props.build.result;
+    let type;
+    if (result === 'SUCCEEDED') {
+      type = 'check';
+    } else if (result === 'FAILED') {
+      type = 'close';
+    } else {
+      return '';
+    }
+
+    let classNames = 'fa-roomy ' + labels[this.props.build.result];
+    return <Icon name={type} classNames={classNames}/>;
+  }
+
   render() {
     let build = this.props.build;
     let commitLink = `https://${build.host}/${build.organization}/${build.repository}/commit/${build.commit}/`;
@@ -28,7 +42,7 @@ class BuildHistoryTableRow extends React.Component {
     return (
       <tr>
         <td>
-          <Label type={labels[build.result]}> </Label>
+          {this.getBuildResult()}
           <Link to={buildLink}>#{build.buildNumber}</Link>
 
         </td>
