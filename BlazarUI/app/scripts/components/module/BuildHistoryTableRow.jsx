@@ -44,13 +44,17 @@ class BuildHistoryTableRow extends React.Component {
         <td>
           {this.getBuildResult()}
           <Link to={buildLink}>#{build.buildNumber}</Link>
-
         </td>
-        <td>{Helpers.timestampFormatted(build.startTime)}</td>
-        <td>{Helpers.timestampDuration(build.endTime - build.startTime)}</td>
+        <td>
+          <Icon classNames='fa-roomy' name='clock-o' />
+          {Helpers.timestampFormatted(build.startTime)}
+        </td>
+        <td>
+          {Helpers.timestampDuration(build.endTime - build.startTime)}
+        </td>
         <td>
           <Copyable text={commitLink} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
-            <Icon classNames='fa-roomy' name='clipboard' />
+            <Icon classNames='fa-roomy fa-link' name='clipboard' />
           </Copyable>
           <a href={commitLink} target="_blank">{Helpers.truncate(build.commit, 8)}</a>
         </td>
