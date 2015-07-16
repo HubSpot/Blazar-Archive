@@ -1,8 +1,7 @@
 import React from 'react';
-import _ from 'jQuery';
-import ComponentHelpers from '../../ComponentHelpers';
 import config from '../../../config';
 let Link = require('react-router').Link;
+import { bindAll } from 'underscore';
 
 class Module extends React.Component {
   render() {
@@ -27,7 +26,7 @@ class ProjectSidebarListItem extends React.Component {
       expanded: false
     };
 
-    ComponentHelpers.bindAll(this, ['handleModuleExpand']);
+    bindAll(this, ['handleModuleExpand']);
   }
 
   handleModuleExpand() {
@@ -43,27 +42,40 @@ class ProjectSidebarListItem extends React.Component {
   }
 
   render() {
+
     let modules = [];
-    let repo = this.props.repo;
-    let moduleDetail = repo[0];
-    let repoLink = `${moduleDetail.host}/${moduleDetail.organization}/${moduleDetail.repository}`;
+    let repoDetail = this.props.repo;
+    let moduleGitInfo = repoDetail[0].gitInfo;
+    let repoLink = `${moduleGitInfo.host}/${moduleGitInfo.organization}/${moduleGitInfo.repository}`;
 
-    _.each(repo, (i) => {
-      let moduleLink = `${repo[i].host}/${repo[i].organization}/${repo[i].repository}/${repo[i].branch}/${repo[i].module}/${repo[i].buildNumber}`;
+    repoDetail.forEach( (repo) => {
+
+      let {
+        gitInfo,
+        module,
+        buildState
+      } = repo;
+
+      let moduleLink = `${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
+
       modules.push(
-        <Module key={i} name={repo[i].module} link={moduleLink} />
+        <Module key={buildState.buildNumber} name={module.name} link={moduleLink} />
       );
-    });
 
+    });
 
     return (
       <div className='sidebar__repo-container'>
-        <div className='sidebar__repo-url'>{repoLink}</div>
+        <div className='sidebar__repo-url'>
+          {repoLink}
+        </div>
         <div className='sidebar__repo' onClick={this.handleModuleExpand}>
           <div className="la-ball-scale la-sm sidebar__active-building-icon"><div></div></div>
-          {repo.repository}
+          {repoDetail.repository}
         </div>
-        <div className={this.getModulesClassNames()}>{modules}</div>
+        <div className={this.getModulesClassNames()}>
+          {modules}
+        </div>
       </div>
     );
   }
