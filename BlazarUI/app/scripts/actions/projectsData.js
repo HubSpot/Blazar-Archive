@@ -22,7 +22,7 @@ var projectsData = {
       for (var value of repo) {
         if(value.buildState.result === 'IN_PROGRESS'){
           repo.moduleIsBuilding = true;
-          repo.repository = value.repository;
+          repo.repository = value.gitInfo.repository;
           buildingRepos.push(repo);
           break;
         }
