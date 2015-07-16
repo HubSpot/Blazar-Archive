@@ -8,7 +8,7 @@ class BuildHistoryTable extends React.Component {
 
   getRows() {
     // mock data
-    let builds = MockBuilds;
+    let builds = MockBuilds.splice(1, MockBuilds.length - 1);
 
     return builds.map((build, i) =>
       <BuildHistoryTableRow
