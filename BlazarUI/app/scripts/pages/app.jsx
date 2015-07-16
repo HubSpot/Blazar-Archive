@@ -1,7 +1,7 @@
 import React from 'react';
 import {RouteHandler} from 'react-router';
 import Navigation from '../components/navigation/navigation.jsx';
-import ProjectsSidebarContainer from '../components/sidebar/projects/ProjectsSidebarContainer.jsx';
+import ProjectsSidebarContainer from '../components/sidebar/ProjectsSidebarContainer.jsx';
 
 class App extends React.Component{
 

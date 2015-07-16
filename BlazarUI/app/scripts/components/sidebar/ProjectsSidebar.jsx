@@ -1,7 +1,7 @@
 import React from 'react';
 import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx';
-import SidebarFilter from '../SidebarFilter.jsx';
-import ComponentHelpers from '../../ComponentHelpers';
+import SidebarFilter from './SidebarFilter.jsx';
+import ComponentHelpers from '../ComponentHelpers';
 
 class ProjectsSidebar extends React.Component {
 
