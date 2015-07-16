@@ -10,7 +10,7 @@ Makes use of:
 
 ## Installation
 
-Install dependencies. 
+Install dependencies.
 
 ```
 $ npm install
@@ -19,7 +19,7 @@ $ git clone
 
 ## Development
 
-Build the application and start livereload. By default the webserver starts at port 1337. You can define a port with `$ gulp --port 3333`.
+Build the application and start livereload. By default the webserver starts at port 5000. You can define a port with `$ gulp --port 3333`.
 
 ```
 $ gulp
