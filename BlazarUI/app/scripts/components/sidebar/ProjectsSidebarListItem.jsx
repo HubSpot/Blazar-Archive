@@ -1,7 +1,7 @@
 import React from 'react';
 import { bindAll } from 'underscore';
 import Module from './Module.jsx';
-import BuildingIcon from '../../shared/BuildingIcon.jsx';
+import BuildingIcon from '../shared/BuildingIcon.jsx';
 
 class ProjectSidebarListItem extends React.Component {
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import config from '../../../config';
+import config from '../../config';
 let Link = require('react-router').Link;
 
 class Module extends React.Component {
