@@ -1,0 +1,52 @@
+@import 'variables'
+
+// Ball-scale
+.la-ball-scale, .la-ball-scale > div
+  -webkit-box-sizing border-box
+  -moz-box-sizing border-box
+  box-sizing border-box
+
+.la-ball-scale
+  display block
+  font-size 0
+  width 20px
+  height 20px
+
+  &.la-dark
+    color #333
+
+  > div
+    display inline-block
+    float none
+    background-color currentColor
+    border 0 solid currentColor
+    width 20px
+    height 20px
+    border-radius 100%
+    opacity 0
+    animation: blink 1s ease-in 0s infinite
+
+  &.la-sm
+    width 16px
+    height 16px
+
+    > div
+      width 16px
+      height 16px
+
+// animation
+@keyframes blink
+  0%
+    opacity 1
+
+  25%
+    opacity: .75
+
+  50%
+    opacity .5
+
+  75%
+    opacity: .25
+
+  100%
+    opacity 0
