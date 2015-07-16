@@ -9,14 +9,14 @@ import Log from './log.jsx';
 class Build extends React.Component{
 
   render() {
-    let {module, buildNumber} = this.props.build;
+    let {module, buildState} = this.props.build;
     return (
       <div>
         <PageHeader>
           <h2 className='header-primary'>
-            {module}{' '}
+            {module.name}{' '}
             <span className='header-subheader'>
-              Build #{buildNumber}
+              Build #{buildState.buildNumber}
             </span>
           </h2>
           <Breadcrumb />
@@ -37,10 +37,12 @@ class Build extends React.Component{
 
 }
 
-Build.defaultProps = { loading: true };
-
 Build.propTypes = {
-  build: React.PropTypes.object.isRequired
+  build: React.PropTypes.shape({
+    buildState: React.PropTypes.object,
+    gitInfo: React.PropTypes.object,
+    module: React.PropTypes.object
+  })
 };
 
 export default Build;

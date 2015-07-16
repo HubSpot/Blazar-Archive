@@ -12,13 +12,10 @@ class BuildContainer extends React.Component {
 
     this.state = {
       build: {
-        buildNumber: null,
-        startTime: null,
-        endTime: null,
-        commit: null,
-        result: null
-      },
-      loading: false
+        buildState: {},
+        gitInfo: {},
+        module: { name: ''}
+      }
     };
   }
 
