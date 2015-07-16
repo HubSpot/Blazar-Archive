@@ -1,21 +1,7 @@
 import React from 'react';
-import config from '../../../config';
-let Link = require('react-router').Link;
 import { bindAll } from 'underscore';
-
-class Module extends React.Component {
-  render() {
-    let name = this.props.name;
-    let moduleLink = `${config.appRoot}/${this.props.link}`;
-    return <Link to={moduleLink} className='sidebar__repo-module'>{name}</Link>;
-  }
-}
-
-Module.propTypes = {
-  name: React.PropTypes.string,
-  link: React.PropTypes.string
-};
-
+import Module from './Module.jsx';
+import BuildingIcon from '../../shared/BuildingIcon.jsx';
 
 class ProjectSidebarListItem extends React.Component {
 
@@ -42,27 +28,23 @@ class ProjectSidebarListItem extends React.Component {
   }
 
   render() {
-
     let modules = [];
     let repoDetail = this.props.repo;
     let moduleGitInfo = repoDetail[0].gitInfo;
     let repoLink = `${moduleGitInfo.host}/${moduleGitInfo.organization}/${moduleGitInfo.repository}`;
 
     repoDetail.forEach( (repo) => {
-
-      let {
-        gitInfo,
-        module,
-        buildState
-      } = repo;
-
-      let moduleLink = `${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
-
       modules.push(
-        <Module key={buildState.buildNumber} name={module.name} link={moduleLink} />
+        <Module key={repo.buildState.buildNumber} repo={repo} />
       );
-
     });
+
+
+    function getRepoBuildState() {
+      if (repoDetail.moduleIsBuilding) {
+        return <BuildingIcon status='success' />;
+      }
+    }
 
     return (
       <div className='sidebar__repo-container'>
@@ -70,7 +52,7 @@ class ProjectSidebarListItem extends React.Component {
           {repoLink}
         </div>
         <div className='sidebar__repo' onClick={this.handleModuleExpand}>
-          <div className="la-ball-scale la-sm sidebar__active-building-icon"><div></div></div>
+          {getRepoBuildState()}
           {repoDetail.repository}
         </div>
         <div className={this.getModulesClassNames()}>
