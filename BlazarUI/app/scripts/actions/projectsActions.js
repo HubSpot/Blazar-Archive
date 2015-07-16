@@ -8,24 +8,34 @@ let ProjectsActions = Reflux.createActions([
   'loadProjectsError'
 ]);
 
-ProjectsActions.loadProjects.preEmit = function(data){
+ProjectsActions.loadProjects.preEmit = function(data) {
+
   let endpoint = "/api/builds";
 
-  let promise = $.ajax({
-    url: endpoint,
-    type: 'GET',
-    dataType: 'json'
-  });
+  (function doPoll(){
 
-  promise.success( (resp) => {
-    projectsData.manageResponse(resp, function(data){
-      ProjectsActions.loadProjectsSuccess(data);
+    let promise = $.ajax({
+      url: endpoint,
+      type: 'GET',
+      dataType: 'json'
+    });
+
+    promise.done( (resp) => {
+      projectsData.manageResponse(resp, function(data) {
+        ProjectsActions.loadProjectsSuccess(data);
+      });
+    });
+
+    promise.always( () => {
+      setTimeout(doPoll, 5000);
+    });
+
+    promise.error( () => {
+      ProjectsActions.loadProjectsError('an error occured');
     })
-  })
 
-  promise.error( ()=> {
-    ProjectsActions.loadProjectsError('an error occured');
-  })
+
+  })();
 
 };
 
