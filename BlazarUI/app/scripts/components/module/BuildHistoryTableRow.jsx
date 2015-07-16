@@ -4,11 +4,8 @@ import config from '../../config';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
-
-const labels = {
-  'SUCCEEDED': 'success',
-  'FAILED': 'danger'
-};
+import {labels} from '../constants';
+// MOVE TO CONSTANTS FOLDER
 
 class BuildHistoryTableRow extends React.Component {
 
@@ -18,6 +15,12 @@ class BuildHistoryTableRow extends React.Component {
 
   handleCopyCommit() {
     console.log('copy');
+  }
+
+  getRowClassNames() {
+    if (this.props.build.result === 'FAILED') {
+      return 'bgc-danger';
+    }
   }
 
   getBuildResult() {
@@ -39,24 +42,30 @@ class BuildHistoryTableRow extends React.Component {
     let build = this.props.build;
     let commitLink = `https://${build.host}/${build.organization}/${build.repository}/commit/${build.commit}/`;
     let buildLink = `${config.appRoot}/${build.host}/${build.organization}/${build.repository}/${build.branch}/${build.module}/${build.buildNumber}`;
+
+    let startTime = Helpers.timestampFormatted(build.startTime);
+    let duration = Helpers.timestampDuration(build.endTime - build.startTime);
+    let buildNumber = <Link to={buildLink}>#{build.buildNumber}</Link>;
+    let sha = Helpers.truncate(build.commit, 8);
+
     return (
-      <tr>
+      <tr className={this.getRowClassNames()}>
         <td>
           {this.getBuildResult()}
-          <Link to={buildLink}>#{build.buildNumber}</Link>
+          {buildNumber}
         </td>
         <td>
           <Icon classNames='fa-roomy' name='clock-o' />
-          {Helpers.timestampFormatted(build.startTime)}
+          {startTime}
         </td>
         <td>
-          {Helpers.timestampDuration(build.endTime - build.startTime)}
+          {duration}
         </td>
         <td>
           <Copyable text={commitLink} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
             <Icon classNames='fa-roomy fa-link' name='clipboard' />
           </Copyable>
-          <a href={commitLink} target="_blank">{Helpers.truncate(build.commit, 8)}</a>
+          <a href={commitLink} target="_blank">{sha}</a>
         </td>
       </tr>
     );
