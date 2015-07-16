@@ -23,7 +23,7 @@ class ProjectsSidebar extends React.Component {
     let sidebarRepoList = [];
     for (let repo in groupedRepos) {
       sidebarRepoList.push(
-        <ProjectsSidebarListItem repo={groupedRepos[repo]} />
+        <ProjectsSidebarListItem key={repo} repo={groupedRepos[repo]} />
       );
     }
 
@@ -41,7 +41,9 @@ class ProjectsSidebar extends React.Component {
         </div>
       </div>
     );
+
   }
+
 }
 
 ProjectsSidebar.propTypes = {
