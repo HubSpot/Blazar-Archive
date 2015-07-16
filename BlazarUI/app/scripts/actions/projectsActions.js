@@ -9,8 +9,13 @@ let ProjectsActions = Reflux.createActions([
 ]);
 
 ProjectsActions.loadProjects.preEmit = function(data){
-  let endpoint = "/js/app/mock.json";
-  let promise = $.ajax({ url: endpoint, type: 'GET', dataType: 'json' });
+  let endpoint = "/api/builds";
+
+  let promise = $.ajax({
+    url: endpoint,
+    type: 'GET',
+    dataType: 'json'
+  });
 
   promise.success( (resp) => {
     projectsData.manageResponse(resp, function(data){

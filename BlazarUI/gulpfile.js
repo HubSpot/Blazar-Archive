@@ -4,10 +4,12 @@ var $ = require('gulp-load-plugins')();
 var del = require('del');
 var concatCss = require('gulp-concat-css');
 var gulpCopy = require('gulp-copy');
+var url = require('url');
 
 // set variable via $ gulp --type production
 var environment = $.util.env.type || 'development';
 var isProduction = environment === 'production';
+var apiEndpoint = require('./config.js').getApiEndpoint(environment);
 var webpackConfig = require('./webpack.config.js').getConfig(environment);
 
 var port = $.util.env.port || 5000;
@@ -36,12 +38,6 @@ gulp.task('scripts', function() {
     .pipe($.connect.reload());
 });
 
-//for mock data
-gulp.task('copy', function() {
-return gulp.src('./app/mock.json')
-  .pipe($.copy('./dist/js'));
-});
-
 gulp.task('lint', function () {
   return gulp.src(['./app/scripts/**/*.jsx'])
     .pipe($.eslint())
@@ -54,6 +50,7 @@ gulp.task('fonts', function() {
     return gulp.src([ './node_modules/font-awesome/fonts/fontawesome-webfont.*'])
       .pipe(gulp.dest(dist + 'font-awesome/fonts/'));
 });
+
 // copy html from app to dist
 gulp.task('html', function() {
   return gulp.src(app + 'index.html')
@@ -97,7 +94,19 @@ gulp.task('serve', function() {
     livereload: {
       port: 35729
     },
-    fallback: dist + 'index.html'
+    fallback: dist + 'index.html',
+    middleware: function(connect, opt) {
+      if (isProduction){
+        console.log('middleware: in prod');
+        return [];
+      }
+      return [ (function() {
+        var proxy = require('proxy-middleware');
+        var options = url.parse(apiEndpoint);
+        options.route = '/api';
+        return proxy(options);
+      })()]
+    }
   });
 });
 
@@ -126,5 +135,5 @@ gulp.task('default', ['build', 'serve', 'watch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
-  gulp.start(['images', 'html', 'fonts', 'copy', 'lint', 'scripts','vendorStyles','styles']);
+  gulp.start(['images', 'html', 'fonts', 'lint', 'scripts','vendorStyles','styles']);
 });
