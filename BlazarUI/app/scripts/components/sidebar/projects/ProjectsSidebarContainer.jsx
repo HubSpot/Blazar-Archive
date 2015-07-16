@@ -11,8 +11,7 @@ class ProjectsSidebarContainer extends React.Component {
 
     this.state = {
       projects: {
-        all: [],
-        buildingRepos: [],
+        grouped: [],
         modules: []
       },
       loading: false

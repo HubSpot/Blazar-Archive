@@ -18,17 +18,21 @@ class ProjectsSidebar extends React.Component {
   render() {
     // To do: replcae loading text with animation
     let loading = this.props.loading ? <div>Loading Projects...</div> : '';
-    let buildingRepos = this.props.projects.buildingRepos;
-    let sidebarRepoList = buildingRepos.map( (repo, i) =>
-      <ProjectsSidebarListItem key={i} repo={repo} />
-    );
+    let groupedRepos = this.props.projects.grouped;
+
+    let sidebarRepoList = [];
+    for (let repo in groupedRepos) {
+      sidebarRepoList.push(
+        <ProjectsSidebarListItem repo={groupedRepos[repo]} />
+      );
+    }
 
     return (
       <div>
         {loading}
         <SidebarFilter
           loading={this.props.loading}
-          buildingRepos={buildingRepos}
+          repos={groupedRepos}
           modules={this.props.projects.modules}
           updateResults={this.updateResults}
         />
