@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 import $ from 'jQuery';
-import parse from './parse';
+
+import Build from '../models/Build';
 
 let BuildActions = Reflux.createActions([
   'loadBuild',
@@ -8,25 +9,15 @@ let BuildActions = Reflux.createActions([
   'loadBuildError'
 ]);
 
-BuildActions.loadBuild.preEmit = function(data){
+BuildActions.loadBuild.preEmit = function(data) {
+  let build = new Build(data);
+  let promise = build.fetch();
 
-  let endpoint = "/api/builds";
-
-  let promise = $.ajax({
-    url: endpoint,
-    type: 'GET',
-    dataType: 'json'
+  promise.done( () => {
+    BuildActions.loadBuildSuccess(build.data.data);
   });
 
-  promise.success( (resp) => {
-    let data = new parse(resp);
-    data.addTimeHelpers()
-    // grab first build for development purposes
-    BuildActions.loadBuildSuccess(data.parsed[0]);
-  })
-
-  promise.error( ()=> {
-    // To do...
+  promise.error( () => {
     BuildActions.loadBuildError('an error occured');
   })
 
