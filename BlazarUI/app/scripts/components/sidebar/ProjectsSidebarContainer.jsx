@@ -1,7 +1,7 @@
 import React from 'react';
 import ProjectsSidebar from './ProjectsSidebar.jsx';
-import ProjectsStore from '../../stores/projectsStore';
-import ProjectsActions from '../../actions/projectsActions';
+import BuildsStore from '../../stores/buildsStore';
+import BuildsActions from '../../actions/buildsActions';
 import Sidebar from './Sidebar.jsx';
 
 class ProjectsSidebarContainer extends React.Component {
@@ -10,7 +10,7 @@ class ProjectsSidebarContainer extends React.Component {
     super(props);
 
     this.state = {
-      projects: {
+      builds: {
         grouped: [],
         modules: []
       },
@@ -19,8 +19,8 @@ class ProjectsSidebarContainer extends React.Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = ProjectsStore.listen(this.onStatusChange.bind(this));
-    ProjectsActions.loadProjects();
+    this.unsubscribe = BuildsStore.listen(this.onStatusChange.bind(this));
+    BuildsActions.loadBuilds();
   }
 
   componentWillUnmount() {
@@ -34,7 +34,7 @@ class ProjectsSidebarContainer extends React.Component {
   render() {
     return (
       <Sidebar>
-        <ProjectsSidebar projects={this.state.projects} loading={this.state.loading} />
+        <ProjectsSidebar builds={this.state.builds} loading={this.state.loading} />
       </Sidebar>
     );
   }
