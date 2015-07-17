@@ -8,10 +8,7 @@ class Breadcrumb extends React.Component {
     let path = window.location.pathname.split('/');
     let pages = path.slice(2, path.length);
     let links = [];
-    links.push(
-      <Link key='dashboard' className='crumb crumb-dashboard' to='dashboard'>Dashboard</Link>
-    );
-
+    
     pages.forEach(function(page, i) {
       let link, pageLink;
       if (i !== pages.length - 1) {
