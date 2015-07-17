@@ -16,7 +16,8 @@ class Breadcrumb extends React.Component {
       let link, pageLink;
       if (i !== pages.length - 1) {
         pageLink = pages.slice(0, i + 1).join('/');
-        link = <Link key={page} className='crumb' to={`/project/${pageLink}`}>{page}</Link>;
+        let key = page + i;
+        link = <Link key={key} className='crumb' to={`/project/${pageLink}`}>{page}</Link>;
       } else {
         link = page;
       }
