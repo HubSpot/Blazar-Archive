@@ -1,8 +1,8 @@
 package com.hubspot.blazar;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
+import com.hubspot.blazar.github.GitHubProtos;
 import io.dropwizard.setup.Environment;
 
 import javax.ws.rs.Consumes;
@@ -22,7 +22,7 @@ public class GitHubWebHookResource {
   }
 
   @POST
-  public void processWebhook(JsonNode webhook) throws IOException {
-    System.out.println(mapper.writeValueAsString(webhook));
+  public void processWebhook(GitHubProtos.PushEvent pushEvent) throws IOException {
+    System.out.println(mapper.writeValueAsString(pushEvent));
   }
 }

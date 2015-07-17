@@ -5,7 +5,9 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -19,6 +21,8 @@ public class BlazarServiceModule extends AbstractModule {
 
     bind(BuildResource.class);
     bind(GitHubWebHookResource.class);
+
+    Multibinder.newSetBinder(binder(), ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
   }
 
   @Provides

@@ -1,0 +1,145 @@
+package com.hubspot.blazar.github;
+
+option java_outer_classname = "GitHubProtos";
+
+message PushEvent {
+    optional string ref = 1;
+    optional string after = 2;
+    optional string base_ref = 12;
+    optional string before = 3;
+    optional bool created = 4;
+    optional bool forced = 5;
+    optional bool deleted = 6;
+    optional string compare = 7;
+    repeated Commit commits = 8;
+    optional Commit head_commit = 9;
+    optional Repository repository = 10;
+    optional User pusher = 11;
+    optional Organization organization = 13;
+    optional Sender sender = 14;
+}
+
+message User {
+    optional string name = 1;
+    optional string email = 2;
+    optional string username = 3;
+}
+
+message Commit {
+    optional string id = 1;
+    optional bool distinct = 2;
+    optional string message = 3;
+    optional string timestamp = 4;;
+    optional string url = 5;
+    optional User author = 6;
+    optional User committer = 7;
+    repeated string added = 8;
+    repeated string removed = 9;
+    repeated string modified = 10;
+}
+
+message Organization {
+    optional string login = 1;
+    optional int32 id = 2;
+    optional string url = 3;
+    optional string repos_url = 4;
+    optional string events_url = 5;
+    optional string members_url = 6;
+    optional string public_members_url = 7;
+    optional string avatar_url = 8;
+}
+
+message Sender {
+    optional string login = 1;
+    optional int32 id = 2;
+    optional string avatar_url = 3;
+    optional string gravatar_id = 4;
+    optional string url = 5;
+    optional string html_url = 6;
+    optional string followers_url = 7;
+    optional string following_url = 8;
+    optional string gists_url = 9;
+    optional string starred_url = 10;
+    optional string subscriptions_url = 11;
+    optional string organizations_url = 12;
+    optional string repos_url = 13;
+    optional string events_url = 14;
+    optional string received_events_url = 15;
+    optional string type = 16;
+    optional string site_admin = 17;
+    optional string ldap_dn = 18;
+}
+
+message Repository {
+    optional string id = 1;
+    optional string name = 2;
+    optional string url = 3;
+    optional string description = 4;
+    optional int32 watchers = 5;
+    optional int32 stargazers = 6;
+    optional int32 forks = 7;
+    optional bool fork = 8;
+    optional int32 size = 9;
+    optional User owner = 10;
+    optional bool private = 11;
+    optional int32 open_issues = 12;
+    optional bool has_issues = 13;
+    optional bool has_downloads = 14;
+    optional bool has_wiki = 15;
+    optional string created_at = 16;
+    optional string pushed_at = 17;
+    optional string master_branch = 18;
+    optional string organization = 19;
+    optional string language = 20;
+    optional string homepage = 21;
+    optional string integrate_branch = 22;
+    optional string full_name = 23;
+    optional string html_url = 24;
+    optional string forks_url = 25;
+    optional string keys_url = 26;
+    optional string collaborators_url = 27;
+    optional string teams_url = 28;
+    optional string hooks_url = 29;
+    optional string issue_events_url = 30;
+    optional string events_url = 31;
+    optional string assignees_url = 32;
+    optional string branches_url = 33;
+    optional string tags_url = 34;
+    optional string blobs_url = 35;
+    optional string git_tags_url = 36;
+    optional string git_refs_url = 37;
+    optional string trees_url = 38;
+    optional string statuses_url = 39;
+    optional string languages_url = 40;
+    optional string stargazers_url = 41;
+    optional string contributors_url = 42;
+    optional string subscribers_url = 43;
+    optional string subscription_url = 44;
+    optional string commits_url = 45;
+    optional string git_commits_url = 46;
+    optional string comments_url = 47;
+    optional string issue_comment_url = 48;
+    optional string contents_url = 49;
+    optional string compare_url = 50;
+    optional string merges_url = 51;
+    optional string archive_url = 52;
+    optional string downloads_url = 53;
+    optional string issues_url = 54;
+    optional string pulls_url = 55;
+    optional string milestones_url = 56;
+    optional string notifications_url = 57;
+    optional string labels_url = 58;
+    optional string releases_url = 59;
+    optional string updated_at = 60;
+    optional string git_url = 61;
+    optional string ssh_url = 62;
+    optional string clone_url = 63;
+    optional string svn_url = 64;
+    optional int32 stargazers_count = 65;
+    optional int32 watchers_count = 66;
+    optional int32 forks_count = 67;
+    optional string mirror_url = 68;
+    optional int32 open_issues_count = 69;
+    optional string default_branch = 70;
+    optional bool has_pages = 71;
+}

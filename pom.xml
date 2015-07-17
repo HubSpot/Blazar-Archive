@@ -26,7 +26,7 @@
   </developers>
 
   <properties>
-    <!--<basepom.git-id.skip>true</basepom.git-id.skip>-->
+    <basepom.check.skip-findbugs>true</basepom.check.skip-findbugs>
   </properties>
 
   <modules>
@@ -63,4 +63,19 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.comoyo.maven.plugins</groupId>
+          <artifactId>protoc-bundled-plugin</artifactId>
+          <version>1.4.47</version>
+          <configuration>
+            <protobufVersion>2.5.0</protobufVersion>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
