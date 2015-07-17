@@ -8,6 +8,7 @@ public class BuildState {
   public enum Result { SUCCEEDED, IN_PROGRESS, CANCELLED, FAILED }
 
   private final int buildNumber;
+  private final String buildLog;
   private final String commitSha;
   private final Result result;
   private final long startTime;
@@ -15,11 +16,13 @@ public class BuildState {
 
   @JsonCreator
   public BuildState(@JsonProperty("buildNumber") int buildNumber,
+                    @JsonProperty("buildLog") String buildLog,
                     @JsonProperty("commitSha") String commitSha,
                     @JsonProperty("result") Result result,
                     @JsonProperty("startTime") long startTime,
                     @JsonProperty("endTime") Optional<Long> endTime) {
     this.buildNumber = buildNumber;
+    this.buildLog = buildLog;
     this.commitSha = commitSha;
     this.result = result;
     this.startTime = startTime;
@@ -28,6 +31,10 @@ public class BuildState {
 
   public int getBuildNumber() {
     return buildNumber;
+  }
+
+  public String getBuildLog() {
+    return buildLog;
   }
 
   public String getCommitSha() {

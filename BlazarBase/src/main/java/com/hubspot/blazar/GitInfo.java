@@ -3,6 +3,8 @@ package com.hubspot.blazar;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class GitInfo {
   private final String host;
   private final String organization;
@@ -34,5 +36,28 @@ public class GitInfo {
 
   public String getBranch() {
     return branch;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    GitInfo gitInfo = (GitInfo) o;
+
+    return Objects.equals(host, gitInfo.host) &&
+        Objects.equals(organization, gitInfo.organization) &&
+        Objects.equals(repository, gitInfo.repository) &&
+        Objects.equals(branch, gitInfo.branch);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(host, organization, repository, branch);
   }
 }

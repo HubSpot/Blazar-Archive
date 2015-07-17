@@ -1,15 +1,20 @@
 package com.hubspot.blazar;
 
 import com.google.common.base.Optional;
+import com.google.common.primitives.Longs;
 import com.google.inject.Inject;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
+import com.sun.jersey.api.NotFoundException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,10 +34,98 @@ public class BuildResource {
 
   @GET
   @PropertyFiltering
-  public synchronized Collection<ModuleBuildWithState> test() {
+  public synchronized Collection<ModuleBuildWithState> getAllBuildStates() {
     updateBuildMap();
 
     return BUILD_MAP.values();
+  }
+
+  @GET
+  @PropertyFiltering
+  @Path("/{host}/{organization}/{repository}/{branch}/{module}")
+  public synchronized Collection<ModuleBuildWithState> getBuildHistoryForModule(@PathParam("host") String host,
+                                                                                @PathParam("organization") String organization,
+                                                                                @PathParam("repository") String repository,
+                                                                                @PathParam("branch") String branch,
+                                                                                @PathParam("module") String module) {
+    updateBuildMap();
+
+    GitInfo gitInfo = new GitInfo(host, organization, repository, branch);
+    for (ModuleBuildWithState build : BUILD_MAP.values()) {
+      if (build.getGitInfo().equals(gitInfo)) {
+        if (build.getModule().getName().equals(module)) {
+          return buildHistory(build);
+        }
+      }
+    }
+
+    throw new NotFoundException();
+  }
+
+  @GET
+  @PropertyFiltering
+  @Path("/{host}/{organization}/{repository}/{branch}/{module}/{buildNumber}")
+  public synchronized ModuleBuildWithState getSpecificBuildForModule(@PathParam("host") String host,
+                                                                     @PathParam("organization") String organization,
+                                                                     @PathParam("repository") String repository,
+                                                                     @PathParam("branch") String branch,
+                                                                     @PathParam("module") String module,
+                                                                     @PathParam("buildNumber") int buildNumber) {
+    updateBuildMap();
+
+    GitInfo gitInfo = new GitInfo(host, organization, repository, branch);
+    for (ModuleBuildWithState build : BUILD_MAP.values()) {
+      if (build.getGitInfo().equals(gitInfo)) {
+        if (build.getModule().getName().equals(module)) {
+          if (buildNumber <= 0 || build.getBuildState().getBuildNumber() < buildNumber) {
+            throw new NotFoundException();
+          } else {
+            ModuleBuildWithState lastBuild = build;
+
+            do {
+              List<ModuleBuildWithState> builds = buildHistory(lastBuild);
+              for (ModuleBuildWithState previousBuild : builds) {
+                if (previousBuild.getBuildState().getBuildNumber() == buildNumber) {
+                  return previousBuild;
+                }
+              }
+
+              lastBuild = builds.get(builds.size() - 1);
+            } while (lastBuild.getBuildState().getBuildNumber() > 0);
+          }
+        }
+      }
+    }
+
+    throw new NotFoundException();
+  }
+
+  private static List<ModuleBuildWithState> buildHistory(ModuleBuildWithState build) {
+    List<ModuleBuildWithState> builds = new ArrayList<>();
+    builds.add(build);
+
+    ModuleBuildWithState previous = build;
+    int buildCount = ThreadLocalRandom.current().nextInt(10) + 10;
+    for (int i = 0; i < buildCount; i++) {
+      BuildState p = previous.getBuildState();
+      Optional<Long> endTime = Optional.of(p.getStartTime() - 15000 - ThreadLocalRandom.current().nextInt(150000));
+      long startTime = endTime.get() - 150000 - ThreadLocalRandom.current().nextInt(15000);
+
+      BuildState newBuildState = new BuildState(p.getBuildNumber() - 1, p.getBuildLog(), p.getCommitSha(), randomCompletedResult(), startTime, endTime);
+      ModuleBuildWithState current = new ModuleBuildWithState(previous.getGitInfo(), previous.getModule(), newBuildState);
+      previous = current;
+      builds.add(current);
+    }
+
+    Collections.sort(builds, new Comparator<ModuleBuildWithState>() {
+
+      @Override
+      public int compare(ModuleBuildWithState build1, ModuleBuildWithState build2) {
+        return -1 * Longs.compare(build1.getBuildState().getStartTime(), build2.getBuildState().getStartTime());
+      }
+    });
+
+    return builds;
   }
 
   private static void updateBuildMap() {
@@ -53,7 +146,7 @@ public class BuildResource {
       if (System.currentTimeMillis() > previous.getBuildState().getStartTime() + buildDuration) {
         BuildState p = previous.getBuildState();
         Optional<Long> endTime = Optional.of(p.getStartTime() + buildDuration);
-        BuildState newBuildState = new BuildState(p.getBuildNumber(), p.getCommitSha(), randomCompletedResult(), p.getStartTime(), endTime);
+        BuildState newBuildState = new BuildState(p.getBuildNumber(), p.getBuildLog(), p.getCommitSha(), randomCompletedResult(), p.getStartTime(), endTime);
         return new ModuleBuildWithState(previous.getGitInfo(), previous.getModule(), newBuildState);
       } else {
         return previous;
@@ -63,7 +156,7 @@ public class BuildResource {
       if (System.currentTimeMillis() > previous.getBuildState().getEndTime().get() + sleepDuration) {
         BuildState p = previous.getBuildState();
         long startTime = p.getEndTime().get() + sleepDuration;
-        BuildState newBuildState = new BuildState(p.getBuildNumber() + 1, p.getCommitSha(), IN_PROGRESS, startTime, Optional.<Long>absent());
+        BuildState newBuildState = new BuildState(p.getBuildNumber() + 1, p.getBuildLog(), p.getCommitSha(), IN_PROGRESS, startTime, Optional.<Long>absent());
         return new ModuleBuildWithState(previous.getGitInfo(), previous.getModule(), newBuildState);
       } else {
         return previous;
@@ -113,7 +206,7 @@ public class BuildResource {
     BuildState.Result result = BuildState.Result.values()[r.nextInt(BuildState.Result.values().length)];
     Optional<Long> endTime = result == IN_PROGRESS ? Optional.<Long>absent() : Optional.of(startTime + r.nextInt(30000));
 
-    return new BuildState(buildNumber, "abc", result, startTime, endTime);
+    return new BuildState(buildNumber, "https://s3.amazonaws.com/archive.travis-ci.org/jobs/70997110/log.txt", "abc", result, startTime, endTime);
   }
 
   private static BuildState.Result randomCompletedResult() {
