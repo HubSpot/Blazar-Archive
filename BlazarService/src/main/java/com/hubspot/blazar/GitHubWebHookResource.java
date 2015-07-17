@@ -22,6 +22,7 @@ public class GitHubWebHookResource {
   }
 
   @POST
+  @Path("/push")
   public void processWebhook(GitHubProtos.PushEvent pushEvent) throws IOException {
     System.out.println(mapper.writeValueAsString(pushEvent));
   }
