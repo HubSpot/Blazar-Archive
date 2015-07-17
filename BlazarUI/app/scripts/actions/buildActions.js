@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import $ from 'jQuery';
+import parse from './parse';
 
 let BuildActions = Reflux.createActions([
   'loadBuild',
@@ -8,11 +9,20 @@ let BuildActions = Reflux.createActions([
 ]);
 
 BuildActions.loadBuild.preEmit = function(data){
-  let endpoint = "/js/app/mock.json";
-  let promise = $.ajax({ url: endpoint, type: 'GET', dataType: 'json' });
+
+  let endpoint = "/api/builds";
+
+  let promise = $.ajax({
+    url: endpoint,
+    type: 'GET',
+    dataType: 'json'
+  });
 
   promise.success( (resp) => {
-    BuildActions.loadBuildSuccess(resp[0]);
+    let data = new parse(resp);
+    data.addTimeHelpers()
+    // grab first build for development purposes
+    BuildActions.loadBuildSuccess(data.parsed[0]);
   })
 
   promise.error( ()=> {

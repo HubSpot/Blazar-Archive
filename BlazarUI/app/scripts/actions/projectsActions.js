@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import $ from 'jQuery';
-import projectsData from './projectsData';
+import parse from './parse';
 
 let ProjectsActions = Reflux.createActions([
   'loadProjects',
@@ -21,9 +21,9 @@ ProjectsActions.loadProjects.preEmit = function(data) {
     });
 
     promise.done( (resp) => {
-      projectsData.manageResponse(resp, function(data) {
-        ProjectsActions.loadProjectsSuccess(data);
-      });
+      let data = new parse(resp);
+      data.addTimeHelpers().groupJobs();
+      ProjectsActions.loadProjectsSuccess(data);
     });
 
     promise.always( () => {
