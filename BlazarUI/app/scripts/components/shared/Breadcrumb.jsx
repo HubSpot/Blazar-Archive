@@ -8,7 +8,7 @@ class Breadcrumb extends React.Component {
     let path = window.location.pathname.split('/');
     let pages = path.slice(2, path.length);
     let links = [];
-    
+
     pages.forEach(function(page, i) {
       let link, pageLink;
       if (i !== pages.length - 1) {

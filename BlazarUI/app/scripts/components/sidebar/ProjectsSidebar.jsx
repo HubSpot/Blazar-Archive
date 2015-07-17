@@ -18,7 +18,7 @@ class ProjectsSidebar extends React.Component {
   render() {
     // To do: replcae loading text with animation
     let loading = this.props.loading ? <div>Loading Projects...</div> : '';
-    let groupedRepos = this.props.projects.grouped;
+    let groupedRepos = this.props.builds.grouped;
 
     let sidebarRepoList = [];
     for (let repo in groupedRepos) {
@@ -33,7 +33,7 @@ class ProjectsSidebar extends React.Component {
         <SidebarFilter
           loading={this.props.loading}
           repos={groupedRepos}
-          modules={this.props.projects.modules}
+          modules={this.props.builds.modules}
           updateResults={this.updateResults}
         />
         <div className='sidebar__list'>

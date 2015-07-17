@@ -10,7 +10,6 @@ import PageHeadline from '../shared/PageHeadline.jsx';
 class Module extends React.Component {
 
   render() {
-
     let latestBuild = [];
 
     return (
