@@ -5,7 +5,6 @@ import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
 import {labels} from '../constants';
-// MOVE TO CONSTANTS FOLDER
 
 class BuildHistoryTableRow extends React.Component {
 
@@ -45,7 +44,7 @@ class BuildHistoryTableRow extends React.Component {
 
     let startTime = Helpers.timestampFormatted(build.startTime);
     let duration = Helpers.timestampDuration(build.endTime - build.startTime);
-    let buildNumber = <Link to={buildLink}>#{build.buildNumber}</Link>;
+    let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
     let sha = Helpers.truncate(build.commit, 8);
 
     return (
@@ -55,7 +54,6 @@ class BuildHistoryTableRow extends React.Component {
           {buildNumber}
         </td>
         <td>
-          <Icon classNames='fa-roomy' name='clock-o' />
           {startTime}
         </td>
         <td>
