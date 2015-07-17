@@ -4,3 +4,7 @@ server:
   connector:
     type: http
     port: 7099
+
+github:
+  endpoint: https://git.mycompany.com/api/v3
+  oauthToken: my-oauth-token

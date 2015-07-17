@@ -113,5 +113,16 @@
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>annotations</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.kohsuke</groupId>
+      <artifactId>github-api</artifactId>
+      <version>1.68</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jenkins-ci</groupId>
+          <artifactId>annotation-indexer</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 </project>
