@@ -1,41 +1,53 @@
 import React from 'react';
+import Helpers from '../ComponentHelpers';
 
 const buildLables = {
   'SUCCEEDED': 'success',
   'FAILED': 'danger',
-  'IN_PROGRESS': 'default'
+  'IN_PROGRESS': 'info',
+  'CANCELLED': 'warning'
 };
 
-class LastBuild extends React.Component {
+class BuildDetail extends React.Component {
 
   getClassNames() {
-    return 'build-detail alert alert-' + buildLables[this.props.build.result];
+    return 'build-detail alert alert-' + buildLables[this.props.build.buildState.result];
   }
 
   render() {
-    let {commit, buildNumber} = this.props.build;
+
+    if (this.props.loading) {
+      return <div></div>;
+    }
+
+    let {buildState} = this.props.build;
+    // to do: add build result icon
+    let buildResult = Helpers.humanizeText(buildState.result);
+
     return (
       <div className={this.getClassNames()}>
-        <p> #{buildNumber} - 2 days, 22 hr ago. Ran for 7 min 34 sec. </p>
-        <pre className='commit'>
-          [mavin-release-plugin] prepare for the next development iteration
-          <br/><a href="#">{commit}</a>
-        </pre>
-        <p>Started by Github push by ssalinas</p>
+        <h4 className='build-detail__build-state'>
+          {buildResult}
+        </h4>
+        <p> #{buildState.buildNumber} - 2 days, 22 hr ago. Ran for {buildState.duration} </p>
+        <a href="#">{buildState.commitSha}</a>
       </div>
     );
   }
 
 }
 
-LastBuild.propTypes = {
+BuildDetail.propTypes = {
+  loading: React.PropTypes.bool.isRequired,
   build: React.PropTypes.shape({
-    buildNumber: React.PropTypes.number,
-    startTime: React.PropTypes.number,
-    endTime: React.PropTypes.number,
-    commit: React.PropTypes.string,
-    result: React.PropTypes.oneOf(['SUCCEEDED', 'FAILED'])
+    buildState: React.PropTypes.shape({
+      buildNumber: React.PropTypes.number,
+      commitSha: React.PropTypes.string,
+      result: React.PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
+      startTime: React.PropTypes.number,
+      endTime: React.PropTypes.number
+    })
   })
 };
 
-export default LastBuild;
+export default BuildDetail;
