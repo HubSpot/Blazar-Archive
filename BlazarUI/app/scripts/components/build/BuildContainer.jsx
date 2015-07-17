@@ -11,6 +11,7 @@ class BuildContainer extends React.Component {
     super(props);
 
     this.state = {
+      loading: true,
       build: {
         buildState: {},
         gitInfo: {},
@@ -20,7 +21,6 @@ class BuildContainer extends React.Component {
   }
 
   componentDidMount() {
-    console.log('we need to fetch with these params: ', this.props.params);
     this.unsubscribe = BuildStore.listen(this.onStatusChange.bind(this));
     BuildActions.loadBuild(this.props.params);
   }
@@ -30,7 +30,12 @@ class BuildContainer extends React.Component {
   }
 
   onStatusChange(state) {
-    this.setState(state);
+    if (state.build) {
+      this.setState({
+        loading: false,
+        build: state.build
+      });
+    }
   }
 
   render() {
@@ -38,6 +43,7 @@ class BuildContainer extends React.Component {
       <PageContainer>
         <Build
           build={this.state.build}
+          params={this.props.params}
           loading={this.state.loading}
         />
       </PageContainer>

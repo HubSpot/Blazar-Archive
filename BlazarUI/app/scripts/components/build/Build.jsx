@@ -5,26 +5,30 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildDetail from '../shared/BuildDetail.jsx';
 import Log from './log.jsx';
+import PageHeadline from '../shared/PageHeadline.jsx';
 
 class Build extends React.Component{
 
   render() {
+    // TO DO: show page loader
+    if (this.props.loading) {
+      return  <div></div>;
+    }
+
     let {module, buildState} = this.props.build;
+    let subheadline = `Build #${buildState.buildNumber}`;
+
     return (
       <div>
         <PageHeader>
-          <h2 className='header-primary'>
-            {module.name}{' '}
-            <span className='header-subheader'>
-              Build #{buildState.buildNumber}
-            </span>
-          </h2>
           <Breadcrumb />
+          <PageHeadline headline={module.name} subheadline={subheadline} />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
             <BuildDetail
               build={this.props.build}
+              loading={this.props.loading}
             />
           </UIGridItem>
           <UIGridItem size={12}>
@@ -42,7 +46,9 @@ Build.propTypes = {
     buildState: React.PropTypes.object,
     gitInfo: React.PropTypes.object,
     module: React.PropTypes.object
-  })
+  }),
+  params: React.PropTypes.object,
+  loading: React.PropTypes.bool
 };
 
 export default Build;
