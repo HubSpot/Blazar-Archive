@@ -1,6 +1,8 @@
 let config = {
+  appRoot: '/project',
 
-  appRoot: '/project'
+  // sidebar polling frequency in ms
+  jobRefresh: 5000
 
 }
 
