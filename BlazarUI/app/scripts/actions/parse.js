@@ -1,18 +1,30 @@
 import _ from 'underscore';
+import moment from 'moment';
 
+class Parse {
 
-var projectsData = {
+  constructor(data) {
+    this.parsed = data;
+  }
 
-  // Ready data for the sidebar
-  manageResponse: function(data, cb) {
+  addTimeHelpers() {
+    this.parsed.forEach( (item) => {
+      if (item.buildState.startTime && item.buildState.endTime) {
+        item.buildState.duration = moment.duration(item.buildState.endTime - item.buildState.startTime).humanize();
+      }
+    });
+    return this;
+  }
+
+  groupJobs() {
     // list of module names, used for sidebar search
     let modules = [];
-    _.filter(data, function(item){
+    _.filter(this.parsed, function(item){
       let module = { value: item.module.name, label: `${item.gitInfo.repository} » ${item.module.name}` };
       modules.push(module);
     });
     // jobs grouped by repo
-    let grouped = _(data).groupBy(function(o) {
+    let grouped = _(this.parsed).groupBy(function(o) {
       return o.gitInfo.repository;
     });
 
@@ -31,15 +43,15 @@ var projectsData = {
 
     // To do: sort them by descending order of time being built
     // To do: if the job is dead, sort by order of last built
+    this.grouped = grouped;
+    this.modules = modules;
 
-    data = {
-      grouped: grouped,
-      modules: modules
-    };
+    return this;
 
-    cb(data);
   }
+
+
 
 }
 
-export default projectsData;
+export default Parse;
