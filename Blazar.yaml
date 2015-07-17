@@ -8,3 +8,13 @@ server:
 github:
   endpoint: https://git.mycompany.com/api/v3
   oauthToken: my-oauth-token
+
+zookeeper:
+  quorum: my.zk.host:2181
+  namespace: blazar
+
+database:
+  driverClass: com.mysql.jdbc.Driver
+  user: blazar-user
+  password: blazar-pass
+  url: jdbc:mysql://my.db.host:3306/blazar
