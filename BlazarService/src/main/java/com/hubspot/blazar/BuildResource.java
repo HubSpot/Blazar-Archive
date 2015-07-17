@@ -38,9 +38,10 @@ public class BuildResource {
   private static void updateBuildMap() {
     for (Entry<String, ModuleBuildWithState> entry : BUILD_MAP.entrySet()) {
       ModuleBuildWithState build = entry.getValue();
-      while (build.getBuildState().getStartTime() + 120000 < System.currentTimeMillis()) {
+
+      do {
         build = updateBuild(build);
-      }
+      } while (build.getBuildState().getStartTime() + 120000 < System.currentTimeMillis());
 
       entry.setValue(build);
     }
