@@ -5,24 +5,25 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import LastBuild from '../shared/BuildDetail.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
-import MockBuilds from './MockBuilds';
+import PageHeadline from '../shared/PageHeadline.jsx';
 
 class Module extends React.Component {
 
   render() {
 
-    let latestBuild = MockBuilds[0];
+    let latestBuild = [];
 
     return (
       <div>
         <PageHeader>
-          <h2 className='header-primary'> {this.props.params.module} <span className='header-subheader'> Build History  </span> </h2>
           <Breadcrumb />
+          <PageHeadline headline={this.props.params.module} subheadline='Build History' />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
             <LastBuild
               build={latestBuild}
+              loading={this.props.loading}
             />
             <BuildHistoryTable />
           </UIGridItem>
@@ -33,11 +34,8 @@ class Module extends React.Component {
 
 }
 
-Module.defaultProps = {
-  loading: true
-};
-
 Module.propTypes = {
+  loading: React.PropTypes.bool.isRequired,
   params: React.PropTypes.object.isRequired
 };
 
