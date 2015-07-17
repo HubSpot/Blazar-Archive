@@ -12,7 +12,6 @@ let BuildsActions = Reflux.createActions([
 BuildsActions.loadBuilds.preEmit = function(data) {
 
   (function doPoll(){
-
     let builds = new Builds();
     let promise = builds.fetch();
 
@@ -21,7 +20,7 @@ BuildsActions.loadBuilds.preEmit = function(data) {
     });
 
     promise.always( () => {
-      setTimeout(doPoll, 15000);
+      setTimeout(doPoll, app.config.jobRefresh);
     });
 
     promise.error( () => {
