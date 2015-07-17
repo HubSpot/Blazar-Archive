@@ -48,7 +48,7 @@ class ProjectsSidebar extends React.Component {
 
 ProjectsSidebar.propTypes = {
   loading: React.PropTypes.bool,
-  projects: React.PropTypes.object
+  builds: React.PropTypes.object
 };
 
 export default ProjectsSidebar;

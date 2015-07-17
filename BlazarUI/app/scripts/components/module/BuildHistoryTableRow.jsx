@@ -1,6 +1,6 @@
+/*global app*/
 import React from 'react';
 import Helpers from '../ComponentHelpers';
-import config from '../../config';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
@@ -40,7 +40,7 @@ class BuildHistoryTableRow extends React.Component {
   render() {
     let build = this.props.build;
     let commitLink = `https://${build.host}/${build.organization}/${build.repository}/commit/${build.commit}/`;
-    let buildLink = `${config.appRoot}/${build.host}/${build.organization}/${build.repository}/${build.branch}/${build.module}/${build.buildNumber}`;
+    let buildLink = `${app.config.appRoot}/${build.host}/${build.organization}/${build.repository}/${build.branch}/${build.module}/${build.buildNumber}`;
 
     let startTime = Helpers.timestampFormatted(build.startTime);
     let duration = Helpers.timestampDuration(build.endTime - build.startTime);

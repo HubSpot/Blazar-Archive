@@ -1,3 +1,5 @@
+/*global app*/
+
 import React from 'react';
 let Link = require('react-router').Link;
 
