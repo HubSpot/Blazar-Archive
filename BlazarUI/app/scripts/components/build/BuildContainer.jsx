@@ -29,6 +29,10 @@ class BuildContainer extends React.Component {
     this.unsubscribe();
   }
 
+  componentWillReceiveProps(nextprops) {
+    BuildActions.loadBuild(nextprops.params);
+  }
+
   onStatusChange(state) {
     if (state.build) {
       this.setState({
