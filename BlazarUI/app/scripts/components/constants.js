@@ -8,7 +8,7 @@ export const labels = {
 export const iconStatus = {
   'SUCCEEDED': 'check',
   'FAILED': 'close',
-  'IN_PROGRESS': 'ship',
+  'IN_PROGRESS': 'circle-o-notch fa-spin',
   'CANCELLED': 'stop opacity-semi'
 }
 
