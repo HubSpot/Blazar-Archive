@@ -43,7 +43,7 @@ class ProjectSidebarListItem extends React.Component {
     });
 
     function getRepoBuildState() {
-      if (repo.moduleIsBuilding) {
+      if (repo.isBuilding) {
         return <BuildingIcon status='success' />;
       }
     }

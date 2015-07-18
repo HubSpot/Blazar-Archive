@@ -43,7 +43,7 @@ class Builds extends BaseCollection {
     for (var repo in grouped) {
       groupedInArray.push({
         name: repo,
-        moduleIsBuilding: grouped[repo].moduleIsBuilding,
+        isBuilding: grouped[repo].moduleIsBuilding,
         modules: grouped[repo]
       })
       // sorted.push([repo, grouped[repo]])
