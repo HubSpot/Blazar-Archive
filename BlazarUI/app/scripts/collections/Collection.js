@@ -13,7 +13,7 @@ class Collection {
     });
 
     promise.done( (resp) => {
-      this.data.data = resp;
+      this.data = resp;
       this.parse();
     })
 

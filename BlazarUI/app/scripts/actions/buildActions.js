@@ -14,7 +14,7 @@ BuildActions.loadBuild.preEmit = function(data) {
   let promise = build.fetch();
 
   promise.done( () => {
-    BuildActions.loadBuildSuccess(build.data.data);
+    BuildActions.loadBuildSuccess(build.data);
   });
 
   promise.error( () => {

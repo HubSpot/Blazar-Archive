@@ -7,27 +7,31 @@ class Builds extends BaseCollection {
     return "/api/builds";
   }
 
-  parse(){
+  parse() {
     this.addTimeHelpers();
-    this.groupBuilds();
   }
+
+  getModuleList() {
+    // list of module names, used for sidebar search
+    let modules = _.map(this.data, function(item){
+      let module = { value: item.module.name, label: `${item.gitInfo.repository} » ${item.module.name}` };
+      return module;
+    });
+
+    return modules;
+  }
+
 
   groupBuilds() {
     // To do: sort them by descending order of time being built
     // To do: if the job is dead, sort by order of last built
 
-    // list of module names, used for sidebar search
-    this.data.modules = _.map(this.data.data, function(item){
-      let module = { value: item.module.name, label: `${item.gitInfo.repository} » ${item.module.name}` };
-      return module;
-    });
-
     // jobs grouped by repo
-    this.data.grouped = _(this.data.data).groupBy(function(o) {
+    let grouped = _(this.data).groupBy(function(o) {
       return o.gitInfo.repository;
     });
 
-    _.each(this.data.grouped, (repo) => {
+    _.each(grouped, (repo) => {
       repo.moduleIsBuilding = false;
       for (var value of repo) {
         repo.repository = value.gitInfo.repository;
@@ -39,6 +43,7 @@ class Builds extends BaseCollection {
       return repo;
     })
 
+    return grouped;
 
   }
 
