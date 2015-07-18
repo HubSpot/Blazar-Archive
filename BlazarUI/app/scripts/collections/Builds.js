@@ -23,9 +23,6 @@ class Builds extends BaseCollection {
 
 
   groupBuilds() {
-    // To do: sort them by descending order of time being built
-    // To do: if the job is dead, sort by order of last built
-
     // jobs grouped by repo
     let grouped = _(this.data).groupBy(function(o) {
       return o.gitInfo.repository;
@@ -34,7 +31,6 @@ class Builds extends BaseCollection {
     _.each(grouped, (repo) => {
       repo.moduleIsBuilding = false;
       for (var value of repo) {
-        repo.repository = value.gitInfo.repository;
         if(value.buildState.result === 'IN_PROGRESS'){
           repo.moduleIsBuilding = true;
           break;
@@ -43,7 +39,20 @@ class Builds extends BaseCollection {
       return repo;
     })
 
-    return grouped;
+    let groupedInArray = [];
+    for (var repo in grouped) {
+      groupedInArray.push({
+        name: repo,
+        moduleIsBuilding: grouped[repo].moduleIsBuilding,
+        modules: grouped[repo]
+      })
+      // sorted.push([repo, grouped[repo]])
+      // sorted.sort(function(a, b) {return a[1] - b[1]})
+    }
+
+    // To do: sort repos in order of most recent module in progress
+    // To do: if the job is dead, sort by order of last built
+    return groupedInArray;
 
   }
 
