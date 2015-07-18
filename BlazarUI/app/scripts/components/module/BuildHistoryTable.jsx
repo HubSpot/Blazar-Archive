@@ -21,6 +21,7 @@ class BuildHistoryTable extends React.Component {
     }
 
     let columnNames = [
+      {label: '', key: 'result'},
       {label: 'Build', key: 'buildNumber'},
       {label: 'Start Time', key: 'startTime'},
       {label: 'Duration', key: 'duration'},

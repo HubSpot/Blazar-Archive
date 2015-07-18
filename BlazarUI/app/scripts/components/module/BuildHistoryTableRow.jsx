@@ -24,7 +24,7 @@ class BuildHistoryTableRow extends React.Component {
 
   getBuildResult() {
     let result = this.props.build.buildState.result;
-    let classNames = 'fa-roomy ' + labels[result];
+    let classNames = labels[result];
 
     return (
       <Icon
@@ -44,10 +44,16 @@ class BuildHistoryTableRow extends React.Component {
     let buildNumber = <Link to={buildLink}>{buildState.buildNumber}</Link>;
     let sha = Helpers.truncate(buildState.commitSha, 8);
 
+    if (buildState.result === 'IN_PROGRESS') {
+      duration = 'In Progress...';
+    }
+
     return (
       <tr className={this.getRowClassNames()}>
-        <td>
+        <td className='build-status'>
           {this.getBuildResult()}
+        </td>
+        <td>
           {buildNumber}
         </td>
         <td>

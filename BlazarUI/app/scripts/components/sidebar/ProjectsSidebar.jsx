@@ -25,7 +25,7 @@ class ProjectsSidebar extends React.Component {
       sidebarRepoList.push(
         <ProjectsSidebarListItem key={repo.name} repo={repo} />
       );
-    })
+    });
 
 
     return (
