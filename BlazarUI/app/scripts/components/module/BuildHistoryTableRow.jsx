@@ -4,7 +4,7 @@ import Helpers from '../ComponentHelpers';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
-import {labels} from '../constants';
+import {labels, iconStatus} from '../constants';
 
 class BuildHistoryTableRow extends React.Component {
 
@@ -17,35 +17,32 @@ class BuildHistoryTableRow extends React.Component {
   }
 
   getRowClassNames() {
-    if (this.props.build.result === 'FAILED') {
+    if (this.props.build.buildState.result === 'FAILED') {
       return 'bgc-danger';
     }
   }
 
   getBuildResult() {
-    let result = this.props.build.result;
-    let type;
-    if (result === 'SUCCEEDED') {
-      type = 'check';
-    } else if (result === 'FAILED') {
-      type = 'close';
-    } else {
-      return '';
-    }
+    let result = this.props.build.buildState.result;
+    let classNames = 'fa-roomy ' + labels[result];
 
-    let classNames = 'fa-roomy ' + labels[this.props.build.result];
-    return <Icon name={type} classNames={classNames}/>;
+    return (
+      <Icon
+        name={iconStatus[result]}
+        classNames={classNames}
+      />
+    );
   }
 
   render() {
-    let build = this.props.build;
-    let commitLink = `https://${build.host}/${build.organization}/${build.repository}/commit/${build.commit}/`;
-    let buildLink = `${app.config.appRoot}/${build.host}/${build.organization}/${build.repository}/${build.branch}/${build.module}/${build.buildNumber}`;
+    let {buildState, gitInfo, module} = this.props.build;
 
-    let startTime = Helpers.timestampFormatted(build.startTime);
-    let duration = Helpers.timestampDuration(build.endTime - build.startTime);
-    let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
-    let sha = Helpers.truncate(build.commit, 8);
+    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.commitSha}/`;
+    let buildLink = `${app.config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
+    let startTime = Helpers.timestampFormatted(buildState.startTime);
+    let duration = buildState.duration;
+    let buildNumber = <Link to={buildLink}>{buildState.buildNumber}</Link>;
+    let sha = Helpers.truncate(buildState.commitSha, 8);
 
     return (
       <tr className={this.getRowClassNames()}>
@@ -60,7 +57,7 @@ class BuildHistoryTableRow extends React.Component {
           {duration}
         </td>
         <td>
-          <Copyable text={build.commit} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
+          <Copyable text={buildState.commitSha} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
             <Icon classNames='fa-roomy fa-link' name='clipboard' />
           </Copyable>
           <a href={commitLink} target="_blank">{sha}</a>
@@ -70,17 +67,23 @@ class BuildHistoryTableRow extends React.Component {
   }
 }
 
+
+
 BuildHistoryTableRow.propTypes = {
   build: React.PropTypes.shape({
-    buildNumber: React.PropTypes.number,
-    startTime: React.PropTypes.number,
-    endTime: React.PropTypes.number,
-    commit: React.PropTypes.string,
-    result: React.PropTypes.oneOf(['SUCCEEDED', 'FAILED'])
+    buildState: React.PropTypes.shape({
+      buildNumber: React.PropTypes.number,
+      commitSha: React.PropTypes.string,
+      result: React.PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
+      startTime: React.PropTypes.number,
+      endTime: React.PropTypes.number
+    }),
+    gitInfo: React.PropTypes.obj,
+    module: React.PropTypes.obj
   })
 };
 
+
+
+
 export default BuildHistoryTableRow;
-
-
-// <i onClick={this.handleCopyCommit} onMouseOver={this.handleHoverCommit} className="fa fa-clipboard fa-roomy clickable"></i>

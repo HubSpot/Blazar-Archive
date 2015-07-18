@@ -20,17 +20,26 @@ class BuildDetail extends React.Component {
       return <div></div>;
     }
 
-    let {buildState} = this.props.build;
+    let {buildState, gitInfo} = this.props.build;
+    let endtime, duration;
     // to do: add build result icon
     let buildResult = Helpers.humanizeText(buildState.result);
+
+    if (buildState.result !== 'IN_PROGRESS') {
+      endtime = 'on ' + Helpers.timestampFormatted(buildState.endTime);
+      duration = 'Ran for ' + buildState.duration;
+    }
+
+    let sha = buildState.commitSha;
+    let shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${sha}`;
 
     return (
       <div className={this.getClassNames()}>
         <h4 className='build-detail__build-state'>
-          {buildResult}
+          {buildResult} <small>{endtime}</small>
         </h4>
-        <p> #{buildState.buildNumber} - 2 days, 22 hr ago. Ran for {buildState.duration} </p>
-        <a href="#">{buildState.commitSha}</a>
+        <p>{duration}</p>
+        <a target="_blank" href={shaLink}>{buildState.commitSha}</a>
       </div>
     );
   }
@@ -46,7 +55,8 @@ BuildDetail.propTypes = {
       result: React.PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
       startTime: React.PropTypes.number,
       endTime: React.PropTypes.number
-    })
+    }),
+    gitInfo: React.PropTypes.obj
   })
 };
 

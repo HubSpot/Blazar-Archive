@@ -2,14 +2,10 @@ import React from 'react';
 import BuildHistoryTableHeader from './BuildHistoryTableHeader.jsx';
 import BuildHistoryTableRow from './BuildHistoryTableRow.jsx';
 
-import MockBuilds from './MockBuilds';
-
 class BuildHistoryTable extends React.Component {
 
   getRows() {
-    // mock data
-    let builds = MockBuilds.splice(1, MockBuilds.length - 1);
-
+    let builds = this.props.buildHistory;
     return builds.map((build, i) =>
       <BuildHistoryTableRow
         build={builds[i]}
@@ -20,7 +16,10 @@ class BuildHistoryTable extends React.Component {
   }
 
   render() {
-    // mock data
+    if (this.props.loading) {
+      return <div></div>;
+    }
+
     let columnNames = [
       {label: 'Build', key: 'buildNumber'},
       {label: 'Start Time', key: 'startTime'},
@@ -29,7 +28,6 @@ class BuildHistoryTable extends React.Component {
     ];
 
     // TO DO: empty table
-
     return (
       <table className="table table-hover table-striped roomy">
         <BuildHistoryTableHeader
@@ -44,5 +42,12 @@ class BuildHistoryTable extends React.Component {
   }
 
 }
+
+
+BuildHistoryTable.propTypes = {
+  loading: React.PropTypes.bool,
+  buildHistory: React.PropTypes.array.isRequired
+};
+
 
 export default BuildHistoryTable;
