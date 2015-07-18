@@ -3,15 +3,12 @@ import PageHeader from '../shared/PageHeader.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-import LastBuild from '../shared/BuildDetail.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 
 class Module extends React.Component {
 
   render() {
-    let latestBuild = [];
-
     return (
       <div>
         <PageHeader>
@@ -20,11 +17,10 @@ class Module extends React.Component {
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            <LastBuild
-              build={latestBuild}
+            <BuildHistoryTable
+              buildHistory={this.props.buildHistory}
               loading={this.props.loading}
             />
-            <BuildHistoryTable />
           </UIGridItem>
         </UIGrid>
       </div>
@@ -33,9 +29,11 @@ class Module extends React.Component {
 
 }
 
+
 Module.propTypes = {
   loading: React.PropTypes.bool.isRequired,
-  params: React.PropTypes.object.isRequired
+  params: React.PropTypes.object.isRequired,
+  buildHistory: React.PropTypes.array.isRequired
 };
 
 export default Module;

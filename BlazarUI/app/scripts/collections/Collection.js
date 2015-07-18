@@ -2,14 +2,10 @@ import $ from 'jQuery';
 
 class Collection {
 
-  constructor() {
-    // holds all of our collections data
-    this.data = {};
-  }
-
   parse() {}
 
   fetch() {
+    this.data = {}
     let promise = $.ajax({
       url: this.url(),
       type: 'GET',
