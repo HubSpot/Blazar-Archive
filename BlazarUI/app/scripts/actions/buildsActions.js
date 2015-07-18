@@ -16,7 +16,10 @@ BuildsActions.loadBuilds.preEmit = function(data) {
     let promise = builds.fetch();
 
     promise.done( () => {
-      BuildsActions.loadBuildsSuccess(builds.data);
+      let allBuilds = {};
+      allBuilds.modules = builds.getModuleList();
+      allBuilds.grouped = builds.groupBuilds();
+      BuildsActions.loadBuildsSuccess(allBuilds);
     });
 
     promise.always( () => {

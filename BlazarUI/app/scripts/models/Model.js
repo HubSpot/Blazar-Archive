@@ -17,7 +17,7 @@ class Model {
     });
 
     promise.done( (resp) => {
-      this.data.data = resp;
+      this.data = resp;
       this.parse();
     })
 
@@ -26,7 +26,7 @@ class Model {
   }
 
   addTimeHelpers() {
-    let buildState = this.data.data.buildState;
+    let buildState = this.data.buildState;
 
     if (buildState.startTime && buildState.endTime) {
       buildState.duration = moment.duration(buildState.endTime - buildState.startTime).humanize();
