@@ -8,7 +8,6 @@ class Module extends React.Component {
   render() {
     let {buildState, gitInfo, module} = this.props.repo;
     let moduleLink = `${app.config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
-
     return (
       <Link to={moduleLink} className='sidebar__repo-module'>{module.name}</Link>
     );

@@ -15,7 +15,6 @@ BuildHistoryActions.loadBuildHistory.preEmit = function(data) {
   let promise = buildHistory.fetch();
 
   promise.done( () => {
-    let builds = {}
     BuildHistoryActions.loadBuildHistorySuccess(buildHistory.data);
   });
 

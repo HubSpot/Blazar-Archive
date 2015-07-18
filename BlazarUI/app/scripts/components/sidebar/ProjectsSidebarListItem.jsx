@@ -28,20 +28,22 @@ class ProjectSidebarListItem extends React.Component {
   }
 
   render() {
-    let modules = [];
-    let repoDetail = this.props.repo;
-    let moduleGitInfo = repoDetail[0].gitInfo;
-    let repoLink = `${moduleGitInfo.host}/${moduleGitInfo.organization}/${moduleGitInfo.repository}`;
 
-    repoDetail.forEach( (repo) => {
-      modules.push(
+    let repo = this.props.repo;
+    let modules = this.props.repo.modules;
+    let repoGitInfo = modules[0].gitInfo;
+    let repoLink = `${repoGitInfo.host}/${repoGitInfo.organization}/${repoGitInfo.repository}`;
+
+    let moduleList = [];
+
+    modules.forEach( (repo) => {
+      moduleList.push(
         <Module key={repo.buildState.buildNumber} repo={repo} />
       );
     });
 
-
     function getRepoBuildState() {
-      if (repoDetail.moduleIsBuilding) {
+      if (repo.moduleIsBuilding) {
         return <BuildingIcon status='success' />;
       }
     }
@@ -53,10 +55,10 @@ class ProjectSidebarListItem extends React.Component {
         </div>
         <div className='sidebar__repo' onClick={this.handleModuleExpand}>
           {getRepoBuildState()}
-          {repoDetail.repository}
+          {repo.name}
         </div>
         <div className={this.getModulesClassNames()}>
-          {modules}
+          {moduleList}
         </div>
       </div>
     );
@@ -64,7 +66,7 @@ class ProjectSidebarListItem extends React.Component {
 }
 
 ProjectSidebarListItem.propTypes = {
-  repo: React.PropTypes.array,
+  repo: React.PropTypes.object,
   project: React.PropTypes.object
 };
 

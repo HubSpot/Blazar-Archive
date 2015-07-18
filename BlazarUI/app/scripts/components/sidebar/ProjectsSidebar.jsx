@@ -21,11 +21,12 @@ class ProjectsSidebar extends React.Component {
     let groupedRepos = this.props.builds.grouped;
 
     let sidebarRepoList = [];
-    for (let repo in groupedRepos) {
+    groupedRepos.forEach( (repo) => {
       sidebarRepoList.push(
-        <ProjectsSidebarListItem key={repo} repo={groupedRepos[repo]} />
+        <ProjectsSidebarListItem key={repo.name} repo={repo} />
       );
-    }
+    })
+
 
     return (
       <div>
