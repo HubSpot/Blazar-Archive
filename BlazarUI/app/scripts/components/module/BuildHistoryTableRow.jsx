@@ -64,7 +64,7 @@ class BuildHistoryTableRow extends React.Component {
         </td>
         <td>
           <Copyable text={buildState.commitSha} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
-            <Icon classNames='fa-roomy fa-link' name='clipboard' />
+            <Icon classNames='icon-roomy fa-link' name='clipboard' />
           </Copyable>
           <a href={commitLink} target="_blank">{sha}</a>
         </td>
