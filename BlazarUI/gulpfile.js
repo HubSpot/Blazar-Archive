@@ -47,8 +47,10 @@ gulp.task('lint', function () {
 
 // fonts
 gulp.task('fonts', function() {
-    return gulp.src([ './node_modules/font-awesome/fonts/fontawesome-webfont.*'])
-      .pipe(gulp.dest(dist + 'font-awesome/fonts/'));
+  return gulp.src([
+    './node_modules/font-awesome/fonts/fontawesome-webfont.*',
+    './bower_components/octicons/octicons/*.{eot,svg,ttf,woff,svg}'
+  ]).pipe(gulp.dest(dist + 'css/fonts/'));
 });
 
 // copy html from app to dist
@@ -63,7 +65,8 @@ gulp.task('vendorStyles', function () {
   var files = [
     './node_modules/bootstrap/dist/css/bootstrap.css',
     './node_modules/font-awesome/css/font-awesome.css',
-    './node_modules/react-select/dist/default.css'
+    './node_modules/react-select/dist/default.css',
+    './bower_components/octicons/octicons/octicons.css'
   ];
   return gulp.src(files)
     .pipe(concatCss('vendor.css'))
