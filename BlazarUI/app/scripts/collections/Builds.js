@@ -23,7 +23,7 @@ class Builds extends BaseCollection {
 
 
   groupBuilds() {
-    // jobs grouped by repo
+    // builds grouped by repo
     let grouped = _(this.data).groupBy(function(o) {
       return o.gitInfo.repository;
     });
@@ -46,12 +46,28 @@ class Builds extends BaseCollection {
         isBuilding: grouped[repo].moduleIsBuilding,
         modules: grouped[repo]
       })
-      // sorted.push([repo, grouped[repo]])
-      // sorted.sort(function(a, b) {return a[1] - b[1]})
     }
 
-    // To do: sort repos in order of most recent module in progress
-    // To do: if the job is dead, sort by order of last built
+    groupedInArray.forEach( (repo) => {
+      // find most recent build
+      repo.mostRecentBuild = repo.modules[0].buildState.startTime;
+      repo.modules.forEach( (module) => {
+        if (module.buildState.startTime < repo.mostRecentBuild) {
+          repo.mostRecentBuild = module.buildState.startTime;
+        }
+
+      })
+    })
+
+    // sort by if building then by most recent build time
+    function cmp(x, y) {
+      return x > y ? 1 : x < y ? -1 : 0;
+    }
+
+    groupedInArray.sort( (a,b) => { ;
+      return cmp(b.isBuilding, a.isBuilding) || cmp(a.mostRecentBuild, b.mostRecentBuild);
+    })
+
     return groupedInArray;
 
   }
