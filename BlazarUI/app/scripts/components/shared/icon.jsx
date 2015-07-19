@@ -3,7 +3,8 @@ import React from 'react';
 class Icon extends React.Component {
 
   getClassNames() {
-    let classNames =  `fa fa-${this.props.name} ${this.props.classNames}`;
+
+    let classNames =  `${this.props.type} ${this.props.type}-${this.props.name} ${this.props.classNames}`;
     return classNames;
   }
 
@@ -16,10 +17,12 @@ class Icon extends React.Component {
 }
 
 Icon.defaultProps = {
+  type: 'fa',
   classNames: ''
 };
 
 Icon.propTypes = {
+  type: React.PropTypes.oneOf('fa', 'octicon'),
   name: React.PropTypes.string.isRequired,
   classNames: React.PropTypes.string
 };
