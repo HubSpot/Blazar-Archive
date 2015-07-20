@@ -3,19 +3,30 @@ import React from 'react';
 class BuildingIcon extends React.Component {
 
   getClassNames() {
-    return 'la-ball-scale la-sm sidebar__active-building-icon ' + this.props.status;
+    return `building-icon sidebar__active-building-icon building-icon--${this.props.result} ${this.props.classNames} building-icon--${this.props.size}`;
+  }
+
+  getInnerClassNames() {
+    return `building-icon-inner building-icon-inner--${this.props.size}`;
   }
 
   render() {
     return (
-      <div className={this.getClassNames()}><div></div></div>
+      <div className={this.getClassNames()}><div className={this.getInnerClassNames()}></div></div>
     );
   }
 
 }
 
+BuildingIcon.defaultProps = {
+  classNames: '',
+  size: 'medium'
+};
+
 BuildingIcon.propTypes = {
-  status: React.PropTypes.string
+  result: React.PropTypes.string,
+  classNames: React.PropTypes.string,
+  size: React.PropTypes.oneOf(['medium', 'small'])
 };
 
 export default BuildingIcon;

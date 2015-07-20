@@ -7,15 +7,16 @@
 .sidebar__list
   margin-top 20px
 
+.sidebar__repo-url
+  font-size 11px
+
 .sidebar__repo
-  font-size 20px
+  font-size 18px
   position relative
   font-weight $font-light
+  padding-left 15px
   &:hover
     cursor pointer
-
-.sidebar__repo-url
-  font-size 12px
 
 .sidebar__repo-container
   position relative
@@ -23,16 +24,20 @@
   padding 10px 0
 
 .sidebar__modules
+  position relative
   display none
+  padding-left: 18px
 
   &.expanded
     display block
-    margin-left: 10px
 
 .sidebar__repo-module
+  position relative
   display: block
+  padding-left 12px
+  line-height 1.6
+  font-size 14px
 
 .sidebar__active-building-icon
   position absolute
-  right 0
-  top 8px
+  left 0
