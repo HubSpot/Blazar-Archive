@@ -2,6 +2,7 @@ import React from 'react';
 import { bindAll } from 'underscore';
 import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
+import Icon from '../shared/Icon.jsx';
 
 class ProjectSidebarListItem extends React.Component {
 
@@ -25,6 +26,17 @@ class ProjectSidebarListItem extends React.Component {
       classNames += ' expanded';
     }
     return classNames;
+  }
+
+  getExpandStatus() {
+    let status = 'chevron-';
+    console.log('get expand status: ', this.state.expanded);
+    if (this.state.expanded === true) {
+      status += 'up';
+    } else {
+      status += 'down';
+    }
+    return status;
   }
 
   render() {
@@ -55,6 +67,7 @@ class ProjectSidebarListItem extends React.Component {
         <div className='sidebar__repo' onClick={this.handleModuleExpand}>
           {getRepoBuildState()}
           {repo.name}
+          <Icon name={this.getExpandStatus()} classNames='sidebar__expand' />
         </div>
         <div className={this.getModulesClassNames()}>
           {moduleList}
