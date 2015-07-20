@@ -201,7 +201,8 @@ public class BuildResource {
     Map<String, ModuleBuildWithState> buildMap = new ConcurrentHashMap<>();
 
     for (ModuleBuildWithState build : builds) {
-      buildMap.put(build.getGitInfo().getRepository(), build);
+      String key = build.getGitInfo().getRepository() + "/" + build.getModule().getName();
+      buildMap.put(key, build);
     }
 
     return buildMap;
