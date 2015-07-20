@@ -14,8 +14,14 @@ class Builds extends BaseCollection {
   getModuleList() {
     // list of module names, used for sidebar search
     let modules = _.map(this.data, function(item){
-      let module = { value: item.module.name, label: `${item.gitInfo.repository} » ${item.module.name}` };
-      return module;
+
+      let {gitInfo, module, buildState} = item;
+      let moduleInfo = {
+        repository: gitInfo.repository,
+        module: module.name,
+        link: `${app.config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`
+      };
+      return moduleInfo;
     });
 
     return modules;

@@ -54,12 +54,16 @@ class ProjectSidebarListItem extends React.Component {
 
     return (
       <div className='sidebar__repo-container'>
-        <div className='sidebar__repo-url'>
-          {repoLink}
-        </div>
         <div className='sidebar__repo' onClick={this.handleModuleExpand}>
-          {getRepoBuildState()}
-          {repo.name}
+          <div className='sidebar__repo-url'>
+            {repoLink}
+          </div>
+          <div className='sidebar__build-detail'>
+            {getRepoBuildState()}
+            <div className='sidebar__repo-name'>
+              {repo.name}
+            </div>
+          </div>
           <Icon name={this.getExpandStatus()} classNames='sidebar__expand' />
         </div>
         <div className={this.getModulesClassNames()}>

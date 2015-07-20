@@ -1,32 +1,54 @@
 @import 'variables'
+@import 'mixins'
 
 .sidebar__headline
   font-size 24px
   margin 10px 0
 
+// holds all filtering tools
+.sidebar__filter
+  padding 0 20px
+
+// holds all our repos and modules
 .sidebar__list
   margin-top 20px
+  &.isFiltering--true
+    margin-top 120px
+    transition .5s all
 
 .sidebar__repo-url
   font-size 11px
+  font-smoothing()
+  padding-left 16px
+  margin-bottom 3px
 
 .sidebar__repo
   font-size 18px
   position relative
   font-weight $font-light
-  padding-left 15px
+  padding-left 0
   &:hover
     cursor pointer
 
+.sidebar__build-detail
+  position relative
+
+.sidebar__repo-name
+  padding-left 15px
+
 .sidebar__repo-container
   position relative
-  border-bottom 1px solid #dadada
-  padding 10px 20px
+  border-top 1px solid #dadada
+  padding 10px 15px
+  &:last-child
+    border-bottom 1px solid #dadada
+  &:hover
+    background #efefef
 
 .sidebar__modules
   position relative
   display none
-  padding-left: 18px
+  padding-left 18px
 
   &.expanded
     display block

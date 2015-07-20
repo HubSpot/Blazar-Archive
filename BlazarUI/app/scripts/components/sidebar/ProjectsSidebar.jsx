@@ -1,43 +1,88 @@
 import React from 'react';
 import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
-import ComponentHelpers from '../ComponentHelpers';
+import {bindAll, filter} from 'underscore';
 
 class ProjectsSidebar extends React.Component {
 
-  constructor(props) {
-    super(props);
-    ComponentHelpers.bindAll(this, ['updateResults']);
+  constructor() {
+    bindAll(this, 'updateResults', 'filterInputFocus');
+    this.state = {
+      filterText: '',
+      isFiltering: false
+
+    };
   }
 
   updateResults(input) {
-    // To do: expand repos to show modules searched for
-    console.log('input change: ', input);
+    this.setState({
+      filterText: input
+    });
+  }
+
+  getModulesList() {
+    let modules = this.props.builds.modules;
+    let filterText = this.state.filterText;
+
+    if (filterText.length === 0) {
+      return modules;
+    }
+    // To do: fuzzy search
+    // case insensitive
+    let filteredModules = filter(modules, (build) => {
+      return build.module.indexOf(filterText) !== -1;
+    });
+
+    return filteredModules;
+  }
+
+  filterInputFocus(status) {
+    this.setState({
+      isFiltering: status
+    });
+  }
+
+  getSidebarListClassNames() {
+    return `sidebar__list isFiltering--${this.state.isFiltering}`;
   }
 
   render() {
-    // To do: replcae loading text with animation
+    // To do: replace loading text with animation
     let loading = this.props.loading ? <div>Loading Projects...</div> : '';
     let groupedRepos = this.props.builds.grouped;
 
     let sidebarRepoList = [];
     groupedRepos.forEach( (repo) => {
+
+      // To do: fuzzy search
+      if (this.state.filterText.length > 0) {
+        let match = repo.name.indexOf(this.state.filterText);
+        if (match === -1) {
+          return;
+        }
+      }
+
       sidebarRepoList.push(
-        <ProjectsSidebarListItem key={repo.name} repo={repo} />
+        <ProjectsSidebarListItem filterText={this.state.filterText} key={repo.name} repo={repo} />
       );
+
     });
 
 
     return (
       <div>
         {loading}
-        <SidebarFilter
-          loading={this.props.loading}
-          repos={groupedRepos}
-          modules={this.props.builds.modules}
-          updateResults={this.updateResults}
-        />
-        <div className='sidebar__list'>
+        <div className='sidebar__filter'>
+          <SidebarFilter
+            loading={this.props.loading}
+            repos={groupedRepos}
+            modules={this.getModulesList()}
+            updateResults={this.updateResults}
+            filterText={this.state.filterText}
+            filterInputFocus={this.filterInputFocus}
+          />
+        </div>
+        <div className={this.getSidebarListClassNames()}>
           {sidebarRepoList}
         </div>
       </div>
