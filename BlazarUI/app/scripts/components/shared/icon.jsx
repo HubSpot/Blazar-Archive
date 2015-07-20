@@ -22,7 +22,7 @@ Icon.defaultProps = {
 };
 
 Icon.propTypes = {
-  type: React.PropTypes.oneOf('fa', 'octicon'),
+  type: React.PropTypes.oneOf(['fa', 'octicon']),
   name: React.PropTypes.string.isRequired,
   classNames: React.PropTypes.string
 };
