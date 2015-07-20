@@ -28,7 +28,6 @@ class ProjectSidebarListItem extends React.Component {
   }
 
   render() {
-
     let repo = this.props.repo;
     let modules = this.props.repo.modules;
     let repoGitInfo = modules[0].gitInfo;
@@ -44,7 +43,7 @@ class ProjectSidebarListItem extends React.Component {
 
     function getRepoBuildState() {
       if (repo.isBuilding) {
-        return <BuildingIcon status='success' />;
+        return <BuildingIcon result='IN_PROGRESS' />;
       }
     }
 
