@@ -2,12 +2,6 @@ import moment from 'moment';
 
 let ComponentHelpers = {
 
-  bindAll: function(scope, arr){
-    arr.forEach(function(method){
-      scope[method] = scope[method].bind(scope);
-    })
-  },
-
   // 'DRIVER_NOT_RUNNING' => 'Driver not running'
   humanizeText: function(string){
     if (!string){
