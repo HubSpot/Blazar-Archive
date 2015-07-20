@@ -168,14 +168,34 @@ public class BuildResource {
     List<ModuleBuildWithState> builds = new ArrayList<>();
 
     builds.add(build("Contacts", "ContactsHadoop"));
+    builds.add(build("Contacts", "ContactsApiWeb"));
+    builds.add(build("Contacts", "ContactsBase"));
+    builds.add(build("Contacts", "ContactsData"));
+    builds.add(build("Contacts", "ContactsKafka"));
+    builds.add(build("Contacts", "ContactsSpark"));
+    builds.add(build("Contacts", "ContactsTasks"));
     builds.add(build("HubSpotConnect"));
     builds.add(build("guice-jdbi"));
     builds.add(build("dropwizard-hubspot"));
     builds.add(build("Wormhole"));
     builds.add(build("Email", "EmailApiClient"));
+    builds.add(build("Email", "EmailApiWeb"));
+    builds.add(build("Email", "EmailApiCore"));
+    builds.add(build("Email", "EmailApiData"));
+    builds.add(build("Email", "EmailJobs"));
     builds.add(build("TaskService", "TaskServiceWorker"));
+    builds.add(build("TaskService", "TaskServiceApiWeb"));
+    builds.add(build("TaskService", "TaskServiceData"));
+    builds.add(build("TaskService", "TaskServiceCommon"));
     builds.add(build("InternalEmail", "InternalEmailJobs"));
+    builds.add(build("InternalEmail", "InternalEmailData"));
+    builds.add(build("InternalEmail", "InternalEmailService"));
+    builds.add(build("InternalEmail", "InternalEmailClient"));
+    builds.add(build("InternalEmail", "InternalEmailCore"));
     builds.add(build("DeployService", "DeployServiceData"));
+    builds.add(build("DeployService", "DeployServiceApiWeb"));
+    builds.add(build("DeployService", "DeployCore"));
+    builds.add(build("DeployService", "DeployTasks"));
     builds.add(build("HubSpotConfig"));
 
     Map<String, ModuleBuildWithState> buildMap = new ConcurrentHashMap<>();
