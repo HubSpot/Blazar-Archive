@@ -29,14 +29,7 @@ class ProjectSidebarListItem extends React.Component {
   }
 
   getExpandStatus() {
-    let status = 'chevron-';
-    console.log('get expand status: ', this.state.expanded);
-    if (this.state.expanded === true) {
-      status += 'up';
-    } else {
-      status += 'down';
-    }
-    return status;
+    return this.state.expanded ? 'chevron-up' : 'chevron-down';
   }
 
   render() {
@@ -79,7 +72,8 @@ class ProjectSidebarListItem extends React.Component {
 
 ProjectSidebarListItem.propTypes = {
   repo: React.PropTypes.object,
-  project: React.PropTypes.object
+  project: React.PropTypes.object,
+  filterText: React.PropTypes.string
 };
 
 export default ProjectSidebarListItem;
