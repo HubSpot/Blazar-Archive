@@ -19,7 +19,7 @@ public class BlazarConfiguration extends Configuration {
   private ZooKeeperConfiguration zooKeeperConfiguration;
 
   @JsonProperty("database")
-  private Optional<DataSourceFactory> databaseConfiguration = Optional.absent();
+  private DataSourceFactory databaseConfiguration;
 
   public Optional<GitHubConfiguration> getGitHubConfiguration() {
     return gitHubConfiguration;
@@ -39,12 +39,12 @@ public class BlazarConfiguration extends Configuration {
     return this;
   }
 
-  public Optional<DataSourceFactory> getDatabaseConfiguration() {
+  public DataSourceFactory getDatabaseConfiguration() {
     return databaseConfiguration;
   }
 
   public BlazarConfiguration setDatabaseConfiguration(DataSourceFactory databaseConfiguration) {
-    this.databaseConfiguration = Optional.of(databaseConfiguration);
+    this.databaseConfiguration = databaseConfiguration;
     return this;
   }
 }

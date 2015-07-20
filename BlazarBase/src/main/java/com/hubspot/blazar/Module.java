@@ -3,6 +3,8 @@ package com.hubspot.blazar;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class Module {
   private final String name;
   private final String path;
@@ -19,5 +21,24 @@ public class Module {
 
   public String getPath() {
     return path;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    Module module = (Module) o;
+    return Objects.equals(name, module.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name);
   }
 }
