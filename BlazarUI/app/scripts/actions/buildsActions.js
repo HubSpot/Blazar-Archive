@@ -26,7 +26,9 @@ BuildsActions.loadBuilds.preEmit = function(data) {
       setTimeout(doPoll, app.config.jobRefresh);
     });
 
-    promise.error( () => {
+    promise.error( (err) => {
+      console.warn('Error connecting to the API. Check that you are connected to the VPN');
+      // To do
       BuildsActions.loadBuildsError('an error occured');
     })
 
