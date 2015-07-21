@@ -25,7 +25,7 @@ class SidebarFilterOption extends React.Component {
           {inputValue}
           <strong>
             {optionData.slice(inputValue.length)}
-            </strong>
+          </strong>
         </span>
       );
     }
@@ -72,6 +72,10 @@ class SidebarFilter extends React.Component {
   onKeyDown(event, build) {
     if (event.keyCode === 13) {
       this.linkToBuild(build.link);
+    }
+    if (event.keyCode === 27) {
+      this.setInputValue('');
+      this.props.filterInputFocus(false);
     }
   }
 
