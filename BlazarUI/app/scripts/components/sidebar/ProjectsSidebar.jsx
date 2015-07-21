@@ -10,7 +10,6 @@ class ProjectsSidebar extends React.Component {
     this.state = {
       filterText: '',
       isFiltering: false
-
     };
   }
 
@@ -35,6 +34,8 @@ class ProjectsSidebar extends React.Component {
   }
 
   filterInputFocus(status) {
+    // to do: adjust margin based on
+    // number of search results
     this.setState({
       isFiltering: status
     });
@@ -50,18 +51,37 @@ class ProjectsSidebar extends React.Component {
     let groupedRepos = this.props.builds.grouped;
 
     let sidebarRepoList = [];
+
     groupedRepos.forEach( (repo) => {
 
       // To do: fuzzy search
       if (this.state.filterText.length > 0) {
-        let match = repo.name.toLowerCase().indexOf(this.state.filterText.toLowerCase());
-        if (match === -1) {
+
+        // match repo name
+        let repoMatch = repo.name.toLowerCase().indexOf(this.state.filterText.toLowerCase());
+
+        // or module name
+        let moduleMatches = false;
+        repo.modules.forEach( (module) => {
+          if (module.module.name.toLowerCase().indexOf(this.state.filterText.toLowerCase()) !== -1){
+            moduleMatches = true;
+          }
+        })
+
+        if (repoMatch === -1 && !moduleMatches) {
           return;
         }
       }
 
+      // expand repos to expose modules
+      // if our list is less than 3
+      let isExpanded = false;
+      if (sidebarRepoList.length < 3) {
+        isExpanded = true;
+      }
+
       sidebarRepoList.push(
-        <ProjectsSidebarListItem filterText={this.state.filterText} key={repo.name} repo={repo} />
+        <ProjectsSidebarListItem isExpanded={isExpanded} filterText={this.state.filterText} key={repo.name} repo={repo} />
       );
 
     });
