@@ -28,11 +28,9 @@ class ProjectsSidebar extends React.Component {
       return modules;
     }
     // To do: fuzzy search
-    // case insensitive
     let filteredModules = filter(modules, (build) => {
-      return build.module.indexOf(filterText) !== -1;
+      return build.module.toLowerCase().indexOf(filterText.toLowerCase()) !== -1;
     });
-
     return filteredModules;
   }
 
@@ -56,7 +54,7 @@ class ProjectsSidebar extends React.Component {
 
       // To do: fuzzy search
       if (this.state.filterText.length > 0) {
-        let match = repo.name.indexOf(this.state.filterText);
+        let match = repo.name.toLowerCase().indexOf(this.state.filterText.toLowerCase());
         if (match === -1) {
           return;
         }
