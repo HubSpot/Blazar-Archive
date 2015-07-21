@@ -1,11 +1,18 @@
 
 module.exports.getApiEndpoint = function(type) {
-  var isDev = type === 'development';
-  var endpoint;
 
-  if(isDev){
-    return endpoint = process.env['BLAZAR_API_ENDPOINT']
-  }
-  return ''
+  console.log('TYPE: ', type);
+
+  // To do: set this up using prompt and localstorage
+  var endpoints = {
+    'staging': process.env['BLAZAR_API_STAGING'],
+    'qa': process.env['BLAZAR_API_QA'],
+    'prod': process.env['BLAZAR_API_PROD']
+  };
+
+  return endpoints[type];
+
+
+
 
 }

@@ -7,7 +7,7 @@ var gulpCopy = require('gulp-copy');
 var url = require('url');
 
 // set variable via $ gulp --type production
-var environment = $.util.env.type || 'development';
+var environment = $.util.env.type || 'staging';
 var isProduction = environment === 'production';
 var apiEndpoint = require('./config.js').getApiEndpoint(environment);
 var webpackConfig = require('./webpack.config.js').getConfig(environment);
