@@ -6,8 +6,7 @@ import Icon from '../shared/Icon.jsx';
 
 class ProjectSidebarListItem extends React.Component {
 
-  constructor(props) {
-    super(props);
+  constructor() {
 
     this.state = {
       expanded: false
@@ -30,6 +29,10 @@ class ProjectSidebarListItem extends React.Component {
 
   getExpandStatus() {
     return this.state.expanded ? 'chevron-up' : 'chevron-down';
+  }
+
+  componentWillReceiveProps() {
+    this.setState({ expanded: this.props.isExpanded });
   }
 
   render() {
@@ -77,7 +80,8 @@ class ProjectSidebarListItem extends React.Component {
 ProjectSidebarListItem.propTypes = {
   repo: React.PropTypes.object,
   project: React.PropTypes.object,
-  filterText: React.PropTypes.string
+  filterText: React.PropTypes.string,
+  isExpanded: React.PropTypes.bool
 };
 
 export default ProjectSidebarListItem;

@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 class SidebarFilterOption extends React.Component {
 
   render() {
@@ -21,7 +20,7 @@ class SidebarFilterOption extends React.Component {
           {inputValue}
           <strong>
             {optionData.slice(inputValue.length)}
-            </strong>
+          </strong>
         </span>
       );
     }
@@ -36,3 +35,5 @@ SidebarFilterOption.propTypes = {
   isSelected: React.PropTypes.bool,
   userInputValue: React.PropTypes.string
 };
+
+export default SidebarFilterOption;
