@@ -34,8 +34,8 @@ class ProjectsSidebar extends React.Component {
   }
 
   filterInputFocus(status) {
-    // to do: adjust margin based on
-    // number of search results
+    // to do: adjust margin below search box
+    // based on number of search results
     this.setState({
       isFiltering: status
     });
@@ -45,47 +45,56 @@ class ProjectsSidebar extends React.Component {
     return `sidebar__list isFiltering--${this.state.isFiltering}`;
   }
 
-  render() {
-    // To do: replace loading text with animation
-    let loading = this.props.loading ? <div>Loading Projects...</div> : '';
-    let groupedRepos = this.props.builds.grouped;
+  // To do: fuzzy search
+  getFilteredRepos() {
+    let matches = [];
 
-    let sidebarRepoList = [];
+    this.props.builds.grouped.forEach( (repo) => {
 
-    groupedRepos.forEach( (repo) => {
-
-      // To do: fuzzy search
       if (this.state.filterText.length > 0) {
 
-        // match repo name
-        let repoMatch = repo.name.toLowerCase().indexOf(this.state.filterText.toLowerCase());
+        let repoMatches = repo.name.toLowerCase().indexOf(this.state.filterText.toLowerCase()) !== -1;
 
-        // or module name
-        let moduleMatches = false;
-        repo.modules.forEach( (module) => {
-          if (module.module.name.toLowerCase().indexOf(this.state.filterText.toLowerCase()) !== -1){
-            moduleMatches = true;
+        let anyModuleMatches = false;
+        repo.modules.forEach( (mod) => {
+          if (mod.module.name.toLowerCase().indexOf(this.state.filterText.toLowerCase()) !== -1) {
+            anyModuleMatches = true;
           }
-        })
+        });
 
-        if (repoMatch === -1 && !moduleMatches) {
+        if (!repoMatches && !anyModuleMatches) {
           return;
         }
       }
 
-      // expand repos to expose modules
-      // if our list is less than 3
-      let isExpanded = false;
-      if (sidebarRepoList.length < 3) {
-        isExpanded = true;
-      }
-
-      sidebarRepoList.push(
-        <ProjectsSidebarListItem isExpanded={isExpanded} filterText={this.state.filterText} key={repo.name} repo={repo} />
-      );
+      matches.push({
+        filterText: this.state.filterText,
+        key: repo.name,
+        repo: repo
+      });
 
     });
 
+    return matches;
+  }
+
+
+  render() {
+    // To do: replace loading text with animation
+    let loading = this.props.loading ? <div>Loading Projects...</div> : '';
+
+    let filteredRepos = this.getFilteredRepos();
+
+    let filteredRepoComponents = filteredRepos.map( (item) => {
+      return (
+        <ProjectsSidebarListItem
+          key={item.key}
+          isExpanded={filteredRepos.length < 3}
+          filterText={item.filterText}
+          repo={item.repo}
+        />
+      );
+    });
 
     return (
       <div>
@@ -93,7 +102,7 @@ class ProjectsSidebar extends React.Component {
         <div className='sidebar__filter'>
           <SidebarFilter
             loading={this.props.loading}
-            repos={groupedRepos}
+            repos={this.props.builds.grouped}
             modules={this.getModulesList()}
             updateResults={this.updateResults}
             filterText={this.state.filterText}
@@ -101,7 +110,7 @@ class ProjectsSidebar extends React.Component {
           />
         </div>
         <div className={this.getSidebarListClassNames()}>
-          {sidebarRepoList}
+          {filteredRepoComponents}
         </div>
       </div>
     );
