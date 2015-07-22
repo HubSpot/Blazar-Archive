@@ -13,7 +13,7 @@ class Builds extends BaseCollection {
 
   getBranchModules(branchInfo) {
 
-    let groupBuilds = this.groupBuilds()
+    let groupBuilds = this.groupBuildsByRepo()
 
     return _.findWhere(groupBuilds, {
       organization: branchInfo.org,
@@ -40,7 +40,7 @@ class Builds extends BaseCollection {
   }
 
 
-  groupBuilds() {
+  groupBuildsByRepo() {
     // builds grouped by repo
     let grouped = _(this.data).groupBy(function(o) {
       return o.gitInfo.repository;
