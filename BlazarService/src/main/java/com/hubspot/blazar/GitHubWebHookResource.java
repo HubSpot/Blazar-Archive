@@ -61,7 +61,7 @@ public class GitHubWebHookResource {
 
     Set<String> poms = new HashSet<>();
     for (GHTreeEntry entry : tree.getTree()) {
-      if ("pom.xml".equals(entry.getPath()) || entry.getPath().endsWith("/pom.xml")) {
+      if (isPom(entry.getPath())) {
         poms.add(entry.getPath());
       }
     }
@@ -77,10 +77,10 @@ public class GitHubWebHookResource {
     return modules;
   }
 
-  private void updateBuilds(PushEvent pushEvent) {
+  private void updateBuilds(PushEvent pushEvent) throws IOException {
     for (String path : affectedPaths(pushEvent)) {
-      if (path.endsWith("pom.xml")) {
-        System.out.println("POM changed: " + path);
+      if (isPom(path)) {
+        processBranch(gitInfo(pushEvent));
       }
     }
   }
@@ -92,7 +92,7 @@ public class GitHubWebHookResource {
     Set<Module> toBuild = new HashSet<>();
     for (String path : affectedPaths(pushEvent)) {
       for (Module module : modules) {
-        if (path.startsWith(module.getPath())) {
+        if (module.contains(path)) {
           toBuild.add(module);
         }
       }
@@ -101,6 +101,10 @@ public class GitHubWebHookResource {
     for (Module module : toBuild) {
       System.out.println("Going to build module: " + module.getName());
     }
+  }
+
+  private static boolean isPom(String path) {
+    return "pom.xml".equals(path) || path.endsWith("/pom.xml");
   }
 
   private GitInfo gitInfo(PushEvent pushEvent) {
