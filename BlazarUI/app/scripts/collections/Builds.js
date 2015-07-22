@@ -73,7 +73,8 @@ class Builds extends BaseCollection {
       repo.organization = repo.modules[0].gitInfo.organization;
 
       repo.modules.forEach( (module) => {
-        module.modulePath = `${app.config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`
+        module.modulePath = `${app.config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
+        module.buildState.buildLink = `${app.config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.buildState.buildNumber}`;
         if (module.buildState.startTime < repo.mostRecentBuild) {
           repo.mostRecentBuild = module.buildState.startTime;
         }
