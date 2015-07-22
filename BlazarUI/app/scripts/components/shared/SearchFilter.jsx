@@ -17,7 +17,7 @@ class SearchFilter extends React.Component {
   }
 
   handleKeyup(e) {
-    if (e.which == 84) {
+    if (e.which === 84) {
       this.refs.searchFilterInput.getDOMNode().focus();
     }
   }

@@ -61,7 +61,7 @@ class ProjectsSidebar extends React.Component {
 
     let results = fuzzy.filter(this.state.filterText, list, options);
 
-    let final = results.map( (el) => {
+    results.map( (el) => {
       matches.push({
         filterText: this.state.filterText,
         key: el.original.repository,
