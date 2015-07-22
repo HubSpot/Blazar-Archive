@@ -20,14 +20,16 @@ class BranchTable extends React.Component {
     }
 
     let columnNames = [
-      {label: 'Last Build', key: 'lastBuild'},
-      {label: 'Branch Modules', key: 'module'}
-
+      {label: 'Latest Build', key: 'latestBuild'},
+      {label: 'Module', key: 'module'},
+      {label: 'Start Time', key: 'startTime'},
+      {label: 'Duration', key: 'duration'},
+      {label: 'Commit', key: 'commit'}
     ];
 
     // TO DO: empty table
     return (
-      <table className="table table-hover table-striped branch-table">
+      <table className="table table-hover table-striped">
         <TableHeader
           columnNames={columnNames}
         />
