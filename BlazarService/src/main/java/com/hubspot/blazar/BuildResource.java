@@ -254,7 +254,7 @@ public class BuildResource {
 
   private static ModuleBuildWithState build(String repoName, String moduleName, String branch, String organization, String host) {
     GitInfo gitInfo = new GitInfo(host, organization, repoName, branch);
-    return new ModuleBuildWithState(gitInfo, new Module(moduleName, moduleName), buildState());
+    return new ModuleBuildWithState(gitInfo, new Module(".".equals(moduleName) ? repoName : moduleName, moduleName), buildState());
   }
 
   private static GitInfo gitInfo(String repository) {
