@@ -18,7 +18,7 @@ BuildsActions.loadBuilds.preEmit = function(data) {
     promise.done( () => {
       let allBuilds = {};
       allBuilds.modules = builds.getModuleList();
-      allBuilds.grouped = builds.groupBuilds();
+      allBuilds.grouped = builds.groupBuildsByRepo();
       BuildsActions.loadBuildsSuccess(allBuilds);
     });
 
