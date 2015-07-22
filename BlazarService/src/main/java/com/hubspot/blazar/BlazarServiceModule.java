@@ -22,6 +22,8 @@ public class BlazarServiceModule extends AbstractModule {
     bind(BuildResource.class);
     bind(GitHubWebHookResource.class);
 
+    bind(BuildService.class);
+
     Multibinder.newSetBinder(binder(), ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
   }
 
