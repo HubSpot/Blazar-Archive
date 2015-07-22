@@ -44,9 +44,9 @@ class ProjectSidebarListItem extends React.Component {
 
     let moduleList = [];
 
-    modules.forEach( (r) => {
+    modules.forEach( (build) => {
       moduleList.push(
-        <Module key={r.buildState.buildNumber} repo={r} />
+        <Module key={build.modulePath} repo={build} />
       );
     });
 
