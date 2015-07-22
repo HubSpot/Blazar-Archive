@@ -1,9 +1,10 @@
 import React from 'react';
 import PageHeader from '../shared/PageHeader.jsx';
-import PageSection from '../shared/PageSection.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
+import PageHeadline from '../shared/PageHeadline.jsx';
+import BranchList from './BranchList.jsx';
 
 class Branch extends React.Component{
 
@@ -11,12 +12,14 @@ class Branch extends React.Component{
     return (
       <div>
         <PageHeader>
-          <h2 className='header-primary'> {this.props.params.branch} <span className='header-subheader'> / Branch Modules  </span> </h2>
           <Breadcrumb />
+          <PageHeadline headline={this.props.params.branch} subheadline="Branch Modules" />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            <PageSection headline='Module Listing'></PageSection>
+            <BranchList
+              modules={this.props.modules}
+            />
           </UIGridItem>
         </UIGrid>
       </div>
@@ -28,7 +31,8 @@ class Branch extends React.Component{
 Branch.defaultProps = { loading: true };
 
 Branch.propTypes = {
-  params: React.PropTypes.object.isRequired
+  params: React.PropTypes.object.isRequired,
+  modules: React.PropTypes.array.isRequired
 };
 
 export default Branch;
