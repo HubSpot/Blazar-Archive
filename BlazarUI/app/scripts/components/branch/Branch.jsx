@@ -4,7 +4,7 @@ import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
-import BranchList from './BranchList.jsx';
+import BranchTable from './BranchTable.jsx';
 
 class Branch extends React.Component{
 
@@ -17,7 +17,7 @@ class Branch extends React.Component{
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            <BranchList
+            <BranchTable
               modules={this.props.modules}
             />
           </UIGridItem>
