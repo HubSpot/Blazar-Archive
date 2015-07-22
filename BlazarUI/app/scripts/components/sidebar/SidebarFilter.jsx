@@ -2,27 +2,26 @@ import React from 'react';
 import Typeahead from 'react-typeahead-component';
 import {bindAll} from 'underscore';
 import SidebarFilterOption from './SidebarFilterOption.jsx';
-// import Router from 'react-router';
 
 
 class SidebarFilter extends React.Component {
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
+
     this.state = {
       inputValue: ''
     };
     bindAll(this, 'handleOptionClick', 'handleChange', 'handleFocus', 'handleBlur', 'onKeyDown');
+
   }
 
   setInputValue(value) {
     this.props.updateResults(value);
   }
 
-  // to do: use react link so we dont have
-  // a full page refresh
   linkToBuild(link) {
-    window.location = link;
+    this.context.router.transitionTo(link);
   }
 
   handleChange(event) {
@@ -73,6 +72,10 @@ class SidebarFilter extends React.Component {
 
   }
 }
+
+SidebarFilter.contextTypes = {
+  router: React.PropTypes.func.isRequired
+};
 
 SidebarFilter.propTypes = {
   updateResults: React.PropTypes.func.isRequired,
