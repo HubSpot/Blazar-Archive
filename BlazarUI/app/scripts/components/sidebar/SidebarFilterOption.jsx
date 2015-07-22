@@ -13,7 +13,7 @@ class SidebarFilterOption extends React.Component {
   renderOption() {
     let optionData = this.props.data.module;
     let inputValue = this.props.userInputValue || '';
-    let inputValueToDisplay = optionData.slice(0, inputValue.length)
+    let inputValueToDisplay = optionData.slice(0, inputValue.length);
 
     if (optionData.toLowerCase().indexOf(inputValue.toLowerCase()) === 0) {
       return (
