@@ -3,6 +3,8 @@ package com.hubspot.blazar;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class ModuleBuild {
   private final GitInfo gitInfo;
   private final Module module;
@@ -19,5 +21,24 @@ public class ModuleBuild {
 
   public Module getModule() {
     return module;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    ModuleBuild that = (ModuleBuild) o;
+    return Objects.equals(gitInfo, that.gitInfo) && Objects.equals(module, that.module);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(gitInfo, module);
   }
 }

@@ -27,7 +27,7 @@ import static com.hubspot.blazar.BuildState.Result.IN_PROGRESS;
 @Path("/builds")
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildResource {
-  private static final Map<GitInfo, ModuleBuildWithState> BUILD_MAP = initialBuilds();
+  private static final Map<ModuleBuild, ModuleBuildWithState> BUILD_MAP = initialBuilds();
 
   @Inject
   public BuildResource() {}
@@ -129,7 +129,7 @@ public class BuildResource {
   }
 
   private static void updateBuildMap() {
-    for (Entry<GitInfo, ModuleBuildWithState> entry : BUILD_MAP.entrySet()) {
+    for (Entry<ModuleBuild, ModuleBuildWithState> entry : BUILD_MAP.entrySet()) {
       ModuleBuildWithState build = entry.getValue();
 
       do {
@@ -164,7 +164,7 @@ public class BuildResource {
     }
   }
 
-  private static Map<GitInfo, ModuleBuildWithState> initialBuilds() {
+  private static Map<ModuleBuild, ModuleBuildWithState> initialBuilds() {
     List<ModuleBuildWithState> builds = new ArrayList<>();
 
     builds.add(build("Contacts", "ContactsHadoop"));
@@ -226,10 +226,10 @@ public class BuildResource {
     builds.add(build("Singularity", "SingularityS3Downloader", "hs_staging", "HubSpot", "github.com"));
     builds.add(build("Singularity", "SingularityExecutor", "hs_staging", "HubSpot", "github.com"));
 
-    Map<GitInfo, ModuleBuildWithState> buildMap = new ConcurrentHashMap<>();
+    Map<ModuleBuild, ModuleBuildWithState> buildMap = new ConcurrentHashMap<>();
 
     for (ModuleBuildWithState build : builds) {
-      buildMap.put(build.getGitInfo(), build);
+      buildMap.put(new ModuleBuild(build.getGitInfo(), build.getModule()), build);
     }
 
     return buildMap;
