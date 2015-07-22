@@ -1,15 +1,17 @@
 import React from 'react';
 import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
-import {bindAll, filter} from 'underscore';
+import {bindAll, filter, contains} from 'underscore';
+
 
 class ProjectsSidebar extends React.Component {
 
   constructor() {
-    bindAll(this, 'updateResults', 'filterInputFocus');
+    bindAll(this, 'updateResults', 'filterInputFocus', 'moduleExpandChange');
     this.state = {
       filterText: '',
-      isFiltering: false
+      isFiltering: false,
+      expandedRepos: []
     };
   }
 
@@ -78,20 +80,44 @@ class ProjectsSidebar extends React.Component {
     return matches;
   }
 
+  moduleExpandChange(id) {
+
+    let expandedIndex = this.state.expandedRepos.indexOf(id);
+
+    if (expandedIndex !== -1) {
+      let newExpandedRepos = this.state.expandedRepos.slice();
+      newExpandedRepos.splice(expandedIndex, 1);
+
+      this.setState({
+        expandedRepos: newExpandedRepos
+      });
+
+    } else {
+      this.setState({
+        expandedRepos: this.state.expandedRepos.concat(id)
+      });
+    }
+
+  }
 
   render() {
     // To do: replace loading text with animation
     let loading = this.props.loading ? <div>Loading Projects...</div> : '';
 
     let filteredRepos = this.getFilteredRepos();
+    let expandedState = this.state.expandedRepos;
 
     let filteredRepoComponents = filteredRepos.map( (item) => {
+
+      let isExpandedCheck = contains(expandedState, item.repo.id)
+
       return (
         <ProjectsSidebarListItem
           key={item.key}
-          isExpanded={filteredRepos.length < 3}
+          isExpanded={filteredRepos.length < 3 || isExpandedCheck}
           filterText={item.filterText}
           repo={item.repo}
+          moduleExpandChange={this.moduleExpandChange}
         />
       );
     });
