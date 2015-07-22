@@ -71,6 +71,7 @@ class Builds extends BaseCollection {
       repo.host = repo.modules[0].gitInfo.host;
       repo.branch = repo.modules[0].gitInfo.branch;
       repo.organization = repo.modules[0].gitInfo.organization;
+      repo.id = `${repo.host}_${repo.branch}_${repo.organization}_${repo.name}`;
 
       repo.modules.forEach( (module) => {
         module.modulePath = `${app.config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;

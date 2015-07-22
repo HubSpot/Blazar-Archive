@@ -16,19 +16,19 @@ class ProjectSidebarListItem extends React.Component {
   }
 
   handleModuleExpand() {
-    this.setState( { expanded: !this.state.expanded } );
+    this.props.moduleExpandChange(this.props.repo.id);
   }
 
   getModulesClassNames() {
     let classNames = 'sidebar__modules';
-    if (this.state.expanded) {
+    if (this.props.isExpanded) {
       classNames += ' expanded';
     }
     return classNames;
   }
 
   getExpandStatus() {
-    return this.state.expanded ? 'chevron-up' : 'chevron-down';
+    return this.props.isExpanded ? 'chevron-up' : 'chevron-down';
   }
 
   componentWillReceiveProps() {
@@ -36,6 +36,7 @@ class ProjectSidebarListItem extends React.Component {
   }
 
   render() {
+
     let repo = this.props.repo;
     let modules = this.props.repo.modules;
     let repoGitInfo = modules[0].gitInfo;
@@ -81,7 +82,8 @@ ProjectSidebarListItem.propTypes = {
   repo: React.PropTypes.object,
   project: React.PropTypes.object,
   filterText: React.PropTypes.string,
-  isExpanded: React.PropTypes.bool
+  isExpanded: React.PropTypes.bool,
+  moduleExpandChange: React.PropTypes.func
 };
 
 export default ProjectSidebarListItem;
