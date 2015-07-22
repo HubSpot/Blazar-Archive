@@ -1,6 +1,7 @@
 import React from 'react';
 import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
+import fuzzy from 'fuzzy';
 import {bindAll, filter, contains} from 'underscore';
 
 
@@ -36,47 +37,35 @@ class ProjectsSidebar extends React.Component {
   }
 
   filterInputFocus(status) {
-    // to do: adjust margin below search box
-    // based on number of search results
     this.setState({
       isFiltering: status
     });
   }
 
-  getSidebarListClassNames() {
-    let moduleLength = '';
-    if (this.getModulesList().length < 3) {
-      moduleLength = 'short';
-    }
-    return `sidebar__list isFiltering--${this.state.isFiltering} isFiltering--${moduleLength}`;
-  }
-
-  // To do: fuzzy search
   getFilteredRepos() {
     let matches = [];
+    let list = this.props.builds.grouped;
 
-    this.props.builds.grouped.forEach( (repo) => {
-
-      if (this.state.filterText.length > 0) {
-
-        let repoMatches = repo.repository.toLowerCase().indexOf(this.state.filterText.toLowerCase()) !== -1;
-
-        let anyModuleMatches = false;
-        repo.modules.forEach( (mod) => {
-          if (mod.module.name.toLowerCase().indexOf(this.state.filterText.toLowerCase()) !== -1) {
-            anyModuleMatches = true;
-          }
+    // To do: add emphasis on matched letters
+    let options = {
+      // pre: '<strong>' ,
+      // post: '>' ,
+      extract: function(el) {
+        let m = '';
+        el.modules.forEach( (build) => {
+          m += build.module.name;
         });
-
-        if (!repoMatches && !anyModuleMatches) {
-          return;
-        }
+        return m;
       }
+    };
 
+    let results = fuzzy.filter(this.state.filterText, list, options);
+
+    let final = results.map( (el) => {
       matches.push({
         filterText: this.state.filterText,
-        key: repo.repository,
-        repo: repo
+        key: el.original.repository,
+        repo: el.original
       });
 
     });
@@ -118,7 +107,7 @@ class ProjectsSidebar extends React.Component {
       return (
         <ProjectsSidebarListItem
           key={item.key}
-          isExpanded={filteredRepos.length < 3 || shouldExpand}
+          isExpanded={filteredRepos.length < 4 || shouldExpand}
           filterText={item.filterText}
           repo={item.repo}
           moduleExpandChange={this.moduleExpandChange}
@@ -129,17 +118,18 @@ class ProjectsSidebar extends React.Component {
     return (
       <div>
         {loading}
-        <div className='sidebar__filter'>
+        <div className="sidebar__filter">
           <SidebarFilter
             loading={this.props.loading}
             repos={this.props.builds.grouped}
             modules={this.getModulesList()}
-            updateResults={this.updateResults}
             filterText={this.state.filterText}
             filterInputFocus={this.filterInputFocus}
+            updateResults={this.updateResults}
+            test="this is a fucking test"
           />
         </div>
-        <div className={this.getSidebarListClassNames()}>
+        <div className="sidebar__list">
           {filteredRepoComponents}
         </div>
       </div>

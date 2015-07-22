@@ -1,0 +1,53 @@
+import React from 'react';
+import {bindAll} from 'underscore';
+
+// To do: Typeahead in input box
+class SearchFilter extends React.Component {
+
+  constructor() {
+    bindAll(this, 'handleFocus', 'handleBlur', 'handleChange');
+  }
+
+  componentWillUpdate() {
+    console.log('will updage');
+  }
+
+  handleFocus() {
+    this.props.onFocus();
+  }
+
+  handleBlur() {
+    this.props.onBlur();
+  }
+
+  handleChange() {
+    this.props.onChange(this.refs.searchFilterInput.getDOMNode().value);
+  }
+
+  render() {
+
+    return (
+      <input
+        type="text"
+        ref="searchFilterInput"
+        className="search-input form-control"
+        placeholder='Filter modules...'
+        value={this.props.inputValue}
+        onFocus={this.handleFocus}
+        onBlur={this.handleBlur}
+        onChange={this.handleChange}
+      />
+    );
+  }
+}
+
+SearchFilter.propTypes = {
+  placeholder: React.PropTypes.string.isRequired,
+  inputValue: React.PropTypes.string.isRequired,
+  options: React.PropTypes.array.isRequired,
+  onChange: React.PropTypes.func.isRequired,
+  onBlur: React.PropTypes.func.isRequired,
+  onFocus: React.PropTypes.func.isRequired
+};
+
+export default SearchFilter;
