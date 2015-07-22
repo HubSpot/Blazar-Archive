@@ -44,7 +44,11 @@ class ProjectsSidebar extends React.Component {
   }
 
   getSidebarListClassNames() {
-    return `sidebar__list isFiltering--${this.state.isFiltering}`;
+    let moduleLength = '';
+    if (this.getModulesList().length < 3) {
+      moduleLength = 'short';
+    }
+    return `sidebar__list isFiltering--${this.state.isFiltering} isFiltering--${moduleLength}`;
   }
 
   // To do: fuzzy search
@@ -55,7 +59,7 @@ class ProjectsSidebar extends React.Component {
 
       if (this.state.filterText.length > 0) {
 
-        let repoMatches = repo.name.toLowerCase().indexOf(this.state.filterText.toLowerCase()) !== -1;
+        let repoMatches = repo.repository.toLowerCase().indexOf(this.state.filterText.toLowerCase()) !== -1;
 
         let anyModuleMatches = false;
         repo.modules.forEach( (mod) => {
@@ -71,7 +75,7 @@ class ProjectsSidebar extends React.Component {
 
       matches.push({
         filterText: this.state.filterText,
-        key: repo.name,
+        key: repo.repository,
         repo: repo
       });
 
@@ -109,12 +113,12 @@ class ProjectsSidebar extends React.Component {
 
     let filteredRepoComponents = filteredRepos.map( (item) => {
 
-      let isExpandedCheck = contains(expandedState, item.repo.id)
+      let shouldExpand = contains(expandedState, item.repo.id);
 
       return (
         <ProjectsSidebarListItem
           key={item.key}
-          isExpanded={filteredRepos.length < 3 || isExpandedCheck}
+          isExpanded={filteredRepos.length < 3 || shouldExpand}
           filterText={item.filterText}
           repo={item.repo}
           moduleExpandChange={this.moduleExpandChange}

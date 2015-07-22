@@ -17,7 +17,7 @@ class Builds extends BaseCollection {
 
     return _.findWhere(groupBuilds, {
       organization: branchInfo.org,
-      name: branchInfo.repo,
+      repository: branchInfo.repo,
       branch: branchInfo.branch,
     })
 
@@ -25,9 +25,10 @@ class Builds extends BaseCollection {
 
   getModuleList() {
     // list of module names, used for sidebar search
-    let modules = _.map(this.data, function(item){
+    let modules = _.map(this.data, function(item) {
 
       let {gitInfo, module, buildState} = item;
+
       let moduleInfo = {
         repository: gitInfo.repository,
         module: module.name,
@@ -60,7 +61,7 @@ class Builds extends BaseCollection {
     let groupedInArray = [];
     for (var repo in grouped) {
       groupedInArray.push({
-        name: repo,
+        repository: repo,
         isBuilding: grouped[repo].moduleIsBuilding,
         modules: grouped[repo]
       })

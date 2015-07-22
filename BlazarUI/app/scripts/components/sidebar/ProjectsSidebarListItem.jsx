@@ -65,7 +65,7 @@ class ProjectSidebarListItem extends React.Component {
           <div className='sidebar__build-detail'>
             {getRepoBuildState()}
             <div className='sidebar__repo-name'>
-              {repo.name}
+              {repo.repository}
             </div>
           </div>
           <Icon name={this.getExpandStatus()} classNames='sidebar__expand' />
