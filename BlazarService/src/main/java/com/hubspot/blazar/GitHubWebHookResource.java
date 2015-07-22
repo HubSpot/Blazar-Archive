@@ -1,11 +1,14 @@
 package com.hubspot.blazar;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.inject.Inject;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
 import io.dropwizard.setup.Environment;
+import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
@@ -16,16 +19,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 @Path("/github/webhooks")
@@ -34,12 +31,17 @@ public class GitHubWebHookResource {
   private final BuildService buildService;
   private final GitHub gitHub;
   private final ObjectMapper mapper;
+  private final XmlMapper xmlMapper;
 
   @Inject
-  public GitHubWebHookResource(BuildService buildService, GitHub gitHub, Environment environment) {
+  public GitHubWebHookResource(BuildService buildService,
+                               GitHub gitHub,
+                               Environment environment,
+                               XmlMapper xmlMapper) {
     this.buildService = buildService;
     this.gitHub = gitHub;
     this.mapper = environment.getObjectMapper();
+    this.xmlMapper = xmlMapper;
   }
 
   @POST
@@ -52,8 +54,8 @@ public class GitHubWebHookResource {
 
   @PUT
   @Path("/process")
-  @Produces(MediaType.TEXT_PLAIN)
-  public String processBranch(GitInfo gitInfo) throws IOException {
+  @Produces(MediaType.APPLICATION_JSON)
+  public Set<Module> processBranch(GitInfo gitInfo) throws IOException {
     GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
     GHTree tree = repository.getTreeRecursive(gitInfo.getBranch(), 1);
 
@@ -64,33 +66,15 @@ public class GitHubWebHookResource {
       }
     }
 
-    if (poms.isEmpty()) {
-      return "No POMs found";
-    }
-
-    Map<String, Integer> pomDepth = new HashMap<>();
+    Set<Module> modules = new HashSet<>();
     for (String pom : poms) {
-      pomDepth.put(pom, pom.length() - pom.replace("/", "").length());
+      GHContent content = repository.getFileContent(pom, gitInfo.getBranch());
+      JsonNode node = xmlMapper.readTree(content.getContent());
+      String artifactId = node.get("artifactId").textValue();
+      modules.add(new Module(artifactId, pom));
     }
 
-    int minDepth = Collections.min(pomDepth.values());
-
-    Set<String> rootPoms = new HashSet<>();
-    for (Entry<String, Integer> entry : pomDepth.entrySet()) {
-      if (entry.getValue() == minDepth) {
-        rootPoms.add(entry.getKey());
-      }
-    }
-
-    if (rootPoms.size() > 1) {
-      Response response = Response.status(400)
-          .type(MediaType.TEXT_PLAIN_TYPE)
-          .entity("Unable to determine root POM for POMs: " + poms)
-          .build();
-      throw new WebApplicationException(response);
-    }
-
-    return rootPoms.iterator().next();
+    return modules;
   }
 
   private void updateBuilds(PushEvent pushEvent) {

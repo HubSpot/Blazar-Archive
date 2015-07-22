@@ -59,7 +59,22 @@
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
         <artifactId>jackson-datatype-protobuf</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot</groupId>
+        <artifactId>HorizonApache</artifactId>
+        <version>0.0.13</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot</groupId>
+        <artifactId>HorizonCore</artifactId>
+        <version>0.0.13</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot</groupId>
+        <artifactId>HorizonNing</artifactId>
+        <version>0.0.13</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

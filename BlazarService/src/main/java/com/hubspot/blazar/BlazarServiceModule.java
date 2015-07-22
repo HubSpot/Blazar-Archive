@@ -7,6 +7,8 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
+import com.hubspot.horizon.AsyncHttpClient;
+import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import org.kohsuke.github.GitHub;
@@ -56,5 +58,11 @@ public class BlazarServiceModule extends AbstractModule {
   @Singleton
   public XmlMapper providesXmlMapper() {
     return new XmlMapper();
+  }
+
+  @Provides
+  @Singleton
+  public AsyncHttpClient providesAsyncHttpClient() {
+    return new NingAsyncHttpClient();
   }
 }
