@@ -1,8 +1,6 @@
 import React from 'react';
-import Typeahead from 'react-typeahead-component';
 import {bindAll} from 'underscore';
-import SidebarFilterOption from './SidebarFilterOption.jsx';
-
+import SearchFilter from '../shared/SearchFilter.jsx';
 
 class SidebarFilter extends React.Component {
 
@@ -12,7 +10,7 @@ class SidebarFilter extends React.Component {
     this.state = {
       inputValue: ''
     };
-    bindAll(this, 'handleOptionClick', 'handleChange', 'handleFocus', 'handleBlur', 'onKeyDown');
+    bindAll(this, 'handleOptionClick', 'handleChange', 'handleFocus', 'handleBlur');
 
   }
 
@@ -24,18 +22,8 @@ class SidebarFilter extends React.Component {
     this.context.router.transitionTo(link);
   }
 
-  handleChange(event) {
-    this.setInputValue(event.target.value);
-  }
-
-  onKeyDown(event, build) {
-    if (event.keyCode === 13) {
-      this.linkToBuild(build.link);
-    }
-    if (event.keyCode === 27) {
-      this.setInputValue('');
-      this.props.filterInputFocus(false);
-    }
+  handleChange(value) {
+    this.setInputValue(value);
   }
 
   handleOptionClick(event, build) {
@@ -43,6 +31,7 @@ class SidebarFilter extends React.Component {
   }
 
   handleFocus() {
+    console.log('handleFocus() from SidebarFilter.jsx');
     this.props.filterInputFocus(true);
   }
 
@@ -56,17 +45,14 @@ class SidebarFilter extends React.Component {
     }
 
     return (
-      <Typeahead
-        ref='typeahead'
+      <SearchFilter
+        ref="buildFilterSearch"
         placeholder='Filter modules...'
         inputValue={this.props.filterText}
         options={this.props.modules}
         onChange={this.handleChange}
-        optionTemplate={SidebarFilterOption}
-        onOptionClick={this.handleOptionClick}
-        onFocus={this.handleFocus}
         onBlur={this.handleBlur}
-        onKeyDown={this.onKeyDown}
+        onFocus={this.handleFocus}
       />
     );
 

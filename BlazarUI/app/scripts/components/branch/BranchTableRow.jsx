@@ -32,8 +32,8 @@ class BranchTableRow extends React.Component {
       modulePath
     } = this.props.module;
 
+    // to do: generate commit link in build collection
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.commitSha}/`;
-    let buildLink = `${app.config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
     let startTime = Helpers.timestampFormatted(buildState.startTime);
     let duration = buildState.duration;
 
