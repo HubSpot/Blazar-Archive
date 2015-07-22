@@ -10,10 +10,18 @@ class PageContainer extends React.Component {
     return 'page-content ' + this.props.classNames;
   }
 
+  getHeadline() {
+    let headline;
+    if (this.props.headline) {
+      headline = <h2 className='PageContainer__headline'>{this.props.headline}</h2>;
+    }
+    return headline;
+  }
+
   render() {
     return (
       <div className={this.getClassNames()}>
-        <h2 className='PageContainer__headline'>{this.props.headline}</h2>
+        {this.getHeadline()}
         {this.props.children}
       </div>
     );
