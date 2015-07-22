@@ -175,9 +175,15 @@ public class BuildResource {
     builds.add(build("Contacts", "ContactsSpark"));
     builds.add(build("Contacts", "ContactsTasks"));
     builds.add(build("HubSpotConnect"));
+    builds.add(build("HubSpotConnect", ".", "gc-metrics"));
+    builds.add(build("HubSpotConnect", ".", "eager-datasource"));
     builds.add(build("guice-jdbi"));
     builds.add(build("dropwizard-hubspot"));
+    builds.add(build("dropwizard-hubspot", ".", "auth4"));
+    builds.add(build("dropwizard-hubspot", ".", "new-metrics"));
     builds.add(build("Wormhole"));
+    builds.add(build("Wormhole", ".", "better-url-escaping"));
+    builds.add(build("Wormhole", ".", "nio-hystrix"));
     builds.add(build("Email", "EmailApiClient"));
     builds.add(build("Email", "EmailApiWeb"));
     builds.add(build("Email", "EmailApiCore"));
@@ -197,6 +203,28 @@ public class BuildResource {
     builds.add(build("DeployService", "DeployCore"));
     builds.add(build("DeployService", "DeployTasks"));
     builds.add(build("HubSpotConfig"));
+    builds.add(build("HubSpotConfig", ".", "new-meta-client"));
+    builds.add(build("HubSpotConfig", ".", "no-regex"));
+    builds.add(build("Overwatch", "OverwatchCore", "master", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchClient", "master", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchData", "master", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchService", "master", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchJobs", "master", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchCore", "build-time", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchClient", "build-time", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchData", "build-time", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchService", "build-time", "PaaS"));
+    builds.add(build("Overwatch", "OverwatchJobs", "build-time", "PaaS"));
+    builds.add(build("Singularity", "SingularityBase", "master", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityData", "master", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityService", "master", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityS3Downloader", "master", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityExecutor", "master", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityBase", "hs_staging", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityData", "hs_staging", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityService", "hs_staging", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityS3Downloader", "hs_staging", "HubSpot", "github.com"));
+    builds.add(build("Singularity", "SingularityExecutor", "hs_staging", "HubSpot", "github.com"));
 
     Map<String, ModuleBuildWithState> buildMap = new ConcurrentHashMap<>();
 
@@ -213,7 +241,20 @@ public class BuildResource {
   }
 
   private static ModuleBuildWithState build(String repoName, String moduleName) {
-    return new ModuleBuildWithState(gitInfo(repoName), new Module(moduleName, moduleName), buildState());
+    return build(repoName, moduleName, "master");
+  }
+
+  private static ModuleBuildWithState build(String repoName, String moduleName, String branch) {
+    return build(repoName, moduleName, branch, "HubSpot");
+  }
+
+  private static ModuleBuildWithState build(String repoName, String moduleName, String branch, String organization) {
+    return build(repoName, moduleName, branch, organization, "git.hubteam.com");
+  }
+
+  private static ModuleBuildWithState build(String repoName, String moduleName, String branch, String organization, String host) {
+    GitInfo gitInfo = new GitInfo(host, organization, repoName, branch);
+    return new ModuleBuildWithState(gitInfo, new Module(moduleName, moduleName), buildState());
   }
 
   private static GitInfo gitInfo(String repository) {
