@@ -1,5 +1,6 @@
 package com.hubspot.blazar;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Optional;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -49,5 +50,11 @@ public class BlazarServiceModule extends AbstractModule {
     }
 
     return builder.build();
+  }
+
+  @Provides
+  @Singleton
+  public XmlMapper providesXmlMapper() {
+    return new XmlMapper();
   }
 }
