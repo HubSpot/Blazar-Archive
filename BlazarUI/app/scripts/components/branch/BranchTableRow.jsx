@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import {labels, iconStatus} from '../constants';
+import Helpers from '../ComponentHelpers';
 
 class BranchTableRow extends React.Component {
 
@@ -27,8 +28,18 @@ class BranchTableRow extends React.Component {
     let {
       buildState,
       module,
+      gitInfo,
       modulePath
     } = this.props.module;
+
+    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.commitSha}/`;
+    let buildLink = `${app.config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
+    let startTime = Helpers.timestampFormatted(buildState.startTime);
+    let duration = buildState.duration;
+
+    if (buildState.result === 'IN_PROGRESS') {
+      duration = 'In Progress...';
+    }
 
     return (
       <tr className={this.getRowClassNames()}>
@@ -38,6 +49,15 @@ class BranchTableRow extends React.Component {
       </td>
         <td>
           <Link to={modulePath}>{module.name}</Link>
+        </td>
+        <td>
+          {startTime}
+        </td>
+        <td>
+          {duration}
+        </td>
+        <td>
+          <a href={commitLink} target="_blank">{buildState.commitSha}</a>
         </td>
       </tr>
     );
