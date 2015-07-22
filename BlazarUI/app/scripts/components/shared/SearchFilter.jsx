@@ -5,11 +5,21 @@ import {bindAll} from 'underscore';
 class SearchFilter extends React.Component {
 
   constructor() {
-    bindAll(this, 'handleFocus', 'handleBlur', 'handleChange');
+    bindAll(this, 'handleFocus', 'handleBlur', 'handleChange', 'handleKeyup');
   }
 
-  componentWillUpdate() {
-    console.log('will updage');
+  componentDidMount() {
+    window.addEventListener('keyup', this.handleKeyup);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keyup', this.handleKeyup);
+  }
+
+  handleKeyup(e) {
+    if (e.which == 84) {
+      this.refs.searchFilterInput.getDOMNode().focus();
+    }
   }
 
   handleFocus() {

@@ -31,7 +31,6 @@ class SidebarFilter extends React.Component {
   }
 
   handleFocus() {
-    console.log('handleFocus() from SidebarFilter.jsx');
     this.props.filterInputFocus(true);
   }
 
