@@ -1,6 +1,7 @@
 package com.hubspot.blazar;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
@@ -36,6 +37,11 @@ public class GitInfo {
 
   public String getBranch() {
     return branch;
+  }
+
+  @JsonIgnore
+  public String getFullRepositoryName() {
+    return getOrganization() + '/' + getRepository();
   }
 
   @Override
