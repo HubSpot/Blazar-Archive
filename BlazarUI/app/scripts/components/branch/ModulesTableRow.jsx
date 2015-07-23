@@ -4,7 +4,7 @@ import Icon from '../shared/Icon.jsx';
 import {labels, iconStatus} from '../constants';
 import Helpers from '../ComponentHelpers';
 
-class BranchTableRow extends React.Component {
+class ModulesTableRow extends React.Component {
 
   getRowClassNames() {
     if (this.props.module.buildState.result === 'FAILED') {
@@ -64,8 +64,8 @@ class BranchTableRow extends React.Component {
   }
 }
 
-BranchTableRow.propTypes = {
+ModulesTableRow.propTypes = {
   module: React.PropTypes.object.isRequired
 };
 
-export default BranchTableRow;
+export default ModulesTableRow;

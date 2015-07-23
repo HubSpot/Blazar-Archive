@@ -1,13 +1,13 @@
 import React from 'react';
 import TableHeader from '../shared/TableHeader.jsx';
-import BranchTableRow from './BranchTableRow.jsx';
+import ModulesTableRow from './ModulesTableRow.jsx';
 
-class BranchTable extends React.Component {
+class ModulesTable extends React.Component {
 
   getRows() {
     let modules = this.props.modules;
     return modules.map((module, i) =>
-      <BranchTableRow
+      <ModulesTableRow
         module={modules[i]}
         key={i}
       />
@@ -44,9 +44,9 @@ class BranchTable extends React.Component {
 }
 
 
-BranchTable.propTypes = {
+ModulesTable.propTypes = {
   loading: React.PropTypes.bool,
   modules: React.PropTypes.array.isRequired
 };
 
-export default BranchTable;
+export default ModulesTable;
