@@ -11,17 +11,6 @@ class Builds extends BaseCollection {
     this.addTimeHelpers();
   }
 
-  getBranchModules(branchInfo) {
-
-    let groupBuilds = this.groupBuildsByRepo()
-
-    return _.findWhere(groupBuilds, {
-      organization: branchInfo.org,
-      repository: branchInfo.repo,
-      branch: branchInfo.branch,
-    })
-
-  }
 
   getModuleList() {
     // list of module names, used for sidebar search
@@ -40,11 +29,25 @@ class Builds extends BaseCollection {
     return modules;
   }
 
+  getBranchModules(branchInfo) {
+    let groupBuilds = this.groupBuildsByRepo()
+
+    let repo = _.findWhere(groupBuilds, {
+      repository: branchInfo.repo
+    })
+
+    return _.findWhere(groupBuilds, {
+      organization: branchInfo.org,
+      repository: branchInfo.repo,
+      branch: branchInfo.branch,
+    })
+
+  }
 
   groupBuildsByRepo() {
     // builds grouped by repo
-    let grouped = _(this.data).groupBy(function(o) {
-      return o.gitInfo.repository;
+    let grouped = _.groupBy(this.data, function(o) {
+      return `${o.gitInfo.repository}[${o.gitInfo.branch}]`;
     });
 
     _.each(grouped, (repo) => {
@@ -61,13 +64,15 @@ class Builds extends BaseCollection {
     let groupedInArray = [];
     for (var repo in grouped) {
       groupedInArray.push({
-        repository: repo,
+        repoModuleKey: repo,
+        repository: grouped[repo][0].gitInfo.repository,
         isBuilding: grouped[repo].moduleIsBuilding,
         modules: grouped[repo]
       })
     }
 
     groupedInArray.forEach( (repo) => {
+
       repo.mostRecentBuild = repo.modules[0].buildState.startTime;
       repo.host = repo.modules[0].gitInfo.host;
       repo.branch = repo.modules[0].gitInfo.branch;

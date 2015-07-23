@@ -1,9 +1,8 @@
 @import 'variables'
 @import 'mixins'
 
-.sidebar__headline
-  font-size 24px
-  margin 10px 0
+.sidebar *
+  user-select none
 
 // holds all filtering tools
 .sidebar__filter
@@ -13,26 +12,31 @@
 .sidebar__list
   margin-top 20px
 
-.sidebar__repo-url
-  font-size 11px
-  font-smoothing()
-  padding-left 16px
-  margin-bottom 3px
-
 .sidebar__repo
   position relative
   padding-left 0
   padding 10px 15px
-  font-size 18px
-  font-weight $font-light
   &:hover
     cursor pointer
 
 .sidebar__build-detail
   position relative
-
+  
 .sidebar__repo-name
+  font-size 16px
+  font-weight $font-light
   padding-left 15px
+
+.sidebar__repo-branch, .sidebar__repo-branch-icon
+  font-weight $font-light
+
+.sidebar__repo-branch
+  font-size 12px
+  margin-left 2px
+
+.sidebar__repo-branch-icon
+  font-size 14px
+  margin-left 10px
 
 .sidebar__repo-container
   position relative
@@ -69,7 +73,6 @@
   margin-top -5px
   font-size 10px
   color $gray-dark
-
 
 .search-input
   margin-bottom 20px

@@ -28,7 +28,7 @@ class ProjectSidebarListItem extends React.Component {
   }
 
   getExpandStatus() {
-    return this.props.isExpanded ? 'chevron-up' : 'chevron-down';
+    return this.props.isExpanded ? 'chevron-down' : 'chevron-right';
   }
 
   componentWillReceiveProps() {
@@ -39,9 +39,6 @@ class ProjectSidebarListItem extends React.Component {
 
     let repo = this.props.repo;
     let modules = this.props.repo.modules;
-    let repoGitInfo = modules[0].gitInfo;
-    let repoLink = `${repoGitInfo.host}/${repoGitInfo.organization}/${repoGitInfo.repository}`;
-
     let moduleList = [];
 
     modules.forEach( (build) => {
@@ -59,13 +56,12 @@ class ProjectSidebarListItem extends React.Component {
     return (
       <div className='sidebar__repo-container'>
         <div className='sidebar__repo' onClick={this.handleModuleExpand}>
-          <div className='sidebar__repo-url'>
-            {repoLink}
-          </div>
           <div className='sidebar__build-detail'>
             {getRepoBuildState()}
             <div className='sidebar__repo-name'>
               {repo.repository}
+              <Icon type='octicon' name='git-branch' classNames='sidebar__repo-branch-icon' />
+              <span className='sidebar__repo-branch'>{repo.branch}</span>
             </div>
           </div>
           <Icon name={this.getExpandStatus()} classNames='sidebar__expand' />
