@@ -11,9 +11,8 @@ class Builds extends BaseCollection {
     this.addTimeHelpers();
   }
 
-
+  // list of module names, used for sidebar search
   getModuleList() {
-    // list of module names, used for sidebar search
     let modules = _.map(this.data, function(item) {
 
       let {gitInfo, module, buildState} = item;
@@ -33,23 +32,37 @@ class Builds extends BaseCollection {
     let groupBuilds = this.groupBuildsByRepo()
 
     let repo = _.findWhere(groupBuilds, {
+      organization: branchInfo.org,
       repository: branchInfo.repo
     })
 
     return _.findWhere(groupBuilds, {
       organization: branchInfo.org,
       repository: branchInfo.repo,
-      branch: branchInfo.branch,
+      branch: branchInfo.branch
+    })
+
+  }
+
+  getBranchesByRepo(repoInfo){
+    let groupBuilds = this.groupBuildsByRepo()
+    let branches = _.filter(groupBuilds, (repo) => {
+      return repo.organization === repoInfo.org && repo.repository === repoInfo.repo;
+    })
+
+    return branches.sort( (a, b) => {
+      return b.branch - a.branch
     })
 
   }
 
   groupBuildsByRepo() {
-    // builds grouped by repo
+    // group/generate key, by org::repo[branch]
     let grouped = _.groupBy(this.data, function(o) {
-      return `${o.gitInfo.repository}[${o.gitInfo.branch}]`;
+      return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
     });
 
+    // Make note if a repo has any module building
     _.each(grouped, (repo) => {
       repo.moduleIsBuilding = false;
       for (var value of repo) {
@@ -61,6 +74,7 @@ class Builds extends BaseCollection {
       return repo;
     })
 
+    // move groupedBy object into an easier-to-work-with array
     let groupedInArray = [];
     for (var repo in grouped) {
       groupedInArray.push({
@@ -71,13 +85,14 @@ class Builds extends BaseCollection {
       })
     }
 
+    // store some helper properites
     groupedInArray.forEach( (repo) => {
-
       repo.mostRecentBuild = repo.modules[0].buildState.startTime;
       repo.host = repo.modules[0].gitInfo.host;
       repo.branch = repo.modules[0].gitInfo.branch;
       repo.organization = repo.modules[0].gitInfo.organization;
       repo.id = `${repo.host}_${repo.branch}_${repo.organization}_${repo.repository}`;
+      repo.branchPath = `${app.config.appRoot}/${repo.modules[0].gitInfo.host}/${repo.modules[0].gitInfo.organization}/${repo.modules[0].gitInfo.repository}/${repo.modules[0].gitInfo.branch}`;
 
       repo.modules.forEach( (module) => {
         module.modulePath = `${app.config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
