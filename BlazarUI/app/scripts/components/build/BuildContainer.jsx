@@ -16,7 +16,8 @@ class BuildContainer extends React.Component {
         buildState: {},
         gitInfo: {},
         module: { name: ''}
-      }
+      },
+      log: ''
     };
   }
 
@@ -34,12 +35,15 @@ class BuildContainer extends React.Component {
   }
 
   onStatusChange(state) {
+
     if (state.build) {
       this.setState({
         loading: false,
-        build: state.build
+        build: state.build.build,
+        log: state.build.log
       });
     }
+
   }
 
   render() {
@@ -47,6 +51,7 @@ class BuildContainer extends React.Component {
       <PageContainer>
         <Build
           build={this.state.build}
+          log={this.state.log}
           params={this.props.params}
           loading={this.state.loading}
         />

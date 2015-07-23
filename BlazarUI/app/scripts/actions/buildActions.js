@@ -2,6 +2,7 @@ import Reflux from 'reflux';
 import $ from 'jQuery';
 
 import Build from '../models/Build';
+import Log from '../models/Log';
 
 let BuildActions = Reflux.createActions([
   'loadBuild',
@@ -10,16 +11,32 @@ let BuildActions = Reflux.createActions([
 ]);
 
 BuildActions.loadBuild.preEmit = function(data) {
+
   let build = new Build(data);
-  let promise = build.fetch();
+  let buildPromise = build.fetch();
 
-  promise.done( () => {
-    BuildActions.loadBuildSuccess(build.data);
-  });
+  buildPromise.done( () => {
+    let log = new Log(build.data.buildState.buildLog);
+    let logPromise = log.fetch();
 
-  promise.error( () => {
-    BuildActions.loadBuildError('an error occured');
+    logPromise.always( (logData) => {
+      BuildActions.loadBuildSuccess({
+        build: build.data,
+        log: logData
+      });
+
+    });
+
+    logPromise.error( () => {
+      BuildActions.loadBuildError('Error retrieving build log');
+    })
+
   })
+
+  buildPromise.error( () => {
+    BuildActions.loadBuildError('Error retrieving build');
+  })
+
 
 };
 
