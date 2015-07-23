@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public class ModuleBuild {
+public class BuildDefinition {
   private final GitInfo gitInfo;
   private final Module module;
 
   @JsonCreator
-  public ModuleBuild(@JsonProperty("gitInfo") GitInfo gitInfo, @JsonProperty("module") Module module) {
+  public BuildDefinition(@JsonProperty("gitInfo") GitInfo gitInfo, @JsonProperty("module") Module module) {
     this.gitInfo = gitInfo;
     this.module = module;
   }
@@ -33,7 +33,7 @@ public class ModuleBuild {
       return false;
     }
 
-    ModuleBuild that = (ModuleBuild) o;
+    BuildDefinition that = (BuildDefinition) o;
     return Objects.equals(gitInfo, that.gitInfo) && Objects.equals(module, that.module);
   }
 

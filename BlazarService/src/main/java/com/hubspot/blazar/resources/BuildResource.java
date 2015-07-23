@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildState;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.ModuleBuildWithState;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 import com.sun.jersey.api.NotFoundException;
@@ -32,7 +32,7 @@ import static com.hubspot.blazar.base.BuildState.Result.IN_PROGRESS;
 @Path("/builds")
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildResource {
-  private static final Map<ModuleBuild, ModuleBuildWithState> BUILD_MAP = initialBuilds();
+  private static final Map<BuildDefinition, ModuleBuildWithState> BUILD_MAP = initialBuilds();
 
   @Inject
   public BuildResource() {}
@@ -134,7 +134,7 @@ public class BuildResource {
   }
 
   private static void updateBuildMap() {
-    for (Entry<ModuleBuild, ModuleBuildWithState> entry : BUILD_MAP.entrySet()) {
+    for (Entry<BuildDefinition, ModuleBuildWithState> entry : BUILD_MAP.entrySet()) {
       ModuleBuildWithState build = entry.getValue();
 
       do {
@@ -169,7 +169,7 @@ public class BuildResource {
     }
   }
 
-  private static Map<ModuleBuild, ModuleBuildWithState> initialBuilds() {
+  private static Map<BuildDefinition, ModuleBuildWithState> initialBuilds() {
     List<ModuleBuildWithState> builds = new ArrayList<>();
 
     builds.add(build("Contacts", "ContactsHadoop"));
@@ -231,10 +231,10 @@ public class BuildResource {
     builds.add(build("Singularity", "SingularityS3Downloader", "hs_staging", "HubSpot", "github.com"));
     builds.add(build("Singularity", "SingularityExecutor", "hs_staging", "HubSpot", "github.com"));
 
-    Map<ModuleBuild, ModuleBuildWithState> buildMap = new ConcurrentHashMap<>();
+    Map<BuildDefinition, ModuleBuildWithState> buildMap = new ConcurrentHashMap<>();
 
     for (ModuleBuildWithState build : builds) {
-      buildMap.put(new ModuleBuild(build.getGitInfo(), build.getModule()), build);
+      buildMap.put(new BuildDefinition(build.getGitInfo(), build.getModule()), build);
     }
 
     return buildMap;

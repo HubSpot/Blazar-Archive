@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.data.dao.BuildDefinitionDao;
 import com.hubspot.guice.transactional.Transactional;
 
@@ -15,6 +16,10 @@ public class BuildDefinitionService {
   @Inject
   public BuildDefinitionService(BuildDefinitionDao buildDefinitionDao) {
     this.buildDefinitionDao = buildDefinitionDao;
+  }
+
+  public Set<BuildDefinition> getAllBuildDefinitions() {
+    return buildDefinitionDao.getAllBuildDefinitions();
   }
 
   public Set<Module> getModules(GitInfo gitInfo) {
