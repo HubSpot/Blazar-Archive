@@ -20,6 +20,10 @@
       <artifactId>BlazarBase</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.hubspot</groupId>
+      <artifactId>BlazarData</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.hubspot.jackson</groupId>
       <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
     </dependency>
@@ -157,11 +161,6 @@
           <artifactId>annotation-indexer</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.hubspot</groupId>

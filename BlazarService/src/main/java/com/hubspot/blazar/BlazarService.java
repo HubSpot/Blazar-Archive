@@ -2,6 +2,9 @@ package com.hubspot.blazar;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.guice.BlazarServiceModule;
+import com.hubspot.blazar.guice.GuiceBundle;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 import io.dropwizard.Application;
 import io.dropwizard.ConfiguredBundle;

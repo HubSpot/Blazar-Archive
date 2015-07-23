@@ -1,4 +1,4 @@
-package com.hubspot.blazar;
+package com.hubspot.blazar.config;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

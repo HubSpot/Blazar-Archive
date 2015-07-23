@@ -1,9 +1,12 @@
-package com.hubspot.blazar;
+package com.hubspot.blazar.resources;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.inject.Inject;
+import com.hubspot.blazar.BuildService;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
@@ -80,7 +83,8 @@ public class GitHubWebHookResource {
   private void updateBuilds(PushEvent pushEvent) throws IOException {
     for (String path : affectedPaths(pushEvent)) {
       if (isPom(path)) {
-        processBranch(gitInfo(pushEvent));
+        Set<Module> modules = processBranch(gitInfo(pushEvent));
+        buildService.setModules(gitInfo(pushEvent), modules);
       }
     }
   }

@@ -1,4 +1,4 @@
-package com.hubspot.blazar;
+package com.hubspot.blazar.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

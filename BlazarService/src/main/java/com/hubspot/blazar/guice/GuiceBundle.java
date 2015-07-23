@@ -1,4 +1,4 @@
-package com.hubspot.blazar;
+package com.hubspot.blazar.guice;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.google.common.base.Function;

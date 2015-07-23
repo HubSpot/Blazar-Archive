@@ -1,4 +1,4 @@
-package com.hubspot.blazar;
+package com.hubspot.blazar.guice;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;

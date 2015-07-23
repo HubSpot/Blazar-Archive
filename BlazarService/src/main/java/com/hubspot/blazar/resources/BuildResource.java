@@ -1,8 +1,13 @@
-package com.hubspot.blazar;
+package com.hubspot.blazar.resources;
 
 import com.google.common.base.Optional;
 import com.google.common.primitives.Longs;
 import com.google.inject.Inject;
+import com.hubspot.blazar.base.BuildState;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.ModuleBuildWithState;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 import com.sun.jersey.api.NotFoundException;
 
@@ -22,7 +27,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.hubspot.blazar.BuildState.Result.IN_PROGRESS;
+import static com.hubspot.blazar.base.BuildState.Result.IN_PROGRESS;
 
 @Path("/builds")
 @Produces(MediaType.APPLICATION_JSON)

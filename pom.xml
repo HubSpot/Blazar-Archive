@@ -32,6 +32,7 @@
   <modules>
     <module>BlazarBase</module>
     <module>BlazarService</module>
+    <module>BlazarData</module>
   </modules>
 
   <dependencyManagement>
@@ -39,6 +40,11 @@
       <dependency>
         <groupId>com.hubspot</groupId>
         <artifactId>BlazarBase</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot</groupId>
+        <artifactId>BlazarData</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -75,6 +81,11 @@
         <groupId>com.hubspot</groupId>
         <artifactId>HorizonNing</artifactId>
         <version>0.0.13</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot.guice</groupId>
+        <artifactId>guice-transactional</artifactId>
+        <version>0.1.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
