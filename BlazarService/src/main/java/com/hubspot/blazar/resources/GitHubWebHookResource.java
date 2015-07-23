@@ -3,6 +3,7 @@ package com.hubspot.blazar.resources;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.google.common.net.UrlEscapers;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
@@ -154,9 +155,9 @@ public class GitHubWebHookResource {
     String fullName = repository.getFullName();
     String organization = fullName.substring(0, fullName.indexOf('/'));
     String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
-    String branch = ref.substring(ref.lastIndexOf('/') + 1);
+    String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
 
-    return new GitInfo(host, organization, repositoryName, branch);
+    return new GitInfo(host, organization, repositoryName, UrlEscapers.urlPathSegmentEscaper().escape(branch));
   }
 
   private static Set<String> affectedPaths(PushEvent pushEvent) {
