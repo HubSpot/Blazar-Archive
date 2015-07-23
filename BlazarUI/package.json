@@ -38,6 +38,7 @@
     "moment": "^2.10.3",
     "object-assign": "^2.0.0",
     "proxy-middleware": "^0.13.0",
+    "react-classset": "0.0.2",
     "react-tools": "^0.13.1",
     "react-typeahead-component": "^0.7.0",
     "underscore": "^1.8.3",
