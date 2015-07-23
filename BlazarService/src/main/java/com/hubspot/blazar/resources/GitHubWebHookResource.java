@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.inject.Inject;
-import com.hubspot.blazar.BuildService;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.data.service.BuildDefinitionService;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
@@ -31,17 +31,17 @@ import java.util.Set;
 @Path("/github/webhooks")
 @Consumes(MediaType.APPLICATION_JSON)
 public class GitHubWebHookResource {
-  private final BuildService buildService;
+  private final BuildDefinitionService buildDefinitionService;
   private final GitHub gitHub;
   private final ObjectMapper mapper;
   private final XmlMapper xmlMapper;
 
   @Inject
-  public GitHubWebHookResource(BuildService buildService,
+  public GitHubWebHookResource(BuildDefinitionService buildDefinitionService,
                                GitHub gitHub,
                                Environment environment,
                                XmlMapper xmlMapper) {
-    this.buildService = buildService;
+    this.buildDefinitionService = buildDefinitionService;
     this.gitHub = gitHub;
     this.mapper = environment.getObjectMapper();
     this.xmlMapper = xmlMapper;
@@ -84,14 +84,14 @@ public class GitHubWebHookResource {
     for (String path : affectedPaths(pushEvent)) {
       if (isPom(path)) {
         Set<Module> modules = processBranch(gitInfo(pushEvent));
-        buildService.setModules(gitInfo(pushEvent), modules);
+        buildDefinitionService.setModules(gitInfo(pushEvent), modules);
       }
     }
   }
 
   private void triggerBuilds(PushEvent pushEvent) {
     GitInfo gitInfo = gitInfo(pushEvent);
-    Set<Module> modules = buildService.getModules(gitInfo);
+    Set<Module> modules = buildDefinitionService.getModules(gitInfo);
 
     Set<Module> toBuild = new HashSet<>();
     for (String path : affectedPaths(pushEvent)) {

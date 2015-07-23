@@ -7,7 +7,6 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
-import com.hubspot.blazar.BuildService;
 import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
@@ -34,8 +33,6 @@ public class BlazarServiceModule extends AbstractModule {
 
     bind(BuildResource.class);
     bind(GitHubWebHookResource.class);
-
-    bind(BuildService.class);
 
     Multibinder.newSetBinder(binder(), ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
   }

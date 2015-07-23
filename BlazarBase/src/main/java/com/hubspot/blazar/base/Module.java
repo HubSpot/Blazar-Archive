@@ -44,11 +44,11 @@ public class Module {
     }
 
     Module module = (Module) o;
-    return Objects.equals(name, module.name);
+    return Objects.equals(name, module.name) && Objects.equals(path, module.path);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name);
+    return Objects.hash(name, path);
   }
 }
