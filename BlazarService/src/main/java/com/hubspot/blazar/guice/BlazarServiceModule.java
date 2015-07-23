@@ -11,6 +11,7 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
+import com.hubspot.blazar.resources.BuildDefinitionResource;
 import com.hubspot.blazar.resources.BuildResource;
 import com.hubspot.blazar.resources.GitHubWebHookResource;
 import com.hubspot.horizon.AsyncHttpClient;
@@ -32,6 +33,7 @@ public class BlazarServiceModule extends AbstractModule {
     bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 
     bind(BuildResource.class);
+    bind(BuildDefinitionResource.class);
     bind(GitHubWebHookResource.class);
 
     Multibinder.newSetBinder(binder(), ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
