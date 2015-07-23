@@ -94,6 +94,7 @@ class ProjectsSidebar extends React.Component {
   }
 
   render() {
+
     // To do: replace loading text with animation
     let loading = this.props.loading ? <div>Loading Projects...</div> : '';
 
@@ -106,7 +107,7 @@ class ProjectsSidebar extends React.Component {
 
       return (
         <ProjectsSidebarListItem
-          key={item.key}
+          key={item.repo.repoModuleKey}
           isExpanded={filteredRepos.length < 4 || shouldExpand}
           filterText={item.filterText}
           repo={item.repo}
