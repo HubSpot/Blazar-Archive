@@ -4,7 +4,7 @@ import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildDetail from '../shared/BuildDetail.jsx';
-import Log from './log.jsx';
+import BuildLog from './BuildLog.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 
 class Build extends React.Component{
@@ -32,7 +32,9 @@ class Build extends React.Component{
             />
           </UIGridItem>
           <UIGridItem size={12}>
-            <Log />
+            <BuildLog
+              log={this.props.log}
+            />
           </UIGridItem>
         </UIGrid>
       </div>
@@ -47,6 +49,7 @@ Build.propTypes = {
     gitInfo: React.PropTypes.object,
     module: React.PropTypes.object
   }),
+  log: React.PropTypes.string,
   params: React.PropTypes.object,
   loading: React.PropTypes.bool
 };

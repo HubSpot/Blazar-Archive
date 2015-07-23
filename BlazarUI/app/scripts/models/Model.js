@@ -3,17 +3,19 @@ import $ from 'jQuery';
 
 class Model {
 
-  constructor() {}
+  constructor() {
+    this.fetchOptions = {};
+    this.fetch = this.fetch.bind(this);
+  }
 
   parse() {}
 
   fetch() {
     this.data = {};
-
     let promise = $.ajax({
-      url: this.url(),
-      type: 'GET',
-      dataType: 'json'
+      url: this.fetchOptions.url || this.url(),
+      type: this.fetchOptions.type || 'GET',
+      dataType: this.fetchOptions.dataType || 'json'
     });
 
     promise.done( (resp) => {
