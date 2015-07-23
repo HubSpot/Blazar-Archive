@@ -5,8 +5,10 @@ import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.hubspot.blazar.data.dao.BuildDefinitionDao;
+import com.hubspot.guice.transactional.DataSourceLocator;
 import com.hubspot.guice.transactional.TransactionalDataSource;
 import com.hubspot.guice.transactional.TransactionalModule;
+import com.hubspot.guice.transactional.impl.DefaultDataSourceLocator;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.setup.Environment;
@@ -20,6 +22,7 @@ public class BlazarDaoModule extends AbstractModule {
   protected void configure() {
     install(new TransactionalModule());
 
+    bind(DataSourceLocator.class).to(DefaultDataSourceLocator.class).in(Scopes.SINGLETON);
     bind(DBI.class).toProvider(DBIProvider.class).in(Scopes.SINGLETON);
 
     bindDao(binder(), BuildDefinitionDao.class);
