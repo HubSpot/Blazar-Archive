@@ -8,6 +8,8 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BuildDefinitionService;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
+import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
+import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
 import io.dropwizard.setup.Environment;
@@ -25,6 +27,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,8 +51,26 @@ public class GitHubWebHookResource {
   }
 
   @POST
+  @Path("/create")
+  public void processCreateEvent(CreateEvent createEvent) throws IOException {
+    System.out.println(mapper.writeValueAsString(createEvent));
+    if ("branch".equalsIgnoreCase(createEvent.getRefType())) {
+      processBranch(gitInfo(createEvent));
+    }
+  }
+
+  @POST
+  @Path("/delete")
+  public void processDeleteEvent(DeleteEvent deleteEvent) throws IOException {
+    System.out.println(mapper.writeValueAsString(deleteEvent));
+    if ("branch".equalsIgnoreCase(deleteEvent.getRefType())) {
+      buildDefinitionService.setModules(gitInfo(deleteEvent), Collections.<Module>emptySet());
+    }
+  }
+
+  @POST
   @Path("/push")
-  public void processWebhook(PushEvent pushEvent) throws IOException {
+  public void processPushEvent(PushEvent pushEvent) throws IOException {
     System.out.println(mapper.writeValueAsString(pushEvent));
     updateBuilds(pushEvent);
     triggerBuilds(pushEvent);
@@ -116,13 +137,23 @@ public class GitHubWebHookResource {
     return "pom.xml".equals(path) || path.endsWith("/pom.xml");
   }
 
-  private GitInfo gitInfo(PushEvent pushEvent) {
-    Repository repository = pushEvent.getRepository();
+  private GitInfo gitInfo(CreateEvent createEvent) {
+    return gitInfo(createEvent.getRepository(), createEvent.getRef());
+  }
 
+  private GitInfo gitInfo(DeleteEvent deleteEvent) {
+    return gitInfo(deleteEvent.getRepository(), deleteEvent.getRef());
+  }
+
+  private GitInfo gitInfo(PushEvent pushEvent) {
+    return gitInfo(pushEvent.getRepository(), pushEvent.getRef());
+  }
+
+  private GitInfo gitInfo(Repository repository, String ref) {
     String host = URI.create(repository.getUrl()).getHost();
     String organization = repository.getOrganization();
     String repositoryName = repository.getName();
-    String branch = pushEvent.getRef().substring(pushEvent.getRef().lastIndexOf('/') + 1);
+    String branch = ref.substring(ref.lastIndexOf('/') + 1);
 
     return new GitInfo(host, organization, repositoryName, branch);
   }

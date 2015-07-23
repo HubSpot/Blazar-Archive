@@ -2,6 +2,24 @@ package com.hubspot.blazar.github;
 
 option java_outer_classname = "GitHubProtos";
 
+message CreateEvent {
+    optional string ref = 1;
+    optional string ref_type = 2;
+    optional string master_branch = 3;
+    optional string description = 4;
+    optional string pusher_type = 5;
+    optional Repository repository = 6;
+    optional Sender sender = 7;
+}
+
+message DeleteEvent {
+    optional string ref = 1;
+    optional string ref_type = 2;
+    optional string pusher_type = 3;
+    optional Repository repository = 4;
+    optional Sender sender = 5;
+}
+
 message PushEvent {
     optional string ref = 1;
     optional string after = 2;
