@@ -13,7 +13,7 @@ public interface BuildDefinitionDao {
   @SqlQuery("SELECT name, path FROM build_definitions WHERE host = :host AND organization = :organization AND repository = :repository AND branch = :branch")
   Set<Module> getModules(@BindWithRosetta GitInfo gitInfo);
 
-  @SqlUpdate("INSERT INTO build_defintions (host, organization, repository, branch, name, path) VALUES (:host, :organization, :repository, :branch, :name, :path)")
+  @SqlUpdate("INSERT INTO build_definitions (host, organization, repository, branch, name, path) VALUES (:host, :organization, :repository, :branch, :name, :path)")
   int insertModule(@BindWithRosetta GitInfo gitInfo, @BindWithRosetta Module module);
 
   @SqlUpdate("DELETE FROM build_definitions WHERE host = :host AND organization = :organization AND repository = :repository AND branch = :branch AND name = :name AND path = :path")

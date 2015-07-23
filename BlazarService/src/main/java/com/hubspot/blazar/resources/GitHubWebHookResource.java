@@ -77,15 +77,20 @@ public class GitHubWebHookResource {
       modules.add(new Module(artifactId, pom));
     }
 
+    buildDefinitionService.setModules(gitInfo, modules);
     return modules;
   }
 
   private void updateBuilds(PushEvent pushEvent) throws IOException {
+    boolean processBranch = false;
     for (String path : affectedPaths(pushEvent)) {
       if (isPom(path)) {
-        Set<Module> modules = processBranch(gitInfo(pushEvent));
-        buildDefinitionService.setModules(gitInfo(pushEvent), modules);
+        processBranch = true;
       }
+    }
+
+    if (processBranch) {
+      processBranch(gitInfo(pushEvent));
     }
   }
 

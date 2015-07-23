@@ -14,7 +14,7 @@ public class Module {
   public Module(@JsonProperty("name") String name, @JsonProperty("path") String path) {
     this.name = name;
     this.path = path;
-    this.basePath = path.contains("/") ? path.substring(0, path.lastIndexOf('/' + 1)) : path;
+    this.basePath = path.contains("/") ? path.substring(0, path.lastIndexOf('/') + 1) : path;
   }
 
   public String getName() {
