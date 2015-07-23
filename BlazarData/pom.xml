@@ -12,6 +12,14 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.hubspot</groupId>
+      <artifactId>BlazarBase</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.inject</groupId>
       <artifactId>guice</artifactId>
     </dependency>
@@ -47,6 +55,10 @@
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.hubspot.rosetta</groupId>
+      <artifactId>RosettaJdbi</artifactId>
     </dependency>
   </dependencies>
 </project>

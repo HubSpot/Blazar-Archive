@@ -2,6 +2,7 @@ package com.hubspot.blazar.data;
 
 import com.google.inject.Inject;
 import com.hubspot.guice.transactional.TransactionalDataSource;
+import com.hubspot.rosetta.jdbi.RosettaMapperFactory;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.jdbi.DBIFactory;
@@ -34,7 +35,9 @@ public class DBIProvider implements Provider<DBI> {
 
   @Override
   public DBI get() {
-    return new DBIFactory().build(environment, dataSourceFactory, frankenDataSource(), "db");
+    DBI dbi = new DBIFactory().build(environment, dataSourceFactory, frankenDataSource(), "db");
+    dbi.registerMapper(new RosettaMapperFactory());
+    return dbi;
   }
 
   private ManagedDataSource frankenDataSource() {

@@ -27,6 +27,9 @@
 
   <properties>
     <basepom.check.skip-findbugs>true</basepom.check.skip-findbugs>
+
+    <dep.horizon.version>0.0.13</dep.horizon.version>
+    <dep.rosetta.version>3.10.1</dep.rosetta.version>
   </properties>
 
   <modules>
@@ -70,22 +73,37 @@
       <dependency>
         <groupId>com.hubspot</groupId>
         <artifactId>HorizonApache</artifactId>
-        <version>0.0.13</version>
+        <version>${dep.horizon.version}</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot</groupId>
         <artifactId>HorizonCore</artifactId>
-        <version>0.0.13</version>
+        <version>${dep.horizon.version}</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot</groupId>
         <artifactId>HorizonNing</artifactId>
-        <version>0.0.13</version>
+        <version>${dep.horizon.version}</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot.guice</groupId>
         <artifactId>guice-transactional</artifactId>
         <version>0.1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot.rosetta</groupId>
+        <artifactId>RosettaAnnotations</artifactId>
+        <version>${dep.rosetta.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot.rosetta</groupId>
+        <artifactId>RosettaCore</artifactId>
+        <version>${dep.rosetta.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot.rosetta</groupId>
+        <artifactId>RosettaJdbi</artifactId>
+        <version>${dep.rosetta.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
