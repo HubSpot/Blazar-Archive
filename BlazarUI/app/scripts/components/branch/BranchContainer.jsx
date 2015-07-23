@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import Branch from './Branch.jsx';
 import PageContainer from '../layout/PageContainer.jsx';
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
-class BranchContainer extends React.Component {
+class BranchContainer extends Component {
 
   constructor() {
     this.state = {
@@ -37,6 +37,7 @@ class BranchContainer extends React.Component {
         <Branch
           params={this.props.params}
           modules={this.state.modules}
+          loading={this.props.loading}
         />
       </PageContainer>
     );
@@ -45,7 +46,8 @@ class BranchContainer extends React.Component {
 
 
 BranchContainer.propTypes = {
-  params: React.PropTypes.object.isRequired
+  params: PropTypes.object.isRequired,
+  loading: PropTypes.string.isRequired
 };
 
 export default BranchContainer;
