@@ -151,8 +151,9 @@ public class GitHubWebHookResource {
 
   private GitInfo gitInfo(Repository repository, String ref) {
     String host = URI.create(repository.getUrl()).getHost();
-    String organization = repository.getOrganization();
-    String repositoryName = repository.getName();
+    String fullName = repository.getFullName();
+    String organization = fullName.substring(0, fullName.indexOf('/'));
+    String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
     String branch = ref.substring(ref.lastIndexOf('/') + 1);
 
     return new GitInfo(host, organization, repositoryName, branch);
