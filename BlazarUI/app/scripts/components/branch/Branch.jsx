@@ -9,9 +9,6 @@ import ModulesTable from './ModulesTable.jsx';
 class Branch extends Component{
 
   render() {
-    if (this.props.loading) {
-      return <div></div>;
-    }
 
     return (
       <div>
