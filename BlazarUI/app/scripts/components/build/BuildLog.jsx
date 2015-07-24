@@ -3,11 +3,9 @@ import React, {Component, PropTypes} from 'react';
 class BuildLog extends Component {
 
   render() {
-
-    if (this.props.loading) {
+    if (this.props.loading || !this.log) {
       return  <div></div>;
     }
-
 
     return (
       <pre className='build-log'>
