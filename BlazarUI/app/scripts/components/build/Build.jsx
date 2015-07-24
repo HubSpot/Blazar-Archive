@@ -10,19 +10,18 @@ import PageHeadline from '../shared/PageHeadline.jsx';
 class Build extends Component{
 
   render() {
-    // TO DO: show page loader
-    if (this.props.loading) {
-      return  <div></div>;
-    }
+    let {buildState} = this.props.build;
+    let subheadline = '';
 
-    let {module, buildState} = this.props.build;
-    let subheadline = `Build #${buildState.buildNumber}`;
+    if (!this.props.loading) {
+      subheadline = `Build #${buildState.buildNumber}`;
+    }
 
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={module.name} subheadline={subheadline} />
+          <PageHeadline headline={this.props.params.module} subheadline={subheadline} />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
@@ -34,6 +33,7 @@ class Build extends Component{
           <UIGridItem size={12}>
             <BuildLog
               log={this.props.log}
+              loading={this.props.loading}
             />
           </UIGridItem>
         </UIGrid>

@@ -4,6 +4,11 @@ class BuildLog extends Component {
 
   render() {
 
+    if (this.props.loading) {
+      return  <div></div>;
+    }
+
+
     return (
       <pre className='build-log'>
         {this.props.log}
@@ -14,7 +19,8 @@ class BuildLog extends Component {
 }
 
 BuildLog.propTypes = {
-  log: PropTypes.string
+  log: PropTypes.string,
+  loading: PropTypes.bool
 };
 
 export default BuildLog;
