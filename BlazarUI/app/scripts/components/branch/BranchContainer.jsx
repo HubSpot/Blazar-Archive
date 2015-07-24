@@ -37,7 +37,7 @@ class BranchContainer extends Component {
         <Branch
           params={this.props.params}
           modules={this.state.modules}
-          loading={this.props.loading}
+          loading={this.state.loading}
         />
       </PageContainer>
     );
@@ -46,8 +46,7 @@ class BranchContainer extends Component {
 
 
 BranchContainer.propTypes = {
-  params: PropTypes.object.isRequired,
-  loading: PropTypes.string.isRequired
+  params: PropTypes.object.isRequired
 };
 
 export default BranchContainer;
