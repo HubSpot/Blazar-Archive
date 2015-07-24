@@ -9,6 +9,19 @@
     <link rel="shortcut icon" href="/images/favicon.jpg" type="image/x-icon" />
   </head>
   <body>
+    <script>
+      window.config = {
+        jobRefresh: <!-- @echo jobRefresh -->,
+        appRoot: "<!-- @echo appRoot -->",
+        <!-- @if apiRoot -->
+        apiRoot: "<!-- @echo apiRoot -->"
+        <!-- @endif -->
+        <!-- @if apiRoot=''  -->
+        apiRoot: localStorage.getItem("apiRootOverride")
+        <!-- @endif -->
+      }
+
+    </script>
     <script src="/js/main.js"></script>
   </body>
 </html>

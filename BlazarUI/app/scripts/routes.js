@@ -1,6 +1,5 @@
 import React from 'react';
 import { Route, DefaultRoute, NotFoundRoute } from 'react-router';
-import config from './config.js';
 
 // Pages
 import App from './pages/app.jsx';
