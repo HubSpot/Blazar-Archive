@@ -9,7 +9,6 @@ var url = require('url');
 // set variable via $ gulp --type production
 var environment = $.util.env.type || 'staging';
 var isProduction = environment === 'production';
-var apiEndpoint = require('./config.js').getApiEndpoint(environment);
 var webpackConfig = require('./webpack.config.js').getConfig(environment);
 
 var port = $.util.env.port || 5000;
@@ -99,16 +98,15 @@ gulp.task('serve', function() {
     },
     fallback: dist + 'index.html',
     middleware: function(connect, opt) {
-      if (isProduction){
-        console.log('middleware: in prod');
-        return [];
+      if (!isProduction){
+        return [ (function() {
+          var proxy = require('proxy-middleware');
+          var options = url.parse(process.env.BLAZAR_API_URL);
+          options.route = '/api';
+          return proxy(options);
+        })()]
       }
-      return [ (function() {
-        var proxy = require('proxy-middleware');
-        var options = url.parse(apiEndpoint);
-        options.route = '/api';
-        return proxy(options);
-      })()]
+      return [];
     }
   });
 });
