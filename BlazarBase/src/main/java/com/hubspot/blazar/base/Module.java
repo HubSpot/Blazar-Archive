@@ -45,7 +45,7 @@ public class Module {
     if (path.contains("/")) {
       return path.startsWith(basePath);
     } else {
-      return path.equals(basePath);
+      return !this.path.contains("/");
     }
   }
 
