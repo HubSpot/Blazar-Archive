@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import SearchFilter from '../shared/SearchFilter.jsx';
 
-class SidebarFilter extends React.Component {
+class SidebarFilter extends Component {
 
   constructor(props, context) {
     super(props, context);
@@ -59,15 +59,15 @@ class SidebarFilter extends React.Component {
 }
 
 SidebarFilter.contextTypes = {
-  router: React.PropTypes.func.isRequired
+  router: PropTypes.func.isRequired
 };
 
 SidebarFilter.propTypes = {
-  updateResults: React.PropTypes.func.isRequired,
-  modules: React.PropTypes.array.isRequired,
-  loading: React.PropTypes.bool.isRequired,
-  filterText: React.PropTypes.string.isRequired,
-  filterInputFocus: React.PropTypes.func.isRequired
+  updateResults: PropTypes.func.isRequired,
+  modules: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired,
+  filterText: PropTypes.string.isRequired,
+  filterInputFocus: PropTypes.func.isRequired
 };
 
 export default SidebarFilter;

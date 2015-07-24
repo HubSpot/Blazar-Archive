@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import ReactZeroClipboard from 'react-zeroclipboard';
 import { bindAll } from 'underscore';
 
-class Copyable extends React.Component {
+class Copyable extends Component {
 
   constructor() {
     bindAll(this, 'handleClick', 'handleHover');
@@ -28,10 +28,10 @@ class Copyable extends React.Component {
 }
 
 Copyable.propTypes = {
-  children: React.PropTypes.node.isRequired,
-  text: React.PropTypes.string.isRequired,
-  click: React.PropTypes.func,
-  hover: React.PropTypes.func
+  children: PropTypes.node.isRequired,
+  text: PropTypes.string.isRequired,
+  click: PropTypes.func,
+  hover: PropTypes.func
 };
 
 export default Copyable;

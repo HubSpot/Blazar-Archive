@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class Label extends React.Component {
+class Label extends Component {
 
   getClassNames() {
     let labelType = this.props.type || 'default';
@@ -16,8 +16,8 @@ class Label extends React.Component {
 }
 
 Label.propTypes = {
-  children: React.PropTypes.node.isRequired,
-  type: React.PropTypes.oneOf(['default', 'primary', 'success', 'info', 'warning', 'danger'])
+  children: PropTypes.node.isRequired,
+  type: PropTypes.oneOf(['default', 'primary', 'success', 'info', 'warning', 'danger'])
 };
 
 export default Label;

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class BuildingIcon extends React.Component {
+class BuildingIcon extends Component {
 
   getClassNames() {
     return `building-icon sidebar__active-building-icon building-icon--${this.props.result} ${this.props.classNames} building-icon--${this.props.size}`;
@@ -24,9 +24,9 @@ BuildingIcon.defaultProps = {
 };
 
 BuildingIcon.propTypes = {
-  result: React.PropTypes.string,
-  classNames: React.PropTypes.string,
-  size: React.PropTypes.oneOf(['medium', 'small'])
+  result: PropTypes.string,
+  classNames: PropTypes.string,
+  size: PropTypes.oneOf(['medium', 'small'])
 };
 
 export default BuildingIcon;

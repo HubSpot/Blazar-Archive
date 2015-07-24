@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import Build from './Build.jsx';
 import PageContainer from '../layout/PageContainer.jsx';
 
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
 
-class BuildContainer extends React.Component {
+class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
@@ -61,7 +61,7 @@ class BuildContainer extends React.Component {
 }
 
 BuildContainer.propTypes = {
-  params: React.PropTypes.object.isRequired
+  params: PropTypes.object.isRequired
 };
 
 export default BuildContainer;

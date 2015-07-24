@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class BuildLog extends React.Component {
+class BuildLog extends Component {
 
   render() {
 
@@ -14,7 +14,7 @@ class BuildLog extends React.Component {
 }
 
 BuildLog.propTypes = {
-  log: React.PropTypes.string
+  log: PropTypes.string
 };
 
 export default BuildLog;

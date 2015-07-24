@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 
 // To do: Typeahead in input box
-class SearchFilter extends React.Component {
+class SearchFilter extends Component {
 
   constructor() {
     bindAll(this, 'handleFocus', 'handleBlur', 'handleChange', 'handleKeyup');
@@ -52,12 +52,12 @@ class SearchFilter extends React.Component {
 }
 
 SearchFilter.propTypes = {
-  placeholder: React.PropTypes.string.isRequired,
-  inputValue: React.PropTypes.string.isRequired,
-  options: React.PropTypes.array.isRequired,
-  onChange: React.PropTypes.func.isRequired,
-  onBlur: React.PropTypes.func.isRequired,
-  onFocus: React.PropTypes.func.isRequired
+  placeholder: PropTypes.string.isRequired,
+  inputValue: PropTypes.string.isRequired,
+  options: PropTypes.array.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired
 };
 
 export default SearchFilter;

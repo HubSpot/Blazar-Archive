@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component} from 'react';
 import DashboardContainer from '../components/dashboard/DashboardContainer.jsx';
 
-class Home extends React.Component {
+class Home extends Component {
 
   render() {
     return (

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import SectionHeader from './SectionHeader.jsx';
 
-class PageSection extends React.Component{
+class PageSection extends Component{
 
   render() {
     let sectionHeader;
@@ -18,8 +18,8 @@ class PageSection extends React.Component{
 }
 
 PageSection.propTypes = {
-  headline: React.PropTypes.string,
-  children: React.PropTypes.node
+  headline: PropTypes.string,
+  children: PropTypes.node
 };
 
 export default PageSection;

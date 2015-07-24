@@ -1,9 +1,9 @@
 /*global config*/
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 let Link = require('react-router').Link;
 
-class Module extends React.Component {
+class Module extends Component {
 
   render() {
     let {buildState, gitInfo, module} = this.props.repo;
@@ -19,9 +19,9 @@ class Module extends React.Component {
 }
 
 Module.propTypes = {
-  repo: React.PropTypes.object,
-  name: React.PropTypes.string,
-  link: React.PropTypes.string
+  repo: PropTypes.object,
+  name: PropTypes.string,
+  link: PropTypes.string
 };
 
 export default Module;

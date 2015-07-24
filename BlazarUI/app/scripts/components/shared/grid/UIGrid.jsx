@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class UIGrid extends React.Component {
+class UIGrid extends Component {
 
   getClassName() {
     return `row ${this.props.className}`;
@@ -27,9 +27,9 @@ UIGrid.defaultProps = {
 };
 
 UIGrid.propTypes = {
-  className: React.PropTypes.string,
-  containerClassName: React.PropTypes.string,
-  children: React.PropTypes.node
+  className: PropTypes.string,
+  containerClassName: PropTypes.string,
+  children: PropTypes.node
 };
 
 export default UIGrid;

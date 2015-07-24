@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class PageContainer extends React.Component {
+class PageContainer extends Component {
 
   constructor(props) {
     super(props);
@@ -29,9 +29,9 @@ class PageContainer extends React.Component {
 }
 
 PageContainer.propTypes = {
-  headline: React.PropTypes.string,
-  classNames: React.PropTypes.string,
-  children: React.PropTypes.node
+  headline: PropTypes.string,
+  classNames: PropTypes.string,
+  children: PropTypes.node
 };
 
 export default PageContainer;

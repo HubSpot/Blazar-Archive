@@ -1,9 +1,9 @@
 /*global config*/
-import React from 'react';
+import React, {Component} from 'react';
 let Link = require('react-router').Link;
 
 
-class Breadcrumb extends React.Component {
+class Breadcrumb extends Component {
 
   render() {
     let path = window.location.pathname.split('/');

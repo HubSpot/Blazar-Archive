@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {Component} from 'react';
 import Dashboard from './Dashboard.jsx';
 import PageContainer from '../layout/PageContainer.jsx';
 
-class DashboardContainer extends React.Component {
+class DashboardContainer extends Component {
 
   render() {
     return (

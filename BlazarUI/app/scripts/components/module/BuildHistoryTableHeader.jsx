@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import {map} from 'underscore';
 
-class BuildHistoryTableHeader extends React.Component {
+class BuildHistoryTableHeader extends Component {
 
   getColumns() {
     return map(this.props.columnNames, (column) =>
@@ -23,7 +23,7 @@ class BuildHistoryTableHeader extends React.Component {
 }
 
 BuildHistoryTableHeader.propTypes = {
-  columnNames: React.PropTypes.array.isRequired
+  columnNames: PropTypes.array.isRequired
 };
 
 export default BuildHistoryTableHeader;

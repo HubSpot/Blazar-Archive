@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class Icon extends React.Component {
+class Icon extends Component {
 
   getClassNames() {
 
@@ -22,9 +22,9 @@ Icon.defaultProps = {
 };
 
 Icon.propTypes = {
-  type: React.PropTypes.oneOf(['fa', 'octicon']),
-  name: React.PropTypes.string.isRequired,
-  classNames: React.PropTypes.string
+  type: PropTypes.oneOf(['fa', 'octicon']),
+  name: PropTypes.string.isRequired,
+  classNames: PropTypes.string
 };
 
 export default Icon;

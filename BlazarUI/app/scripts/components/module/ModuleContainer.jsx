@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import Module from './Module.jsx';
 import PageContainer from '../layout/PageContainer.jsx';
 import BuildHistoryStore from '../../stores/buildHistoryStore';
 import BuildHistoryActions from '../../actions/buildHistoryActions';
 
-class ModuleContainer extends React.Component {
+class ModuleContainer extends Component {
 
   constructor(props) {
     super(props);
@@ -47,7 +47,7 @@ class ModuleContainer extends React.Component {
 }
 
 ModuleContainer.propTypes = {
-  params: React.PropTypes.object.isRequired
+  params: PropTypes.object.isRequired
 };
 
 export default ModuleContainer;

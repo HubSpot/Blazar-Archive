@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {Component} from 'react';
 import ProjectsSidebar from './ProjectsSidebar.jsx';
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
 import Sidebar from './Sidebar.jsx';
 
-class ProjectsSidebarContainer extends React.Component {
+class ProjectsSidebarContainer extends Component {
 
   constructor(props) {
     super(props);

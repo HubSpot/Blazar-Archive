@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import BuildHistoryTableHeader from './BuildHistoryTableHeader.jsx';
 import BuildHistoryTableRow from './BuildHistoryTableRow.jsx';
 
-class BuildHistoryTable extends React.Component {
+class BuildHistoryTable extends Component {
 
   getRows() {
     let builds = this.props.buildHistory;
@@ -46,8 +46,8 @@ class BuildHistoryTable extends React.Component {
 
 
 BuildHistoryTable.propTypes = {
-  loading: React.PropTypes.bool,
-  buildHistory: React.PropTypes.array.isRequired
+  loading: PropTypes.bool,
+  buildHistory: PropTypes.array.isRequired
 };
 
 

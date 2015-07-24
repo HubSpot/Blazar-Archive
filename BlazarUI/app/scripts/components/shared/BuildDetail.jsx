@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import Helpers from '../ComponentHelpers';
 
 const buildLables = {
@@ -8,7 +8,7 @@ const buildLables = {
   'CANCELLED': 'warning'
 };
 
-class BuildDetail extends React.Component {
+class BuildDetail extends Component {
 
   getClassNames() {
     return 'build-detail alert alert-' + buildLables[this.props.build.buildState.result];
@@ -47,16 +47,16 @@ class BuildDetail extends React.Component {
 }
 
 BuildDetail.propTypes = {
-  loading: React.PropTypes.bool.isRequired,
-  build: React.PropTypes.shape({
-    buildState: React.PropTypes.shape({
-      buildNumber: React.PropTypes.number,
-      commitSha: React.PropTypes.string,
-      result: React.PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
-      startTime: React.PropTypes.number,
-      endTime: React.PropTypes.number
+  loading: PropTypes.bool.isRequired,
+  build: PropTypes.shape({
+    buildState: PropTypes.shape({
+      buildNumber: PropTypes.number,
+      commitSha: PropTypes.string,
+      result: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
+      startTime: PropTypes.number,
+      endTime: PropTypes.number
     }),
-    gitInfo: React.PropTypes.obj
+    gitInfo: PropTypes.obj
   })
 };
 

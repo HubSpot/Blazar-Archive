@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import RepoContainer from '../components/repo/RepoContainer.jsx';
 
-class Repo extends React.Component {
+class Repo extends Component {
 
   constructor(props) {
     super(props);
@@ -19,7 +19,7 @@ class Repo extends React.Component {
 }
 
 Repo.propTypes = {
-  params: React.PropTypes.object.isRequired
+  params: PropTypes.object.isRequired
 };
 
 export default Repo;

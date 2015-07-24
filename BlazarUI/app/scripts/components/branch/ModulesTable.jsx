@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import TableHeader from '../shared/TableHeader.jsx';
 import ModulesTableRow from './ModulesTableRow.jsx';
 
-class ModulesTable extends React.Component {
+class ModulesTable extends Component {
 
   getRows() {
     let modules = this.props.modules;
@@ -45,8 +45,8 @@ class ModulesTable extends React.Component {
 
 
 ModulesTable.propTypes = {
-  loading: React.PropTypes.bool,
-  modules: React.PropTypes.array.isRequired
+  loading: PropTypes.bool,
+  modules: PropTypes.array.isRequired
 };
 
 export default ModulesTable;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import PageHeader from '../shared/PageHeader.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -7,7 +7,7 @@ import BuildDetail from '../shared/BuildDetail.jsx';
 import BuildLog from './BuildLog.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 
-class Build extends React.Component{
+class Build extends Component{
 
   render() {
     // TO DO: show page loader
@@ -44,14 +44,14 @@ class Build extends React.Component{
 }
 
 Build.propTypes = {
-  build: React.PropTypes.shape({
-    buildState: React.PropTypes.object,
-    gitInfo: React.PropTypes.object,
-    module: React.PropTypes.object
+  build: PropTypes.shape({
+    buildState: PropTypes.object,
+    gitInfo: PropTypes.object,
+    module: PropTypes.object
   }),
-  log: React.PropTypes.string,
-  params: React.PropTypes.object,
-  loading: React.PropTypes.bool
+  log: PropTypes.string,
+  params: PropTypes.object,
+  loading: PropTypes.bool
 };
 
 export default Build;

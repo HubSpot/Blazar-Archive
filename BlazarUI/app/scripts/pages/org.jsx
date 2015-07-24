@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import OrgContainer from '../components/org/OrgContainer.jsx';
 
-class Org extends React.Component {
+class Org extends Component {
 
   constructor(props) {
     super(props);
@@ -19,7 +19,7 @@ class Org extends React.Component {
 }
 
 Org.propTypes = {
-  params: React.PropTypes.object.isRequired
+  params: PropTypes.object.isRequired
 };
 
 export default Org;

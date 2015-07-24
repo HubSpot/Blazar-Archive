@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import {labels, iconStatus} from '../constants';
 import Helpers from '../ComponentHelpers';
 
-class ModulesTableRow extends React.Component {
+class ModulesTableRow extends Component {
 
   getRowClassNames() {
     if (this.props.module.buildState.result === 'FAILED') {
@@ -65,7 +65,7 @@ class ModulesTableRow extends React.Component {
 }
 
 ModulesTableRow.propTypes = {
-  module: React.PropTypes.object.isRequired
+  module: PropTypes.object.isRequired
 };
 
 export default ModulesTableRow;

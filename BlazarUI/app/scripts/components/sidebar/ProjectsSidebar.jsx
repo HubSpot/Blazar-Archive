@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
 import {bindAll, filter, contains} from 'underscore';
 
 
-class ProjectsSidebar extends React.Component {
+class ProjectsSidebar extends Component {
 
   constructor() {
     bindAll(this, 'updateResults', 'filterInputFocus', 'moduleExpandChange');
@@ -141,8 +141,8 @@ class ProjectsSidebar extends React.Component {
 }
 
 ProjectsSidebar.propTypes = {
-  loading: React.PropTypes.bool,
-  builds: React.PropTypes.object
+  loading: PropTypes.bool,
+  builds: PropTypes.object
 };
 
 export default ProjectsSidebar;

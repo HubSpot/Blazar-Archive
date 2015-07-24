@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class Image extends React.Component {
+class Image extends Component {
 
   getStyles() {
     return {
@@ -24,10 +24,10 @@ Image.defaultProps = {
 };
 
 Image.propTypes = {
-  src: React.PropTypes.string.isRequired,
-  width: React.PropTypes.string,
-  height: React.PropTypes.string,
-  classNames: React.PropTypes.string
+  src: PropTypes.string.isRequired,
+  width: PropTypes.string,
+  height: PropTypes.string,
+  classNames: PropTypes.string
 };
 
 export default Image;

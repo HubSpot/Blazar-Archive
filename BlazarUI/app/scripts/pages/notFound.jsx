@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component} from 'react';
 import PageContainer from '../components/layout/PageContainer.jsx';
 
-class NotFound extends React.Component {
+class NotFound extends Component {
 
   render() {
     return (

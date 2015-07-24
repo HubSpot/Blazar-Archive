@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import BranchContainer from '../components/branch/BranchContainer.jsx';
 
-class Branch extends React.Component {
+class Branch extends Component {
 
   constructor(props) {
     super(props);
@@ -19,7 +19,7 @@ class Branch extends React.Component {
 }
 
 Branch.propTypes = {
-  params: React.PropTypes.object.isRequired
+  params: PropTypes.object.isRequired
 };
 
 export default Branch;

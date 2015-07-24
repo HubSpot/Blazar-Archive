@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import { bindAll } from 'underscore';
 import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 
-class ProjectSidebarListItem extends React.Component {
+class ProjectSidebarListItem extends Component {
 
   constructor() {
 
@@ -75,11 +75,11 @@ class ProjectSidebarListItem extends React.Component {
 }
 
 ProjectSidebarListItem.propTypes = {
-  repo: React.PropTypes.object,
-  project: React.PropTypes.object,
-  filterText: React.PropTypes.string,
-  isExpanded: React.PropTypes.bool,
-  moduleExpandChange: React.PropTypes.func
+  repo: PropTypes.object,
+  project: PropTypes.object,
+  filterText: PropTypes.string,
+  isExpanded: PropTypes.bool,
+  moduleExpandChange: PropTypes.func
 };
 
 export default ProjectSidebarListItem;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import PageHeader from '../shared/PageHeader.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -6,7 +6,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 
-class Module extends React.Component {
+class Module extends Component {
 
   render() {
     return (
@@ -31,9 +31,9 @@ class Module extends React.Component {
 
 
 Module.propTypes = {
-  loading: React.PropTypes.bool.isRequired,
-  params: React.PropTypes.object.isRequired,
-  buildHistory: React.PropTypes.array.isRequired
+  loading: PropTypes.bool.isRequired,
+  params: PropTypes.object.isRequired,
+  buildHistory: PropTypes.array.isRequired
 };
 
 export default Module;

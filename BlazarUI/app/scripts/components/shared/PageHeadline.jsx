@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class PageHeadline extends React.Component{
+class PageHeadline extends Component{
 
   render() {
     return (
@@ -18,9 +18,9 @@ class PageHeadline extends React.Component{
 }
 
 PageHeadline.propTypes = {
-  headline: React.PropTypes.string.isRequired,
-  subheadline: React.PropTypes.string,
-  children: React.PropTypes.node
+  headline: PropTypes.string.isRequired,
+  subheadline: PropTypes.string,
+  children: PropTypes.node
 };
 
 export default PageHeadline;

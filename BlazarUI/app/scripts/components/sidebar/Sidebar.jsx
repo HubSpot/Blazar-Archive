@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class Sidebar extends React.Component {
+class Sidebar extends Component {
 
   render() {
     let headline;
@@ -17,8 +17,8 @@ class Sidebar extends React.Component {
 }
 
 Sidebar.propTypes = {
-  headline: React.PropTypes.string,
-  children: React.PropTypes.node
+  headline: PropTypes.string,
+  children: PropTypes.node
 };
 
 export default Sidebar;

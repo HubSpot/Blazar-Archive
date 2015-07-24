@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import ModuleContainer from '../components/module/ModuleContainer.jsx';
 
-class Module extends React.Component {
+class Module extends Component {
 
   constructor(props) {
     super(props);
@@ -19,7 +19,7 @@ class Module extends React.Component {
 }
 
 Module.propTypes = {
-  params: React.PropTypes.object.isRequired
+  params: PropTypes.object.isRequired
 };
 
 export default Module;

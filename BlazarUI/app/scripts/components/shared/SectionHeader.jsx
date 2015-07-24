@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 
-class SectionHeader extends React.Component {
+class SectionHeader extends Component {
 
   render() {
     return (
@@ -12,7 +12,7 @@ class SectionHeader extends React.Component {
 }
 
 SectionHeader.propTypes = {
-  children: React.PropTypes.node
+  children: PropTypes.node
 };
 
 export default SectionHeader;

@@ -1,12 +1,12 @@
 /*global config*/
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
 import Helpers from '../ComponentHelpers';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
 import {labels, iconStatus} from '../constants';
 
-class BuildHistoryTableRow extends React.Component {
+class BuildHistoryTableRow extends Component {
 
   handleHoverCommit() {
     console.log('hover');
@@ -76,16 +76,16 @@ class BuildHistoryTableRow extends React.Component {
 
 
 BuildHistoryTableRow.propTypes = {
-  build: React.PropTypes.shape({
-    buildState: React.PropTypes.shape({
-      buildNumber: React.PropTypes.number,
-      commitSha: React.PropTypes.string,
-      result: React.PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
-      startTime: React.PropTypes.number,
-      endTime: React.PropTypes.number
+  build: PropTypes.shape({
+    buildState: PropTypes.shape({
+      buildNumber: PropTypes.number,
+      commitSha: PropTypes.string,
+      result: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
+      startTime: PropTypes.number,
+      endTime: PropTypes.number
     }),
-    gitInfo: React.PropTypes.obj,
-    module: React.PropTypes.obj
+    gitInfo: PropTypes.obj,
+    module: PropTypes.obj
   })
 };
 
