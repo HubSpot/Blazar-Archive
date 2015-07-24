@@ -20,7 +20,7 @@ class Builds extends BaseCollection {
       let moduleInfo = {
         repository: gitInfo.repository,
         module: module.name,
-        link: `${app.config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`
+        link: `${config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`
       };
       return moduleInfo;
     });
@@ -104,11 +104,11 @@ class Builds extends BaseCollection {
       repo.branch = repo.modules[0].gitInfo.branch;
       repo.organization = repo.modules[0].gitInfo.organization;
       repo.id = `${repo.host}_${repo.branch}_${repo.organization}_${repo.repository}`;
-      repo.branchPath = `${app.config.appRoot}/${repo.modules[0].gitInfo.host}/${repo.modules[0].gitInfo.organization}/${repo.modules[0].gitInfo.repository}/${repo.modules[0].gitInfo.branch}`;
+      repo.branchPath = `${config.appRoot}/${repo.modules[0].gitInfo.host}/${repo.modules[0].gitInfo.organization}/${repo.modules[0].gitInfo.repository}/${repo.modules[0].gitInfo.branch}`;
 
       repo.modules.forEach( (module) => {
-        module.modulePath = `${app.config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
-        module.buildState.buildLink = `${app.config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.buildState.buildNumber}`;
+        module.modulePath = `${config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
+        module.buildState.buildLink = `${config.appRoot}/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.buildState.buildNumber}`;
         if (module.buildState.startTime < repo.mostRecentBuild) {
           repo.mostRecentBuild = module.buildState.startTime;
         }

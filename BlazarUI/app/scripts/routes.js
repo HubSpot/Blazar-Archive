@@ -12,15 +12,19 @@ import Build from './pages/build.jsx';
 import Module from './pages/module.jsx';
 import NotFound from './pages/notFound.jsx';
 
+function pagePath(path){
+  return config.appRoot + path;
+}
+
 var routes = (
   <Route name="app" path="/" handler={ App }>
-    <Route name="dashboard" handler={ Dashboard } />
     <DefaultRoute handler={ Dashboard } />
-    <Route name="org" path="/project/:url/:org" handler={Org}/>
-    <Route name="repo" path="/project/:url/:org/:repo" handler={Repo}/>
-    <Route name="branch" path="/project/:url/:org/:repo/:branch" handler={Branch}/>
-    <Route name="module" path="/project/:url/:org/:repo/:branch/:module" handler={Module}/>
-    <Route name="build"  path="/project/:url/:org/:repo/:branch/:module/:buildNumber" handler={Build}/>
+    <Route name="dashboard" handler={ Dashboard } />
+    <Route name="org" path={pagePath("/build/:url/:org")} handler={Org}/>
+    <Route name="repo" path={pagePath("/build/:url/:org/:repo")} handler={Repo}/>
+    <Route name="branch" path={pagePath("/build/:url/:org/:repo/:branch")} handler={Branch}/>
+    <Route name="module" path={pagePath("/build/:url/:org/:repo/:branch/:module")} handler={Module}/>
+    <Route name="build" path={pagePath("/build/:url/:org/:repo/:branch/:module/:buildNumber")} handler={Build}/>
     <NotFoundRoute handler={ NotFound } />
   </Route>
 );

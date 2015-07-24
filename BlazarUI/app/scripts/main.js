@@ -4,9 +4,7 @@ import routes from './routes';
 import config from './config';
 import ZeroClipboard from 'ZeroClipboard';
 
-window.app = {
-  config: config
-};
+window.config = config;
 
 // make ZeroClipboard global
 // for react-zeroclipboard
