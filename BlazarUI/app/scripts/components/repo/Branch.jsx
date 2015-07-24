@@ -11,15 +11,14 @@ class Branch extends Component {
 
     this.state = {
       expanded: false
-    }
+    };
   }
 
-  componentDidMount(){
+  componentDidMount() {
     if (this.props.branch.branch === 'master') {
-      console.log('we have master');
       this.setState({
         expanded: true
-      })
+      });
     }
   }
 
@@ -32,7 +31,6 @@ class Branch extends Component {
   }
 
   handleExpandToggleClick() {
-    console.log('handle');
     this.setState({
       expanded: !this.state.expanded
     });
@@ -40,7 +38,6 @@ class Branch extends Component {
 
   render() {
     let branch = this.props.branch;
-    console.log('props; ', this.props);
     return (
       <div className='repo-branch'>
         <h4 onClick={this.handleExpandToggleClick} className='repo-branch__headline'>

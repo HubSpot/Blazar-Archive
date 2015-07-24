@@ -50,9 +50,21 @@ class Builds extends BaseCollection {
       return repo.organization === repoInfo.org && repo.repository === repoInfo.repo;
     })
 
-    return branches.sort( (a, b) => {
+    branches.sort( (a, b) => {
       return b.branch - a.branch
     })
+
+    // move master to top of branches list
+    let masterIndex = branches.map(function(el) {
+      return el.branch;
+    }).indexOf('master');
+
+    if (masterIndex > 0) {
+      let master = branches.splice(masterIndex, masterIndex + 1);
+      branches = master.concat(branches);
+    }
+
+    return branches;
 
   }
 
