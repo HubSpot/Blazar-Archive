@@ -1,5 +1,7 @@
 package com.hubspot.blazar.data.service;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
@@ -24,23 +26,35 @@ public class ModuleService {
   }
 
   @Transactional
-  public Set<Module> setModules(GitInfo gitInfo, Set<Module> modules) {
-    Map<String, Module> modulesByName = mapByName(modules);
+  public Set<Module> setModules(GitInfo gitInfo, Set<Module> updatedModules) {
     Set<Module> oldModules = getModules(gitInfo);
+    Set<Module> newModules = new HashSet<>();
 
-    for (Module oldModule : oldModules) {
-      if (!modulesByName.containsKey(oldModule.getName())) {
-        moduleDao.delete(oldModule.getId().get());
-      }
+    Map<String, Module> updatedModulesByName = mapByName(updatedModules);
+    Map<String, Module> oldModulesByName = mapByName(oldModules);
+
+    for (String deletedModule : Sets.difference(oldModulesByName.keySet(), updatedModulesByName.keySet())) {
+      checkAffectedRowCount(moduleDao.delete(oldModulesByName.get(deletedModule).getId().get()));
     }
 
-    Set<Module> newModules = new HashSet<>();
-    for (Module module : modules) {
-      long id = moduleDao.upsert(gitInfo.getId().get(), module);
-      newModules.add(module.withId(id));
+    for (String updatedModule : Sets.intersection(oldModulesByName.keySet(), updatedModulesByName.keySet())) {
+      long id = oldModulesByName.get(updatedModule).getId().get();
+      Module updated = updatedModulesByName.get(updatedModule).withId(id);
+      checkAffectedRowCount(moduleDao.update(updated));
+      newModules.add(updated);
+    }
+
+    for (String addedModule : Sets.intersection(updatedModulesByName.keySet(), oldModulesByName.keySet())) {
+      Module added = updatedModulesByName.get(addedModule);
+      long id = moduleDao.insert(gitInfo.getId().get(), added);
+      newModules.add(added.withId(id));
     }
 
     return newModules;
+  }
+
+  private static void checkAffectedRowCount(int affectedRows) {
+    Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
   }
 
   private static Map<String, Module> mapByName(Set<Module> modules) {
