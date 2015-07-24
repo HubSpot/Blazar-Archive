@@ -105,6 +105,11 @@ gulp.task('serve', function() {
     fallback: dist + 'index.html',
     middleware: function(connect, opt) {
       if (!isProduction){
+        if (!process.env.BLAZAR_API_URL) {
+          console.log('You must first set your API endpoint url to');
+          console.log('an environment variable named BLAZAR_API_URL');
+          process.exit(1);
+        }
         return [ (function() {
           var proxy = require('proxy-middleware');
           var options = url.parse(process.env.BLAZAR_API_URL);
