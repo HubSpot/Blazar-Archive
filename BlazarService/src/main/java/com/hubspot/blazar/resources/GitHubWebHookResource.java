@@ -73,8 +73,10 @@ public class GitHubWebHookResource {
   @Path("/push")
   public void processPushEvent(PushEvent pushEvent) throws IOException {
     System.out.println(mapper.writeValueAsString(pushEvent));
-    updateBuilds(pushEvent);
-    triggerBuilds(pushEvent);
+    if (!pushEvent.getRef().startsWith("refs/tags/")) {
+      updateBuilds(pushEvent);
+      triggerBuilds(pushEvent);
+    }
   }
 
   @PUT
