@@ -1,4 +1,4 @@
-/*global app*/
+/*global config*/
 import React from 'react';
 import Helpers from '../ComponentHelpers';
 import { Link } from 'react-router';
@@ -38,7 +38,7 @@ class BuildHistoryTableRow extends React.Component {
     let {buildState, gitInfo, module} = this.props.build;
 
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.commitSha}/`;
-    let buildLink = `${app.config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
+    let buildLink = `${config.appRoot}/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
     let startTime = Helpers.timestampFormatted(buildState.startTime);
     let duration = buildState.duration;
     let buildNumber = <Link to={buildLink}>{buildState.buildNumber}</Link>;

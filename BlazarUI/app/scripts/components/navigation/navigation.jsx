@@ -8,7 +8,7 @@ class Navigation extends React.Component {
         <nav className="navbar navbar-default navbar-dark" role="navigation">
           <div className="container-fluid">
             <div className="navbar-header">
-              <Link className="navbar-brand" to="dashboard">
+              <Link className="navbar-brand" to="app">
                 Blazar
               </Link>
             </div>
