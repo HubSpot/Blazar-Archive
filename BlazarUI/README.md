@@ -13,24 +13,27 @@ Makes use of:
 Install dependencies.
 
 ```
-$ npm install
-$ git clone
+$ cd BlazarUI
+$ npm install && bower install
 ```
 
 ## Development
 
-Build the application and start livereload. By default the webserver starts at port 5000. You can define a port with `$ gulp --port 3333`.
+Build and run the application locally with gulp. By default a local webserver starts at port 5000 and uses livereload. You can define a port with `$ gulp --port 3333`.
 
 ```
 $ gulp
 ```
+
+#### Connecting to the API
+For local development, to avoid any cross-domain restrictions, the connect-server has a middleware proxy in place. Add your API endpoint URL path to an environment variable named BLAZAR_API_URL and the gulp file will pick it up. You can override your API Root at any time by typing the following into your console: localStorage.set('apiRootOverride', 'http://example/blazar/api')
 
 ## Build
 
 Build a minified version of the application in the dist folder.
 
 ```
-$ gulp build --type production
+$ gulp build --type prod
 ```
 
 ## Testing
