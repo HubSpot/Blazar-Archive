@@ -55,7 +55,7 @@ public class BuildResource {
                                                                                 @PathParam("module") String module) {
     updateBuildMap();
 
-    GitInfo gitInfo = new GitInfo(host, organization, repository, branch);
+    GitInfo gitInfo = new GitInfo(Optional.<Long>absent(), host, organization, repository, 0L, branch, true);
     for (ModuleBuildWithState build : BUILD_MAP.values()) {
       if (build.getGitInfo().equals(gitInfo)) {
         if (build.getModule().getName().equals(module)) {
@@ -78,7 +78,7 @@ public class BuildResource {
                                                                      @PathParam("buildNumber") int buildNumber) {
     updateBuildMap();
 
-    GitInfo gitInfo = new GitInfo(host, organization, repository, branch);
+    GitInfo gitInfo = new GitInfo(Optional.<Long>absent(), host, organization, repository, 0L, branch, true);
     for (ModuleBuildWithState build : BUILD_MAP.values()) {
       if (build.getGitInfo().equals(gitInfo)) {
         if (build.getModule().getName().equals(module)) {
@@ -241,7 +241,7 @@ public class BuildResource {
   }
 
   private static ModuleBuildWithState build(String repoName) {
-    return new ModuleBuildWithState(gitInfo(repoName), new Module(repoName, "."), buildState());
+    return new ModuleBuildWithState(gitInfo(repoName), new Module(Optional.<Long>absent(), repoName, ".", true), buildState());
   }
 
   private static ModuleBuildWithState build(String repoName, String moduleName) {
@@ -257,12 +257,12 @@ public class BuildResource {
   }
 
   private static ModuleBuildWithState build(String repoName, String moduleName, String branch, String organization, String host) {
-    GitInfo gitInfo = new GitInfo(host, organization, repoName, branch);
-    return new ModuleBuildWithState(gitInfo, new Module(".".equals(moduleName) ? repoName : moduleName, moduleName), buildState());
+    GitInfo gitInfo = new GitInfo(Optional.<Long>absent(), host, organization, repoName, 0L, branch, true);
+    return new ModuleBuildWithState(gitInfo, new Module(Optional.<Long>absent(), ".".equals(moduleName) ? repoName : moduleName, moduleName, true), buildState());
   }
 
   private static GitInfo gitInfo(String repository) {
-    return new GitInfo("git.hubteam.com", "HubSpot", repository, "master");
+    return new GitInfo(Optional.<Long>absent(), "git.hubteam.com", "HubSpot", repository, 0L, "master", true);
   }
 
   private static BuildState buildState() {

@@ -1,24 +1,20 @@
 package com.hubspot.blazar.resources;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.google.common.base.Optional;
 import com.google.common.net.UrlEscapers;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.data.service.BuildDefinitionService;
+import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
+import com.hubspot.blazar.util.ModuleDiscovery;
 import io.dropwizard.setup.Environment;
-import org.kohsuke.github.GHContent;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GHTreeEntry;
-import org.kohsuke.github.GitHub;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -28,27 +24,26 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 @Path("/github/webhooks")
 @Consumes(MediaType.APPLICATION_JSON)
 public class GitHubWebHookResource {
-  private final BuildDefinitionService buildDefinitionService;
-  private final GitHub gitHub;
+  private final BranchService branchService;
+  private final ModuleService moduleService;
+  private final ModuleDiscovery moduleDiscovery;
   private final ObjectMapper mapper;
-  private final XmlMapper xmlMapper;
 
   @Inject
-  public GitHubWebHookResource(BuildDefinitionService buildDefinitionService,
-                               GitHub gitHub,
-                               Environment environment,
-                               XmlMapper xmlMapper) {
-    this.buildDefinitionService = buildDefinitionService;
-    this.gitHub = gitHub;
+  public GitHubWebHookResource(BranchService branchService,
+                               ModuleService moduleService,
+                               ModuleDiscovery moduleDiscovery,
+                               Environment environment) {
+    this.branchService = branchService;
+    this.moduleService = moduleService;
+    this.moduleDiscovery = moduleDiscovery;
     this.mapper = environment.getObjectMapper();
-    this.xmlMapper = xmlMapper;
   }
 
   @POST
@@ -65,7 +60,7 @@ public class GitHubWebHookResource {
   public void processDeleteEvent(DeleteEvent deleteEvent) throws IOException {
     System.out.println(mapper.writeValueAsString(deleteEvent));
     if ("branch".equalsIgnoreCase(deleteEvent.getRefType())) {
-      buildDefinitionService.setModules(gitInfo(deleteEvent), Collections.<Module>emptySet());
+      branchService.delete(gitInfo(deleteEvent));
     }
   }
 
@@ -74,8 +69,10 @@ public class GitHubWebHookResource {
   public void processPushEvent(PushEvent pushEvent) throws IOException {
     System.out.println(mapper.writeValueAsString(pushEvent));
     if (!pushEvent.getRef().startsWith("refs/tags/")) {
-      updateBuilds(pushEvent);
-      triggerBuilds(pushEvent);
+      GitInfo gitInfo = branchService.upsert(gitInfo(pushEvent));
+
+      Set<Module> modules = updateModules(gitInfo, pushEvent);
+      triggerBuilds(pushEvent, modules);
     }
   }
 
@@ -83,45 +80,23 @@ public class GitHubWebHookResource {
   @Path("/process")
   @Produces(MediaType.APPLICATION_JSON)
   public Set<Module> processBranch(GitInfo gitInfo) throws IOException {
-    GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
-    GHTree tree = repository.getTreeRecursive(gitInfo.getBranch(), 1);
+    gitInfo = branchService.upsert(gitInfo);
 
-    Set<String> poms = new HashSet<>();
-    for (GHTreeEntry entry : tree.getTree()) {
-      if (isPom(entry.getPath())) {
-        poms.add(entry.getPath());
-      }
-    }
-
-    Set<Module> modules = new HashSet<>();
-    for (String pom : poms) {
-      GHContent content = repository.getFileContent(pom, gitInfo.getBranch());
-      JsonNode node = xmlMapper.readTree(content.getContent());
-      String artifactId = node.get("artifactId").textValue();
-      modules.add(new Module(artifactId, pom));
-    }
-
-    buildDefinitionService.setModules(gitInfo, modules);
-    return modules;
+    Set<Module> modules = moduleDiscovery.discover(gitInfo);
+    return moduleService.setModules(gitInfo, modules);
   }
 
-  private void updateBuilds(PushEvent pushEvent) throws IOException {
-    boolean processBranch = false;
+  private Set<Module> updateModules(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
     for (String path : affectedPaths(pushEvent)) {
       if (isPom(path)) {
-        processBranch = true;
+        return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
       }
     }
 
-    if (processBranch) {
-      processBranch(gitInfo(pushEvent));
-    }
+    return moduleService.getModules(gitInfo);
   }
 
-  private void triggerBuilds(PushEvent pushEvent) {
-    GitInfo gitInfo = gitInfo(pushEvent);
-    Set<Module> modules = buildDefinitionService.getModules(gitInfo);
-
+  private void triggerBuilds(PushEvent pushEvent, Set<Module> modules) {
     Set<Module> toBuild = new HashSet<>();
     for (String path : affectedPaths(pushEvent)) {
       for (Module module : modules) {
@@ -141,25 +116,27 @@ public class GitHubWebHookResource {
   }
 
   private GitInfo gitInfo(CreateEvent createEvent) {
-    return gitInfo(createEvent.getRepository(), createEvent.getRef());
+    return gitInfo(createEvent.getRepository(), createEvent.getRef(), true);
   }
 
   private GitInfo gitInfo(DeleteEvent deleteEvent) {
-    return gitInfo(deleteEvent.getRepository(), deleteEvent.getRef());
+    return gitInfo(deleteEvent.getRepository(), deleteEvent.getRef(), false);
   }
 
   private GitInfo gitInfo(PushEvent pushEvent) {
-    return gitInfo(pushEvent.getRepository(), pushEvent.getRef());
+    return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), true);
   }
 
-  private GitInfo gitInfo(Repository repository, String ref) {
+  private GitInfo gitInfo(Repository repository, String ref, boolean active) {
     String host = URI.create(repository.getUrl()).getHost();
     String fullName = repository.getFullName();
     String organization = fullName.substring(0, fullName.indexOf('/'));
     String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
+    int repositoryId = repository.getId();
     String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
+    String escapedBranch = UrlEscapers.urlPathSegmentEscaper().escape(branch);
 
-    return new GitInfo(host, organization, repositoryName, UrlEscapers.urlPathSegmentEscaper().escape(branch));
+    return new GitInfo(Optional.<Long>absent(), host, organization, repositoryName, repositoryId, escapedBranch, active);
   }
 
   private static Set<String> affectedPaths(PushEvent pushEvent) {

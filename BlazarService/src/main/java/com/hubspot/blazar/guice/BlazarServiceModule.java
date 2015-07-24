@@ -14,6 +14,7 @@ import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.resources.BuildDefinitionResource;
 import com.hubspot.blazar.resources.BuildResource;
 import com.hubspot.blazar.resources.GitHubWebHookResource;
+import com.hubspot.blazar.util.ModuleDiscovery;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
@@ -35,6 +36,8 @@ public class BlazarServiceModule extends AbstractModule {
     bind(BuildResource.class);
     bind(BuildDefinitionResource.class);
     bind(GitHubWebHookResource.class);
+
+    bind(ModuleDiscovery.class);
 
     Multibinder.newSetBinder(binder(), ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
   }
