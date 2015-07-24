@@ -6,9 +6,13 @@ var concatCss = require('gulp-concat-css');
 var gulpCopy = require('gulp-copy');
 var url = require('url');
 
-// set variable via $ gulp --type production
+// config to sent to html as global config variables
+var appConfig = require('./appConfig.js');
+console.log('APP CONFIG: ', appConfig);
+
+// set variable via $ gulp --type prod
 var environment = $.util.env.type || 'staging';
-var isProduction = environment === 'production';
+var isProduction = environment === 'prod';
 var webpackConfig = require('./webpack.config.js').getConfig(environment);
 
 var port = $.util.env.port || 5000;
@@ -52,9 +56,11 @@ gulp.task('fonts', function() {
   ]).pipe(gulp.dest(dist + 'css/fonts/'));
 });
 
-// copy html from app to dist
+// preprocess env variables for html
+// and copy html from app to dist
 gulp.task('html', function() {
   return gulp.src(app + 'index.html')
+    .pipe($.preprocess({context: appConfig }))
     .pipe(gulp.dest(dist))
     .pipe($.size({ title : 'html' }))
     .pipe($.connect.reload());
