@@ -58,3 +58,18 @@ CSS entry file: `app/stylus/main.styl`<br />
 * node
 * npm
 * gulp
+
+
+## Code Structure
+The BlazarUI uses React components and Reflux, a library for unidirectional dataflow architecture inspired by ReactJS Flux.
+
+What follows is a run-down of the general structure of the react-components and their related flux actions and stores.
+
+Let's start with the routes.js file. As indicated, this file holds all of our routes. One important component that you will notice called by our routes is the the app.jsx component. You can think of this as our primary template. This component loads the top level navigation, sidebar, and sets in place the rest of the routes. Next you can see the react-router loads a unique `page` component for each route. This is the starting point for all other react-components.  In the `scripts/components` directory each sub-directory represents a page. This directory holds all of its components, starting with the Container component.
+
+The Container component is the first component loaded by the page, conventionally named in the form of `Page` followed by `Container` and is where you will do all of your initial data fetching. It then renders its corresponding sub-component, typically using the same name as the page. For more information about using container components, check out this article: (https://medium.com/@learnreact/container-components-c0e67432e005).
+
+Flux actions and stores...to do.
+
+
+Collections and models...to do.
