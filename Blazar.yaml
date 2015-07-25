@@ -6,10 +6,6 @@ server:
     port: 7099
 
 github:
-  endpoint: https://git.mycompany.com/api/v3
-  oauthToken: my-oauth-token
-
-github:
   git.mycompany.com:
     oauthToken: my-github-enterprise-token
     organizations:
