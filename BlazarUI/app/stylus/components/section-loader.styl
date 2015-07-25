@@ -1,6 +1,14 @@
-@import 'variables'
-
 .section-loader
-  text-align center
-  margin 20px
-  font-size 30px
+  margin 25px auto
+  height 28px
+  width 28px
+  animation rotate 1s infinite linear
+  border 2px solid #888
+  border-right-color transparent
+  border-radius 50%
+
+@keyframes rotate
+  0%
+    transform rotate(0deg)
+  100%
+    transform rotate(360deg)
