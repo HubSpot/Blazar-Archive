@@ -1,17 +1,13 @@
 import React, {Component, PropTypes} from 'react';
-import classSet from 'react-classset';
+import Icon from '../shared/Icon.jsx';
 
 class SectionLoader extends Component {
 
-  getClassNames(provided) {
-    return provided + ' ' + classSet({
-      'section-loader': true
-    });
-  }
-
   render() {
     return (
-      <span className={this.getClassNames()}></span>
+      <div className="section-loader">
+        <Icon classNames='fa-spin' name='circle-o-notch' type='fa' />
+      </div>
     );
   }
 
