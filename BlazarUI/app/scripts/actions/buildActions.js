@@ -16,6 +16,14 @@ BuildActions.loadBuild.preEmit = function(data) {
   let buildPromise = build.fetch();
 
   buildPromise.done( () => {
+
+    if (build.data.buildState.result === 'IN_PROGRESS') {
+      BuildActions.loadBuildSuccess({
+        build: build.data
+      });
+      return;
+    }
+
     let log = new Log(build.data.buildState.buildLog);
     let logPromise = log.fetch();
 
