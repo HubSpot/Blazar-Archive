@@ -6,16 +6,20 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildDetail from '../shared/BuildDetail.jsx';
 import BuildLog from './BuildLog.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
+import SectionLoader from '../shared/SectionLoader.jsx';
 
 class Build extends Component{
 
   render() {
-    let {buildState} = this.props.build;
-    let subheadline = '';
 
-    if (!this.props.loading) {
-      subheadline = `Build #${buildState.buildNumber}`;
+    if (this.props.loading) {
+      return (
+        <SectionLoader />
+      );
     }
+
+    let {buildState} = this.props.build;
+    let subheadline = `Build #${buildState.buildNumber}`;
 
     return (
       <div>

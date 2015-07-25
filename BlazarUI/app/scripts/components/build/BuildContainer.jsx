@@ -31,6 +31,7 @@ class BuildContainer extends Component {
   }
 
   componentWillReceiveProps(nextprops) {
+    this.state.loading = true;
     BuildActions.loadBuild(nextprops.params);
   }
 
