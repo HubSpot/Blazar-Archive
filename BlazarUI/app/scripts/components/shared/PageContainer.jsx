@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import classnames from 'classnames';
 
 class PageContainer extends Component {
 
@@ -7,7 +8,10 @@ class PageContainer extends Component {
   }
 
   getClassNames() {
-    return 'page-content ' + this.props.classNames;
+    return classnames([
+       'page-content',
+       this.props.classNames
+    ]);
   }
 
   getHeadline() {
