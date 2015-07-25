@@ -9,6 +9,7 @@ class ProjectsSidebar extends Component {
 
   constructor() {
     bindAll(this, 'updateResults', 'filterInputFocus', 'moduleExpandChange');
+
     this.state = {
       filterText: '',
       isFiltering: false,
@@ -29,10 +30,11 @@ class ProjectsSidebar extends Component {
     if (filterText.length === 0) {
       return modules;
     }
-    // To do: fuzzy search
+
     let filteredModules = filter(modules, (build) => {
       return build.module.toLowerCase().indexOf(filterText.toLowerCase()) !== -1;
     });
+
     return filteredModules;
   }
 
@@ -117,6 +119,7 @@ class ProjectsSidebar extends Component {
           moduleExpandChange={this.moduleExpandChange}
         />
       );
+
     });
 
     return (
@@ -129,7 +132,6 @@ class ProjectsSidebar extends Component {
             filterText={this.state.filterText}
             filterInputFocus={this.filterInputFocus}
             updateResults={this.updateResults}
-            test="this is a fucking test"
           />
         </div>
         <div className="sidebar__list">
