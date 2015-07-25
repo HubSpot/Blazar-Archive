@@ -69,7 +69,17 @@ Let's start with the routes.js file. As indicated, this file holds all of our ro
 
 The Container component is the first component loaded by the page, conventionally named in the form of `Page` followed by `Container` and is where you will do all of your initial data fetching. It then renders its corresponding sub-component, typically using the same name as the page. For more information about using container components, check out this article: (https://medium.com/@learnreact/container-components-c0e67432e005).
 
-Flux actions and stores...to do.
+####Style
+/components directory
+ - Styles specific to react components should be stored within the components directory with the same name as the component.
 
+Layout.styl
+ - General structure of the pages
 
-Collections and models...to do.
+To do..
+
+####Flux actions and stores
+To Do
+
+####Collections and models
+To Do
