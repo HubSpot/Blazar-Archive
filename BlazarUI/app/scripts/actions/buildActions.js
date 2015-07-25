@@ -7,10 +7,20 @@ import Log from '../models/Log';
 let BuildActions = Reflux.createActions([
   'loadBuild',
   'loadBuildSuccess',
-  'loadBuildError'
+  'loadBuildError',
+  'reloadBuild'
 ]);
 
 BuildActions.loadBuild.preEmit = function(data) {
+  fetchBuild(data);
+};
+
+BuildActions.reloadBuild = function (data) {
+  fetchBuild(data)
+};
+
+
+function fetchBuild(data) {
 
   let build = new Build(data);
   let buildPromise = build.fetch();
@@ -45,7 +55,6 @@ BuildActions.loadBuild.preEmit = function(data) {
     BuildActions.loadBuildError('Error retrieving build');
   })
 
-
-};
+}
 
 export default BuildActions;

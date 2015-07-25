@@ -16,30 +16,34 @@ class BuildDetail extends Component {
 
   render() {
 
-    if (this.props.loading) {
-      return <div></div>;
-    }
-
     let {buildState, gitInfo} = this.props.build;
     let endtime, duration;
-    // to do: add build result icon
     let buildResult = Helpers.humanizeText(buildState.result);
 
     if (buildState.result !== 'IN_PROGRESS') {
-      endtime = 'on ' + Helpers.timestampFormatted(buildState.endTime);
+      endtime = 'On ' + Helpers.timestampFormatted(buildState.endTime);
       duration = 'Ran for ' + buildState.duration;
     }
 
     let sha = buildState.commitSha;
     let shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${sha}`;
+    let buildDetail;
+
+    if (buildState.result === 'IN_PROGRESS') {
+      buildDetail = 'started ' + Helpers.timestampFormatted(buildState.startTime);
+    } else {
+      buildDetail = endtime;
+    }
 
     return (
       <div className={this.getClassNames()}>
         <h4 className='build-detail__build-state'>
-          {buildResult} <small>{endtime}</small>
+          Build {buildResult} <small>{buildDetail}</small>
         </h4>
         <p>{duration}</p>
-        <a target="_blank" href={shaLink}>{buildState.commitSha}</a>
+        <p>
+          Commit: <a target="_blank" href={shaLink}>{buildState.commitSha}</a>
+        </p>
       </div>
     );
   }
