@@ -1,11 +1,11 @@
 import React, {Component, PropTypes} from 'react';
-import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx';
+import BuildsSidebarListItem from './BuildsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
 import {bindAll, filter, contains} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
 
-class ProjectsSidebar extends Component {
+class BuildsSidebar extends Component {
 
   constructor() {
     bindAll(this, 'updateResults', 'filterInputFocus', 'moduleExpandChange');
@@ -111,7 +111,7 @@ class ProjectsSidebar extends Component {
       let shouldExpand = contains(expandedState, item.repo.id);
 
       return (
-        <ProjectsSidebarListItem
+        <BuildsSidebarListItem
           key={item.repo.repoModuleKey}
           isExpanded={filteredRepos.length < 4 || shouldExpand}
           filterText={item.filterText}
@@ -144,9 +144,9 @@ class ProjectsSidebar extends Component {
 
 }
 
-ProjectsSidebar.propTypes = {
+BuildsSidebar.propTypes = {
   loading: PropTypes.bool,
   builds: PropTypes.object
 };
 
-export default ProjectsSidebar;
+export default BuildsSidebar;

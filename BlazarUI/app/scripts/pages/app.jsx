@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {RouteHandler} from 'react-router';
 import Navigation from '../components/navigation/navigation.jsx';
-import ProjectsSidebarContainer from '../components/sidebar/ProjectsSidebarContainer.jsx';
+import BuildsSidebarContainer from '../components/sidebar/BuildsSidebarContainer.jsx';
 
 class App extends Component{
 
@@ -10,7 +10,7 @@ class App extends Component{
       <div>
         <Navigation />
         <div className="page-wrapper">
-          <ProjectsSidebarContainer/>
+          <BuildsSidebarContainer/>
           <RouteHandler/>
         </div>
       </div>

@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import ProjectsSidebar from './ProjectsSidebar.jsx';
+import BuildsSidebar from './BuildsSidebar.jsx';
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
 import Sidebar from './Sidebar.jsx';
 
-class ProjectsSidebarContainer extends Component {
+class BuildsSidebarContainer extends Component {
 
   constructor(props) {
     super(props);
@@ -34,10 +34,10 @@ class ProjectsSidebarContainer extends Component {
   render() {
     return (
       <Sidebar>
-        <ProjectsSidebar builds={this.state.builds} loading={this.state.loading} />
+        <BuildsSidebar builds={this.state.builds} loading={this.state.loading} />
       </Sidebar>
     );
   }
 }
 
-export default ProjectsSidebarContainer;
+export default BuildsSidebarContainer;

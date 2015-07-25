@@ -68,7 +68,8 @@ SidebarFilter.propTypes = {
   modules: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
   filterText: PropTypes.string.isRequired,
-  filterInputFocus: PropTypes.func.isRequired
+  filterInputFocus: PropTypes.func.isRequired,
+  repos: PropTypes.array.isRequired
 };
 
 export default SidebarFilter;

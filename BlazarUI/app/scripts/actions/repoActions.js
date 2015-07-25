@@ -23,7 +23,6 @@ BranchActions.updatePollingStatus = function (status) {
 function startPolling(data){
 
   (function doPoll(){
-    console.log('sugar shot');
     let builds = new Builds();
     let promise = builds.fetch();
 

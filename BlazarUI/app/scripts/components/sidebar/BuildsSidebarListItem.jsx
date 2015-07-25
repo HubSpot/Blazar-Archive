@@ -4,7 +4,7 @@ import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 
-class ProjectSidebarListItem extends Component {
+class BuildsSidebarListItem extends Component {
 
   constructor() {
 
@@ -74,7 +74,7 @@ class ProjectSidebarListItem extends Component {
   }
 }
 
-ProjectSidebarListItem.propTypes = {
+BuildsSidebarListItem.propTypes = {
   repo: PropTypes.object,
   project: PropTypes.object,
   filterText: PropTypes.string,
@@ -82,4 +82,4 @@ ProjectSidebarListItem.propTypes = {
   moduleExpandChange: PropTypes.func
 };
 
-export default ProjectSidebarListItem;
+export default BuildsSidebarListItem;
