@@ -1,10 +1,15 @@
 import React, {Component, PropTypes} from 'react';
+import SectionLoader from '../shared/SectionLoader.jsx';
 
 class BuildLog extends Component {
 
   render() {
-    if (this.props.loading || !this.log) {
-      return  <div></div>;
+    if (this.props.loading) {
+      return <SectionLoader />;
+    }
+
+    if (!this.props.log) {
+      return <div></div>;
     }
 
     return (
