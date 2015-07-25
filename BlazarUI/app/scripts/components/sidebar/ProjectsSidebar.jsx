@@ -3,7 +3,7 @@ import ProjectsSidebarListItem from './ProjectsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
 import {bindAll, filter, contains} from 'underscore';
-
+import SectionLoader from '../shared/SectionLoader.jsx';
 
 class ProjectsSidebar extends Component {
 
@@ -95,8 +95,11 @@ class ProjectsSidebar extends Component {
 
   render() {
 
-    // To do: replace loading text with animation
-    let loading = this.props.loading ? <div>Loading Projects...</div> : '';
+    if (this.props.loading) {
+      return (
+        <SectionLoader />
+      );
+    }
 
     let filteredRepos = this.getFilteredRepos();
     let expandedState = this.state.expandedRepos;
@@ -118,7 +121,6 @@ class ProjectsSidebar extends Component {
 
     return (
       <div>
-        {loading}
         <div className="sidebar__filter">
           <SidebarFilter
             loading={this.props.loading}
