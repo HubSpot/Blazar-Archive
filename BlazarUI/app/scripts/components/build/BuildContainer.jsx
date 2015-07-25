@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import Build from './Build.jsx';
-import PageContainer from '../layout/PageContainer.jsx';
+import PageContainer from '../shared/PageContainer.jsx';
 
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
@@ -26,13 +26,13 @@ class BuildContainer extends Component {
     BuildActions.loadBuild(this.props.params);
   }
 
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
   componentWillReceiveProps(nextprops) {
     this.state.loading = true;
     BuildActions.loadBuild(nextprops.params);
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   onStatusChange(state) {

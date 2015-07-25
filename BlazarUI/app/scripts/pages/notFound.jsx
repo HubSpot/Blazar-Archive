@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import PageContainer from '../components/layout/PageContainer.jsx';
+import PageContainer from '../components/shared/PageContainer.jsx';
 
 class NotFound extends Component {
 

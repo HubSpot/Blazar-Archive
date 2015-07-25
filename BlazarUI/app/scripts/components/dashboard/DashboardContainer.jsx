@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Dashboard from './Dashboard.jsx';
-import PageContainer from '../layout/PageContainer.jsx';
+import PageContainer from '../shared/PageContainer.jsx';
 
 class DashboardContainer extends Component {
 

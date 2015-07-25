@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import Branch from './Branch.jsx';
-import PageContainer from '../layout/PageContainer.jsx';
+import PageContainer from '../shared/PageContainer.jsx';
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
@@ -18,6 +18,10 @@ class BranchContainer extends Component {
     BranchActions.loadModules(this.props.params);
   }
 
+  componentWillReceiveProps(nextprops) {
+    BranchActions.loadModules(nextprops.params);
+  }
+
   componentWillUnmount() {
     BranchActions.updatePollingStatus(false);
     this.unsubscribe();
@@ -25,10 +29,6 @@ class BranchContainer extends Component {
 
   onStatusChange(state) {
     this.setState(state);
-  }
-
-  componentWillReceiveProps(nextprops) {
-    BranchActions.loadModules(nextprops.params);
   }
 
   render() {

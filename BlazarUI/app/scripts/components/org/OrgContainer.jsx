@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import Org from './Org.jsx';
-import PageContainer from '../layout/PageContainer.jsx';
+import PageContainer from '../shared/PageContainer.jsx';
 
 class OrgContainer extends Component {
 

@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import Module from './Module.jsx';
-import PageContainer from '../layout/PageContainer.jsx';
+import PageContainer from '../shared/PageContainer.jsx';
 import BuildHistoryStore from '../../stores/buildHistoryStore';
 import BuildHistoryActions from '../../actions/buildHistoryActions';
 
