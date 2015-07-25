@@ -20,18 +20,18 @@ class ModuleContainer extends Component {
     BuildHistoryActions.loadBuildHistory(this.props.params);
   }
 
+  componentWillReceiveProps(nextprops) {
+    BuildHistoryActions.loadBuildHistory(nextprops.params);
+  }
+
   componentWillUnmount() {
+    BuildHistoryActions.updatePollingStatus(false);
     this.unsubscribe();
   }
 
   onStatusChange(state) {
     this.setState(state);
   }
-
-  componentWillReceiveProps(nextprops) {
-    BuildHistoryActions.loadBuildHistory(nextprops.params);
-  }
-
 
   render() {
     return (

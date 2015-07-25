@@ -20,16 +20,17 @@ class RepoContainer extends Component {
     RepoActions.loadBranches(this.props.params);
   }
 
+  componentWillReceiveProps(nextprops) {
+    RepoActions.loadBranches(nextprops.params);
+  }
+
   componentWillUnmount() {
+    RepoActions.updatePollingStatus(false);
     this.unsubscribe();
   }
 
   onStatusChange(state) {
     this.setState(state);
-  }
-
-  componentWillReceiveProps(nextprops) {
-    RepoActions.loadBranches(nextprops.params);
   }
 
   render() {
