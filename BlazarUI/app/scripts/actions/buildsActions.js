@@ -23,7 +23,7 @@ BuildsActions.loadBuilds.preEmit = function(data) {
     });
 
     promise.always( () => {
-      setTimeout(doPoll, config.jobRefresh);
+      setTimeout(doPoll, config.buildsRefresh);
     });
 
     promise.error( (err) => {
