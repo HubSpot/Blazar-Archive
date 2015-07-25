@@ -5,10 +5,17 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 import ModulesTable from './ModulesTable.jsx';
+import SectionLoader from '../shared/SectionLoader.jsx';
 
 class Branch extends Component{
 
   render() {
+
+    if (this.props.loading) {
+      return (
+        <SectionLoader />
+      );
+    }
 
     return (
       <div>
