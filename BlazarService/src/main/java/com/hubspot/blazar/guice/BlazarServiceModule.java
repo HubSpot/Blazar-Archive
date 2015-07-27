@@ -87,7 +87,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     return new NingAsyncHttpClient();
   }
 
-  private GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {
+  public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {
     final String endpoint;
     if ("api.github.com".equals(host)) {
       endpoint = "https://api.github.com";
