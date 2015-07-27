@@ -52,7 +52,9 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
         GitHub gitHub = BlazarServiceModule.toGitHub(host, gitHubConfig);
 
         for (String organization : gitHubConfig.getOrganizations()) {
+          System.out.println("Processing " + host + "/" + organization);
           processOrganization(namespace.getString("url"), host, gitHub.getOrganization(organization));
+          System.out.println("Processed " + host + "/" + organization);
         }
       }
     } finally {
@@ -71,7 +73,9 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
           true);
 
       try {
-        httpClient.execute(HttpRequest.newBuilder().setMethod(Method.POST).setUrl(url).setBody(gitInfo).build());
+        System.out.println("Processing " + host + "/" + repository.getOwnerName() + "/" + repository.getName());
+        httpClient.execute(HttpRequest.newBuilder().setMethod(Method.PUT).setUrl(url).setBody(gitInfo).build());
+        System.out.println("Processed " + host + "/" + repository.getOwnerName() + "/" + repository.getName());
       } catch (Throwable t) {
         System.out.println(Throwables.getStackTraceAsString(t));
       }
