@@ -13,7 +13,6 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
-import com.hubspot.blazar.resources.BuildDefinitionResource;
 import com.hubspot.blazar.resources.BuildResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
@@ -42,7 +41,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 
     binder.bind(BuildResource.class);
-    binder.bind(BuildDefinitionResource.class);
     binder.bind(GitHubWebhookResource.class);
 
     binder.bind(ModuleDiscovery.class);

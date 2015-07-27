@@ -4,52 +4,58 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 
-public class BuildState {
-  public enum Result { SUCCEEDED, IN_PROGRESS, CANCELLED, FAILED }
+import java.util.Objects;
 
-  private final int buildNumber;
-  private final String buildLog;
-  private final String commitSha;
-  private final Result result;
-  private final long startTime;
-  private final Optional<Long> endTime;
+public class BuildState extends BuildDefinition {
+  private final Optional<Build> lastBuild;
+  private final Optional<Build> inProgressBuild;
 
   @JsonCreator
-  public BuildState(@JsonProperty("buildNumber") int buildNumber,
-                    @JsonProperty("buildLog") String buildLog,
-                    @JsonProperty("commitSha") String commitSha,
-                    @JsonProperty("result") Result result,
-                    @JsonProperty("startTime") long startTime,
-                    @JsonProperty("endTime") Optional<Long> endTime) {
-    this.buildNumber = buildNumber;
-    this.buildLog = buildLog;
-    this.commitSha = commitSha;
-    this.result = result;
-    this.startTime = startTime;
-    this.endTime = endTime;
+  public BuildState(@JsonProperty("gitInfo") GitInfo gitInfo,
+                    @JsonProperty("module") Module module,
+                    @JsonProperty("lastBuild") Optional<Build> lastBuild,
+                    @JsonProperty("inProgressBuild") Optional<Build> inProgressBuild) {
+    super(gitInfo, module);
+
+    if (lastBuild.isPresent() && !lastBuild.get().getId().isPresent()) {
+      this.lastBuild = Optional.absent();
+    } else {
+      this.lastBuild = lastBuild;
+    }
+
+    if (inProgressBuild.isPresent() && !inProgressBuild.get().getId().isPresent()) {
+      this.inProgressBuild = Optional.absent();
+    } else {
+      this.inProgressBuild = inProgressBuild;
+    }
   }
 
-  public int getBuildNumber() {
-    return buildNumber;
+  public Optional<Build> getLastBuild() {
+    return lastBuild;
   }
 
-  public String getBuildLog() {
-    return buildLog;
+  public Optional<Build> getInProgressBuild() {
+    return inProgressBuild;
   }
 
-  public String getCommitSha() {
-    return commitSha;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    BuildState that = (BuildState) o;
+    return super.equals(o) &&
+        Objects.equals(lastBuild, that.lastBuild) &&
+        Objects.equals(inProgressBuild, that.inProgressBuild);
   }
 
-  public Result getResult() {
-    return result;
-  }
-
-  public long getStartTime() {
-    return startTime;
-  }
-
-  public Optional<Long> getEndTime() {
-    return endTime;
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), lastBuild, inProgressBuild);
   }
 }

@@ -7,6 +7,9 @@ import java.util.Set;
 
 public interface BuildDefinitionDao {
 
-  @SqlQuery("SELECT gitInfo.*, module.* FROM branches AS gitInfo INNER JOIN modules AS module ON (gitInfo.id = module.branchId)")
+  @SqlQuery("" +
+      "SELECT gitInfo.*, module.* " +
+      "FROM branches AS gitInfo " +
+      "INNER JOIN modules AS module ON (gitInfo.id = module.branchId)")
   Set<BuildDefinition> getAllBuildDefinitions();
 }
