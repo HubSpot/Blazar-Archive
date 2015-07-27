@@ -38,9 +38,11 @@ public class ModuleService {
     }
 
     for (String updatedModule : Sets.intersection(oldModulesByName.keySet(), updatedModulesByName.keySet())) {
-      long id = oldModulesByName.get(updatedModule).getId().get();
-      Module updated = updatedModulesByName.get(updatedModule).withId(id);
-      checkAffectedRowCount(moduleDao.update(updated));
+      Module old = oldModulesByName.get(updatedModule);
+      Module updated = updatedModulesByName.get(updatedModule).withId(old.getId().get());
+      if (!updated.equals(old)) {
+        checkAffectedRowCount(moduleDao.update(updated));
+      }
       newModules.add(updated);
     }
 
