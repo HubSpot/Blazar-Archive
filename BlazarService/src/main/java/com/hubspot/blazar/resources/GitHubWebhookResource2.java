@@ -21,12 +21,12 @@ import java.util.Set;
 
 @Path("/github/webhooks")
 @Consumes(MediaType.APPLICATION_JSON)
-public class GitHubWebhookResource {
+public class GitHubWebhookResource2 {
   private final EventBus eventBus;
   private final GitHubWebhookHandler handler;
 
   @Inject
-  public GitHubWebhookResource(EventBus eventBus, GitHubWebhookHandler handler) {
+  public GitHubWebhookResource2(EventBus eventBus, GitHubWebhookHandler handler) {
     this.eventBus = eventBus;
     this.handler = handler;
   }
