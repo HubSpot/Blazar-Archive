@@ -1,6 +1,9 @@
 package com.hubspot.blazar.guice;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
@@ -13,7 +16,9 @@ import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.resources.BuildDefinitionResource;
 import com.hubspot.blazar.resources.BuildResource;
-import com.hubspot.blazar.resources.GitHubWebHookResource;
+import com.hubspot.blazar.resources.GitHubWebhookResource;
+import com.hubspot.blazar.util.GitHubWebhookHandler;
+import com.hubspot.blazar.util.LoggingHandler;
 import com.hubspot.blazar.util.ModuleDiscovery;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
@@ -25,6 +30,9 @@ import org.kohsuke.github.GitHubBuilder;
 
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfiguration> {
 
@@ -36,9 +44,11 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
     binder.bind(BuildResource.class);
     binder.bind(BuildDefinitionResource.class);
-    binder.bind(GitHubWebHookResource.class);
+    binder.bind(GitHubWebhookResource.class);
 
     binder.bind(ModuleDiscovery.class);
+    binder.bind(GitHubWebhookHandler.class);
+    binder.bind(LoggingHandler.class);
 
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 
@@ -47,6 +57,14 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
       String host = entry.getKey();
       mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
     }
+  }
+
+  @Provides
+  @Singleton
+  public EventBus providesEventBus() {
+    ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("GitHubEventProcessor-%d").build();
+    Executor executor = Executors.newCachedThreadPool(threadFactory);
+    return new AsyncEventBus("GitHubEventProcessor", executor);
   }
 
   @Provides
