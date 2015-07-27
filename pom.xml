@@ -105,6 +105,11 @@
         <artifactId>RosettaJdbi</artifactId>
         <version>${dep.rosetta.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-util</artifactId>
+        <version>${dropwizard.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
