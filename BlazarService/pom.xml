@@ -87,6 +87,10 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-jersey</artifactId>
     </dependency>
     <dependency>
@@ -173,6 +177,10 @@
     <dependency>
       <groupId>com.hubspot</groupId>
       <artifactId>HorizonNing</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.argparse4j</groupId>
+      <artifactId>argparse4j</artifactId>
     </dependency>
   </dependencies>
 
