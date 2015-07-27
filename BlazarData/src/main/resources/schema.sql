@@ -15,6 +15,7 @@ CREATE TABLE `modules` (
   `branchId` int(11) unsigned NOT NULL,
   `name` varchar(250) NOT NULL,
   `path` varchar(250) NOT NULL,
+  `glob` varchar(250) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`branchId`, `name`)

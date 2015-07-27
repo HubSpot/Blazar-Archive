@@ -24,6 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.FileSystems;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -100,7 +101,7 @@ public class GitHubWebHookResource {
     Set<Module> toBuild = new HashSet<>();
     for (String path : affectedPaths(pushEvent)) {
       for (Module module : modules) {
-        if (module.contains(path)) {
+        if (module.contains(FileSystems.getDefault().getPath(path))) {
           toBuild.add(module);
         }
       }

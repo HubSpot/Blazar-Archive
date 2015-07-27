@@ -45,7 +45,13 @@ public class ModuleDiscovery {
       GHContent content = repository.getFileContent(pom, gitInfo.getBranch());
       JsonNode node = xmlMapper.readTree(content.getContent());
       String artifactId = node.get("artifactId").textValue();
-      modules.add(new Module(Optional.<Long>absent(), artifactId, pom, true));
+      final String glob;
+      if ("pom".equals(node.path("packaging").textValue())) {
+        glob = pom;
+      } else {
+        glob = (pom.contains("/") ? pom.substring(0, pom.lastIndexOf('/') + 1) : "") + "**";
+      }
+      modules.add(new Module(Optional.<Long>absent(), artifactId, pom, glob, true));
     }
 
     return modules;
