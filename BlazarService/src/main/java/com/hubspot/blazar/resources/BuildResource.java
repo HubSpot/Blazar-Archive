@@ -1,14 +1,18 @@
 package com.hubspot.blazar.resources;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
+import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.data.service.BuildDefinitionService;
 import com.hubspot.blazar.data.service.BuildStateService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
@@ -34,7 +38,20 @@ public class BuildResource {
 
   @GET
   @Path("/states")
+  @PropertyFiltering
   public Set<BuildState> getAllBuildStates() {
     return buildStateService.getAllBuildStates();
+  }
+
+  @GET
+  @Path("/{id}")
+  public Optional<ModuleBuild> get(@PathParam("id") long id) {
+    return buildStateService.get(id);
+  }
+
+  @PUT
+  public ModuleBuild update(ModuleBuild moduleBuild) {
+    buildStateService.update(moduleBuild);
+    return moduleBuild;
   }
 }
