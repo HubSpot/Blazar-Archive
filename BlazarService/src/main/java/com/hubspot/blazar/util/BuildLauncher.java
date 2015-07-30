@@ -1,6 +1,8 @@
 package com.hubspot.blazar.util;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.Build;
@@ -8,6 +10,7 @@ import com.hubspot.blazar.base.Build.State;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.BuildStateService;
 import com.hubspot.horizon.AsyncHttpClient;
@@ -83,21 +86,23 @@ public class BuildLauncher {
     startBuild(buildDefinition, buildToLaunch);
   }
 
-  private synchronized void startBuild(BuildDefinition buildDefinition, Build queued) throws Exception {
-    String sha = currentSha(buildDefinition.getGitInfo());
+  private synchronized void startBuild(BuildDefinition definition, Build queued) throws Exception {
+    String sha = currentSha(definition.getGitInfo());
     Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha);
 
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     buildService.begin(launching);
     LOG.info("About to launch build {}", launching.getId().get());
-    HttpResponse response = asyncHttpClient.execute(buildRequest(launching)).get();
+    HttpResponse response = asyncHttpClient.execute(buildRequest(definition.getModule(), launching)).get();
     LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
   }
 
-  private HttpRequest buildRequest(Build build) {
+  private HttpRequest buildRequest(Module module, Build build) {
     String host = System.getenv("SINGULARITY_HOST");
     String url = String.format("http://%s/singularity/v2/api/requests/request/blazar-executor/run", host);
-    List<String> body = Arrays.asList("blazar-executor", "--build_id", String.valueOf(build.getId().get()));
+
+    String buildId = String.valueOf(build.getId().get());
+    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, buildCommand(module));
 
     return HttpRequest.newBuilder()
         .setMethod(Method.POST)
@@ -105,6 +110,13 @@ public class BuildLauncher {
         .setUrl(url)
         .setBody(body)
         .build();
+  }
+
+  private String buildCommand(Module module) {
+    String whitelist = Objects.firstNonNull(System.getenv("BUILD_WHITELIST"), "");
+
+    List<String> modulesToBuild = Splitter.on(',').omitEmptyStrings().splitToList(whitelist);
+    return modulesToBuild.contains(module.getName()) ? "--safe_mode" : "--dry_run";
   }
 
   private String currentSha(GitInfo gitInfo) throws IOException {
