@@ -48,7 +48,7 @@ public class ModuleService {
 
     for (String addedModule : Sets.difference(updatedModulesByName.keySet(), oldModulesByName.keySet())) {
       Module added = updatedModulesByName.get(addedModule);
-      long id = moduleDao.insert(gitInfo.getId().get(), added);
+      int id = moduleDao.insert(gitInfo.getId().get(), added);
       newModules.add(added.withId(id));
     }
 

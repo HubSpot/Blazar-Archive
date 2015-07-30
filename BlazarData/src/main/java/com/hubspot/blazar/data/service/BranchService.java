@@ -30,7 +30,7 @@ public class BranchService {
       return gitInfo;
     } else {
       try {
-        long id = branchDao.insert(gitInfo);
+        int id = branchDao.insert(gitInfo);
         return gitInfo.withId(id);
       } catch (UnableToExecuteStatementException e) {
         if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {

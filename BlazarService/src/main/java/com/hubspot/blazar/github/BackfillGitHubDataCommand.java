@@ -64,7 +64,8 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
 
   private void processOrganization(String url, String host, GHOrganization organization) throws IOException {
     for (GHRepository repository : organization.listRepositories()) {
-      GitInfo gitInfo = new GitInfo(Optional.<Long>absent(),
+      GitInfo gitInfo = new GitInfo(
+          Optional.<Integer>absent(),
           host,
           repository.getOwnerName(),
           repository.getName(),

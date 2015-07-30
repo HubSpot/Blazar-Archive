@@ -51,7 +51,7 @@ public class ModuleDiscovery {
       } else {
         glob = (pom.contains("/") ? pom.substring(0, pom.lastIndexOf('/') + 1) : "") + "**";
       }
-      modules.add(new Module(Optional.<Long>absent(), artifactId, pom, glob, true));
+      modules.add(new Module(Optional.<Integer>absent(), artifactId, pom, glob, true));
     }
 
     return modules;

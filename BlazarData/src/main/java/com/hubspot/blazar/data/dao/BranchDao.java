@@ -16,7 +16,7 @@ public interface BranchDao {
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO branches (host, organization, repository, repositoryId, branch, active) VALUES (:host, :organization, :repository, :repositoryId, :branch, :active)")
-  long insert(@BindWithRosetta GitInfo gitInfo);
+  int insert(@BindWithRosetta GitInfo gitInfo);
 
   @SqlUpdate("UPDATE branches SET organization = :organization, repository = :repository, active = :active WHERE id = :id")
   int update(@BindWithRosetta GitInfo gitInfo);

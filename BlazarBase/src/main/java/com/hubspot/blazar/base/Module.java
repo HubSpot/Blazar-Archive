@@ -10,7 +10,7 @@ import java.nio.file.PathMatcher;
 import java.util.Objects;
 
 public class Module {
-  private final Optional<Long> id;
+  private final Optional<Integer> id;
   private final String name;
   private final String path;
   private final String glob;
@@ -18,7 +18,7 @@ public class Module {
   private final boolean active;
 
   @JsonCreator
-  public Module(@JsonProperty("id") Optional<Long> id,
+  public Module(@JsonProperty("id") Optional<Integer> id,
                 @JsonProperty("name") String name,
                 @JsonProperty("path") String path,
                 @JsonProperty("glob") String glob,
@@ -31,7 +31,7 @@ public class Module {
     this.active = active;
   }
 
-  public Optional<Long> getId() {
+  public Optional<Integer> getId() {
     return id;
   }
 
@@ -55,7 +55,7 @@ public class Module {
     return matcher.matches(path);
   }
 
-  public Module withId(long id) {
+  public Module withId(int id) {
     return new Module(Optional.of(id), name, path, glob, active);
   }
 

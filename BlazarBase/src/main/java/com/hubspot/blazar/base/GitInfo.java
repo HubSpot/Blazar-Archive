@@ -8,7 +8,7 @@ import com.google.common.base.Optional;
 import java.util.Objects;
 
 public class GitInfo {
-  private final Optional<Long> id;
+  private final Optional<Integer> id;
   private final String host;
   private final String organization;
   private final String repository;
@@ -17,7 +17,7 @@ public class GitInfo {
   private final boolean active;
 
   @JsonCreator
-  public GitInfo(@JsonProperty("id") Optional<Long> id,
+  public GitInfo(@JsonProperty("id") Optional<Integer> id,
                  @JsonProperty("host") String host,
                  @JsonProperty("organization") String organization,
                  @JsonProperty("repository") String repository,
@@ -33,7 +33,7 @@ public class GitInfo {
     this.active = active;
   }
 
-  public Optional<Long> getId() {
+  public Optional<Integer> getId() {
     return id;
   }
 
@@ -66,7 +66,7 @@ public class GitInfo {
     return getOrganization() + '/' + getRepository();
   }
 
-  public GitInfo withId(long id) {
+  public GitInfo withId(int id) {
     return new GitInfo(Optional.of(id), host, organization, repository, repositoryId, branch, active);
   }
 

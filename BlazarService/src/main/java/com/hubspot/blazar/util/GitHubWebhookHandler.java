@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.net.UrlEscapers;
+import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
@@ -13,6 +14,8 @@ import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -24,18 +27,23 @@ import java.util.Set;
 
 @Singleton
 public class GitHubWebhookHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(GitHubWebhookHandler.class);
+
   private final BranchService branchService;
   private final ModuleService moduleService;
   private final ModuleDiscovery moduleDiscovery;
+  private final JobBuilder jobBuilder;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
                               ModuleService moduleService,
                               ModuleDiscovery moduleDiscovery,
+                              JobBuilder jobBuilder,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.moduleDiscovery = moduleDiscovery;
+    this.jobBuilder = jobBuilder;
 
     eventBus.register(this);
   }
@@ -60,7 +68,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = branchService.upsert(gitInfo(pushEvent));
 
       Set<Module> modules = updateModules(gitInfo, pushEvent);
-      triggerBuilds(pushEvent, modules);
+      triggerBuilds(pushEvent, gitInfo, modules);
     }
   }
 
@@ -81,7 +89,7 @@ public class GitHubWebhookHandler {
     return moduleService.getModules(gitInfo);
   }
 
-  private void triggerBuilds(PushEvent pushEvent, Set<Module> modules) {
+  private void triggerBuilds(PushEvent pushEvent, GitInfo gitInfo, Set<Module> modules) throws IOException {
     Set<Module> toBuild = new HashSet<>();
     for (String path : affectedPaths(pushEvent)) {
       for (Module module : modules) {
@@ -92,7 +100,10 @@ public class GitHubWebhookHandler {
     }
 
     for (Module module : toBuild) {
-      System.out.println("Going to build module: " + module.getName());
+      LOG.info("Going to build module: " + module.getName());
+      if ("true".equals(System.getenv("TRIGGER_BUILDS"))) {
+        jobBuilder.triggerBuild(new BuildDefinition(gitInfo, module));
+      }
     }
   }
 
@@ -124,7 +135,7 @@ public class GitHubWebhookHandler {
     String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
     String escapedBranch = UrlEscapers.urlPathSegmentEscaper().escape(branch);
 
-    return new GitInfo(Optional.<Long>absent(), host, organization, repositoryName, repositoryId, escapedBranch, active);
+    return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, escapedBranch, active);
   }
 
   private static Set<String> affectedPaths(PushEvent pushEvent) {

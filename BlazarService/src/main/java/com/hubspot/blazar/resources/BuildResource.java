@@ -6,6 +6,7 @@ import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.data.service.BuildDefinitionService;
+import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.BuildStateService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
@@ -22,11 +23,15 @@ import java.util.Set;
 public class BuildResource {
   private final BuildDefinitionService buildDefinitionService;
   private final BuildStateService buildStateService;
+  private final BuildService buildService;
 
   @Inject
-  public BuildResource(BuildDefinitionService buildDefinitionService, BuildStateService buildStateService) {
+  public BuildResource(BuildDefinitionService buildDefinitionService,
+                       BuildStateService buildStateService,
+                       BuildService buildService) {
     this.buildDefinitionService = buildDefinitionService;
     this.buildStateService = buildStateService;
+    this.buildService = buildService;
   }
 
   @GET
@@ -46,12 +51,12 @@ public class BuildResource {
   @GET
   @Path("/{id}")
   public Optional<ModuleBuild> get(@PathParam("id") long id) {
-    return buildStateService.get(id);
+    return buildService.get(id);
   }
 
   @PUT
   public ModuleBuild update(ModuleBuild moduleBuild) {
-    buildStateService.update(moduleBuild);
+    buildService.update(moduleBuild.getBuild());
     return moduleBuild;
   }
 }
