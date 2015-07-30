@@ -22,6 +22,9 @@ import com.hubspot.blazar.util.LoggingHandler;
 import com.hubspot.blazar.util.ModuleDiscovery;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpConfig;
+import com.hubspot.horizon.HttpRequest;
+import com.hubspot.horizon.HttpResponse;
+import com.hubspot.horizon.RetryStrategy;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -31,6 +34,7 @@ import io.dropwizard.util.Duration;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.concurrent.Executor;
@@ -92,7 +96,20 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
   @Provides
   @Singleton
   public AsyncHttpClient providesAsyncHttpClient(ObjectMapper mapper) {
-    return new NingAsyncHttpClient(HttpConfig.newBuilder().setObjectMapper(mapper).build());
+    HttpConfig config = HttpConfig.newBuilder().setObjectMapper(mapper).setRetryStrategy(new RetryStrategy() {
+
+      @Override
+      public boolean shouldRetry(@Nonnull HttpRequest request, @Nonnull HttpResponse response) {
+        return response.getStatusCode() == 409 || RetryStrategy.DEFAULT.shouldRetry(request, response);
+      }
+
+      @Override
+      public boolean shouldRetry(@Nonnull HttpRequest request, @Nonnull IOException exception) {
+        return RetryStrategy.DEFAULT.shouldRetry(request, exception);
+      }
+    }).build();
+
+    return new NingAsyncHttpClient(config);
   }
 
   public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {
