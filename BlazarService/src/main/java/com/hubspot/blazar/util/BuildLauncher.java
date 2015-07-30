@@ -52,22 +52,28 @@ public class BuildLauncher {
 
   @Subscribe
   public void handleBuildChange(Build build) throws Exception {
+    LOG.info("Received event for build {} with state {}", build.getId().get(), build.getState());
+
     final BuildDefinition buildDefinition;
     final Build buildToLaunch;
     if (build.getState() == State.QUEUED) {
       BuildState buildState = buildStateService.getByModule(build.getModuleId());
       if (!buildState.getInProgressBuild().isPresent()) {
+        LOG.info("No in progress build for module {}, going to launch build {}", build.getModuleId(), build.getId().get());
         buildDefinition = buildState;
         buildToLaunch = build;
       } else {
+        LOG.info("In progress build for module {}, not launching build {}", build.getModuleId(), build.getId().get());
         return;
       }
     } else if (build.getState().isComplete()) {
       BuildState buildState = buildStateService.getByModule(build.getModuleId());
       if (buildState.getPendingBuild().isPresent()) {
+        LOG.info("Pending build for module {}, going to launch build {}", build.getModuleId(), buildState.getPendingBuild().get().getId().get());
         buildDefinition = buildState;
         buildToLaunch = buildState.getPendingBuild().get();
       } else {
+        LOG.info("No pending build for module {}", build.getModuleId());
         return;
       }
     } else {
@@ -81,6 +87,7 @@ public class BuildLauncher {
     String sha = currentSha(buildDefinition.getGitInfo());
     Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha);
 
+    LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     buildService.begin(launching);
     LOG.info("About to launch build {}", launching.getId().get());
     HttpResponse response = asyncHttpClient.execute(buildRequest(launching)).get();

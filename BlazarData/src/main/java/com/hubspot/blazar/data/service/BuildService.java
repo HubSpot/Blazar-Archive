@@ -11,8 +11,12 @@ import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.data.dao.BuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 import com.hubspot.guice.transactional.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BuildService {
+  private static final Logger LOG = LoggerFactory.getLogger(BuildService.class);
+
   private final BuildStateService buildStateService;
   private final BuildDao buildDao;
   private final ModuleDao moduleDao;
@@ -30,10 +34,13 @@ public class BuildService {
     return buildDao.get(id);
   }
 
-  public BuildState enqueue(BuildDefinition buildDefinition) {
-    BuildState buildState = buildStateService.getByModule(buildDefinition.getModule().getId().get());
+  public BuildState enqueue(BuildDefinition definition) {
+    int moduleId = definition.getModule().getId().get();
+    BuildState buildState = buildStateService.getByModule(moduleId);
 
     if (buildState.getPendingBuild().isPresent()) {
+      long pendingBuildId = buildState.getPendingBuild().get().getId().get();
+      LOG.info("Not enqueuing build for module {}, pending build {} already exists", moduleId, pendingBuildId);
       return buildState;
     } else {
       final int nextBuildNumber;
@@ -45,8 +52,10 @@ public class BuildService {
         nextBuildNumber = 1;
       }
 
-      Build build = Build.queuedBuild(buildDefinition.getModule(), nextBuildNumber);
+      LOG.info("Enqueuing build for module {} with build number {}", moduleId, nextBuildNumber);
+      Build build = Build.queuedBuild(definition.getModule(), nextBuildNumber);
       build = enqueue(build);
+      LOG.info("Enqueued build for module {} with id {}", moduleId, build.getId().get());
 
       return buildState.withPendingBuild(build);
     }

@@ -101,7 +101,7 @@ public class GitHubWebhookHandler {
     }
 
     for (Module module : toBuild) {
-      LOG.info("Going to build module: " + module.getName());
+      LOG.info("Going to build module {}", module.getId().get());
       if ("true".equals(System.getenv("TRIGGER_BUILDS"))) {
         buildService.enqueue(new BuildDefinition(gitInfo, module));
       }
