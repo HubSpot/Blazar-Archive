@@ -77,7 +77,7 @@ public class BuildLauncher {
     startBuild(buildDefinition, buildToLaunch);
   }
 
-  private void startBuild(BuildDefinition buildDefinition, Build queued) throws Exception {
+  private synchronized void startBuild(BuildDefinition buildDefinition, Build queued) throws Exception {
     String sha = currentSha(buildDefinition.getGitInfo());
     Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha);
 
