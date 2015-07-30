@@ -8,6 +8,7 @@ import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
@@ -32,18 +33,18 @@ public class GitHubWebhookHandler {
   private final BranchService branchService;
   private final ModuleService moduleService;
   private final ModuleDiscovery moduleDiscovery;
-  private final JobBuilder jobBuilder;
+  private final BuildService buildService;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
                               ModuleService moduleService,
                               ModuleDiscovery moduleDiscovery,
-                              JobBuilder jobBuilder,
+                              BuildService buildService,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.moduleDiscovery = moduleDiscovery;
-    this.jobBuilder = jobBuilder;
+    this.buildService = buildService;
 
     eventBus.register(this);
   }
@@ -102,7 +103,7 @@ public class GitHubWebhookHandler {
     for (Module module : toBuild) {
       LOG.info("Going to build module: " + module.getName());
       if ("true".equals(System.getenv("TRIGGER_BUILDS"))) {
-        jobBuilder.triggerBuild(new BuildDefinition(gitInfo, module));
+        buildService.enqueue(new BuildDefinition(gitInfo, module));
       }
     }
   }

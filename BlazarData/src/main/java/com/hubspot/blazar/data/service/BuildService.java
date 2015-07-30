@@ -2,10 +2,11 @@ package com.hubspot.blazar.data.service;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.Build;
+import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.data.dao.BuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
@@ -15,21 +16,22 @@ public class BuildService {
   private final BuildStateService buildStateService;
   private final BuildDao buildDao;
   private final ModuleDao moduleDao;
+  private final EventBus eventBus;
 
   @Inject
-  public BuildService(BuildStateService buildStateService, BuildDao buildDao, ModuleDao moduleDao) {
+  public BuildService(BuildStateService buildStateService, BuildDao buildDao, ModuleDao moduleDao, EventBus eventBus) {
     this.buildStateService = buildStateService;
     this.buildDao = buildDao;
     this.moduleDao = moduleDao;
+    this.eventBus = eventBus;
   }
 
   public Optional<ModuleBuild> get(long id) {
     return buildDao.get(id);
   }
 
-  @Transactional
-  public BuildState enqueue(Module module) {
-    BuildState buildState = buildStateService.getByModule(module);
+  public BuildState enqueue(BuildDefinition buildDefinition) {
+    BuildState buildState = buildStateService.getByModule(buildDefinition.getModule().getId().get());
 
     if (buildState.getPendingBuild().isPresent()) {
       return buildState;
@@ -43,19 +45,31 @@ public class BuildService {
         nextBuildNumber = 1;
       }
 
-      Build build = Build.queuedBuild(module, nextBuildNumber);
-      long id = buildDao.enqueue(build);
-      build = build.withId(id);
-      checkAffectedRowCount(moduleDao.updatePendingBuild(build));
+      Build build = Build.queuedBuild(buildDefinition.getModule(), nextBuildNumber);
+      build = enqueue(build);
 
       return buildState.withPendingBuild(build);
     }
   }
 
   @Transactional
+  protected Build enqueue(Build build) {
+    long id = buildDao.enqueue(build);
+    build = build.withId(id);
+
+    checkAffectedRowCount(moduleDao.updatePendingBuild(build));
+
+    eventBus.post(build);
+
+    return build;
+  }
+
+  @Transactional
   public void begin(Build build) {
     checkAffectedRowCount(buildDao.begin(build));
     checkAffectedRowCount(moduleDao.updateInProgressBuild(build));
+
+    eventBus.post(build);
   }
 
   @Transactional
@@ -66,10 +80,11 @@ public class BuildService {
 
       checkAffectedRowCount(buildDao.complete(build));
       checkAffectedRowCount(moduleDao.updateLastBuild(build));
-      // TODO build queued module if present
     } else {
       checkAffectedRowCount(buildDao.update(build));
     }
+
+    eventBus.post(build);
   }
 
   private static void checkAffectedRowCount(int affectedRows) {

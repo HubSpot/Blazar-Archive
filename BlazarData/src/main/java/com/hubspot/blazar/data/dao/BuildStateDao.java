@@ -1,8 +1,7 @@
 package com.hubspot.blazar.data.dao;
 
 import com.hubspot.blazar.base.BuildState;
-import com.hubspot.blazar.base.Module;
-import com.hubspot.rosetta.jdbi.BindWithRosetta;
+import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 
 import java.util.Set;
@@ -25,6 +24,6 @@ public interface BuildStateDao {
       "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuildId = lastBuild.id) " +
       "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuildId = inProgressBuild.id) " +
       "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuildId = pendingBuild.id) " +
-      "WHERE module.id = :id")
-  BuildState getByModule(@BindWithRosetta Module module);
+      "WHERE module.id = :it")
+  BuildState getByModule(@Bind int moduleId);
 }

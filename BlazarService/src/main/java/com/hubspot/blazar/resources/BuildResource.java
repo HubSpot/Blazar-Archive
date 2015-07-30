@@ -11,6 +11,7 @@ import com.hubspot.blazar.data.service.BuildStateService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -52,6 +53,13 @@ public class BuildResource {
   @Path("/{id}")
   public Optional<ModuleBuild> get(@PathParam("id") long id) {
     return buildService.get(id);
+  }
+
+  @POST
+  public ModuleBuild trigger(BuildDefinition buildDefinition) {
+    BuildState buildState = buildService.enqueue(buildDefinition);
+
+    return new ModuleBuild(buildState.getGitInfo(), buildState.getModule(), buildState.getPendingBuild().get());
   }
 
   @PUT

@@ -2,7 +2,6 @@ package com.hubspot.blazar.data.service;
 
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildState;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.dao.BuildStateDao;
 
 import java.util.Set;
@@ -19,7 +18,7 @@ public class BuildStateService {
     return buildStateDao.getAllBuildStates();
   }
 
-  public BuildState getByModule(Module module) {
-    return buildStateDao.getByModule(module);
+  public BuildState getByModule(int moduleId) {
+    return buildStateDao.getByModule(moduleId);
   }
 }
