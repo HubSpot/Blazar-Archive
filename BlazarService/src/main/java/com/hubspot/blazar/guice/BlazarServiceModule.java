@@ -1,5 +1,6 @@
 package com.hubspot.blazar.guice;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -20,6 +21,7 @@ import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
 import com.hubspot.blazar.util.ModuleDiscovery;
 import com.hubspot.horizon.AsyncHttpClient;
+import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -83,8 +85,14 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
   @Provides
   @Singleton
-  public AsyncHttpClient providesAsyncHttpClient() {
-    return new NingAsyncHttpClient();
+  public ObjectMapper providesObjectMapper(Environment environment) {
+    return environment.getObjectMapper();
+  }
+
+  @Provides
+  @Singleton
+  public AsyncHttpClient providesAsyncHttpClient(ObjectMapper mapper) {
+    return new NingAsyncHttpClient(HttpConfig.newBuilder().setObjectMapper(mapper).build());
   }
 
   public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {
