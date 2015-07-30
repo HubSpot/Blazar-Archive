@@ -17,9 +17,9 @@ CREATE TABLE `modules` (
   `path` varchar(250) NOT NULL,
   `glob` varchar(250) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
-  `lastBuild` bigint(20) unsigned,
-  `inProgressBuild` bigint(20) unsigned,
-  `pendingBuild` bigint(20) unsigned,
+  `lastBuildId` bigint(20) unsigned,
+  `inProgressBuildId` bigint(20) unsigned,
+  `pendingBuildId` bigint(20) unsigned,
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`branchId`, `name`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;

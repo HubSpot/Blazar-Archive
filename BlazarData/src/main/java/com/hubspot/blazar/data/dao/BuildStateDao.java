@@ -13,18 +13,18 @@ public interface BuildStateDao {
       "SELECT gitInfo.*, module.*, lastBuild.*, inProgressBuild.*, pendingBuild.* " +
       "FROM branches AS gitInfo " +
       "INNER JOIN modules AS module ON (gitInfo.id = module.branchId) " +
-      "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuild = lastBuild.id) " +
-      "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuild = inProgressBuild.id) " +
-      "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuild = pendingBuild.id)")
+      "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuildId = lastBuild.id) " +
+      "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuildId = inProgressBuild.id) " +
+      "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuildId = pendingBuild.id)")
   Set<BuildState> getAllBuildStates();
 
   @SqlQuery("" +
       "SELECT gitInfo.*, module.*, lastBuild.*, inProgressBuild.*, pendingBuild.* " +
       "FROM branches AS gitInfo " +
       "INNER JOIN modules AS module ON (gitInfo.id = module.branchId) " +
-      "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuild = lastBuild.id) " +
-      "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuild = inProgressBuild.id) " +
-      "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuild = pendingBuild.id) " +
+      "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuildId = lastBuild.id) " +
+      "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuildId = inProgressBuild.id) " +
+      "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuildId = pendingBuild.id) " +
       "WHERE module.id = :id")
   BuildState getByModule(@BindWithRosetta Module module);
 }

@@ -25,12 +25,12 @@ public interface ModuleDao {
   @SqlUpdate("UPDATE modules SET active = 0 WHERE id = :id")
   int delete(@Bind("id") int id);
 
-  @SqlUpdate("UPDATE modules SET pendingBuild = :id WHERE id = :moduleId AND pendingBuild IS NULL")
+  @SqlUpdate("UPDATE modules SET pendingBuildId = :id WHERE id = :moduleId AND pendingBuildId IS NULL")
   int updatePendingBuild(@BindWithRosetta Build build);
 
-  @SqlUpdate("UPDATE modules SET inProgressBuild = :id, pendingBuild = NULL WHERE id = :moduleId AND pendingBuild = :id AND inProgressBuild IS NULL")
+  @SqlUpdate("UPDATE modules SET inProgressBuildId = :id, pendingBuildId = NULL WHERE id = :moduleId AND pendingBuildId = :id AND inProgressBuildId IS NULL")
   int updateInProgressBuild(@BindWithRosetta Build build);
 
-  @SqlUpdate("UPDATE modules SET lastBuild = :id, inProgressBuild = NULL WHERE id = :moduleId AND inProgressBuild = :id")
+  @SqlUpdate("UPDATE modules SET lastBuildId = :id, inProgressBuildId = NULL WHERE id = :moduleId AND inProgressBuildId = :id")
   int updateLastBuild(@BindWithRosetta Build build);
 }
