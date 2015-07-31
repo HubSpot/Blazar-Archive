@@ -14,6 +14,7 @@ class Collection {
 
     promise.done( (resp) => {
       this.data = resp;
+      console.log(resp);
       this.parse();
     })
 
