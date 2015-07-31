@@ -19,11 +19,11 @@ var routes = (
   <Route name="app" path="/" handler={ App }>
     <DefaultRoute handler={ Dashboard } />
     <Route name="dashboard" handler={ Dashboard } />
-    <Route name="org" path={pagePath("/builds/:url/:org")} handler={Org}/>
-    <Route name="repo" path={pagePath("/builds/:url/:org/:repo")} handler={Repo}/>
-    <Route name="branch" path={pagePath("/builds/:url/:org/:repo/:branch")} handler={Branch}/>
-    <Route name="module" path={pagePath("/builds/:url/:org/:repo/:branch/:module")} handler={Module}/>
-    <Route name="build" path={pagePath("/builds/:url/:org/:repo/:branch/:module/:buildNumber")} handler={Build}/>
+    <Route name="org" path={pagePath("/builds/:url/:org/?")} handler={Org}/>
+    <Route name="repo" path={pagePath("/builds/:url/:org/:repo/?")} handler={Repo}/>
+    <Route name="branch" path={pagePath("/builds/:url/:org/:repo/:branch/?")} handler={Branch}/>
+    <Route name="module" path={pagePath("/builds/:url/:org/:repo/:branch/:module/?")} handler={Module}/>
+    <Route name="build" path={pagePath("/builds/:url/:org/:repo/:branch/:module/:buildNumber/?")} handler={Build}/>
     <NotFoundRoute handler={ NotFound } />
   </Route>
 );
