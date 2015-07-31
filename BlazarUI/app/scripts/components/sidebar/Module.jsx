@@ -7,11 +7,11 @@ class Module extends Component {
 
   render() {
     let {buildState, gitInfo, module} = this.props.repo;
-    let moduleLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
+    let moduleLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState !== undefined ? buildState.buildNumber : ''}`;
 
     return (
       <Link to={moduleLink} className='sidebar__repo-module'>
-        <BuildingIcon result={buildState.result} size='small' />
+        <BuildingIcon result={buildState !== undefined ? buildState.result : ''} size='small' />
         {module.name}
       </Link>
     );
