@@ -1,3 +1,4 @@
+import {has} from 'underscore';
 import moment from 'moment';
 import Collection from './Collection';
 
@@ -5,8 +6,8 @@ class BaseCollection extends Collection{
 
   addTimeHelpers() {
     this.data.forEach( (item) => {
-      if (item.buildState.startTime && item.buildState.endTime) {
-        item.buildState.duration = moment.duration(item.buildState.endTime - item.buildState.startTime).humanize();
+      if (has(item, 'lastBuild')) {
+        item.lastBuild.duration = moment.duration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp).humanize();
       }
     });
   }

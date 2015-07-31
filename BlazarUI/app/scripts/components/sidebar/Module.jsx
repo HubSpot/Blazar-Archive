@@ -6,12 +6,13 @@ let Link = require('react-router').Link;
 class Module extends Component {
 
   render() {
-    let {buildState, gitInfo, module} = this.props.repo;
-    let moduleLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
+
+    let {inProgressBuild, gitInfo, module} = this.props.repo;
+    let moduleLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
 
     return (
       <Link to={moduleLink} className='sidebar__repo-module'>
-        <BuildingIcon result={buildState.result} size='small' />
+        <BuildingIcon result={inProgressBuild.state} size='small' />
         {module.name}
       </Link>
     );
