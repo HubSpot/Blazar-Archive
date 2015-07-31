@@ -2,17 +2,18 @@ package com.hubspot.blazar.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Optional;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BlazarConfiguration extends Configuration {
 
   @JsonProperty("github")
-  private Optional<GitHubConfiguration> gitHubConfiguration = Optional.absent();
+  private Map<String, GitHubConfiguration> gitHubConfiguration = Collections.emptyMap();
 
   @Valid
   @JsonProperty("zookeeper")
@@ -21,12 +22,12 @@ public class BlazarConfiguration extends Configuration {
   @JsonProperty("database")
   private DataSourceFactory databaseConfiguration;
 
-  public Optional<GitHubConfiguration> getGitHubConfiguration() {
+  public Map<String, GitHubConfiguration> getGitHubConfiguration() {
     return gitHubConfiguration;
   }
 
-  public BlazarConfiguration setGitHubConfiguration(GitHubConfiguration gitHubConfiguration) {
-    this.gitHubConfiguration = Optional.of(gitHubConfiguration);
+  public BlazarConfiguration setGitHubConfiguration(Map<String, GitHubConfiguration> gitHubConfiguration) {
+    this.gitHubConfiguration = gitHubConfiguration;
     return this;
   }
 

@@ -4,7 +4,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
+import com.hubspot.blazar.data.dao.BranchDao;
+import com.hubspot.blazar.data.dao.BuildDao;
 import com.hubspot.blazar.data.dao.BuildDefinitionDao;
+import com.hubspot.blazar.data.dao.BuildStateDao;
+import com.hubspot.blazar.data.dao.ModuleDao;
 import com.hubspot.guice.transactional.DataSourceLocator;
 import com.hubspot.guice.transactional.TransactionalDataSource;
 import com.hubspot.guice.transactional.TransactionalModule;
@@ -26,6 +30,10 @@ public class BlazarDaoModule extends AbstractModule {
     bind(DBI.class).toProvider(DBIProvider.class).in(Scopes.SINGLETON);
 
     bindDao(binder(), BuildDefinitionDao.class);
+    bindDao(binder(), BuildStateDao.class);
+    bindDao(binder(), BranchDao.class);
+    bindDao(binder(), ModuleDao.class);
+    bindDao(binder(), BuildDao.class);
   }
 
   private static <T> void bindDao(Binder binder, Class<T> type) {

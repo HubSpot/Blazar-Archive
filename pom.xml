@@ -88,7 +88,7 @@
       <dependency>
         <groupId>com.hubspot.guice</groupId>
         <artifactId>guice-transactional</artifactId>
-        <version>0.1.2</version>
+        <version>0.1.3</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot.rosetta</groupId>
@@ -104,6 +104,27 @@
         <groupId>com.hubspot.rosetta</groupId>
         <artifactId>RosettaJdbi</artifactId>
         <version>${dep.rosetta.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-util</artifactId>
+        <version>${dropwizard.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sourceforge.argparse4j</groupId>
+        <artifactId>argparse4j</artifactId>
+        <version>0.4.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kohsuke</groupId>
+        <artifactId>github-api</artifactId>
+        <version>1.68</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.jenkins-ci</groupId>
+            <artifactId>annotation-indexer</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

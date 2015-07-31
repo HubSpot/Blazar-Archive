@@ -6,8 +6,15 @@ server:
     port: 7099
 
 github:
-  endpoint: https://git.mycompany.com/api/v3
-  oauthToken: my-oauth-token
+  git.mycompany.com:
+    oauthToken: my-github-enterprise-token
+    organizations:
+      - org1
+      - org2
+  api.github.com:
+    oauthToken: my-public-github-token
+    organizations:
+      - org3
 
 zookeeper:
   quorum: my.zk.host:2181

@@ -11,42 +11,57 @@ class Builds extends BaseCollection {
     this.addTimeHelpers();
   }
 
+  hasBuildState() {
+    return _.filter(this.data, (item) => {
+      return _.has(item, 'lastBuild') || _.has(item, 'inProgressBuild') || _.has(item, 'pendingBuild');
+    });
+  }
+
+  isBuilding() {
+    return _.filter(this.data, (item) => {
+      return _.has(item, 'inProgressBuild');
+    });
+  }
+
   // list of module names, used for sidebar search
   getModuleList() {
-    let modules = _.map(this.data, function(item) {
+    return _.map(this.hasBuildState(), function(item) {
 
-      let {gitInfo, module, buildState} = item;
+      let {gitInfo, module, lastBuild, inProgressBuild, pendingBuild} = item;
 
       let moduleInfo = {
         repository: gitInfo.repository,
         module: module.name,
-        link: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState === undefined ? '' : buildState.buildNumber}`
+        //link: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState === undefined ? '' : buildState.buildNumber}`i
       };
+
+      if (lastBuild) {
+        moduleInfo.lastBuildState = lastBuild.state;
+      }
+
+      if (inProgressBuild) {
+        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
+      }
+
+      if (pendingBuild) {
+        moduleInfo.pendingBuild = true
+      }
+
       return moduleInfo;
     });
 
-    return modules;
   }
 
   getBranchModules(branchInfo) {
-    let groupBuilds = this.groupBuildsByRepo()
-
-    let repo = _.findWhere(groupBuilds, {
-      organization: branchInfo.org,
-      repository: branchInfo.repo
-    })
-
-    return _.findWhere(groupBuilds, {
+    return _.findWhere(this.groupBuildsByRepo(), {
       organization: branchInfo.org,
       repository: branchInfo.repo,
       branch: branchInfo.branch
     })
-
   }
 
   getBranchesByRepo(repoInfo){
-    let groupBuilds = this.groupBuildsByRepo()
-    let branches = _.filter(groupBuilds, (repo) => {
+    let branches = _.filter(this.groupBuildsByRepo(), (repo) => {
       return repo.organization === repoInfo.org && repo.repository === repoInfo.repo;
     })
 
@@ -69,16 +84,22 @@ class Builds extends BaseCollection {
   }
 
   groupBuildsByRepo() {
-    // group/generate key, by org::repo[branch]
-    let grouped = _.groupBy(this.data, function(o) {
+    // group and generate key, by org::repo[branch]
+    let grouped = _.groupBy(this.isBuilding(), function(o) {
       return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
     });
 
-    // Make note if a repo has any module building
+    // Make note if a repo has ANY module building
     _.each(grouped, (repo) => {
+
       repo.moduleIsBuilding = false;
+
       for (var value of repo) {
+<<<<<<< HEAD
         if(value.buildState !== undefined && value.buildState.result === 'IN_PROGRESS'){
+=======
+        if(value.inProgressBuild){
+>>>>>>> origin/ui
           repo.moduleIsBuilding = true;
           break;
         }
@@ -99,9 +120,13 @@ class Builds extends BaseCollection {
 
     // store some helper properites
     groupedInArray.forEach( (repo) => {
+<<<<<<< HEAD
       if (repo.modules[0].buildState !== undefined) {
         repo.mostRecentBuild = repo.modules[0].buildState.startTime;
       }
+=======
+      repo.mostRecentBuild = repo.modules[0].inProgressBuild.startTimestamp;
+>>>>>>> origin/ui
       repo.host = repo.modules[0].gitInfo.host;
       repo.branch = repo.modules[0].gitInfo.branch;
       repo.organization = repo.modules[0].gitInfo.organization;
@@ -110,11 +135,17 @@ class Builds extends BaseCollection {
 
       repo.modules.forEach( (module) => {
         module.modulePath = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
+<<<<<<< HEAD
         if (module.buildState !== undefined) {
           module.buildState.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.buildState.buildNumber}`;
           if (module.buildState.startTime < repo.mostRecentBuild) {
             repo.mostRecentBuild = module.buildState.startTime;
           }
+=======
+        module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.inProgressBuild.buildNumber}`;
+        if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
+          repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
+>>>>>>> origin/ui
         }
       })
     })
