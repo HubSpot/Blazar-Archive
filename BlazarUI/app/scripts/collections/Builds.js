@@ -95,11 +95,7 @@ class Builds extends BaseCollection {
       repo.moduleIsBuilding = false;
 
       for (var value of repo) {
-<<<<<<< HEAD
-        if(value.buildState !== undefined && value.buildState.result === 'IN_PROGRESS'){
-=======
         if(value.inProgressBuild){
->>>>>>> origin/ui
           repo.moduleIsBuilding = true;
           break;
         }
@@ -120,13 +116,7 @@ class Builds extends BaseCollection {
 
     // store some helper properites
     groupedInArray.forEach( (repo) => {
-<<<<<<< HEAD
-      if (repo.modules[0].buildState !== undefined) {
-        repo.mostRecentBuild = repo.modules[0].buildState.startTime;
-      }
-=======
       repo.mostRecentBuild = repo.modules[0].inProgressBuild.startTimestamp;
->>>>>>> origin/ui
       repo.host = repo.modules[0].gitInfo.host;
       repo.branch = repo.modules[0].gitInfo.branch;
       repo.organization = repo.modules[0].gitInfo.organization;
@@ -135,17 +125,9 @@ class Builds extends BaseCollection {
 
       repo.modules.forEach( (module) => {
         module.modulePath = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
-<<<<<<< HEAD
-        if (module.buildState !== undefined) {
-          module.buildState.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.buildState.buildNumber}`;
-          if (module.buildState.startTime < repo.mostRecentBuild) {
-            repo.mostRecentBuild = module.buildState.startTime;
-          }
-=======
         module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.inProgressBuild.buildNumber}`;
         if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
           repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
->>>>>>> origin/ui
         }
       })
     })
