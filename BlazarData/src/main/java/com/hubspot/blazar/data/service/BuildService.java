@@ -7,12 +7,15 @@ import com.google.inject.Inject;
 import com.hubspot.blazar.base.Build;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.data.dao.BuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 import com.hubspot.guice.transactional.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class BuildService {
   private static final Logger LOG = LoggerFactory.getLogger(BuildService.class);
@@ -32,6 +35,10 @@ public class BuildService {
 
   public Optional<ModuleBuild> get(long id) {
     return buildDao.get(id);
+  }
+
+  public List<Build> getByModule(Module module) {
+    return buildDao.getByModule(module);
   }
 
   public BuildState enqueue(BuildDefinition definition) {

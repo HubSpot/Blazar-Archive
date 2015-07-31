@@ -1,5 +1,6 @@
 package com.hubspot.blazar.data.service;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.data.dao.BuildDefinitionDao;
@@ -16,5 +17,9 @@ public class BuildDefinitionService {
 
   public Set<BuildDefinition> getAllBuildDefinitions() {
     return buildDefinitionDao.getAllBuildDefinitions();
+  }
+
+  public Optional<BuildDefinition> getByModuleId(int moduleId) {
+    return buildDefinitionDao.getByModuleId(moduleId);
   }
 }
