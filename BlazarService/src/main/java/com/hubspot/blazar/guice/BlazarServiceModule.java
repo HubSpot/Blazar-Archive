@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.SubscriberExceptionContext;
+import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
@@ -34,6 +36,8 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.util.Duration;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -70,11 +74,20 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
   @Singleton
   public EventBus providesEventBus(Environment environment) {
     Executor executor = environment.lifecycle()
-        .executorService("GitHubEventProcessor-%d")
+        .executorService("EventProcessor-%d")
         .shutdownTime(Duration.seconds(120))
         .build();
 
-    return new AsyncEventBus("GitHubEventProcessor", executor);
+    return new AsyncEventBus(executor, new SubscriberExceptionHandler() {
+      private final Logger LOG = LoggerFactory.getLogger("SubscriberExceptionHandler");
+
+      @Override
+      public void handleException(Throwable exception, SubscriberExceptionContext context) {
+        String className = context.getSubscriber().getClass().getSimpleName();
+        String methodName = context.getSubscriberMethod().getName();
+        LOG.error("Error calling subscriber method {}.{}", className, methodName, exception);
+      }
+    });
   }
 
   @Provides
