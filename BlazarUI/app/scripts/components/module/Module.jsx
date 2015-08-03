@@ -16,12 +16,12 @@ class Module extends Component {
         <SectionLoader />
       );
     }
-
+    let moduleName = this.props.params.module.substring(0, this.props.params.module.lastIndexOf("_"));
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.module} subheadline='Build History' />
+          <PageHeadline headline={moduleName} subheadline='Build History' />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>

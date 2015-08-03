@@ -9,8 +9,8 @@ class BuildHistory extends BaseCollection {
 
   url() {
     let build = this.build;
-
-    return `/api/build/history/module/${build.module}`
+    let moduleId = _.last(build.module.split('_'));
+    return `/api/build/history/module/${moduleId}`
   }
 
 

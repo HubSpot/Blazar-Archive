@@ -7,7 +7,7 @@ class Module extends Component {
 
   render() {
     let {inProgressBuild, gitInfo, module} = this.props.repo;
-    let moduleLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
+    let moduleLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name + '_' + module.id}/${inProgressBuild.buildNumber}`;
 
     return (
       <Link to={moduleLink} className='sidebar__repo-module'>

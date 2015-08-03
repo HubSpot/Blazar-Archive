@@ -35,19 +35,14 @@ class BuildHistoryTableRow extends Component {
 
   render() {
     let {build, gitInfo, module} = this.props.build;
-    console.log(this.props.build);
 
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
-    let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
+    let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name + '_' + module.id}/${build.buildNumber}`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
 
     let duration = '';
     if (build.startTimestamp !== undefined && build.endTimestamp !== undefined) {
       duration = Helpers.timestampDuration(build.endTimestamp - build.startTimestamp);
-    } else if (build.startTimestamp !== undefined) {
-      duration = 'In Progress...';
-    } else {
-      duration = '';
     }
 
     let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
@@ -55,6 +50,10 @@ class BuildHistoryTableRow extends Component {
 
     if (build.state === 'IN_PROGRESS') {
       duration = 'In Progress...';
+    } else if (build.state === 'QUEUED') {
+      duration = 'Queued...';
+    } else if (build.state === 'LAUNCHING') {
+      duration = 'Launching...';
     }
 
     if (build.sha !== undefined) {
