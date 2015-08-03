@@ -17,7 +17,6 @@ class BuildDetail extends Component {
   render() {
 
     let {build, gitInfo} = this.props.build;
-    console.log(build);
     let endtime, duration;
     let buildResult = Helpers.humanizeText(build.state);
 

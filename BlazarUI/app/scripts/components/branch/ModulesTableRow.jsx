@@ -7,13 +7,13 @@ import Helpers from '../ComponentHelpers';
 class ModulesTableRow extends Component {
 
   getRowClassNames() {
-    if (this.props.module.buildState.result === 'FAILED') {
+    if (this.props.module.inProgressBuild.result === 'FAILED') {
       return 'bgc-danger';
     }
   }
 
   getBuildResult() {
-    let result = this.props.module.buildState.result;
+    let result = this.props.module.inProgressBuild.result;
     let classNames = `icon-roomy ${labels[result]}`;
 
     return (
@@ -26,18 +26,19 @@ class ModulesTableRow extends Component {
 
   render() {
     let {
-      buildState,
+      inProgressBuild,
       module,
       gitInfo,
       modulePath
     } = this.props.module;
+    console.log(this.props.module);
 
     // to do: generate commit link in build collection
-    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.sha}/`;
-    let startTime = Helpers.timestampFormatted(buildState.startTime);
-    let duration = buildState.duration;
+    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${inProgressBuild.sha}/`;
+    let startTime = Helpers.timestampFormatted(inProgressBuild.startTime);
+    let duration = inProgressBuild.duration;
 
-    if (buildState.result === 'IN_PROGRESS') {
+    if (inProgressBuild.result === 'IN_PROGRESS') {
       duration = 'In Progress...';
     }
 
@@ -45,7 +46,7 @@ class ModulesTableRow extends Component {
       <tr className={this.getRowClassNames()}>
       <td className='build-result-link'>
         {this.getBuildResult()}
-        <Link to={buildState.buildLink}>{buildState.buildNumber}</Link>
+        <Link to={inProgressBuild.buildLink}>{inProgressBuild.buildNumber}</Link>
       </td>
         <td>
           <Link to={modulePath}>{module.name}</Link>
@@ -57,7 +58,7 @@ class ModulesTableRow extends Component {
           {duration}
         </td>
         <td>
-          <a href={commitLink} target="_blank">{buildState.commitSha}</a>
+          <a href={commitLink} target="_blank">{inProgressBuild.sha}</a>
         </td>
       </tr>
     );
