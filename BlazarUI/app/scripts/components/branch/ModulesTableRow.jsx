@@ -31,7 +31,6 @@ class ModulesTableRow extends Component {
       gitInfo,
       modulePath
     } = this.props.module;
-    console.log(this.props.module);
 
     // to do: generate commit link in build collection
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${inProgressBuild.sha}/`;
