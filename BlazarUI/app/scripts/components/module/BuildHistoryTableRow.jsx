@@ -17,13 +17,12 @@ class BuildHistoryTableRow extends Component {
   }
 
   getRowClassNames() {
-    if (this.props.build.buildState.result === 'FAILED') {
+    if (this.props.build.state === 'FAILED') {
       return 'bgc-danger';
     }
   }
 
-  getBuildResult() {
-    let result = this.props.build.buildState.result;
+  getBuildResult(result) {
     let classNames = labels[result];
 
     return (
@@ -35,23 +34,42 @@ class BuildHistoryTableRow extends Component {
   }
 
   render() {
-    let {buildState, gitInfo, module} = this.props.build;
+    let {build, gitInfo, module} = this.props.build;
+    console.log(this.props.build);
 
-    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.commitSha}/`;
-    let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState.buildNumber}`;
-    let startTime = Helpers.timestampFormatted(buildState.startTime);
-    let duration = buildState.duration;
-    let buildNumber = <Link to={buildLink}>{buildState.buildNumber}</Link>;
-    let sha = Helpers.truncate(buildState.commitSha, 8);
+    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
+    let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
+    let startTime = Helpers.timestampFormatted(build.startTimestamp);
 
-    if (buildState.result === 'IN_PROGRESS') {
+    let duration = '';
+    if (build.startTimestamp !== undefined && build.endTimestamp !== undefined) {
+      duration = Helpers.timestampDuration(build.endTimestamp - build.startTimestamp);
+    } else if (build.startTimestamp !== undefined) {
       duration = 'In Progress...';
+    } else {
+      duration = '';
+    }
+
+    let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
+    let sha = '';
+
+    if (build.state === 'IN_PROGRESS') {
+      duration = 'In Progress...';
+    }
+
+    if (build.sha !== undefined) {
+      sha = (<span><Copyable text={build.sha} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
+              <Icon classNames='icon-roomy fa-link' name='clipboard' />
+            </Copyable>
+            <a href={commitLink} target="_blank">{Helpers.truncate(build.sha, 8)}</a></span>);
+    } else {
+      sha = 'None';
     }
 
     return (
       <tr className={this.getRowClassNames()}>
         <td className='build-status'>
-          {this.getBuildResult()}
+          {this.getBuildResult(build.state)}
         </td>
         <td>
           {buildNumber}
@@ -63,10 +81,7 @@ class BuildHistoryTableRow extends Component {
           {duration}
         </td>
         <td>
-          <Copyable text={buildState.commitSha} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
-            <Icon classNames='icon-roomy fa-link' name='clipboard' />
-          </Copyable>
-          <a href={commitLink} target="_blank">{sha}</a>
+          {sha}
         </td>
       </tr>
     );
@@ -77,7 +92,7 @@ class BuildHistoryTableRow extends Component {
 
 BuildHistoryTableRow.propTypes = {
   build: PropTypes.shape({
-    buildState: PropTypes.shape({
+    build: PropTypes.shape({
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
       result: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),

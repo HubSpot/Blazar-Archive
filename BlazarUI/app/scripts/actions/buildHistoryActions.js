@@ -24,7 +24,6 @@ BuildHistoryActions.updatePollingStatus = function (status) {
 function startPolling(data){
 
   (function doPoll(){
-
     let buildHistory = new BuildHistory(data);
     let promise = buildHistory.fetch();
 

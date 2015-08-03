@@ -33,7 +33,7 @@ class ModulesTableRow extends Component {
     } = this.props.module;
 
     // to do: generate commit link in build collection
-    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.commitSha}/`;
+    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.sha}/`;
     let startTime = Helpers.timestampFormatted(buildState.startTime);
     let duration = buildState.duration;
 

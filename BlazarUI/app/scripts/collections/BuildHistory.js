@@ -9,7 +9,8 @@ class BuildHistory extends BaseCollection {
 
   url() {
     let build = this.build;
-    return `/api/builds/${build.url}/${build.org}/${build.repo}/${build.branch}/${build.module}`
+
+    return `/api/build/history/module/${build.module}`
   }
 
 

@@ -40,7 +40,7 @@ class Builds extends BaseCollection {
       }
 
       if (inProgressBuild) {
-        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
+        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.id}/${inProgressBuild.buildNumber}`;
       }
 
       if (pendingBuild) {
