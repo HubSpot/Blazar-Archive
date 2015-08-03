@@ -18,7 +18,7 @@ class Build extends Component{
       );
     }
 
-    let {buildState} = this.props.build;
+    let buildState = this.props.build.build;
     let subheadline = `Build #${buildState.buildNumber}`;
 
     return (

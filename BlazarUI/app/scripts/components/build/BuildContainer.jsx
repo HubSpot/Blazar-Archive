@@ -45,7 +45,7 @@ class BuildContainer extends Component {
         log: state.build.log
       });
 
-      if (state.build.build.buildState.result === 'IN_PROGRESS') {
+      if (state.build.build.build.state === 'IN_PROGRESS') {
         setTimeout( () => {
           BuildActions.reloadBuild(this.props.params);
         }, 5000);
