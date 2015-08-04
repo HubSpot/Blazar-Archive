@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import SectionLoader from '../shared/SectionLoader.jsx';
+import AnsiUp from 'ansi_up';
 
 class BuildLog extends Component {
 
@@ -13,8 +14,8 @@ class BuildLog extends Component {
     }
 
     return (
-      <pre className='build-log'>
-        {this.props.log}
+      <pre className='build-log'
+        dangerouslySetInnerHTML={{__html: AnsiUp.ansi_to_html(this.props.log)}}>
       </pre>
     );
   }
