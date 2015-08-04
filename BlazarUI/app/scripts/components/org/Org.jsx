@@ -4,6 +4,7 @@ import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
+import ReposTable from './ReposTable.jsx';
 
 class org extends Component {
 
@@ -16,7 +17,10 @@ class org extends Component {
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            
+            <ReposTable
+              repos={this.props.repos}
+              org={this.props.params.org}
+            />
           </UIGridItem>
         </UIGrid>
       </div>
@@ -24,7 +28,6 @@ class org extends Component {
   }
 
 }
-
 
 org.propTypes = {
   loading: PropTypes.bool.isRequired,

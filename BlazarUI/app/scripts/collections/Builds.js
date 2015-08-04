@@ -61,7 +61,7 @@ class Builds extends BaseCollection {
     let repos = _.uniq(_.map(orgBuilds, function (build) {
       return build.gitInfo.repository;
     }));
-    return repos;
+    return repos.sort();
   }
 
   getBranchModules(branchInfo) {
