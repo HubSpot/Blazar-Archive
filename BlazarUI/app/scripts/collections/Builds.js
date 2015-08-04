@@ -52,6 +52,18 @@ class Builds extends BaseCollection {
 
   }
 
+  getReposByOrg(orgInfo) {
+    let builds = this.hasBuildState();
+    let orgBuilds = _.filter(builds, function(a) {
+      return a.gitInfo.organization === orgInfo.org
+    });
+
+    let repos = _.uniq(_.map(orgBuilds, function (build) {
+      return build.gitInfo.repository;
+    }));
+    return repos;
+  }
+
   getBranchModules(branchInfo) {
     return _.findWhere(this.groupBuildsByRepo(), {
       organization: branchInfo.org,

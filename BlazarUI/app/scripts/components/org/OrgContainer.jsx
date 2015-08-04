@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import Org from './Org.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
+import OrgActions from '../../actions/orgActions';
 
 class OrgContainer extends Component {
 
@@ -8,8 +9,27 @@ class OrgContainer extends Component {
     super(props);
 
     this.state = {
+      repos: [],
       loading: true
     };
+  }
+
+  componentDidMount() {
+    OrgActions.loadRepos(this.props.params);
+  }
+
+  componentWillReceiveProps(nextprops) {
+    console.log('hi');
+    OrgActions.loadRepos(nextprops.params);
+  }
+
+  componentWillUnmount() {
+    OrgActions.updatePollingStatus(false);
+    this.unsubscribe();
+  }
+
+  onStatusChange(state) {
+    this.setState(state);
   }
 
   render() {
