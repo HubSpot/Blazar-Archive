@@ -15,7 +15,7 @@ class BuildLog extends Component {
 
     return (
       <pre className='build-log'
-        dangerouslySetInnerHTML={{__html: AnsiUp.ansi_to_html(this.props.log)}}>
+        dangerouslySetInnerHTML={{__html: AnsiUp.ansi_to_html(AnsiUp.escape_for_html(this.props.log))}}>
       </pre>
     );
   }
