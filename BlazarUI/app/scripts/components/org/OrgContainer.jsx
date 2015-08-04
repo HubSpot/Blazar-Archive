@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import Org from './Org.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 import OrgActions from '../../actions/orgActions';
+import OrgStore from '../../stores/orgStore';
 
 class OrgContainer extends Component {
 
@@ -15,11 +16,11 @@ class OrgContainer extends Component {
   }
 
   componentDidMount() {
+    this.unsubscribe = OrgStore.listen(this.onStatusChange.bind(this));
     OrgActions.loadRepos(this.props.params);
   }
 
   componentWillReceiveProps(nextprops) {
-    console.log('hi');
     OrgActions.loadRepos(nextprops.params);
   }
 
@@ -37,6 +38,7 @@ class OrgContainer extends Component {
       <PageContainer>
         <Org
           params={this.props.params}
+          repos={this.state.repos}
           loading={this.state.loading}
         />
       </PageContainer>

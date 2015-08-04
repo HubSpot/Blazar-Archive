@@ -16,7 +16,7 @@ class org extends Component {
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            Repos here
+            
           </UIGridItem>
         </UIGrid>
       </div>

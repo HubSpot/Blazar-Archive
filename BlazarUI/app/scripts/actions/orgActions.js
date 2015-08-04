@@ -29,7 +29,7 @@ function startPolling(data){
 
     promise.done( () => {
       let repos = builds.getReposByOrg(data);
-      OrgActions.loadReposSuccess(builds.data);
+      OrgActions.loadReposSuccess(repos);
     });
 
     promise.error( () => {
