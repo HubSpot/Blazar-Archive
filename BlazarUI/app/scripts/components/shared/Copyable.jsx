@@ -20,7 +20,7 @@ class Copyable extends Component {
   render() {
     return (
       <ReactZeroClipboard text={this.props.text}>
-        <span onClick={this.handleClick} onMouseOver={this.handleHover}>{this.props.children}</span>
+        <span title="Copy to clipboard" onClick={this.handleClick} onMouseOver={this.handleHover}>{this.props.children}</span>
       </ReactZeroClipboard>
     );
   }

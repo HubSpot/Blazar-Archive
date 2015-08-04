@@ -34,7 +34,7 @@ function fetchBuild(data) {
       return;
     }
 
-    let log = new Log(build.data.build.buildLog);
+    let log = new Log(build.data.build.log);
     let logPromise = log.fetch();
 
     logPromise.always( (logData) => {
