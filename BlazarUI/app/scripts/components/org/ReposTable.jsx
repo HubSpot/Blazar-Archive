@@ -21,7 +21,8 @@ class ReposTable extends Component {
     }
 
     let columnNames = [
-      {label: 'Name', key: 'name'}
+      {label: 'Name', key: 'name'},
+      {label: 'Last Build', key: 'lastBuild'}
     ];
 
     // TO DO: empty table

@@ -59,9 +59,27 @@ class Builds extends BaseCollection {
     });
 
     let repos = _.uniq(_.map(orgBuilds, function (build) {
-      return build.gitInfo.repository;
-    }));
-    return repos.sort();
+      let repo = { repo: build.gitInfo.repository };
+      if(build.lastBuild !== undefined) {
+        repo = {
+          repo: build.gitInfo.repository,
+          latestBuild: {
+            state: build.lastBuild.state,
+            number: build.lastBuild.buildNumber,
+            id: build.lastBuild.id,
+            module: build.module.name,
+            moduleId: build.lastBuild.moduleId,
+            endTimestamp: build.lastBuild.endTimestamp
+          }
+        };
+      }
+      return repo;
+    }), false, function(r) {
+      return r.repo;
+    });
+    return _.sortBy(repos, function(r) {
+      return r.repo;
+    });
   }
 
   getBranchModules(branchInfo) {
