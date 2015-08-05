@@ -69,6 +69,7 @@ class Builds extends BaseCollection {
             id: build.lastBuild.id,
             module: build.module.name,
             moduleId: build.lastBuild.moduleId,
+            branch: build.gitInfo.branch,
             endTimestamp: build.lastBuild.endTimestamp
           }
         };

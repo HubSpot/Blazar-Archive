@@ -9,7 +9,7 @@ class BuildLog extends Component {
       return <SectionLoader />;
     }
 
-    if (!this.props.log) {
+    if (!this.props.log || typeof this.props.log !== "string") {
       return <div></div>;
     }
 
