@@ -32,7 +32,7 @@ class Builds extends BaseCollection {
       let moduleInfo = {
         repository: gitInfo.repository,
         module: module.name,
-        //link: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${buildState === undefined ? '' : buildState.buildNumber}`
+        link: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}`
       };
 
       if (lastBuild) {
@@ -40,7 +40,7 @@ class Builds extends BaseCollection {
       }
 
       if (inProgressBuild) {
-        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
+        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}/${inProgressBuild.buildNumber}`;
       }
 
       if (pendingBuild) {
@@ -53,7 +53,7 @@ class Builds extends BaseCollection {
   }
 
   getReposByOrg(orgInfo) {
-    let builds = this.hasBuildState();
+    let builds = this.isBuilding();
     let orgBuilds = _.filter(builds, function(a) {
       return a.gitInfo.organization === orgInfo.org
     });

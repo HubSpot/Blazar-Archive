@@ -3,6 +3,7 @@ import { bindAll } from 'underscore';
 import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
+let Link = require('react-router').Link;
 
 class BuildsSidebarListItem extends Component {
 
@@ -36,10 +37,11 @@ class BuildsSidebarListItem extends Component {
   }
 
   render() {
-
+    let config = window.config;
     let repo = this.props.repo;
     let modules = this.props.repo.modules;
     let moduleList = [];
+    let repoLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}`;
 
     modules.forEach( (build) => {
       moduleList.push(
@@ -59,7 +61,9 @@ class BuildsSidebarListItem extends Component {
           <div className='sidebar__build-detail'>
             {getRepoBuildState()}
             <div className='sidebar__repo-name'>
-              {repo.repository}
+              <Link to={repoLink}>
+                {repo.repository}
+              </Link>
               <Icon type='octicon' name='git-branch' classNames='sidebar__repo-branch-icon' />
               <span className='sidebar__repo-branch'>{repo.branch}</span>
             </div>

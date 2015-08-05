@@ -22,14 +22,14 @@ class ReposTableRow extends Component {
     let org = this.props.org;
     let repoPath = org + "/" + repo.repo;
 
-    let lastBuild = (<span>None</span>);
+    let lastBuild = (<span></span>);
     if(repo.latestBuild) {
       let build = repo.latestBuild;
       let buildLink = `${org}/${repo.repo}/${build.branch}/${build.module}_${build.moduleId}/${build.id}`;
       let moduleLink = `${org}/${repo.repo}/${build.branch}/${build.module}_${build.moduleId}`;
       lastBuild = (
         <span>
-          <a href={moduleLink}>{build.module}</a> --- #<a href={buildLink}>{build.number}</a> at {Helpers.timestampFormatted(build.endTimestamp)} {this.getBuildResult(build.state)}
+          <a href={moduleLink}>{build.module}</a> --- #<a href={buildLink}>{build.number}</a> @ {Helpers.timestampFormatted(build.endTimestamp)} {this.getBuildResult(build.state)}
         </span>
       );
     }
