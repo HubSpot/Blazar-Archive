@@ -42,6 +42,7 @@ class BuildsSidebarListItem extends Component {
     let modules = this.props.repo.modules;
     let moduleList = [];
     let repoLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}`;
+    let branchLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}/${repo.branch}`;
 
     modules.forEach( (build) => {
       moduleList.push(
@@ -65,7 +66,7 @@ class BuildsSidebarListItem extends Component {
                 {repo.repository}
               </Link>
               <Icon type='octicon' name='git-branch' classNames='sidebar__repo-branch-icon' />
-              <span className='sidebar__repo-branch'>{repo.branch}</span>
+              <span className='sidebar__repo-branch'><Link to={branchLink}>{repo.branch}</Link></span>
             </div>
           </div>
           <Icon name={this.getExpandStatus()} classNames='sidebar__expand' />
