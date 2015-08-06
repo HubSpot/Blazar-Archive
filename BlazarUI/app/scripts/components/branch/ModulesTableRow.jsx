@@ -37,7 +37,7 @@ class ModulesTableRow extends Component {
     let build = (inProgressBuild ? inProgressBuild : lastBuild);
 
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
-    let startTime = Helpers.timestampFormatted(build.startTime);
+    let startTime = Helpers.timestampFormatted(build.startTimestamp);
     let duration = build.duration;
 
     if (build.result === 'IN_PROGRESS') {
