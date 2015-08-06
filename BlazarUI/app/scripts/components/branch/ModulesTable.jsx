@@ -20,8 +20,8 @@ class ModulesTable extends Component {
     }
 
     let columnNames = [
-      {label: 'Latest Build', key: 'latestBuild'},
       {label: 'Module', key: 'module'},
+      {label: 'Latest Build', key: 'latestBuild'},
       {label: 'Start Time', key: 'startTime'},
       {label: 'Duration', key: 'duration'},
       {label: 'Commit', key: 'commit'}

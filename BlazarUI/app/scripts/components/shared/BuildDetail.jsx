@@ -31,7 +31,7 @@ class BuildDetail extends Component {
     let shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${sha}`;
     let buildDetail;
 
-    if (build.result === 'IN_PROGRESS') {
+    if (build.state === 'IN_PROGRESS') {
       buildDetail = 'started ' + Helpers.timestampFormatted(build.startTimestamp);
     } else {
       buildDetail = endtime;

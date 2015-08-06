@@ -16,12 +16,17 @@ class Branch extends Component{
         <SectionLoader />
       );
     }
-
+    let headline = (
+      <span>
+        <i className='mega-octicon octicon-git-branch headline-icon'></i>
+        <span>{this.props.params.branch}</span>
+      </span>
+    );
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.branch} subheadline="Branch Modules" />
+          <PageHeadline headline={headline} subheadline="Branch Modules" />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
