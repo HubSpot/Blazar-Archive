@@ -21,7 +21,7 @@ class ReposTable extends Component {
     }
 
     let columnNames = [
-      {label: 'Name', key: 'name'},
+      {label: 'Repository', key: 'name'},
       {label: 'Last Build', key: 'lastBuild'}
     ];
 
