@@ -19,7 +19,7 @@ class BuildDetail extends Component {
     let {build, gitInfo} = this.props.build;
     let endtime, duration;
     let buildResult = Helpers.humanizeText(build.state);
-    console.log(build);
+
     if (build.state !== 'IN_PROGRESS') {
       endtime = 'On ' + Helpers.timestampFormatted(build.endTimestamp);
       duration = 'Ran for ' + build.duration;
