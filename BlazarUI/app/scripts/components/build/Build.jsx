@@ -8,7 +8,21 @@ import BuildLog from './BuildLog.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 
-class Build extends Component{
+class Build extends Component {
+
+  getIconForState(state) {
+    switch(state) {
+      case 'LAUNCHING':
+        return 'fa fa-hourglass-start headline-icon';
+      case 'IN_PROGRESS':
+        return 'fa fa-hourglass-half headline-icon';
+      case 'SUCCEEDED':
+      case 'FAILED':
+        return 'fa fa-hourglass-end headline-icon';
+      default:
+        return 'fa fa-hourglass-o headline-icon';
+    }
+  }
 
   render() {
 
@@ -19,13 +33,21 @@ class Build extends Component{
     }
 
     let buildState = this.props.build.build;
+    let icon = this.getIconForState(buildState.state);
+
+    let headline = (
+      <span>
+        <i className={icon}></i>
+        <span>{this.props.params.module}</span>
+      </span>
+    );
     let subheadline = `Build #${buildState.buildNumber}`;
 
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.module} subheadline={subheadline} />
+          <PageHeadline headline={headline} subheadline={subheadline} />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>

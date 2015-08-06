@@ -5,6 +5,8 @@ const buildLables = {
   'SUCCEEDED': 'success',
   'FAILED': 'danger',
   'IN_PROGRESS': 'info',
+  'QUEUED': 'info',
+  'LAUNCHING': 'info',
   'CANCELLED': 'warning'
 };
 
@@ -20,7 +22,7 @@ class BuildDetail extends Component {
     let endtime, duration;
     let buildResult = Helpers.humanizeText(build.state);
 
-    if (build.state !== 'IN_PROGRESS') {
+    if (build.state !== 'IN_PROGRESS' && build.state !== 'QUEUED' && build.state !== 'LAUNCHING') {
       endtime = 'On ' + Helpers.timestampFormatted(build.endTimestamp);
       duration = 'Ran for ' + build.duration;
     }

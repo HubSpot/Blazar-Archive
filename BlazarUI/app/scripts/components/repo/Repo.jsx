@@ -16,12 +16,17 @@ class Repo extends Component {
         <SectionLoader />
       );
     }
-
+    let headline = (
+      <span>
+        <i className='mega-octicon octicon-repo headline-icon'></i>
+        <span>{this.props.params.repo}</span>
+      </span>
+    );
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.repo} subheadline='Branches' />
+          <PageHeadline headline={headline} subheadline='Branches' />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>

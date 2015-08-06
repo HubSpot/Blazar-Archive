@@ -15,11 +15,17 @@ class org extends Component {
         <SectionLoader />
       );
     }
+    let headline = (
+      <span>
+        <i className='mega-octicon octicon-organization headline-icon'></i>
+        <span>{this.props.params.org}</span>
+      </span>
+    );
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.org} subheadline='Repositories' />
+          <PageHeadline headline={headline} subheadline='Repositories' />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>

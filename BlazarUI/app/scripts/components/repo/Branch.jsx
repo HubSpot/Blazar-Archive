@@ -42,6 +42,7 @@ class Branch extends Component {
       <div className='repo-branch'>
         <h4 onClick={this.handleExpandToggleClick} className='repo-branch__headline'>
         <Icon classNames='repo-branch__headine-icon' type='fa' name={this.getExpandedIcon()} />
+        <Icon type='octicon' name='git-branch' classNames="repolist-icon" />
           {branch.branch}
         </h4>
         <div className={this.getExpandedState()}>

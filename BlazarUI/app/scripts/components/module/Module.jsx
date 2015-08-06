@@ -17,11 +17,17 @@ class Module extends Component {
       );
     }
     let moduleName = this.props.params.module.substring(0, this.props.params.module.lastIndexOf("_"));
+    let headline = (
+      <span>
+        <i className='mega-octicon octicon-file-directory headline-icon'></i>
+        <span>{moduleName}</span>
+      </span>
+    );
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={moduleName} subheadline='Build History' />
+          <PageHeadline headline={headline} subheadline='Module Build History' />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
