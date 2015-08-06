@@ -1,5 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import {labels, iconStatus} from '../constants';
 import Helpers from '../ComponentHelpers';
@@ -49,10 +48,10 @@ class ModulesTableRow extends Component {
       <tr className={this.getRowClassNames()}>
       <td className='build-result-link'>
         {this.getBuildResult()}
-        <Link to={build.buildLink}>{build.buildNumber}</Link>
+        <a href={build.buildLink}>{build.buildNumber}</a>
       </td>
         <td>
-          <Link to={modulePath}>{module.name}</Link>
+          <a href={modulePath}>{module.name}</a>
         </td>
         <td>
           {startTime}

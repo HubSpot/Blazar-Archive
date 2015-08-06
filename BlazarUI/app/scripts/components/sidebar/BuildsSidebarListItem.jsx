@@ -3,7 +3,7 @@ import { bindAll } from 'underscore';
 import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
-let Link = require('react-router').Link;
+//let Link = require('react-router').Link;
 
 class BuildsSidebarListItem extends Component {
 
@@ -62,11 +62,11 @@ class BuildsSidebarListItem extends Component {
           <div className='sidebar__build-detail'>
             {getRepoBuildState()}
             <div className='sidebar__repo-name'>
-              <Link to={repoLink}>
+              <a href={repoLink}>
                 {repo.repository}
-              </Link>
+              </a>
               <Icon type='octicon' name='git-branch' classNames='sidebar__repo-branch-icon' />
-              <span className='sidebar__repo-branch'><Link to={branchLink}>{repo.branch}</Link></span>
+              <span className='sidebar__repo-branch'><a href={branchLink}>{repo.branch}</a></span>
             </div>
           </div>
           <Icon name={this.getExpandStatus()} classNames='sidebar__expand' />
