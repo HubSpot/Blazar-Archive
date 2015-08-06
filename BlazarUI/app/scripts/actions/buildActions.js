@@ -38,11 +38,12 @@ function fetchBuild(data) {
     let logPromise = log.fetch();
 
     logPromise.always( (logData) => {
-      BuildActions.loadBuildSuccess({
-        build: build.data,
-        log: logData
-      });
-
+      if (!logData.status || logData.status === 200) {
+        BuildActions.loadBuildSuccess({
+          build: build.data,
+          log: logData.data
+        });
+      }
     });
 
     logPromise.error( () => {

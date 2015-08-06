@@ -36,9 +36,13 @@ class BuildContainer extends Component {
   }
 
   onStatusChange(state) {
-
+    if (state.loading) {
+      this.setState({
+        loading: true
+      });
+      return;
+    }
     if (state.build) {
-
       this.setState({
         loading: false,
         build: state.build.build,
@@ -50,6 +54,11 @@ class BuildContainer extends Component {
           BuildActions.reloadBuild(this.props.params);
         }, 5000);
       }
+    } else {
+      this.setState({
+        loading: false,
+        log: state.error
+      });
     }
 
   }
