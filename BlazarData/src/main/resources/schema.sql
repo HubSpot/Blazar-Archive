@@ -32,7 +32,7 @@ CREATE TABLE `builds` (
   `startTimestamp` bigint(20) unsigned,
   `endTimestamp` bigint(20) unsigned,
   `sha` char(40),
-  `log` varchar(250),
+  `log` varchar(2048),
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`moduleId`, `buildNumber`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
