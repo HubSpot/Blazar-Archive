@@ -7,13 +7,15 @@ import Helpers from '../ComponentHelpers';
 class ModulesTableRow extends Component {
 
   getRowClassNames() {
-    if (this.props.module.inProgressBuild.result === 'FAILED') {
+    let build = (this.props.module.inProgressBuild ? this.props.module.inProgressBuild : this.props.module.lastBuild);
+    if (build.result === 'FAILED') {
       return 'bgc-danger';
     }
   }
 
   getBuildResult() {
-    let result = this.props.module.inProgressBuild.result;
+    let build = (this.props.module.inProgressBuild ? this.props.module.inProgressBuild : this.props.module.lastBuild);
+    let result = build.result;
     let classNames = `icon-roomy ${labels[result]}`;
 
     return (
@@ -26,18 +28,20 @@ class ModulesTableRow extends Component {
 
   render() {
     let {
+      lastBuild,
       inProgressBuild,
       module,
       gitInfo,
       modulePath
     } = this.props.module;
 
-    // to do: generate commit link in build collection
-    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${inProgressBuild.sha}/`;
-    let startTime = Helpers.timestampFormatted(inProgressBuild.startTime);
-    let duration = inProgressBuild.duration;
+    let build = (inProgressBuild ? inProgressBuild : lastBuild);
 
-    if (inProgressBuild.result === 'IN_PROGRESS') {
+    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
+    let startTime = Helpers.timestampFormatted(build.startTime);
+    let duration = build.duration;
+
+    if (build.result === 'IN_PROGRESS') {
       duration = 'In Progress...';
     }
 
@@ -45,7 +49,7 @@ class ModulesTableRow extends Component {
       <tr className={this.getRowClassNames()}>
       <td className='build-result-link'>
         {this.getBuildResult()}
-        <Link to={inProgressBuild.buildLink}>{inProgressBuild.buildNumber}</Link>
+        <Link to={build.buildLink}>{build.buildNumber}</Link>
       </td>
         <td>
           <Link to={modulePath}>{module.name}</Link>
@@ -57,7 +61,7 @@ class ModulesTableRow extends Component {
           {duration}
         </td>
         <td>
-          <a href={commitLink} target="_blank">{inProgressBuild.sha}</a>
+          <a href={commitLink} target="_blank">{build.sha}</a>
         </td>
       </tr>
     );

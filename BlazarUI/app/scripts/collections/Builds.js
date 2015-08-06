@@ -116,7 +116,7 @@ class Builds extends BaseCollection {
 
   groupBuildsByRepo() {
     // group and generate key, by org::repo[branch]
-    let grouped = _.groupBy(this.isBuilding(), function(o) {
+    let grouped = _.groupBy(this.hasBuildState(), function(o) {
       return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
     });
 
@@ -147,7 +147,9 @@ class Builds extends BaseCollection {
 
     // store some helper properites
     groupedInArray.forEach( (repo) => {
-      repo.mostRecentBuild = repo.modules[0].inProgressBuild.startTimestamp;
+      if (repo.modules[0].inProgressBuild) {
+        repo.mostRecentBuild = repo.modules[0].inProgressBuild.startTimestamp;
+      }
       repo.host = repo.modules[0].gitInfo.host;
       repo.branch = repo.modules[0].gitInfo.branch;
       repo.organization = repo.modules[0].gitInfo.organization;
@@ -156,9 +158,11 @@ class Builds extends BaseCollection {
 
       repo.modules.forEach( (module) => {
         module.modulePath = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}`;
-        module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}/${module.inProgressBuild.buildNumber}`;
-        if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
-          repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
+        if (module.inProgressBuild) {
+          module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}/${module.inProgressBuild.buildNumber}`;
+          if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
+            repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
+          }
         }
       })
     })
@@ -173,7 +177,6 @@ class Builds extends BaseCollection {
     })
 
     return groupedInArray;
-
   }
 
 

@@ -29,7 +29,7 @@ class ReposTableRow extends Component {
       let moduleLink = `${org}/${repo.repo}/${build.branch}/${build.module}_${build.moduleId}`;
       lastBuild = (
         <span>
-          <a href={moduleLink}>{build.module}</a> --- #<a href={buildLink}>{build.number}</a> @ {Helpers.timestampFormatted(build.endTimestamp)} {this.getBuildResult(build.state)}
+          <a href={moduleLink}>{build.module}</a> --- <a href={buildLink}>#{build.number}</a> @ {Helpers.timestampFormatted(build.endTimestamp)} {this.getBuildResult(build.state)}
         </span>
       );
     }
