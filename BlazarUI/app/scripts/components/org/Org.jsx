@@ -6,6 +6,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 import ReposTable from './ReposTable.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
+import Icon from '../shared/Icon.jsx';
 
 class org extends Component {
 
@@ -17,7 +18,7 @@ class org extends Component {
     }
     let headline = (
       <span>
-        <i className='mega-octicon octicon-organization headline-icon'></i>
+        <Icon prefix="mega" type="octicon" name="organization" classNames="headline-icon" />
         <span>{this.props.params.org}</span>
       </span>
     );

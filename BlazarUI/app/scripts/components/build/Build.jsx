@@ -7,20 +7,21 @@ import BuildDetail from '../shared/BuildDetail.jsx';
 import BuildLog from './BuildLog.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
+import Icon from '../shared/Icon.jsx';
 
 class Build extends Component {
 
   getIconForState(state) {
     switch(state) {
       case 'LAUNCHING':
-        return 'fa fa-hourglass-start headline-icon';
+        return 'hourglass-start';
       case 'IN_PROGRESS':
-        return 'fa fa-hourglass-half headline-icon';
+        return 'hourglass-half';
       case 'SUCCEEDED':
       case 'FAILED':
-        return 'fa fa-hourglass-end headline-icon';
+        return 'hourglass-end';
       default:
-        return 'fa fa-hourglass-o headline-icon';
+        return 'hourglass-o';
     }
   }
 
@@ -37,7 +38,7 @@ class Build extends Component {
 
     let headline = (
       <span>
-        <i className={icon}></i>
+        <Icon name={icon} classNames="headline-icon"></Icon>
         <span>{this.props.params.module}</span>
       </span>
     );

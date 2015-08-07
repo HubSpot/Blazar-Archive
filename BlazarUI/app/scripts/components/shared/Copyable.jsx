@@ -13,7 +13,6 @@ class Copyable extends Component {
   handleClick() {
     this.props.click();
     document.getElementById('copy-tooltip-text').innerHTML = 'Copied!';
-    document.getElementById('copy-tooltip-text').fixTitle();
   }
 
   handleHover() {

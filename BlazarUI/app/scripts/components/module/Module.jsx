@@ -6,6 +6,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
+import Icon from '../shared/Icon.jsx';
 
 class Module extends Component {
 
@@ -19,7 +20,7 @@ class Module extends Component {
     let moduleName = this.props.params.module.substring(0, this.props.params.module.lastIndexOf("_"));
     let headline = (
       <span>
-        <i className='mega-octicon octicon-file-directory headline-icon'></i>
+        <Icon prefix="mega" type="octicon" name="file-directory" classNames="headline-icon" />
         <span>{moduleName}</span>
       </span>
     );
