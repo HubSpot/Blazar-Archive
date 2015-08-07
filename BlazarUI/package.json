@@ -49,6 +49,7 @@
   "dependencies": {
     "ansi_up": "^1.2.1",
     "react": "^0.13.1",
+    "react-bootstrap": "^0.24.3",
     "react-router": "^0.13.3",
     "react-select": "^0.5.4",
     "react-zeroclipboard": "^1.1.0",
