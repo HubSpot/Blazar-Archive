@@ -3,6 +3,7 @@ import { bindAll } from 'underscore';
 import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
+import Star from '../shared/Star.jsx';
 //let Link = require('react-router').Link;
 
 class BuildsSidebarListItem extends Component {
@@ -62,6 +63,7 @@ class BuildsSidebarListItem extends Component {
           <div className='sidebar__build-detail'>
             {getRepoBuildState()}
             <div className='sidebar__repo-name'>
+              <Star repo={repo.repository}></Star>
               <a href={repoLink}>
                 {repo.repository}
               </a>
