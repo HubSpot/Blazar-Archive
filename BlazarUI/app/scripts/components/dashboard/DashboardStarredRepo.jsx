@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
+import NotificationToggle from '../shared/NotificationToggle.jsx';
 
 class DashboardStarredRepo extends Component {
 
@@ -23,12 +24,17 @@ class DashboardStarredRepo extends Component {
     return (
       <div className={outerClass}>
         <div className="starredRepo-inner">
+
           <span className="dashboard__repo-name">
-            <Link to={repoLink} className="dashboard__title-link">{this.props.repo.repository}</Link>
+            <Link to={repoLink} className="dashboard__title-link">{repo.repository}</Link>
           </span>
           <Icon type='octicon' name='git-branch' classNames='sidebar__repo-branch-icon' />
           <span className='dashboard__title-link'>
             <Link to={branchLink} className="dashboard__title-link dashboard__branch-link">{repo.branch}</Link>
+          </span>
+
+          <span className="dashboard__toggle-container">
+            <NotificationToggle repo={repo.repository} banch={repo.branch}></NotificationToggle>
           </span>
 
           <div className="dashboard__repo-details">

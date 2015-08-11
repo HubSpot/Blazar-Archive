@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import StarredProvider from '../StarredProvider';
 import DashboardStarredRepo from './DashboardStarredRepo.jsx';
+import Icon from '../shared/Icon.jsx';
 
 class Dashboard extends Component {
 
@@ -25,7 +26,10 @@ class Dashboard extends Component {
 
     return (
       <div className="primary-content">
-        <h2 className="header-primary">Dashboard</h2>
+        <h2 className="header-primary">
+          <Icon name="tachometer" classNames="headline-icon"></Icon>
+          Dashboard
+        </h2>
         {starredRepos}
       </div>
     );
