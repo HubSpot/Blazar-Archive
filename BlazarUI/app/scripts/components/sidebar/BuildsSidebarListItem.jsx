@@ -4,7 +4,7 @@ import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
-//let Link = require('react-router').Link;
+import { Link } from 'react-router';
 
 class BuildsSidebarListItem extends Component {
 
@@ -64,11 +64,11 @@ class BuildsSidebarListItem extends Component {
             {getRepoBuildState()}
             <div className='sidebar__repo-name'>
               <Star repo={repo.repository} branch={repo.branch}></Star>
-              <a href={repoLink}>
+              <Link to={repoLink}>
                 {repo.repository}
-              </a>
+              </Link>
               <Icon type='octicon' name='git-branch' classNames='sidebar__repo-branch-icon' />
-              <span className='sidebar__repo-branch'><a href={branchLink}>{repo.branch}</a></span>
+              <span className='sidebar__repo-branch'><Link to={branchLink}>{repo.branch}</Link></span>
             </div>
           </div>
           <Icon name={this.getExpandStatus()} classNames='sidebar__expand' />

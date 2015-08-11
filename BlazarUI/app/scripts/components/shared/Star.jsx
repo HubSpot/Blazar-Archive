@@ -23,20 +23,20 @@ class Star extends Component {
   }
 
   render() {
-      let className, iconName = '';
-      if (this.state.starred) {
-        className = 'sidebar__star selected';
-        iconName = 'star';
-      } else {
-        className = 'sidebar__star unselected';
-        iconName = 'star-o';
-      }
+    let className, iconName = '';
+    if (this.state.starred) {
+      className = 'sidebar__star selected';
+      iconName = 'star';
+    } else {
+      className = 'sidebar__star unselected';
+      iconName = 'star-o';
+    }
 
-      return (
-          <span onClick={this.handleClick} className={ className }>
-              <Icon name={ iconName }></Icon>
-          </span>
-      );
+    return (
+      <span onClick={this.handleClick} className={ className }>
+          <Icon name={ iconName }></Icon>
+      </span>
+    );
   }
 
 }
