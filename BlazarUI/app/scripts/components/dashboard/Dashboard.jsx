@@ -24,12 +24,17 @@ class Dashboard extends Component {
       });
     }
 
+    if (starredRepos.length === 0) {
+      starredRepos = (<span className="dashboard__placeholder">You have no starred repos.</span>);
+    }
+
     return (
       <div className="primary-content">
         <h2 className="header-primary">
           <Icon name="tachometer" classNames="headline-icon"></Icon>
           Dashboard
         </h2>
+        <h4 className="dashboard__section-title">Starred Repos</h4>
         {starredRepos}
       </div>
     );

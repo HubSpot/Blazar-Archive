@@ -3,12 +3,11 @@ import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import NotificationToggle from '../shared/NotificationToggle.jsx';
+import DashboardRepoDetails from './DashboardRepoDetails.jsx';
 
 class DashboardStarredRepo extends Component {
 
   render() {
-    console.log(this.props.repo);
-
     let building = <span></span>;
     let outerClass = 'starredRepo';
     if (this.props.repo.isBuilding) {
@@ -38,7 +37,7 @@ class DashboardStarredRepo extends Component {
           </span>
 
           <div className="dashboard__repo-details">
-            details here
+            <DashboardRepoDetails repo={repo}></DashboardRepoDetails>
           </div>
         </div>
 
