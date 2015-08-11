@@ -3,6 +3,7 @@ import Toggle from 'react-toggle';
 import { bindAll } from 'underscore';
 import Tooltip from 'react-bootstrap/lib/Tooltip';
 import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
+import Notify from 'notifyjs';
 
 class NotificationToggle extends Component {
 
@@ -13,7 +14,22 @@ class NotificationToggle extends Component {
   }
 
   handleWatchingChange() {
-    console.log(this.state.watching);
+    this.setState({watching: !this.state.watching});
+    if(!this.state.watching) {
+      if (Notify.needsPermission) {
+        Notify.requestPermission(this.showNotification());
+      } else {
+        this.showNotification();
+      }
+    }
+  }
+
+  showNotification() {
+    let notification = new Notify('Wassup', {
+        body: 'Your buizzle is donizzle.',
+        icon: '/images/blazar.jpg'
+    });
+    notification.show();
   }
 
   render() {

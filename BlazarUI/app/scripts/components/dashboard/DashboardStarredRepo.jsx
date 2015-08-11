@@ -41,6 +41,7 @@ class DashboardStarredRepo extends Component {
             details here
           </div>
         </div>
+
         {building}
       </div>
     );
