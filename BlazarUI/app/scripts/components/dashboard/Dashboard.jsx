@@ -18,7 +18,7 @@ class Dashboard extends Component {
       this.props.builds.grouped.forEach(function(repo) {
         if(StarredProvider.hasStar({ repo: repo.repository, branch: repo.branch }) !== -1) {
           starredRepos.push(
-            <DashboardStarredRepo repo={repo}></DashboardStarredRepo>
+            <DashboardStarredRepo key={repo.repository} repo={repo}></DashboardStarredRepo>
           );
         }
       });

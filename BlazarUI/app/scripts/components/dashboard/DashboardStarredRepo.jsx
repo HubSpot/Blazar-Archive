@@ -34,7 +34,7 @@ class DashboardStarredRepo extends Component {
           </span>
 
           <span className="dashboard__toggle-container">
-            <NotificationToggle repo={repo.repository} banch={repo.branch}></NotificationToggle>
+            <NotificationToggle repo={repo.repository} branch={repo.branch}></NotificationToggle>
           </span>
 
           <div className="dashboard__repo-details">
