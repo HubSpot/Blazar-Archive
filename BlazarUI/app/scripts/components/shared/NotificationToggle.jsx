@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import Toggle from 'react-toggle';
 import { bindAll } from 'underscore';
+import Tooltip from 'react-bootstrap/lib/Tooltip';
+import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
 
 class NotificationToggle extends Component {
 
@@ -15,15 +17,21 @@ class NotificationToggle extends Component {
   }
 
   render() {
+    let tooltip = (
+      <Tooltip id="copy-tooltip">
+            <span id="copy-tooltip-text">Notify me when builds complete</span>
+      </Tooltip>
+    );
 
     return (
-      <span>
-        <label htmlFor="watching-status">Notify when builds complete</label>
-        <Toggle
-          id="watching-status"
-          defaultChecked={this.state.watching}
-          onChange={this.handleWatchingChange} />
-      </span>
+      <OverlayTrigger placement='left' overlay={tooltip}>
+        <span>
+          <Toggle
+            id="watching-status"
+            defaultChecked={this.state.watching}
+            onChange={this.handleWatchingChange} />
+        </span>
+      </OverlayTrigger>
     );
   }
 
