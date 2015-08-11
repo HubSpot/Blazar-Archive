@@ -27,7 +27,7 @@ class NotificationToggle extends Component {
   showNotification() {
     let notification = new Notify('Wassup', {
         body: 'Your buizzle is donizzle.',
-        icon: '/images/blazar.jpg'
+        icon: '/images/icon.jpg'
     });
     notification.show();
   }
