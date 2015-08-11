@@ -8,8 +8,7 @@ class Star extends Component {
   constructor(props) {
     super(props);
     bindAll(this, 'handleClick');
-    let starredRepos = StarredProvider.getStars();
-    this.state = { starred: starredRepos.indexOf(props.repo) !== -1 };
+    this.state = { starred: StarredProvider.hasStar({ repo: props.repo, branch: props.branch }) !== -1 };
   }
 
   handleClick(event) {
@@ -17,9 +16,9 @@ class Star extends Component {
     this.setState({starred: !this.state.starred});
 
     if (!this.state.starred) {
-      StarredProvider.addStar(this.props.repo);
+      StarredProvider.addStar(this.props.repo, this.props.branch);
     } else {
-      StarredProvider.removeStar(this.props.repo);
+      StarredProvider.removeStar(this.props.repo, this.props.branch);
     }
   }
 
@@ -43,7 +42,8 @@ class Star extends Component {
 }
 
 Star.propTypes = {
-  repo: PropTypes.string.isRequired
+  repo: PropTypes.string.isRequired,
+  branch: PropTypes.string.isRequired
 };
 
 export default Star;

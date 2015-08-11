@@ -63,7 +63,7 @@ class BuildsSidebarListItem extends Component {
           <div className='sidebar__build-detail'>
             {getRepoBuildState()}
             <div className='sidebar__repo-name'>
-              <Star repo={repo.repository}></Star>
+              <Star repo={repo.repository} branch={repo.branch}></Star>
               <a href={repoLink}>
                 {repo.repository}
               </a>

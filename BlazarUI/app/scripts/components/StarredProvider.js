@@ -2,17 +2,17 @@ import Cookies from 'js-cookie';
 
 let StarredProvider = {
 
-  addStar: function(repo) {
+  addStar: function(repo, branch) {
     let starredRepos = this.getStars();
-    if (starredRepos.indexOf(repo) === -1) {
-      starredRepos.push(repo);
+    if (this.hasStar({ repo: repo, branch: branch }) === -1) {
+      starredRepos.push({ repo: repo, branch: branch });
     }
     Cookies.set('starred-repos', starredRepos);
   },
 
-  removeStar: function(repo) {
+  removeStar: function(repo, branch) {
     let starredRepos = this.getStars();
-    let index = starredRepos.indexOf(repo);
+    let index = this.hasStar({ repo: repo, branch: branch });
     if (index !== -1) {
       starredRepos.splice(index, 1);
     }
@@ -25,6 +25,16 @@ let StarredProvider = {
       starredRepos = [];
     }
     return starredRepos;
+  },
+
+  hasStar: function(o) {
+    let stars = this.getStars();
+    for (var i = 0; i < stars.length; i++) {
+        if (stars[i].repo == o.repo && stars[i].branch == o.branch) {
+            return i;
+        }
+    }
+    return -1;
   }
 
 }
