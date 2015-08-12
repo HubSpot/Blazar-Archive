@@ -1,9 +1,9 @@
 import React, {Component, PropTypes} from 'react';
-import { Link } from 'react-router';
 import Module from '../sidebar/Module.jsx';
 import PanelGroup from 'react-bootstrap/lib/PanelGroup';
 import Panel from 'react-bootstrap/lib/Panel';
-import {filter} from 'underscore';
+import {filter, map, max} from 'underscore';
+import Helpers from '../ComponentHelpers';
 
 class DashboardRepoDetails extends Component {
 
@@ -37,8 +37,20 @@ class DashboardRepoDetails extends Component {
     let inactivePanelHeader = `Inactive Builds (${inactiveModuleList.length})`;
     let inactivePanel = (inactiveModuleList.length !== 0 ? <Panel header={inactivePanelHeader} eventKey='2'>{inactiveModuleList}</Panel> : '');
 
+    let latest = Helpers.timestampFormatted(max(map(repo.modules, (m) => {
+      if (m.inProgressBuild) {
+        return m.inProgressBuild.startTimestamp;
+      } else if (m.lastBuild) {
+        return m.lastBuild.endTimestamp;
+      }
+      return 0;
+    })));
+
     return (
       <div>
+        <span className="dashboard__latest-activity">
+          Last Activity: {latest}
+        </span>
         <PanelGroup accordion>
           {activePanel}
           {inactivePanel}
