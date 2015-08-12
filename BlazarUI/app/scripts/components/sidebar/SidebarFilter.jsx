@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import SearchFilter from '../shared/SearchFilter.jsx';
+import StarredToggle from './StarredToggle.jsx';
 
 class SidebarFilter extends Component {
 
@@ -8,7 +9,8 @@ class SidebarFilter extends Component {
     super(props, context);
 
     this.state = {
-      inputValue: ''
+      inputValue: '',
+      showStarred: true
     };
     bindAll(this, 'handleOptionClick', 'handleChange', 'handleFocus', 'handleBlur');
 
@@ -38,6 +40,16 @@ class SidebarFilter extends Component {
     this.props.filterInputFocus(false);
   }
 
+  handleSelect(event) {
+    let id = event.target.id;
+    console.log(id);
+    if (id === 'starred') {
+      this.state.showStarred = true;
+    } else {
+      this.state.showStarred = false;
+    }
+  }
+
   render() {
 
     if (this.props.loading || this.props.repos.length === 0) {
@@ -45,15 +57,18 @@ class SidebarFilter extends Component {
     }
 
     return (
-      <SearchFilter
-        ref="buildFilterSearch"
-        placeholder='Filter modules...'
-        inputValue={this.props.filterText}
-        options={this.props.modules}
-        onChange={this.handleChange}
-        onBlur={this.handleBlur}
-        onFocus={this.handleFocus}
-      />
+      <span>
+        <SearchFilter
+          ref="buildFilterSearch"
+          placeholder='Filter modules...'
+          inputValue={this.props.filterText}
+          options={this.props.modules}
+          onChange={this.handleChange}
+          onBlur={this.handleBlur}
+          onFocus={this.handleFocus}
+        />
+      <StarredToggle onClick={this.handleSelect} showStarred={this.state.showStarred}></StarredToggle>
+      </span>
     );
 
   }
