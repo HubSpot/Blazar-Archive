@@ -31,6 +31,7 @@ class Builds extends BaseCollection {
 
       let moduleInfo = {
         repository: gitInfo.repository,
+        branch: gitInfo.branch,
         module: module.name,
         link: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}`
       };

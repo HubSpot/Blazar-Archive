@@ -4,22 +4,34 @@ import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
 import {bindAll, filter, contains} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
+import StarredProvider from '../StarredProvider';
 
 class BuildsSidebar extends Component {
 
   constructor() {
-    bindAll(this, 'updateResults', 'filterInputFocus', 'moduleExpandChange');
+    bindAll(this, 'updateResults', 'filterInputFocus', 'moduleExpandChange', 'updateStarred');
 
     this.state = {
       filterText: '',
       isFiltering: false,
-      expandedRepos: []
+      expandedRepos: [],
+      showStarred: true
     };
   }
 
   updateResults(input) {
+    let showStarred = this.state.showStarred;
     this.setState({
-      filterText: input
+      filterText: input,
+      showStarred: showStarred
+    });
+  }
+
+  updateStarred(showStarred) {
+    let filterText = this.state.filterText;
+    this.setState({
+      filterText: filterText,
+      showStarred: showStarred
     });
   }
 
@@ -64,6 +76,9 @@ class BuildsSidebar extends Component {
     let results = fuzzy.filter(this.state.filterText, list, options);
 
     results.map( (el) => {
+      if (this.state.showStarred && StarredProvider.hasStar({ repo: el.original.repository, branch: el.original.branch }) === -1) {
+        return;
+      }
       matches.push({
         filterText: this.state.filterText,
         key: el.original.repository,
@@ -132,6 +147,7 @@ class BuildsSidebar extends Component {
             filterText={this.state.filterText}
             filterInputFocus={this.filterInputFocus}
             updateResults={this.updateResults}
+            updateStarred={this.updateStarred}
           />
         </div>
         <div className="sidebar__list">

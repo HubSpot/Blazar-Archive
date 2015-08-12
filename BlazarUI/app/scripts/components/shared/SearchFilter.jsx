@@ -57,7 +57,8 @@ SearchFilter.propTypes = {
   options: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
-  onFocus: PropTypes.func.isRequired
+  onFocus: PropTypes.func.isRequired,
+  showStarred: PropTypes.bool.isRequired
 };
 
 export default SearchFilter;

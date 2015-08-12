@@ -40,14 +40,15 @@ class SidebarFilter extends Component {
     this.props.filterInputFocus(false);
   }
 
-  handleSelect(event) {
+  handleSelect() {
     let id = event.target.id;
-    console.log(id);
     if (id === 'starred') {
       this.state.showStarred = true;
     } else {
       this.state.showStarred = false;
     }
+    this.forceUpdate();
+    this.props.updateStarred(this.state.showStarred);
   }
 
   render() {
@@ -66,8 +67,9 @@ class SidebarFilter extends Component {
           onChange={this.handleChange}
           onBlur={this.handleBlur}
           onFocus={this.handleFocus}
+          showStarred={this.state.showStarred}
         />
-      <StarredToggle onClick={this.handleSelect} showStarred={this.state.showStarred}></StarredToggle>
+      <StarredToggle onClick={this.handleSelect.bind(this)} showStarred={this.state.showStarred}></StarredToggle>
       </span>
     );
 
@@ -84,7 +86,8 @@ SidebarFilter.propTypes = {
   loading: PropTypes.bool.isRequired,
   filterText: PropTypes.string.isRequired,
   filterInputFocus: PropTypes.func.isRequired,
-  repos: PropTypes.array.isRequired
+  repos: PropTypes.array.isRequired,
+  updateStarred: PropTypes.func.isRequired
 };
 
 export default SidebarFilter;
