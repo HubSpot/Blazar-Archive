@@ -2,7 +2,7 @@
 
 const appConfig = {
   // sidebar polling frequency in ms
-  buildsRefresh: 5000,
+  buildsRefresh: 10000,
 
   appRoot: process.env.BLAZAR_APP_URI || '/blazar/ui',
   apiRoot: process.env.BLAZAR_API_URL || ''
