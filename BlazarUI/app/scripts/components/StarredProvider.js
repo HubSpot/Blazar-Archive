@@ -1,5 +1,7 @@
 import Cookies from 'js-cookie';
 
+let starCache = undefined;
+
 let StarredProvider = {
 
   addStar: function(repo, branch) {
@@ -8,6 +10,7 @@ let StarredProvider = {
       starredRepos.push({ repo: repo, branch: branch });
     }
     Cookies.set('starred-repos', starredRepos, { expires: 3650 });
+    starCache = starredRepos;
   },
 
   removeStar: function(repo, branch) {
@@ -17,14 +20,14 @@ let StarredProvider = {
       starredRepos.splice(index, 1);
     }
     Cookies.set('starred-repos', starredRepos, { expires: 3650 });
+    starCache = starredRepos;
   },
 
   getStars: function() {
-    let starredRepos = Cookies.getJSON('starred-repos');
-    if (!starredRepos) {
-      starredRepos = [];
+    if (starCache === undefined) {
+      this.syncStarCache();
     }
-    return starredRepos;
+    return starCache;
   },
 
   hasStar: function(o) {
@@ -35,6 +38,14 @@ let StarredProvider = {
         }
     }
     return -1;
+  },
+
+  syncStarCache: function() {
+    let starredRepos = Cookies.getJSON('starred-repos');
+    if (!starredRepos) {
+      starredRepos = [];
+    }
+    starCache = starredRepos;
   }
 
 }
