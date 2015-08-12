@@ -9,7 +9,6 @@ class DashboardRepoDetails extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { modulesOpen: false };
   }
 
   render() {
@@ -28,8 +27,10 @@ class DashboardRepoDetails extends Component {
       );
     });
 
-    let activePanel = (buildingModuleList.length !== 0 ? <Panel header='In Progress Builds' eventKey='1'>{buildingModuleList}</Panel> : '');
-    let inactivePanel = (inactiveModuleList.length !== 0 ? <Panel header='Inactive Builds' eventKey='2'>{inactiveModuleList}</Panel> : '');
+    let activePanelHeader = `In Progress Builds (${buildingModuleList.length})`;
+    let activePanel = (buildingModuleList.length !== 0 ? <Panel header={activePanelHeader} eventKey='1'>{buildingModuleList}</Panel> : '');
+    let inactivePanelHeader = `Inactive Builds (${inactiveModuleList.length})`;
+    let inactivePanel = (inactiveModuleList.length !== 0 ? <Panel header={inactivePanelHeader} eventKey='2'>{inactiveModuleList}</Panel> : '');
 
     return (
       <div>

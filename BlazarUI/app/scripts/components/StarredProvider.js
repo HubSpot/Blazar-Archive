@@ -7,7 +7,7 @@ let StarredProvider = {
     if (this.hasStar({ repo: repo, branch: branch }) === -1) {
       starredRepos.push({ repo: repo, branch: branch });
     }
-    Cookies.set('starred-repos', starredRepos);
+    Cookies.set('starred-repos', starredRepos, { expires: 3650 });
   },
 
   removeStar: function(repo, branch) {
@@ -16,7 +16,7 @@ let StarredProvider = {
     if (index !== -1) {
       starredRepos.splice(index, 1);
     }
-    Cookies.set('starred-repos', starredRepos);
+    Cookies.set('starred-repos', starredRepos, { expires: 3650 });
   },
 
   getStars: function() {
