@@ -12,7 +12,7 @@ import Icon from '../shared/Icon.jsx';
 class Build extends Component {
 
   getIconForState(state) {
-    switch(state) {
+    switch (state) {
       case 'LAUNCHING':
         return 'hourglass-start';
       case 'IN_PROGRESS':
@@ -72,7 +72,7 @@ class Build extends Component {
 
 Build.propTypes = {
   build: PropTypes.shape({
-    buildState: PropTypes.object,
+    build: PropTypes.object,
     gitInfo: PropTypes.object,
     module: PropTypes.object
   }),

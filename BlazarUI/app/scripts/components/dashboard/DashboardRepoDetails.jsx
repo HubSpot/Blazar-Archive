@@ -16,12 +16,17 @@ class DashboardRepoDetails extends Component {
     let buildingModuleList = [];
     let inactiveModuleList = [];
 
-    filter(repo.modules, (m) => { return m.inProgressBuild; }).forEach((build) => {
+    filter(repo.modules, (m) => {
+      return m.inProgressBuild;
+    }).forEach((build) => {
       buildingModuleList.push(
         <Module key={build.modulePath} repo={build} />
       );
     });
-    filter(repo.modules, (m) => { return !m.inProgressBuild; }).forEach((build) => {
+
+    filter(repo.modules, (m) => {
+      return !m.inProgressBuild;
+    }).forEach((build) => {
       inactiveModuleList.push(
         <Module key={build.modulePath} repo={build} />
       );

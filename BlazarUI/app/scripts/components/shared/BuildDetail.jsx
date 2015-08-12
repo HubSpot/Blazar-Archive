@@ -55,10 +55,10 @@ class BuildDetail extends Component {
 BuildDetail.propTypes = {
   loading: PropTypes.bool.isRequired,
   build: PropTypes.shape({
-    buildState: PropTypes.shape({
+    build: PropTypes.shape({
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
-      result: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
+      state: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
       startTime: PropTypes.number,
       endTime: PropTypes.number
     }),

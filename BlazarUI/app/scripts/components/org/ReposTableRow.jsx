@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react';
 import Helpers from '../ComponentHelpers';
 import {labels, iconStatus} from '../constants';
 import Icon from '../shared/Icon.jsx';
-//import { Link } from 'react-router';
 
 class ReposTableRow extends Component {
 
@@ -20,10 +19,10 @@ class ReposTableRow extends Component {
   render() {
     let repo = this.props.repo;
     let org = this.props.org;
-    let repoPath = org + "/" + repo.repo;
+    let repoPath = org + '/' + repo.repo;
 
     let lastBuild = (<span></span>);
-    if(repo.latestBuild) {
+    if (repo.latestBuild) {
       let build = repo.latestBuild;
       let buildLink = `${org}/${repo.repo}/${build.branch}/${build.module}_${build.moduleId}/${build.id}`;
       let moduleLink = `${org}/${repo.repo}/${build.branch}/${build.module}_${build.moduleId}`;

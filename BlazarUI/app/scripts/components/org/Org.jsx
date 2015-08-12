@@ -44,7 +44,8 @@ class org extends Component {
 
 org.propTypes = {
   loading: PropTypes.bool.isRequired,
-  params: PropTypes.object.isRequired
+  params: PropTypes.object.isRequired,
+  repos: PropTypes.array.isRequired
 };
 
 export default org;

@@ -17,7 +17,7 @@ class BuildHistoryTableRow extends Component {
   }
 
   getRowClassNames() {
-    if (this.props.build.state === 'FAILED') {
+    if (this.props.build.build.state === 'FAILED') {
       return 'bgc-danger';
     }
   }
@@ -94,7 +94,7 @@ BuildHistoryTableRow.propTypes = {
     build: PropTypes.shape({
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
-      result: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
+      state: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
       startTime: PropTypes.number,
       endTime: PropTypes.number
     }),

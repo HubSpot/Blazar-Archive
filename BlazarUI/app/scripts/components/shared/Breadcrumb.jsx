@@ -17,7 +17,7 @@ class Breadcrumb extends Component {
         key = page + i;
         link = <Link key={key} className='crumb' to={`${config.appRoot}/builds/${pageLink}`}>{page}</Link>;
       } else if (i === 0) {
-        link = page + " / ";
+        link = page + ' / ';
       } else {
         link = page;
       }

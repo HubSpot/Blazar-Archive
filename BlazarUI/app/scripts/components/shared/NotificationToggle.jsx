@@ -15,7 +15,7 @@ class NotificationToggle extends Component {
 
   handleWatchingChange() {
     this.setState({watching: !this.state.watching});
-    if(!this.state.watching) {
+    if (!this.state.watching) {
       if (Notify.needsPermission) {
         Notify.requestPermission(this.showNotification());
       } else {
