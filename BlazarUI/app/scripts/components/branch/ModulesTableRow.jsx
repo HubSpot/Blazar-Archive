@@ -5,15 +5,13 @@ import Helpers from '../ComponentHelpers';
 
 class ModulesTableRow extends Component {
 
-  getRowClassNames() {
-    let build = (this.props.module.inProgressBuild ? this.props.module.inProgressBuild : this.props.module.lastBuild);
+  getRowClassNames(build) {
     if (build.state === 'FAILED') {
       return 'bgc-danger';
     }
   }
 
-  getBuildResult() {
-    let build = (this.props.module.inProgressBuild ? this.props.module.inProgressBuild : this.props.module.lastBuild);
+  getBuildResult(build) {
     let result = build.state;
     let classNames = `icon-roomy ${labels[result]}`;
 
@@ -29,12 +27,14 @@ class ModulesTableRow extends Component {
     let {
       lastBuild,
       inProgressBuild,
+      pendingBuild,
       module,
       gitInfo,
       modulePath
     } = this.props.module;
 
-    let build = (inProgressBuild ? inProgressBuild : lastBuild);
+    let build = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
+    console.log(build);
 
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
@@ -45,13 +45,13 @@ class ModulesTableRow extends Component {
     }
 
     return (
-      <tr className={this.getRowClassNames()}>
+      <tr className={this.getRowClassNames(build)}>
         <td>
           <Icon type='octicon' name='file-directory' classNames="repolist-icon" />
           <a href={modulePath}>{module.name}</a>
         </td>
         <td className='build-result-link'>
-          {this.getBuildResult()}
+          {this.getBuildResult(build)}
           <a href={build.buildLink}>{build.buildNumber}</a>
         </td>
         <td>
