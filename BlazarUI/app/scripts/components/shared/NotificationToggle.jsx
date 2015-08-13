@@ -3,33 +3,23 @@ import Toggle from 'react-toggle';
 import { bindAll } from 'underscore';
 import Tooltip from 'react-bootstrap/lib/Tooltip';
 import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
-import Notify from 'notifyjs';
+import WatchingProvider from '../WatchingProvider';
 
 class NotificationToggle extends Component {
 
   constructor(props) {
     super(props);
     bindAll(this, 'handleWatchingChange');
-    this.state = { watching: false };
+    this.state = { watching: WatchingProvider.isWatching({ repo: this.props.repo, branch: this.props.branch }) !== -1 };
   }
 
   handleWatchingChange() {
     this.setState({watching: !this.state.watching});
     if (!this.state.watching) {
-      if (Notify.needsPermission) {
-        Notify.requestPermission(this.showNotification());
-      } else {
-        this.showNotification();
-      }
+      WatchingProvider.addWatch(this.props.repo, this.props.branch);
+    } else {
+      WatchingProvider.removeWatch(this.props.repo, this.props.branch);
     }
-  }
-
-  showNotification() {
-    let notification = new Notify('Wassup', {
-        body: 'Your buizzle is donizzle.',
-        icon: '/images/icon.jpg'
-    });
-    notification.show();
   }
 
   render() {

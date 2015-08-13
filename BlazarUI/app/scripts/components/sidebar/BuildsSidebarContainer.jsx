@@ -3,6 +3,7 @@ import BuildsSidebar from './BuildsSidebar.jsx';
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
 import Sidebar from './Sidebar.jsx';
+import BuildsNotifier from '../BuildsNotifier';
 
 class BuildsSidebarContainer extends Component {
 
@@ -32,6 +33,7 @@ class BuildsSidebarContainer extends Component {
   }
 
   render() {
+    BuildsNotifier.updateModules(this.state.builds.modules);
     return (
       <Sidebar>
         <BuildsSidebar builds={this.state.builds} loading={this.state.loading} />
