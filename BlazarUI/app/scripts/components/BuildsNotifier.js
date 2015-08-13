@@ -13,7 +13,6 @@ let BuildsNotifier = {
       }
 
       if (lastModuleStates[id] === 'IN_PROGRESS' && module.inProgressBuildLink === undefined) {
-        console.log('woah');
         this.showNotification(module.repository, module.branch, module.module, module.lastBuildState, module.link);
       }
 
