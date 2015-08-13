@@ -4,6 +4,7 @@ import { bindAll } from 'underscore';
 import Tooltip from 'react-bootstrap/lib/Tooltip';
 import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
 import WatchingProvider from '../WatchingProvider';
+import Notify from 'notifyjs';
 
 class NotificationToggle extends Component {
 
@@ -16,6 +17,9 @@ class NotificationToggle extends Component {
   handleWatchingChange() {
     this.setState({watching: !this.state.watching});
     if (!this.state.watching) {
+      if (Notify.needsPermission) {
+        Notify.requestPermission();
+      }
       WatchingProvider.addWatch(this.props.repo, this.props.branch);
     } else {
       WatchingProvider.removeWatch(this.props.repo, this.props.branch);
