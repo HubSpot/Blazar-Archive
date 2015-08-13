@@ -10,7 +10,7 @@ class Icon extends Component {
 
   render() {
     return (
-      <i className={this.getClassNames()}></i>
+      <i title={this.props.title} className={this.getClassNames()}></i>
     );
   }
 
@@ -25,7 +25,8 @@ Icon.propTypes = {
   type: PropTypes.oneOf(['fa', 'octicon']),
   name: PropTypes.string.isRequired,
   prefix: PropTypes.string,
-  classNames: PropTypes.string
+  classNames: PropTypes.string,
+  title: PropTypes.string
 };
 
 export default Icon;

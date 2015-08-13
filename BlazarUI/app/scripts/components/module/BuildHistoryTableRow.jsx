@@ -29,6 +29,7 @@ class BuildHistoryTableRow extends Component {
       <Icon
         name={iconStatus[result]}
         classNames={classNames}
+        title={Helpers.humanizeText(result)}
       />
     );
   }

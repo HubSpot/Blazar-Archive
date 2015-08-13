@@ -19,6 +19,7 @@ class ModulesTableRow extends Component {
       <Icon
         name={iconStatus[result]}
         classNames={classNames}
+        title={Helpers.humanizeText(result)}
       />
     );
   }
@@ -34,7 +35,6 @@ class ModulesTableRow extends Component {
     } = this.props.module;
 
     let build = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
-    console.log(build);
 
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);

@@ -32,7 +32,7 @@ class DashboardRepoDetails extends Component {
       );
     });
 
-    let activePanelHeader = `In Progress Builds (${buildingModuleList.length})`;
+    let activePanelHeader = `Active Builds (${buildingModuleList.length})`;
     let activePanel = (buildingModuleList.length !== 0 ? <Panel header={activePanelHeader} eventKey='1'>{buildingModuleList}</Panel> : '');
     let inactivePanelHeader = `Inactive Builds (${inactiveModuleList.length})`;
     let inactivePanel = (inactiveModuleList.length !== 0 ? <Panel header={inactivePanelHeader} eventKey='2'>{inactiveModuleList}</Panel> : '');
