@@ -5,6 +5,7 @@ import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
 import {labels, iconStatus} from '../constants';
+import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 
 class BuildHistoryTableRow extends Component {
 
@@ -66,6 +67,11 @@ class BuildHistoryTableRow extends Component {
       sha = 'None';
     }
 
+    let progressBar = '';
+    if (this.props.progress) {
+      progressBar = <ProgressBar active now={this.props.progress} bsStyle="default" className="build-progress" />;
+    }
+
     return (
       <tr className={this.getRowClassNames()}>
         <td className='build-status'>
@@ -83,12 +89,13 @@ class BuildHistoryTableRow extends Component {
         <td>
           {sha}
         </td>
+        <td>
+          {progressBar}
+        </td>
       </tr>
     );
   }
 }
-
-
 
 BuildHistoryTableRow.propTypes = {
   build: PropTypes.shape({
@@ -100,11 +107,9 @@ BuildHistoryTableRow.propTypes = {
       endTime: PropTypes.number
     }),
     gitInfo: PropTypes.obj,
-    module: PropTypes.obj
+    module: PropTypes.obj,
+    progress: PropTypes.number
   })
 };
-
-
-
 
 export default BuildHistoryTableRow;
