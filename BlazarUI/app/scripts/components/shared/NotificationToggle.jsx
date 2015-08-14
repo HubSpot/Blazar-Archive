@@ -35,7 +35,7 @@ class NotificationToggle extends Component {
 
     return (
       <OverlayTrigger placement='left' overlay={tooltip}>
-        <span>
+        <span className="dashboard__toggle">
           <Toggle
             id="watching-status"
             defaultChecked={this.state.watching}
