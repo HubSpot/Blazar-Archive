@@ -10,7 +10,7 @@ class BuildHistoryTable extends Component {
     let avgTime = this.averageBuildTime();
 
     return builds.map((build, i) => {
-      if (build.build.state === "IN_PROGRESS") {
+      if (build.build.state === 'IN_PROGRESS') {
         let elapsedTime = new Date().getTime() - build.build.startTimestamp;
         let progress = Math.round((elapsedTime / avgTime) * 100);
 

@@ -68,11 +68,11 @@ class BuildHistoryTableRow extends Component {
     }
 
     let progressBar = '';
-    let style = 'default';
-    if (this.props.progress > 100) {
-      style = 'warning';
-    }
     if (this.props.progress) {
+      let style = 'default';
+      if (this.props.progress > 100) {
+        style = 'warning';
+      }
       progressBar = <ProgressBar active now={this.props.progress} bsStyle={style} className="build-progress" />;
     }
 
@@ -111,9 +111,9 @@ BuildHistoryTableRow.propTypes = {
       endTime: PropTypes.number
     }),
     gitInfo: PropTypes.obj,
-    module: PropTypes.obj,
-    progress: PropTypes.number
-  })
+    module: PropTypes.obj
+  }),
+  progress: PropTypes.number
 };
 
 export default BuildHistoryTableRow;
