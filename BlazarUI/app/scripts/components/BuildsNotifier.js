@@ -7,15 +7,13 @@ let BuildsNotifier = {
 
   updateModules: function(modules) {
     modules.forEach((module) => {
-      let id = { repo: module.repository, branch: module.branch };
-      if (WatchingProvider.isWatching(id) === -1) {
+      if (WatchingProvider.isWatching({ repo: module.repository, branch: module.branch }) === -1) {
         return;
       }
-
+      let id = JSON.stringify({ repo: module.repository, branch: module.branch, build: module.module });
       if (lastModuleStates[id] === 'IN_PROGRESS' && module.inProgressBuildLink === undefined) {
         this.showNotification(module.repository, module.branch, module.module, module.lastBuildState, module.link);
       }
-
       lastModuleStates[id] = (module.inProgressBuildLink !== undefined ? 'IN_PROGRESS' : module.lastBuildState);
     });
   },
