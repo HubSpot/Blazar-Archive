@@ -120,10 +120,12 @@ public class BuildLauncher {
   }
 
   private String currentSha(GitInfo gitInfo) throws IOException {
+    LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
     GitHub gitHub = gitHubFor(gitInfo);
 
     GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
     GHBranch branch = Preconditions.checkNotNull(repository.getBranches().get(gitInfo.getBranch()));
+    LOG.info("Found sha {} for branch {}/{}", branch.getSHA1(), gitInfo.getRepository(), gitInfo.getBranch());
     return branch.getSHA1();
   }
 

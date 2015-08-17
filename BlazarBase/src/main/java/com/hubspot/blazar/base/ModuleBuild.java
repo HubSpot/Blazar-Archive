@@ -8,6 +8,10 @@ import java.util.Objects;
 public class ModuleBuild extends BuildDefinition {
   private final Build build;
 
+  public ModuleBuild(BuildDefinition definition, Build build) {
+    this(definition.getGitInfo(), definition.getModule(), build);
+  }
+
   @JsonCreator
   public ModuleBuild(@JsonProperty("gitInfo") GitInfo gitInfo,
                      @JsonProperty("module") Module module,
