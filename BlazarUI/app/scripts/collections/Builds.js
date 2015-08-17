@@ -4,7 +4,7 @@ import BaseCollection from './BaseCollection';
 class Builds extends BaseCollection {
 
   url() {
-    return "/api/build/states";
+    return `${config.apiRoot}/build/states`;
   }
 
   parse() {
