@@ -68,8 +68,12 @@ class BuildHistoryTableRow extends Component {
     }
 
     let progressBar = '';
+    let style = 'default';
+    if (this.props.progress > 100) {
+      style = 'warning';
+    }
     if (this.props.progress) {
-      progressBar = <ProgressBar active now={this.props.progress} bsStyle="default" className="build-progress" />;
+      progressBar = <ProgressBar active now={this.props.progress} bsStyle={style} className="build-progress" />;
     }
 
     return (
