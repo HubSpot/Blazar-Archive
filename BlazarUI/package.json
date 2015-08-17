@@ -7,6 +7,9 @@
     "start": "gulp",
     "test": "jest"
   },
+  "engines": {
+    "node": "~0.12"
+  },
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^4.7.0",
