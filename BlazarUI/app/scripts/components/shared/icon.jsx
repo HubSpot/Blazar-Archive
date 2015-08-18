@@ -4,13 +4,13 @@ class Icon extends Component {
 
   getClassNames() {
 
-    let classNames =  `${this.props.type} ${this.props.type}-${this.props.name} ${this.props.classNames}`;
+    let classNames =  `${(this.props.prefix ? this.props.prefix + '-' : '')}${this.props.type} ${this.props.type}-${this.props.name} ${this.props.classNames}`;
     return classNames;
   }
 
   render() {
     return (
-      <i className={this.getClassNames()}></i>
+      <i title={this.props.title} className={this.getClassNames()}></i>
     );
   }
 
@@ -24,7 +24,9 @@ Icon.defaultProps = {
 Icon.propTypes = {
   type: PropTypes.oneOf(['fa', 'octicon']),
   name: PropTypes.string.isRequired,
-  classNames: PropTypes.string
+  prefix: PropTypes.string,
+  classNames: PropTypes.string,
+  title: PropTypes.string
 };
 
 export default Icon;

@@ -5,32 +5,34 @@ const buildLables = {
   'SUCCEEDED': 'success',
   'FAILED': 'danger',
   'IN_PROGRESS': 'info',
+  'QUEUED': 'info',
+  'LAUNCHING': 'info',
   'CANCELLED': 'warning'
 };
 
 class BuildDetail extends Component {
 
   getClassNames() {
-    return 'build-detail alert alert-' + buildLables[this.props.build.buildState.result];
+    return 'build-detail alert alert-' + buildLables[this.props.build.build.state];
   }
 
   render() {
 
-    let {buildState, gitInfo} = this.props.build;
+    let {build, gitInfo} = this.props.build;
     let endtime, duration;
-    let buildResult = Helpers.humanizeText(buildState.result);
+    let buildResult = Helpers.humanizeText(build.state);
 
-    if (buildState.result !== 'IN_PROGRESS') {
-      endtime = 'On ' + Helpers.timestampFormatted(buildState.endTime);
-      duration = 'Ran for ' + buildState.duration;
+    if (build.state !== 'IN_PROGRESS' && build.state !== 'QUEUED' && build.state !== 'LAUNCHING') {
+      endtime = 'On ' + Helpers.timestampFormatted(build.endTimestamp);
+      duration = 'Ran for ' + build.duration;
     }
 
-    let sha = buildState.commitSha;
+    let sha = build.sha;
     let shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${sha}`;
     let buildDetail;
 
-    if (buildState.result === 'IN_PROGRESS') {
-      buildDetail = 'started ' + Helpers.timestampFormatted(buildState.startTime);
+    if (build.state === 'IN_PROGRESS') {
+      buildDetail = 'started ' + Helpers.timestampFormatted(build.startTimestamp);
     } else {
       buildDetail = endtime;
     }
@@ -42,7 +44,7 @@ class BuildDetail extends Component {
         </h4>
         <p>{duration}</p>
         <p>
-          Commit: <a target="_blank" href={shaLink}>{buildState.commitSha}</a>
+          Commit: <a target="_blank" href={shaLink}>{build.sha}</a>
         </p>
       </div>
     );
@@ -53,10 +55,10 @@ class BuildDetail extends Component {
 BuildDetail.propTypes = {
   loading: PropTypes.bool.isRequired,
   build: PropTypes.shape({
-    buildState: PropTypes.shape({
+    build: PropTypes.shape({
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
-      result: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
+      state: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
       startTime: PropTypes.number,
       endTime: PropTypes.number
     }),

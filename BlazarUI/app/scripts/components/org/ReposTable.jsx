@@ -1,15 +1,16 @@
 import React, {Component, PropTypes} from 'react';
 import TableHeader from '../shared/TableHeader.jsx';
-import ModulesTableRow from './ModulesTableRow.jsx';
+import ReposTableRow from './ReposTableRow.jsx';
 
-class ModulesTable extends Component {
+class ReposTable extends Component {
 
   getRows() {
-    let modules = this.props.modules;
-    return modules.map((module, i) =>
-      <ModulesTableRow
-        module={modules[i]}
+    let repos = this.props.repos;
+    return repos.map((repo, i) =>
+      <ReposTableRow
+        repo={repos[i]}
         key={i}
+        org={this.props.org}
       />
     );
   }
@@ -20,11 +21,8 @@ class ModulesTable extends Component {
     }
 
     let columnNames = [
-      {label: 'Module', key: 'module'},
-      {label: 'Latest Build', key: 'latestBuild'},
-      {label: 'Start Time', key: 'startTime'},
-      {label: 'Duration', key: 'duration'},
-      {label: 'Commit', key: 'commit'}
+      {label: 'Repository', key: 'name'},
+      {label: 'Last Build', key: 'lastBuild'}
     ];
 
     // TO DO: empty table
@@ -44,9 +42,10 @@ class ModulesTable extends Component {
 }
 
 
-ModulesTable.propTypes = {
+ReposTable.propTypes = {
   loading: PropTypes.bool,
-  modules: PropTypes.array.isRequired
+  repos: PropTypes.array.isRequired,
+  org: PropTypes.string.isRequired
 };
 
-export default ModulesTable;
+export default ReposTable;

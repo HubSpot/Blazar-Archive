@@ -2,6 +2,8 @@ export const labels = {
   'SUCCEEDED': 'success',
   'FAILED': 'danger',
   'CANCELLED': 'default',
+  'QUEUED': 'default',
+  'LAUNCHING': 'default',
   'IN_PROGRESS': 'info'
 };
 
@@ -9,6 +11,8 @@ export const iconStatus = {
   'SUCCEEDED': 'check',
   'FAILED': 'close',
   'IN_PROGRESS': 'circle-o-notch fa-spin',
+  'QUEUED': 'circle-o-notch fa-spin',
+  'LAUNCHING': 'circle-o-notch fa-spin',
   'CANCELLED': 'stop opacity-semi'
 }
 

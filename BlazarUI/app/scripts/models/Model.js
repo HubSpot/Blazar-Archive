@@ -28,13 +28,11 @@ class Model {
   }
 
   addTimeHelpers() {
-    let buildState = this.data.buildState;
+    let build = this.data.build;
 
-    if (buildState.startTime && buildState.endTime) {
-      buildState.duration = moment.duration(buildState.endTime - buildState.startTime).humanize();
+    if (build.startTimestamp && build.endTimestamp) {
+      build.duration = moment.duration(build.endTimestamp - build.startTimestamp).humanize();
     }
-
-
   }
 
 }

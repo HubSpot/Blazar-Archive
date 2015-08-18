@@ -4,13 +4,41 @@
 .sidebar *
   user-select none
 
+.sidebar
+  margin-top: 50px
+  padding-top: 30px
+
 // holds all filtering tools
 .sidebar__filter
-  margin: 0 20px 20px 20px
+  padding: 10px 20px 20px 20px
+  position: fixed
+  top: 50px
+  left: 0px
+  z-index: 99
+  width: 299px
+  height: 94px
+  background-color: #f9f9f9
+  border-bottom: 1px solid #dadada;
+
+.sidebar__filter-buttons
+  margin-top 4px
+  margin-left -20px
+  width 301px
+
+.sidebar__filter-buttons-btn
+  border-radius 0 !important
+  width 50%
+  outline none !important
+
+.sidebar__filter-buttons-btn:focus
+  background-color #fff
+  border-color #ccc
 
 // holds all our repos and modules
 .sidebar__list
-  margin-top 20px
+  margin-top 63px
+  overflow hidden
+  margin-bottom 50px
 
 .sidebar__repo
   position relative
@@ -26,6 +54,13 @@
   font-size 16px
   font-weight $font-light
   padding-left 15px
+  padding-right 5px
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+.sidebar__repo-name a
+  color #333
 
 .sidebar__repo-branch, .sidebar__repo-branch-icon
   font-weight $font-light
@@ -37,6 +72,7 @@
 .sidebar__repo-branch-icon
   font-size 14px
   margin-left 10px
+  margin-right 3px
 
 .sidebar__repo-container
   position relative
@@ -75,4 +111,13 @@
   color $gray-dark
 
 .search-input
-  margin-bottom 29px
+  margin-bottom 0px
+
+.sidebar__star
+  margin-right 5px
+
+.sidebar__star.unselected
+  color #dadada
+
+.sidebar__star.selected
+  color #ffd700

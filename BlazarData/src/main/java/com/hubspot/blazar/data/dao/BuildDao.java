@@ -2,6 +2,7 @@ package com.hubspot.blazar.data.dao;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.Build;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 import org.skife.jdbi.v2.sqlobject.Bind;
@@ -9,6 +10,8 @@ import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
+
+import java.util.List;
 
 public interface BuildDao {
 
@@ -20,6 +23,9 @@ public interface BuildDao {
       "INNER JOIN branches AS gitInfo ON (module.branchId = gitInfo.id) " +
       "WHERE build.id = :it")
   Optional<ModuleBuild> get(@Bind long id);
+
+  @SqlQuery("SELECT * FROM builds WHERE moduleId = :id ORDER BY buildNumber DESC")
+  List<Build> getByModule(@BindWithRosetta Module module);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO builds (moduleId, buildNumber, state) VALUES (:moduleId, :buildNumber, :state)")

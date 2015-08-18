@@ -6,6 +6,8 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
+import Icon from '../shared/Icon.jsx';
+
 
 class Repo extends Component {
 
@@ -16,12 +18,17 @@ class Repo extends Component {
         <SectionLoader />
       );
     }
-
+    let headline = (
+      <span>
+        <Icon prefix="mega" type="octicon" name="repo" classNames="headline-icon" />
+        <span>{this.props.params.repo}</span>
+      </span>
+    );
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.repo} subheadline='Branches' />
+          <PageHeadline headline={headline} subheadline='Branches' />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>

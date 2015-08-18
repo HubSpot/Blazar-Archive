@@ -4,7 +4,7 @@ import BaseCollection from './BaseCollection';
 class Builds extends BaseCollection {
 
   url() {
-    return "/api/build/states";
+    return `${config.apiRoot}/build/states`;
   }
 
   parse() {
@@ -31,7 +31,9 @@ class Builds extends BaseCollection {
 
       let moduleInfo = {
         repository: gitInfo.repository,
-        module: module.name
+        branch: gitInfo.branch,
+        module: module.name,
+        link: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}`
       };
 
       if (lastBuild) {
@@ -39,7 +41,7 @@ class Builds extends BaseCollection {
       }
 
       if (inProgressBuild) {
-        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
+        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}/${inProgressBuild.buildNumber}`;
       }
 
       if (pendingBuild) {
@@ -49,6 +51,37 @@ class Builds extends BaseCollection {
       return moduleInfo;
     });
 
+  }
+
+  getReposByOrg(orgInfo) {
+    let builds = this.isBuilding();
+    let orgBuilds = _.filter(builds, function(a) {
+      return a.gitInfo.organization === orgInfo.org
+    });
+
+    let repos = _.uniq(_.map(orgBuilds, function (build) {
+      let repo = { repo: build.gitInfo.repository };
+      if(build.lastBuild !== undefined) {
+        repo = {
+          repo: build.gitInfo.repository,
+          latestBuild: {
+            state: build.lastBuild.state,
+            number: build.lastBuild.buildNumber,
+            id: build.lastBuild.id,
+            module: build.module.name,
+            moduleId: build.lastBuild.moduleId,
+            branch: build.gitInfo.branch,
+            endTimestamp: build.lastBuild.endTimestamp
+          }
+        };
+      }
+      return repo;
+    }), false, function(r) {
+      return r.repo;
+    });
+    return _.sortBy(repos, function(r) {
+      return r.repo;
+    });
   }
 
   getBranchModules(branchInfo) {
@@ -84,7 +117,7 @@ class Builds extends BaseCollection {
 
   groupBuildsByRepo() {
     // group and generate key, by org::repo[branch]
-    let grouped = _.groupBy(this.isBuilding(), function(o) {
+    let grouped = _.groupBy(this.hasBuildState(), function(o) {
       return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
     });
 
@@ -115,7 +148,9 @@ class Builds extends BaseCollection {
 
     // store some helper properites
     groupedInArray.forEach( (repo) => {
-      repo.mostRecentBuild = repo.modules[0].inProgressBuild.startTimestamp;
+      if (repo.modules[0].inProgressBuild) {
+        repo.mostRecentBuild = repo.modules[0].inProgressBuild.startTimestamp;
+      }
       repo.host = repo.modules[0].gitInfo.host;
       repo.branch = repo.modules[0].gitInfo.branch;
       repo.organization = repo.modules[0].gitInfo.organization;
@@ -123,12 +158,13 @@ class Builds extends BaseCollection {
       repo.branchPath = `${config.appRoot}/builds/${repo.modules[0].gitInfo.host}/${repo.modules[0].gitInfo.organization}/${repo.modules[0].gitInfo.repository}/${repo.modules[0].gitInfo.branch}`;
 
       repo.modules.forEach( (module) => {
-        module.modulePath = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
-        module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.inProgressBuild.buildNumber}`;
-        if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
-          repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
+        module.modulePath = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}`;
+        if (module.inProgressBuild) {
+          module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}/${module.inProgressBuild.buildNumber}`;
+          if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
+            repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
+          }
         }
-
       })
     })
 
@@ -142,7 +178,6 @@ class Builds extends BaseCollection {
     })
 
     return groupedInArray;
-
   }
 
 

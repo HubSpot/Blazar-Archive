@@ -27,22 +27,23 @@ function fetchBuild(data) {
 
   buildPromise.done( () => {
 
-    if (build.data.buildState.result === 'IN_PROGRESS') {
+    if (build.data.build.state === 'IN_PROGRESS') {
       BuildActions.loadBuildSuccess({
         build: build.data
       });
       return;
     }
 
-    let log = new Log(build.data.buildState.buildLog);
+    let log = new Log(build.data.build.log);
     let logPromise = log.fetch();
 
     logPromise.always( (logData) => {
-      BuildActions.loadBuildSuccess({
-        build: build.data,
-        log: logData
-      });
-
+      if (!logData.status || logData.status === 200) {
+        BuildActions.loadBuildSuccess({
+          build: build.data,
+          log: logData.data
+        });
+      }
     });
 
     logPromise.error( () => {

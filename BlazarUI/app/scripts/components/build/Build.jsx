@@ -7,8 +7,23 @@ import BuildDetail from '../shared/BuildDetail.jsx';
 import BuildLog from './BuildLog.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
+import Icon from '../shared/Icon.jsx';
 
-class Build extends Component{
+class Build extends Component {
+
+  getIconForState(state) {
+    switch (state) {
+      case 'LAUNCHING':
+        return 'hourglass-start';
+      case 'IN_PROGRESS':
+        return 'hourglass-half';
+      case 'SUCCEEDED':
+      case 'FAILED':
+        return 'hourglass-end';
+      default:
+        return 'hourglass-o';
+    }
+  }
 
   render() {
 
@@ -18,14 +33,22 @@ class Build extends Component{
       );
     }
 
-    let {buildState} = this.props.build;
+    let buildState = this.props.build.build;
+    let icon = this.getIconForState(buildState.state);
+
+    let headline = (
+      <span>
+        <Icon name={icon} classNames="headline-icon"></Icon>
+        <span>{this.props.params.module}</span>
+      </span>
+    );
     let subheadline = `Build #${buildState.buildNumber}`;
 
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.module} subheadline={subheadline} />
+          <PageHeadline headline={headline} subheadline={subheadline} />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
@@ -49,7 +72,7 @@ class Build extends Component{
 
 Build.propTypes = {
   build: PropTypes.shape({
-    buildState: PropTypes.object,
+    build: PropTypes.object,
     gitInfo: PropTypes.object,
     module: PropTypes.object
   }),

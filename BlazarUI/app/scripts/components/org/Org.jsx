@@ -4,19 +4,36 @@ import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
+import ReposTable from './ReposTable.jsx';
+import SectionLoader from '../shared/SectionLoader.jsx';
+import Icon from '../shared/Icon.jsx';
 
 class org extends Component {
 
   render() {
+    if (this.props.loading) {
+      return (
+        <SectionLoader />
+      );
+    }
+    let headline = (
+      <span>
+        <Icon prefix="mega" type="octicon" name="organization" classNames="headline-icon" />
+        <span>{this.props.params.org}</span>
+      </span>
+    );
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.org} subheadline='Repositories' />
+          <PageHeadline headline={headline} subheadline='Repositories' />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            Repos here
+            <ReposTable
+              repos={this.props.repos}
+              org={this.props.params.org}
+            />
           </UIGridItem>
         </UIGrid>
       </div>
@@ -25,10 +42,10 @@ class org extends Component {
 
 }
 
-
 org.propTypes = {
   loading: PropTypes.bool.isRequired,
-  params: PropTypes.object.isRequired
+  params: PropTypes.object.isRequired,
+  repos: PropTypes.array.isRequired
 };
 
 export default org;

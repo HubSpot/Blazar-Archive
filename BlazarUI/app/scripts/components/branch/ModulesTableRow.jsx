@@ -1,54 +1,58 @@
 import React, {Component, PropTypes} from 'react';
-import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import {labels, iconStatus} from '../constants';
 import Helpers from '../ComponentHelpers';
 
 class ModulesTableRow extends Component {
 
-  getRowClassNames() {
-    if (this.props.module.buildState.result === 'FAILED') {
+  getRowClassNames(build) {
+    if (build.state === 'FAILED') {
       return 'bgc-danger';
     }
   }
 
-  getBuildResult() {
-    let result = this.props.module.buildState.result;
+  getBuildResult(build) {
+    let result = build.state;
     let classNames = `icon-roomy ${labels[result]}`;
 
     return (
       <Icon
         name={iconStatus[result]}
         classNames={classNames}
+        title={Helpers.humanizeText(result)}
       />
     );
   }
 
   render() {
     let {
-      buildState,
+      lastBuild,
+      inProgressBuild,
+      pendingBuild,
       module,
       gitInfo,
       modulePath
     } = this.props.module;
 
-    // to do: generate commit link in build collection
-    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${buildState.commitSha}/`;
-    let startTime = Helpers.timestampFormatted(buildState.startTime);
-    let duration = buildState.duration;
+    let build = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
 
-    if (buildState.result === 'IN_PROGRESS') {
+    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
+    let startTime = Helpers.timestampFormatted(build.startTimestamp);
+    let duration = build.duration;
+
+    if (build.state === 'IN_PROGRESS') {
       duration = 'In Progress...';
     }
 
     return (
-      <tr className={this.getRowClassNames()}>
-      <td className='build-result-link'>
-        {this.getBuildResult()}
-        <Link to={buildState.buildLink}>{buildState.buildNumber}</Link>
-      </td>
+      <tr className={this.getRowClassNames(build)}>
         <td>
-          <Link to={modulePath}>{module.name}</Link>
+          <Icon type='octicon' name='file-directory' classNames="repolist-icon" />
+          <a href={modulePath}>{module.name}</a>
+        </td>
+        <td className='build-result-link'>
+          {this.getBuildResult(build)}
+          <a href={build.buildLink}>{build.buildNumber}</a>
         </td>
         <td>
           {startTime}
@@ -57,7 +61,7 @@ class ModulesTableRow extends Component {
           {duration}
         </td>
         <td>
-          <a href={commitLink} target="_blank">{buildState.commitSha}</a>
+          <a href={commitLink} target="_blank">{build.sha}</a>
         </td>
       </tr>
     );

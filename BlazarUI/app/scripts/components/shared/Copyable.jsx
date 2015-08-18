@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import ReactZeroClipboard from 'react-zeroclipboard';
 import { bindAll } from 'underscore';
+import Tooltip from 'react-bootstrap/lib/Tooltip';
+import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
 
 class Copyable extends Component {
 
@@ -10,18 +12,28 @@ class Copyable extends Component {
 
   handleClick() {
     this.props.click();
+    document.getElementById('copy-tooltip-text').innerHTML = 'Copied!';
   }
 
   handleHover() {
-    console.log('hovering');
     this.props.hover();
   }
 
   render() {
+    let tooltip = (
+      <Tooltip id="copy-tooltip">
+            <span id="copy-tooltip-text">Copy to clipboard</span>
+      </Tooltip>
+    );
+
     return (
-      <ReactZeroClipboard text={this.props.text}>
-        <span onClick={this.handleClick} onMouseOver={this.handleHover}>{this.props.children}</span>
-      </ReactZeroClipboard>
+      <span>
+          <ReactZeroClipboard text={this.props.text}>
+            <OverlayTrigger placement='bottom' overlay={tooltip}>
+              <span onClick={this.handleClick} onMouseOver={this.handleHover}>{this.props.children}</span>
+            </OverlayTrigger>
+          </ReactZeroClipboard>
+      </span>
     );
   }
 

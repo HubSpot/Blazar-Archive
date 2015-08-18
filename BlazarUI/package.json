@@ -50,9 +50,15 @@
     "zeroclipboard": "^2.2.0"
   },
   "dependencies": {
+    "ansi_up": "^1.2.1",
+    "js-cookie": "^2.0.3",
+    "notifyjs": "^1.2.5",
+    "octicons": "^2.4.1",
     "react": "^0.13.1",
+    "react-bootstrap": "^0.24.3",
     "react-router": "^0.13.3",
     "react-select": "^0.5.4",
+    "react-toggle": "^1.2.3",
     "react-zeroclipboard": "^1.1.0",
     "reflux": "^0.2.7"
   },

@@ -6,6 +6,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageHeadline from '../shared/PageHeadline.jsx';
 import ModulesTable from './ModulesTable.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
+import Icon from '../shared/Icon.jsx';
 
 class Branch extends Component{
 
@@ -16,12 +17,17 @@ class Branch extends Component{
         <SectionLoader />
       );
     }
-
+    let headline = (
+      <span>
+        <Icon prefix="mega" type="octicon" name="git-branch" classNames="headline-icon" />
+        <span>{this.props.params.branch}</span>
+      </span>
+    );
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={this.props.params.branch} subheadline="Branch Modules" />
+          <PageHeadline headline={headline} subheadline="Branch Modules" />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
