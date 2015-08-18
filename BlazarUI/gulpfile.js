@@ -17,7 +17,7 @@ var webpackConfig = require('./webpack.config.js').getConfig(environment);
 
 var port = $.util.env.port || 5000;
 var app = 'app/';
-var dist = 'dist/';
+var dist = isProduction ? path.resolve(__dirname, '../BlazarService/target/generated-resources/assets') : 'dist/';
 
 // https://github.com/ai/autoprefixer
 var autoprefixerBrowsers = [
