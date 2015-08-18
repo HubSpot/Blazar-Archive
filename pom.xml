@@ -145,6 +145,11 @@
             <protobufVersion>2.5.0</protobufVersion>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>com.github.eirslett</groupId>
+          <artifactId>frontend-maven-plugin</artifactId>
+          <version>0.0.23</version>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
