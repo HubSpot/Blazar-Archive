@@ -110,7 +110,7 @@ BuildHistoryTableRow.propTypes = {
     build: PropTypes.shape({
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
-      state: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED']),
+      state: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED', 'QUEUED']),
       startTime: PropTypes.number,
       endTime: PropTypes.number
     }),
