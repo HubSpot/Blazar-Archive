@@ -1,0 +1,8 @@
+{
+  "name": "BlazarUI",
+  "version": "0.0.1",
+  "dependencies": {
+    "octicons": "~2.4.1"
+  },
+  "private": true
+}

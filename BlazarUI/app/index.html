@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BlazarUI</title>
+    <link rel="stylesheet" href="/css/vendor.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="shortcut icon" href="/images/favicon.jpg" type="image/x-icon" />
+  </head>
+  <body>
+    <script>
+      window.config = {
+        buildsRefresh: <!-- @echo buildsRefresh -->,
+        appRoot: "<!-- @echo appRoot -->",
+        <!-- @if apiRoot -->
+        apiRoot: "<!-- @echo apiRoot -->"
+        <!-- @endif -->
+        <!-- @if apiRoot=''  -->
+        apiRoot: localStorage.getItem("apiRootOverride")
+        <!-- @endif -->
+      }
+
+    </script>
+    <script src="/js/main.js"></script>
+  </body>
+</html>
