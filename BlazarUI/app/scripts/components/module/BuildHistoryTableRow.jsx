@@ -70,10 +70,12 @@ class BuildHistoryTableRow extends Component {
     let progressBar = '';
     if (this.props.progress) {
       let style = 'default';
+      let label = '';
       if (this.props.progress > 100) {
         style = 'warning';
+        label = 'Overdue';
       }
-      progressBar = <ProgressBar active now={this.props.progress} bsStyle={style} className="build-progress" />;
+      progressBar = <ProgressBar active now={this.props.progress} bsStyle={style} className="build-progress" label={label} />;
     }
 
     return (
@@ -94,7 +96,9 @@ class BuildHistoryTableRow extends Component {
           {sha}
         </td>
         <td>
-          {progressBar}
+          <div className="progress-container">
+            {progressBar}
+          </div>
         </td>
       </tr>
     );

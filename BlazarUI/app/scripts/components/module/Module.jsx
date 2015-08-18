@@ -28,7 +28,7 @@ class Module extends Component {
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={headline} subheadline='Module Build History' />
+          <PageHeadline headline={headline} subheadline='Build History' />
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
