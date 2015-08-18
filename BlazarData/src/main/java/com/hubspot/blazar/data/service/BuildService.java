@@ -11,10 +11,10 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.data.dao.BuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
-import com.hubspot.guice.transactional.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 public class BuildService {
