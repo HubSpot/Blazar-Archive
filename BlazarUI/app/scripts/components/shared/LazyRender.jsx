@@ -47,9 +47,8 @@ let LazyRender = React.createClass({
     let fullHeight = numChildren * childHeight;
     if (fullHeight < maxHeight) {
       return fullHeight;
-    } else {
-      return maxHeight;
     }
+    return maxHeight;
   },
 
   getElementHeight: function(element) {
@@ -163,7 +162,7 @@ let LazyRender = React.createClass({
     return (
       <div
         onMouseOver={() => {
-          document.body.style.overflow = 'hidden'; 
+          document.body.style.overflow = 'hidden';
         }}
         onMouseOut={() => {
           document.body.style.overflow = 'auto';
