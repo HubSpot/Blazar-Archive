@@ -161,7 +161,14 @@ let LazyRender = React.createClass({
     );
 
     return (
-      <div style={{ height: this.state.height, overflowY: 'auto' }}
+      <div
+        onMouseOver={() => {
+          document.body.style.overflow = 'hidden'; 
+        }}
+        onMouseOut={() => {
+          document.body.style.overflow = 'auto';
+        }}
+        style={{ height: this.state.height, overflowY: 'auto' }}
         className={this.props.className}
         ref="container"
         onScroll={this.onScroll}>
