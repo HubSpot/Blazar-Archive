@@ -5,6 +5,7 @@ import fuzzy from 'fuzzy';
 import {bindAll, filter, contains} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import StarredProvider from '../StarredProvider';
+import LazyRender from '../shared/LazyRender.jsx';
 
 class BuildsSidebar extends Component {
 
@@ -111,7 +112,6 @@ class BuildsSidebar extends Component {
   }
 
   render() {
-
     if (this.props.loading) {
       return (
         <SectionLoader />
@@ -120,11 +120,8 @@ class BuildsSidebar extends Component {
 
     let filteredRepos = this.getFilteredRepos();
     let expandedState = this.state.expandedRepos;
-
     let filteredRepoComponents = filteredRepos.map( (item) => {
-
       let shouldExpand = contains(expandedState, item.repo.id);
-
       return (
         <BuildsSidebarListItem
           key={item.repo.repoModuleKey}
@@ -134,8 +131,23 @@ class BuildsSidebar extends Component {
           moduleExpandChange={this.moduleExpandChange}
         />
       );
-
     });
+
+    let list = '';
+    if (this.state.showStarred) {
+      list = (
+        <div className="sidebar__list">
+          {filteredRepoComponents}
+        </div>
+      );
+    } else {
+      let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - 80;
+      list = (
+        <LazyRender maxHeight={h} className="sidebar__list">
+          {filteredRepoComponents}
+        </LazyRender>
+      );
+    }
 
     return (
       <div>
@@ -150,14 +162,10 @@ class BuildsSidebar extends Component {
             updateStarred={this.updateStarred}
           />
         </div>
-        <div className="sidebar__list">
-          {filteredRepoComponents}
-        </div>
+        {list}
       </div>
     );
-
   }
-
 }
 
 BuildsSidebar.propTypes = {
