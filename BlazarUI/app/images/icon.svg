@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+<g>
+	<g>
+		<path fill="none" stroke="#000000" stroke-width="6" stroke-miterlimit="10" d="M29.3,37.9C11.7,57.4,4.2,78.8,12.7,87.3
+			c9.1,9.1,33.2-0.2,53.8-20.8c20.6-20.6,29.9-44.7,20.8-53.8c-8.5-8.5-29.9-1-49.4,16.6"/>
+		<g>
+			<path fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" d="M91.5,74.5c-0.3-0.3-1.1-0.8-1.1-0.8L50,50
+				l23.7,40.4c0,0,0.5,0.8,0.8,1.1c2.1,2.1,7.6,0,12.3-4.7C91.5,82.1,93.6,76.6,91.5,74.5z"/>
+			<path fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" d="M50,50L26.3,9.6c0,0-0.5-0.8-0.8-1.1
+				c-2.1-2.1-7.6,0-12.3,4.7S6.4,23.4,8.5,25.5c0.3,0.3,1.1,0.8,1.1,0.8L50,50z"/>
+			
+				<ellipse transform="matrix(0.7071 -0.7071 0.7071 0.7071 -7.0469 17.0127)" fill="none" stroke="#000000" stroke-width="3" stroke-miterlimit="10" cx="17" cy="17" rx="12" ry="5.3"/>
+		</g>
+	</g>
+</g>
+<path d="M50.8,42.2c-1.4,0-2.8,0.4-3.9,1.1l3.9,6.7l-6.7-3.9C43.4,47.2,43,48.6,43,50c0,4.3,3.5,7.8,7.8,7.8s7.8-3.5,7.8-7.8
+	S55.1,42.2,50.8,42.2z"/>
+</svg>

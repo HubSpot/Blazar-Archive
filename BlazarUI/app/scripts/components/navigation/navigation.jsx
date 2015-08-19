@@ -9,7 +9,7 @@ class Navigation extends Component {
           <div className="container-fluid">
             <div className="navbar-header">
               <Link className="navbar-brand" to="dashboard">
-                Blazar
+                <img className="title-image" src="/images/title.png" />
               </Link>
             </div>
           </div>
