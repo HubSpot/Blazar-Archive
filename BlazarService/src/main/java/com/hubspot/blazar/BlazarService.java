@@ -21,7 +21,7 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
     bootstrap.addBundle(buildGuiceBundle());
     bootstrap.addBundle(new CorsBundle());
     bootstrap.addBundle(new ViewBundle());
-    bootstrap.addBundle(new AssetsBundle("/assets/static/", "/static/"));
+    bootstrap.addBundle(new AssetsBundle("/assets/", "/static/"));
     bootstrap.getObjectMapper().registerModule(new ProtobufModule());
     bootstrap.getObjectMapper().setSerializationInclusion(Include.NON_NULL);
     bootstrap.getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
