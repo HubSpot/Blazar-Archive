@@ -22,7 +22,7 @@ let BuildsNotifier = {
     let body = `${repo}[${branch}] ${module}: ${state}`;
     var notification = new Notify('Build Complete', {
         body: body,
-        icon: '/images/icon.jpg',
+        icon: '/images/icon.png',
         notifyClick: () => {
           window.open(link);
         }
