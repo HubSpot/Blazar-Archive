@@ -20,9 +20,10 @@ let BuildsNotifier = {
 
   showNotification: function(repo, branch, module, state, link) {
     let body = `${repo}[${branch}] ${module}: ${state}`;
+    let imgPath = `${config.appRoot}/images/icon.png`;
     var notification = new Notify('Build Complete', {
         body: body,
-        icon: '/images/icon.png',
+        icon: {imgPath},
         notifyClick: () => {
           window.open(link);
         }
