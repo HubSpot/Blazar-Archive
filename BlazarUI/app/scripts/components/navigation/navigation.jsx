@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 class Navigation extends Component {
 
   render() {
-    let imgPath = `${config.appRoot}/images/title.png`;
+    let imgPath = `${window.config.appRoot}/images/title.png`;
     return (
         <nav className="navbar navbar-default navbar-dark" role="navigation">
           <div className="container-fluid">
