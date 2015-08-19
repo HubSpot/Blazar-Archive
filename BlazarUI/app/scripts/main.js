@@ -1,7 +1,7 @@
 import React from 'react';
 import Router from 'react-router';
 import routes from './routes';
-import ZeroClipboard from 'ZeroClipboard';
+import ZeroClipboard from 'zeroclipboard';
 
 // make ZeroClipboard global
 // for react-zeroclipboard
