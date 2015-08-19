@@ -79,6 +79,10 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-assets</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-servlets</artifactId>
     </dependency>
     <dependency>
@@ -108,6 +112,10 @@
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-views</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -215,6 +223,15 @@
             </goals>
             <configuration>
               <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>gulp-build</id>
+            <goals>
+              <goal>gulp</goal>
+            </goals>
+            <configuration>
+              <arguments>build --type prod</arguments>
             </configuration>
           </execution>
         </executions>

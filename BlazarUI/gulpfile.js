@@ -17,7 +17,7 @@ var webpackConfig = require('./webpack.config.js').getConfig(environment);
 
 var port = $.util.env.port || 5000;
 var app = 'app/';
-var dist = 'dist/';
+var dist = isProduction ? path.resolve(__dirname, '../BlazarService/target/generated-resources/assets/') : 'dist/';
 
 // https://github.com/ai/autoprefixer
 var autoprefixerBrowsers = [
@@ -111,6 +111,7 @@ gulp.task('serve', function() {
           process.exit(1);
         }*/
         if (process.env.BLAZAR_API_URL) {
+          appConfig.apiRoot = '/api';
           return [ (function() {
             var proxy = require('proxy-middleware');
             var options = url.parse(process.env.BLAZAR_API_URL);
@@ -149,5 +150,5 @@ gulp.task('default', ['build', 'serve', 'watch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
-  gulp.start(['images', 'html', 'fonts', 'lint', 'scripts','vendorStyles','styles']);
+  gulp.start(['images', 'html', 'fonts', 'lint', 'scripts', 'vendorStyles', 'styles']);
 });
