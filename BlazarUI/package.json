@@ -8,10 +8,11 @@
     "test": "jest"
   },
   "engines": {
-    "node": "~0.12"
+    "node": "~0.12",
+    "npm": "~1.4.9"
   },
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "babel-core": "^4.7.0",
     "babel-jest": "^4.0.0",
     "babel-loader": "^4.2.0",
@@ -47,9 +48,6 @@
     "react-typeahead-component": "^0.7.0",
     "underscore": "^1.8.3",
     "webpack": "^1.7.3",
-    "zeroclipboard": "^2.2.0"
-  },
-  "dependencies": {
     "ansi_up": "^1.2.1",
     "intersect": "^1.0.1",
     "js-cookie": "^2.0.3",
@@ -62,7 +60,8 @@
     "react-toggle": "^1.2.3",
     "react-zeroclipboard": "^1.1.0",
     "reflux": "^0.2.7",
-    "uniq": "^1.0.1"
+    "uniq": "^1.0.1",
+    "zeroclipboard": "^2.2.0"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",

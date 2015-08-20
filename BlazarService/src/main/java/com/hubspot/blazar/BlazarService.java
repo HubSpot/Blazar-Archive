@@ -9,8 +9,10 @@ import com.hubspot.blazar.guice.GuiceBundle;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 import io.dropwizard.Application;
 import io.dropwizard.ConfiguredBundle;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.dropwizard.views.ViewBundle;
 
 public class BlazarService<T extends BlazarConfiguration> extends Application<T> {
 
@@ -18,6 +20,8 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
   public void initialize(final Bootstrap<T> bootstrap) {
     bootstrap.addBundle(buildGuiceBundle());
     bootstrap.addBundle(new CorsBundle());
+    bootstrap.addBundle(new ViewBundle());
+    bootstrap.addBundle(new AssetsBundle("/assets/", "/static/"));
     bootstrap.getObjectMapper().registerModule(new ProtobufModule());
     bootstrap.getObjectMapper().setSerializationInclusion(Include.NON_NULL);
     bootstrap.getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

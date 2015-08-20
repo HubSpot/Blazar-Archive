@@ -6,8 +6,8 @@ import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.dao.ModuleDao;
-import com.hubspot.guice.transactional.Transactional;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

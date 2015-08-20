@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import $ from 'jQuery';
+import $ from 'jquery';
 
 import Builds from '../collections/Builds';
 

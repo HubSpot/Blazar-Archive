@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import $ from 'jQuery';
+import $ from 'jquery';
 
 import Build from '../models/Build';
 import Log from '../models/Log';
