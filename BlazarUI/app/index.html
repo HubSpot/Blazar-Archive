@@ -29,6 +29,9 @@
   <body>
     <script>
       window.config = {
+        <!-- @if staticRoot -->
+        staticRoot: <!-- @echo staticRoot -->,
+        <!-- @endif -->
         buildsRefresh: <!-- @echo buildsRefresh -->,
         appRoot: "<!-- @echo appRoot -->",
         <!-- @if apiRoot -->
