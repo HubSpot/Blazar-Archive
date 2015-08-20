@@ -60,7 +60,7 @@ gulp.task('fonts', function() {
 // and copy html from app to dist
 gulp.task('html', function() {
   if (isProduction) {
-    appConfig.staticRoot = 'static';
+    appConfig.staticRoot = 'static/';
   }
   return gulp.src(app + 'index.html')
     .pipe($.preprocess({context: appConfig }))

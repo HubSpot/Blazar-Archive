@@ -42,8 +42,8 @@ class BuildsSidebarListItem extends Component {
     let repo = this.props.repo;
     let modules = this.props.repo.modules;
     let moduleList = [];
-    let repoLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}`;
-    let branchLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}/${repo.branch}`;
+    let repoLink = `${config.appRoot}builds/${repo.host}/${repo.organization}/${repo.repository}`;
+    let branchLink = `${config.appRoot}builds/${repo.host}/${repo.organization}/${repo.repository}/${repo.branch}`;
 
     modules.forEach( (build) => {
       moduleList.push(

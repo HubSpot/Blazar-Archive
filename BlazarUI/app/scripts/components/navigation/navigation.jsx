@@ -4,9 +4,9 @@ import { Link } from 'react-router';
 class Navigation extends Component {
 
   render() {
-    let imgPath = `${window.config.appRoot}/images/title.png`;
+    let imgPath = `${window.config.appRoot}images/title.png`;
     if (window.config.staticRoot) {
-      imgPath = `${window.config.appRoot}${window.config.staticRoot}/images/title.png`;
+      imgPath = `${window.config.appRoot}${window.config.staticRoot}images/title.png`;
     }
     return (
         <nav className="navbar navbar-default navbar-dark" role="navigation">
