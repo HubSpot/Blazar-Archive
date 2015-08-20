@@ -81,7 +81,7 @@ let Paginator = React.createClass({
                 className={prevClassName + (isFirstPage ? ' disabled' : '')}
             >
                 <a href='#' onClick={this.preventDefault}>
-                    Previous
+                    <span aria-hidden="true">«</span>
                 </a>
             </li>
         );
@@ -92,7 +92,7 @@ let Paginator = React.createClass({
                 className={nextClassName + (isLastPage ? ' disabled' : '')}
             >
                 <a href='#' onClick={this.preventDefault}>
-                    Next
+                    <span aria-hidden="true">»</span>
                 </a>
             </li>
         );

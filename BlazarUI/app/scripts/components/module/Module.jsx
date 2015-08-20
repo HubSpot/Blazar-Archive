@@ -56,17 +56,17 @@ class Module extends Component {
           </UIGridItem>
         </UIGrid>
         <div className='pagination-outer'>
-            <Paginator
-              className='pagination'
-              ellipsesClassName='disabled'
-              selectedClassName='active'
-              page={paginated.page}
-              pages={paginated.amount}
-              beginPages={1}
-              endPages={1}
-              showPrevNext={true}
-              onSelect={this.onPage.bind(this)}>
-            </Paginator>
+          <Paginator
+            className='pagination'
+            ellipsesClassName='disabled'
+            selectedClassName='active'
+            page={paginated.page}
+            pages={paginated.amount}
+            beginPages={1}
+            endPages={1}
+            showPrevNext={true}
+            onSelect={this.onPage.bind(this)}>
+          </Paginator>
         </div>
       </div>
     );
