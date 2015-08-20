@@ -22,7 +22,7 @@ let BuildsNotifier = {
     let body = `${repo}[${branch}] ${module}: ${state}`;
     let imgPath = `${config.appRoot}/images/icon.png`;
     if (window.config.staticRoot) {
-      imgPath = `${window.config.appRoot}/${window.config.staticRoot}/images/title.png`;
+      imgPath = `${window.config.appRoot}${window.config.staticRoot}/images/title.png`;
     }
     var notification = new Notify('Build Complete', {
         body: body,
