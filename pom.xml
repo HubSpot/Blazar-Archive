@@ -30,12 +30,15 @@
 
     <dep.horizon.version>0.0.13</dep.horizon.version>
     <dep.rosetta.version>3.10.1</dep.rosetta.version>
+    <singularity.version>0.4.3</singularity.version>
+    <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
   </properties>
 
   <modules>
     <module>BlazarBase</module>
     <module>BlazarService</module>
     <module>BlazarData</module>
+    <module>BlazarServiceIntegrationTests</module>
   </modules>
 
   <dependencyManagement>
@@ -144,6 +147,28 @@
           <configuration>
             <protobufVersion>2.5.0</protobufVersion>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.jolokia</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
+          <version>0.13.2</version>
+          <configuration>
+            <images />  <!-- default to no images to allow building from parent, let submodules override -->
+          </configuration>
+          <executions>
+            <execution>
+              <id>build-docker-images</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>build</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.18.1</version>
         </plugin>
         <plugin>
           <groupId>com.github.eirslett</groupId>
