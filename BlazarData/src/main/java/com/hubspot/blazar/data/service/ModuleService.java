@@ -25,6 +25,10 @@ public class ModuleService {
     return moduleDao.getByBranch(gitInfo.getId().get());
   }
 
+  public Module getModule(GitInfo info, String moduleName) {
+    return moduleDao.getByInfo(info, moduleName);
+  }
+
   @Transactional
   public Set<Module> setModules(GitInfo gitInfo, Set<Module> updatedModules) {
     Set<Module> oldModules = getModules(gitInfo);

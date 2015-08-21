@@ -33,6 +33,20 @@ public class GitInfo {
     this.active = active;
   }
 
+  public GitInfo(Optional<Integer> id,
+                 String host,
+                 String organization,
+                 String repository,
+                 String branch) {
+    this.id = id;
+    this.host = host;
+    this.organization = organization;
+    this.repository = repository;
+    this.branch = branch;
+    this.active = false;
+    this.repositoryId = -1;
+  }
+
   public Optional<Integer> getId() {
     return id;
   }
