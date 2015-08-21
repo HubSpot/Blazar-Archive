@@ -19,5 +19,9 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.hubspot.rosetta</groupId>
+      <artifactId>RosettaAnnotations</artifactId>
+    </dependency>
   </dependencies>
 </project>

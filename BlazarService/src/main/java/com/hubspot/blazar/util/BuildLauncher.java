@@ -1,5 +1,22 @@
 package com.hubspot.blazar.util;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHContent;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -7,6 +24,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.Build;
 import com.hubspot.blazar.base.Build.State;
+import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
 import com.hubspot.blazar.base.GitInfo;
@@ -17,18 +35,6 @@ import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpRequest.Method;
 import com.hubspot.horizon.HttpResponse;
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 @Singleton
 public class BuildLauncher {
@@ -38,17 +44,25 @@ public class BuildLauncher {
   private final BuildService buildService;
   private final AsyncHttpClient asyncHttpClient;
   private final Map<String, GitHub> gitHubByHost;
+  private final EventBus eventBus;
+  private final ObjectMapper objectMapper;
+  private final YAMLFactory yamlFactory;
 
   @Inject
   public BuildLauncher(BuildStateService buildStateService,
                        BuildService buildService,
                        AsyncHttpClient asyncHttpClient,
                        Map<String, GitHub> gitHubByHost,
-                       EventBus eventBus) {
+                       EventBus eventBus,
+                       ObjectMapper objectMapper,
+                       YAMLFactory yamlFactory) {
     this.buildStateService = buildStateService;
     this.buildService = buildService;
     this.asyncHttpClient = asyncHttpClient;
     this.gitHubByHost = gitHubByHost;
+    this.eventBus = eventBus;
+    this.objectMapper = objectMapper;
+    this.yamlFactory = yamlFactory;
 
     eventBus.register(this);
   }
@@ -88,7 +102,8 @@ public class BuildLauncher {
 
   private synchronized void startBuild(BuildDefinition definition, Build queued) throws Exception {
     String sha = currentSha(definition.getGitInfo());
-    Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha);
+    BuildConfig buildConfig = configAtSha(definition.getModule().getName(), sha, definition.getGitInfo());
+    Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha).withBuildConfig(buildConfig);
 
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     buildService.begin(launching);
@@ -117,6 +132,17 @@ public class BuildLauncher {
 
     List<String> modulesToBuild = Splitter.on(',').omitEmptyStrings().splitToList(whitelist);
     return modulesToBuild.contains(module.getName()) ? "--safe_mode" : "--dry_run";
+  }
+
+  private BuildConfig configAtSha(String name, String sha, GitInfo gitInfo) throws IOException {
+    LOG.info("Trying to fetch current config at sha: {}", sha);
+    GitHub gitHub = gitHubFor(gitInfo);
+    GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
+
+    GHContent configContent = repository.getFileContent(".blazar.yaml", gitInfo.getBranch());
+
+    LOG.info("Found config at hubspot.build/%s ".format(name));
+    return objectMapper.readValue(yamlFactory.createParser(configContent.getContent()), BuildConfig.class);
   }
 
   private String currentSha(GitInfo gitInfo) throws IOException {

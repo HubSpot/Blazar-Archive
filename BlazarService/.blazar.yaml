@@ -1,0 +1,5 @@
+env:
+  TEST_VAR: TEST_VALUE
+
+autoDeployQa: true
+cmds: []
