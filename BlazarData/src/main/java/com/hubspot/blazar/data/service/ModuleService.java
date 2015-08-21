@@ -1,5 +1,6 @@
 package com.hubspot.blazar.data.service;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -25,7 +26,7 @@ public class ModuleService {
     return moduleDao.getByBranch(gitInfo.getId().get());
   }
 
-  public Module getModule(GitInfo info, String moduleName) {
+  public Optional<Module> getModule(GitInfo info, String moduleName) {
     return moduleDao.getByInfo(info, moduleName);
   }
 

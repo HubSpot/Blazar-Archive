@@ -1,5 +1,6 @@
 package com.hubspot.blazar.data.dao;
 
+import com.google.common.base.Optional;
 import com.hubspot.blazar.base.Build;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
@@ -23,7 +24,7 @@ public interface ModuleDao {
       "AND b.repository = :repository " +
       "AND b.branch = :branch " +
       "AND m.name = :module")
-  Module getByInfo(@BindWithRosetta GitInfo info, @Bind("module") String module);
+  Optional<Module> getByInfo(@BindWithRosetta GitInfo info, @Bind("module") String module);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO modules (branchId, name, path, glob, active) VALUES (:branchId, :name, :path, :glob, :active)")

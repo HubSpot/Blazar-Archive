@@ -4,11 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import com.hubspot.blazar.base.Build;
-import com.hubspot.blazar.base.BuildDefinition;
-import com.hubspot.blazar.base.BuildState;
-import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.*;
 import com.hubspot.blazar.data.dao.BuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 import org.slf4j.Logger;
@@ -35,6 +31,10 @@ public class BuildService {
 
   public Optional<ModuleBuild> get(long id) {
     return buildDao.get(id);
+  }
+
+  public Optional<ModuleBuild> get(GitInfo info, String moduleName, Integer buildNumber) {
+    return buildDao.get(info, moduleName, buildNumber);
   }
 
   public List<Build> getByModule(Module module) {
