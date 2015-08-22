@@ -139,7 +139,7 @@ public class BuildLauncher {
     GitHub gitHub = gitHubFor(gitInfo);
     GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
 
-    GHContent configContent = repository.getFileContent(".blazar.yaml", gitInfo.getBranch());
+    GHContent configContent = repository.getFileContent(".blazar.yaml", sha);
 
     LOG.info("Found config at hubspot.build/%s ".format(name));
     return objectMapper.readValue(yamlFactory.createParser(configContent.getContent()), BuildConfig.class);
