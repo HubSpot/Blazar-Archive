@@ -111,11 +111,19 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-migrations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-util</artifactId>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-views</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-views-mustache</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -202,7 +210,7 @@
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <configuration>
-          <workingDirectory>../BlazarUI</workingDirectory>
+          <workingDirectory>${project.basedir}/../BlazarUI</workingDirectory>
           <nodeDownloadRoot>https://hubspot-boxen-public.s3.amazonaws.com/nodejs/</nodeDownloadRoot>
         </configuration>
         <executions>
@@ -249,7 +257,8 @@
             <configuration>
               <resources>
                 <resource>
-                  <directory>${project.build.directory}/generated-resources</directory>
+                  <directory>${project.basedir}/../BlazarUI/dist</directory>
+                  <targetPath>assets</targetPath>
                 </resource>
               </resources>
             </configuration>
@@ -308,6 +317,11 @@
                             <source>${project.basedir}/target/${project.name}-${project.version}-shaded.jar</source>
                             <destName>${project.name}.jar</destName>
                             <outputDirectory>/</outputDirectory>
+                          </file>
+                          <file>
+                            <source>${project.basedir}/../BlazarData/src/main/resources/schema.sql</source>
+                            <destName>schema.sql</destName>
+                            <outputDirectory>/etc/blazar</outputDirectory>
                           </file>
                         </files>
                       </inline>

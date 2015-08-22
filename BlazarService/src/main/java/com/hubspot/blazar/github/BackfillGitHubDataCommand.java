@@ -1,6 +1,13 @@
 package com.hubspot.blazar.github;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import java.io.IOException;
+import java.util.Map.Entry;
+
+import org.kohsuke.github.GHOrganization;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
@@ -13,26 +20,16 @@ import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpRequest.Method;
 import com.hubspot.horizon.ning.NingHttpClient;
+
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.setup.Bootstrap;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
-import org.kohsuke.github.GHOrganization;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
-
-import java.io.IOException;
-import java.util.Map.Entry;
 
 public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfiguration> {
-  private final HttpClient httpClient;
-
   public BackfillGitHubDataCommand() {
     super("backfill", "Reprocess all repo and branch data");
-
-    ObjectMapper mapper = Jackson.newObjectMapper().setSerializationInclusion(Include.NON_NULL);
-    this.httpClient = new NingHttpClient(HttpConfig.newBuilder().setObjectMapper(mapper).build());
   }
 
   @Override
@@ -45,6 +42,8 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
   protected void run(Bootstrap<BlazarConfiguration> bootstrap,
                      Namespace namespace,
                      BlazarConfiguration configuration) throws Exception {
+    final ObjectMapper mapper = Jackson.newObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    final HttpClient httpClient = new NingHttpClient(HttpConfig.newBuilder().setObjectMapper(mapper).build());
     try {
       for (Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {
         String host = entry.getKey();
@@ -53,7 +52,7 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
 
         for (String organization : gitHubConfig.getOrganizations()) {
           System.out.println("Processing " + host + "/" + organization);
-          processOrganization(namespace.getString("url"), host, gitHub.getOrganization(organization));
+          processOrganization(httpClient, namespace.getString("url"), host, gitHub.getOrganization(organization));
           System.out.println("Processed " + host + "/" + organization);
         }
       }
@@ -62,7 +61,7 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
     }
   }
 
-  private void processOrganization(String url, String host, GHOrganization organization) throws IOException {
+  private void processOrganization(HttpClient httpClient, String url, String host, GHOrganization organization) throws IOException {
     for (GHRepository repository : organization.listRepositories()) {
       GitInfo gitInfo = new GitInfo(
           Optional.<Integer>absent(),

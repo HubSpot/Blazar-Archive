@@ -1,13 +1,15 @@
 package com.hubspot.blazar.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
-
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.Map;
+
+import javax.validation.Valid;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.dropwizard.Configuration;
+import io.dropwizard.db.DataSourceFactory;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BlazarConfiguration extends Configuration {
@@ -21,6 +23,10 @@ public class BlazarConfiguration extends Configuration {
 
   @JsonProperty("database")
   private DataSourceFactory databaseConfiguration;
+
+  @Valid
+  @JsonProperty("ui")
+  private UiConfiguration uiConfiguration = new UiConfiguration();
 
   public Map<String, GitHubConfiguration> getGitHubConfiguration() {
     return gitHubConfiguration;
@@ -46,6 +52,15 @@ public class BlazarConfiguration extends Configuration {
 
   public BlazarConfiguration setDatabaseConfiguration(DataSourceFactory databaseConfiguration) {
     this.databaseConfiguration = databaseConfiguration;
+    return this;
+  }
+
+  public UiConfiguration getUiConfiguration() {
+    return uiConfiguration;
+  }
+
+  public BlazarConfiguration setUiConfiguration(UiConfiguration uiConfiguration) {
+    this.uiConfiguration = uiConfiguration;
     return this;
   }
 }

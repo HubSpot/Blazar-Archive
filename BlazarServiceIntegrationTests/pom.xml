@@ -10,6 +10,10 @@
 
   <artifactId>BlazarServiceIntegrationTests</artifactId>
 
+  <properties>
+    <blazar-mysql.password>test123</blazar-mysql.password>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.hubspot</groupId>
@@ -146,14 +150,12 @@
                       <MESOS_HOSTNAME>${mesos.slave1.hostname}</MESOS_HOSTNAME>
                       <MESOS_PORT>5051</MESOS_PORT>
                     </env>
-                    <!--volumes>
+                    <volumes>
                       <bind>
-                        <volume>/sys/fs/cgroup:/sys/fs/cgroup</volume>
-                        <volume>/usr/bin/docker:/usr/bin/docker</volume>
-                        <volume>/usr/local/bin/docker:/usr/local/bin/docker</volume>
                         <volume>/var/run/docker.sock:/var/run/docker.sock</volume>
+                        <volume>/sys:/sys</volume>
                       </bind>
-                    </volumes-->
+                    </volumes>
                     <wait>
                       <log>Registered with master</log>
                       <time>10000</time>
@@ -193,7 +195,7 @@
                       <port>blazar-mysql.port:3306</port>
                     </ports>
                     <env>
-                      <MYSQL_ROOT_PASSWORD>test123</MYSQL_ROOT_PASSWORD>
+                      <MYSQL_ROOT_PASSWORD>${blazar-mysql.password}</MYSQL_ROOT_PASSWORD>
                       <MYSQL_DATABASE>Blazar</MYSQL_DATABASE>
                     </env>
                   </run>
@@ -213,13 +215,14 @@
                     <env>
                       <BLAZAR_MYSQL_HOST>blazar-test-mysql</BLAZAR_MYSQL_HOST>
                       <BLAZAR_MYSQL_USER>root</BLAZAR_MYSQL_USER>
-                      <BLAZAR_MYSQL_PASSWORD>test123</BLAZAR_MYSQL_PASSWORD>
+                      <BLAZAR_MYSQL_PASSWORD>${blazar-mysql.password}</BLAZAR_MYSQL_PASSWORD>
                       <BLAZAR_PORT>7199</BLAZAR_PORT>
+                      <BLAZAR_DB_MIGRATIONS>/etc/blazar/schema.sql</BLAZAR_DB_MIGRATIONS>
                     </env>
-                    <wait>
+                    <!--wait>
                       <log>Started BlazarService</log>
-                      <time>5000</time>
-                    </wait>
+                      <time>10000</time>
+                    </wait-->
                   </run>
                 </image>
               </images>
