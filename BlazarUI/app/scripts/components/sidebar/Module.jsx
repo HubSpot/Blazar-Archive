@@ -10,7 +10,7 @@ class Module extends Component {
 
     let moduleLink = '';
     if (inProgressBuild) {
-      moduleLink = `${config.appRoot}builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.id}`;
+      moduleLink = `${config.appRoot}builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
     } else {
       moduleLink = `${config.appRoot}builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}`;
     }
