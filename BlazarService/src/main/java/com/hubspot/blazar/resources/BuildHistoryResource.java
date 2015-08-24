@@ -1,5 +1,6 @@
 package com.hubspot.blazar.resources;
 
+import com.google.common.base.Optional;
 import com.hubspot.blazar.base.Build;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -35,10 +36,24 @@ public class BuildHistoryResource {
     BuildDefinition definition = buildDefinitionService.getByModuleId(moduleId).get();
 
     List<ModuleBuild> builds = new ArrayList<>();
-    for (Build build : buildService.getByModule(definition.getModule())) {
+    for (Build build : buildService.getAllByModule(definition.getModule())) {
       builds.add(new ModuleBuild(definition, build));
     }
 
     return builds;
+  }
+
+  @GET
+  @Path("/module/{id}/build/{buildNumber}")
+  @PropertyFiltering
+  public Optional<ModuleBuild> getByModule(@PathParam("id") int moduleId, @PathParam("buildNumber") int buildNumber) {
+    BuildDefinition definition = buildDefinitionService.getByModuleId(moduleId).get();
+    Optional<Build> build = buildService.getByModuleAndNumber(definition.getModule(), buildNumber);
+
+    if (build.isPresent()) {
+      return Optional.of(new ModuleBuild(definition, build.get()));
+    } else {
+      return Optional.absent();
+    }
   }
 }

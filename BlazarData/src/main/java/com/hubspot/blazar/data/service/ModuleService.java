@@ -1,6 +1,5 @@
 package com.hubspot.blazar.data.service;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -22,17 +21,13 @@ public class ModuleService {
     this.moduleDao = moduleDao;
   }
 
-  public Set<Module> getModules(GitInfo gitInfo) {
-    return moduleDao.getByBranch(gitInfo.getId().get());
-  }
-
-  public Optional<Module> getModule(GitInfo info, String moduleName) {
-    return moduleDao.getByInfo(info, moduleName);
+  public Set<Module> getByBranch(int branchId) {
+    return moduleDao.getByBranch(branchId);
   }
 
   @Transactional
   public Set<Module> setModules(GitInfo gitInfo, Set<Module> updatedModules) {
-    Set<Module> oldModules = getModules(gitInfo);
+    Set<Module> oldModules = getByBranch(gitInfo.getId().get());
     Set<Module> newModules = new HashSet<>();
 
     Map<String, Module> updatedModulesByName = mapByName(updatedModules);

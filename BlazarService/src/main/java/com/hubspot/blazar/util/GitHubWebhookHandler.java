@@ -87,7 +87,7 @@ public class GitHubWebhookHandler {
       }
     }
 
-    return moduleService.getModules(gitInfo);
+    return moduleService.getByBranch(gitInfo.getId().get());
   }
 
   private void triggerBuilds(PushEvent pushEvent, GitInfo gitInfo, Set<Module> modules) throws IOException {
@@ -132,7 +132,7 @@ public class GitHubWebhookHandler {
     String fullName = repository.getFullName();
     String organization = fullName.substring(0, fullName.indexOf('/'));
     String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
-    Optional<Long> repositoryId = Optional.of((long)repository.getId());
+    long repositoryId = repository.getId();
     String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
     String escapedBranch = UrlEscapers.urlPathSegmentEscaper().escape(branch);
 
