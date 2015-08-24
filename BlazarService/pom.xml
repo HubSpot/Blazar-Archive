@@ -111,11 +111,19 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-migrations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-util</artifactId>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-views</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.dropwizard</groupId>
+      <artifactId>dropwizard-views-mustache</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -202,7 +210,7 @@
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <configuration>
-          <workingDirectory>../BlazarUI</workingDirectory>
+          <workingDirectory>${project.basedir}/../BlazarUI</workingDirectory>
           <nodeDownloadRoot>https://hubspot-boxen-public.s3.amazonaws.com/nodejs/</nodeDownloadRoot>
         </configuration>
         <executions>
@@ -249,7 +257,8 @@
             <configuration>
               <resources>
                 <resource>
-                  <directory>${project.build.directory}/generated-resources</directory>
+                  <directory>${project.basedir}/../BlazarUI/dist</directory>
+                  <targetPath>assets</targetPath>
                 </resource>
               </resources>
             </configuration>
@@ -258,4 +267,72 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>build-docker-image</id>
+      <activation>
+        <property>
+          <name>env.DOCKER_HOST</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jolokia</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <configuration>
+              <images>
+                <image>
+                  <name>hubspot/blazarservice:${project.version}</name>
+                  <build>
+                    <from>java:8u45-jre</from>
+                    <maintainer>platform-infrastructure-groups@hubspot.com</maintainer>
+                    <ports>
+                      <port>8099</port>
+                    </ports>
+                    <entryPoint>
+                      <exec>
+                        <arg>/etc/blazar/start.sh</arg>
+                      </exec>
+                    </entryPoint>
+                    <cmd>
+                      <exec>
+                        <args>server</args>
+                        <args>/etc/blazar/blazar.yaml</args>
+                      </exec>
+                    </cmd>
+                    <assembly>
+                      <mode>dir</mode>
+                      <basedir>/</basedir>
+                      <inline>
+                        <fileSets>
+                          <fileSet>
+                            <directory>${project.basedir}/src/main/docker</directory>
+                            <outputDirectory>/etc/blazar</outputDirectory>
+                          </fileSet>
+                        </fileSets>
+                        <files>
+                          <file>
+                            <source>${project.basedir}/target/${project.name}-${project.version}-shaded.jar</source>
+                            <destName>${project.name}.jar</destName>
+                            <outputDirectory>/</outputDirectory>
+                          </file>
+                          <file>
+                            <source>${project.basedir}/../BlazarData/src/main/resources/schema.sql</source>
+                            <destName>schema.sql</destName>
+                            <outputDirectory>/etc/blazar</outputDirectory>
+                          </file>
+                        </files>
+                      </inline>
+                    </assembly>
+                  </build>
+                </image>
+              </images>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

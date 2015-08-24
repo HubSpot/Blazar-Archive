@@ -1,3 +1,6 @@
+--liquibase formatted sql
+
+--changeset tpetr:1 dbms:mysql
 CREATE TABLE `branches` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `host` varchar(250) NOT NULL,
