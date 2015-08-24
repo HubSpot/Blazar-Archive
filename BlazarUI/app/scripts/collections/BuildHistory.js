@@ -9,7 +9,7 @@ class BuildHistory extends BaseCollection {
 
   url() {
     let moduleId = this.module.moduleId;
-    return `${config.apiRoot}/build/history/module/${moduleId}`
+    return `${config.apiRoot}build/history/module/${moduleId}`
   }
 
   parse(){

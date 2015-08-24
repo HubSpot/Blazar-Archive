@@ -9,7 +9,7 @@ class BranchDefinition extends Model {
 
   url() {
     let gitInfo = this.gitInfo;
-    return `${config.apiRoot}/branch/lookup?host=${gitInfo.url}&organization=${gitInfo.org}&repository=${gitInfo.repo}&branch=${gitInfo.branch}`;
+    return `${config.apiRoot}branch/lookup?host=${gitInfo.url}&organization=${gitInfo.org}&repository=${gitInfo.repo}&branch=${gitInfo.branch}`;
   }
 }
 
