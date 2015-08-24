@@ -26,7 +26,6 @@ BuildHistoryActions.updatePollingStatus = function (status) {
 };
 
 function getBranchId() {
-  (function doPoll() {
     let branchDefinition = new BranchDefinition(gitInfo);
     let branchPromise =  branchDefinition.fetch();
 
@@ -34,14 +33,9 @@ function getBranchId() {
       gitInfo.branchId = branchDefinition.data.id;
       getModule();
     });
-
-    branchPromise.always( () => {
-      if (buildHistoryActionSettings.polling) {
-        setTimeout(doPoll, config.buildsRefresh);
-      }
-    });
-
-  })();
+    branchPromise.error( () => {
+      BuildHistoryActions.loadBuildHistoryError('an error occured');
+    })
 }
 
 function getModule() {
@@ -54,6 +48,9 @@ function getModule() {
     }).id;
     getBuildHistory();
   });
+  modulesPromise.error( () => {
+    BuildHistoryActions.loadBuildHistoryError('an error occured');
+  })
 }
 
 function getBuildHistory() {
@@ -63,7 +60,6 @@ function getBuildHistory() {
     promise.done( () => {
       BuildHistoryActions.loadBuildHistorySuccess(buildHistory.data);
     });
-
     promise.error( () => {
       BuildHistoryActions.loadBuildHistoryError('an error occured');
     })
@@ -71,7 +67,13 @@ function getBuildHistory() {
 
 function startPolling(data){
   gitInfo = data;
-  getBranchId();
+
+  (function doPoll() {
+    getBranchId();
+    if (buildHistoryActionSettings.polling) {
+      setTimeout(doPoll, config.buildsRefresh);
+    }
+  })();
 }
 
 
