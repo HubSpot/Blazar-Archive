@@ -4,7 +4,7 @@ import BaseCollection from './BaseCollection';
 class Builds extends BaseCollection {
 
   url() {
-    return `${config.apiRoot}build/states`;
+    return `${config.apiRoot}/build/states`;
   }
 
   parse() {
@@ -33,7 +33,7 @@ class Builds extends BaseCollection {
         repository: gitInfo.repository,
         branch: gitInfo.branch,
         module: module.name,
-        link: `${config.appRoot}builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}`
+        link: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}`
       };
 
       if (lastBuild) {
@@ -41,7 +41,7 @@ class Builds extends BaseCollection {
       }
 
       if (inProgressBuild) {
-        moduleInfo.inProgressBuildLink = `${config.appRoot}builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}/${inProgressBuild.buildNumber}`;
+        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}/${inProgressBuild.buildNumber}`;
       }
 
       if (pendingBuild) {
@@ -155,12 +155,12 @@ class Builds extends BaseCollection {
       repo.branch = repo.modules[0].gitInfo.branch;
       repo.organization = repo.modules[0].gitInfo.organization;
       repo.id = `${repo.host}_${repo.branch}_${repo.organization}_${repo.repository}`;
-      repo.branchPath = `${config.appRoot}builds/${repo.modules[0].gitInfo.host}/${repo.modules[0].gitInfo.organization}/${repo.modules[0].gitInfo.repository}/${repo.modules[0].gitInfo.branch}`;
+      repo.branchPath = `${config.appRoot}/builds/${repo.modules[0].gitInfo.host}/${repo.modules[0].gitInfo.organization}/${repo.modules[0].gitInfo.repository}/${repo.modules[0].gitInfo.branch}`;
 
       repo.modules.forEach( (module) => {
-        module.modulePath = `${config.appRoot}builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}`;
+        module.modulePath = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}`;
         if (module.inProgressBuild) {
-          module.inProgressBuild.buildLink = `${config.appRoot}builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}/${module.inProgressBuild.buildNumber}`;
+          module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name + '_' + module.module.id}/${module.inProgressBuild.buildNumber}`;
           if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
             repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
           }

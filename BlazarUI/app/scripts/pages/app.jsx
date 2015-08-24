@@ -10,7 +10,7 @@ class App extends Component {
 
   constructor() {
     this.state = {
-      showModal: (window.config.apiRoot === null)
+      showModal: (!window.config.apiRoot)
     };
   }
 
