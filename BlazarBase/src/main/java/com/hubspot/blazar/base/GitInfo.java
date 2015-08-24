@@ -12,7 +12,7 @@ public class GitInfo {
   private final String host;
   private final String organization;
   private final String repository;
-  private final Optional<Long> repositoryId;
+  private final long repositoryId;
   private final String branch;
   private final boolean active;
 
@@ -21,7 +21,7 @@ public class GitInfo {
                  @JsonProperty("host") String host,
                  @JsonProperty("organization") String organization,
                  @JsonProperty("repository") String repository,
-                 @JsonProperty("repositoryId") Optional<Long> repositoryId,
+                 @JsonProperty("repositoryId") long repositoryId,
                  @JsonProperty("branch") String branch,
                  @JsonProperty("active") boolean active) {
     this.id = id;
@@ -31,20 +31,6 @@ public class GitInfo {
     this.repositoryId = repositoryId;
     this.branch = branch;
     this.active = active;
-  }
-
-  public GitInfo(Optional<Integer> id,
-                 String host,
-                 String organization,
-                 String repository,
-                 String branch) {
-    this.id = id;
-    this.host = host;
-    this.organization = organization;
-    this.repository = repository;
-    this.branch = branch;
-    this.active = false;
-    this.repositoryId = Optional.absent();
   }
 
   public Optional<Integer> getId() {
@@ -63,7 +49,7 @@ public class GitInfo {
     return repository;
   }
 
-  public Optional<Long> getRepositoryId() {
+  public long getRepositoryId() {
     return repositoryId;
   }
 

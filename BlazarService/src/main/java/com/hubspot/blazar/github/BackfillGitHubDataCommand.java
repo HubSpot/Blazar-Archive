@@ -69,7 +69,7 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
           host,
           repository.getOwnerName(),
           repository.getName(),
-          Optional.of((long)repository.getId()),
+          repository.getId(),
           "master",
           true);
 

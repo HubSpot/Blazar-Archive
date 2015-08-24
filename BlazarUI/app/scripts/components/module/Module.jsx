@@ -34,7 +34,7 @@ class Module extends Component {
         <SectionLoader />
       );
     }
-    let moduleName = this.props.params.module.substring(0, this.props.params.module.lastIndexOf('_'));
+    let moduleName = this.props.params.module;
     let headline = (
       <span>
         <Icon prefix="mega" type="octicon" name="file-directory" classNames="headline-icon" />

@@ -2,7 +2,6 @@ package com.hubspot.blazar.data.dao;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.Build;
-import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
@@ -25,19 +24,12 @@ public interface BuildDao {
       "WHERE build.id = :it")
   Optional<ModuleBuild> get(@Bind long id);
 
-  @SqlQuery("select gitInfo.*, module.*, build.* FROM builds AS build " +
-      "INNER JOIN modules as module on (module.id = build.moduleId) " +
-      "INNER JOIN branches as gitInfo on (gitInfo.id = module.branchId) " +
-      "WHERE gitInfo.host = :host " +
-      "AND gitInfo.organization = :organization " +
-      "AND gitInfo.repository = :repository " +
-      "AND gitInfo.branch = :branch " +
-      "AND build.buildNumber = :buildNumber " +
-      "AND module.name = :moduleName")
-  Optional<ModuleBuild> get(@BindWithRosetta GitInfo info, @Bind("moduleName") String moduleName, @Bind("buildNumber") Integer buildNumber);
-
   @SqlQuery("SELECT * FROM builds WHERE moduleId = :id ORDER BY buildNumber DESC")
-  List<Build> getByModule(@BindWithRosetta Module module);
+  List<Build> getAllByModule(@BindWithRosetta Module module);
+
+  @SingleValueResult
+  @SqlQuery("SELECT * FROM builds WHERE moduleId = :id AND buildNumber = :buildNumber ORDER BY buildNumber DESC")
+  Optional<Build> getByModuleAndNumber(@BindWithRosetta Module module, @Bind("buildNumber") int buildNumber);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO builds (moduleId, buildNumber, state) VALUES (:moduleId, :buildNumber, :state)")

@@ -53,7 +53,7 @@ public class GitHubWebhookResource {
   @Path("/process")
   @Produces(MediaType.APPLICATION_JSON)
   public Set<Module> processBranch(GitInfo gitInfo) throws IOException {
-    Preconditions.checkArgument(gitInfo.getRepositoryId().get() > 0, "repositoryId must be > 0");
+    Preconditions.checkArgument(gitInfo.getRepositoryId() > 0, "repositoryId must be > 0");
     return handler.processBranch(gitInfo);
   }
 }
