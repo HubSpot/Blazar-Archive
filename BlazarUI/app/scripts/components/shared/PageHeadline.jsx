@@ -18,7 +18,7 @@ class PageHeadline extends Component{
 }
 
 PageHeadline.propTypes = {
-  headline: PropTypes.string.isRequired,
+  headline: PropTypes.object.isRequired,
   subheadline: PropTypes.string,
   children: PropTypes.node
 };
