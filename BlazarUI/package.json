@@ -31,7 +31,7 @@
     "gulp-eslint": "^0.15.0",
     "gulp-livereload": "^3.8.0",
     "gulp-load-plugins": "^0.9.0",
-    "gulp-preprocess": "^1.2.0",
+    "gulp-mustache": "^1.1.1",
     "gulp-size": "^1.2.1",
     "gulp-stylus": "^2.0.1",
     "gulp-uglifyjs": "^0.6.1",

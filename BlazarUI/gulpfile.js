@@ -5,6 +5,7 @@ var del = require('del');
 var concatCss = require('gulp-concat-css');
 var gulpCopy = require('gulp-copy');
 var url = require('url');
+var mustache = require('gulp-mustache');
 
 // config to sent to html as global config variables
 var appConfig = require('./appConfig.js');
@@ -17,7 +18,7 @@ var webpackConfig = require('./webpack.config.js').getConfig(environment);
 
 var port = $.util.env.port || 5000;
 var app = 'app/';
-var dist = isProduction ? path.resolve(__dirname, '../BlazarService/target/generated-resources/assets') + '/' : 'dist/';
+var dist = 'dist/';
 
 // https://github.com/ai/autoprefixer
 var autoprefixerBrowsers = [
@@ -59,11 +60,8 @@ gulp.task('fonts', function() {
 // preprocess env variables for html
 // and copy html from app to dist
 gulp.task('html', function() {
-  if (isProduction) {
-    appConfig.staticRoot = 'static/';
-  }
-  return gulp.src(app + 'index.html')
-    .pipe($.preprocess({context: appConfig }))
+  return gulp.src(app + 'index.mustache')
+    .pipe(mustache(appConfig, {extension: '.html'}))
     .pipe(gulp.dest(dist))
     .pipe($.size({ title : 'html' }))
     .pipe($.connect.reload());
@@ -143,7 +141,7 @@ gulp.task('watch', function() {
   gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
 });
 
-// remove bundels
+// remove bundles
 gulp.task('clean', function(cb) {
   del([dist], cb);
 });
