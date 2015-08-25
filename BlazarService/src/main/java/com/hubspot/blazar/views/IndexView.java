@@ -23,7 +23,7 @@ public class IndexView extends View {
 
     buildsRefresh = configuration.getUiConfiguration().getBuildsRefresh();
     apiRoot = configuration.getUiConfiguration().getApiRoot().or(appRoot);
-    staticRoot = configuration.getUiConfiguration().getStaticPath();
+    staticRoot = appRoot + "/" + configuration.getUiConfiguration().getStaticPath();
   }
 
   public String getStaticRoot() {
