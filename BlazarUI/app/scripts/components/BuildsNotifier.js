@@ -20,10 +20,8 @@ let BuildsNotifier = {
 
   showNotification: function(repo, branch, module, state, link) {
     let body = `${repo}[${branch}] ${module}: ${state}`;
-    let imgPath = `${config.appRoot}images/icon.png`;
-    if (window.config.staticRoot) {
-      imgPath = `${window.config.appRoot}${window.config.staticRoot}images/icon.png`;
-    }
+    let imgPath = `${config.staticRoot}/images/icon.png`;
+
     var notification = new Notify('Build Complete', {
         body: body,
         icon: {imgPath},
