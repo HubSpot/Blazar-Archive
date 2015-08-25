@@ -21,13 +21,13 @@ public class ModuleService {
     this.moduleDao = moduleDao;
   }
 
-  public Set<Module> getModules(GitInfo gitInfo) {
-    return moduleDao.getByBranch(gitInfo.getId().get());
+  public Set<Module> getByBranch(int branchId) {
+    return moduleDao.getByBranch(branchId);
   }
 
   @Transactional
   public Set<Module> setModules(GitInfo gitInfo, Set<Module> updatedModules) {
-    Set<Module> oldModules = getModules(gitInfo);
+    Set<Module> oldModules = getByBranch(gitInfo.getId().get());
     Set<Module> newModules = new HashSet<>();
 
     Map<String, Module> updatedModulesByName = mapByName(updatedModules);

@@ -16,6 +16,7 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
+import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
 import com.hubspot.blazar.resources.BuildResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
@@ -54,6 +55,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 
     binder.bind(IndexResource.class);
+    binder.bind(BranchResource.class);
     binder.bind(BuildResource.class);
     binder.bind(BuildHistoryResource.class);
     binder.bind(GitHubWebhookResource.class);

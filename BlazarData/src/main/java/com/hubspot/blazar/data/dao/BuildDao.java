@@ -25,7 +25,11 @@ public interface BuildDao {
   Optional<ModuleBuild> get(@Bind long id);
 
   @SqlQuery("SELECT * FROM builds WHERE moduleId = :id ORDER BY buildNumber DESC")
-  List<Build> getByModule(@BindWithRosetta Module module);
+  List<Build> getAllByModule(@BindWithRosetta Module module);
+
+  @SingleValueResult
+  @SqlQuery("SELECT * FROM builds WHERE moduleId = :id AND buildNumber = :buildNumber ORDER BY buildNumber DESC")
+  Optional<Build> getByModuleAndNumber(@BindWithRosetta Module module, @Bind("buildNumber") int buildNumber);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO builds (moduleId, buildNumber, state) VALUES (:moduleId, :buildNumber, :state)")

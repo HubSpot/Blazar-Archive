@@ -7,7 +7,11 @@ class Breadcrumb extends Component {
 
   render() {
     let path = window.location.pathname.split('/');
-    let pages = path.slice(4, path.length);
+    let appRoot = window.config.appRoot.split('/').filter((e) => {
+      return e !== '';
+    });
+    let pages = path.slice(2 + appRoot.length, path.length);
+
     let links = [];
 
     pages.forEach(function(page, i) {

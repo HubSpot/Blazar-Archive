@@ -24,8 +24,8 @@ class ReposTableRow extends Component {
     let lastBuild = (<span></span>);
     if (repo.latestBuild) {
       let build = repo.latestBuild;
-      let buildLink = `${org}/${repo.repo}/${build.branch}/${build.module}_${build.moduleId}/${build.id}`;
-      let moduleLink = `${org}/${repo.repo}/${build.branch}/${build.module}_${build.moduleId}`;
+      let buildLink = `${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
+      let moduleLink = `${org}/${repo.repo}/${build.branch}/${build.module}`;
       lastBuild = (
         <span>
           <a href={moduleLink}>{build.module}</a> --- <a href={buildLink}>#{build.number}</a> @ {Helpers.timestampFormatted(build.endTimestamp)} {this.getBuildResult(build.state)}
@@ -37,7 +37,7 @@ class ReposTableRow extends Component {
       <tr>
         <td>
           <Icon type='octicon' name='repo' classNames="repolist-icon" />
-          <a href={repoPath}>{repo.repo}</a>
+          <Link to={repoPath}>{repo.repo}</Link>
         </td>
         <td>
           {lastBuild}

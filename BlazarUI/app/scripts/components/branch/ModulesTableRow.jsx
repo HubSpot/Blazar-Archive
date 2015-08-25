@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import Icon from '../shared/Icon.jsx';
 import {labels, iconStatus} from '../constants';
 import Helpers from '../ComponentHelpers';
+import { Link } from 'react-router';
 
 class ModulesTableRow extends Component {
 
@@ -35,6 +36,7 @@ class ModulesTableRow extends Component {
     } = this.props.module;
 
     let build = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
+    let buildLink = `${window.config.appRoot}builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
 
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
@@ -52,7 +54,7 @@ class ModulesTableRow extends Component {
         </td>
         <td className='build-result-link'>
           {this.getBuildResult(build)}
-          <a href={build.buildLink}>{build.buildNumber}</a>
+          <Link to={buildLink}>{build.buildNumber}</Link>
         </td>
         <td>
           {startTime}

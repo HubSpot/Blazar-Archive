@@ -39,7 +39,7 @@ class BuildHistoryTableRow extends Component {
     let {build, gitInfo, module} = this.props.build;
 
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
-    let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name + '_' + module.id}/${build.id}`;
+    let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
 
     let duration = '';
@@ -110,7 +110,7 @@ BuildHistoryTableRow.propTypes = {
     build: PropTypes.shape({
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
-      state: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED', 'QUEUED']),
+      state: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED', 'QUEUED', 'LAUNCHING']),
       startTime: PropTypes.number,
       endTime: PropTypes.number
     }),

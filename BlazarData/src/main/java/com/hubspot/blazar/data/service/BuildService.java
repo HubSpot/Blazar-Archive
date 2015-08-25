@@ -37,8 +37,12 @@ public class BuildService {
     return buildDao.get(id);
   }
 
-  public List<Build> getByModule(Module module) {
-    return buildDao.getByModule(module);
+  public List<Build> getAllByModule(Module module) {
+    return buildDao.getAllByModule(module);
+  }
+
+  public Optional<Build> getByModuleAndNumber(Module module, int buildNumber) {
+    return buildDao.getByModuleAndNumber(module, buildNumber);
   }
 
   public BuildState enqueue(BuildDefinition definition) {
