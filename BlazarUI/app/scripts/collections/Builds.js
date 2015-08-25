@@ -54,33 +54,25 @@ class Builds extends BaseCollection {
   }
 
   getReposByOrg(orgInfo) {
-    let builds = this.isBuilding();
+    let builds = this.hasBuildState();
     let orgBuilds = _.filter(builds, function(a) {
       return a.gitInfo.organization === orgInfo.org
     });
 
     let repos = _.uniq(_.map(orgBuilds, function (build) {
-      let repo = { repo: build.gitInfo.repository };
-      if(build.lastBuild !== undefined) {
-        repo = {
-          repo: build.gitInfo.repository,
-          latestBuild: {
-            state: build.lastBuild.state,
-            number: build.lastBuild.buildNumber,
-            id: build.lastBuild.id,
-            module: build.module.name,
-            moduleId: build.lastBuild.moduleId,
-            branch: build.gitInfo.branch,
-            endTimestamp: build.lastBuild.endTimestamp
-          }
-        };
-      }
+      let latestBuild = (build.inProgressBuild ? build.inProgressBuild : build.lastBuild ? build.lastBuild : build.pendingBuild);
+      latestBuild.module = build.module.name
+      latestBuild.branch = build.gitInfo.branch;
+      let repo = {
+        repo: build.gitInfo.repository,
+        latestBuild: latestBuild
+      };
       return repo;
     }), false, function(r) {
       return r.repo;
     });
     return _.sortBy(repos, function(r) {
-      return r.repo;
+      return r.repo.toLowerCase();
     });
   }
 

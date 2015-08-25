@@ -11,6 +11,7 @@ class ReposTable extends Component {
         repo={repos[i]}
         key={i}
         org={this.props.org}
+        host={this.props.host}
       />
     );
   }
@@ -45,7 +46,8 @@ class ReposTable extends Component {
 ReposTable.propTypes = {
   loading: PropTypes.bool,
   repos: PropTypes.array.isRequired,
-  org: PropTypes.string.isRequired
+  org: PropTypes.string.isRequired,
+  host: PropTypes.string.isRequired
 };
 
 export default ReposTable;

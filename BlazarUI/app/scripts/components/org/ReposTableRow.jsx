@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import Helpers from '../ComponentHelpers';
 import {labels, iconStatus} from '../constants';
 import Icon from '../shared/Icon.jsx';
+import { Link } from 'react-router';
 
 class ReposTableRow extends Component {
 
@@ -19,18 +20,27 @@ class ReposTableRow extends Component {
   render() {
     let repo = this.props.repo;
     let org = this.props.org;
-    let repoPath = org + '/' + repo.repo;
+    let host = this.props.host;
+    let repoPath = `/builds/${host}/${org}/${repo.repo}`;
 
     let lastBuild = (<span></span>);
     if (repo.latestBuild) {
       let build = repo.latestBuild;
-      let buildLink = `${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
-      let moduleLink = `${org}/${repo.repo}/${build.branch}/${build.module}`;
-      lastBuild = (
-        <span>
-          <a href={moduleLink}>{build.module}</a> --- <a href={buildLink}>#{build.number}</a> @ {Helpers.timestampFormatted(build.endTimestamp)} {this.getBuildResult(build.state)}
-        </span>
-      );
+      let buildLink = `/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
+      let moduleLink = `/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}`;
+      if (build.endTimestamp || build.startTimestamp) {
+        lastBuild = (
+          <span>
+            <Link to={moduleLink}>{build.module}</Link> --- <Link to={buildLink}>#{build.buildNumber}</Link> @ {Helpers.timestampFormatted(build.endTimestamp ? build.endTimestamp : build.startTimestamp)} {this.getBuildResult(build.state)}
+          </span>
+        );
+      } else {
+        lastBuild = (
+          <span>
+            <Link to={moduleLink}>{build.module}</Link> --- <Link to={buildLink}>#{build.buildNumber}</Link>  {this.getBuildResult(build.state)}
+          </span>
+        );
+      }
     }
 
     return (
@@ -49,7 +59,8 @@ class ReposTableRow extends Component {
 
 ReposTableRow.propTypes = {
   repo: PropTypes.object.isRequired,
-  org: PropTypes.string.isRequired
+  org: PropTypes.string.isRequired,
+  host: PropTypes.string.isRequired
 };
 
 export default ReposTableRow;
