@@ -26,8 +26,8 @@ class ReposTableRow extends Component {
     let lastBuild = (<span></span>);
     if (repo.latestBuild) {
       let build = repo.latestBuild;
-      let buildLink = `/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
-      let moduleLink = `/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}`;
+      let buildLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
+      let moduleLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}`;
       if (build.endTimestamp || build.startTimestamp) {
         lastBuild = (
           <span>
