@@ -39,7 +39,7 @@ class BuildHistoryTableRow extends Component {
     let {build, gitInfo, module} = this.props.build;
 
     let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
-    let buildLink = `${config.appRoot}builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
+    let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
 
     let duration = '';

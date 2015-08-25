@@ -17,8 +17,8 @@ class DashboardStarredRepo extends Component {
 
     let config = window.config;
     let repo = this.props.repo;
-    let repoLink = `${config.appRoot}builds/${repo.host}/${repo.organization}/${repo.repository}`;
-    let branchLink = `${config.appRoot}builds/${repo.host}/${repo.organization}/${repo.repository}/${repo.branch}`;
+    let repoLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}`;
+    let branchLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}/${repo.branch}`;
 
     return (
       <div className={outerClass}>

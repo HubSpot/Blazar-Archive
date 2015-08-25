@@ -12,7 +12,7 @@ class Build extends Model {
 
   url() {
     let build = this.build;
-    return `${config.apiRoot}build/history/module/${build.moduleId}/build/${build.buildNumber}/`
+    return `${config.apiRoot}/build/history/module/${build.moduleId}/build/${build.buildNumber}/`
   }
 }
 

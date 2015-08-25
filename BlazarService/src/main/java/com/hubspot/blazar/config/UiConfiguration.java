@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import com.google.common.base.Optional;
 
 public class UiConfiguration {
-  public static final String DEFAULT_STATIC_PATH = "static/";
+  public static final String DEFAULT_STATIC_PATH = "static";
 
   @NotNull
   private Optional<String> baseUri = Optional.absent();

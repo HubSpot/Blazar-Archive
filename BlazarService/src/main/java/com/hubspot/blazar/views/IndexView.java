@@ -18,7 +18,7 @@ public class IndexView extends View {
       appRoot = configuration.getUiConfiguration().getBaseUri().get();
     } else {
       final String rawAppRoot = ((SimpleServerFactory) configuration.getServerFactory()).getApplicationContextPath();
-      appRoot = rawAppRoot.endsWith("/") ? rawAppRoot : rawAppRoot + "/";
+      appRoot = !rawAppRoot.endsWith("/") ? rawAppRoot : rawAppRoot.substring(0, rawAppRoot.length() - 1);
     }
 
     buildsRefresh = configuration.getUiConfiguration().getBuildsRefresh();
