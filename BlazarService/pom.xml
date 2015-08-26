@@ -115,10 +115,6 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-views</artifactId>
     </dependency>
     <dependency>
@@ -207,6 +203,10 @@
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty</artifactId>
     </dependency>
   </dependencies>
 
