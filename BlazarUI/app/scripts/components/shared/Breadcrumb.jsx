@@ -1,23 +1,19 @@
 /*global config*/
 import React, {Component} from 'react';
-let Link = require('react-router').Link;
+const Link = require('react-router').Link;
 
 
 class Breadcrumb extends Component {
 
   render() {
-    let path = window.location.pathname.split('/');
-    let appRoot = window.config.appRoot.split('/').filter((e) => {
-      return e !== '';
-    });
-    let pages = path.slice(2 + appRoot.length, path.length);
-
-    let links = [];
+    const path = window.location.pathname.split('/');
+    const pages = path.slice(2, path.length);
+    const links = [];
 
     pages.forEach(function(page, i) {
-      let link, pageLink, key;
+      let link, key;
       if (i !== pages.length - 1 && i !== 0) {
-        pageLink = pages.slice(0, i + 1).join('/');
+        const pageLink = pages.slice(0, i + 1).join('/');
         key = page + i;
         link = <Link key={key} className='crumb' to={`${config.appRoot}/builds/${pageLink}`}>{page}</Link>;
       } else if (i === 0) {
