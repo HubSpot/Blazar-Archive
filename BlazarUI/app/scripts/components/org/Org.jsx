@@ -3,7 +3,8 @@ import PageHeader from '../shared/PageHeader.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-import PageHeadline from '../shared/PageHeadline.jsx';
+import Headline from '../shared/headline/Headline.jsx';
+import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import ReposTable from './ReposTable.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
@@ -16,17 +17,18 @@ class org extends Component {
         <SectionLoader />
       );
     }
-    let headline = (
-      <span>
-        <Icon prefix="mega" type="octicon" name="organization" classNames="headline-icon" />
-        <span>{this.props.params.org}</span>
-      </span>
-    );
+
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={headline} subheadline='Repositories' />
+          <Headline>
+            <Icon prefix="mega" type="octicon" name="organization" classNames="headline-icon" />
+            <span>{this.props.params.org}</span>
+            <HeadlineDetail>
+              Repositories
+            </HeadlineDetail>
+          </Headline>
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>

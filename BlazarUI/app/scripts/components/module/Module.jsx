@@ -4,7 +4,8 @@ import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
-import PageHeadline from '../shared/PageHeadline.jsx';
+import Headline from '../shared/headline/Headline.jsx';
+import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
 import Paginator from '../shared/Paginator.jsx';
@@ -35,17 +36,18 @@ class Module extends Component {
       );
     }
     let moduleName = this.props.params.module.substring(0, this.props.params.module.lastIndexOf('_'));
-    let headline = (
-      <span>
-        <Icon prefix="mega" type="octicon" name="file-directory" classNames="headline-icon" />
-        <span>{moduleName}</span>
-      </span>
-    );
+
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={headline} subheadline='Build History' />
+          <Headline>
+            <Icon prefix="mega" type="octicon" name="file-directory" classNames="headline-icon" />
+            <span>{moduleName}</span>
+            <HeadlineDetail>
+              Build History
+            </HeadlineDetail>
+          </Headline>
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
