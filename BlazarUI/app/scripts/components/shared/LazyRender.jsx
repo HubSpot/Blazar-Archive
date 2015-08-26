@@ -128,6 +128,11 @@ let LazyRender = React.createClass({
     }
     let firstChild = this.refs['child-0'];
     let el = React.findDOMNode(firstChild);
+
+    if (el === null) {
+      return this.props.maxHeight;
+    }
+
     return this.getElementHeight(el);
   },
 
