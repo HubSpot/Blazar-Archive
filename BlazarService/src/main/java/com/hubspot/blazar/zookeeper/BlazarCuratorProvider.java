@@ -28,12 +28,13 @@ public class BlazarCuratorProvider implements Provider<CuratorFramework>, Manage
     ZooKeeperConfiguration zooKeeperConfiguration = configuration.getZooKeeperConfiguration();
 
     this.curatorFramework = CuratorFrameworkFactory.builder()
-        .defaultData(null)
+        .connectString(zooKeeperConfiguration.getQuorum())
         .sessionTimeoutMs(zooKeeperConfiguration.getSessionTimeoutMillis())
         .connectionTimeoutMs(zooKeeperConfiguration.getConnectTimeoutMillis())
-        .connectString(zooKeeperConfiguration.getQuorum())
         .retryPolicy(new ExponentialBackoffRetry(zooKeeperConfiguration.getInitialRetryBackoffMillis(), zooKeeperConfiguration.getMaxRetries()))
-        .namespace(zooKeeperConfiguration.getNamespace()).build();
+        .namespace(zooKeeperConfiguration.getNamespace())
+        .defaultData(null)
+        .build();
 
     for (ConnectionStateListener listener : listeners) {
       curatorFramework.getConnectionStateListenable().addListener(listener);
