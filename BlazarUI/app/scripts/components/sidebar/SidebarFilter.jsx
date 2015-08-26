@@ -58,19 +58,21 @@ class SidebarFilter extends Component {
     }
 
     return (
-      <span>
-        <SearchFilter
-          ref="buildFilterSearch"
-          placeholder='Filter modules...'
-          inputValue={this.props.filterText}
-          options={this.props.modules}
-          onChange={this.handleChange}
-          onBlur={this.handleBlur}
-          onFocus={this.handleFocus}
-          showStarred={this.state.showStarred}
-        />
+      <div>
+        <div className='sidebar__filter-search'>
+          <SearchFilter
+            ref="buildFilterSearch"
+            placeholder='Filter modules...'
+            inputValue={this.props.filterText}
+            options={this.props.modules}
+            onChange={this.handleChange}
+            onBlur={this.handleBlur}
+            onFocus={this.handleFocus}
+            showStarred={this.state.showStarred}
+          />
+        </div>
       <StarredToggle onClick={this.handleSelect.bind(this)} showStarred={this.state.showStarred}></StarredToggle>
-      </span>
+      </div>
     );
 
   }

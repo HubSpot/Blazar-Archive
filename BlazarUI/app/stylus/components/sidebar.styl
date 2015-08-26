@@ -5,30 +5,36 @@
   user-select none
 
 .sidebar
-  margin-top: 50px
-  padding-top: 30px
+  margin-top 50px
+  padding-top 30px
 
 // holds all filtering tools
 .sidebar__filter
-  padding: 10px 20px 20px 20px
-  position: fixed
-  top: 50px
-  left: 0px
-  z-index: 99
-  width: 299px
-  height: 94px
-  background-color: #f9f9f9
-  border-bottom: 1px solid #dadada;
+  padding 0
+  position fixed
+  top 50px
+  left 0px
+  z-index 99
+  width 299px
+  height 94px
+  background-color #f9f9f9
+  border-bottom 1px solid #dadada;
+
+.sidebar__filter-search
+  padding 15px
 
 .sidebar__filter-buttons
-  margin-top 4px
-  margin-left -20px
-  width 301px
+  position absolute
+  bottom 0
+  width 100%
 
 .sidebar__filter-buttons-btn
-  border-radius 0 !important
+  display inline-block
   width 50%
-  outline none !important
+  border-radius 0
+  &.btn-default:active, &.btn-default.active
+    outline none 
+    
 
 .sidebar__filter-buttons-btn:focus
   background-color #fff
@@ -112,6 +118,7 @@
 
 .search-input
   margin-bottom 0px
+  padding 15px
 
 .sidebar__star
   margin-right 5px
