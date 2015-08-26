@@ -9,14 +9,6 @@ import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 
 class BuildHistoryTableRow extends Component {
 
-  handleHoverCommit() {
-    console.log('hover');
-  }
-
-  handleCopyCommit() {
-    console.log('copy');
-  }
-
   getRowClassNames() {
     if (this.props.build.build.state === 'FAILED') {
       return 'bgc-danger';
@@ -59,10 +51,14 @@ class BuildHistoryTableRow extends Component {
     }
 
     if (build.sha !== undefined) {
-      sha = (<span><Copyable text={build.sha} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
-              <Icon classNames='icon-roomy fa-link' name='clipboard' />
-            </Copyable>
-            <a href={commitLink} target="_blank">{Helpers.truncate(build.sha, 8)}</a></span>);
+      sha = (
+        <span>
+          <Copyable text={build.sha} hover={this.handleHoverCommit}>
+            <Icon type='octicon' classNames='icon-roomy fa-link' name='clippy' />
+          </Copyable>
+          <a href={commitLink} target="_blank">{Helpers.truncate(build.sha, 8)}</a>
+        </span>
+        );
     } else {
       sha = 'None';
     }
