@@ -46,7 +46,7 @@ public class ZooKeeperEventBus extends EventBus {
     try {
       curatorFramework.create()
           .creatingParentsIfNeeded()
-          .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
+          .withMode(CreateMode.PERSISTENT_SEQUENTIAL)
           .forPath(queuePath(event), serialize(event));
     } catch (Exception e) {
       LOG.error("Error enqueuing event to ZooKeeper", e);
