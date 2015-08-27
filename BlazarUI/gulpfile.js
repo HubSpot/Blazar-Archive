@@ -43,7 +43,7 @@ gulp.task('scripts', function() {
 });
 
 gulp.task('lint', function () {
-  return gulp.src(['./app/scripts/**/*.jsx'])
+  return gulp.src(['./app/scripts/**/*.{js, jsx}'])
     .pipe($.eslint())
     .pipe($.eslint.format())
     .pipe($.eslint.failOnError());

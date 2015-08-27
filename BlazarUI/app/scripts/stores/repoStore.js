@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 import RepoActions from '../actions/repoActions';
 
-var RepoStore = Reflux.createStore({
+const RepoStore = Reflux.createStore({
 
   init() {
     this.branches = [];
@@ -21,14 +21,14 @@ var RepoStore = Reflux.createStore({
     this.branches = branches;
 
     this.trigger({
-      branches : this.branches,
+      branches: this.branches,
       loading: false
     });
   },
 
   loadBranchesError(error) {
     this.trigger({
-      error : error,
+      error: error,
       loading: false
     });
   }

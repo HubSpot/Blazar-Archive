@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 import BranchActions from '../actions/branchActions';
 
-var BranchStore = Reflux.createStore({
+const BranchStore = Reflux.createStore({
 
   init() {
     this.modules = [];
@@ -21,14 +21,14 @@ var BranchStore = Reflux.createStore({
     this.modules = modules;
 
     this.trigger({
-      modules : this.modules,
+      modules: this.modules,
       loading: false
     });
   },
 
   loadModulesError(error) {
     this.trigger({
-      error : error,
+      error: error,
       loading: false
     });
   }

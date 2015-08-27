@@ -1,5 +1,5 @@
+/*global BuildHistoryActions*/
 import Reflux from 'reflux';
-import $ from 'jquery';
 import _ from 'underscore';
 
 import Build from '../models/Build';
@@ -7,7 +7,12 @@ import Log from '../models/Log';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
 
-var gitInfo;
+let gitInfo;
+
+function fetchBuild(data) {
+  gitInfo = data;
+  getBranchId();
+}
 
 let BuildActions = Reflux.createActions([
   'loadBuild',
@@ -20,22 +25,9 @@ BuildActions.loadBuild.preEmit = function(data) {
   fetchBuild(data);
 };
 
-BuildActions.reloadBuild = function (data) {
-  fetchBuild(data)
+BuildActions.reloadBuild = function(data) {
+  fetchBuild(data);
 };
-
-function getBranchId() {
-    let branchDefinition = new BranchDefinition(gitInfo);
-    let branchPromise =  branchDefinition.fetch();
-
-    branchPromise.done( () => {
-      gitInfo.branchId = branchDefinition.data.id;
-      getModule();
-    });
-    branchPromise.error( () => {
-      BuildHistoryActions.loadBuildHistoryError('an error occured');
-    })
-}
 
 function getModule() {
   let branchModules = new BranchModules(gitInfo.branchId);
@@ -49,8 +41,22 @@ function getModule() {
   });
   modulesPromise.error( () => {
     BuildHistoryActions.loadBuildHistoryError('an error occured');
-  })
+  });
 }
+
+function getBranchId() {
+    let branchDefinition = new BranchDefinition(gitInfo);
+    let branchPromise =  branchDefinition.fetch();
+
+    branchPromise.done( () => {
+      gitInfo.branchId = branchDefinition.data.id;
+      getModule();
+    });
+    branchPromise.error( () => {
+      BuildHistoryActions.loadBuildHistoryError('an error occured');
+    });
+}
+
 
 function getBuild() {
   let build = new Build(gitInfo);
@@ -79,19 +85,14 @@ function getBuild() {
 
     logPromise.error( () => {
       BuildActions.loadBuildError('Error retrieving build log');
-    })
+    });
 
-  })
+  });
 
   buildPromise.error( () => {
     BuildActions.loadBuildError('Error retrieving build');
-  })
+  });
 
-}
-
-function fetchBuild(data) {
-  gitInfo = data;
-  getBranchId();
 }
 
 export default BuildActions;

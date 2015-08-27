@@ -1,9 +1,10 @@
+/*global config*/
 import Notify from 'notifyjs';
 import WatchingProvider from './WatchingProvider';
 
 let lastModuleStates = {};
 
-let BuildsNotifier = {
+const BuildsNotifier = {
 
   updateModules: function(modules) {
     modules.forEach((module) => {
@@ -22,7 +23,7 @@ let BuildsNotifier = {
     let body = `${repo}[${branch}] ${module}: ${state}`;
     let imgPath = `${config.staticRoot}/images/icon.png`;
 
-    var notification = new Notify('Build Complete', {
+    const notification = new Notify('Build Complete', {
         body: body,
         icon: {imgPath},
         notifyClick: () => {

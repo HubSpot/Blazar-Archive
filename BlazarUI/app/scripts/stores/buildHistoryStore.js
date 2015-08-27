@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 import BuildHistoryActions from '../actions/buildHistoryActions';
 
-var buildHistoryStore = Reflux.createStore({
+const buildHistoryStore = Reflux.createStore({
 
   init() {
     this.buildHistory = [];
@@ -21,14 +21,14 @@ var buildHistoryStore = Reflux.createStore({
     this.buildHistory = buildHistory;
 
     this.trigger({
-      buildHistory : this.buildHistory,
+      buildHistory: this.buildHistory,
       loading: false
     });
   },
 
   loadBuildHistoryError(error) {
     this.trigger({
-      error : error,
+      error: error,
       loading: false
     });
   }

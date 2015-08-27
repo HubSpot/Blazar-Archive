@@ -1,12 +1,12 @@
+/*global config*/
 import Reflux from 'reflux';
-import $ from 'jquery';
 import _ from 'underscore';
 import ActionSettings from './utils/ActionSettings';
 import BuildHistory from '../collections/BuildHistory';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
 
-var gitInfo;
+let gitInfo;
 
 let buildHistoryActionSettings = new ActionSettings;
 
@@ -21,7 +21,7 @@ BuildHistoryActions.loadBuildHistory.preEmit = function(data) {
   startPolling(data);
 };
 
-BuildHistoryActions.updatePollingStatus = function (status) {
+BuildHistoryActions.updatePollingStatus = function(status) {
   buildHistoryActionSettings.setPolling(status);
 };
 
@@ -35,7 +35,7 @@ function getBranchId() {
     });
     branchPromise.error( () => {
       BuildHistoryActions.loadBuildHistoryError('an error occured');
-    })
+    });
 }
 
 function getModule() {
@@ -50,7 +50,7 @@ function getModule() {
   });
   modulesPromise.error( () => {
     BuildHistoryActions.loadBuildHistoryError('an error occured');
-  })
+  });
 }
 
 function getBuildHistory() {
@@ -62,10 +62,10 @@ function getBuildHistory() {
     });
     promise.error( () => {
       BuildHistoryActions.loadBuildHistoryError('an error occured');
-    })
+    });
 }
 
-function startPolling(data){
+function startPolling(data) {
   gitInfo = data;
 
   (function doPoll() {

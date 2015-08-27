@@ -1,5 +1,5 @@
+/*global config*/
 import Reflux from 'reflux';
-import $ from 'jquery';
 import Builds from '../collections/Builds';
 import ActionSettings from './utils/ActionSettings';
 
@@ -16,13 +16,13 @@ BranchActions.loadBranches.preEmit = function(data) {
   startPolling(data);
 };
 
-BranchActions.updatePollingStatus = function (status) {
+BranchActions.updatePollingStatus = function(status) {
   repoActionSettings.setPolling(status);
 };
 
-function startPolling(data){
+function startPolling(data) {
 
-  (function doPoll(){
+  (function doPoll() {
     let builds = new Builds();
     let promise = builds.fetch();
 
@@ -31,10 +31,10 @@ function startPolling(data){
       BranchActions.loadBranchesSuccess(branches);
     });
 
-    promise.error( (err) => {
+    promise.error( () => {
       console.warn('Error connecting to the API. Check that you are connected to the VPN');
       BranchActions.loadBranchesError('an error occured');
-    })
+    });
 
     promise.always( () => {
       if (repoActionSettings.polling) {

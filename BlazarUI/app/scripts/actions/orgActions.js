@@ -1,5 +1,5 @@
+/*global config*/
 import Reflux from 'reflux';
-import $ from 'jquery';
 import ActionSettings from './utils/ActionSettings';
 import Builds from '../collections/Builds';
 
@@ -16,14 +16,14 @@ OrgActions.loadRepos.preEmit = function(data) {
   startPolling(data);
 };
 
-OrgActions.updatePollingStatus = function (status) {
+OrgActions.updatePollingStatus = function(status) {
   orgActionSettings.setPolling(status);
 };
 
 
-function startPolling(data){
+function startPolling(data) {
 
-  (function doPoll(){
+  (function doPoll() {
     let builds = new Builds(data);
     let promise = builds.fetch();
 
@@ -34,7 +34,7 @@ function startPolling(data){
 
     promise.error( () => {
       OrgActions.loadReposError('an error occured');
-    })
+    });
 
     promise.always( () => {
       if (orgActionSettings.polling) {
