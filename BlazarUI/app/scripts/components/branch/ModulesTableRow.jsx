@@ -55,7 +55,7 @@ class ModulesTableRow extends Component {
     return (
       <tr className={this.getRowClassNames(build)}>
         <td>
-          <Icon type='octicon' name='file-directory' classNames="repolist-icon" />
+          <Icon type='octicon' name='file-directory' classNames="icon-roomy icon-muted" />
           <Link to={modulePath}>{module.name}</Link>
         </td>
         <td className='build-result-link'>

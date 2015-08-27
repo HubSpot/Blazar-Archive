@@ -52,7 +52,7 @@ class ReposTableRow extends Component {
     return (
       <tr>
         <td>
-          <Icon type='octicon' name='repo' classNames="repolist-icon" />
+          <Icon type='octicon' name='repo' classNames="icon-roomy icon-muted" />
           <Link to={repoPath}>{repo.repo}</Link>
         </td>
         <td>
