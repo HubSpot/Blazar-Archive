@@ -6,16 +6,9 @@ import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
 import {labels, iconStatus} from '../constants';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
+import { contains } from 'underscore';
 
 class BuildHistoryTableRow extends Component {
-
-  handleHoverCommit() {
-    console.log('hover');
-  }
-
-  handleCopyCommit() {
-    console.log('copy');
-  }
 
   getRowClassNames() {
     if (this.props.build.build.state === 'FAILED') {
@@ -42,27 +35,26 @@ class BuildHistoryTableRow extends Component {
     let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
 
-    let duration = '';
+    let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
+    let sha, duration;
+
     if (build.startTimestamp !== undefined && build.endTimestamp !== undefined) {
       duration = Helpers.timestampDuration(build.endTimestamp - build.startTimestamp);
     }
 
-    let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
-    let sha = '';
-
-    if (build.state === 'IN_PROGRESS') {
-      duration = 'In Progress...';
-    } else if (build.state === 'QUEUED') {
-      duration = 'Queued...';
-    } else if (build.state === 'LAUNCHING') {
-      duration = 'Launching...';
+    if (contains(['IN_PROGRESS', 'QUEUED', 'LAUNCHING'], build.state)) {
+      duration = Helpers.humanizeText(build.state) + '...';
     }
 
     if (build.sha !== undefined) {
-      sha = (<span><Copyable text={build.sha} click={this.handleCopyCommit} hover={this.handleHoverCommit}>
-              <Icon classNames='icon-roomy fa-link' name='clipboard' />
-            </Copyable>
-            <a href={commitLink} target="_blank">{Helpers.truncate(build.sha, 8)}</a></span>);
+      sha = (
+        <span>
+          <Copyable text={build.sha} hover={this.handleHoverCommit}>
+            <Icon type='octicon' classNames='icon-roomy fa-link' name='clippy' />
+          </Copyable>
+          <a href={commitLink} target="_blank">{Helpers.truncate(build.sha, 8)}</a>
+        </span>
+        );
     } else {
       sha = 'None';
     }
@@ -110,7 +102,14 @@ BuildHistoryTableRow.propTypes = {
     build: PropTypes.shape({
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
-      state: PropTypes.oneOf(['SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED', 'QUEUED', 'LAUNCHING']),
+      state: PropTypes.oneOf([
+        'SUCCEEDED',
+        'FAILED',
+        'IN_PROGRESS',
+        'CANCELLED',
+        'QUEUED',
+        'LAUNCHING'
+      ]),
       startTime: PropTypes.number,
       endTime: PropTypes.number
     }),

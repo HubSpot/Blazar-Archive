@@ -5,7 +5,8 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildDetail from '../shared/BuildDetail.jsx';
 import BuildLog from './BuildLog.jsx';
-import PageHeadline from '../shared/PageHeadline.jsx';
+import Headline from '../shared/headline/Headline.jsx';
+import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
 
@@ -34,21 +35,19 @@ class Build extends Component {
     }
 
     let buildState = this.props.build.build;
-    let icon = this.getIconForState(buildState.state);
-
-    let headline = (
-      <span>
-        <Icon name={icon} classNames="headline-icon"></Icon>
-        <span>{this.props.params.module}</span>
-      </span>
-    );
-    let subheadline = `Build #${buildState.buildNumber}`;
+    let buildStateIcon = this.getIconForState(buildState.state);
 
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
-          <PageHeadline headline={headline} subheadline={subheadline} />
+          <Headline>
+            <Icon name={buildStateIcon} classNames="headline-icon"></Icon>
+            <span>{this.props.params.module}</span>
+            <HeadlineDetail>
+              Build # {buildState.buildNumber}
+            </HeadlineDetail>
+          </Headline>
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
