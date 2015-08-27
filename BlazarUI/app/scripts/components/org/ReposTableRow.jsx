@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 class ReposTableRow extends Component {
 
   getBuildResult(result) {
-    let classNames = labels[result];
+    let classNames = labels[result] + ' icon-roomy';
 
     return (
       <Icon
@@ -18,39 +18,50 @@ class ReposTableRow extends Component {
   }
 
   render() {
-    let repo = this.props.repo;
-    let org = this.props.org;
-    let host = this.props.host;
+    let lastBuildNumber, lastBuildModule, lastBuildTimestamp;
+    const {
+      repo,
+      org,
+      host
+    } = this.props;
+
     let repoPath = `/builds/${host}/${org}/${repo.repo}`;
 
-    let lastBuild = (<span></span>);
     if (repo.latestBuild) {
       let build = repo.latestBuild;
       let buildLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
       let moduleLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}`;
+
       if (build.endTimestamp || build.startTimestamp) {
-        lastBuild = (
-          <span>
-            <Link to={moduleLink}>{build.module}</Link> --- <Link to={buildLink}>#{build.buildNumber}</Link> @ {Helpers.timestampFormatted(build.endTimestamp ? build.endTimestamp : build.startTimestamp)} {this.getBuildResult(build.state)}
-          </span>
-        );
-      } else {
-        lastBuild = (
-          <span>
-            <Link to={moduleLink}>{build.module}</Link> --- <Link to={buildLink}>#{build.buildNumber}</Link>  {this.getBuildResult(build.state)}
-          </span>
-        );
+        lastBuildTimestamp = Helpers.timestampFormatted(build.endTimestamp ? build.endTimestamp : build.startTimestamp);
       }
+
+      lastBuildNumber = (
+          <span>
+            {this.getBuildResult(build.state)}
+            <Link to={buildLink}>#{build.buildNumber}</Link>
+          </span>
+      );
+
+      lastBuildModule = (
+          <Link to={moduleLink}>{build.module}</Link>
+      );
+
     }
 
     return (
       <tr>
         <td>
-          <Icon type='octicon' name='repo' classNames="repolist-icon" />
+          <Icon type='octicon' name='repo' classNames="icon-roomy icon-muted" />
           <Link to={repoPath}>{repo.repo}</Link>
         </td>
         <td>
-          {lastBuild}
+          {lastBuildNumber}
+          {' '}
+          {lastBuildModule}
+        </td>
+        <td>
+          {lastBuildTimestamp}
         </td>
       </tr>
     );

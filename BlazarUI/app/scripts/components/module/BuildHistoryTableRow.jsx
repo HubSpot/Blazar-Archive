@@ -1,12 +1,12 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
-import Helpers from '../ComponentHelpers';
-import { Link } from 'react-router';
-import Icon from '../shared/Icon.jsx';
-import Copyable from '../shared/Copyable.jsx';
-import {labels, iconStatus} from '../constants';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import { contains } from 'underscore';
+import Helpers from '../ComponentHelpers';
+import {labels, iconStatus} from '../constants';
+import { Link } from 'react-router';
+import Icon from '../shared/Icon.jsx';
+import Sha from '../shared/Sha.jsx';
 
 class BuildHistoryTableRow extends Component {
 
@@ -30,8 +30,6 @@ class BuildHistoryTableRow extends Component {
 
   render() {
     let {build, gitInfo, module} = this.props.build;
-
-    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
     let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
 
@@ -47,19 +45,10 @@ class BuildHistoryTableRow extends Component {
     }
 
     if (build.sha !== undefined) {
-      sha = (
-        <span>
-          <Copyable text={build.sha} hover={this.handleHoverCommit}>
-            <Icon type='octicon' classNames='icon-roomy fa-link' name='clippy' />
-          </Copyable>
-          <a href={commitLink} target="_blank">{Helpers.truncate(build.sha, 8)}</a>
-        </span>
-        );
-    } else {
-      sha = 'None';
+      sha = <Sha gitInfo={gitInfo} build={build} />;
     }
 
-    let progressBar = '';
+    let progressBar;
     if (this.props.progress) {
       let style = 'default';
       let label = '';

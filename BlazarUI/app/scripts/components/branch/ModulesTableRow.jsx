@@ -1,8 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import Icon from '../shared/Icon.jsx';
+import { Link } from 'react-router';
 import {labels, iconStatus} from '../constants';
 import Helpers from '../ComponentHelpers';
-import { Link } from 'react-router';
+
+import Icon from '../shared/Icon.jsx';
+import Sha from '../shared/Sha.jsx';
 
 class ModulesTableRow extends Component {
 
@@ -35,10 +37,14 @@ class ModulesTableRow extends Component {
       modulePath
     } = this.props.module;
 
+    let sha;
     let build = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
     let buildLink = `${window.config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
 
-    let commitLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}/`;
+    if (build.sha !== undefined) {
+      sha = <Sha gitInfo={gitInfo} build={build} />;
+    }
+
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
     let duration = build.duration;
 
@@ -49,7 +55,7 @@ class ModulesTableRow extends Component {
     return (
       <tr className={this.getRowClassNames(build)}>
         <td>
-          <Icon type='octicon' name='file-directory' classNames="repolist-icon" />
+          <Icon type='octicon' name='file-directory' classNames="icon-roomy icon-muted" />
           <Link to={modulePath}>{module.name}</Link>
         </td>
         <td className='build-result-link'>
@@ -63,7 +69,7 @@ class ModulesTableRow extends Component {
           {duration}
         </td>
         <td>
-          <a href={commitLink} target="_blank">{build.sha}</a>
+          {sha}
         </td>
       </tr>
     );

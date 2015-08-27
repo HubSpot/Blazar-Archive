@@ -36,15 +36,13 @@ class Module extends Component {
       );
     }
 
-    let moduleName = this.props.params.module.substring(0, this.props.params.module.lastIndexOf('_'));
-
     return (
       <div>
         <PageHeader>
           <Breadcrumb />
           <Headline>
             <Icon prefix="mega" type="octicon" name="file-directory" classNames="headline-icon" />
-            <span>{moduleName}</span>
+            <span>{this.props.params.module}</span>
             <HeadlineDetail>
               Build History
             </HeadlineDetail>

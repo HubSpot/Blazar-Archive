@@ -39,6 +39,10 @@ let ComponentHelpers = {
     }
     let timeObject = moment(timestamp);
     return timeObject.format('lll');
+  },
+
+  githubShaLink: function(info) {
+    return `https://github.com/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
   }
 
 }

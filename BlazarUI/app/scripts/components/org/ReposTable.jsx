@@ -23,7 +23,8 @@ class ReposTable extends Component {
 
     let columnNames = [
       {label: 'Repository', key: 'name'},
-      {label: 'Last Build', key: 'lastBuild'}
+      {label: 'Latest Build', key: 'lastBuild'},
+      {label: '', key: 'lastBuildTime'}
     ];
 
     // TO DO: empty table
