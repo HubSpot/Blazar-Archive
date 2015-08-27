@@ -115,7 +115,7 @@ public class Build {
   }
 
   public Build withBuildConfig(BuildConfig buildConfig) {
-    return new Build(id, moduleId, buildNumber, state,startTimestamp, endTimestamp, sha, log, Optional.of(buildConfig));
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log, Optional.of(buildConfig));
   }
 
   @Override

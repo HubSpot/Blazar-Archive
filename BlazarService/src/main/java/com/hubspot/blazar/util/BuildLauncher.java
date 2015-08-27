@@ -44,7 +44,6 @@ public class BuildLauncher {
   private final BuildService buildService;
   private final AsyncHttpClient asyncHttpClient;
   private final Map<String, GitHub> gitHubByHost;
-  private final EventBus eventBus;
   private final ObjectMapper objectMapper;
   private final YAMLFactory yamlFactory;
 
@@ -60,7 +59,6 @@ public class BuildLauncher {
     this.buildService = buildService;
     this.asyncHttpClient = asyncHttpClient;
     this.gitHubByHost = gitHubByHost;
-    this.eventBus = eventBus;
     this.objectMapper = objectMapper;
     this.yamlFactory = yamlFactory;
 
@@ -135,13 +133,13 @@ public class BuildLauncher {
   }
 
   private BuildConfig configAtSha(String name, String sha, GitInfo gitInfo) throws IOException {
-    LOG.info("Trying to fetch current config at sha: {}", sha);
+    LOG.info("Trying to fetch current config at sha: {} in repo: {}", sha, gitInfo.getFullRepositoryName());
     GitHub gitHub = gitHubFor(gitInfo);
     GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
-
-    GHContent configContent = repository.getFileContent(".blazar.yaml", sha);
-
-    LOG.info("Found config at hubspot.build/%s ".format(name));
+    // TODO: Actually enable per module configs
+    String configPath = ".blazar.yaml".format(name);
+    GHContent configContent = repository.getFileContent(configPath, sha);
+    LOG.info("Found config at %s".format(configPath));
     return objectMapper.readValue(yamlFactory.createParser(configContent.getContent()), BuildConfig.class);
   }
 
