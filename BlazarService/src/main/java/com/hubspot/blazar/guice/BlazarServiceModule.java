@@ -2,10 +2,6 @@ package com.hubspot.blazar.guice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.google.common.eventbus.AsyncEventBus;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.SubscriberExceptionContext;
-import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
@@ -35,22 +31,19 @@ import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Environment;
-import io.dropwizard.util.Duration;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Map.Entry;
-import java.util.concurrent.Executor;
 
 public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfiguration> {
 
   @Override
   protected void configure(Binder binder, BlazarConfiguration configuration) {
     binder.install(new BlazarDataModule());
+    binder.install(new BlazarZooKeeperModule());
 
     binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 
@@ -72,26 +65,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
       String host = entry.getKey();
       mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
     }
-  }
-
-  @Provides
-  @Singleton
-  public EventBus providesEventBus(Environment environment) {
-    Executor executor = environment.lifecycle()
-        .executorService("EventProcessor-%d")
-        .shutdownTime(Duration.seconds(120))
-        .build();
-
-    return new AsyncEventBus(executor, new SubscriberExceptionHandler() {
-      private final Logger LOG = LoggerFactory.getLogger("SubscriberExceptionHandler");
-
-      @Override
-      public void handleException(Throwable exception, SubscriberExceptionContext context) {
-        String className = context.getSubscriber().getClass().getSimpleName();
-        String methodName = context.getSubscriberMethod().getName();
-        LOG.error("Error calling subscriber method {}.{}", className, methodName, exception);
-      }
-    });
   }
 
   @Provides

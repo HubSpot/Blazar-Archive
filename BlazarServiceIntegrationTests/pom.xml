@@ -213,6 +213,7 @@
                       <port>blazar.port:7199</port>
                     </ports>
                     <env>
+                      <BLAZAR_ZK>blazar-test-zk:2181</BLAZAR_ZK>
                       <BLAZAR_MYSQL_HOST>blazar-test-mysql</BLAZAR_MYSQL_HOST>
                       <BLAZAR_MYSQL_USER>root</BLAZAR_MYSQL_USER>
                       <BLAZAR_MYSQL_PASSWORD>${blazar-mysql.password}</BLAZAR_MYSQL_PASSWORD>

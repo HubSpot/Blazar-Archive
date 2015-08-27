@@ -11,6 +11,8 @@ PATH=/usr/local/sbin:/usr/sbin:/sbin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/
 
 args+=( -Xmx${BLAZAR_MAX_HEAP:-512m} )
 args+=( -Djava.net.preferIPv4Stack=true )
+args+=( -Ddw.zookeeper.quorum="${BLAZAR_ZK:=localhost:2181}" )
+args+=( -Ddw.zookeeper.namespace="${BLAZAR_ZK_NAMESPACE:=blazar}" )
 args+=( -Ddw.database.url="jdbc:mysql://${BLAZAR_MYSQL_HOST:-localhost}:${BLAZAR_MYSQL_PORT:-3306}/${BLAZAR_MYSQL_DATABASE:-Blazar}" )
 
 if [[ -f "${BLAZAR_DB_MIGRATIONS:-}" ]]; then

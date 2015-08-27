@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>12.2</version>
+    <version>12.3</version>
   </parent>
 
   <artifactId>Blazar</artifactId>
@@ -114,9 +114,9 @@
         <version>${dep.rosetta.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.dropwizard</groupId>
-        <artifactId>dropwizard-util</artifactId>
-        <version>${dropwizard.version}</version>
+        <groupId>io.netty</groupId>
+        <artifactId>netty</artifactId>
+        <version>3.9.2.Final</version>
       </dependency>
       <dependency>
         <groupId>net.sourceforge.argparse4j</groupId>
