@@ -6,6 +6,7 @@ import Icon from '../shared/Icon.jsx';
 import Copyable from '../shared/Copyable.jsx';
 import {labels, iconStatus} from '../constants';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
+import { contains } from 'underscore';
 
 class BuildHistoryTableRow extends Component {
 
@@ -34,20 +35,15 @@ class BuildHistoryTableRow extends Component {
     let buildLink = `${config.appRoot}builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name + '_' + module.id}/${build.id}`;
     let startTime = Helpers.timestampFormatted(build.startTimestamp);
 
+    let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
+    
     let duration = '';
     if (build.startTimestamp !== undefined && build.endTimestamp !== undefined) {
       duration = Helpers.timestampDuration(build.endTimestamp - build.startTimestamp);
     }
 
-    let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
-    let sha = '';
-
-    if (build.state === 'IN_PROGRESS') {
-      duration = 'In Progress...';
-    } else if (build.state === 'QUEUED') {
-      duration = 'Queued...';
-    } else if (build.state === 'LAUNCHING') {
-      duration = 'Launching...';
+    if (contains(['IN_PROGRESS', 'QUEUED', 'LAUNCHING'], build.state)) {
+      duration = Helpers.humanizeText(build.state) + '...';
     }
 
     if (build.sha !== undefined) {
@@ -107,11 +103,11 @@ BuildHistoryTableRow.propTypes = {
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
       state: PropTypes.oneOf([
-        'SUCCEEDED', 
-        'FAILED', 
-        'IN_PROGRESS', 
-        'CANCELLED', 
-        'QUEUED', 
+        'SUCCEEDED',
+        'FAILED',
+        'IN_PROGRESS',
+        'CANCELLED',
+        'QUEUED',
         'LAUNCHING'
       ]),
       startTime: PropTypes.number,
