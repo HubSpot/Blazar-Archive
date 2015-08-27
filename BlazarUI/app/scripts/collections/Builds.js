@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import $ from 'jquery';
 import BaseCollection from './BaseCollection';
 
 class Builds extends BaseCollection {
@@ -53,17 +54,28 @@ class Builds extends BaseCollection {
 
   }
 
+
   getReposByOrg(orgInfo) {
-    let builds = this.isBuilding();
-    let orgBuilds = _.filter(builds, function(a) {
-      return a.gitInfo.organization === orgInfo.org
+    const builds = this.isBuilding();
+    const orgBuilds = _.filter(builds, function(a) {
+      return a.gitInfo.organization === orgInfo.org;
     });
 
-    let repos = _.uniq(_.map(orgBuilds, function (build) {
-      let repo = { repo: build.gitInfo.repository };
+    const repos = _.uniq(_.map(orgBuilds, function (build) {
+      const repoLink = `${config.appRoot}builds/${build.gitInfo.host}/${build.gitInfo.organization}/${build.gitInfo.repository}`;
+      let repo = {
+        name: build.gitInfo.repository,
+        repoLink: repoLink
+      };
+
       if(build.lastBuild !== undefined) {
-        repo = {
-          repo: build.gitInfo.repository,
+        let latestBuildLink, moduleLink;
+        latestBuildLink = `${config.appRoot}builds/${build.gitInfo.host}/${build.gitInfo.organization}/${build.gitInfo.repository}/${build.gitInfo.branch}/${build.module.name}/${build.lastBuild.id}`;
+        moduleLink = `${config.appRoot}builds/${build.gitInfo.host}/${build.gitInfo.organization}/${build.gitInfo.repository}/${build.gitInfo.branch}/${build.module.name}_${build.lastBuild.moduleId}`;
+
+        const buildInfo = {
+          latestBuildLink: latestBuildLink,
+          moduleLink: moduleLink,
           latestBuild: {
             state: build.lastBuild.state,
             number: build.lastBuild.buildNumber,
@@ -74,13 +86,17 @@ class Builds extends BaseCollection {
             endTimestamp: build.lastBuild.endTimestamp
           }
         };
+        repo = $.extend({}, repo, buildInfo)
+
       }
       return repo;
-    }), false, function(r) {
-      return r.repo;
+
+    }), false, function(repo) {
+      return repo.name;
     });
-    return _.sortBy(repos, function(r) {
-      return r.repo;
+
+    return _.sortBy(repos, function(repo) {
+      return repo.name;
     });
   }
 
