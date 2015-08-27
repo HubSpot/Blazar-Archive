@@ -206,6 +206,7 @@
                   <run>
                     <namingStrategy>alias</namingStrategy>
                     <links>
+                      <link>blazar-test-zk</link>
                       <link>blazar-test-mysql</link>
                       <link>blazar-test-singularity</link>
                     </links>

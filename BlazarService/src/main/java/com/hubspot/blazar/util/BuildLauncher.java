@@ -1,5 +1,6 @@
 package com.hubspot.blazar.util;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -137,10 +138,15 @@ public class BuildLauncher {
     GitHub gitHub = gitHubFor(gitInfo);
     GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
     // TODO: Actually enable per module configs
-    String configPath = ".blazar.yaml".format(name);
-    GHContent configContent = repository.getFileContent(configPath, sha);
-    LOG.info("Found config at %s".format(configPath));
-    return objectMapper.readValue(yamlFactory.createParser(configContent.getContent()), BuildConfig.class);
+    String configPath = ".blazar.yaml";
+    try {
+      GHContent configContent = repository.getFileContent(configPath, sha);
+      LOG.info("Found config at {}", configPath);
+      return objectMapper.readValue(yamlFactory.createParser(configContent.getContent()), BuildConfig.class);
+    } catch (FileNotFoundException e) {
+      LOG.info("No blazar config file found for project {} using default values", name);
+      return BuildConfig.makeDefaultBuildConfig();
+    }
   }
 
   private String currentSha(GitInfo gitInfo) throws IOException {

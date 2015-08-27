@@ -31,6 +31,11 @@ public class BuildConfig {
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
   }
 
+  public static BuildConfig makeDefaultBuildConfig(){
+    return new BuildConfig(null, null, null, null, null);
+  }
+
+
   public List<String> getCmds() {
     return cmds;
   }
