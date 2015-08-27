@@ -81,10 +81,8 @@ public class GitHubWebhookHandler {
   }
 
   private Set<Module> updateModules(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
-    for (String path : affectedPaths(pushEvent)) {
-      if (isPom(path)) {
-        return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
-      }
+    if (moduleDiscovery.shouldRediscover(gitInfo, pushEvent)) {
+      return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
     }
 
     return moduleService.getByBranch(gitInfo.getId().get());
@@ -106,10 +104,6 @@ public class GitHubWebhookHandler {
         buildService.enqueue(new BuildDefinition(gitInfo, module));
       }
     }
-  }
-
-  private static boolean isPom(String path) {
-    return "pom.xml".equals(path) || path.endsWith("/pom.xml");
   }
 
   private GitInfo gitInfo(CreateEvent createEvent) {

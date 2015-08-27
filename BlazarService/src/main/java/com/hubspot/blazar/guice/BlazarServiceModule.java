@@ -17,9 +17,12 @@ import com.hubspot.blazar.resources.BuildHistoryResource;
 import com.hubspot.blazar.resources.BuildResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.IndexResource;
+import com.hubspot.blazar.util.BlazarServiceLoader;
 import com.hubspot.blazar.util.BuildLauncher;
+import com.hubspot.blazar.util.CompositeModuleDiscovery;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
+import com.hubspot.blazar.util.MavenModuleDiscovery;
 import com.hubspot.blazar.util.ModuleDiscovery;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpConfig;
@@ -37,6 +40,7 @@ import org.kohsuke.github.GitHubBuilder;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.ServiceLoader;
 
 public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfiguration> {
 
@@ -53,12 +57,19 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(BuildHistoryResource.class);
     binder.bind(GitHubWebhookResource.class);
 
-    binder.bind(ModuleDiscovery.class);
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
     binder.bind(BuildLauncher.class);
 
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
+
+    Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
+    multibinder.addBinding().to(MavenModuleDiscovery.class);
+    for (Class<? extends ModuleDiscovery> moduleDiscovery : BlazarServiceLoader.load(ModuleDiscovery.class)) {
+      multibinder.addBinding().to(moduleDiscovery);
+    }
+
+    binder.bind(ModuleDiscovery.class).to(CompositeModuleDiscovery.class);
 
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
     for (Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {
