@@ -46,6 +46,7 @@ class BuildHistoryTableRow extends Component {
       duration = Helpers.humanizeText(build.state) + '...';
     }
 
+    let sha = '';
     if (build.sha !== undefined) {
       sha = (
         <span>
