@@ -36,6 +36,7 @@ CREATE TABLE `builds` (
   `endTimestamp` bigint(20) unsigned,
   `sha` char(40),
   `log` varchar(2048),
+  `buildConfig` mediumtext,
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`moduleId`, `buildNumber`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;

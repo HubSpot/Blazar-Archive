@@ -3,6 +3,7 @@ package com.hubspot.blazar.base;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
+import com.hubspot.rosetta.annotations.StoredAsJson;
 
 import java.util.Objects;
 
@@ -29,6 +30,8 @@ public class Build {
   private final Optional<Long> endTimestamp;
   private final Optional<String> sha;
   private final Optional<String> log;
+  @StoredAsJson
+  private final Optional<BuildConfig> buildConfig;
 
   @JsonCreator
   public Build(@JsonProperty("id") Optional<Long> id,
@@ -38,7 +41,8 @@ public class Build {
                @JsonProperty("startTimestamp") Optional<Long> startTimestamp,
                @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
                @JsonProperty("sha") Optional<String> sha,
-               @JsonProperty("log") Optional<String> log) {
+               @JsonProperty("log") Optional<String> log,
+               @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig) {
     this.id = id;
     this.moduleId = moduleId;
     this.buildNumber = buildNumber;
@@ -47,13 +51,15 @@ public class Build {
     this.endTimestamp = endTimestamp;
     this.sha = sha;
     this.log = log;
+    this.buildConfig = buildConfig;
   }
 
   public static Build queuedBuild(Module module, int buildNumber) {
     Optional<Long> absentLong = Optional.absent();
     Optional<String> absentString = Optional.absent();
+    Optional<BuildConfig> buildConfig = Optional.absent();
 
-    return new Build(absentLong, module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, absentString);
+    return new Build(absentLong, module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, absentString, buildConfig);
   }
 
   public Optional<Long> getId() {
@@ -88,20 +94,28 @@ public class Build {
     return log;
   }
 
+  public Optional<BuildConfig> getBuildConfig() {
+    return buildConfig;
+  }
+
   public Build withId(long id) {
-    return new Build(Optional.of(id), moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log);
+    return new Build(Optional.of(id), moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log, buildConfig);
   }
 
   public Build withSha(String sha) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, Optional.of(sha), log);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, Optional.of(sha), log, buildConfig);
   }
 
   public Build withState(State state) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log, buildConfig);
   }
 
   public Build withStartTimestamp(long startTimestamp) {
-    return new Build(id, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, log);
+    return new Build(id, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, log, buildConfig);
+  }
+
+  public Build withBuildConfig(BuildConfig buildConfig) {
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log, Optional.of(buildConfig));
   }
 
   @Override

@@ -1,7 +1,16 @@
 package com.hubspot.blazar.guice;
 
+import java.io.IOException;
+import java.util.Map.Entry;
+
+import javax.annotation.Nonnull;
+
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
@@ -32,15 +41,9 @@ import com.hubspot.horizon.RetryStrategy;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
+
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Environment;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitHubBuilder;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.util.Map.Entry;
-import java.util.ServiceLoader;
 
 public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfiguration> {
 
@@ -82,6 +85,12 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
   @Singleton
   public DataSourceFactory providesDataSourceFactory(BlazarConfiguration configuration) {
     return configuration.getDatabaseConfiguration();
+  }
+
+  @Provides
+  @Singleton
+  public YAMLFactory providesYAMLFactory() {
+    return new YAMLFactory();
   }
 
   @Provides
