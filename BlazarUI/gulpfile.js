@@ -132,7 +132,8 @@ gulp.task('images', function(cb) {
 gulp.task('watch', function() {
   gulp.watch(app + 'stylus/**/*.styl', ['styles']);
   gulp.watch(app + 'index.html', ['html']);
-  gulp.watch(app + 'scripts/**/*.{js, jsx}', ['scripts', 'lint']);
+  gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
+  gulp.watch(app + 'scripts/**/*.js', ['scripts', 'lint']);
 });
 
 // remove bundles
