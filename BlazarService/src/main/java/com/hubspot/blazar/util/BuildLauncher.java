@@ -127,6 +127,10 @@ public class BuildLauncher {
   }
 
   private String buildCommand(Module module) {
+    if (module.getPath().endsWith(".blazar.yaml")) {
+      return "--safe_mode";
+    }
+
     String whitelist = Objects.firstNonNull(System.getenv("BUILD_WHITELIST"), "");
 
     List<String> modulesToBuild = Splitter.on(',').omitEmptyStrings().splitToList(whitelist);
