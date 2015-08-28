@@ -88,6 +88,6 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   private static boolean isBlazarConfig(String path) {
-    return ".blazar.yml".equals(path) || path.endsWith("/.blazar.yml");
+    return ".blazar.yaml".equals(path) || path.endsWith("/.blazar.yaml");
   }
 }

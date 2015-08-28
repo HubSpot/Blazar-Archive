@@ -101,7 +101,7 @@ public class BuildLauncher {
 
   private synchronized void startBuild(BuildDefinition definition, Build queued) throws Exception {
     String sha = currentSha(definition.getGitInfo());
-    BuildConfig buildConfig = configAtSha(definition.getModule().getName(), sha, definition.getGitInfo());
+    BuildConfig buildConfig = configAtSha(definition, sha);
     Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha).withBuildConfig(buildConfig);
 
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
@@ -133,18 +133,23 @@ public class BuildLauncher {
     return modulesToBuild.contains(module.getName()) ? "--safe_mode" : "--dry_run";
   }
 
-  private BuildConfig configAtSha(String name, String sha, GitInfo gitInfo) throws IOException {
-    LOG.info("Trying to fetch current config at sha: {} in repo: {}", sha, gitInfo.getFullRepositoryName());
-    GitHub gitHub = gitHubFor(gitInfo);
-    GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
-    // TODO: Actually enable per module configs
-    String configPath = ".blazar.yaml";
+  private BuildConfig configAtSha(BuildDefinition definition, String sha) throws IOException {
+    GitHub gitHub = gitHubFor(definition.getGitInfo());
+    GHRepository repository = gitHub.getRepository(definition.getGitInfo().getFullRepositoryName());
+
+    String modulePath = definition.getModule().getPath();
+    String moduleFolder = modulePath.contains("/") ? modulePath.substring(0, modulePath.lastIndexOf('/') + 1) : "";
+    String configPath = moduleFolder + ".blazar.yaml";
+
+    String repositoryName = definition.getGitInfo().getFullRepositoryName();
+    LOG.info("Going to fetch config for path {} in repo {}@{}", configPath, repositoryName, sha);
+
     try {
       GHContent configContent = repository.getFileContent(configPath, sha);
-      LOG.info("Found config at {}", configPath);
+      LOG.info("Found config for path {} in repo {}@{}", configPath, repositoryName, sha);
       return objectMapper.readValue(yamlFactory.createParser(configContent.getContent()), BuildConfig.class);
     } catch (FileNotFoundException e) {
-      LOG.info("No blazar config file found for project {} using default values", name);
+      LOG.info("No config found for path {} in repo {}@{}, using default values", configPath, repositoryName, sha);
       return BuildConfig.makeDefaultBuildConfig();
     }
   }
