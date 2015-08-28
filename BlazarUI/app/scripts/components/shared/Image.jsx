@@ -3,10 +3,12 @@ import React, {Component, PropTypes} from 'react';
 class Image extends Component {
 
   getStyles() {
-    return {
-      width: this.props.width,
-      height: this.props.height
-    };
+    if (this.props.width || this.props.height) {
+      return {
+        width: this.props.width || 'auto',
+        height: this.props.height || 'auto'
+      };
+    }
   }
 
   render() {
@@ -18,15 +20,13 @@ class Image extends Component {
 }
 
 Image.defaultProps = {
-  width: 'auto',
-  height: 'auto',
   classNames: ''
 };
 
 Image.propTypes = {
   src: PropTypes.string.isRequired,
-  width: PropTypes.string,
-  height: PropTypes.string,
+  width: PropTypes.number,
+  height: PropTypes.number,
   classNames: PropTypes.string
 };
 
