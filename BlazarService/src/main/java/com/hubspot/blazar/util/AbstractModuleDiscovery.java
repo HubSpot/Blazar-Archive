@@ -20,6 +20,11 @@ public abstract class AbstractModuleDiscovery implements ModuleDiscovery {
   @Inject
   Map<String, GitHub> gitHubByHost;
 
+  @Override
+  public boolean allowDuplicates() {
+    return true;
+  }
+
   protected String contentsFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
     GHContent content = repository.getFileContent(file, gitInfo.getBranch());
     return content.getContent();

@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
+import com.hubspot.blazar.util.BlazarConfigModuleDiscovery;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -67,6 +68,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 
     Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
+    multibinder.addBinding().to(BlazarConfigModuleDiscovery.class);
     multibinder.addBinding().to(MavenModuleDiscovery.class);
     for (Class<? extends ModuleDiscovery> moduleDiscovery : BlazarServiceLoader.load(ModuleDiscovery.class)) {
       multibinder.addBinding().to(moduleDiscovery);
