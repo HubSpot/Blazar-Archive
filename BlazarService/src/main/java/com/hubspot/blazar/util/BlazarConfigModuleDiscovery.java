@@ -83,7 +83,7 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   private static String moduleName(GitInfo gitInfo, String path) {
-    return path.contains("/") ? gitInfo.getRepository() : folderName(path);
+    return path.contains("/") ? folderName(path) : gitInfo.getRepository();
   }
 
   private static String folderName(String path) {
