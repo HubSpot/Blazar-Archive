@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
+import Image from '../shared/Image.jsx';
 
 class Navigation extends Component {
 
@@ -11,7 +12,7 @@ class Navigation extends Component {
           <div className="container-fluid">
             <div className="navbar-header">
               <Link className="navbar-brand" to="dashboard">
-                <img className="title-image" src={imgPath} />
+                <Image classNames="title-image" src={imgPath} />
               </Link>
             </div>
           </div>
