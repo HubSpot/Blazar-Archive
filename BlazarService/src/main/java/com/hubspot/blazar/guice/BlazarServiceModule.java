@@ -128,7 +128,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
   public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {
     final String endpoint;
-    if ("api.github.com".equals(host)) {
+    if ("github.com".equals(host) || "api.github.com".equals(host)) {
       endpoint = "https://api.github.com";
     } else {
       endpoint = "https://" + host + "/api/v3";

@@ -120,8 +120,8 @@ public class GitHubWebhookHandler {
 
   private GitInfo gitInfo(Repository repository, String ref, boolean active) {
     String host = URI.create(repository.getUrl()).getHost();
-    if ("github.com".equals(host)) {
-      host = "api.github.com";
+    if ("api.github.com".equals(host)) {
+      host = "github.com";
     }
     String fullName = repository.getFullName();
     String organization = fullName.substring(0, fullName.indexOf('/'));
