@@ -1,9 +1,9 @@
+/*global config*/
 import Reflux from 'reflux';
-import $ from 'jquery';
 import ActionSettings from './utils/ActionSettings';
 import Builds from '../collections/Builds';
 
-let BranchActionSettings = new ActionSettings;
+const BranchActionSettings = new ActionSettings;
 
 let BranchActions = Reflux.createActions([
   'loadModules',
@@ -12,17 +12,9 @@ let BranchActions = Reflux.createActions([
   'updatePollingStatus'
 ]);
 
-BranchActions.loadModules.preEmit = function(data) {
-  startPolling(data);
-}
+function startPolling(data) {
 
-BranchActions.updatePollingStatus = function (status) {
-  BranchActionSettings.setPolling(status);
-};
-
-function startPolling(data){
-
-  (function doPoll(){
+  (function doPoll() {
     let builds = new Builds();
     let promise = builds.fetch();
 
@@ -32,9 +24,9 @@ function startPolling(data){
     });
 
     promise.error( (err) => {
-      console.warn('Error connecting to the API. Check that you are connected to the VPN');
+      console.warn('Error connecting to the API. Check that you are connected to the VPN.  ', err);
       BranchActions.loadModulesError('an error occured');
-    })
+    });
 
     promise.always( () => {
       if (BranchActionSettings.polling) {
@@ -44,6 +36,15 @@ function startPolling(data){
 
   })();
 
+}
+
+
+BranchActions.loadModules.preEmit = function(data) {
+  startPolling(data);
+};
+
+BranchActions.updatePollingStatus = function(status) {
+  BranchActionSettings.setPolling(status);
 };
 
 export default BranchActions;

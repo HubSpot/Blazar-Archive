@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-let watchingCache = undefined;
+let watchingCache;
 
 let WatchingProvider = {
 
@@ -32,8 +32,8 @@ let WatchingProvider = {
 
   isWatching: function(o) {
     let watching = this.getWatching();
-    for (var i = 0; i < watching.length; i++) {
-        if (watching[i].repo == o.repo && watching[i].branch == o.branch) {
+    for (let i = 0; i < watching.length; i++) {
+        if (watching[i].repo === o.repo && watching[i].branch === o.branch) {
             return i;
         }
     }
@@ -48,6 +48,6 @@ let WatchingProvider = {
     watchingCache = watching;
   }
 
-}
+};
 
 export default WatchingProvider;

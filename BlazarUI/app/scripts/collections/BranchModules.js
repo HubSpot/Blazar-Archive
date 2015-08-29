@@ -1,9 +1,9 @@
-import _ from 'underscore';
+/*global config*/
 import BaseCollection from './BaseCollection';
 
 class BranchModules extends BaseCollection {
 
-  constructor(branchId){
+  constructor(branchId) {
     this.branchId = branchId;
   }
 

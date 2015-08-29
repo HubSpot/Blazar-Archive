@@ -14,9 +14,9 @@ export const iconStatus = {
   'QUEUED': 'circle-o-notch fa-spin',
   'LAUNCHING': 'circle-o-notch fa-spin',
   'CANCELLED': 'stop opacity-semi'
-}
+};
 
 export const unicode = {
   'left-bracket': '\u007B',
-  'right-bracket':  '\u007D'
+  'right-bracket': '\u007D'
 };

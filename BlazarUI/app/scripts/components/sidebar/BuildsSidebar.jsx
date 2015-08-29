@@ -61,10 +61,7 @@ class BuildsSidebar extends Component {
     let matches = [];
     let list = this.props.builds.grouped;
 
-    // To do: add emphasis on matched letters
     let options = {
-      // pre: '<strong>' ,
-      // post: '>' ,
       extract: function(el) {
         let m = '';
         el.modules.forEach( (build) => {
@@ -125,7 +122,7 @@ class BuildsSidebar extends Component {
       return (
         <BuildsSidebarListItem
           key={item.repo.repoModuleKey}
-          isExpanded={filteredRepos.length < 4 || shouldExpand}
+          isExpanded={shouldExpand}
           filterText={item.filterText}
           repo={item.repo}
           moduleExpandChange={this.moduleExpandChange}

@@ -1,11 +1,12 @@
 import React, {Component, PropTypes} from 'react';
 import {map} from 'underscore';
+import TableHeadRow from './TableHeadRow.jsx';
 
-class TableHeader extends Component {
+class TableHead extends Component {
 
   getColumns() {
     return map(this.props.columnNames, (column) =>
-      <th key={column.key}>{column.label}</th>
+      <TableHeadRow key={column.key} label={column.label} />
     );
   }
 
@@ -22,8 +23,8 @@ class TableHeader extends Component {
 
 }
 
-TableHeader.propTypes = {
+TableHead.propTypes = {
   columnNames: PropTypes.array.isRequired
 };
 
-export default TableHeader;
+export default TableHead;

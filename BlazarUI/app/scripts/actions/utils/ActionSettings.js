@@ -1,6 +1,3 @@
-import Reflux from 'reflux';
-import $ from 'jquery';
-
 class ActionSettings {
 
   constructor() {

@@ -1,11 +1,12 @@
 import Model from './Model';
 
 class Log extends Model {
-  constructor(logFileUrl){
-    this.logFileUrl = logFileUrl + "&offset=0&length=1000000";
+
+  constructor(logFileUrl) {
+    this.logFileUrl = logFileUrl + '&offset=0&length=1000000';
     this.fetchOptions = {
       dataType: 'json'
-    }
+    };
   }
 
   url() {

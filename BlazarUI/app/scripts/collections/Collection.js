@@ -5,7 +5,7 @@ class Collection {
   parse() {}
 
   fetch() {
-    this.data = {}
+    this.data = {};
     let promise = $.ajax({
       url: this.url(),
       type: 'GET',
@@ -15,7 +15,7 @@ class Collection {
     promise.done( (resp) => {
       this.data = resp;
       this.parse();
-    })
+    });
 
     return promise;
 

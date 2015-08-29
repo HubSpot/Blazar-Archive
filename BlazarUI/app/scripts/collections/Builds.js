@@ -1,3 +1,4 @@
+/*global config*/
 import _ from 'underscore';
 import BaseCollection from './BaseCollection';
 
@@ -45,7 +46,7 @@ class Builds extends BaseCollection {
       }
 
       if (pendingBuild) {
-        moduleInfo.pendingBuild = true
+        moduleInfo.pendingBuild = true;
       }
 
       return moduleInfo;
@@ -56,12 +57,12 @@ class Builds extends BaseCollection {
   getReposByOrg(orgInfo) {
     let builds = this.hasBuildState();
     let orgBuilds = _.filter(builds, function(a) {
-      return a.gitInfo.organization === orgInfo.org
+      return a.gitInfo.organization === orgInfo.org;
     });
 
-    let repos = _.uniq(_.map(orgBuilds, function (build) {
+    let repos = _.uniq(_.map(orgBuilds, function(build) {
       let latestBuild = (build.inProgressBuild ? build.inProgressBuild : build.lastBuild ? build.lastBuild : build.pendingBuild);
-      latestBuild.module = build.module.name
+      latestBuild.module = build.module.name;
       latestBuild.branch = build.gitInfo.branch;
       let repo = {
         repo: build.gitInfo.repository,
@@ -81,17 +82,17 @@ class Builds extends BaseCollection {
       organization: branchInfo.org,
       repository: branchInfo.repo,
       branch: branchInfo.branch
-    })
+    });
   }
 
-  getBranchesByRepo(repoInfo){
+  getBranchesByRepo(repoInfo) {
     let branches = _.filter(this.groupBuildsByRepo(), (repo) => {
       return repo.organization === repoInfo.org && repo.repository === repoInfo.repo;
-    })
+    });
 
     branches.sort( (a, b) => {
-      return b.branch - a.branch
-    })
+      return b.branch - a.branch;
+    });
 
     // move master to top of branches list
     let masterIndex = branches.map(function(el) {
@@ -118,24 +119,24 @@ class Builds extends BaseCollection {
 
       repo.moduleIsBuilding = false;
 
-      for (var value of repo) {
-        if(value.inProgressBuild){
+      for (let value in repo) {
+        if (value.inProgressBuild) {
           repo.moduleIsBuilding = true;
           break;
         }
       }
       return repo;
-    })
+    });
 
     // move groupedBy object into an easier-to-work-with array
     let groupedInArray = [];
-    for (var repo in grouped) {
+    for (let repo in grouped) {
       groupedInArray.push({
         repoModuleKey: repo,
         repository: grouped[repo][0].gitInfo.repository,
         isBuilding: grouped[repo].moduleIsBuilding,
         modules: grouped[repo]
-      })
+      });
     }
 
     // store some helper properites
@@ -157,17 +158,17 @@ class Builds extends BaseCollection {
             repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
           }
         }
-      })
-    })
+      });
+    });
 
     // sort by if building then by most recent build time
     function cmp(x, y) {
       return x > y ? 1 : x < y ? -1 : 0;
     }
 
-    groupedInArray.sort( (a,b) => { ;
+    groupedInArray.sort( (a, b) => {
       return cmp(b.isBuilding, a.isBuilding) || cmp(a.mostRecentBuild, b.mostRecentBuild);
-    })
+    });
 
     return groupedInArray;
   }

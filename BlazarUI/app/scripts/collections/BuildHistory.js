@@ -1,18 +1,18 @@
-import _ from 'underscore';
+/*global config*/
 import BaseCollection from './BaseCollection';
 
 class BuildHistory extends BaseCollection {
 
-  constructor(module){
+  constructor(module) {
     this.module = module;
   }
 
   url() {
     let moduleId = this.module.moduleId;
-    return `${config.apiRoot}/build/history/module/${moduleId}`
+    return `${config.apiRoot}/build/history/module/${moduleId}`;
   }
 
-  parse(){
+  parse() {
     this.addTimeHelpers();
   }
 }

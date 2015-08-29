@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import TableHeader from '../shared/TableHeader.jsx';
+import TableHead from '../shared/TableHead.jsx';
 import ReposTableRow from './ReposTableRow.jsx';
 
 class ReposTable extends Component {
@@ -30,7 +30,7 @@ class ReposTable extends Component {
     // TO DO: empty table
     return (
       <table className="table table-hover table-striped">
-        <TableHeader
+        <TableHead
           columnNames={columnNames}
         />
         <tbody>

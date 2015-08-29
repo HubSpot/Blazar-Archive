@@ -1,5 +1,5 @@
+/*global config*/
 import Reflux from 'reflux';
-import $ from 'jquery';
 
 import Builds from '../collections/Builds';
 
@@ -9,9 +9,9 @@ let BuildsActions = Reflux.createActions([
   'loadBuildsError'
 ]);
 
-BuildsActions.loadBuilds.preEmit = function(data) {
+BuildsActions.loadBuilds.preEmit = function() {
 
-  (function doPoll(){
+  (function doPoll() {
     let builds = new Builds();
     let promise = builds.fetch();
 
@@ -27,10 +27,10 @@ BuildsActions.loadBuilds.preEmit = function(data) {
     });
 
     promise.error( (err) => {
-      console.warn('Error connecting to the API. Check that you are connected to the VPN');
+      console.warn('Error connecting to the API. Check that you are connected to the VPN ', err);
       // To do
       BuildsActions.loadBuildsError('an error occured');
-    })
+    });
 
 
   })();

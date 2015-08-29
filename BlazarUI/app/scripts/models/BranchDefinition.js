@@ -1,9 +1,10 @@
+/*global config*/
 import Model from './Model';
 
 class BranchDefinition extends Model {
 
   constructor(gitInfo) {
-    super()
+    super();
     this.gitInfo = gitInfo;
   }
 

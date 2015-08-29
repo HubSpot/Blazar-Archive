@@ -18,10 +18,10 @@ class Model {
       dataType: this.fetchOptions.dataType || 'json'
     });
 
-    promise.done( (resp) => {
+    promise.done((resp) => {
       this.data = resp;
       this.parse();
-    })
+    });
 
     return promise;
 

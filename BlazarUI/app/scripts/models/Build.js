@@ -1,8 +1,9 @@
+/*global config*/
 import Model from './Model';
 
 class Build extends Model {
-  constructor(build){
-    super()
+  constructor(build) {
+    super();
     this.build = build;
   }
 
@@ -12,7 +13,7 @@ class Build extends Model {
 
   url() {
     let build = this.build;
-    return `${config.apiRoot}/build/history/module/${build.moduleId}/build/${build.buildNumber}/`
+    return `${config.apiRoot}/build/history/module/${build.moduleId}/build/${build.buildNumber}/`;
   }
 }
 

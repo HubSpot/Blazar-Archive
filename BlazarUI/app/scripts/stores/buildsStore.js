@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
 
-var BuildsStore = Reflux.createStore({
+const BuildsStore = Reflux.createStore({
 
   init() {
     this.builds = [];
@@ -21,14 +21,14 @@ var BuildsStore = Reflux.createStore({
     this.builds = builds;
 
     this.trigger({
-      builds : this.builds,
+      builds: this.builds,
       loading: false
     });
   },
 
   loadBuildsError(error) {
     this.trigger({
-      error : error,
+      error: error,
       loading: false
     });
   }

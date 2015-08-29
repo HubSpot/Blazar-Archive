@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-let starCache = undefined;
+let starCache;
 
 let StarredProvider = {
 
@@ -32,8 +32,8 @@ let StarredProvider = {
 
   hasStar: function(o) {
     let stars = this.getStars();
-    for (var i = 0; i < stars.length; i++) {
-        if (stars[i].repo == o.repo && stars[i].branch == o.branch) {
+    for (let i = 0; i < stars.length; i++) {
+        if (stars[i].repo === o.repo && stars[i].branch === o.branch) {
             return i;
         }
     }
@@ -48,6 +48,6 @@ let StarredProvider = {
     starCache = starredRepos;
   }
 
-}
+};
 
 export default StarredProvider;

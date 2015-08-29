@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 import OrgActions from '../actions/orgActions';
 
-var orgStore = Reflux.createStore({
+const orgStore = Reflux.createStore({
 
   init() {
     this.repos = [];
@@ -21,14 +21,14 @@ var orgStore = Reflux.createStore({
     this.repos = repos;
 
     this.trigger({
-      repos : this.repos,
+      repos: this.repos,
       loading: false
     });
   },
 
   loadReposError(error) {
     this.trigger({
-      error : error,
+      error: error,
       loading: false
     });
   }

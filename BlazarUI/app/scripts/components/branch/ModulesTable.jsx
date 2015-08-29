@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import TableHeader from '../shared/TableHeader.jsx';
+import TableHead from '../shared/TableHead.jsx';
 import ModulesTableRow from './ModulesTableRow.jsx';
 
 class ModulesTable extends Component {
@@ -30,7 +30,7 @@ class ModulesTable extends Component {
     // TO DO: empty table
     return (
       <table className="table table-hover table-striped">
-        <TableHeader
+        <TableHead
           columnNames={columnNames}
         />
         <tbody>
