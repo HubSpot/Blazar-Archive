@@ -130,8 +130,9 @@ gulp.task('images', function(cb) {
 
 // watch styl, html and js file changes
 gulp.task('watch', function() {
+  gulp.watch(app + 'images/**/*.{png,jpg,jpeg,gif,svg}', ['images']);
   gulp.watch(app + 'stylus/**/*.styl', ['styles']);
-  gulp.watch(app + 'index.html', ['html']);
+  gulp.watch(app + 'index.mustache', ['html']);
   gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
   gulp.watch(app + 'scripts/**/*.js', ['scripts', 'lint']);
 });
