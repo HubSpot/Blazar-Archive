@@ -113,7 +113,8 @@ public class BuildLauncher {
       LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
     } else {
       LOG.info("Failing build {}", queued.getId().get());
-      Build failed = queued.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis());
+      // TODO
+      Build failed = queued.withState(State.FAILED).withLog("https://fake.com").withEndTimestamp(System.currentTimeMillis());
       buildService.update(failed);
     }
   }
