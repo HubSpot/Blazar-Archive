@@ -40,7 +40,7 @@ class Build extends Component {
     return (
       <div>
         <PageHeader>
-          <Breadcrumb />
+          <Breadcrumb path={window.location.pathname} />
           <Headline>
             <Icon name={buildStateIcon} classNames="headline-icon"></Icon>
             <span>{this.props.params.module}</span>

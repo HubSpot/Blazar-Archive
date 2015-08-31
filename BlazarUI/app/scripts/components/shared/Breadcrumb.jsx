@@ -1,12 +1,12 @@
 /*global config*/
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 const Link = require('react-router').Link;
 
 
 class Breadcrumb extends Component {
 
   render() {
-    const path = window.location.pathname.split('/');
+    const path = this.props.path.split('/');
     const pages = path.slice(2, path.length);
     const links = [];
 
@@ -30,5 +30,11 @@ class Breadcrumb extends Component {
 
   }
 }
+
+
+Breadcrumb.propTypes = {
+  path: PropTypes.string.isRequired
+};
+
 
 export default Breadcrumb;

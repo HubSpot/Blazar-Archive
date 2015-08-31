@@ -39,7 +39,7 @@ class Module extends Component {
     return (
       <div>
         <PageHeader>
-          <Breadcrumb />
+          <Breadcrumb path={window.location.pathname} />
           <Headline>
             <Icon prefix="mega" type="octicon" name="file-directory" classNames="headline-icon" />
             <span>{this.props.params.module}</span>

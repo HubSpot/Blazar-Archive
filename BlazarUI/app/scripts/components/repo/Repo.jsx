@@ -23,7 +23,7 @@ class Repo extends Component {
     return (
       <div>
         <PageHeader>
-          <Breadcrumb />
+          <Breadcrumb path={window.location.pathname} />
           <Headline>
             <Icon prefix="mega" type="octicon" name="repo" classNames="headline-icon" />
             <span>{this.props.params.repo}</span>
