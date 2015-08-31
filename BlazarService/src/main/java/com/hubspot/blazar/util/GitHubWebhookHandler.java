@@ -1,6 +1,8 @@
 package com.hubspot.blazar.util;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.net.UrlEscapers;
@@ -23,7 +25,9 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Singleton
@@ -127,10 +131,20 @@ public class GitHubWebhookHandler {
     String organization = fullName.substring(0, fullName.indexOf('/'));
     String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
     long repositoryId = repository.getId();
-    String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
+    String branch = escapeBranchName(ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref);
     String escapedBranch = UrlEscapers.urlPathSegmentEscaper().escape(branch);
 
     return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, escapedBranch, active);
+  }
+
+  private static String escapeBranchName(String branchName) {
+    List<String> parts = Splitter.on('/').splitToList(branchName);
+    List<String> escaped = new ArrayList<>();
+    for (String part : parts) {
+      escaped.add(UrlEscapers.urlPathSegmentEscaper().escape(part));
+    }
+
+    return Joiner.on('/').join(escaped);
   }
 
   private static Set<String> affectedPaths(PushEvent pushEvent) {
