@@ -132,9 +132,8 @@ public class GitHubWebhookHandler {
     String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
     long repositoryId = repository.getId();
     String branch = escapeBranchName(ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref);
-    String escapedBranch = UrlEscapers.urlPathSegmentEscaper().escape(branch);
 
-    return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, escapedBranch, active);
+    return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, branch, active);
   }
 
   private static String escapeBranchName(String branchName) {
@@ -156,5 +155,9 @@ public class GitHubWebhookHandler {
     }
 
     return affectedPaths;
+  }
+
+  public static void main(String... args) throws Exception {
+    System.out.println(escapeBranchName("jgetto/contact-details-slowlane"));
   }
 }
