@@ -23,6 +23,18 @@
       <name>Jonathan Haber</name>
       <email>jhaber@hubspot.com</email>
     </developer>
+    <developer>
+      <name>Jonathan Goodwin</name>
+      <email>jgoodwin@hubspot.com</email>
+    </developer>
+    <developer>
+      <name>Ben Lodge</name>
+      <email>blodge@hubspot.com</email>
+    </developer>
+    <developer>
+      <name>Kevin Moses</name>
+      <email>kmoses@hubspot.com</email>
+    </developer>    
   </developers>
 
   <properties>
