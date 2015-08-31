@@ -114,6 +114,14 @@ public class Build {
     return new Build(id, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, log, buildConfig);
   }
 
+  public Build withEndTimestamp(long endTimestamp) {
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), sha, log, buildConfig);
+  }
+
+  public Build withLog(String log) {
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, Optional.of(log), buildConfig);
+  }
+
   public Build withBuildConfig(BuildConfig buildConfig) {
     return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log, Optional.of(buildConfig));
   }
