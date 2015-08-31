@@ -8,18 +8,20 @@ class Star extends Component {
   constructor(props) {
     super(props);
     bindAll(this, 'handleClick');
-    this.state = { starred: StarredProvider.hasStar({ repo: props.repo, branch: props.branch }) !== -1 };
+    this.state = {
+      starred: StarredProvider.hasStar({
+        repo: props.repo,
+        branch: props.branch
+      }) !== -1 };
   }
 
   handleClick(event) {
     event.stopPropagation();
-    this.setState({starred: !this.state.starred});
+    this.setState({
+      starred: !this.state.starred
+    });
 
-    if (!this.state.starred) {
-      StarredProvider.addStar(this.props.repo, this.props.branch);
-    } else {
-      StarredProvider.removeStar(this.props.repo, this.props.branch);
-    }
+    StarredProvider.starChange(this.state.starred, this.props.repo, this.props.branch);
   }
 
   render() {

@@ -4,6 +4,14 @@ let starCache;
 
 let StarredProvider = {
 
+  starChange: function(type, repo, branch) {
+    if (type === false) {
+      this.addStar(repo, branch);
+    } else {
+      this.removeStar(repo, branch);
+    }
+  },
+
   addStar: function(repo, branch) {
     let starredRepos = this.getStars();
     if (this.hasStar({ repo: repo, branch: branch }) === -1) {
