@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.google.common.base.Optional;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
@@ -100,15 +101,21 @@ public class BuildLauncher {
   }
 
   private synchronized void startBuild(BuildDefinition definition, Build queued) throws Exception {
-    String sha = currentSha(definition.getGitInfo());
-    BuildConfig buildConfig = configAtSha(definition, sha);
-    Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha).withBuildConfig(buildConfig);
+    Optional<String> sha = currentSha(definition.getGitInfo());
+    if (sha.isPresent()) {
+      BuildConfig buildConfig = configAtSha(definition, sha.get());
+      Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha.get()).withBuildConfig(buildConfig);
 
-    LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
-    buildService.begin(launching);
-    LOG.info("About to launch build {}", launching.getId().get());
-    HttpResponse response = asyncHttpClient.execute(buildRequest(definition.getModule(), launching)).get();
-    LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
+      LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
+      buildService.begin(launching);
+      LOG.info("About to launch build {}", launching.getId().get());
+      HttpResponse response = asyncHttpClient.execute(buildRequest(definition.getModule(), launching)).get();
+      LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
+    } else {
+      LOG.info("Failing build {}", queued.getId().get());
+      Build failed = queued.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis());
+      buildService.update(failed);
+    }
   }
 
   private HttpRequest buildRequest(Module module, Build build) {
@@ -158,14 +165,19 @@ public class BuildLauncher {
     }
   }
 
-  private String currentSha(GitInfo gitInfo) throws IOException {
+  private Optional<String> currentSha(GitInfo gitInfo) throws IOException {
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
     GitHub gitHub = gitHubFor(gitInfo);
 
     GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
-    GHBranch branch = Preconditions.checkNotNull(repository.getBranches().get(gitInfo.getBranch()));
-    LOG.info("Found sha {} for branch {}/{}", branch.getSHA1(), gitInfo.getRepository(), gitInfo.getBranch());
-    return branch.getSHA1();
+    GHBranch branch = repository.getBranches().get(gitInfo.getBranch());
+    if (branch == null) {
+      LOG.info("Couldn't find branch {} for repository {}", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
+      return Optional.absent();
+    } else {
+      LOG.info("Found sha {} for branch {}/{}", branch.getSHA1(), gitInfo.getRepository(), gitInfo.getBranch());
+      return Optional.of(branch.getSHA1());
+    }
   }
 
   private GitHub gitHubFor(GitInfo gitInfo) {
