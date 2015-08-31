@@ -1,7 +1,7 @@
-jest.dontMock('../../components/shared/SectionLoader.jsx');
+jest.dontMock('../../components/shared/Star.jsx');
 
 import React from 'react/addons';
-import SectionLoader from '../../components/shared/SectionLoader.jsx';
+import Star from '../../components/shared/Star.jsx';
 
 const TestUtils = React.addons.TestUtils;
 
@@ -11,20 +11,26 @@ function renderedOutput(elt) {
   return shallowRenderer.getRenderOutput();
 }
 
-describe('<SectionLoader />', () => {
+describe('<Star />', () => {
 
-  let sectionLoader;
+  let shallowStar, star, button;
 
   beforeEach(() => {
-    sectionLoader = renderedOutput(<SectionLoader />);
+    shallowStar = renderedOutput(<Star repo='Blazar' branch='master'></Star>);
+    star = TestUtils.renderIntoDocument(<Star repo='apple' branch='bacon'></Star>);
+    button = TestUtils.findRenderedDOMComponentWithClass(
+      star, 'sidebar__star'
+    );
   });
 
   it('should have the right tag', () => {
-    expect(sectionLoader.type).toBe('div');
+    expect(shallowStar.type).toBe('span');
   });
 
-  it('should have the right class names', () => {
-    expect(sectionLoader.props.className).toBe('section-loader');
+  it('should call event handler when clicked', () => {
+    star.setState({ starred: false });
+    expect(button.props.className).toBe('sidebar__star unselected');
   });
+
 
 });
