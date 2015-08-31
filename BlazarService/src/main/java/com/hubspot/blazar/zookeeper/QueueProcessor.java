@@ -131,7 +131,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
             LOG.debug("Deleting successfully processed queue item: {}", path);
             curatorFramework.delete().guaranteed().forPath(path);
           } else {
-            LOG.info("Failed to process queue item, will retry: {}");
+            LOG.info("Failed to process queue item, will retry: {}", path);
           }
         }
       } catch (Throwable t) {
