@@ -9,52 +9,46 @@ class SidebarFilter extends Component {
     super(props, context);
 
     this.state = {
-      inputValue: '',
-      showStarred: true
+      inputValue: ''
     };
-    bindAll(this, 'handleOptionClick', 'handleChange', 'handleFocus', 'handleBlur');
 
+    bindAll(this,
+      'handleFilterChange',
+      'handleFilterFocus',
+      'handleFilterBlur',
+      'toggleFilter'
+    );
+
+  }
+
+  componentDidMount() {
+    this.handleFilterFocus();
   }
 
   setInputValue(value) {
     this.props.updateResults(value);
   }
 
-  linkToBuild(link) {
-    this.context.router.transitionTo(link);
-  }
-
-  handleChange(value) {
+  handleFilterChange(value) {
     this.setInputValue(value);
   }
 
-  handleOptionClick(event, build) {
-    this.linkToBuild(build.link);
-  }
-
-  handleFocus() {
+  handleFilterFocus() {
     this.props.filterInputFocus(true);
   }
 
-  handleBlur() {
+  handleFilterBlur() {
     this.props.filterInputFocus(false);
   }
 
-  handleSelect() {
-    let id = event.target.id;
-    if (id === 'starred') {
-      this.state.showStarred = true;
-    } else {
-      this.state.showStarred = false;
-    }
-    this.forceUpdate();
-    this.props.updateStarred(this.state.showStarred);
+  toggleFilter(filter) {
+    let showStarred = filter === 'starred' ? true : false;
+    this.props.updateStarred(showStarred);
   }
 
   render() {
-
     if (this.props.loading || this.props.repos.length === 0) {
-      return <div></div>;
+      return <div />;
     }
 
     return (
@@ -65,13 +59,14 @@ class SidebarFilter extends Component {
             placeholder='Filter modules...'
             inputValue={this.props.filterText}
             options={this.props.modules}
-            onChange={this.handleChange}
-            onBlur={this.handleBlur}
-            onFocus={this.handleFocus}
-            showStarred={this.state.showStarred}
-          />
+            onChange={this.handleFilterChange}
+            onBlur={this.handleFilterBlur}
+            onFocus={this.handleFilterFocus}
+            showStarred={this.props.showStarred} />
         </div>
-      <StarredToggle onClick={this.handleSelect.bind(this)} showStarred={this.state.showStarred}></StarredToggle>
+        <StarredToggle
+          toggleFilter={this.toggleFilter}
+          showStarred={this.props.showStarred} />
       </div>
     );
 
@@ -89,7 +84,8 @@ SidebarFilter.propTypes = {
   filterText: PropTypes.string.isRequired,
   filterInputFocus: PropTypes.func.isRequired,
   repos: PropTypes.array.isRequired,
-  updateStarred: PropTypes.func.isRequired
+  updateStarred: PropTypes.func.isRequired,
+  showStarred: PropTypes.bool.isRequired
 };
 
 export default SidebarFilter;

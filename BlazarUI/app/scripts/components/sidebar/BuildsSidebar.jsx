@@ -59,7 +59,7 @@ class BuildsSidebar extends Component {
 
   getFilteredRepos() {
     let matches = [];
-    let list = this.props.builds.grouped;
+    const list = this.props.builds.grouped;
 
     let options = {
       extract: function(el) {
@@ -125,8 +125,7 @@ class BuildsSidebar extends Component {
           isExpanded={shouldExpand}
           filterText={item.filterText}
           repo={item.repo}
-          moduleExpandChange={this.moduleExpandChange}
-        />
+          moduleExpandChange={this.moduleExpandChange} />
       );
     });
 
@@ -157,6 +156,7 @@ class BuildsSidebar extends Component {
             filterInputFocus={this.filterInputFocus}
             updateResults={this.updateResults}
             updateStarred={this.updateStarred}
+            showStarred={this.state.showStarred}
           />
         </div>
         {list}
