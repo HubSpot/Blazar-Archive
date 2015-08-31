@@ -1,6 +1,7 @@
 package com.hubspot.blazar.util;
 
 import com.google.common.base.Preconditions;
+import com.google.common.net.UrlEscapers;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
@@ -31,7 +32,8 @@ public abstract class AbstractModuleDiscovery implements ModuleDiscovery {
   }
 
   protected GHTree treeFor(GHRepository repository, GitInfo gitInfo) throws IOException {
-    return repository.getTreeRecursive(gitInfo.getBranch(), 1);
+    String escapedBranch = UrlEscapers.urlPathSegmentEscaper().escape(gitInfo.getBranch());
+    return repository.getTreeRecursive(escapedBranch, 1);
   }
 
   protected GHRepository repositoryFor(GitInfo gitInfo) throws IOException {
