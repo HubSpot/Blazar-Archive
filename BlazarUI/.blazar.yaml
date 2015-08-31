@@ -1,2 +1,3 @@
 cmds:
-  - echo hello world
+  - npm install
+  - ./node_modules/.bin/gulp build
