@@ -1,9 +1,9 @@
 import React, {Component, PropTypes} from 'react';
 import Module from '../sidebar/Module.jsx';
-import PanelGroup from 'react-bootstrap/lib/PanelGroup';
-import Panel from 'react-bootstrap/lib/Panel';
+
 import {filter, map, max} from 'underscore';
 import Helpers from '../ComponentHelpers';
+import Collapsable from '../shared/Collapsable.jsx';
 
 class DashboardRepoDetails extends Component {
 
@@ -15,6 +15,7 @@ class DashboardRepoDetails extends Component {
     let repo = this.props.repo;
     let buildingModuleList = [];
     let inactiveModuleList = [];
+    let inactivePanel, activePanel;
 
     filter(repo.modules, (m) => {
       return m.inProgressBuild;
@@ -33,9 +34,23 @@ class DashboardRepoDetails extends Component {
     });
 
     let activePanelHeader = `Active Builds (${buildingModuleList.length})`;
-    let activePanel = (buildingModuleList.length !== 0 ? <Panel header={activePanelHeader} eventKey='1'>{buildingModuleList}</Panel> : '');
     let inactivePanelHeader = `Inactive Builds (${inactiveModuleList.length})`;
-    let inactivePanel = (inactiveModuleList.length !== 0 ? <Panel header={inactivePanelHeader} eventKey='2'>{inactiveModuleList}</Panel> : '');
+
+    if (inactiveModuleList.length > 0) {
+      inactivePanel = (
+        <Collapsable header={inactivePanelHeader}>
+          {inactiveModuleList}
+        </Collapsable>
+      )
+    }
+
+    if (buildingModuleList.length > 0) {
+      activePanel = (
+        <Collapsable header={activePanelHeader}>
+          {buildingModuleList}
+        </Collapsable>
+      )
+    }
 
     let latest = Helpers.timestampFormatted(max(map(repo.modules, (m) => {
       if (m.inProgressBuild) {
@@ -51,10 +66,8 @@ class DashboardRepoDetails extends Component {
         <span className="dashboard__latest-activity">
           Last Activity: {latest}
         </span>
-        <PanelGroup accordion>
-          {activePanel}
-          {inactivePanel}
-        </PanelGroup>
+        {activePanel}
+        {inactivePanel}
       </div>
     );
   }

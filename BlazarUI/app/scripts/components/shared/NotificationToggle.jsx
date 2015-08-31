@@ -11,7 +11,12 @@ class NotificationToggle extends Component {
   constructor(props) {
     super(props);
     bindAll(this, 'handleWatchingChange');
-    this.state = { watching: WatchingProvider.isWatching({ repo: this.props.repo, branch: this.props.branch }) !== -1 };
+    this.state = {
+      watching: WatchingProvider.isWatching({
+        repo: this.props.repo,
+        branch: this.props.branch
+      }) !== -1
+    };
   }
 
   handleWatchingChange() {
@@ -29,7 +34,7 @@ class NotificationToggle extends Component {
   render() {
     let tooltip = (
       <Tooltip id="copy-tooltip">
-            <span id="copy-tooltip-text">Notify me when builds complete</span>
+        <span id="copy-tooltip-text">Notify me when builds complete</span>
       </Tooltip>
     );
 
