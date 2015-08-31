@@ -10,11 +10,19 @@ class SearchFilter extends Component {
 
   componentDidMount() {
     window.addEventListener('keyup', this.handleKeyup);
-    this.refs.searchFilterInput.getDOMNode().focus();
+    this.focusInput();
+  }
+
+  componentDidUpdate() {
+    this.focusInput();
   }
 
   componentWillUnmount() {
     window.removeEventListener('keyup', this.handleKeyup);
+  }
+
+  focusInput() {
+    this.refs.searchFilterInput.getDOMNode().focus();
   }
 
   handleKeyup(e) {
