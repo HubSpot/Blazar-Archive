@@ -1,4 +1,3 @@
-/*global config*/
 import React, {Component, PropTypes} from 'react';
 const Link = require('react-router').Link;
 
@@ -15,14 +14,14 @@ class Breadcrumb extends Component {
       if (i !== pages.length - 1 && i !== 0) {
         const pageLink = pages.slice(0, i + 1).join('/');
         key = page + i;
-        link = <Link key={key} className='crumb' to={`${config.appRoot}/builds/${pageLink}`}>{page}</Link>;
+        link = <Link key={key} className='crumb' to={`${this.props.appRoot}/builds/${pageLink}`}>{page}</Link>;
       } else if (i === 0) {
         link = page + ' / ';
       } else {
         link = page;
       }
       links.push(link);
-    });
+    }.bind(this));
 
     return (
       <div className='breadcrumbs'> {links} </div>
@@ -33,7 +32,8 @@ class Breadcrumb extends Component {
 
 
 Breadcrumb.propTypes = {
-  path: PropTypes.string.isRequired
+  path: PropTypes.string.isRequired,
+  appRoot: PropTypes.string.isRequired,
 };
 
 

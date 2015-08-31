@@ -1,3 +1,4 @@
+/*global config*/
 import React, {Component, PropTypes} from 'react';
 import PageHeader from '../shared/PageHeader.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
@@ -21,7 +22,10 @@ class org extends Component {
     return (
       <div>
         <PageHeader>
-          <Breadcrumb path={window.location.pathname} />
+          <Breadcrumb
+            appRoot={config.appRoot}
+            path={window.location.pathname}
+          />
           <Headline>
             <Icon prefix="mega" type="octicon" name="organization" classNames="headline-icon" />
             <span>{this.props.params.org}</span>

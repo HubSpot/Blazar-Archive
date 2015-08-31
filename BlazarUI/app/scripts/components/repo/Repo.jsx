@@ -1,3 +1,4 @@
+/*global config*/
 import React, {Component, PropTypes} from 'react';
 import Branches from './Branches.jsx';
 import PageHeader from '../shared/PageHeader.jsx';
@@ -23,7 +24,10 @@ class Repo extends Component {
     return (
       <div>
         <PageHeader>
-          <Breadcrumb path={window.location.pathname} />
+          <Breadcrumb
+            appRoot={config.appRoot}
+            path={window.location.pathname}
+          />
           <Headline>
             <Icon prefix="mega" type="octicon" name="repo" classNames="headline-icon" />
             <span>{this.props.params.repo}</span>
