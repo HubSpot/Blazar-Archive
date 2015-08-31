@@ -96,7 +96,6 @@ public class BuildService {
   public void update(Build build) {
     if (build.getState().isComplete()) {
       Preconditions.checkArgument(build.getEndTimestamp().isPresent());
-      Preconditions.checkArgument(build.getLog().isPresent());
 
       checkAffectedRowCount(buildDao.complete(build));
       checkAffectedRowCount(moduleDao.updateLastBuild(build));
