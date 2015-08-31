@@ -112,6 +112,7 @@ public class BuildLauncher {
       HttpResponse response = asyncHttpClient.execute(buildRequest(definition.getModule(), launching)).get();
       LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
     } else {
+      // TODO mark branch as inactive
       LOG.info("Failing build {}", queued.getId().get());
       buildService.begin(queued.withState(State.LAUNCHING));
       buildService.update(queued.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
@@ -169,7 +170,13 @@ public class BuildLauncher {
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
     GitHub gitHub = gitHubFor(gitInfo);
 
-    GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
+    final GHRepository repository;
+    try {
+      repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
+    } catch (FileNotFoundException e) {
+      LOG.info("Couldn't find repository {}", gitInfo.getFullRepositoryName());
+      return Optional.absent();
+    }
     GHBranch branch = repository.getBranches().get(gitInfo.getBranch());
     if (branch == null) {
       LOG.info("Couldn't find branch {} for repository {}", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
