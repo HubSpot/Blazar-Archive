@@ -10,7 +10,7 @@ import LazyRender from '../shared/LazyRender.jsx';
 class BuildsSidebar extends Component {
 
   constructor() {
-    bindAll(this, 'updateResults', 'filterInputFocus', 'moduleExpandChange', 'updateStarred');
+    bindAll(this, 'updateResults', 'moduleExpandChange', 'updateStarred');
 
     this.state = {
       filterText: '',
@@ -49,12 +49,6 @@ class BuildsSidebar extends Component {
     });
 
     return filteredModules;
-  }
-
-  filterInputFocus(status) {
-    this.setState({
-      isFiltering: status
-    });
   }
 
   getFilteredRepos() {
@@ -153,7 +147,6 @@ class BuildsSidebar extends Component {
             repos={this.props.builds.grouped}
             modules={this.getModulesList()}
             filterText={this.state.filterText}
-            filterInputFocus={this.filterInputFocus}
             updateResults={this.updateResults}
             updateStarred={this.updateStarred}
             showStarred={this.state.showStarred}

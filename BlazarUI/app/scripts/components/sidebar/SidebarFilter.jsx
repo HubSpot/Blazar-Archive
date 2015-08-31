@@ -14,16 +14,11 @@ class SidebarFilter extends Component {
 
     bindAll(this,
       'handleFilterChange',
-      'handleFilterFocus',
-      'handleFilterBlur',
       'toggleFilter'
     );
 
   }
 
-  componentDidMount() {
-    this.handleFilterFocus();
-  }
 
   setInputValue(value) {
     this.props.updateResults(value);
@@ -31,14 +26,6 @@ class SidebarFilter extends Component {
 
   handleFilterChange(value) {
     this.setInputValue(value);
-  }
-
-  handleFilterFocus() {
-    this.props.filterInputFocus(true);
-  }
-
-  handleFilterBlur() {
-    this.props.filterInputFocus(false);
   }
 
   toggleFilter(filter) {
@@ -60,8 +47,6 @@ class SidebarFilter extends Component {
             inputValue={this.props.filterText}
             options={this.props.modules}
             onChange={this.handleFilterChange}
-            onBlur={this.handleFilterBlur}
-            onFocus={this.handleFilterFocus}
             showStarred={this.props.showStarred} />
         </div>
         <StarredToggle
@@ -82,7 +67,6 @@ SidebarFilter.propTypes = {
   modules: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
   filterText: PropTypes.string.isRequired,
-  filterInputFocus: PropTypes.func.isRequired,
   repos: PropTypes.array.isRequired,
   updateStarred: PropTypes.func.isRequired,
   showStarred: PropTypes.bool.isRequired

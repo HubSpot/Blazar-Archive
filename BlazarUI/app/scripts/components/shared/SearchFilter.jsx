@@ -5,11 +5,12 @@ import {bindAll} from 'underscore';
 class SearchFilter extends Component {
 
   constructor() {
-    bindAll(this, 'handleFocus', 'handleBlur', 'handleChange', 'handleKeyup');
+    bindAll(this, 'handleChange', 'handleKeyup');
   }
 
   componentDidMount() {
     window.addEventListener('keyup', this.handleKeyup);
+    this.refs.searchFilterInput.getDOMNode().focus();
   }
 
   componentWillUnmount() {
@@ -20,14 +21,6 @@ class SearchFilter extends Component {
     if (e.which === 84) {
       this.refs.searchFilterInput.getDOMNode().focus();
     }
-  }
-
-  handleFocus() {
-    this.props.onFocus();
-  }
-
-  handleBlur() {
-    this.props.onBlur();
   }
 
   handleChange() {
@@ -43,8 +36,6 @@ class SearchFilter extends Component {
         className="search-input form-control"
         placeholder='Filter modules...'
         value={this.props.inputValue}
-        onFocus={this.handleFocus}
-        onBlur={this.handleBlur}
         onChange={this.handleChange}
       />
     );
@@ -56,8 +47,6 @@ SearchFilter.propTypes = {
   inputValue: PropTypes.string.isRequired,
   options: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
-  onBlur: PropTypes.func.isRequired,
-  onFocus: PropTypes.func.isRequired,
   showStarred: PropTypes.bool.isRequired
 };
 
