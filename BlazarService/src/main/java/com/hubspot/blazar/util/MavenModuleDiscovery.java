@@ -58,7 +58,7 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
       } else {
         glob = (pom.contains("/") ? pom.substring(0, pom.lastIndexOf('/') + 1) : "") + "**";
       }
-      modules.add(new Module(Optional.<Integer>absent(), artifactId, pom, glob, true));
+      modules.add(new Module(artifactId, pom, glob));
     }
 
     return modules;

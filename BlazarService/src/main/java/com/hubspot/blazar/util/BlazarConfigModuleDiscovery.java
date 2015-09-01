@@ -61,7 +61,7 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
       if (hasCommandsSection(contentsFor(blazarConfig, repository, gitInfo))) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
-        modules.add(new Module(Optional.<Integer>absent(), moduleName, blazarConfig, glob, true));
+        modules.add(new Module(moduleName, blazarConfig, glob));
       }
     }
 
