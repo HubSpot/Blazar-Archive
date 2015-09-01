@@ -13,8 +13,9 @@ public interface BuildDefinitionDao {
   @SqlQuery("" +
       "SELECT gitInfo.*, module.* " +
       "FROM branches AS gitInfo " +
-      "INNER JOIN modules AS module ON (gitInfo.id = module.branchId)")
-  Set<BuildDefinition> getAllBuildDefinitions();
+      "INNER JOIN modules AS module ON (gitInfo.id = module.branchId) " +
+      "WHERE modules.updatedTimestamp > :since")
+  Set<BuildDefinition> getAllBuildDefinitions(@Bind("since") long since);
 
   @SingleValueResult
   @SqlQuery("" +

@@ -14,8 +14,8 @@ public class BuildStateService {
     this.buildStateDao = buildStateDao;
   }
 
-  public Set<BuildState> getAllBuildStates() {
-    return buildStateDao.getAllBuildStates();
+  public Set<BuildState> getAllBuildStates(long since) {
+    return buildStateDao.getAllBuildStates(since);
   }
 
   public BuildState getByModule(int moduleId) {

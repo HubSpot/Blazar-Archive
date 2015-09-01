@@ -15,8 +15,8 @@ public class BuildDefinitionService {
     this.buildDefinitionDao = buildDefinitionDao;
   }
 
-  public Set<BuildDefinition> getAllBuildDefinitions() {
-    return buildDefinitionDao.getAllBuildDefinitions();
+  public Set<BuildDefinition> getAllBuildDefinitions(long since) {
+    return buildDefinitionDao.getAllBuildDefinitions(since);
   }
 
   public Optional<BuildDefinition> getByModuleId(int moduleId) {
