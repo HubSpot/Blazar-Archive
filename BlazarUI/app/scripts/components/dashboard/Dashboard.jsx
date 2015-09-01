@@ -5,6 +5,7 @@ import PageHeader from '../shared/PageHeader.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
+import MutedMessage from '../shared/MutedMessage.jsx';
 import Icon from '../shared/Icon.jsx';
 import Helpers from '../ComponentHelpers';
 
@@ -29,7 +30,9 @@ class Dashboard extends Component {
     }
 
     if (starredRepos.length === 0) {
-      starredRepos = (<span className="dashboard__placeholder">You have no starred repos.</span>);
+      starredRepos = (
+        <MutedMessage> You have no starred repos. </MutedMessage>
+      );
     }
 
     return (

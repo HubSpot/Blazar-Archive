@@ -4,6 +4,7 @@ import Module from '../sidebar/Module.jsx';
 import {filter, map, max} from 'underscore';
 import Helpers from '../ComponentHelpers';
 import Collapsable from '../shared/Collapsable.jsx';
+import MutedMessage from '../shared/MutedMessage.jsx';
 
 class DashboardRepoDetails extends Component {
 
@@ -63,9 +64,9 @@ class DashboardRepoDetails extends Component {
 
     return (
       <div>
-        <span className="dashboard__latest-activity">
+        <MutedMessage>
           Last Activity: {latest}
-        </span>
+        </MutedMessage>
         {activePanel}
         {inactivePanel}
       </div>

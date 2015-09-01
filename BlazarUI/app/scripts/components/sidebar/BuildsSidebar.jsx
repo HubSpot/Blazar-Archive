@@ -6,6 +6,7 @@ import {bindAll, filter, contains} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import LazyRender from '../shared/LazyRender.jsx';
 import Helpers from '../ComponentHelpers';
+import MutedMessage from '../shared/MutedMessage.jsx';
 
 class BuildsSidebar extends Component {
 
@@ -126,7 +127,12 @@ class BuildsSidebar extends Component {
 
   // Final listing of <BuildsSidebarListItem />'s
   getList() {
-    const filteredRepoComponents = this.getFilteredRepoComponents();
+    let filteredRepoComponents = this.getFilteredRepoComponents();
+    if (filteredRepoComponents.length === 0) {
+      filteredRepoComponents = (
+        <MutedMessage roomy={true}>No starred repos.</MutedMessage>
+      )
+    }
     let list;
     // Show starred branches only
     if (this.state.showStarred) {
