@@ -28,6 +28,8 @@ public class BlazarConfiguration extends Configuration {
   @JsonProperty("ui")
   private UiConfiguration uiConfiguration = new UiConfiguration();
 
+  private boolean webhookOnly = false;
+
   public Map<String, GitHubConfiguration> getGitHubConfiguration() {
     return gitHubConfiguration;
   }
@@ -61,6 +63,15 @@ public class BlazarConfiguration extends Configuration {
 
   public BlazarConfiguration setUiConfiguration(UiConfiguration uiConfiguration) {
     this.uiConfiguration = uiConfiguration;
+    return this;
+  }
+
+  public boolean isWebhookOnly() {
+    return webhookOnly;
+  }
+
+  public BlazarConfiguration setWebhookOnly(boolean webhookOnly) {
+    this.webhookOnly = webhookOnly;
     return this;
   }
 }

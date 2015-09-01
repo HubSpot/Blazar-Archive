@@ -7,6 +7,7 @@ import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.github.BackfillGitHubDataCommand;
 import com.hubspot.blazar.guice.BlazarServiceModule;
 import com.hubspot.blazar.guice.GuiceBundle;
+import com.hubspot.blazar.util.DisableWebhookOnlyBundle;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 
 import io.dropwizard.Application;
@@ -23,15 +24,16 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
   @Override
   public void initialize(final Bootstrap<T> bootstrap) {
     bootstrap.addBundle(buildGuiceBundle());
-    bootstrap.addBundle(new CorsBundle());
-    bootstrap.addBundle(new ViewBundle());
-    bootstrap.addBundle(new AssetsBundle("/assets/", "/" + UiConfiguration.DEFAULT_STATIC_PATH));
+    bootstrap.addBundle(new DisableWebhookOnlyBundle(new CorsBundle()));
+    bootstrap.addBundle(new DisableWebhookOnlyBundle(new ViewBundle()));
+    bootstrap.addBundle(new DisableWebhookOnlyBundle(new AssetsBundle("/assets/", "/" + UiConfiguration.DEFAULT_STATIC_PATH)));
     bootstrap.addBundle(new MigrationsBundle<BlazarConfiguration>() {
-            @Override
-            public DataSourceFactory getDataSourceFactory(final BlazarConfiguration configuration) {
-                return configuration.getDatabaseConfiguration();
-              }
-          });
+
+      @Override
+      public DataSourceFactory getDataSourceFactory(final BlazarConfiguration configuration) {
+        return configuration.getDatabaseConfiguration();
+      }
+    });
     bootstrap.getObjectMapper().registerModule(new ProtobufModule());
     bootstrap.getObjectMapper().setSerializationInclusion(Include.NON_NULL);
     bootstrap.getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
