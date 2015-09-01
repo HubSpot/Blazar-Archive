@@ -43,8 +43,7 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
                      Namespace namespace,
                      BlazarConfiguration configuration) throws Exception {
     final ObjectMapper mapper = Jackson.newObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    final HttpClient httpClient = new NingHttpClient(HttpConfig.newBuilder().setObjectMapper(mapper).build());
-    try {
+    try (HttpClient httpClient = new NingHttpClient(HttpConfig.newBuilder().setObjectMapper(mapper).build())) {
       for (Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {
         String host = entry.getKey();
         GitHubConfiguration gitHubConfig = entry.getValue();
@@ -56,8 +55,6 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
           System.out.println("Processed " + host + "/" + organization);
         }
       }
-    } finally {
-      httpClient.close();
     }
   }
 
