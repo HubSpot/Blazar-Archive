@@ -19,7 +19,7 @@ class BuildsSidebarContainer extends Component {
         grouped: [],
         modules: []
       },
-      stars: [], 
+      stars: [],
       loadingBuilds: true,
       loadingStars: true,
       loading: true
@@ -58,11 +58,10 @@ class BuildsSidebarContainer extends Component {
     BuildsNotifier.updateModules(this.state.builds.modules);
     return (
       <Sidebar>
-        <BuildsSidebar 
-          builds={this.state.builds} 
+        <BuildsSidebar
+          builds={this.state.builds}
           stars={this.state.stars}
           loading={this.state.loading} 
-          stars={this.state.stars} 
           persistStarChange={this.persistStarChange} />
       </Sidebar>
     );
