@@ -2,10 +2,9 @@ import Cookies from 'js-cookie';
 
 let starCache;
 
-let StarredProvider = {
+let StarProvider = {
 
   starChange: function(isStarred, repo, branch) {
-
     if (isStarred) {
       this.removeStar(repo, branch);
     } else {
@@ -59,4 +58,4 @@ let StarredProvider = {
 
 };
 
-export default StarredProvider;
+export default StarProvider;

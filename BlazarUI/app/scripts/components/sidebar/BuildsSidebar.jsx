@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import BuildsSidebarListItem from './BuildsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
-import {bindAll, filter, contains} from 'underscore';
+import {bindAll, filter, contains, findWhere} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import StarredProvider from '../StarredProvider';
 import LazyRender from '../shared/LazyRender.jsx';
@@ -51,39 +51,47 @@ class BuildsSidebar extends Component {
     return filteredModules;
   }
 
-  getFilteredRepos() {
-    let matches = [];
-    const list = this.props.builds.grouped;
+  isStarred(repo, branch) {
+    const isStarred = findWhere(this.props.stars, {
+      repo: repo,
+      branch: branch
+    });
+    return isStarred !== undefined;
+  }
 
-    let options = {
-      extract: function(el) {
-        let m = '';
-        el.modules.forEach( (build) => {
-          m += build.module.name;
-        });
-        return m;
-      }
-    };
-
-    let results = fuzzy.filter(this.state.filterText, list, options);
+  getStoredStars(results) {
+    let matches = [];    
 
     results.map( (el) => {
-      if (this.state.showStarred && StarredProvider.hasStar({ repo: el.original.repository, branch: el.original.branch }) === -1) {
-        return;
+
+      if (this.state.showStarred && !this.isStarred(el.original.repository, el.original.branch)){ 
+        return; 
       }
+
       matches.push({
         filterText: this.state.filterText,
         key: el.original.repository,
         repo: el.original
       });
 
-    });
-
+    }.bind(this));
     return matches;
   }
 
-  moduleExpandChange(id) {
+  getFilteredRepos() {
+    const groupedList = this.props.builds.grouped;
+    const options = {
+      extract: function(el) {
+        let m = '';
+        el.modules.forEach( (build) => { m += build.module.name; });
+        return m;
+      }
+    };
 
+    return fuzzy.filter(this.state.filterText, groupedList, options);
+  }
+
+  moduleExpandChange(id) {
     let expandedIndex = this.state.expandedRepos.indexOf(id);
 
     if (expandedIndex !== -1) {
@@ -102,28 +110,33 @@ class BuildsSidebar extends Component {
 
   }
 
-  render() {
-    if (this.props.loading) {
-      return (
-        <SectionLoader />
-      );
-    }
+  // Build listing of BuildsSidebarListItem
+  getFilteredRepoComponents() {
+    const filteredRepos = this.getStoredStars(this.getFilteredRepos());
+    const expandedState = this.state.expandedRepos;
 
-    let filteredRepos = this.getFilteredRepos();
-    let expandedState = this.state.expandedRepos;
-    let filteredRepoComponents = filteredRepos.map( (item) => {
-      let shouldExpand = contains(expandedState, item.repo.id);
+    return filteredRepos.map( (item) => {
+      const shouldExpand = contains(expandedState, item.repo.id);
+      const isStarred = this.isStarred(item.repo.repository, item.repo.branch)
+
       return (
         <BuildsSidebarListItem
+          isStarred={isStarred}
+          persistStarChange={this.props.persistStarChange}
           key={item.repo.repoModuleKey}
           isExpanded={shouldExpand}
           filterText={item.filterText}
           repo={item.repo}
           moduleExpandChange={this.moduleExpandChange} />
       );
-    });
+    }.bind(this));
+  }
 
-    let list = '';
+  // Final listing of <BuildsSidebarListItem />'s
+  getList() {
+    const filteredRepoComponents = this.getFilteredRepoComponents();
+    let list;
+    // Show starred branches only
     if (this.state.showStarred) {
       list = (
         <div className="sidebar__list">
@@ -131,11 +144,23 @@ class BuildsSidebar extends Component {
         </div>
       );
     } else {
+      // Show all branches
       let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0) - 80;
       list = (
         <LazyRender maxHeight={h} className="sidebar__list">
           {filteredRepoComponents}
         </LazyRender>
+      );
+    }
+    return list;
+  }
+
+  render() {
+    const list = this.getList();
+
+    if (this.props.loading) {
+      return (
+        <SectionLoader />
       );
     }
 
@@ -159,8 +184,10 @@ class BuildsSidebar extends Component {
 }
 
 BuildsSidebar.propTypes = {
-  loading: PropTypes.bool,
-  builds: PropTypes.object
+  loading: PropTypes.bool.isRequired,
+  builds: PropTypes.object.isRequired,
+  stars: PropTypes.array.isRequired,
+  persistStarChange: PropTypes.func.isRequired
 };
 
 export default BuildsSidebar;

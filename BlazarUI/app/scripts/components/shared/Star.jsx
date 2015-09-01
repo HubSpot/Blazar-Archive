@@ -1,32 +1,23 @@
 import React, {Component, PropTypes} from 'react';
 import Icon from '../shared/Icon.jsx';
 import { bindAll } from 'underscore';
-import StarredProvider from '../StarredProvider';
+
 
 class Star extends Component {
 
   constructor(props) {
     super(props);
     bindAll(this, 'handleClick');
-    this.state = {
-      starred: StarredProvider.hasStar({
-        repo: props.repo,
-        branch: props.branch
-      }) !== -1 };
   }
 
   handleClick(event) {
     event.stopPropagation();
-    this.setState({
-      starred: !this.state.starred
-    });
-
-    StarredProvider.starChange(this.state.starred, this.props.repo, this.props.branch);
+    this.props.toggleStar(!this.props.isStarred);
   }
 
   render() {
     let className, iconName = '';
-    if (this.state.starred) {
+    if (this.props.isStarred) {
       className = 'sidebar__star selected';
       iconName = 'star';
     } else {
@@ -44,8 +35,8 @@ class Star extends Component {
 }
 
 Star.propTypes = {
-  repo: PropTypes.string.isRequired,
-  branch: PropTypes.string.isRequired
+  isStarred: PropTypes.bool.isRequired,
+  toggleStar: PropTypes.func.isRequired
 };
 
 export default Star;

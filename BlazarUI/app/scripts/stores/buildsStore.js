@@ -13,23 +13,22 @@ const BuildsStore = Reflux.createStore({
 
   loadBuilds() {
     this.trigger({
-      loading: true
+      loadingBuilds: true
     });
   },
 
   loadBuildsSuccess(builds) {
     this.builds = builds;
-
     this.trigger({
       builds: this.builds,
-      loading: false
+      loadingBuilds: false
     });
   },
 
   loadBuildsError(error) {
     this.trigger({
       error: error,
-      loading: false
+      loadingBuilds: false
     });
   }
 

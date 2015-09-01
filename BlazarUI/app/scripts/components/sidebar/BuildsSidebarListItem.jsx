@@ -4,17 +4,40 @@ import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
+import StarredProvider from '../StarredProvider';
+
 import { Link } from 'react-router';
 
 class BuildsSidebarListItem extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
+    bindAll(this, 'handleModuleExpand', 'toggleStar');
 
     this.state = {
       expanded: false
     };
+    
+  }
 
-    bindAll(this, ['handleModuleExpand']);
+  getStarredState() {
+    const repo = this.props.repo;
+    const repoName = repo.resository;
+
+    return StarredProvider.hasStar({
+      repo: repo.repository,
+      branch: repo.branch
+    }) !== -1;
+  }
+
+  toggleStar(starState) {
+    this.props.persistStarChange(!starState, this.props.repo.repository, this.props.repo.branch);
+  }
+
+  componentWillReceiveProps() {
+    this.setState({
+      expanded: this.props.isExpanded
+    });
   }
 
   handleModuleExpand() {
@@ -31,10 +54,6 @@ class BuildsSidebarListItem extends Component {
 
   getExpandStatus() {
     return this.props.isExpanded ? 'chevron-down' : 'chevron-right';
-  }
-
-  componentWillReceiveProps() {
-    this.setState({ expanded: this.props.isExpanded });
   }
 
   render() {
@@ -63,7 +82,7 @@ class BuildsSidebarListItem extends Component {
           <div className='sidebar__build-detail'>
             {getRepoBuildState()}
             <div className='sidebar__repo-name'>
-              <Star repo={repo.repository} branch={repo.branch}></Star>
+              <Star isStarred={this.props.isStarred} toggleStar={this.toggleStar} />
               <Link to={repoLink}>
                 {repo.repository}
               </Link>
@@ -86,7 +105,9 @@ BuildsSidebarListItem.propTypes = {
   project: PropTypes.object,
   filterText: PropTypes.string,
   isExpanded: PropTypes.bool,
-  moduleExpandChange: PropTypes.func
+  moduleExpandChange: PropTypes.func,
+  persistStarChange: PropTypes.func,
+  isStarred: PropTypes.bool.isRequired
 };
 
 export default BuildsSidebarListItem;
