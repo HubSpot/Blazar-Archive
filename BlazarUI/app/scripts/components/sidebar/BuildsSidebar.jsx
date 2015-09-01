@@ -4,7 +4,6 @@ import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
 import {bindAll, filter, contains} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
-import StarredProvider from '../StarredProvider';
 import LazyRender from '../shared/LazyRender.jsx';
 import Helpers from '../ComponentHelpers';
 

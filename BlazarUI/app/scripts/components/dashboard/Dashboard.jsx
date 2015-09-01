@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import SectionLoader from '../shared/SectionLoader.jsx';
-import StarredProvider from '../StarredProvider';
 import DashboardStarredRepo from './DashboardStarredRepo.jsx';
 import PageHeader from '../shared/PageHeader.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
