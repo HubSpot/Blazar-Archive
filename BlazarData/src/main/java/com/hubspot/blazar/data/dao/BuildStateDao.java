@@ -15,7 +15,7 @@ public interface BuildStateDao {
       "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuildId = lastBuild.id) " +
       "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuildId = inProgressBuild.id) " +
       "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuildId = pendingBuild.id) " +
-      "WHERE modules.updatedTimestamp > :since")
+      "WHERE module.updatedTimestamp > :since")
   Set<BuildState> getAllBuildStates(@Bind("since") long since);
 
   @SqlQuery("" +
