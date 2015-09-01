@@ -19,9 +19,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -75,16 +77,25 @@ public class GitHubWebhookHandler {
   public Set<Module> processBranch(GitInfo gitInfo) throws IOException {
     gitInfo = branchService.upsert(gitInfo);
 
-    Set<Module> modules = moduleDiscovery.discover(gitInfo);
-    return moduleService.setModules(gitInfo, modules);
+    try {
+      Set<Module> modules = moduleDiscovery.discover(gitInfo);
+      return moduleService.setModules(gitInfo, modules);
+    } catch (FileNotFoundException e) {
+      branchService.delete(gitInfo);
+      return Collections.emptySet();
+    }
   }
 
   private Set<Module> updateModules(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
-    if (moduleDiscovery.shouldRediscover(gitInfo, pushEvent)) {
-      return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
-    }
+    try {
+      if (moduleDiscovery.shouldRediscover(gitInfo, pushEvent)) {
+        return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
+      }
 
-    return moduleService.getByBranch(gitInfo.getId().get());
+      return moduleService.getByBranch(gitInfo.getId().get());
+    } catch (FileNotFoundException e) {
+      return Collections.emptySet();
+    }
   }
 
   private void triggerBuilds(PushEvent pushEvent, GitInfo gitInfo, Set<Module> modules) throws IOException {

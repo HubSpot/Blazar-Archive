@@ -6,7 +6,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
@@ -36,17 +35,9 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
 
   @Override
   public boolean shouldRediscover(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
-    for (Commit commit : pushEvent.getCommitsList()) {
-      for (String file : commit.getAddedList()) {
-        if (isBlazarConfig(file)) {
-          return true;
-        }
-      }
-
-      for (String file : commit.getRemovedList()) {
-        if (isBlazarConfig(file)) {
-          return true;
-        }
+    for (String path : affectedPaths(pushEvent)) {
+      if (isBlazarConfig(path)) {
+        return true;
       }
     }
 
