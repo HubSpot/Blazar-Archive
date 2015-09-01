@@ -87,7 +87,8 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   private static String folderName(String path) {
-    return path.substring(path.lastIndexOf('/') + 1);
+    String folderPath = path.substring(0, path.lastIndexOf('/'));
+    return folderPath.contains("/") ? folderPath.substring(folderPath.lastIndexOf('/') + 1) : folderPath;
   }
 
   private static boolean isBlazarConfig(String path) {
