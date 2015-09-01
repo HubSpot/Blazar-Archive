@@ -7,6 +7,7 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import Icon from '../shared/Icon.jsx';
+import Helpers from '../ComponentHelpers';
 
 class Dashboard extends Component {
 
@@ -19,13 +20,13 @@ class Dashboard extends Component {
 
     let starredRepos = [];
     if (this.props.builds) {
-      this.props.builds.grouped.forEach(function(repo) {
-        if (StarredProvider.hasStar({ repo: repo.repository, branch: repo.branch }) !== -1) {
+      this.props.builds.grouped.forEach((repo) => {
+        if (Helpers.isStarred(this.props.stars, repo.repository, repo.branch)) {
           starredRepos.push(
-            <DashboardStarredRepo key={repo.repository} repo={repo}></DashboardStarredRepo>
+            <DashboardStarredRepo key={repo.repoModuleKey} repo={repo}></DashboardStarredRepo>
           );
         }
-      });
+      }.bind(this));
     }
 
     if (starredRepos.length === 0) {
@@ -55,7 +56,8 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
   loading: PropTypes.bool,
-  builds: PropTypes.object
+  builds: PropTypes.object,
+  stars: PropTypes.array.isRequired
 };
 
 export default Dashboard;

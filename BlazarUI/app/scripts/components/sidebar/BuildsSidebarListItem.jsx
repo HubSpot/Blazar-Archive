@@ -4,7 +4,6 @@ import Module from './Module.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
-import StarredProvider from '../StarredProvider';
 
 import { Link } from 'react-router';
 
@@ -18,16 +17,6 @@ class BuildsSidebarListItem extends Component {
       expanded: false
     };
     
-  }
-
-  getStarredState() {
-    const repo = this.props.repo;
-    const repoName = repo.resository;
-
-    return StarredProvider.hasStar({
-      repo: repo.repository,
-      branch: repo.branch
-    }) !== -1;
   }
 
   toggleStar(starState) {

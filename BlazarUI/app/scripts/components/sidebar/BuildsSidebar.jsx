@@ -2,10 +2,11 @@ import React, {Component, PropTypes} from 'react';
 import BuildsSidebarListItem from './BuildsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
-import {bindAll, filter, contains, findWhere} from 'underscore';
+import {bindAll, filter, contains} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import StarredProvider from '../StarredProvider';
 import LazyRender from '../shared/LazyRender.jsx';
+import Helpers from '../ComponentHelpers';
 
 class BuildsSidebar extends Component {
 
@@ -51,20 +52,12 @@ class BuildsSidebar extends Component {
     return filteredModules;
   }
 
-  isStarred(repo, branch) {
-    const isStarred = findWhere(this.props.stars, {
-      repo: repo,
-      branch: branch
-    });
-    return isStarred !== undefined;
-  }
-
   getStoredStars(results) {
     let matches = [];    
 
     results.map( (el) => {
 
-      if (this.state.showStarred && !this.isStarred(el.original.repository, el.original.branch)){ 
+      if (this.state.showStarred && !Helpers.isStarred(this.props.stars, el.original.repository, el.original.branch)){ 
         return; 
       }
 
@@ -117,7 +110,7 @@ class BuildsSidebar extends Component {
 
     return filteredRepos.map( (item) => {
       const shouldExpand = contains(expandedState, item.repo.id);
-      const isStarred = this.isStarred(item.repo.repository, item.repo.branch)
+      const isStarred = Helpers.isStarred(this.props.stars, item.repo.repository, item.repo.branch)
 
       return (
         <BuildsSidebarListItem
