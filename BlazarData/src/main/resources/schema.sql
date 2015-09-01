@@ -23,8 +23,10 @@ CREATE TABLE `modules` (
   `lastBuildId` bigint(20) unsigned,
   `inProgressBuildId` bigint(20) unsigned,
   `pendingBuildId` bigint(20) unsigned,
+  `updatedTimestamp` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX (`branchId`, `name`)
+  UNIQUE INDEX (`branchId`, `name`),
+  INDEX (`updatedTimestamp`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `builds` (
