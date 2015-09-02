@@ -5,7 +5,8 @@
   "main": "index.html",
   "scripts": {
     "start": "gulp",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "bower install"
   },
   "engines": {
     "node": "~0.12",
@@ -81,5 +82,8 @@
       "<rootDir>/node_modules/object-assign",
       "<rootDir>/test-utils/stubRouterContext.jsx"
     ]
+  },
+  "devDependencies": {
+    "bower": "^1.5.2"
   }
 }

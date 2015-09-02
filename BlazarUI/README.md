@@ -14,7 +14,7 @@ Install dependencies.
 
 ```
 $ cd BlazarUI
-$ npm install && bower install
+$ npm install
 ```
 
 ## Development
