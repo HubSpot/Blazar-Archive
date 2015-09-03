@@ -53,7 +53,7 @@ public class Build {
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.sha = sha;
-    this.commitInfo = commitInfo;
+    this.commitInfo = commitInfo == null ? Optional.<CommitInfo>absent() : commitInfo;
     this.log = log;
     this.buildConfig = buildConfig;
   }
