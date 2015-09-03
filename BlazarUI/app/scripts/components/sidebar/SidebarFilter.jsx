@@ -12,20 +12,12 @@ class SidebarFilter extends Component {
       inputValue: ''
     };
 
-    bindAll(this,
-      'handleFilterChange',
-      'toggleFilter'
-    );
+    bindAll(this, 'setInputValue', 'toggleFilter');
 
   }
-
 
   setInputValue(value) {
     this.props.updateResults(value);
-  }
-
-  handleFilterChange(value) {
-    this.setInputValue(value);
   }
 
   toggleFilter(filter) {
@@ -34,7 +26,9 @@ class SidebarFilter extends Component {
   }
 
   render() {
-    if (this.props.loading || this.props.repos.length === 0) {
+
+
+    if (this.props.loading || this.props.builds.length === 0) {
       return <div />;
     }
 
@@ -45,8 +39,7 @@ class SidebarFilter extends Component {
             ref="buildFilterSearch"
             placeholder='Filter modules...'
             inputValue={this.props.filterText}
-            options={this.props.modules}
-            onChange={this.handleFilterChange}
+            onChange={this.setInputValue}
             showStarred={this.props.showStarred} />
         </div>
         <StarredToggle
@@ -64,10 +57,9 @@ SidebarFilter.contextTypes = {
 
 SidebarFilter.propTypes = {
   updateResults: PropTypes.func.isRequired,
-  modules: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired,
   filterText: PropTypes.string.isRequired,
-  repos: PropTypes.array.isRequired,
+  builds: PropTypes.array.isRequired,
   updateStarred: PropTypes.func.isRequired,
   showStarred: PropTypes.bool.isRequired
 };

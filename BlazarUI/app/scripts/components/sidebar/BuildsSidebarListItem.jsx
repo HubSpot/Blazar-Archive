@@ -1,6 +1,9 @@
+// To do
+// Deprecate...
+
 import React, {Component, PropTypes} from 'react';
 import { bindAll } from 'underscore';
-import Module from './Module.jsx';
+import SidebarItem from './SidebarItem.jsx';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
@@ -53,9 +56,11 @@ class BuildsSidebarListItem extends Component {
     let repoLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}`;
     let branchLink = `${config.appRoot}/builds/${repo.host}/${repo.organization}/${repo.repository}/${repo.branch}`;
 
+    console.log('dets: ', this.props.repo);
+
     modules.forEach( (build) => {
       moduleList.push(
-        <Module key={build.modulePath} repo={build} />
+        <SidebarItem key={build.modulePath} repo={build} />
       );
     });
 
@@ -67,25 +72,11 @@ class BuildsSidebarListItem extends Component {
 
     return (
       <div className='sidebar__repo-container'>
-        <div className='sidebar__repo' onClick={this.handleModuleExpand}>
-          <div className='sidebar__build-detail'>
-            {getRepoBuildState()}
-            <div className='sidebar__repo-name'>
-              <Star isStarred={this.props.isStarred} toggleStar={this.toggleStar} />
-              <Link to={repoLink}>
-                {repo.repository}
-              </Link>
-              <Icon type='octicon' name='git-branch' classNames='sidebar__repo-branch-icon' />
-              <span className='sidebar__repo-branch'><Link to={branchLink}>{repo.branch}</Link></span>
-            </div>
-          </div>
-          <Icon name={this.getExpandStatus()} classNames='sidebar__expand' />
-        </div>
-        <div className={this.getModulesClassNames()}>
-          {moduleList}
-        </div>
+        {moduleList}
       </div>
     );
+
+
   }
 }
 

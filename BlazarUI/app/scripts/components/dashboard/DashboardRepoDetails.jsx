@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import Module from '../sidebar/Module.jsx';
+import SidebarItem from '../sidebar/SidebarItem.jsx';
 
 import {filter, map, max} from 'underscore';
 import Helpers from '../ComponentHelpers';
@@ -22,7 +22,7 @@ class DashboardRepoDetails extends Component {
       return m.inProgressBuild;
     }).forEach((build) => {
       buildingModuleList.push(
-        <Module key={build.modulePath} repo={build} />
+        <SidebarItem key={build.modulePath} repo={build} />
       );
     });
 
@@ -30,7 +30,7 @@ class DashboardRepoDetails extends Component {
       return !m.inProgressBuild;
     }).forEach((build) => {
       inactiveModuleList.push(
-        <Module key={build.modulePath} repo={build} />
+        <SidebarItem key={build.modulePath} repo={build} />
       );
     });
 

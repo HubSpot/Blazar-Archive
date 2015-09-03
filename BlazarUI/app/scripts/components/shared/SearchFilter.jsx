@@ -53,7 +53,6 @@ class SearchFilter extends Component {
 SearchFilter.propTypes = {
   placeholder: PropTypes.string.isRequired,
   inputValue: PropTypes.string.isRequired,
-  options: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   showStarred: PropTypes.bool.isRequired
 };

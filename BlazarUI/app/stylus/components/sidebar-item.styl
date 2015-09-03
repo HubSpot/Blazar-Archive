@@ -1,0 +1,39 @@
+.sidebar__repo-name
+  font-size 16px
+  font-weight $font-light
+  padding-left 0
+  padding-right 5px
+  white-space: nowrap;
+  overflow: hidden;
+
+.sidebar-item
+  position relative
+  display block
+  padding 2px 0 2px 35px
+  border-bottom 1px solid #dadada
+
+  &:hover
+    background #efefef
+
+.sidebar-item__module-name
+  line-height 1.6
+  font-size 13px
+  font-weight $font-medium
+  text-overflow: ellipsis
+  
+.sidebar-item__module-branch-name
+  color $gray-dark
+  font-size 12px
+  font-weight $font-light
+
+.sidebar__active-building-icon
+  position absolute
+  left 18px
+  top 8px
+
+// make easier to click by
+// adding padding to container
+.sidebar-item__building-icon-link
+  position absolute
+  padding 15px
+  left 0px

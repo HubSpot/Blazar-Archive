@@ -24,33 +24,35 @@ class Builds extends BaseCollection {
     });
   }
 
-  // list of module names, used for sidebar search
-  getModuleList() {
-    return _.map(this.hasBuildState(), function(item) {
 
-      let {gitInfo, module, lastBuild, inProgressBuild, pendingBuild} = item;
+  getAllBuilds() {
 
-      let moduleInfo = {
-        repository: gitInfo.repository,
-        branch: gitInfo.branch,
-        module: module.name,
-        link: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}`
-      };
+    return _.map(this.data, (item) => {
 
-      if (lastBuild) {
-        moduleInfo.lastBuildState = lastBuild.state;
+      let {
+        gitInfo,
+        module,
+        lastBuild,
+        inProgressBuild
+      } = item;
+
+      if (_.has(item, 'inProgressBuild')) {
+        item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
       }
 
-      if (inProgressBuild) {
-        moduleInfo.inProgressBuildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}_${module.id}/${inProgressBuild.buildNumber}`;
+      if (_.has(item, 'lastBuild')) {
+        item.lastBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${lastBuild.buildNumber}`;
       }
 
-      if (pendingBuild) {
-        moduleInfo.pendingBuild = true;
+      if (_.has(item, 'module', (item) )) {
+        item.module.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}`;
       }
 
-      return moduleInfo;
+      gitInfo.branchBlazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}`;
+
+      return item;
     });
+
 
   }
 
@@ -78,16 +80,20 @@ class Builds extends BaseCollection {
   }
 
   getBranchModules(branchInfo) {
-    return _.findWhere(this.groupBuildsByRepo(), {
+    const modules = _.findWhere(this.groupBuildsByRepo(), {
       organization: branchInfo.org,
       repository: branchInfo.repo,
       branch: branchInfo.branch
     });
+
+    return modules || {};
   }
 
   getBranchesByRepo(repoInfo) {
+
     let branches = _.filter(this.groupBuildsByRepo(), (repo) => {
-      return repo.organization === repoInfo.org && repo.repository === repoInfo.repo;
+      const match = (repo.organization === repoInfo.org) && (repo.repository === repoInfo.repo);
+      return match;
     });
 
     branches.sort( (a, b) => {
@@ -108,11 +114,19 @@ class Builds extends BaseCollection {
 
   }
 
+
+
+
+
   groupBuildsByRepo() {
     // group and generate key, by org::repo[branch]
-    let grouped = _.groupBy(this.hasBuildState(), function(o) {
+
+
+    // let grouped = _.groupBy(this.hasBuildState(), function(o) {
+    let grouped = _.groupBy(this.data, function(o) {
       return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
     });
+
 
     // Make note if a repo has ANY module building
     _.each(grouped, (repo) => {
@@ -150,8 +164,17 @@ class Builds extends BaseCollection {
       repo.id = `${repo.host}_${repo.branch}_${repo.organization}_${repo.repository}`;
       repo.branchPath = `${config.appRoot}/builds/${repo.modules[0].gitInfo.host}/${repo.modules[0].gitInfo.organization}/${repo.modules[0].gitInfo.repository}/${repo.modules[0].gitInfo.branch}`;
 
+
+      let timesBuiltOnBlazar = 0;
+      repo.hasBuiltOnBlazar = false;
+
       repo.modules.forEach( (module) => {
         module.modulePath = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
+
+        if (_.has(module, 'lastBuild')) {
+          timesBuiltOnBlazar++;
+        }
+
         if (module.inProgressBuild) {
           module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.inProgressBuild.buildNumber}`;
           if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
@@ -159,6 +182,11 @@ class Builds extends BaseCollection {
           }
         }
       });
+
+      if (timesBuiltOnBlazar > 0) {
+        repo.hasBuiltOnBlazar = true;
+      }
+
     });
 
     // sort by if building then by most recent build time
@@ -172,6 +200,10 @@ class Builds extends BaseCollection {
 
     return groupedInArray;
   }
+
+
+
+
 
 
 }

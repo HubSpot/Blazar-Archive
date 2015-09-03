@@ -7,7 +7,7 @@ import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
 
 import Sidebar from './Sidebar.jsx';
-import BuildsNotifier from '../BuildsNotifier';
+// import BuildsNotifier from '../BuildsNotifier';
 
 class BuildsSidebarContainer extends Component {
 
@@ -17,7 +17,8 @@ class BuildsSidebarContainer extends Component {
     this.state = {
       builds: {
         grouped: [],
-        modules: []
+        modules: [],
+        all: []
       },
       stars: [],
       loadingBuilds: true,
@@ -55,7 +56,7 @@ class BuildsSidebarContainer extends Component {
   }
 
   render() {
-    BuildsNotifier.updateModules(this.state.builds.modules);
+    // BuildsNotifier.updateModules(this.state.builds.modules);
     return (
       <Sidebar>
         <BuildsSidebar
