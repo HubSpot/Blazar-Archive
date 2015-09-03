@@ -24,6 +24,10 @@
       <artifactId>BlazarData</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.hubspot.rosetta</groupId>
+      <artifactId>RosettaCore</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.hubspot.jackson</groupId>
       <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
     </dependency>
@@ -92,12 +96,6 @@
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-jackson</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.module</groupId>
-          <artifactId>jackson-module-afterburner</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
