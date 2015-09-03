@@ -36,6 +36,7 @@ CREATE TABLE `builds` (
   `state` varchar(40) NOT NULL,
   `startTimestamp` bigint(20) unsigned,
   `endTimestamp` bigint(20) unsigned,
+  `commitInfo` mediumtext,
   `sha` char(40),
   `log` varchar(2048),
   `buildConfig` mediumtext,
