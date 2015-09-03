@@ -133,7 +133,7 @@ public class BuildLauncher {
     String url = String.format("http://%s/singularity/v2/api/requests/request/blazar-executor/run", host);
 
     String buildId = String.valueOf(build.getId().get());
-    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, buildCommand(module));
+    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(module));
 
     return HttpRequest.newBuilder()
         .setMethod(Method.POST)
