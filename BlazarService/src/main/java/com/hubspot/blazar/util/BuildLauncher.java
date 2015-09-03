@@ -10,7 +10,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.CommitInfo;
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -73,12 +75,14 @@ public class BuildLauncher {
 
     final BuildDefinition buildDefinition;
     final Build buildToLaunch;
+    final Optional<Build> previousBuild;
     if (build.getState() == State.QUEUED) {
       BuildState buildState = buildStateService.getByModule(build.getModuleId());
       if (!buildState.getInProgressBuild().isPresent()) {
         LOG.info("No in progress build for module {}, going to launch build {}", build.getModuleId(), build.getId().get());
         buildDefinition = buildState;
         buildToLaunch = build;
+        previousBuild = buildState.getLastBuild();
       } else {
         LOG.info("In progress build for module {}, not launching build {}", build.getModuleId(), build.getId().get());
         return;
@@ -89,6 +93,7 @@ public class BuildLauncher {
         LOG.info("Pending build for module {}, going to launch build {}", build.getModuleId(), buildState.getPendingBuild().get().getId().get());
         buildDefinition = buildState;
         buildToLaunch = buildState.getPendingBuild().get();
+        previousBuild = buildState.getLastBuild();
       } else {
         LOG.info("No pending build for module {}", build.getModuleId());
         return;
@@ -97,14 +102,15 @@ public class BuildLauncher {
       return;
     }
 
-    startBuild(buildDefinition, buildToLaunch);
+    startBuild(buildDefinition, buildToLaunch, previousBuild);
   }
 
-  private synchronized void startBuild(BuildDefinition definition, Build queued) throws Exception {
-    Optional<String> sha = currentSha(definition.getGitInfo());
-    if (sha.isPresent()) {
-      BuildConfig buildConfig = configAtSha(definition, sha.get());
-      Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha.get()).withBuildConfig(buildConfig);
+  private synchronized void startBuild(BuildDefinition definition, Build queued, Optional<Build> previous) throws Exception {
+    Optional<String> previousSha = previous.isPresent() ? previous.get().getSha() : Optional.<String>absent();
+    Optional<CommitInfo> commitInfo = commitInfo(definition.getGitInfo(), previousSha);
+    if (commitInfo.isPresent()) {
+      BuildConfig buildConfig = configAtSha(definition, commitInfo.get().getCurrent().getSha());
+      Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withCommitInfo(commitInfo.get()).withBuildConfig(buildConfig);
 
       LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
       buildService.begin(launching);
@@ -112,7 +118,6 @@ public class BuildLauncher {
       HttpResponse response = asyncHttpClient.execute(buildRequest(definition.getModule(), launching)).get();
       LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
     } else {
-      // TODO mark branch as inactive
       LOG.info("Failing build {}", queued.getId().get());
       buildService.begin(queued.withState(State.LAUNCHING));
       buildService.update(queued.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
@@ -166,7 +171,7 @@ public class BuildLauncher {
     }
   }
 
-  private Optional<String> currentSha(GitInfo gitInfo) throws IOException {
+  private Optional<CommitInfo> commitInfo(GitInfo gitInfo, Optional<String> previousSha) throws IOException {
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
     GitHub gitHub = gitHubFor(gitInfo);
 
@@ -177,12 +182,16 @@ public class BuildLauncher {
       LOG.info("Couldn't find repository {}", gitInfo.getFullRepositoryName());
       return Optional.absent();
     }
+
     GHBranch branch = repository.getBranches().get(gitInfo.getBranch());
     if (branch == null) {
       LOG.info("Couldn't find branch {} for repository {}", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
       return Optional.absent();
     } else {
       LOG.info("Found sha {} for branch {}/{}", branch.getSHA1(), gitInfo.getRepository(), gitInfo.getBranch());
+
+      GHCommit.ShortInfo commit = repository.getCommit(branch.getSHA1()).getCommitShortInfo();
+
       return Optional.of(branch.getSHA1());
     }
   }
