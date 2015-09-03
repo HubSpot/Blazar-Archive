@@ -8,6 +8,7 @@ let Paginator = React.createClass({
     displayName: 'Paginator',
 
     propTypes: {
+        hasData: React.PropTypes.bool,
         onSelect: React.PropTypes.func,
         page: React.PropTypes.number,
         beginPages: React.PropTypes.number,
@@ -32,6 +33,7 @@ let Paginator = React.createClass({
     },
     render() {
         let {
+            hasData,
             onSelect,
             page,
             ellipsesClassName,
@@ -41,6 +43,10 @@ let Paginator = React.createClass({
             prevClassName,
             nextClassName
         } = this.props;
+
+        if (!hasData) {
+            return <div></div>;
+        }
 
         let segments = segmentize(this.props);
         segments = segments.reduce(function(a, b) {
