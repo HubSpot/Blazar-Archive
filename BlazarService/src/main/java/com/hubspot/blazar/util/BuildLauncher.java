@@ -106,8 +106,7 @@ public class BuildLauncher {
   }
 
   private synchronized void startBuild(BuildDefinition definition, Build queued, Optional<Build> previous) throws Exception {
-    Optional<String> previousSha = previous.isPresent() ? previous.get().getSha() : Optional.<String>absent();
-    Optional<CommitInfo> commitInfo = commitInfo(definition.getGitInfo(), previousSha);
+    Optional<CommitInfo> commitInfo = commitInfo(definition.getGitInfo(), sha(previous));
     if (commitInfo.isPresent()) {
       BuildConfig buildConfig = configAtSha(definition, commitInfo.get().getCurrent().getSha());
       Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withCommitInfo(commitInfo.get()).withBuildConfig(buildConfig);
@@ -200,5 +199,15 @@ public class BuildLauncher {
     String host = gitInfo.getHost();
 
     return Preconditions.checkNotNull(gitHubByHost.get(host), "No GitHub found for host " + host);
+  }
+
+  private static Optional<String> sha(Optional<Build> build) {
+    if (!build.isPresent()) {
+      return Optional.absent();
+    } else if (build.get().getCommitInfo().isPresent()) {
+      return Optional.of(build.get().getCommitInfo().get().getCurrent().getSha());
+    } else {
+      return build.get().getSha();
+    }
   }
 }
