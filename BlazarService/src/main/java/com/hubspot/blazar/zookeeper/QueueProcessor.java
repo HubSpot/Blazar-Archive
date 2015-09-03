@@ -57,7 +57,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
   @Override
   public void start() {
     running.set(true);
-    executorService.scheduleAtFixedRate(new QueueManager(), 0, 1, TimeUnit.SECONDS);
+    executorService.scheduleAtFixedRate(new QueueManager(), 0, 10, TimeUnit.SECONDS);
   }
 
   @Override
