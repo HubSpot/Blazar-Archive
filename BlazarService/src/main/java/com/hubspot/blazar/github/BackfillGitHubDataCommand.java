@@ -2,7 +2,15 @@ package com.hubspot.blazar.github;
 
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.hubspot.blazar.base.Build;
+import com.hubspot.blazar.base.Build.State;
+import com.hubspot.blazar.base.BuildState;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.horizon.HttpResponse;
+import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 import org.kohsuke.github.GHOrganization;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -75,6 +83,37 @@ public class BackfillGitHubDataCommand extends ConfiguredCommand<BlazarConfigura
         System.out.println("Processed " + host + "/" + repository.getOwnerName() + "/" + repository.getName());
       } catch (Throwable t) {
         System.out.println(Throwables.getStackTraceAsString(t));
+      }
+    }
+  }
+
+  private static final String BASE_URL = "https://bootstrap.hubteam.com/blazar/v1/build";
+
+  public static void main(String... args) throws Exception {
+    final ObjectMapper mapper = Jackson.newObjectMapper().registerModule(new ProtobufModule()).setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    try (HttpClient httpClient = new NingHttpClient(HttpConfig.newBuilder().setConnectTimeoutSeconds(10).setObjectMapper(mapper).build())) {
+      HttpRequest request = HttpRequest.newBuilder().setUrl(BASE_URL + "/states").build();
+      Set<BuildState> buildStates = httpClient.execute(request).getAs(new TypeReference<Set<BuildState>>() {});
+
+      long now = System.currentTimeMillis();
+      for (BuildState buildState : buildStates) {
+        if (buildState.getInProgressBuild().isPresent()) {
+          Build inProgress = buildState.getInProgressBuild().get();
+          if (!inProgress.getStartTimestamp().isPresent()) {
+            System.out.println("No start timestamp for build: " + inProgress.getId().get());
+          }
+
+          if ((now - inProgress.getStartTimestamp().get()) > 60_000) {
+            Build completed = inProgress.withState(State.CANCELLED).withEndTimestamp(now);
+            ModuleBuild moduleBuild = new ModuleBuild(buildState.getGitInfo(), buildState.getModule(), completed);
+
+            HttpRequest finishBuild = HttpRequest.newBuilder().setUrl(BASE_URL).setMethod(Method.PUT).setBody(moduleBuild).build();
+            HttpResponse response = httpClient.execute(finishBuild);
+            if (response.getStatusCode() != 200) {
+              throw new IllegalStateException("Unable to finished build: " + response.getStatusCode());
+            }
+          }
+        }
       }
     }
   }

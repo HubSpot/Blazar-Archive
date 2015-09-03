@@ -21,6 +21,7 @@ import org.kohsuke.github.GHCompare;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -248,19 +249,28 @@ public class BuildLauncher {
   }
 
   private static User toAuthor(GHCommit commit) throws IOException {
-    return User.newBuilder()
-        .setName(commit.getCommitShortInfo().getAuthor().getName())
-        .setEmail(commit.getCommitShortInfo().getAuthor().getEmail())
-        .setUsername(commit.getAuthor().getLogin())
-        .build();
+    User.Builder builder = toUser(commit.getCommitShortInfo().getAuthor());
+
+    if (commit.getAuthor() != null && commit.getAuthor().getLogin() != null) {
+      builder.setUsername(commit.getAuthor().getLogin());
+    }
+
+    return builder.build();
   }
 
   private static User toCommitter(GHCommit commit) throws IOException {
-    return User.newBuilder()
-        .setName(commit.getCommitShortInfo().getCommitter().getName())
-        .setEmail(commit.getCommitShortInfo().getCommitter().getEmail())
-        .setUsername(commit.getCommitter().getLogin())
-        .build();
+    User.Builder builder = toUser(commit.getCommitShortInfo().getCommitter());
+
+    if (commit.getCommitter() != null && commit.getCommitter().getLogin() != null) {
+      builder.setUsername(commit.getCommitter().getLogin());
+    }
+
+    return builder.build();
+  }
+
+  private static User.Builder toUser(GitUser user) {
+    return User.newBuilder().setName(user.getName()).setEmail(user.getEmail());
+
   }
 
   private static Optional<String> sha(Optional<Build> build) {
