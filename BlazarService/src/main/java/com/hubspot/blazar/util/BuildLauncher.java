@@ -2,7 +2,9 @@ package com.hubspot.blazar.util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +12,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.CommitInfo;
+import com.hubspot.blazar.github.GitHubProtos.Commit;
+import com.hubspot.blazar.github.GitHubProtos.User;
 import org.kohsuke.github.GHBranch;
+import org.kohsuke.github.GHCommit;
+import org.kohsuke.github.GHCompare;
 import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -73,12 +80,14 @@ public class BuildLauncher {
 
     final BuildDefinition buildDefinition;
     final Build buildToLaunch;
+    final Optional<Build> previousBuild;
     if (build.getState() == State.QUEUED) {
       BuildState buildState = buildStateService.getByModule(build.getModuleId());
       if (!buildState.getInProgressBuild().isPresent()) {
         LOG.info("No in progress build for module {}, going to launch build {}", build.getModuleId(), build.getId().get());
         buildDefinition = buildState;
         buildToLaunch = build;
+        previousBuild = buildState.getLastBuild();
       } else {
         LOG.info("In progress build for module {}, not launching build {}", build.getModuleId(), build.getId().get());
         return;
@@ -89,6 +98,7 @@ public class BuildLauncher {
         LOG.info("Pending build for module {}, going to launch build {}", build.getModuleId(), buildState.getPendingBuild().get().getId().get());
         buildDefinition = buildState;
         buildToLaunch = buildState.getPendingBuild().get();
+        previousBuild = buildState.getLastBuild();
       } else {
         LOG.info("No pending build for module {}", build.getModuleId());
         return;
@@ -97,14 +107,14 @@ public class BuildLauncher {
       return;
     }
 
-    startBuild(buildDefinition, buildToLaunch);
+    startBuild(buildDefinition, buildToLaunch, previousBuild);
   }
 
-  private synchronized void startBuild(BuildDefinition definition, Build queued) throws Exception {
-    Optional<String> sha = currentSha(definition.getGitInfo());
-    if (sha.isPresent()) {
-      BuildConfig buildConfig = configAtSha(definition, sha.get());
-      Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withSha(sha.get()).withBuildConfig(buildConfig);
+  private synchronized void startBuild(BuildDefinition definition, Build queued, Optional<Build> previous) throws Exception {
+    Optional<CommitInfo> commitInfo = commitInfo(definition.getGitInfo(), sha(previous));
+    if (commitInfo.isPresent()) {
+      BuildConfig buildConfig = configAtSha(definition, commitInfo.get().getCurrent().getId());
+      Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withCommitInfo(commitInfo.get()).withBuildConfig(buildConfig);
 
       LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
       buildService.begin(launching);
@@ -112,7 +122,6 @@ public class BuildLauncher {
       HttpResponse response = asyncHttpClient.execute(buildRequest(definition.getModule(), launching)).get();
       LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
     } else {
-      // TODO mark branch as inactive
       LOG.info("Failing build {}", queued.getId().get());
       buildService.begin(queued.withState(State.LAUNCHING));
       buildService.update(queued.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
@@ -166,7 +175,7 @@ public class BuildLauncher {
     }
   }
 
-  private Optional<String> currentSha(GitInfo gitInfo) throws IOException {
+  private Optional<CommitInfo> commitInfo(GitInfo gitInfo, Optional<String> previousSha) throws IOException {
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
     GitHub gitHub = gitHubFor(gitInfo);
 
@@ -177,13 +186,28 @@ public class BuildLauncher {
       LOG.info("Couldn't find repository {}", gitInfo.getFullRepositoryName());
       return Optional.absent();
     }
+
     GHBranch branch = repository.getBranches().get(gitInfo.getBranch());
     if (branch == null) {
       LOG.info("Couldn't find branch {} for repository {}", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
       return Optional.absent();
     } else {
       LOG.info("Found sha {} for branch {}/{}", branch.getSHA1(), gitInfo.getRepository(), gitInfo.getBranch());
-      return Optional.of(branch.getSHA1());
+
+      Commit commit = toCommit(repository.getCommit(branch.getSHA1()));
+      final List<Commit> newCommits;
+      if (previousSha.isPresent()) {
+        newCommits = new ArrayList<>();
+
+        GHCompare compare = repository.getCompare(previousSha.get(), commit.getId());
+        for (GHCompare.Commit newCommit : compare.getCommits()) {
+          newCommits.add(toCommit(repository.getCommit(newCommit.getSHA1())));
+        }
+      } else {
+        newCommits = Collections.emptyList();
+      }
+
+      return Optional.of(new CommitInfo(commit, newCommits));
     }
   }
 
@@ -191,5 +215,60 @@ public class BuildLauncher {
     String host = gitInfo.getHost();
 
     return Preconditions.checkNotNull(gitHubByHost.get(host), "No GitHub found for host " + host);
+  }
+
+  private static Commit toCommit(GHCommit commit) throws IOException {
+    Commit.Builder builder = Commit.newBuilder()
+        .setId(commit.getSHA1())
+        .setDistinct(true) // TODO ??
+        .setMessage(commit.getCommitShortInfo().getMessage())
+        .setTimestamp(String.valueOf(commit.getCommitShortInfo().getCommitter().getDate().getTime()))
+        .setUrl(commit.getOwner().getHtmlUrl() + "/commit/" + commit.getSHA1())
+        .setAuthor(toAuthor(commit))
+        .setCommitter(toCommitter(commit));
+
+    for (GHCommit.File file : commit.getFiles()) {
+      switch (file.getStatus()) {
+        case "added":
+          builder.addAdded(file.getFileName());
+          break;
+        case "modified":
+          builder.addModified(file.getFileName());
+          break;
+        case "removed":
+          builder.addRemoved(file.getFileName());
+          break;
+        default:
+          throw new IllegalArgumentException("Unrecognized file status: " + file.getStatus());
+      }
+    }
+
+    return builder.build();
+  }
+
+  private static User toAuthor(GHCommit commit) throws IOException {
+    return User.newBuilder()
+        .setName(commit.getCommitShortInfo().getAuthor().getName())
+        .setEmail(commit.getCommitShortInfo().getAuthor().getEmail())
+        .setUsername(commit.getAuthor().getLogin())
+        .build();
+  }
+
+  private static User toCommitter(GHCommit commit) throws IOException {
+    return User.newBuilder()
+        .setName(commit.getCommitShortInfo().getCommitter().getName())
+        .setEmail(commit.getCommitShortInfo().getCommitter().getEmail())
+        .setUsername(commit.getCommitter().getLogin())
+        .build();
+  }
+
+  private static Optional<String> sha(Optional<Build> build) {
+    if (!build.isPresent()) {
+      return Optional.absent();
+    } else if (build.get().getCommitInfo().isPresent()) {
+      return Optional.of(build.get().getCommitInfo().get().getCurrent().getId());
+    } else {
+      return build.get().getSha();
+    }
   }
 }

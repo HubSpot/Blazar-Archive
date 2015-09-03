@@ -29,6 +29,8 @@ public class Build {
   private final Optional<Long> startTimestamp;
   private final Optional<Long> endTimestamp;
   private final Optional<String> sha;
+  @StoredAsJson
+  private final Optional<CommitInfo> commitInfo;
   private final Optional<String> log;
   @StoredAsJson
   private final Optional<BuildConfig> buildConfig;
@@ -41,6 +43,7 @@ public class Build {
                @JsonProperty("startTimestamp") Optional<Long> startTimestamp,
                @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
                @JsonProperty("sha") Optional<String> sha,
+               @JsonProperty("commitInfo") Optional<CommitInfo> commitInfo,
                @JsonProperty("log") Optional<String> log,
                @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig) {
     this.id = id;
@@ -50,6 +53,7 @@ public class Build {
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.sha = sha;
+    this.commitInfo = commitInfo;
     this.log = log;
     this.buildConfig = buildConfig;
   }
@@ -57,9 +61,10 @@ public class Build {
   public static Build queuedBuild(Module module, int buildNumber) {
     Optional<Long> absentLong = Optional.absent();
     Optional<String> absentString = Optional.absent();
+    Optional<CommitInfo> commitInfo = Optional.absent();
     Optional<BuildConfig> buildConfig = Optional.absent();
 
-    return new Build(absentLong, module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, absentString, buildConfig);
+    return new Build(absentLong, module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, commitInfo, absentString, buildConfig);
   }
 
   public Optional<Long> getId() {
@@ -90,6 +95,10 @@ public class Build {
     return sha;
   }
 
+  public Optional<CommitInfo> getCommitInfo() {
+    return commitInfo;
+  }
+
   public Optional<String> getLog() {
     return log;
   }
@@ -99,31 +108,32 @@ public class Build {
   }
 
   public Build withId(long id) {
-    return new Build(Optional.of(id), moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log, buildConfig);
+    return new Build(Optional.of(id), moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, buildConfig);
   }
 
-  public Build withSha(String sha) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, Optional.of(sha), log, buildConfig);
+  public Build withCommitInfo(CommitInfo commitInfo) {
+    Optional<String> sha = Optional.of(commitInfo.getCurrent().getId());
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, Optional.of(commitInfo), log, buildConfig);
   }
 
   public Build withState(State state) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log, buildConfig);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, buildConfig);
   }
 
   public Build withStartTimestamp(long startTimestamp) {
-    return new Build(id, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, log, buildConfig);
+    return new Build(id, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, commitInfo, log, buildConfig);
   }
 
   public Build withEndTimestamp(long endTimestamp) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), sha, log, buildConfig);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), sha, commitInfo, log, buildConfig);
   }
 
   public Build withLog(String log) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, Optional.of(log), buildConfig);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, Optional.of(log), buildConfig);
   }
 
   public Build withBuildConfig(BuildConfig buildConfig) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log, Optional.of(buildConfig));
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, Optional.of(buildConfig));
   }
 
   @Override
@@ -137,18 +147,11 @@ public class Build {
     }
 
     Build build = (Build) o;
-    return Objects.equals(moduleId, build.moduleId) &&
-        Objects.equals(buildNumber, build.buildNumber) &&
-        Objects.equals(startTimestamp, build.startTimestamp) &&
-        Objects.equals(id, build.id) &&
-        Objects.equals(state, build.state) &&
-        Objects.equals(endTimestamp, build.endTimestamp) &&
-        Objects.equals(sha, build.sha) &&
-        Objects.equals(log, build.log);
+    return Objects.equals(moduleId, build.moduleId) && Objects.equals(buildNumber, build.buildNumber);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, log);
+    return Objects.hash(moduleId, buildNumber);
   }
 }
