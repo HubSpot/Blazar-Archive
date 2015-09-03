@@ -52,7 +52,7 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.inject</groupId>
+      <groupdId>javax.inject</groupdId>
       <artifactId>javax.inject</artifactId>
     </dependency>
     <dependency>
@@ -92,6 +92,12 @@
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-jackson</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.module</groupId>
+          <artifactId>jackson-module-afterburner</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
