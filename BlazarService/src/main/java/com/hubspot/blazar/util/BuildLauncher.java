@@ -266,7 +266,7 @@ public class BuildLauncher {
   private static Optional<String> sha(Optional<Build> build) {
     if (!build.isPresent()) {
       return Optional.absent();
-    } else if (build.get().getCommitInfo().isPresent()) {
+    } else if (build.get().getCommitInfo() != null && build.get().getCommitInfo().isPresent()) {
       return Optional.of(build.get().getCommitInfo().get().getCurrent().getId());
     } else {
       return build.get().getSha();
