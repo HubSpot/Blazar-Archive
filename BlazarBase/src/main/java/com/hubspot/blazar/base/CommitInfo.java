@@ -2,6 +2,7 @@ package com.hubspot.blazar.base;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hubspot.blazar.github.GitHubProtos.Commit;
 
 import java.util.List;
 

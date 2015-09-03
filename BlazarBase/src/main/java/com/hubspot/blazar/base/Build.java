@@ -112,7 +112,7 @@ public class Build {
   }
 
   public Build withCommitInfo(CommitInfo commitInfo) {
-    Optional<String> sha = Optional.of(commitInfo.getCurrent().getSha());
+    Optional<String> sha = Optional.of(commitInfo.getCurrent().getId());
     return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, Optional.of(commitInfo), log, buildConfig);
   }
 
