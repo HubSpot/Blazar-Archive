@@ -221,7 +221,6 @@ public class BuildLauncher {
   private static Commit toCommit(GHCommit commit) throws IOException {
     Commit.Builder builder = Commit.newBuilder()
         .setId(commit.getSHA1())
-        .setDistinct(true) // TODO ??
         .setMessage(commit.getCommitShortInfo().getMessage())
         .setTimestamp(String.valueOf(commit.getCommitShortInfo().getCommitter().getDate().getTime()))
         .setUrl(commit.getOwner().getHtmlUrl() + "/commit/" + commit.getSHA1())
