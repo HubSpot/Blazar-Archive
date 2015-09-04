@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import SearchFilter from '../shared/SearchFilter.jsx';
-import StarredToggle from './StarredToggle.jsx';
+import SidebarToggle from './SidebarToggle.jsx';
 
 class SidebarFilter extends Component {
 
@@ -21,12 +21,10 @@ class SidebarFilter extends Component {
   }
 
   toggleFilter(filter) {
-    let showStarred = filter === 'starred' ? true : false;
-    this.props.updateStarred(showStarred);
+    this.props.setToggleState(filter);
   }
 
   render() {
-
 
     if (this.props.loading || this.props.builds.length === 0) {
       return <div />;
@@ -39,12 +37,11 @@ class SidebarFilter extends Component {
             ref="buildFilterSearch"
             placeholder='Filter modules...'
             inputValue={this.props.filterText}
-            onChange={this.setInputValue}
-            showStarred={this.props.showStarred} />
+            onChange={this.setInputValue} />
         </div>
-        <StarredToggle
-          toggleFilter={this.toggleFilter}
-          showStarred={this.props.showStarred} />
+        <SidebarToggle
+          toggleFilter={this.toggleFilter} 
+          toggleFilterState={this.props.toggleFilterState} />
       </div>
     );
 
@@ -60,8 +57,7 @@ SidebarFilter.propTypes = {
   loading: PropTypes.bool.isRequired,
   filterText: PropTypes.string.isRequired,
   builds: PropTypes.array.isRequired,
-  updateStarred: PropTypes.func.isRequired,
-  showStarred: PropTypes.bool.isRequired
+  setToggleState: PropTypes.func.isRequired
 };
 
 export default SidebarFilter;
