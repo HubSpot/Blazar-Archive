@@ -93,7 +93,7 @@ public class BuildResource {
 
     HttpResponse response = asyncHttpClient.execute(request).get();
     if (response.isSuccess()) {
-      return response.getAs(LogChunk.class);
+      return response.getAs(LogChunk.class).withNextOffset(offset + length);
     } else {
       String message = String.format("Error hitting Singularity, status code %d, response %s", response.getStatusCode(), response.getAsString());
       throw new WebApplicationException(Response.serverError().entity(message).type(MediaType.TEXT_PLAIN_TYPE).build());
