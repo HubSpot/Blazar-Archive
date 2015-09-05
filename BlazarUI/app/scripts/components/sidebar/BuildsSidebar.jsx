@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import $ from 'jquery';
 import LazyRender from '../shared/LazyRender.jsx';
-import BuildsSidebarListItem from './BuildsSidebarListItem.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
 import {bindAll, filter, contains, has} from 'underscore';
@@ -9,36 +8,41 @@ import SectionLoader from '../shared/SectionLoader.jsx';
 import Helpers from '../ComponentHelpers';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import SidebarItem from '../sidebar/SidebarItem.jsx';
+import Immutable from 'immutable';
 
 let Link = require('react-router').Link;
+
 
 class BuildsSidebar extends Component {
 
   constructor() {
-    bindAll(this, 'updateResults', 'updateStarred');
+    bindAll(this, 'updateResults', 'setToggleState', 'toggleStar');
 
     this.state = {
       filterText: '',
       isFiltering: false,
       expandedRepos: [],
-      showStarred: true
+      toggleFilterState: 'all'
     };
   }
 
   updateResults(input) {
-    let showStarred = this.state.showStarred;
     this.setState({
-      filterText: input,
-      showStarred: showStarred
+      filterText: input
     });
   }
 
-  updateStarred(showStarred) {
-    let filterText = this.state.filterText;
+  setToggleState(toggleState) {
+    const filterText = this.state.filterText;
+    
     this.setState({
       filterText: filterText,
-      showStarred: showStarred
+      toggleFilterState: toggleState
     });
+  }
+
+  toggleStar(isStarred, moduleId) {
+    this.props.persistStarChange(isStarred, moduleId)
   }
 
   getBuildsList() {
@@ -56,30 +60,43 @@ class BuildsSidebar extends Component {
     return filteredModules;
   }
 
+  markStarredModules(modules) {
+
+    modules.map( (module) => {
+      module.module.isStarred = false;
+      if (contains(this.props.stars, module.module.id)) {
+        module.module.isStarred = true;
+      }
+    })
+    
+    return modules;
+  }
 
 
-  // getStoredStars(results) {
-  //   let matches = [];    
-
-  //   results.map( (el) => {
-
-  //     if (this.state.showStarred && !Helpers.isStarred(this.props.stars, el.original.repository, el.original.branch)){ 
-  //       return; 
-  //     }
-
-  //     matches.push({
-  //       filterText: this.state.filterText,
-  //       key: el.original.repository,
-  //       repo: el.original
-  //     });
-
-  //   }.bind(this));
-  //   return matches;
+  // // TO DO:
+  // markStarredModules(modules) {
+  //   let moduleList = Immutable.fromJS(modules);
+  //   return moduleList
   // }
 
 
 
-  getFilteredRepos() {
+  filterByToggle(modules) {
+    if (this.state.toggleFilterState === 'starred') {
+      const starredModules = [];
+
+      modules.forEach( (module) => {
+        if (contains(this.props.stars, module.module.id)) {
+          starredModules.push(module)
+        }
+      })
+      return starredModules;
+    }
+
+    return modules;
+  }
+
+  getFilterMatches() {
     const allBuilds = this.props.builds.all;
     const options = {
       extract: function(el) {
@@ -92,24 +109,27 @@ class BuildsSidebar extends Component {
     return matches;
   }
 
-
-
-  getFilteredRepoComponents() {
-    const filteredRepos = this.getFilteredRepos();
-
-    return filteredRepos.map( (build) => {
-      if (has(build, 'module')){
+  buildModuleComponents(modules) {
+    return modules.map( (module) => {
+      if (has(module, 'module')){
         return (
-          <SidebarItem key={build.module.id} build={build} />
+          <SidebarItem 
+            key={module.module.id} 
+            build={module} 
+            isStarred={module.module.isStarred}
+            toggleStar={this.toggleStar} 
+            persistStarChange={this.props.persistStarChange} />
         )
       }
-    })
-
+    });
   }
 
-
   render() {
-    let moduleComponents = this.getFilteredRepoComponents();
+
+    const matches = this.getFilterMatches();
+    const markStarred = this.markStarredModules(matches);
+    const filteredByToggle = this.filterByToggle(markStarred);
+    const moduleComponents = this.buildModuleComponents(filteredByToggle);
     let sidebarMessage;
 
     if (this.props.loading) {
@@ -124,8 +144,6 @@ class BuildsSidebar extends Component {
       )
     }
 
-    const height = $(window).height();
-
     return (
       <div>
         <div className="sidebar__filter">
@@ -134,22 +152,17 @@ class BuildsSidebar extends Component {
             builds={this.props.builds.all}
             filterText={this.state.filterText}
             updateResults={this.updateResults}
-            updateStarred={this.updateStarred}
-            showStarred={this.state.showStarred}
+            setToggleState={this.setToggleState}
+            toggleFilterState={this.state.toggleFilterState}
           />
         </div>
-        
 
         <div className='sidebar__list'>
-        
-          <LazyRender maxHeight={700}>
+          <LazyRender maxHeight={$(window).height()}>
             {moduleComponents}
           </LazyRender>
-
           {sidebarMessage}
-
         </div>
-
 
       </div>
     );

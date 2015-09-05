@@ -1,61 +1,59 @@
-import Cookies from 'js-cookie';
+import {union} from 'underscore';
+import store from 'store';
 
-let starCache;
+const StarProvider = {
 
-let StarProvider = {
+  haveSynced: false,
+  starCache: [],
 
-  starChange: function(isStarred, repo, branch) {
+  checkStorage: function() {
+    if (!this.haveSynced) {
+      this.getStars();
+      this.haveSynced = true;
+    }
+  },
+
+  starChange: function(isStarred, moduleId) {
+    this.checkStorage();
+
     if (isStarred) {
-      this.removeStar(repo, branch);
+      this.removeStar(moduleId);
     } else {
-      this.addStar(repo, branch);
+      this.addStar(moduleId);
     }
+    return this.starCache;
   },
 
-  addStar: function(repo, branch) {
-    let starredRepos = this.getStars();
-    if (this.hasStar({ repo: repo, branch: branch }) === -1) {
-      starredRepos.push({ repo: repo, branch: branch });
-    }
-    Cookies.set('starred-repos', starredRepos, { expires: 3650 });
-    starCache = starredRepos;
+  addStar: function(moduleId) {
+    this.starCache = union(this.starCache, [moduleId]);
+    this.updateStore();
   },
 
-  removeStar: function(repo, branch) {
-    let starredRepos = this.getStars();
-    let index = this.hasStar({ repo: repo, branch: branch });
-    if (index !== -1) {
-      starredRepos.splice(index, 1);
+  removeStar: function(moduleId) {
+    const i = this.starCache.indexOf(moduleId);
+    if (i !== -1) {
+      this.starCache.splice(i, 1);
     }
-    Cookies.set('starred-repos', starredRepos, { expires: 3650 });
-    starCache = starredRepos;
+    this.updateStore();
+  },
+
+  updateStore: function() {
+    store.set('starredModules', this.starCache);
   },
 
   getStars: function() {
-    if (starCache === undefined) {
-      this.syncStarCache();
+    if (this.haveSynced) {
+      return this.starCache;
     }
-    return starCache;
-  },
 
-  hasStar: function(o) {
-    let stars = this.getStars();
-    for (let i = 0; i < stars.length; i++) {
-        if (stars[i].repo === o.repo && stars[i].branch === o.branch) {
-            return i;
-        }
-    }
-    return -1;
-  },
+    this.starCache = store.get('starredModules') || [];
+    this.haveSynced = true;
 
-  syncStarCache: function() {
-    let starredRepos = Cookies.getJSON('starred-repos');
-    if (!starredRepos) {
-      starredRepos = [];
-    }
-    starCache = starredRepos;
+    return this.starCache;
   }
 
 };
+
+window.StarProvider = StarProvider;
 
 export default StarProvider;

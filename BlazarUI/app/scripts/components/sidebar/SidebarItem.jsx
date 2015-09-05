@@ -9,7 +9,7 @@ import Star from '../shared/Star.jsx';
 
 let Link = require('react-router').Link;
 
-class Module extends Component {
+class SidebarItem extends Component {
 
   getClassNames() {
 
@@ -49,7 +49,7 @@ class Module extends Component {
 
     const star = (
       <Star 
-        isStarred={false}
+        isStarred={this.props.isStarred}
         toggleStar={this.props.toggleStar} 
         moduleId={this.props.build.module.id} />
     );
@@ -91,9 +91,10 @@ class Module extends Component {
   }
 }
 
-Module.propTypes = {
+SidebarItem.propTypes = {
+  isStarred: PropTypes.bool,
   build: PropTypes.object.isRequired,
   toggleStar: PropTypes.func.isRequired
 };
 
-export default Module;
+export default SidebarItem;

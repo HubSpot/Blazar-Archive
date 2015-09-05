@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import Icon from '../shared/Icon.jsx';
 import { bindAll } from 'underscore';
-
+import classnames from 'classnames';
 
 class Star extends Component {
 
@@ -12,31 +12,43 @@ class Star extends Component {
 
   handleClick(event) {
     event.stopPropagation();
-    this.props.toggleStar(!this.props.isStarred);
+    this.props.toggleStar(this.props.isStarred, this.props.moduleId);
+  }
+
+  getContainerClassNames() {
+    return classnames([
+       'sidebar__star',
+       this.props.classNames,
+       {selected: this.props.isStarred},
+       {unselected: !this.props.isStarred}
+    ]);
+  }
+
+  getIconClassNames() {
+    return classnames([
+       {'star': this.props.isStarred},
+       {'star-o': !this.props.isStarred}
+    ]);
   }
 
   render() {
-    let className, iconName = '';
-    if (this.props.isStarred) {
-      className = 'sidebar__star selected';
-      iconName = 'star';
-    } else {
-      className = 'sidebar__star unselected';
-      iconName = 'star-o';
-    }
-
     return (
-      <span onClick={this.handleClick} className={ className }>
-          <Icon name={ iconName }></Icon>
+      <span onClick={this.handleClick} className={this.getContainerClassNames()}>
+          <Icon name={this.getIconClassNames()}></Icon>
       </span>
     );
   }
 
 }
 
+Star.defaultProps = {
+  isStarred: false
+};
+
 Star.propTypes = {
   isStarred: PropTypes.bool.isRequired,
-  toggleStar: PropTypes.func.isRequired
+  toggleStar: PropTypes.func.isRequired,
+  moduleId: PropTypes.number.isRequired
 };
 
 export default Star;

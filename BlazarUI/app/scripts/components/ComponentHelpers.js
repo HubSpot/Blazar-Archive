@@ -1,4 +1,3 @@
-import {findWhere} from 'underscore';
 import moment from 'moment';
 
 let ComponentHelpers = {
@@ -44,14 +43,6 @@ let ComponentHelpers = {
 
   githubShaLink: function(info) {
     return `https://github.com/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
-  },
-
-  isStarred: function(stars, repo, branch) {
-    const isStarred = findWhere(stars, {
-      repo: repo,
-      branch: branch
-    });
-    return isStarred !== undefined;
   }
 
 };
