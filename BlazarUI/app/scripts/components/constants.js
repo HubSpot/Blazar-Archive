@@ -20,3 +20,11 @@ export const unicode = {
   'left-bracket': '\u007B',
   'right-bracket': '\u007D'
 };
+
+
+export const ICON_LIST = {
+  'module': 'fa-folder-o',
+  'branch': 'octicon octicon-git-branch',
+  'repo': 'octicon octicon-repo'
+};
+

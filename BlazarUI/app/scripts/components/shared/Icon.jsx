@@ -1,10 +1,17 @@
 import React, {Component, PropTypes} from 'react';
+import { ICON_LIST } from '../constants';
+
 
 class Icon extends Component {
 
   getClassNames() {
 
-    let classNames =  `${(this.props.prefix ? this.props.prefix + '-' : '')}${this.props.type} ${this.props.type}-${this.props.name} ${this.props.classNames}`;
+    let classNames = `${(this.props.prefix ? this.props.prefix + '-' : '')}${this.props.type} ${this.props.type}-${this.props.name} ${this.props.classNames}`;
+
+    if (this.props.for) {
+      classNames += ` ${ICON_LIST[this.props.for]}`
+    }
+
     return classNames;
   }
 
@@ -26,7 +33,8 @@ Icon.propTypes = {
   name: PropTypes.string.isRequired,
   prefix: PropTypes.string,
   classNames: PropTypes.string,
-  title: PropTypes.string
+  title: PropTypes.string,
+  for: PropTypes.string
 };
 
 export default Icon;
