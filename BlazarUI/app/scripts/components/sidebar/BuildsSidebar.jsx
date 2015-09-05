@@ -68,18 +68,9 @@ class BuildsSidebar extends Component {
         module.module.isStarred = true;
       }
     })
-    
+
     return modules;
   }
-
-
-  // // TO DO:
-  // markStarredModules(modules) {
-  //   let moduleList = Immutable.fromJS(modules);
-  //   return moduleList
-  // }
-
-
 
   filterByToggle(modules) {
     if (this.state.toggleFilterState === 'starred') {
@@ -144,6 +135,9 @@ class BuildsSidebar extends Component {
       )
     }
 
+    const headerHeight = $('#primary-nav').height() + $('.sidebar__filter').height();
+    const containerHeight = $(window).height() - headerHeight;
+
     return (
       <div>
         <div className="sidebar__filter">
@@ -158,7 +152,7 @@ class BuildsSidebar extends Component {
         </div>
 
         <div className='sidebar__list'>
-          <LazyRender maxHeight={$(window).height()}>
+          <LazyRender maxHeight={containerHeight}>
             {moduleComponents}
           </LazyRender>
           {sidebarMessage}
