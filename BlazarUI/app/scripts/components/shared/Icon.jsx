@@ -30,7 +30,7 @@ Icon.defaultProps = {
 
 Icon.propTypes = {
   type: PropTypes.oneOf(['fa', 'octicon']),
-  name: PropTypes.string.isRequired,
+  name: PropTypes.string,
   prefix: PropTypes.string,
   classNames: PropTypes.string,
   title: PropTypes.string,

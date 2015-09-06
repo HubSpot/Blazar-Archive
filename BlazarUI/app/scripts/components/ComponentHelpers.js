@@ -1,3 +1,4 @@
+import {contains} from 'underscore';
 import moment from 'moment';
 
 let ComponentHelpers = {
@@ -43,6 +44,16 @@ let ComponentHelpers = {
 
   githubShaLink: function(info) {
     return `https://github.com/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
+  },
+
+  getStarredModules: function(stars, modules) {
+    const starredModules = [];
+    modules.forEach( (module) => {
+      if (contains(stars, module.module.id)) {
+        starredModules.push(module);
+      }
+    });
+    return starredModules;
   }
 
 };

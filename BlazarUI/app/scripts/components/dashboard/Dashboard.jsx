@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import SectionLoader from '../shared/SectionLoader.jsx';
-import DashboardStarredRepo from './DashboardStarredRepo.jsx';
+import DashboardStarredModule from './DashboardStarredModule.jsx';
+
 import PageHeader from '../shared/PageHeader.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
@@ -18,19 +19,21 @@ class Dashboard extends Component {
       );
     }
 
-    let starredRepos = [];
-    if (this.props.builds) {
-      this.props.builds.grouped.forEach((repo) => {
-        if (Helpers.isStarred(this.props.stars, repo.repository, repo.branch)) {
-          starredRepos.push(
-            <DashboardStarredRepo key={repo.repoModuleKey} repo={repo}></DashboardStarredRepo>
-          );
-        }
-      }.bind(this));
-    }
+    let starredModuleTables = this.props.modulesBuildHistory.map( (modules, i) => {
+      if (modules.length === 0) {
+        return [];
+      };
+      
+      return (
+        <DashboardStarredModule 
+          key={modules[i].build.id}
+          modules={modules} />
+      );
 
-    if (starredRepos.length === 0) {
-      starredRepos = (
+    })
+
+    if (starredModuleTables.length === 0) {
+      starredModuleTables = (
         <MutedMessage> You have no starred repos. </MutedMessage>
       );
     }
@@ -46,8 +49,8 @@ class Dashboard extends Component {
 
         <UIGrid>
           <UIGridItem size={12}>
-            <h4 className="dashboard__section-title">Starred Repos</h4>
-            {starredRepos}
+            <h4 className="dashboard__section-title">Starred Modules</h4>
+            {starredModuleTables}
           </UIGridItem>
         </UIGrid>
 
@@ -59,7 +62,7 @@ class Dashboard extends Component {
 Dashboard.propTypes = {
   loading: PropTypes.bool,
   builds: PropTypes.object,
-  stars: PropTypes.array.isRequired
+  modulesBuildHistory: PropTypes.array
 };
 
 export default Dashboard;

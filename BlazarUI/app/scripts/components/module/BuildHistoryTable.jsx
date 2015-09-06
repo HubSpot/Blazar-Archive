@@ -90,7 +90,7 @@ class BuildHistoryTable extends Component {
 
     // TO DO: empty table
     return (
-      <table className="table table-hover table-striped roomy">
+      <table className="table table-hover table-striped">
         <BuildHistoryTableHeader
           columnNames={columnNames}
         />

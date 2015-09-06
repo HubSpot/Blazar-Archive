@@ -1,10 +1,12 @@
 @import 'variables'
 
+header-state(state)
+  border-left 3px solid state
+
 .collapsable
   margin 5px 0
   border 1px solid $gray
-  table
-    margin-top 5px
+
   .show
     padding: 10px 0
     background white
@@ -16,7 +18,16 @@
   font-weight 400
   &:hover
     cursor pointer
+    
+  &.SUCCEEDED
+    header-state($success)
+  
+  &.FAILED
+    header-state($danger)
 
+  &.CANCELLED
+    header-state($warning)
+    
 .collapsable__header-icon
   font-size 12px
   padding 12px 10px 10px

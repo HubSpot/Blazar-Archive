@@ -22,7 +22,7 @@ class BuildsSidebar extends Component {
       filterText: '',
       isFiltering: false,
       expandedRepos: [],
-      toggleFilterState: 'all'
+      toggleFilterState: 'starred'
     };
   }
 
@@ -74,13 +74,7 @@ class BuildsSidebar extends Component {
 
   filterByToggle(modules) {
     if (this.state.toggleFilterState === 'starred') {
-      const starredModules = [];
-
-      modules.forEach( (module) => {
-        if (contains(this.props.stars, module.module.id)) {
-          starredModules.push(module)
-        }
-      })
+      const starredModules = Helpers.getStarredModules(this.props.stars, modules);
       return starredModules;
     }
 

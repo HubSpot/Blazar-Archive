@@ -26,7 +26,7 @@ buildStatus(color)
   animation: blink 1.5s ease-in 0s infinite
 
 .building-icon--CANCELLED
-  buildStatus($default)
+  buildStatus($warning)
 
 .building-icon--SUCCEEDED
   buildStatus($success)
@@ -35,10 +35,7 @@ buildStatus(color)
   buildStatus($danger)
 
 .building-icon--never-built
-  border 1px solid $default
-  border-radius 50%
-  width 10px
-  height 10px
+  buildStatus($default)
 
 // animation
 @keyframes blink

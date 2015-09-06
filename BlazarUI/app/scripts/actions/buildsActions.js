@@ -17,7 +17,8 @@ BuildsActions.loadBuilds.preEmit = function() {
 
     promise.done( () => {
       let allBuilds = {};
-      allBuilds.all = builds.getAllBuilds();
+
+      allBuilds.all = builds.get();
 
       // refactor this:
       allBuilds.grouped = [];

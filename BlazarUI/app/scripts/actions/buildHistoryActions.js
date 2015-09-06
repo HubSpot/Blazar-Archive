@@ -12,14 +12,35 @@ let buildHistoryActionSettings = new ActionSettings;
 
 let BuildHistoryActions = Reflux.createActions([
   'loadBuildHistory',
+  'loadModulesBuildHistory',
   'loadBuildHistorySuccess',
   'loadBuildHistoryError',
+  'loadModulesBuildHistorySuccess',
   'updatePollingStatus'
 ]);
 
 BuildHistoryActions.loadBuildHistory.preEmit = function(data) {
   startPolling(data);
 };
+
+
+BuildHistoryActions.loadModulesBuildHistory = function(options) {
+
+  let modulesHistory = [];
+
+  options.modules.forEach((moduleId) => {
+    let buildHistory = new BuildHistory(moduleId);
+    let promise = buildHistory.fetch();
+
+    promise.done( () => {
+      modulesHistory.push(buildHistory.limit(options.limit));
+      BuildHistoryActions.loadModulesBuildHistorySuccess(modulesHistory);
+    });
+
+  });
+
+};
+
 
 BuildHistoryActions.updatePollingStatus = function(status) {
   buildHistoryActionSettings.setPolling(status);
@@ -54,7 +75,7 @@ function getModule() {
 }
 
 function getBuildHistory() {
-    let buildHistory = new BuildHistory(gitInfo);
+    let buildHistory = new BuildHistory(gitInfo.module.moduleId);
     let promise = buildHistory.fetch();
 
     promise.done( () => {

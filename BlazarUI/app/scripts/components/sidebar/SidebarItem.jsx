@@ -22,12 +22,18 @@ class SidebarItem extends Component {
   render() {
 
     const build = this.props.build;
-    let icon;
+    let icon, buildNumberLink;
 
     if (has(build, 'inProgressBuild')) {
       icon = (
         <Link to={config.appRoot + build.inProgressBuild.blazarPath} className='sidebar-item__building-icon-link'>
           <BuildingIcon result={build.inProgressBuild.state} size='small' />
+        </Link>
+      );
+
+      buildNumberLink =(
+        <Link to={config.appRoot + build.inProgressBuild.blazarPath} className='sidebar-item__build-number'>
+          #{build.inProgressBuild.buildNumber}
         </Link>
       );
 
@@ -38,6 +44,13 @@ class SidebarItem extends Component {
             <BuildingIcon result={build.lastBuild.state} size='small' />
           </Link>
         );
+
+        buildNumberLink = (
+          <Link to={config.appRoot + build.lastBuild.blazarPath} className='sidebar-item__build-number'>
+            #{build.lastBuild.buildNumber}
+          </Link>
+        );
+
       } else {
         icon = (
           <div className='sidebar-item__building-icon-link'>
@@ -55,16 +68,15 @@ class SidebarItem extends Component {
     );
 
     const moduleLink = (
-      <Link to={build.module.blazarPath} className='sidebar-item__module-name'>
+      <Link to={build.module.blazarPath.module} className='sidebar-item__module-name'>
         {build.module.name}
       </Link>
     );
 
-
     const repoLink = (
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='icon-muted'/>{ ' ' }
-        <Link to={build.gitInfo.branchBlazarPath} className='sidebar-item__module-branch-name'>
+        <Link to={build.module.blazarPath.repo} className='sidebar-item__module-branch-name'>
           {build.gitInfo.repository}
         </Link>
       </div>
@@ -73,7 +85,7 @@ class SidebarItem extends Component {
     const branchLink = (
       <div className='sidebar-item__branch-link'>
         <Icon type='octicon' name='git-branch' classNames='icon-muted'/>{ ' ' }
-        <Link to={build.gitInfo.branchBlazarPath} className='sidebar-item__module-branch-name'>
+        <Link to={build.module.blazarPath.branch} className='sidebar-item__module-branch-name'>
           {build.gitInfo.branch}
         </Link>
       </div>
@@ -83,6 +95,7 @@ class SidebarItem extends Component {
       <li className={this.getClassNames()}>
         {icon}
         {moduleLink}
+        {buildNumberLink}
         {repoLink}
         {branchLink}
         {star}

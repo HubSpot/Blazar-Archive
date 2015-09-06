@@ -8,10 +8,6 @@ class Builds extends BaseCollection {
     return `${config.apiRoot}/build/states`;
   }
 
-  parse() {
-    this.addTimeHelpers();
-  }
-
   hasBuildState() {
     return _.filter(this.data, (item) => {
       return _.has(item, 'lastBuild') || _.has(item, 'inProgressBuild') || _.has(item, 'pendingBuild');
@@ -22,38 +18,6 @@ class Builds extends BaseCollection {
     return _.filter(this.data, (item) => {
       return _.has(item, 'inProgressBuild');
     });
-  }
-
-
-  getAllBuilds() {
-
-    return _.map(this.data, (item) => {
-
-      let {
-        gitInfo,
-        module,
-        lastBuild,
-        inProgressBuild
-      } = item;
-
-      if (_.has(item, 'inProgressBuild')) {
-        item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
-      }
-
-      if (_.has(item, 'lastBuild')) {
-        item.lastBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${lastBuild.buildNumber}`;
-      }
-
-      if (_.has(item, 'module', (item) )) {
-        item.module.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}`;
-      }
-
-      gitInfo.branchBlazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}`;
-
-      return item;
-    });
-
-
   }
 
   getReposByOrg(orgInfo) {
@@ -115,32 +79,12 @@ class Builds extends BaseCollection {
   }
 
 
-
-
-
   groupBuildsByRepo() {
     // group and generate key, by org::repo[branch]
-
-
-    // let grouped = _.groupBy(this.hasBuildState(), function(o) {
     let grouped = _.groupBy(this.data, function(o) {
       return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
     });
 
-
-    // Make note if a repo has ANY module building
-    _.each(grouped, (repo) => {
-
-      repo.moduleIsBuilding = false;
-
-      for (let value in repo) {
-        if (value.inProgressBuild) {
-          repo.moduleIsBuilding = true;
-          break;
-        }
-      }
-      return repo;
-    });
 
     // move groupedBy object into an easier-to-work-with array
     let groupedInArray = [];
