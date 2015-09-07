@@ -1,4 +1,4 @@
-import {chain, pluck, union} from 'underscore';
+import {chain, union} from 'underscore';
 import store from 'store';
 
 const StarProvider = {
@@ -33,14 +33,14 @@ const StarProvider = {
   },
 
   removeStar: function() {
-    var indx = chain(this.starCache)
-                .pluck("moduleId")
+    const indx = chain(this.starCache)
+                .pluck('moduleId')
                 .indexOf(this.starInfo.moduleId)
                 .value();
 
-    if (indx !== -1){
+    if (indx !== -1) {
       this.starCache.splice(indx, 1);
-      this.updateStore(); 
+      this.updateStore();
     }
 
   },

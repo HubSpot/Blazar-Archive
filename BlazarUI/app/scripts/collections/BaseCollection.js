@@ -30,7 +30,7 @@ class BaseCollection extends Collection {
         inProgressBuild
       } = item;
 
-      if (has(item, 'module')){
+      if (has(item, 'module')) {
         item.module.blazarPath = {
           module: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}`,
           branch: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}`,

@@ -31,7 +31,7 @@ const buildHistoryStore = Reflux.createStore({
 
   loadModulesBuildHistorySuccess(buildHistory) {
     this.modulesBuildHistory = buildHistory;
-    
+
     this.trigger({
       modulesBuildHistory: this.modulesBuildHistory,
       loadingModulesBuildHistory: false

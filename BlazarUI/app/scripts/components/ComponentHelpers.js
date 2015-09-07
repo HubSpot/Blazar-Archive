@@ -1,4 +1,3 @@
-import {contains} from 'underscore';
 import moment from 'moment';
 
 let ComponentHelpers = {
@@ -55,7 +54,7 @@ let ComponentHelpers = {
           starredModules.push(module);
           return;
         }
-      })
+      });
     });
 
     return starredModules;

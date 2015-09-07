@@ -20,8 +20,6 @@ class BuildsSidebar extends Component {
 
     this.state = {
       filterText: '',
-      isFiltering: false,
-      expandedRepos: [],
       toggleFilterState: 'starred'
     };
   }
@@ -130,9 +128,11 @@ class BuildsSidebar extends Component {
         <MutedMessage roomy={true}>No matches for {this.state.filterText}.</MutedMessage>
       )
     } 
+
+    // to do: better setup for initial page load
     if (moduleComponents.length === 0 && this.state.toggleFilterState === 'starred') {
       sidebarMessage = (
-        <MutedMessage roomy={true}>No matches for {this.state.filterText}.</MutedMessage>
+        <MutedMessage roomy={true}></MutedMessage>
       )
     }
 
