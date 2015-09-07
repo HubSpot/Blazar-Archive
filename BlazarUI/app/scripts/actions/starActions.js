@@ -11,8 +11,8 @@ StarActions.loadStars.preEmit = function() {
   StarActions.loadStarsSuccess(StarProvider.getStars());
 };
 
-StarActions.toggleStar = function(isStarred, moduleId) {
-  const stars = StarProvider.starChange(isStarred, moduleId);
+StarActions.toggleStar = function(isStarred, starInfo) {
+  const stars = StarProvider.starChange(isStarred, starInfo);
   StarActions.loadStarsSuccess(stars);
 };
 

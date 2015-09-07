@@ -28,12 +28,16 @@ BuildHistoryActions.loadModulesBuildHistory = function(options) {
 
   let modulesHistory = [];
 
-  options.modules.forEach((moduleId) => {
-    let buildHistory = new BuildHistory(moduleId);
+  options.modules.forEach((module) => {
+    let buildHistory = new BuildHistory(module.moduleId);
     let promise = buildHistory.fetch();
 
     promise.done( () => {
-      modulesHistory.push(buildHistory.limit(options.limit));
+      const builds = buildHistory.limit(options.limit);
+      modulesHistory.push({
+        module: module,
+        builds: builds
+      });
       BuildHistoryActions.loadModulesBuildHistorySuccess(modulesHistory);
     });
 
@@ -75,15 +79,15 @@ function getModule() {
 }
 
 function getBuildHistory() {
-    let buildHistory = new BuildHistory(gitInfo.module.moduleId);
-    let promise = buildHistory.fetch();
+  let buildHistory = new BuildHistory(gitInfo.moduleId);
+  let promise = buildHistory.fetch();
 
-    promise.done( () => {
-      BuildHistoryActions.loadBuildHistorySuccess(buildHistory.data);
-    });
-    promise.error( () => {
-      BuildHistoryActions.loadBuildHistoryError('an error occured');
-    });
+  promise.done( () => {
+    BuildHistoryActions.loadBuildHistorySuccess(buildHistory.data);
+  });
+  promise.error( () => {
+    BuildHistoryActions.loadBuildHistoryError('an error occured');
+  });
 }
 
 function startPolling(data) {

@@ -26,9 +26,9 @@ function startPolling(data) {
       BranchActions.loadModulesSuccess(branch.modules || []);
     });
 
-    promise.error( (err) => {
-      console.warn('Error connecting to the API. Check that you are connected to the VPN.  ', err);
-      BranchActions.loadModulesError('an error occured');
+    promise.error( () => {
+      console.warn('Error connecting to the API. Check that you are connected to the VPN.');
+      BranchActions.loadModulesError('error');
     });
 
     promise.always( () => {

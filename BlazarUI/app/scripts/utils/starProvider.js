@@ -1,10 +1,11 @@
-import {union} from 'underscore';
+import {chain, pluck, union} from 'underscore';
 import store from 'store';
 
 const StarProvider = {
 
   haveSynced: false,
   starCache: [],
+  starInfo: {},
 
   checkStorage: function() {
     if (!this.haveSynced) {
@@ -13,28 +14,35 @@ const StarProvider = {
     }
   },
 
-  starChange: function(isStarred, moduleId) {
+  starChange: function(isStarred, starInfo) {
     this.checkStorage();
 
+    this.starInfo = starInfo;
+
     if (isStarred) {
-      this.removeStar(moduleId);
+      this.removeStar();
     } else {
-      this.addStar(moduleId);
+      this.addStar();
     }
     return this.starCache;
   },
 
-  addStar: function(moduleId) {
-    this.starCache = union(this.starCache, [moduleId]);
+  addStar: function() {
+    this.starCache = union(this.starCache, [this.starInfo]);
     this.updateStore();
   },
 
-  removeStar: function(moduleId) {
-    const i = this.starCache.indexOf(moduleId);
-    if (i !== -1) {
-      this.starCache.splice(i, 1);
+  removeStar: function() {
+    var indx = chain(this.starCache)
+                .pluck("moduleId")
+                .indexOf(this.starInfo.moduleId)
+                .value();
+
+    if (indx !== -1){
+      this.starCache.splice(indx, 1);
+      this.updateStore(); 
     }
-    this.updateStore();
+
   },
 
   updateStore: function() {

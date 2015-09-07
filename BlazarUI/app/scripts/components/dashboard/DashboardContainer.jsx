@@ -47,22 +47,20 @@ class DashboardContainer extends Component {
     this.setState(state);
     
     // fetch build history for starred modules
-    if (!this.state.loadingStars){
-      if (this.state.loadingModulesBuildHistory){
-        BuildHistoryActions.loadModulesBuildHistory({
-          modules: this.state.stars,
-          limit: 3
-        });
-      }
+    if (!this.state.loadingStars && this.state.loadingModulesBuildHistory){
+      BuildHistoryActions.loadModulesBuildHistory({
+        modules: this.state.stars,
+        limit: 3
+      });
     }
 
     // now that we have builds and stars, let's render the page
-    if (!this.state.loadingBuilds && !this.state.loadingStars) {
+    if (!this.state.loadingModulesBuildHistory && !this.state.loadingStars) {
       this.setState({
         loading: false
       });
     }
-
+  
   }
 
   render() {

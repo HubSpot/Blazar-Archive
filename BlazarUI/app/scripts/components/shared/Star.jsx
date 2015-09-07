@@ -12,7 +12,13 @@ class Star extends Component {
 
   handleClick(event) {
     event.stopPropagation();
-    this.props.toggleStar(this.props.isStarred, this.props.moduleId);
+    const starInfo = {
+      moduleId: this.props.moduleId,
+      moduleName: this.props.moduleName,
+      modulePath: this.props.modulePath
+    };
+
+    this.props.toggleStar(this.props.isStarred, starInfo);
   }
 
   getContainerClassNames() {
@@ -48,7 +54,9 @@ Star.defaultProps = {
 Star.propTypes = {
   isStarred: PropTypes.bool.isRequired,
   toggleStar: PropTypes.func.isRequired,
-  moduleId: PropTypes.number.isRequired
+  moduleId: PropTypes.number.isRequired,
+  modulePath: PropTypes.string.isRequired,
+  moduleName: PropTypes.string.isRequired,
 };
 
 export default Star;

@@ -8,8 +8,7 @@ class BuildHistory extends BaseCollection {
   }
 
   url() {
-    return 'http://localhost:5000/js/fixtures/moduleBuild.json';
-    // return `${config.apiRoot}/build/history/module/${this.moduleId}`;
+    return `${config.apiRoot}/build/history/module/${this.moduleId}`;
   }
 
 

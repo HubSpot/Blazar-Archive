@@ -1,15 +1,17 @@
-import {map,has} from 'underscore';
+/*global config*/
+
+import {map, has} from 'underscore';
 import moment from 'moment';
 import Collection from './Collection';
 
-class BaseCollection extends Collection{
+class BaseCollection extends Collection {
 
   parse() {
     this.addHelpers();
   }
 
   limit(limit) {
-    return this.data.splice(0, limit)
+    return this.data.splice(0, limit);
   }
 
 
@@ -28,11 +30,13 @@ class BaseCollection extends Collection{
         inProgressBuild
       } = item;
 
-      item.module.blazarPath = {
-        module: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}`,
-        branch: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}`,
-        repo: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`
-      };
+      if (has(item, 'module')){
+        item.module.blazarPath = {
+          module: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}`,
+          branch: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}`,
+          repo: `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`
+        };
+      }
 
       if (has(item, 'inProgressBuild')) {
         item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;

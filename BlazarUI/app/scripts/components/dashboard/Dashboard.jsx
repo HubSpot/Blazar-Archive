@@ -8,6 +8,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import Icon from '../shared/Icon.jsx';
+import EmptyMessage from '../shared/EmptyMessage.jsx';
 import Helpers from '../ComponentHelpers';
 
 class Dashboard extends Component {
@@ -18,19 +19,18 @@ class Dashboard extends Component {
         <SectionLoader />
       );
     }
+  
+    let starredModuleTables = this.props.modulesBuildHistory.map((module) => {
 
-    let starredModuleTables = this.props.modulesBuildHistory.map( (modules, i) => {
-      if (modules.length === 0) {
-        return [];
-      };
-      
       return (
-        <DashboardStarredModule 
-          key={modules[i].build.id}
-          modules={modules} />
+        <DashboardStarredModule
+          key={module.module.moduleId}
+          modules={module.builds}
+          moduleId={module.module.moduleId}
+          moduleName={module.module.moduleName}
+          modulePath={module.module.modulePath} />
       );
-
-    })
+    });
 
     if (starredModuleTables.length === 0) {
       starredModuleTables = (

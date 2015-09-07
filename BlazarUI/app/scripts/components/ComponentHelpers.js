@@ -48,11 +48,16 @@ let ComponentHelpers = {
 
   getStarredModules: function(stars, modules) {
     const starredModules = [];
+
     modules.forEach( (module) => {
-      if (contains(stars, module.module.id)) {
-        starredModules.push(module);
-      }
+      stars.forEach( (star) => {
+        if (star.moduleId === module.module.id) {
+          starredModules.push(module);
+          return;
+        }
+      })
     });
+
     return starredModules;
   }
 

@@ -55,8 +55,8 @@ class BuildsSidebarContainer extends Component {
 
   }
 
-  persistStarChange(isStarred, moduleId) {
-    StarActions.toggleStar(isStarred, moduleId);
+  persistStarChange(isStarred, starInfo) {
+    StarActions.toggleStar(isStarred, starInfo);
   }
 
   render() {

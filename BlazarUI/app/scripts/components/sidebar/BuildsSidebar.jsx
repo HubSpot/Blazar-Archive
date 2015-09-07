@@ -41,8 +41,8 @@ class BuildsSidebar extends Component {
     });
   }
 
-  toggleStar(isStarred, moduleId) {
-    this.props.persistStarChange(isStarred, moduleId)
+  toggleStar(isStarred, moduleInfo) {
+    this.props.persistStarChange(isStarred, moduleInfo)
   }
 
   getBuildsList() {
@@ -61,13 +61,15 @@ class BuildsSidebar extends Component {
   }
 
   markStarredModules(modules) {
-
-    modules.map( (module) => {
+    modules.map( (module) => {      
       module.module.isStarred = false;
-      if (contains(this.props.stars, module.module.id)) {
-        module.module.isStarred = true;
-      }
-    })
+      this.props.stars.forEach( (star) => {
+        if (star.moduleId === module.module.id) {
+          module.module.isStarred = true;
+          return;
+        }
+      });
+    });
 
     return modules;
   }
@@ -123,7 +125,12 @@ class BuildsSidebar extends Component {
       );
     }
 
-    if (moduleComponents.length === 0) {
+    if (moduleComponents.length === 0 && this.state.filterText.length > 0) {
+      sidebarMessage = (
+        <MutedMessage roomy={true}>No matches for {this.state.filterText}.</MutedMessage>
+      )
+    } 
+    if (moduleComponents.length === 0 && this.state.toggleFilterState === 'starred') {
       sidebarMessage = (
         <MutedMessage roomy={true}>No matches for {this.state.filterText}.</MutedMessage>
       )

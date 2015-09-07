@@ -8,6 +8,7 @@
 import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
+import EmptyMessage from '../shared/EmptyMessage.jsx';
 import NotificationToggle from '../shared/NotificationToggle.jsx';
 import BuildHistoryTable from '../module/BuildHistoryTable.jsx';
 import Collapsable from '../shared/Collapsable.jsx';
@@ -15,6 +16,14 @@ import Collapsable from '../shared/Collapsable.jsx';
 class DashboardStarredModule extends Component {
 
   render() {
+
+    if (this.props.modules.length === 0) {
+      return (
+        <EmptyMessage>
+          No build history for <Link to={this.props.modulePath}>{this.props.moduleName}</Link>
+        </EmptyMessage>
+      )
+    }
 
     let showMore,
     {
@@ -64,7 +73,9 @@ class DashboardStarredModule extends Component {
 }
 
 DashboardStarredModule.propTypes = {
-  repo: PropTypes.object
+  moduleId: PropTypes.number.isRequired,
+  moduleName: PropTypes.string.isRequired,
+  modulePath: PropTypes.string.isRequired
 };
 
 export default DashboardStarredModule;

@@ -64,6 +64,8 @@ class SidebarItem extends Component {
       <Star 
         isStarred={this.props.isStarred}
         toggleStar={this.props.toggleStar} 
+        modulePath={this.props.build.module.blazarPath.module}
+        moduleName={this.props.build.module.name}
         moduleId={this.props.build.module.id} />
     );
 
