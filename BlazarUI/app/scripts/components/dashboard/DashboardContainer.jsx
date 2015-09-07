@@ -20,7 +20,6 @@ class DashboardContainer extends Component {
       builds: {},
       stars: [], 
       modulesBuildHistory: [],
-      loadingBuilds: true,
       loadingModulesBuildHistory: true,
       loadingStars: true,
       loading: true
@@ -45,11 +44,10 @@ class DashboardContainer extends Component {
   onStatusChange(state) {
 
     this.setState(state);
-    
-    // fetch build history for starred modules
-    if (!this.state.loadingStars && this.state.loadingModulesBuildHistory){
+
+    if (state.stars){
       BuildHistoryActions.loadModulesBuildHistory({
-        modules: this.state.stars,
+        modules: state.stars,
         limit: 3
       });
     }
@@ -60,7 +58,7 @@ class DashboardContainer extends Component {
         loading: false
       });
     }
-  
+
   }
 
   render() {
