@@ -62,6 +62,7 @@ class Module extends Component {
         </UIGrid>
         <div className='pagination-outer'>
           <Paginator
+            hasData={this.props.buildHistory.length > 0}
             className='pagination'
             ellipsesClassName='disabled'
             selectedClassName='active'

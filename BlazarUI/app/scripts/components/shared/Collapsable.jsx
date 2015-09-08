@@ -18,6 +18,10 @@ class Collapsable extends Component {
     });
   }
 
+  getHeaderClassNames() {
+    return 'collapsable__header ' + this.props.headerClassNames;
+  }
+
   getIconState() {
     return this.state.expanded ? 'minus' : 'plus';
   }
@@ -41,7 +45,7 @@ class Collapsable extends Component {
     }
     return (
       <div className='collapsable'>
-        <h4 onClick={this.handleToggle} className='collapsable__header'>
+        <h4 onClick={this.handleToggle} className={this.getHeaderClassNames()}>
           <Icon classNames='collapsable__header-icon' type='fa' name={this.getIconState()} />
           {icon}
           {this.props.header}
@@ -60,7 +64,7 @@ Collapsable.defaultProps = {
 };
 
 Collapsable.propTypes = {
-  header: PropTypes.string,
+  header: PropTypes.node,
   children: PropTypes.node,
   iconType: PropTypes.oneOf(['fa','octicon']),
   iconName: PropTypes.string

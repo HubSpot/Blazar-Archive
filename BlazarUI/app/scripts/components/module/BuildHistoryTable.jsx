@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react';
+import {map, filter, reduce} from 'underscore';
 import BuildHistoryTableHeader from './BuildHistoryTableHeader.jsx';
 import BuildHistoryTableRow from './BuildHistoryTableRow.jsx';
-import {map, filter, reduce} from 'underscore';
+import EmptyMessage from '../shared/EmptyMessage.jsx';
 
 class BuildHistoryTable extends Component {
 
@@ -67,8 +68,15 @@ class BuildHistoryTable extends Component {
   }
 
   render() {
+
     if (this.props.loading) {
       return <div></div>;
+    }
+
+    if (this.props.buildHistory.length === 0) {
+      return (
+        <EmptyMessage> No build history </EmptyMessage>
+      );
     }
 
     let columnNames = [
@@ -82,7 +90,7 @@ class BuildHistoryTable extends Component {
 
     // TO DO: empty table
     return (
-      <table className="table table-hover table-striped roomy">
+      <table className="table table-hover table-striped">
         <BuildHistoryTableHeader
           columnNames={columnNames}
         />

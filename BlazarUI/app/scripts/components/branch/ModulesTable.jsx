@@ -1,11 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import TableHead from '../shared/TableHead.jsx';
 import ModulesTableRow from './ModulesTableRow.jsx';
+import EmptyMessage from '../shared/EmptyMessage.jsx';
 
 class ModulesTable extends Component {
 
   getRows() {
-    let modules = this.props.modules;
+    const modules = this.props.modules;
+
     return modules.map((module, i) =>
       <ModulesTableRow
         module={modules[i]}
@@ -17,6 +19,14 @@ class ModulesTable extends Component {
   render() {
     if (this.props.loading) {
       return <div></div>;
+    }
+
+    if (this.props.modules.length === 0) {
+      return (
+        <EmptyMessage>
+          No build history yet.
+        </EmptyMessage>
+      )
     }
 
     let columnNames = [

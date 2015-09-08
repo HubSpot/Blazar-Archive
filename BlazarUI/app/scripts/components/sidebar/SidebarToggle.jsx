@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/lib/Button';
 import Icon from '../shared/Icon.jsx';
 import {bindAll} from 'underscore';
 
-class StarredToggle extends Component {
+class SidebarToggle extends Component {
 
   constructor(props) {
     super(props);
@@ -20,14 +20,15 @@ class StarredToggle extends Component {
         <Button
           id="starred"
           className="sidebar__filter-buttons-btn"
-          active={this.props.showStarred}
+          active={this.props.toggleFilterState === 'starred'}
           onClick={this.handleToggle}>
             <Icon name="star" />
         </Button>
+
         <Button
           id="all"
           className="sidebar__filter-buttons-btn"
-          active={!this.props.showStarred}
+          active={this.props.toggleFilterState === 'all'}
           onClick={this.handleToggle}>
             All
         </Button>
@@ -36,9 +37,9 @@ class StarredToggle extends Component {
   }
 }
 
-StarredToggle.propTypes = {
+SidebarToggle.propTypes = {
   toggleFilter: PropTypes.func.isRequired,
-  showStarred: PropTypes.bool.isRequired
+  toggleFilterState: PropTypes.string.isRequired
 };
 
-export default StarredToggle;
+export default SidebarToggle;

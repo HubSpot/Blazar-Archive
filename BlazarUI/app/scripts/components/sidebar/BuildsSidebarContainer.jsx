@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import {bindAll} from 'underscore';
+
 import BuildsSidebar from './BuildsSidebar.jsx';
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
@@ -7,17 +9,20 @@ import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
 
 import Sidebar from './Sidebar.jsx';
-import BuildsNotifier from '../BuildsNotifier';
+// import BuildsNotifier from '../BuildsNotifier';
 
 class BuildsSidebarContainer extends Component {
 
   constructor(props) {
     super(props);
+    
+    bindAll(this, 'persistStarChange');
 
     this.state = {
       builds: {
         grouped: [],
-        modules: []
+        modules: [],
+        all: []
       },
       stars: [],
       loadingBuilds: true,
@@ -50,12 +55,12 @@ class BuildsSidebarContainer extends Component {
 
   }
 
-  persistStarChange(state, repo, branch) {
-    StarActions.toggleStar(state, repo, branch);
+  persistStarChange(isStarred, starInfo) {
+    StarActions.toggleStar(isStarred, starInfo);
   }
 
   render() {
-    BuildsNotifier.updateModules(this.state.builds.modules);
+    // BuildsNotifier.updateModules(this.state.builds.modules);
     return (
       <Sidebar>
         <BuildsSidebar

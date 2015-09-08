@@ -1,7 +1,7 @@
 export const labels = {
   'SUCCEEDED': 'success',
   'FAILED': 'danger',
-  'CANCELLED': 'default',
+  'CANCELLED': 'warning',
   'QUEUED': 'default',
   'LAUNCHING': 'default',
   'IN_PROGRESS': 'info'
@@ -20,3 +20,11 @@ export const unicode = {
   'left-bracket': '\u007B',
   'right-bracket': '\u007D'
 };
+
+
+export const ICON_LIST = {
+  'module': 'fa-folder-o',
+  'branch': 'octicon octicon-git-branch',
+  'repo': 'octicon octicon-repo'
+};
+

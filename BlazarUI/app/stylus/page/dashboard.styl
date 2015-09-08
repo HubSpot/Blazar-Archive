@@ -1,14 +1,14 @@
-.starredRepo
+@import '../variables'
+
+.starred-module
   margin-bottom 20px
   background-color #f9f9f9
   border 1px solid #e5e5e5
   position relative
+  padding 10px
 
 .starredRepo.active
   margin-bottom 20px
-
-.starredRepo-inner
-  padding 10px
 
 .progressBar-dashboard.progress
   height 8px
@@ -18,158 +18,5 @@
   bottom -20px
   left -1px
 
-.dashboard__repo-name
-  font-size 18px
-  font-weight 300
-
-.dashboard__title-link
-  color #333
-  font-weight 500
-
-.dashboard__branch-link
-  font-size 13px
-  font-weight 400
-
-.dashboard__repo-details
-  margin-top 5px
-  padding-top 5px
-  border-top 1px solid #e5e5e5
-
 .dashboard__toggle-container
   float right
-
-.dashboard__toggle-container label
-  position relative
-  bottom 7px
-  margin-right 7px
-  font-weight 300
-  font-size 13px
-
-.dashboard__toggle
-  display inline-block
-
-.toggle
-  cursor pointer
-
-.toggle:hover
-  text-decoration none
-
-.react-toggle
-  display inline-block
-  position relative
-  cursor pointer
-  background-color transparent
-  border 0
-  padding 0
-  -webkit-touch-callout none
-  -webkit-user-select none
-  -khtml-user-select none
-  -moz-user-select none
-  -ms-user-select none
-  user-select none
-  -webkit-tap-highlight-color rgba(0,0,0,0)
-  -webkit-tap-highlight-color transparent
-  &:hover
-    .react-toggle-track
-      background-color #000000
-  &.react-toggle--checked
-    &:hover
-      .react-toggle-track
-        background-color #128D15
-  &:active
-    .react-toggle-thumb
-      -webkit-box-shadow 0px 0px 5px 5px #0099E0
-      -moz-box-shadow 0px 0px 5px 5px #0099E0
-      box-shadow 0px 0px 5px 5px #0099E0
-
-.react-toggle-screenreader-only
-  border 0
-  clip rect(0 0 0 0)
-  height 1px
-  margin -1px
-  overflow hidden
-  padding 0
-  position absolute
-  width 1px
-
-.react-toggle--disabled
-  opacity 0.5
-  -webkit-transition opacity 0.25s
-  transition opacity 0.25s
-
-.react-toggle-track
-  width 50px
-  height 24px
-  padding 0
-  border-radius 30px
-  background-color #4D4D4D
-  -webkit-transition all 0.2s ease
-  -moz-transition all 0.2s ease
-  transition all 0.2s ease
-
-.react-toggle--checked
-  .react-toggle-track
-    background-color #19AB27
-  .react-toggle-track-check
-    opacity 1
-    -webkit-transition opacity 0.25s ease
-    -moz-transition opacity 0.25s ease
-    transition opacity 0.25s ease
-  .react-toggle-track-x
-    opacity 0
-  .react-toggle-thumb
-    left 27px
-    border-color #19AB27
-
-.react-toggle-track-check
-  position absolute
-  width 14px
-  height 10px
-  top 0px
-  bottom 0px
-  margin-top auto
-  margin-bottom auto
-  line-height 0
-  left 8px
-  opacity 0
-  -webkit-transition opacity 0.25s ease
-  -moz-transition opacity 0.25s ease
-  transition opacity 0.25s ease
-
-.react-toggle-track-x
-  position absolute
-  width 10px
-  height 10px
-  top 0px
-  bottom 0px
-  margin-top auto
-  margin-bottom auto
-  line-height 0
-  right 10px
-  opacity 1
-  -webkit-transition opacity 0.25s ease
-  -moz-transition opacity 0.25s ease
-  transition opacity 0.25s ease
-
-.react-toggle-thumb
-  transition all 0.5s cubic-bezier(0.23, 1, 0.32, 1) 0ms
-  position absolute
-  top 1px
-  left 1px
-  width 22px
-  height 22px
-  border 1px solid #4D4D4D
-  border-radius 50%
-  background-color #FAFAFA
-  -webkit-box-sizing border-box
-  -moz-box-sizing border-box
-  box-sizing border-box
-  -webkit-transition all 0.25s ease
-  -moz-transition all 0.25s ease
-  transition all 0.25s ease
-
-.react-toggle--focus
-  .react-toggle-thumb
-    -webkit-box-shadow 0px 0px 3px 2px #0099E0
-    -moz-box-shadow 0px 0px 3px 2px #0099E0
-    box-shadow 0px 0px 2px 3px #0099E0

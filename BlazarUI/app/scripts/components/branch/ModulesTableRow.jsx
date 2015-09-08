@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
 import {labels, iconStatus} from '../constants';
+import {has} from 'underscore';
+
 import Helpers from '../ComponentHelpers';
 
 import Icon from '../shared/Icon.jsx';
@@ -28,6 +30,7 @@ class ModulesTableRow extends Component {
   }
 
   render() {
+
     let {
       lastBuild,
       inProgressBuild,
@@ -37,17 +40,29 @@ class ModulesTableRow extends Component {
       modulePath
     } = this.props.module;
 
+    if (!has(this.props.module, 'lastBuild')) {
+      return (
+        <tr> 
+          <td>{module.name}</td>  
+          <td>No History</td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr> 
+      )
+    }
+
+
     let sha;
-    let build = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
-    let buildLink = `${window.config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
+    const build = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
+    const buildLink = `${window.config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
+    const startTime = Helpers.timestampFormatted(build.startTimestamp);
 
     if (build.sha !== undefined) {
       sha = <Sha gitInfo={gitInfo} build={build} />;
     }
 
-    let startTime = Helpers.timestampFormatted(build.startTimestamp);
     let duration = build.duration;
-
     if (build.state === 'IN_PROGRESS') {
       duration = 'In Progress...';
     }

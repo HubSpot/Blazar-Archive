@@ -3,18 +3,15 @@ import BaseCollection from './BaseCollection';
 
 class BuildHistory extends BaseCollection {
 
-  constructor(module) {
-    this.module = module;
+  constructor(moduleId) {
+    this.moduleId = moduleId;
   }
 
   url() {
-    let moduleId = this.module.moduleId;
-    return `${config.apiRoot}/build/history/module/${moduleId}`;
+    return `${config.apiRoot}/build/history/module/${this.moduleId}`;
   }
 
-  parse() {
-    this.addTimeHelpers();
-  }
+
 }
 
 export default BuildHistory;

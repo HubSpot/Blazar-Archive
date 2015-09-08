@@ -5,9 +5,11 @@ const buildHistoryStore = Reflux.createStore({
 
   init() {
     this.buildHistory = [];
+    this.modulesBuildHistory = [];
 
     this.listenTo(BuildHistoryActions.loadBuildHistory, this.loadBuildHistory);
     this.listenTo(BuildHistoryActions.loadBuildHistorySuccess, this.loadBuildHistorySuccess);
+    this.listenTo(BuildHistoryActions.loadModulesBuildHistorySuccess, this.loadModulesBuildHistorySuccess);
     this.listenTo(BuildHistoryActions.loadBuildHistoryError, this.loadBuildHistoryError);
   },
 
@@ -23,6 +25,25 @@ const buildHistoryStore = Reflux.createStore({
     this.trigger({
       buildHistory: this.buildHistory,
       loading: false
+    });
+  },
+
+  loadModulesBuildHistorySuccess(buildHistory) {
+    this.modulesBuildHistory = buildHistory;
+
+    this.modulesBuildHistory.sort((a, b) => {
+      if (a.module.moduleName < b.module.moduleName) {
+        return -1;
+      }
+      if (a.module.moduleName > b.module.moduleName) {
+        return 1;
+      }
+      return 0;
+    });
+
+    this.trigger({
+      modulesBuildHistory: this.modulesBuildHistory,
+      loadingModulesBuildHistory: false
     });
   },
 

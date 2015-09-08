@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 
 import ModulesTable from '../branch/ModulesTable.jsx';
 import Collapsable from '../shared/Collapsable.jsx';
+import EmptyMessage from '../shared/EmptyMessage.jsx';
 
 class Branches extends Component {
 
@@ -11,6 +12,18 @@ class Branches extends Component {
 
     branches.forEach((branch, i) => {
 
+      let table = (
+        <ModulesTable modules={branch.modules} />
+      )
+
+      if (!branch.hasBuiltOnBlazar){
+        table = (
+          <EmptyMessage>
+            No build history.
+          </EmptyMessage>
+        )
+      }
+
       branchList.push(
         <Collapsable
           key={i}
@@ -19,7 +32,7 @@ class Branches extends Component {
           iconName='git-branch'
           initialToggleStateOpen={branch.branch === 'master'}
         >
-          <ModulesTable modules={branch.modules} />
+          {table}
         </Collapsable>
       )
     });

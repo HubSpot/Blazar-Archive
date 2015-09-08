@@ -12,14 +12,39 @@ let buildHistoryActionSettings = new ActionSettings;
 
 let BuildHistoryActions = Reflux.createActions([
   'loadBuildHistory',
+  'loadModulesBuildHistory',
   'loadBuildHistorySuccess',
   'loadBuildHistoryError',
+  'loadModulesBuildHistorySuccess',
   'updatePollingStatus'
 ]);
 
 BuildHistoryActions.loadBuildHistory.preEmit = function(data) {
   startPolling(data);
 };
+
+
+BuildHistoryActions.loadModulesBuildHistory = function(options) {
+
+  let modulesHistory = [];
+
+  options.modules.forEach((module) => {
+    let buildHistory = new BuildHistory(module.moduleId);
+    let promise = buildHistory.fetch();
+
+    promise.done( () => {
+      const builds = buildHistory.limit(options.limit);
+      modulesHistory.push({
+        module: module,
+        builds: builds
+      });
+      BuildHistoryActions.loadModulesBuildHistorySuccess(modulesHistory);
+    });
+
+  });
+
+};
+
 
 BuildHistoryActions.updatePollingStatus = function(status) {
   buildHistoryActionSettings.setPolling(status);
@@ -54,15 +79,15 @@ function getModule() {
 }
 
 function getBuildHistory() {
-    let buildHistory = new BuildHistory(gitInfo);
-    let promise = buildHistory.fetch();
+  let buildHistory = new BuildHistory(gitInfo.moduleId);
+  let promise = buildHistory.fetch();
 
-    promise.done( () => {
-      BuildHistoryActions.loadBuildHistorySuccess(buildHistory.data);
-    });
-    promise.error( () => {
-      BuildHistoryActions.loadBuildHistoryError('an error occured');
-    });
+  promise.done( () => {
+    BuildHistoryActions.loadBuildHistorySuccess(buildHistory.data);
+  });
+  promise.error( () => {
+    BuildHistoryActions.loadBuildHistoryError('an error occured');
+  });
 }
 
 function startPolling(data) {

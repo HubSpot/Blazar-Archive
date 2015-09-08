@@ -7,24 +7,13 @@ buildStatus(color)
 .building-icon
   display block
   border-radius 50%
-  font-size 0
-  top 50%
-  margin-top -4px
 
 .building-icon--small
   margin-top: -3px
 
-.building-icon-inner
-  display inline-block
-  float none
-  width 8px
-  height 8px
-  border-radius 50%
-  opacity: 1
-
 .building-icon-inner--small
-  width 6px
-  height 6px
+  width 10px
+  height 10px
 
 .building-icon--IN_PROGRESS
   buildStatus($info)
@@ -37,13 +26,16 @@ buildStatus(color)
   animation: blink 1.5s ease-in 0s infinite
 
 .building-icon--CANCELLED
-  buildStatus($default)
+  buildStatus($warning)
 
 .building-icon--SUCCEEDED
   buildStatus($success)
 
 .building-icon--FAILED
   buildStatus($danger)
+
+.building-icon--never-built
+  buildStatus($default)
 
 // animation
 @keyframes blink

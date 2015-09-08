@@ -1,12 +1,14 @@
 import React, {Component, PropTypes} from 'react';
 import SectionLoader from '../shared/SectionLoader.jsx';
-import DashboardStarredRepo from './DashboardStarredRepo.jsx';
+import DashboardStarredModule from './DashboardStarredModule.jsx';
+
 import PageHeader from '../shared/PageHeader.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import Icon from '../shared/Icon.jsx';
+import EmptyMessage from '../shared/EmptyMessage.jsx';
 import Helpers from '../ComponentHelpers';
 
 class Dashboard extends Component {
@@ -17,20 +19,21 @@ class Dashboard extends Component {
         <SectionLoader />
       );
     }
+  
+    let starredModuleTables = this.props.modulesBuildHistory.map((module) => {
 
-    let starredRepos = [];
-    if (this.props.builds) {
-      this.props.builds.grouped.forEach((repo) => {
-        if (Helpers.isStarred(this.props.stars, repo.repository, repo.branch)) {
-          starredRepos.push(
-            <DashboardStarredRepo key={repo.repoModuleKey} repo={repo}></DashboardStarredRepo>
-          );
-        }
-      }.bind(this));
-    }
+      return (
+        <DashboardStarredModule
+          key={module.module.moduleId}
+          modules={module.builds}
+          moduleId={module.module.moduleId}
+          moduleName={module.module.moduleName}
+          modulePath={module.module.modulePath} />
+      );
+    });
 
-    if (starredRepos.length === 0) {
-      starredRepos = (
+    if (starredModuleTables.length === 0) {
+      starredModuleTables = (
         <MutedMessage> You have no starred repos. </MutedMessage>
       );
     }
@@ -46,8 +49,8 @@ class Dashboard extends Component {
 
         <UIGrid>
           <UIGridItem size={12}>
-            <h4 className="dashboard__section-title">Starred Repos</h4>
-            {starredRepos}
+            <h4 className="dashboard__section-title">Starred Modules</h4>
+            {starredModuleTables}
           </UIGridItem>
         </UIGrid>
 
@@ -59,7 +62,7 @@ class Dashboard extends Component {
 Dashboard.propTypes = {
   loading: PropTypes.bool,
   builds: PropTypes.object,
-  stars: PropTypes.array.isRequired
+  modulesBuildHistory: PropTypes.array
 };
 
 export default Dashboard;
