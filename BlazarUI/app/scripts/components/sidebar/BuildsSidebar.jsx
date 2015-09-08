@@ -131,7 +131,7 @@ class BuildsSidebar extends Component {
     // to do: better setup for initial page load
     if (moduleComponents.length === 0 && this.state.toggleFilterState === 'starred') {
       sidebarMessage = (
-        <MutedMessage roomy={true}></MutedMessage>
+        <MutedMessage roomy={true}>No starred modules</MutedMessage>
       )
     }
 
