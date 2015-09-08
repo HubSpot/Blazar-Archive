@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
@@ -113,9 +115,18 @@ public class BuildLauncher {
 
   private synchronized void startBuild(BuildDefinition definition, Build queued, Optional<Build> previous) throws Exception {
     Optional<CommitInfo> commitInfo = commitInfo(definition.getGitInfo(), sha(previous));
+    final Optional<BuildConfig> buildConfig;
     if (commitInfo.isPresent()) {
-      BuildConfig buildConfig = configAtSha(definition, commitInfo.get().getCurrent().getId());
-      Build launching = queued.withStartTimestamp(System.currentTimeMillis()).withState(State.LAUNCHING).withCommitInfo(commitInfo.get()).withBuildConfig(buildConfig);
+      buildConfig = configAtSha(definition, commitInfo.get().getCurrent().getId());
+    } else {
+      buildConfig = Optional.absent();
+    }
+
+    if (buildConfig.isPresent()) {
+      Build launching = queued.withStartTimestamp(System.currentTimeMillis())
+          .withState(State.LAUNCHING)
+          .withCommitInfo(commitInfo.get())
+          .withBuildConfig(buildConfig.get());
 
       LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
       buildService.begin(launching);
@@ -155,7 +166,7 @@ public class BuildLauncher {
     return modulesToBuild.contains(module.getName()) ? "--safe_mode" : "--dry_run";
   }
 
-  private BuildConfig configAtSha(BuildDefinition definition, String sha) throws IOException {
+  private Optional<BuildConfig> configAtSha(BuildDefinition definition, String sha) throws IOException {
     GitHub gitHub = gitHubFor(definition.getGitInfo());
     GHRepository repository = gitHub.getRepository(definition.getGitInfo().getFullRepositoryName());
 
@@ -169,10 +180,14 @@ public class BuildLauncher {
     try {
       GHContent configContent = repository.getFileContent(configPath, sha);
       LOG.info("Found config for path {} in repo {}@{}", configPath, repositoryName, sha);
-      return objectMapper.readValue(yamlFactory.createParser(configContent.getContent()), BuildConfig.class);
+      JsonParser parser = yamlFactory.createParser(configContent.getContent());
+      return Optional.of(objectMapper.readValue(parser, BuildConfig.class));
     } catch (FileNotFoundException e) {
       LOG.info("No config found for path {} in repo {}@{}, using default values", configPath, repositoryName, sha);
-      return BuildConfig.makeDefaultBuildConfig();
+      return Optional.of(BuildConfig.makeDefaultBuildConfig());
+    } catch (JsonProcessingException e) {
+      LOG.info("Invalid config found for path {} in repo {}@{}, failing build", configPath, repositoryName, sha);
+      return Optional.absent();
     }
   }
 
