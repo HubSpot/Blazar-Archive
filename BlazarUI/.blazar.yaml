@@ -12,4 +12,4 @@ cmds:
       BLAZAR_STATIC_ROOT=https://static.hsappstatic.net/BlazarUI/static-1.$BUILD_NUMBER
       ./node_modules/.bin/gulp build
   - ./node_modules/.bin/bender-deps cdn-publish BlazarUI@1.$BUILD_NUMBER dist
-  - publish-build-success --project BlazarUI --version 1.$BUILD_NUMBER
+  - CI_ENVIRONMENT=PROD publish-build-success --project BlazarUI --version 1.$BUILD_NUMBER
