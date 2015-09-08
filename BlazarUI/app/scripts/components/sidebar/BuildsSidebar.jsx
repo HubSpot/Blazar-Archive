@@ -8,7 +8,6 @@ import SectionLoader from '../shared/SectionLoader.jsx';
 import Helpers from '../ComponentHelpers';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import SidebarItem from '../sidebar/SidebarItem.jsx';
-import Immutable from 'immutable';
 
 let Link = require('react-router').Link;
 
