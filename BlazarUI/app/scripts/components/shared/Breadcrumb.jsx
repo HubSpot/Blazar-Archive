@@ -14,7 +14,7 @@ class Breadcrumb extends Component {
       if (i !== pages.length - 1 && i !== 0) {
         const pageLink = pages.slice(0, i + 1).join('/');
         key = page + i;
-        link = <Link key={key} className='crumb' to={`${this.props.appRoot}/builds/${pageLink}`}>{page}</Link>;
+        link = <Link key={key} className='crumb' to={`/builds/${pageLink}`}>{page}</Link>;
       } else if (i === 0) {
         link = page + ' / ';
       } else {

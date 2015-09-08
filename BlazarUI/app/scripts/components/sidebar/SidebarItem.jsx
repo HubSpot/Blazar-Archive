@@ -32,7 +32,7 @@ class SidebarItem extends Component {
       );
 
       buildNumberLink =(
-        <Link to={config.appRoot + build.inProgressBuild.blazarPath} className='sidebar-item__build-number'>
+        <Link to={build.inProgressBuild.blazarPath} className='sidebar-item__build-number'>
           #{build.inProgressBuild.buildNumber}
         </Link>
       );
