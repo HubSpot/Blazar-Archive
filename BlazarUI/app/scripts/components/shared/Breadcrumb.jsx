@@ -5,9 +5,13 @@ const Link = require('react-router').Link;
 class Breadcrumb extends Component {
 
   render() {
-    const path = this.props.path.split('/');
-    const pages = path.slice(2, path.length);
-    const links = [];
+    const appRootSplit = this.props.appRoot.split('/');
+    let path = this.props.path.split('/');
+    path.shift()
+
+    const pages = path.slice(appRootSplit.length, path.length);
+
+    let links = [];
 
     pages.forEach(function(page, i) {
       let link, key;
