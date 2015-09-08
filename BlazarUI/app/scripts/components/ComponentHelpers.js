@@ -1,3 +1,6 @@
+// Deprecated in favor of Helpers.js
+
+
 import moment from 'moment';
 
 let ComponentHelpers = {

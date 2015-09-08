@@ -22,7 +22,11 @@ class Build extends Component {
       );
     }
 
-    let buildState = this.props.build.build;
+    const {
+      build,
+      gitInfo,
+      module
+    } = this.props.build;
 
     return (
       <div>
@@ -32,10 +36,10 @@ class Build extends Component {
             path={window.location.pathname}
           />
           <Headline>
-            <Icon name={BUILD_ICONS[buildState.state]} classNames="headline-icon"></Icon>
+            <Icon name={BUILD_ICONS[build.state]} classNames="headline-icon"></Icon>
             <span>{this.props.params.module}</span>
             <HeadlineDetail>
-              Build # {buildState.buildNumber}
+              Build #{build.buildNumber}
             </HeadlineDetail>
           </Headline>
         </PageHeader>

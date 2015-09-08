@@ -2,8 +2,31 @@
 
 .build-detail
   padding 10px
+  float left
+  width 100%
   .commit
     margin 10px 0
 
 .build-detail__build-state
   font-weight $font-medium
+
+.build-detail__topline
+  border-bottom 1px solid $gray
+  padding-bottom 10px
+  margin-bottom 10px
+
+.build-detail__sha
+  padding-left 10px
+  float right
+  font-size 13px
+  a
+    font-family $monospace
+
+.build-detail__commit-desc
+  pre
+    max-width: 100%
+    word-wrap break-word
+    background inherit
+    border none
+    padding 0
+    margin 0

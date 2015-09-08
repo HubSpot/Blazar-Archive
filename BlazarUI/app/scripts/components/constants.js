@@ -29,7 +29,7 @@ export const ICON_LIST = {
 
 export const BUILD_ICONS = {
   'LAUNCHING': 'hourglass-start',
-  'IN_PROGRESS': 'hourglass-half info',
+  'IN_PROGRESS': 'hourglass-half',
   'SUCCEEDED': 'check success',
   'FAILED': 'close danger',
   'CANCELLED': 'circle warning'
