@@ -30,12 +30,6 @@ const buildHistoryStore = Reflux.createStore({
 
   loadModulesBuildHistorySuccess(buildHistory) {
     this.modulesBuildHistory = buildHistory;
-    
-    this.modulesBuildHistory.sort((a, b) => {
-      if(a.module.moduleName < b.module.moduleName) return -1;
-      if(a.module.moduleName > b.module.moduleName) return 1;
-      return 0;
-    });
 
     this.modulesBuildHistory.sort((a, b) => {
       if (a.module.moduleName < b.module.moduleName) {
