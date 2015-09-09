@@ -31,30 +31,16 @@ class BuildsSidebar extends Component {
 
   setToggleState(toggleState) {
     const filterText = this.state.filterText;
-    
+
     this.setState({
       filterText: filterText,
       toggleFilterState: toggleState
     });
+
   }
 
   toggleStar(isStarred, moduleInfo) {
     this.props.persistStarChange(isStarred, moduleInfo)
-  }
-
-  getBuildsList() {
-    let modules = this.props.builds.modules;
-    let filterText = this.state.filterText;
-
-    if (filterText.length === 0) {
-      return modules;
-    }
-
-    let filteredModules = filter(modules, (build) => {
-      return build.module.toLowerCase().indexOf(filterText.toLowerCase()) !== -1;
-    });
-
-    return filteredModules;
   }
 
   markStarredModules(modules) {
@@ -114,6 +100,7 @@ class BuildsSidebar extends Component {
     const markStarred = this.markStarredModules(matches);
     const filteredByToggle = this.filterByToggle(markStarred);
     const moduleComponents = this.buildModuleComponents(filteredByToggle);
+
     let sidebarMessage;
 
     if (this.props.loading) {
@@ -152,7 +139,7 @@ class BuildsSidebar extends Component {
         </div>
 
         <div className='sidebar__list'>
-          <LazyRender maxHeight={containerHeight}>
+          <LazyRender childHeight={65} maxHeight={containerHeight}>
             {moduleComponents}
           </LazyRender>
           {sidebarMessage}

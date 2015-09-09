@@ -5,7 +5,7 @@ import {bindAll} from 'underscore';
 class SearchFilter extends Component {
 
   constructor() {
-    bindAll(this, 'handleChange', 'handleKeyup');
+    bindAll(this, 'handleChange');
   }
 
   componentDidMount() {
@@ -23,12 +23,6 @@ class SearchFilter extends Component {
 
   focusInput() {
     this.refs.searchFilterInput.getDOMNode().focus();
-  }
-
-  handleKeyup(e) {
-    if (e.which === 84) {
-      this.refs.searchFilterInput.getDOMNode().focus();
-    }
   }
 
   handleChange() {

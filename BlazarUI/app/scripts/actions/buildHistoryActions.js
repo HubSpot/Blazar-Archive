@@ -29,7 +29,7 @@ BuildHistoryActions.loadModulesBuildHistory = function(options) {
   let modulesHistory = [];
 
   if (options.modules.length === 0) {
-    BuildHistoryActions.loadModulesBuildHistorySuccess([]); 
+    BuildHistoryActions.loadModulesBuildHistorySuccess([]);
     return;
   }
 
