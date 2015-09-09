@@ -32,8 +32,10 @@ class Collapsable extends Component {
     });
   }
 
-  getCollapsableState() {
-    return this.state.expanded ? 'show' : 'hide';
+  getInnerClassNames() {
+    let classNames = this.state.expanded ? 'show' : 'hide';
+    classNames += this.props.pad ? ' pad-inner' : '';
+    return classNames;
   }
 
   render() {
@@ -50,7 +52,7 @@ class Collapsable extends Component {
           {icon}
           {this.props.header}
         </h4>
-        <div className={this.getCollapsableState()}>
+        <div className={this.getInnerClassNames()}>
           {this.props.children}
         </div>
       </div>
@@ -60,14 +62,16 @@ class Collapsable extends Component {
 }
 
 Collapsable.defaultProps = {
-  initialToggleStateOpen: false
+  initialToggleStateOpen: false,
+  pad: false
 };
 
 Collapsable.propTypes = {
   header: PropTypes.node,
   children: PropTypes.node,
   iconType: PropTypes.oneOf(['fa','octicon']),
-  iconName: PropTypes.string
+  iconName: PropTypes.string,
+  pad: PropTypes.bool
 };
 
 export default Collapsable;
