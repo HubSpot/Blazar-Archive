@@ -28,6 +28,11 @@ BuildHistoryActions.loadModulesBuildHistory = function(options) {
 
   let modulesHistory = [];
 
+  if (options.modules.length === 0) {
+    BuildHistoryActions.loadModulesBuildHistorySuccess([]);
+    return;
+  }
+
   options.modules.forEach((module) => {
     let buildHistory = new BuildHistory(module.moduleId);
     let promise = buildHistory.fetch();

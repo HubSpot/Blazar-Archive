@@ -4,7 +4,7 @@ let LazyRender = React.createClass({
   propTypes: {
     children: React.PropTypes.array.isRequired,
     maxHeight: React.PropTypes.number.isRequired,
-
+    childHeight: React.PropTypes.number,
     className: React.PropTypes.string,
     itemPadding: React.PropTypes.number
   },
@@ -123,9 +123,15 @@ let LazyRender = React.createClass({
   },
 
   getChildHeight: function() {
+
+    if (this.props.childHeight) {
+      return this.props.childHeight;
+    }
+
     if (this.props.children.length === 0) {
       return 0;
     }
+
     let firstChild = this.refs['child-0'];
     let el = React.findDOMNode(firstChild);
 
