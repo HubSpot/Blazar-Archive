@@ -24,12 +24,15 @@ export const humanizeText = function(string) {
 };
 
 
-export const truncate = function(str, len = 10) {
+export const truncate = function(str, len = 10, ellip=false) {
   if (str && str.length > len && str.length > 0) {
     let new_str = str + ' ';
     new_str = str.substr(0, len);
     new_str = str.substr(0, new_str.lastIndexOf(' '));
     new_str = (new_str.length > 0) ? new_str : str.substr(0, len);
+    if (ellip && str.length > len) {
+      new_str += '…';
+    }
     return new_str;
   }
   return str;
