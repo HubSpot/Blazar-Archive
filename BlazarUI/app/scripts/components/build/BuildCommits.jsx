@@ -8,12 +8,12 @@ import {timestampFormatted} from '../Helpers';
 class BuildCommits extends Component {
 
   render() {
+    let commitHistory;
+    const commitInfo = this.props.build.build.commitInfo;
+
     if (this.props.loading) {
       return <SectionLoader />;
     }
-
-
-    let commitHistory;
     
     if (this.props.loading) {
       commitHistory = (
@@ -21,10 +21,14 @@ class BuildCommits extends Component {
       )
     }
 
+    const header = (
+      <span> ({commitInfo.newCommits.length}) new commits since this build </span>
+    )
+
     return (
       <Collapsable
-        header='Commits since this build'
-        initialToggleStateOpen={true}
+        header={header}
+        initialToggleStateOpen={false}
         pad={true}
       >
         <CommitsTable 
