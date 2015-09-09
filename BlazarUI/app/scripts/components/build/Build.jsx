@@ -11,6 +11,7 @@ import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
 import { BUILD_ICONS } from '../constants';
+import BuildCommits from './BuildCommits.jsx';
 
 class Build extends Component {
 
@@ -46,6 +47,12 @@ class Build extends Component {
         <UIGrid>
           <UIGridItem size={12}>
             <BuildDetail
+              build={this.props.build}
+              loading={this.props.loading}
+            />
+          </UIGridItem>
+          <UIGridItem size={12}>
+            <BuildCommits 
               build={this.props.build}
               loading={this.props.loading}
             />

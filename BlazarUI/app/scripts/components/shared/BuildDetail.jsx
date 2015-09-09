@@ -37,10 +37,6 @@ class BuildDetail extends Component {
     const currentCommit = build.commitInfo.current
     const newCommits = build.commitInfo.newCommits
 
-    console.log('build: ', build);
-    console.log('current: ', currentCommit);
-    console.log('new commits: ', newCommits);
-
     let endtime, duration;
 
     let buildDetail = {
