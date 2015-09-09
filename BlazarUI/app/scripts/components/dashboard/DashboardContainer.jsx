@@ -45,6 +45,9 @@ class DashboardContainer extends Component {
 
     this.setState(state);
 
+    const noHistoryToFetch = state.stars && state.stars.length === 0;
+    const haveHistory = !this.state.loadingModulesBuildHistory && !this.state.loadingStars;
+
     if (state.stars){
       BuildHistoryActions.loadModulesBuildHistory({
         modules: state.stars,
@@ -53,12 +56,11 @@ class DashboardContainer extends Component {
     }
 
     // now that we have builds and stars, let's render the page
-    if (!this.state.loadingModulesBuildHistory && !this.state.loadingStars) {
+    if (noHistoryToFetch || haveHistory) {
       this.setState({
         loading: false
       });
     }
-
   }
 
   render() {
