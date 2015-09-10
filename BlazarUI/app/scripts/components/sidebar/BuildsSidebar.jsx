@@ -8,9 +8,8 @@ import SectionLoader from '../shared/SectionLoader.jsx';
 import Helpers from '../ComponentHelpers';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import SidebarItem from '../sidebar/SidebarItem.jsx';
-
+import {NO_MATCH_MESSAGES} from '../constants';
 let Link = require('react-router').Link;
-
 
 class BuildsSidebar extends Component {
 
@@ -101,12 +100,11 @@ class BuildsSidebar extends Component {
   }
 
   render() {
-
     const matches = this.getFilterMatches();
     const markStarred = this.markStarredModules(matches);
     const filteredByToggle = this.filterByToggle(markStarred);
     const moduleComponents = this.buildModuleComponents(filteredByToggle);
-
+    const searchType = NO_MATCH_MESSAGES[this.state.toggleFilterState];
     let sidebarMessage;
 
     if (this.props.loading) {
@@ -117,12 +115,11 @@ class BuildsSidebar extends Component {
 
     if (moduleComponents.length === 0 && this.state.filterText.length > 0) {
       sidebarMessage = (
-        <MutedMessage roomy={true}>No matches for {this.state.filterText}.</MutedMessage>
+        <MutedMessage roomy={true}>No {searchType} modules matching <strong>{this.state.filterText}</strong>.</MutedMessage>
       )
     } 
 
-    // to do: better setup for initial page load
-    if (moduleComponents.length === 0 && this.state.toggleFilterState === 'starred') {
+    if (moduleComponents.length === 0 && this.state.toggleFilterState === 'starred' && this.props.stars.length === 0) {
       sidebarMessage = (
         <MutedMessage roomy={true}>No starred modules</MutedMessage>
       )

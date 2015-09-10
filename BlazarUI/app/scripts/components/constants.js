@@ -34,3 +34,9 @@ export const BUILD_ICONS = {
   'FAILED': 'close danger',
   'CANCELLED': 'circle warning'
 };
+
+export const NO_MATCH_MESSAGES = {
+  'starred': 'starred',
+  'all': '',
+  'building': 'actively building'
+};
