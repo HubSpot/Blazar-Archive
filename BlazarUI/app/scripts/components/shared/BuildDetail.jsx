@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {has} from 'underscore';
+import Alert from 'react-bootstrap/lib/Alert';
 import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
 import Sha from '../shared/Sha.jsx';
@@ -30,7 +31,7 @@ class BuildDetail extends Component {
 
     if (!has(build, 'commitInfo')) {
       return (
-        <p>No detail available for this build</p>
+        <Alert>No detail available for this build</Alert>
       );
     }
 

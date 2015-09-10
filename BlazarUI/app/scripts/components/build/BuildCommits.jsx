@@ -9,6 +9,11 @@ class BuildCommits extends Component {
 
   render() {
     let commitHistory;
+
+    if (!has(this.props.build.build,'commitInfo')) {
+      return <div />;
+    }
+
     const commitInfo = this.props.build.build.commitInfo;
 
     if (this.props.loading) {

@@ -14,7 +14,7 @@ function fetchBuild(data) {
   getBranchId();
 }
 
-let BuildActions = Reflux.createActions([
+const BuildActions = Reflux.createActions([
   'loadBuild',
   'loadBuildSuccess',
   'loadBuildError',
@@ -30,8 +30,8 @@ BuildActions.reloadBuild = function(data) {
 };
 
 function getModule() {
-  let branchModules = new BranchModules(gitInfo.branchId);
-  let modulesPromise = branchModules.fetch();
+  const branchModules = new BranchModules(gitInfo.branchId);
+  const modulesPromise = branchModules.fetch();
 
   modulesPromise.done( () => {
     gitInfo.moduleId = _.find(branchModules.data, (m) => {
@@ -45,8 +45,8 @@ function getModule() {
 }
 
 function getBranchId() {
-    let branchDefinition = new BranchDefinition(gitInfo);
-    let branchPromise =  branchDefinition.fetch();
+    const branchDefinition = new BranchDefinition(gitInfo);
+    const branchPromise =  branchDefinition.fetch();
 
     branchPromise.done( () => {
       gitInfo.branchId = branchDefinition.data.id;
@@ -59,28 +59,31 @@ function getBranchId() {
 
 
 function getBuild() {
-  let build = new Build(gitInfo);
-  let buildPromise = build.fetch();
+  const build = new Build(gitInfo);
+  const buildPromise = build.fetch();
 
   buildPromise.done( () => {
 
-    if (build.data.build.state === 'IN_PROGRESS') {
+    if (build.data.build.state === 'LAUNCHING') {
       BuildActions.loadBuildSuccess({
         build: build.data
       });
       return;
     }
 
-    let log = new Log(build.data.build.log);
-    let logPromise = log.fetch();
+    const log = new Log(build.data.build.id);
+    const logPromise = log.fetch();
 
     logPromise.always( (logData) => {
-      if (!logData.status || logData.status === 200) {
-        BuildActions.loadBuildSuccess({
-          build: build.data,
-          log: logData.data
-        });
+      if (!logData) {
+        logData.data = '';
       }
+
+      BuildActions.loadBuildSuccess({
+        build: build.data,
+        log: logData.data
+      });
+
     });
 
     logPromise.error( () => {
