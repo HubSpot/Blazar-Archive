@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
+      import Icon from '../shared/Icon.jsx';
 
 // To do: Typeahead in input box
 class SearchFilter extends Component {
@@ -32,14 +33,17 @@ class SearchFilter extends Component {
   render() {
 
     return (
-      <input
-        type="text"
-        ref="searchFilterInput"
-        className="search-input form-control"
-        placeholder='Filter modules...'
-        value={this.props.inputValue}
-        onChange={this.handleChange}
-      />
+      <div>
+        <Icon name='search' classNames='search-filter__icon' />
+        <input
+          type="text"
+          ref="searchFilterInput"
+          className="search-input form-control"
+          placeholder='Filter modules...'
+          value={this.props.inputValue}
+          onChange={this.handleChange}
+        />
+      </div>
     );
   }
 }

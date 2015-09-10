@@ -13,8 +13,9 @@
 
 .sidebar__filter-search
   position relative
-  top 20px
+  height 95px
   padding 10px
+  box-shadow inset 0 -4px 15px rgba(0, 0, 0, 0.05)
 
 .sidebar__filter-buttons
   position absolute
@@ -34,19 +35,37 @@
   &:hover
     cursor pointer
     text-decoration none
-  &.btn-default:active, &.btn-default.active
+  &.btn-default:active
     outline none
   &.active
     background $offwhite
-    border none
-
+    
 .sidebar__list
   margin-top 64px
 
-.search-input
+.search-input, .search-input:focus
   margin-bottom 0px
   padding 15px
   border-radius 0
+  background inherit
+  border none
+  outline: 0
+  -webkit-box-shadow: none
+  -moz-box-shadow: none
+  box-shadow: none
+  font-size 17px
+  font-weight $font-light
+  position absolute
+  bottom 5px
+  left 0px
+  padding-left 35px
+
+.search-filter__icon
+  position absolute
+  font-size 16px
+  left 15px
+  bottom 15px
+  color $gray-dark
 
 .sidebar__star
   margin-right 5px
@@ -56,3 +75,4 @@
 
 .sidebar__star.selected
   color #ffd700
+  
