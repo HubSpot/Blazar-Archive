@@ -29,7 +29,6 @@ class BuildCommits extends Component {
       <Collapsable
         header={header}
         initialToggleStateOpen={false}
-        pad={true}
       >
         <CommitsTable 
           commits={this.props.build.build.commitInfo.newCommits}

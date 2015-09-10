@@ -36,6 +36,7 @@ class CommitsTable extends Component {
       <table className="table table-hover table-striped">
         <TableHead
           columnNames={columnNames}
+          classNames='hide'
         />
         <tbody>
           {this.getRows()}

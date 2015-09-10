@@ -1,3 +1,4 @@
+
 @import 'variables'
 
 header-state(state)
@@ -6,13 +7,11 @@ header-state(state)
 .collapsable
   margin 5px 0
   border 1px solid $gray-light
-
-  .show
-    padding 10px 0
-    background white
-    
-  .pad-inner
-    padding 10px
+  background white
+  padding 0
+  
+  &.no-border
+    border none
 
 .collapsable__header
   background $gray-light

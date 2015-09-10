@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { bindAll } from 'underscore';
 import Icon from './Icon.jsx';
+import classNames from 'classnames';
 
 class Collapsable extends Component {
 
@@ -32,9 +33,15 @@ class Collapsable extends Component {
     });
   }
 
+  getWrapperClassNames() {
+    return classNames([
+      'collapsable',
+      {'no-border': this.props.noBorder }
+    ]);
+  }
+
   getInnerClassNames() {
     let classNames = this.state.expanded ? 'show' : 'hide';
-    classNames += this.props.pad ? ' pad-inner' : '';
     return classNames;
   }
 
@@ -46,7 +53,7 @@ class Collapsable extends Component {
       icon = <Icon type={this.props.iconType} name={this.props.iconName} classNames="icon-roomy" />
     }
     return (
-      <div className='collapsable'>
+      <div className={this.getWrapperClassNames()}>
         <h4 onClick={this.handleToggle} className={this.getHeaderClassNames()}>
           <Icon classNames='collapsable__header-icon' type='fa' name={this.getIconState()} />
           {icon}
@@ -62,8 +69,9 @@ class Collapsable extends Component {
 }
 
 Collapsable.defaultProps = {
+  headerClassNames: '',
   initialToggleStateOpen: false,
-  pad: false
+  noBorder: false
 };
 
 Collapsable.propTypes = {
@@ -71,7 +79,7 @@ Collapsable.propTypes = {
   children: PropTypes.node,
   iconType: PropTypes.oneOf(['fa','octicon']),
   iconName: PropTypes.string,
-  pad: PropTypes.bool
+  noBorder: PropTypes.bool
 };
 
 export default Collapsable;
