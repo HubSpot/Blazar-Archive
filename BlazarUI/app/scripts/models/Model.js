@@ -1,5 +1,7 @@
-import moment from 'moment';
+import humanizeDuration from 'humanize-duration';
 import $ from 'jquery';
+
+
 
 class Model {
 
@@ -31,7 +33,7 @@ class Model {
     let build = this.data.build;
 
     if (build.startTimestamp && build.endTimestamp) {
-      build.duration = moment.duration(build.endTimestamp - build.startTimestamp).humanize();
+      build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp);
     }
   }
 

@@ -1,20 +1,20 @@
 import React, {Component, PropTypes} from 'react';
 import Copyable from './Copyable.jsx';
 import Icon from './Icon.jsx';
-import Helpers from '../ComponentHelpers';
+import {githubShaLink, truncate} from '../Helpers';
 
 class Sha extends Component {
 
   render() {
 
-    const commitLink = Helpers.githubShaLink({gitInfo: this.props.gitInfo, build: this.props.build});
+    const commitLink = githubShaLink({gitInfo: this.props.gitInfo, build: this.props.build});
 
     return (
-      <span>
+      <span className='sha'>
+        <a href={commitLink} target="_blank">{truncate(this.props.build.sha, this.props.truncate)}</a>
         <Copyable text={this.props.build.sha}>
           <Icon type='octicon' classNames='icon-roomy fa-link' name='clippy' />
         </Copyable>
-        <a href={commitLink} target="_blank">{Helpers.truncate(this.props.build.sha, this.props.truncate)}</a>
       </span>
     );
   }
@@ -22,7 +22,7 @@ class Sha extends Component {
 }
 
 Sha.defaultProps = {
-  truncate: 8
+  truncate: 10
 };
 
 Sha.propTypes = {

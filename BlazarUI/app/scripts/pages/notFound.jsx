@@ -6,8 +6,7 @@ class NotFound extends Component {
   render() {
     return (
       <PageContainer>
-        <h1 className="notfound__heading">There's nothing here‽‽‽</h1>
-        That's a 404.
+        <h1 className="notfound__heading">404. Page Not Found. <br/ > Sorry about that.</h1>
       </PageContainer>
     );
   }

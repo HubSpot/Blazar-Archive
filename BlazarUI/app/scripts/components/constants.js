@@ -21,10 +21,16 @@ export const unicode = {
   'right-bracket': '\u007D'
 };
 
-
 export const ICON_LIST = {
   'module': 'fa-folder-o',
   'branch': 'octicon octicon-git-branch',
   'repo': 'octicon octicon-repo'
 };
 
+export const BUILD_ICONS = {
+  'LAUNCHING': 'hourglass-start',
+  'IN_PROGRESS': 'hourglass-half',
+  'SUCCEEDED': 'check success',
+  'FAILED': 'close danger',
+  'CANCELLED': 'circle warning'
+};

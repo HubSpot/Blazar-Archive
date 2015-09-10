@@ -1,5 +1,8 @@
 import React, {Component, PropTypes} from 'react';
-import Helpers from '../ComponentHelpers';
+import {has} from 'underscore';
+import {humanizeText, timestampFormatted, truncate} from '../Helpers';
+import classNames from 'classnames';
+import Sha from '../shared/Sha.jsx';
 
 const buildLables = {
   'SUCCEEDED': 'success',
@@ -12,45 +15,86 @@ const buildLables = {
 
 class BuildDetail extends Component {
 
-  getClassNames() {
-    return 'build-detail alert alert-' + buildLables[this.props.build.build.state];
+  getWrapperClassNames() {
+    return classNames([
+      `build-detail alert alert-${buildLables[this.props.build.build.state]}`
+    ]);
   }
 
   render() {
 
-    let {build, gitInfo} = this.props.build;
+    const {
+      build, 
+      gitInfo
+    } = this.props.build;
+
+    if (!has(build, 'commitInfo')) {
+      return (
+        <p>No detail available for this build</p>
+      );
+    }
+
+    const currentCommit = build.commitInfo.current
+    const newCommits = build.commitInfo.newCommits
+
     let endtime, duration;
-    let buildResult = Helpers.humanizeText(build.state);
+
+    let buildDetail = {
+      endtime: '',
+      duration: '',
+      durationPrefix: '',
+      buildResult: humanizeText(build.state)
+    }
 
     if (build.state !== 'IN_PROGRESS' && build.state !== 'QUEUED' && build.state !== 'LAUNCHING') {
-      endtime = 'On ' + Helpers.timestampFormatted(build.endTimestamp);
-      duration = 'Ran for ' + build.duration;
+      buildDetail.endtime = timestampFormatted(build.endTimestamp)
+      buildDetail.duration = (
+        <small>in {build.duration}</small>
+      );
     }
-
-    let sha = build.sha;
-    let shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${sha}`;
-    let buildDetail;
 
     if (build.state === 'IN_PROGRESS') {
-      buildDetail = 'started ' + Helpers.timestampFormatted(build.startTimestamp);
-    } else {
-      buildDetail = endtime;
+      buildDetail.duration = (
+        <small>started {timestampFormatted(build.startTimestamp)}</small>
+      );
     }
 
+    const sha = build.sha;
+    const shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${sha}`;
+
     return (
-      <div className={this.getClassNames()}>
-        <h4 className='build-detail__build-state'>
-          Build {buildResult} <small>{buildDetail}</small>
-        </h4>
-        <p>{duration}</p>
-        <p>
-          Commit: <a target="_blank" href={shaLink}>{build.sha}</a>
-        </p>
+      <div className={this.getWrapperClassNames()}>
+        
+        <div className='build-detail__topline'>
+
+          <h4 className='build-detail__build-state'>
+            Build {buildDetail.buildResult} {buildDetail.duration}
+          </h4>
+        
+        </div>  
+
+        
+        <div className='build-detail__commitInfo'>
+          
+          <p className='build-detail__sha'>
+            commit <Sha gitInfo={gitInfo} build={build} />
+          </p>
+          <p>
+            <strong>{currentCommit.author.name}</strong> authored on {timestampFormatted(currentCommit.timestamp, 'll')}
+          </p>
+          <div className='build-detail__commit-desc'>
+            <pre>{currentCommit.message}</pre>
+          </div>
+
+        </div>
+
       </div>
     );
   }
 
 }
+
+
 
 BuildDetail.propTypes = {
   loading: PropTypes.bool.isRequired,

@@ -10,22 +10,10 @@ import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
+import { BUILD_ICONS } from '../constants';
+import BuildCommits from './BuildCommits.jsx';
 
 class Build extends Component {
-
-  getIconForState(state) {
-    switch (state) {
-      case 'LAUNCHING':
-        return 'hourglass-start';
-      case 'IN_PROGRESS':
-        return 'hourglass-half';
-      case 'SUCCEEDED':
-      case 'FAILED':
-        return 'hourglass-end';
-      default:
-        return 'hourglass-o';
-    }
-  }
 
   render() {
 
@@ -35,8 +23,11 @@ class Build extends Component {
       );
     }
 
-    let buildState = this.props.build.build;
-    let buildStateIcon = this.getIconForState(buildState.state);
+    const {
+      build,
+      gitInfo,
+      module
+    } = this.props.build;
 
     return (
       <div>
@@ -46,16 +37,22 @@ class Build extends Component {
             path={window.location.pathname}
           />
           <Headline>
-            <Icon name={buildStateIcon} classNames="headline-icon"></Icon>
+            <Icon name={BUILD_ICONS[build.state]} classNames="headline-icon"></Icon>
             <span>{this.props.params.module}</span>
             <HeadlineDetail>
-              Build # {buildState.buildNumber}
+              Build #{build.buildNumber}
             </HeadlineDetail>
           </Headline>
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
             <BuildDetail
+              build={this.props.build}
+              loading={this.props.loading}
+            />
+          </UIGridItem>
+          <UIGridItem size={12}>
+            <BuildCommits 
               build={this.props.build}
               loading={this.props.loading}
             />
