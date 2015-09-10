@@ -63,7 +63,7 @@ class BuildsSidebar extends Component {
       return starredModules;
     }
 
-    if (this.state.toggleFilterState === 'active') {
+    if (this.state.toggleFilterState === 'building') {
       modules = filter(modules, (module) => {
         return has(module, 'inProgressBuild');
       });

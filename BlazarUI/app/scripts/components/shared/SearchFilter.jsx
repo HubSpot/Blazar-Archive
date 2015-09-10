@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
-      import Icon from '../shared/Icon.jsx';
+import Icon from '../shared/Icon.jsx';
 
 // To do: Typeahead in input box
 class SearchFilter extends Component {

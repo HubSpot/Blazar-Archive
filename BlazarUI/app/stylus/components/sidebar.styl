@@ -23,9 +23,10 @@
   width 100%
 
 .sidebar__filter-buttons-btn
-  text-align center
   display inline-block
+  position relative
   width 33.3%
+  text-align center
   border-radius 0
   background #e6e6e6
   padding 10px
@@ -39,7 +40,25 @@
     outline none
   &.active
     background $offwhite
-    
+  &.starred, &.building
+    span
+      visibility hidden
+    &:after
+      font-family FontAwesome
+      font-style normal
+      font-weight normal
+      text-decoration inherit
+      position absolute
+      left 50%
+      margin-left -4px
+      z-index 1
+  &.starred
+    &:after
+      content '\f005'
+  &.building
+      &:after
+        content '\f0e7'
+
 .sidebar__list
   margin-top 64px
 

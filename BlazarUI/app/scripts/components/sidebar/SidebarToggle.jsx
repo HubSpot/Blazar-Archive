@@ -14,9 +14,9 @@ class SidebarToggle extends Component {
     this.props.toggleFilter(e.target.id);
   }
 
-  getButtonClassNames(state) {
-    let classNames = 'sidebar__filter-buttons-btn';
-    if (this.props.toggleFilterState === state) {
+  getButtonClassNames(type) {
+    let classNames = `sidebar__filter-buttons-btn ${type}`;
+    if (this.props.toggleFilterState === type) {
       classNames += ' active'
     }
     return classNames;
@@ -29,7 +29,7 @@ class SidebarToggle extends Component {
           id="starred"
           className={this.getButtonClassNames('starred')}
           onClick={this.handleToggle}>
-            <Icon name="star" />
+            <span>starred</span>
         </a>
 
         <a
@@ -40,10 +40,10 @@ class SidebarToggle extends Component {
         </a>
 
         <a
-          id="active"
-          className={this.getButtonClassNames('active')}
+          id="building"
+          className={this.getButtonClassNames('building')}
           onClick={this.handleToggle}>
-          <Icon name='bolt' />
+            <span>building</span>
         </a>
 
       </div>
