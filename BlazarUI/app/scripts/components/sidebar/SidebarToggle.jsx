@@ -39,6 +39,13 @@ class SidebarToggle extends Component {
           All
         </a>
 
+        <a
+          id="active"
+          className={this.getButtonClassNames('active')}
+          onClick={this.handleToggle}>
+          <Icon name='bolt' />
+        </a>
+
       </div>
     );
   }

@@ -63,6 +63,12 @@ class BuildsSidebar extends Component {
       return starredModules;
     }
 
+    if (this.state.toggleFilterState === 'active') {
+      modules = filter(modules, (module) => {
+        return has(module, 'inProgressBuild');
+      });
+    }
+
     return modules;
   }
 
@@ -139,7 +145,7 @@ class BuildsSidebar extends Component {
         </div>
 
         <div className='sidebar__list'>
-          <LazyRender childHeight={65} maxHeight={containerHeight}>
+          <LazyRender childHeight={71} maxHeight={containerHeight}>
             {moduleComponents}
           </LazyRender>
           {sidebarMessage}

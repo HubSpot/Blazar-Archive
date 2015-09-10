@@ -1,14 +1,6 @@
 @import 'variables'
 @import 'mixins'
 
-.sidebar *
-  user-select none
-
-.sidebar
-  margin-top 50px
-  padding-top 30px
-
-// holds all filtering tools
 .sidebar__filter
   padding 0
   position fixed
@@ -16,10 +8,12 @@
   left 0px
   z-index 99
   width 299px
-  height 94px
+  height 134px
   background #d5d5d5
 
 .sidebar__filter-search
+  position relative
+  top 20px
   padding 10px
 
 .sidebar__filter-buttons
@@ -30,10 +24,13 @@
 .sidebar__filter-buttons-btn
   text-align center
   display inline-block
-  width 50%
+  width 33.3%
   border-radius 0
   background #e6e6e6
   padding 10px
+  border-right 1px solid #dadada
+  &:last-child
+    border-right none
   &:hover
     cursor pointer
     text-decoration none
@@ -41,15 +38,7 @@
     outline none
   &.active
     background $offwhite
-    &#all
-      border-left 1px solid #dadada
-    &#starred
-      border-right 1px solid #dadada
-      
-
-.sidebar__filter-buttons-btn:focus
-  background-color #fff
-  border-color #ccc
+    border none
 
 .sidebar__list
   margin-top 64px
@@ -57,6 +46,7 @@
 .search-input
   margin-bottom 0px
   padding 15px
+  border-radius 0
 
 .sidebar__star
   margin-right 5px
@@ -66,9 +56,3 @@
 
 .sidebar__star.selected
   color #ffd700
-
-
-
-.test
-  border: red 1px solid
-  height 42px
