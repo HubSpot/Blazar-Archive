@@ -212,18 +212,26 @@ public class BuildLauncher {
 
       Commit commit = toCommit(repository.getCommit(branch.getSHA1()));
       final List<Commit> newCommits;
+      boolean truncated = false;
       if (previousSha.isPresent()) {
         newCommits = new ArrayList<>();
 
         GHCompare compare = repository.getCompare(previousSha.get(), commit.getId());
-        for (GHCompare.Commit newCommit : compare.getCommits()) {
+        List<GHCompare.Commit> commits = Arrays.asList(compare.getCommits());
+
+        if (commits.size() > 10) {
+          commits = commits.subList(commits.size() - 10, commits.size());
+          truncated = true;
+        }
+
+        for (GHCompare.Commit newCommit : commits) {
           newCommits.add(toCommit(repository.getCommit(newCommit.getSHA1())));
         }
       } else {
         newCommits = Collections.emptyList();
       }
 
-      return Optional.of(new CommitInfo(commit, newCommits));
+      return Optional.of(new CommitInfo(commit, newCommits, truncated));
     }
   }
 
