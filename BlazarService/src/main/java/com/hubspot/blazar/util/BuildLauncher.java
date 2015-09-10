@@ -114,7 +114,7 @@ public class BuildLauncher {
   }
 
   private synchronized void startBuild(BuildDefinition definition, Build queued, Optional<Build> previous) throws Exception {
-    Optional<CommitInfo> commitInfo = commitInfo(definition.getGitInfo(), sha(previous));
+    Optional<CommitInfo> commitInfo = commitInfo(definition.getGitInfo(), commit(previous));
     final Optional<BuildConfig> buildConfig;
     if (commitInfo.isPresent()) {
       buildConfig = configAtSha(definition, commitInfo.get().getCurrent().getId());
@@ -191,7 +191,7 @@ public class BuildLauncher {
     }
   }
 
-  private Optional<CommitInfo> commitInfo(GitInfo gitInfo, Optional<String> previousSha) throws IOException {
+  private Optional<CommitInfo> commitInfo(GitInfo gitInfo, Optional<Commit> previousCommit) throws IOException {
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
     GitHub gitHub = gitHubFor(gitInfo);
 
@@ -213,10 +213,10 @@ public class BuildLauncher {
       Commit commit = toCommit(repository.getCommit(branch.getSHA1()));
       final List<Commit> newCommits;
       boolean truncated = false;
-      if (previousSha.isPresent()) {
+      if (previousCommit.isPresent()) {
         newCommits = new ArrayList<>();
 
-        GHCompare compare = repository.getCompare(previousSha.get(), commit.getId());
+        GHCompare compare = repository.getCompare(previousCommit.get().getId(), commit.getId());
         List<GHCompare.Commit> commits = Arrays.asList(compare.getCommits());
 
         if (commits.size() > 10) {
@@ -231,7 +231,7 @@ public class BuildLauncher {
         newCommits = Collections.emptyList();
       }
 
-      return Optional.of(new CommitInfo(commit, newCommits, truncated));
+      return Optional.of(new CommitInfo(commit, previousCommit, newCommits, truncated));
     }
   }
 
@@ -295,13 +295,11 @@ public class BuildLauncher {
 
   }
 
-  private static Optional<String> sha(Optional<Build> build) {
-    if (!build.isPresent()) {
-      return Optional.absent();
-    } else if (build.get().getCommitInfo() != null && build.get().getCommitInfo().isPresent()) {
-      return Optional.of(build.get().getCommitInfo().get().getCurrent().getId());
+  private static Optional<Commit> commit(Optional<Build> build) {
+    if (build.isPresent() && build.get().getCommitInfo() != null && build.get().getCommitInfo().isPresent()) {
+      return Optional.of(build.get().getCommitInfo().get().getCurrent());
     } else {
-      return build.get().getSha();
+      return Optional.absent();
     }
   }
 }
