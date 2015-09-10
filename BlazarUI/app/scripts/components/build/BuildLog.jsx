@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
+import Collapsable from '../shared/Collapsable.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
-import AnsiUp from 'ansi_up';
+import utf8 from 'utf8';
 
 class BuildLog extends Component {
 
@@ -14,12 +15,17 @@ class BuildLog extends Component {
     }
 
     return (
-      <pre className='build-log'
-        dangerouslySetInnerHTML={{__html: AnsiUp.ansi_to_html(AnsiUp.escape_for_html(this.props.log))}}>
-      </pre>
+      <Collapsable 
+        header='Build Log'
+        initialToggleStateOpen={true}
+        noBorder={true}
+      >
+        <pre className='build-log'>
+          {utf8.decode(this.props.log)}
+        </pre>
+      </Collapsable>
     );
   }
-
 }
 
 BuildLog.propTypes = {

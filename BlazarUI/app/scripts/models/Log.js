@@ -1,16 +1,20 @@
+/*global config*/
 import Model from './Model';
 
 class Log extends Model {
 
-  constructor(logFileUrl) {
-    this.logFileUrl = logFileUrl + '&offset=0&length=1000000';
+  constructor(buildNumber) {
+
+    const params = '';
+    this.logUrl = `${config.apiRoot}/build/${buildNumber}/log/${params}`;
+
     this.fetchOptions = {
       dataType: 'json'
     };
   }
 
   url() {
-    return this.logFileUrl;
+    return this.logUrl;
   }
 }
 
