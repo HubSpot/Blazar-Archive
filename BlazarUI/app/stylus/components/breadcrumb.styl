@@ -1,5 +1,23 @@
+@import 'variables'
+
 .breadcrumbs
   margin-top 7px
-  
+  font-size 12px
+
+.crumb
+  position relative
+
+  &:hover
+    text-decoration none
+
+  &:after
+    content: '\f105';
+    font-family: 'FontAwesome';
+    color: #818da7;
+    padding 0 6px
+    
+.crumb-active
+  font-weight $font-normal
+
 .breadcrumb-icon
   margin-right 2px

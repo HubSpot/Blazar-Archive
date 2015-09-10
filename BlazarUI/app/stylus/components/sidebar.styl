@@ -17,11 +17,10 @@
   z-index 99
   width 299px
   height 94px
-  background-color #f9f9f9
-  border-bottom 1px solid #dadada;
+  background #d5d5d5
 
 .sidebar__filter-search
-  padding 15px
+  padding 10px
 
 .sidebar__filter-buttons
   position absolute
@@ -29,18 +28,31 @@
   width 100%
 
 .sidebar__filter-buttons-btn
+  text-align center
   display inline-block
   width 50%
   border-radius 0
+  background #e6e6e6
+  padding 10px
+  &:hover
+    cursor pointer
+    text-decoration none
   &.btn-default:active, &.btn-default.active
     outline none
+  &.active
+    background $offwhite
+    &#all
+      border-left 1px solid #dadada
+    &#starred
+      border-right 1px solid #dadada
+      
 
 .sidebar__filter-buttons-btn:focus
   background-color #fff
   border-color #ccc
 
 .sidebar__list
-  margin-top 65px
+  margin-top 64px
 
 .search-input
   margin-bottom 0px

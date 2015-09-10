@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 const Link = require('react-router').Link;
-
+import Icon from './Icon.jsx';
 
 class Breadcrumb extends Component {
 
@@ -14,21 +14,29 @@ class Breadcrumb extends Component {
     let links = [];
 
     pages.forEach(function(page, i) {
-      let link, key;
+      let link;
+      const key = page + i;
+
       if (i !== pages.length - 1 && i !== 0) {
         const pageLink = pages.slice(0, i + 1).join('/');
-        key = page + i;
         link = <Link key={key} className='crumb' to={`${this.props.appRoot}/builds/${pageLink}`}>{page}</Link>;
       } else if (i === 0) {
-        link = page + ' / ';
+        <span key={key} className='crumb' />
       } else {
-        link = page;
+        link = <span key={key} className='crumb-active'> {page} </span>
       }
+
       links.push(link);
+
     }.bind(this));
 
     return (
-      <div className='breadcrumbs'> {links} </div>
+      <div className='breadcrumbs'> 
+        <Link className='crumb' to='dashboard'> 
+          <Icon name='home' />
+        </Link>
+        {links} 
+      </div>
     );
 
   }

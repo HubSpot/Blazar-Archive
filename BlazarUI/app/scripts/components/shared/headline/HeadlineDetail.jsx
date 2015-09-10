@@ -5,7 +5,7 @@ class HeadlineDetail extends Component{
   render() {
     return (
       <span className='headline__detail'>
-        {' '} · {this.props.children}
+        {' '} <span className='headline__detail-subheadline'>{this.props.children}</span>
       </span>
     );
   }
