@@ -25,20 +25,17 @@ class DashboardStarredModule extends Component {
       )
     }
 
-    let showMore,
-    {
+    const {
       build,
       gitInfo,
       module
     } = this.props.modules[0];
 
     const divider = ' / ';
-
     const panelsAreOpen = this.props.modules.length < 5;
 
     const header = (
       <span className='dashboard-panel__header'>
-        
         <span className='dashboard-panel__header-headline'>
           <Icon for='repo' classNames='icon-muted breadcrumb-icon' />
           <Link to={module.blazarPath.repo}>{gitInfo.repository}</Link> {divider}
@@ -47,10 +44,8 @@ class DashboardStarredModule extends Component {
           <Icon for='module' classNames='icon-muted--extra breadcrumb-icon' />
           <Link to={module.blazarPath.module}> {module.name}</Link>
         </span>
-        
         <span className="dashboard__toggle-container">
         </span>
-
       </span>
     );
 
@@ -58,15 +53,12 @@ class DashboardStarredModule extends Component {
       <Collapsable
         header={header}
         initialToggleStateOpen={panelsAreOpen} >
-
           <div className='dashboard-panel__content'>
             <BuildHistoryTable buildHistory={this.props.modules} />
           </div>
-
           <div className='dashboard-panel__footer'>
             <Link className='dashboard-panel__footer-link' to={module.blazarPath.module}> Full History </Link>
           </div>
-
         </Collapsable>
     );
   }

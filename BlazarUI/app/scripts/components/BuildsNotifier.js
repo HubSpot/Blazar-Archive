@@ -11,7 +11,7 @@ const BuildsNotifier = {
       if (WatchingProvider.isWatching({ repo: module.repository, branch: module.branch }) === -1) {
         return;
       }
-      let id = JSON.stringify({ repo: module.repository, branch: module.branch, build: module.module });
+      const id = JSON.stringify({ repo: module.repository, branch: module.branch, build: module.module });
       if (lastModuleStates[id] === 'IN_PROGRESS' && module.inProgressBuildLink === undefined) {
         this.showNotification(module.repository, module.branch, module.module, module.lastBuildState, module.link);
       }
@@ -20,8 +20,8 @@ const BuildsNotifier = {
   },
 
   showNotification: function(repo, branch, module, state, link) {
-    let body = `${repo}[${branch}] ${module}: ${state}`;
-    let imgPath = `${config.staticRoot}/images/icon.png`;
+    const body = `${repo}[${branch}] ${module}: ${state}`;
+    const imgPath = `${config.staticRoot}/images/icon.png`;
 
     const notification = new Notify('Build Complete', {
         body: body,

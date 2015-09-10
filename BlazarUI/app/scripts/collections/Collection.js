@@ -6,7 +6,7 @@ class Collection {
 
   fetch() {
     this.data = {};
-    let promise = $.ajax({
+    const promise = $.ajax({
       url: this.url(),
       type: 'GET',
       dataType: 'json'

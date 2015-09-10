@@ -3,9 +3,9 @@ import Reflux from 'reflux';
 import Builds from '../collections/Builds';
 import ActionSettings from './utils/ActionSettings';
 
-let repoActionSettings = new ActionSettings;
+const repoActionSettings = new ActionSettings;
 
-let BranchActions = Reflux.createActions([
+const BranchActions = Reflux.createActions([
   'loadBranches',
   'loadBranchesSuccess',
   'loadBranchesError',
@@ -23,11 +23,11 @@ BranchActions.updatePollingStatus = function(status) {
 function startPolling(data) {
 
   (function doPoll() {
-    let builds = new Builds();
-    let promise = builds.fetch();
+    const builds = new Builds();
+    const promise = builds.fetch();
 
     promise.done( () => {
-      let branches = builds.getBranchesByRepo(data);
+      const branches = builds.getBranchesByRepo(data);
       BranchActions.loadBranchesSuccess(branches);
     });
 

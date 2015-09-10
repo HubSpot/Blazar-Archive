@@ -7,38 +7,43 @@ import EmptyMessage from '../shared/EmptyMessage.jsx';
 class BuildHistoryTable extends Component {
 
   getRows() {
-    let builds = this.props.buildHistory;
-    let avgTime = this.averageBuildTime();
+    const builds = this.props.buildHistory;
+    const avgTime = this.averageBuildTime();
 
     return builds.map((build, i) => {
       if (build.build.state === 'IN_PROGRESS') {
-        let elapsedTime = new Date().getTime() - build.build.startTimestamp;
-        let progress = Math.round((elapsedTime / avgTime) * 100);
+        const elapsedTime = new Date().getTime() - build.build.startTimestamp;
+        const progress = Math.round((elapsedTime / avgTime) * 100);
 
-        return <BuildHistoryTableRow
+        return (
+          <BuildHistoryTableRow
+            build={builds[i]}
+            key={i}
+            progress={progress}
+          />
+        );
+      }
+
+      return (
+        <BuildHistoryTableRow
           build={builds[i]}
           key={i}
-          progress={progress}
-        />;
-      }
-      return <BuildHistoryTableRow
-        build={builds[i]}
-        key={i}
-      />;
+        />
+      );
     });
   }
 
   filterOutliers(durations) {
-    let values = durations.concat();
+    const values = durations.concat();
     values.sort(function(a, b) {
       return a - b;
     });
-    let q1 = values[Math.floor((values.length / 4))];
-    let q3 = values[Math.ceil((values.length * (3 / 4)))];
-    let iqr = q3 - q1;
-    let maxValue = q3 + iqr * 1.5;
-    let minValue = q1 - iqr * 1.5;
-    let filteredValues = values.filter(function(x) {
+    const q1 = values[Math.floor((values.length / 4))];
+    const q3 = values[Math.ceil((values.length * (3 / 4)))];
+    const iqr = q3 - q1;
+    const maxValue = q3 + iqr * 1.5;
+    const minValue = q1 - iqr * 1.5;
+    const filteredValues = values.filter(function(x) {
         return (x < maxValue) && (x > minValue);
     });
     return filteredValues;
@@ -79,7 +84,7 @@ class BuildHistoryTable extends Component {
       );
     }
 
-    let columnNames = [
+    const columnNames = [
       {label: '', key: 'result'},
       {label: 'Build', key: 'buildNumber'},
       {label: 'Start Time', key: 'startTime'},

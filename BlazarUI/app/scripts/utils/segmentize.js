@@ -3,8 +3,8 @@ const uniq = require('uniq');
 const range = require('./range');
 
 module.exports = function(o) {
-  let page = o.page;
-  let pages = o.pages;
+  const page = o.page;
+  const pages = o.pages;
   let beginPages = o.beginPages ? range(Math.min(o.beginPages, pages)) : [];
   let endPages = o.endPages ? range(Math.max(pages - o.endPages, 0), pages) : [];
   let center, ret;

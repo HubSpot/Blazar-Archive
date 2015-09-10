@@ -17,7 +17,7 @@ class BuildHistoryTableRow extends Component {
   }
 
   getBuildResult(result) {
-    let classNames = labels[result];
+    const classNames = labels[result];
 
     return (
       <Icon
@@ -29,11 +29,15 @@ class BuildHistoryTableRow extends Component {
   }
 
   render() {
-    let {build, gitInfo, module} = this.props.build;
-    let buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
-    let startTime = Helpers.timestampFormatted(build.startTimestamp);
+    const {
+      build, 
+      gitInfo, 
+      module
+    } = this.props.build;
 
-    let buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
+    const buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
+    const startTime = Helpers.timestampFormatted(build.startTimestamp);
+    const buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
     let sha, duration;
 
     if (build.startTimestamp !== undefined && build.endTimestamp !== undefined) {

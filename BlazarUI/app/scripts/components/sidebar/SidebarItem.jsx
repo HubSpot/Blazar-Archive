@@ -7,7 +7,7 @@ import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
 
-let Link = require('react-router').Link;
+const Link = require('react-router').Link;
 
 class SidebarItem extends Component {
 

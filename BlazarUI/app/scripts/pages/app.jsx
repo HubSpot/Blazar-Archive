@@ -37,7 +37,7 @@ class App extends Component {
   }
 
   setUrl() {
-    let url = document.getElementById('apiInput').value;
+    const url = document.getElementById('apiInput').value;
     localStorage.apiRootOverride = url;
     this.close();
     location.reload();
@@ -54,7 +54,7 @@ class App extends Component {
   }
 
   render() {
-    let modal = this.apiModal();
+    const modal = this.apiModal();
     return (
       <div>
         <Navigation />

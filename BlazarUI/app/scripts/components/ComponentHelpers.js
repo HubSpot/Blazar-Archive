@@ -40,7 +40,7 @@ let ComponentHelpers = {
     if (!timestamp) {
       return '';
     }
-    let timeObject = moment(timestamp);
+    const timeObject = moment(timestamp);
     return timeObject.format('lll');
   },
 

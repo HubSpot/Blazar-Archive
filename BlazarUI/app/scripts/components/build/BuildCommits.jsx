@@ -8,7 +8,6 @@ import {timestampFormatted} from '../Helpers';
 class BuildCommits extends Component {
 
   render() {
-    let commitHistory;
 
     if (!has(this.props.build.build,'commitInfo')) {
       return <div />;
@@ -19,15 +18,9 @@ class BuildCommits extends Component {
     if (this.props.loading) {
       return <SectionLoader />;
     }
-    
-    if (this.props.loading) {
-      commitHistory = (
-        <p>Loading commits pushed since this build</p>
-      )
-    }
 
     const header = (
-      <span> ({commitInfo.newCommits.length}) new commits since this build </span>
+      <span> ({commitInfo.newCommits.length}) new commits since previous build </span>
     )
 
     return (

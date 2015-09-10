@@ -14,14 +14,14 @@ class Branches extends Component {
 
       let table = (
         <ModulesTable modules={branch.modules} />
-      )
+      );
 
       if (!branch.hasBuiltOnBlazar){
         table = (
           <EmptyMessage>
             No build history.
           </EmptyMessage>
-        )
+        );
       }
 
       branchList.push(
@@ -34,7 +34,7 @@ class Branches extends Component {
         >
           {table}
         </Collapsable>
-      )
+      );
     });
 
     return branchList;

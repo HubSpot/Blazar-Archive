@@ -3,9 +3,9 @@ import Reflux from 'reflux';
 import ActionSettings from './utils/ActionSettings';
 import Builds from '../collections/Builds';
 
-let orgActionSettings = new ActionSettings;
+const orgActionSettings = new ActionSettings;
 
-let OrgActions = Reflux.createActions([
+const OrgActions = Reflux.createActions([
   'loadRepos',
   'loadReposSuccess',
   'loadReposError',
@@ -24,11 +24,11 @@ OrgActions.updatePollingStatus = function(status) {
 function startPolling(data) {
 
   (function doPoll() {
-    let builds = new Builds(data);
-    let promise = builds.fetch();
+    const builds = new Builds(data);
+    const promise = builds.fetch();
 
     promise.done( () => {
-      let repos = builds.getReposByOrg(data);
+      const repos = builds.getReposByOrg(data);
       OrgActions.loadReposSuccess(repos);
     });
 

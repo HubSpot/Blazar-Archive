@@ -17,8 +17,8 @@ class ModulesTableRow extends Component {
   }
 
   getBuildResult(build) {
-    let result = build.state;
-    let classNames = `icon-roomy ${labels[result]}`;
+    const result = build.state;
+    const classNames = `icon-roomy ${labels[result]}`;
 
     return (
       <Icon
@@ -31,7 +31,7 @@ class ModulesTableRow extends Component {
 
   render() {
 
-    let {
+    const {
       lastBuild,
       inProgressBuild,
       pendingBuild,

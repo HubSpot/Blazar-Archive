@@ -29,7 +29,7 @@ class ModulesTable extends Component {
       )
     }
 
-    let columnNames = [
+    const columnNames = [
       {label: 'Module', key: 'module'},
       {label: 'Latest Build', key: 'latestBuild'},
       {label: 'Start Time', key: 'startTime'},

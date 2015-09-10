@@ -21,16 +21,16 @@ class Builds extends BaseCollection {
   }
 
   getReposByOrg(orgInfo) {
-    let builds = this.hasBuildState();
-    let orgBuilds = _.filter(builds, function(a) {
+    const builds = this.hasBuildState();
+    const orgBuilds = _.filter(builds, function(a) {
       return a.gitInfo.organization === orgInfo.org;
     });
 
-    let repos = _.uniq(_.map(orgBuilds, function(build) {
-      let latestBuild = (build.inProgressBuild ? build.inProgressBuild : build.lastBuild ? build.lastBuild : build.pendingBuild);
+    const repos = _.uniq(_.map(orgBuilds, function(build) {
+      const latestBuild = (build.inProgressBuild ? build.inProgressBuild : build.lastBuild ? build.lastBuild : build.pendingBuild);
       latestBuild.module = build.module.name;
       latestBuild.branch = build.gitInfo.branch;
-      let repo = {
+      const repo = {
         repo: build.gitInfo.repository,
         latestBuild: latestBuild
       };
@@ -65,12 +65,12 @@ class Builds extends BaseCollection {
     });
 
     // move master to top of branches list
-    let masterIndex = branches.map(function(el) {
+    const masterIndex = branches.map(function(el) {
       return el.branch;
     }).indexOf('master');
 
     if (masterIndex > 0) {
-      let master = branches.splice(masterIndex, masterIndex + 1);
+      const master = branches.splice(masterIndex, masterIndex + 1);
       branches = master.concat(branches);
     }
 
@@ -81,7 +81,7 @@ class Builds extends BaseCollection {
 
   groupBuildsByRepo() {
     // group and generate key, by org::repo[branch]
-    let grouped = _.groupBy(this.data, function(o) {
+    const grouped = _.groupBy(this.data, function(o) {
       return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
     });
 

@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 class ReposTableRow extends Component {
 
   getBuildResult(result) {
-    let classNames = labels[result] + ' icon-roomy';
+    const classNames = labels[result] + ' icon-roomy';
 
     return (
       <Icon
@@ -19,18 +19,19 @@ class ReposTableRow extends Component {
 
   render() {
     let lastBuildNumber, lastBuildModule, lastBuildTimestamp;
+    
     const {
       repo,
       org,
       host
     } = this.props;
 
-    let repoPath = `/builds/${host}/${org}/${repo.repo}`;
+    const repoPath = `/builds/${host}/${org}/${repo.repo}`;
 
     if (repo.latestBuild) {
-      let build = repo.latestBuild;
-      let buildLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
-      let moduleLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}`;
+      const build = repo.latestBuild;
+      const buildLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
+      const moduleLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}`;
 
       if (build.endTimestamp || build.startTimestamp) {
         lastBuildTimestamp = Helpers.timestampFormatted(build.endTimestamp ? build.endTimestamp : build.startTimestamp);

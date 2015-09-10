@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 
 import Builds from '../collections/Builds';
 
-let BuildsActions = Reflux.createActions([
+const BuildsActions = Reflux.createActions([
   'loadBuilds',
   'loadBuildsSuccess',
   'loadBuildsError'
@@ -12,8 +12,8 @@ let BuildsActions = Reflux.createActions([
 BuildsActions.loadBuilds.preEmit = function() {
 
   (function doPoll() {
-    let builds = new Builds();
-    let promise = builds.fetch();
+    const builds = new Builds();
+    const promise = builds.fetch();
 
     promise.done( () => {
       let allBuilds = {};

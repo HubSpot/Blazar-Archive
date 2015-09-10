@@ -8,7 +8,7 @@ class BranchModules extends BaseCollection {
   }
 
   url() {
-    let branchId = this.branchId;
+    const branchId = this.branchId;
     return `${config.apiRoot}/branch/${branchId}/modules`;
   }
 

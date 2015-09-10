@@ -14,7 +14,7 @@ class Model {
 
   fetch() {
     this.data = {};
-    let promise = $.ajax({
+    const promise = $.ajax({
       url: this.fetchOptions.url || this.url(),
       type: this.fetchOptions.type || 'GET',
       dataType: this.fetchOptions.dataType || 'json'
@@ -30,7 +30,7 @@ class Model {
   }
 
   addTimeHelpers() {
-    let build = this.data.build;
+    const build = this.data.build;
 
     if (build.startTimestamp && build.endTimestamp) {
       build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp);

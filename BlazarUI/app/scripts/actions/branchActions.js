@@ -5,7 +5,7 @@ import Builds from '../collections/Builds';
 
 const BranchActionSettings = new ActionSettings;
 
-let BranchActions = Reflux.createActions([
+const BranchActions = Reflux.createActions([
   'loadModules',
   'loadModulesSuccess',
   'loadModulesError',
@@ -18,11 +18,11 @@ function startPolling(data) {
   // TO DO:
   // DONT FETCH BUILDS HERE, USE BUILD STORE'S CACHE
   (function doPoll() {
-    let builds = new Builds();
-    let promise = builds.fetch();
+    const builds = new Builds();
+    const promise = builds.fetch();
 
     promise.done( () => {
-      let branch = builds.getBranchModules(data);
+      const branch = builds.getBranchModules(data);
       BranchActions.loadModulesSuccess(branch.modules || []);
     });
 

@@ -5,7 +5,7 @@ import ReposTableRow from './ReposTableRow.jsx';
 class ReposTable extends Component {
 
   getRows() {
-    let repos = this.props.repos;
+    const repos = this.props.repos;
     return repos.map((repo, i) =>
       <ReposTableRow
         repo={repos[i]}
@@ -21,7 +21,7 @@ class ReposTable extends Component {
       return <div></div>;
     }
 
-    let columnNames = [
+    const columnNames = [
       {label: 'Repository', key: 'name'},
       {label: 'Latest Build', key: 'lastBuild'},
       {label: '', key: 'lastBuildTime'}

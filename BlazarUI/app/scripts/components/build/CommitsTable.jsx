@@ -19,12 +19,12 @@ class CommitsTable extends Component {
     if (this.props.commits.length === 0) {
       return (
         <MutedMessage>
-          No new commits since this build
+          No new commits since previous build
         </MutedMessage>
       )
     }
 
-    let columnNames = [
+    const columnNames = [
       {label: '', key: 'actions'},
       {label: '', key: 'timestamp'},
       {label: '', key: 'message'},

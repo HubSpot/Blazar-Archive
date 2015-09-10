@@ -28,8 +28,8 @@ class Module extends Component {
   }
 
   render() {
-    let pagination = this.state.pagination || {};
-    let paginated = Paginator.paginate(this.props.buildHistory, pagination);
+    const pagination = this.state.pagination || {};
+    const paginated = Paginator.paginate(this.props.buildHistory, pagination);
 
     if (this.props.loading) {
       return (

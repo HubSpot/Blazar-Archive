@@ -8,9 +8,9 @@ import BranchModules from '../collections/BranchModules';
 
 let gitInfo;
 
-let buildHistoryActionSettings = new ActionSettings;
+const buildHistoryActionSettings = new ActionSettings;
 
-let BuildHistoryActions = Reflux.createActions([
+const BuildHistoryActions = Reflux.createActions([
   'loadBuildHistory',
   'loadModulesBuildHistory',
   'loadBuildHistorySuccess',
@@ -23,7 +23,6 @@ BuildHistoryActions.loadBuildHistory.preEmit = function(data) {
   startPolling(data);
 };
 
-
 BuildHistoryActions.loadModulesBuildHistory = function(options) {
 
   let modulesHistory = [];
@@ -34,8 +33,8 @@ BuildHistoryActions.loadModulesBuildHistory = function(options) {
   }
 
   options.modules.forEach((module) => {
-    let buildHistory = new BuildHistory(module.moduleId);
-    let promise = buildHistory.fetch();
+    const buildHistory = new BuildHistory(module.moduleId);
+    const promise = buildHistory.fetch();
 
     promise.done( () => {
       const builds = buildHistory.limit(options.limit);
@@ -50,14 +49,13 @@ BuildHistoryActions.loadModulesBuildHistory = function(options) {
 
 };
 
-
 BuildHistoryActions.updatePollingStatus = function(status) {
   buildHistoryActionSettings.setPolling(status);
 };
 
 function getBranchId() {
-    let branchDefinition = new BranchDefinition(gitInfo);
-    let branchPromise =  branchDefinition.fetch();
+    const branchDefinition = new BranchDefinition(gitInfo);
+    const branchPromise =  branchDefinition.fetch();
 
     branchPromise.done( () => {
       gitInfo.branchId = branchDefinition.data.id;
@@ -69,8 +67,8 @@ function getBranchId() {
 }
 
 function getModule() {
-  let branchModules = new BranchModules(gitInfo.branchId);
-  let modulesPromise = branchModules.fetch();
+  const branchModules = new BranchModules(gitInfo.branchId);
+  const modulesPromise = branchModules.fetch();
 
   modulesPromise.done( () => {
     gitInfo.moduleId = _.find(branchModules.data, (m) => {
@@ -84,8 +82,8 @@ function getModule() {
 }
 
 function getBuildHistory() {
-  let buildHistory = new BuildHistory(gitInfo.moduleId);
-  let promise = buildHistory.fetch();
+  const buildHistory = new BuildHistory(gitInfo.moduleId);
+  const promise = buildHistory.fetch();
 
   promise.done( () => {
     BuildHistoryActions.loadBuildHistorySuccess(buildHistory.data);

@@ -21,7 +21,7 @@ class BaseCollection extends Collection {
 
     return map(this.data, (item) => {
 
-      let {
+      const {
         gitInfo,
         module,
         lastBuild,
