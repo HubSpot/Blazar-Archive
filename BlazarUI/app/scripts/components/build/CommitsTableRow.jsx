@@ -22,10 +22,10 @@ class CommitsTableRow extends Component {
     // to do:
     // - get build branch in place of master
     // - expand in table??
-    const githubRoot = (this.props.commit.url).split('/').slice(0,5).join('/');
+    const [_, githubRoot] = this.props.commit.url.match(/(https?:\/\/.+)\/commit/);
 
     const commits = this.props.commit.modified.map( (mod, i) => {
-      const link = githubRoot + '/tree/master/' + mod;
+      const link = `${githubRoot}/tree/master/${mod}`;
       return (
         <li key={i}> <a target='_blank' href={link}>{mod}</a> </li>
       );
@@ -37,7 +37,7 @@ class CommitsTableRow extends Component {
           <Modal.Title>Modified Files</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ul>
+          <ul className='plain-list'>
             {commits}
           </ul>
         </Modal.Body>
@@ -66,7 +66,7 @@ class CommitsTableRow extends Component {
         <td>
           {timestampFormatted(commit.timestamp)}
         </td>
-        <td>
+        <td className='code'>
           {truncate(commit.message, 60, true)}
         </td>
         <td>
