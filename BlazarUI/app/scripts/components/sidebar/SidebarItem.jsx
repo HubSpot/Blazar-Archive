@@ -26,7 +26,7 @@ class SidebarItem extends Component {
 
     if (has(build, 'inProgressBuild')) {
       icon = (
-        <Link to={config.appRoot + build.inProgressBuild.blazarPath} className='sidebar-item__building-icon-link'>
+        <Link to={build.inProgressBuild.blazarPath} className='sidebar-item__building-icon-link'>
           <BuildingIcon result={build.inProgressBuild.state} size='small' />
         </Link>
       );
