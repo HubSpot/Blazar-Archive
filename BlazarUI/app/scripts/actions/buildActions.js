@@ -1,6 +1,5 @@
 /*global BuildHistoryActions*/
 import Reflux from 'reflux';
-import {find} from 'underscore';
 
 import Build from '../models/Build';
 import Log from '../models/Log';
@@ -33,13 +32,13 @@ function getModule() {
   const branchModules = new BranchModules(gitInfo.branchId);
   const modulesPromise = branchModules.fetch();
 
-  modulesPromise.done( () => {
-    gitInfo.moduleId = find(branchModules.data, (m) => {
+  modulesPromise.done(() => {
+    gitInfo.moduleId = branchModules.data.find((m) => {
       return m.name === gitInfo.module;
     }).id;
     getBuild();
   });
-  modulesPromise.error( () => {
+  modulesPromise.error(() => {
     BuildHistoryActions.loadBuildHistoryError('an error occured');
   });
 }
@@ -48,11 +47,11 @@ function getBranchId() {
     const branchDefinition = new BranchDefinition(gitInfo);
     const branchPromise =  branchDefinition.fetch();
 
-    branchPromise.done( () => {
+    branchPromise.done(() => {
       gitInfo.branchId = branchDefinition.data.id;
       getModule();
     });
-    branchPromise.error( () => {
+    branchPromise.error(() => {
       BuildHistoryActions.loadBuildHistoryError('an error occured');
     });
 }

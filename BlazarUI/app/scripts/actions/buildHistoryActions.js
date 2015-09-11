@@ -1,6 +1,5 @@
 /*global config*/
 import Reflux from 'reflux';
-import _ from 'underscore';
 import ActionSettings from './utils/ActionSettings';
 import BuildHistory from '../collections/BuildHistory';
 import BranchDefinition from '../models/BranchDefinition';
@@ -71,7 +70,7 @@ function getModule() {
   const modulesPromise = branchModules.fetch();
 
   modulesPromise.done( () => {
-    gitInfo.moduleId = _.find(branchModules.data, (m) => {
+    gitInfo.moduleId = branchModules.data.find((m) => {
       return m.name === gitInfo.module;
     }).id;
     getBuildHistory();
