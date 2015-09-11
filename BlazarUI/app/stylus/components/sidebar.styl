@@ -1,11 +1,20 @@
 @import 'variables'
 @import 'mixins'
 
+.sidebar__logo
+  position absolute
+  z-index 2
+  top 10px
+  left 10px
+  
+.sidebar__logo-image
+  width 85px
+
 .sidebar__filter
   padding 0
   position fixed
-  top 50px
-  left 0px
+  top 0
+  left 0
   z-index 99
   width 299px
   height 134px
@@ -60,9 +69,6 @@
       &:after
         content '\f0e7'
 
-.sidebar__list
-  margin-top 64px
-
 .search-input, .search-input:focus
   margin-bottom 0px
   padding 15px
@@ -73,7 +79,7 @@
   -webkit-box-shadow: none
   -moz-box-shadow: none
   box-shadow: none
-  font-size 17px
+  font-size 15px
   font-weight $font-light
   position absolute
   bottom 5px

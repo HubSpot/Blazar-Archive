@@ -133,6 +133,7 @@ class BuildsSidebar extends Component {
     return (
       <div>
         <div className="sidebar__filter">
+          <SidebarLogo />
           <SidebarFilter
             loading={this.props.loading}
             builds={this.props.builds.all}

@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {RouteHandler} from 'react-router';
-import Navigation from '../components/navigation/navigation.jsx';
 import BuildsSidebarContainer from '../components/sidebar/BuildsSidebarContainer.jsx';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
@@ -57,7 +56,6 @@ class App extends Component {
     const modal = this.apiModal();
     return (
       <div>
-        <Navigation />
         <div className="page-wrapper">
           <BuildsSidebarContainer/>
           <RouteHandler/>

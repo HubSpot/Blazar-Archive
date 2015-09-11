@@ -30,23 +30,24 @@ body
     user-select none
 
 .sidebar-inner
-  margin-top: 155px
+  margin-top: 105px
 
 .page-content
   position relative
   width "calc(100% - %s)" % $layout-offset-md
   margin-left $layout-offset-md
-  padding 150px 10px 10px
+  padding 100px 10px 10px
 
 .page-header
-  min-height 93px
-  border-bottom 1px solid $gray
   position fixed
   z-index 2
   width "calc(100% - %s)" % $layout-offset-md
-  top 11px
+  top 0
   left $layout-offset-md
+  margin 0
   padding 10px 30px 2px 30px
+  min-height 94px
+  border-bottom 1px solid $gray
   background-color $offwhite
 
 .page-section
