@@ -18,9 +18,23 @@ class DashboardStarredModule extends Component {
   render() {
 
     if (this.props.modules.length === 0) {
+      // to do -> pass more star detail down as props (e.g. branch)
+      const repo = this.props.modulePath.split('/')[4];
+      const branch = this.props.modulePath.split('/')[5];
       return (
-        <EmptyMessage>
-          No build history for <Link to={this.props.modulePath}>{this.props.moduleName}</Link>
+        <EmptyMessage simple={true}>
+          <p>
+            <strong>No build history for:</strong>
+          </p>
+          <span className='crumb'>
+            {repo}
+          </span>
+          <span className='crumb'>
+            {branch}
+          </span>
+          <Link to={this.props.modulePath}>
+            {this.props.moduleName}
+          </Link>
         </EmptyMessage>
       )
     }
