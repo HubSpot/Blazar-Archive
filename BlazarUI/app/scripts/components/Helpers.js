@@ -23,7 +23,6 @@ export const humanizeText = function(string) {
   return string;
 };
 
-
 export const truncate = function(str, len = 10, ellip=false) {
   if (str && str.length > len && str.length > 0) {
     let new_str = str + ' ';
@@ -40,4 +39,13 @@ export const truncate = function(str, len = 10, ellip=false) {
 
 export const githubShaLink = function(info) {
   return `https://github.com/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
+};
+
+export const events = {
+  listenTo: function(event, cb) {
+    window.addEventListener(event, cb);
+  },
+  removeListener: function(event, cb) {
+    window.removeEventListener(event, cb);
+  }
 };
