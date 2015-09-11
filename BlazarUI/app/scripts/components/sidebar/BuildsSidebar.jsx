@@ -3,12 +3,14 @@ import $ from 'jquery';
 import LazyRender from '../shared/LazyRender.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
 import fuzzy from 'fuzzy';
-import {bindAll, filter, contains, has} from 'underscore';
+import {bindAll, filter, contains, has, contains} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Helpers from '../ComponentHelpers';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import SidebarItem from '../sidebar/SidebarItem.jsx';
-import {NO_MATCH_MESSAGES} from '../constants';
+import SidebarLogo from './SidebarLogo.jsx';
+import {FILTER_MESSAGES, NO_MATCH_MESSAGES} from '../constants';
+
 let Link = require('react-router').Link;
 
 class BuildsSidebar extends Component {
@@ -117,11 +119,11 @@ class BuildsSidebar extends Component {
       sidebarMessage = (
         <MutedMessage roomy={true}>No {searchType} modules matching <strong>{this.state.filterText}</strong>.</MutedMessage>
       )
-    } 
+    }
 
-    if (moduleComponents.length === 0 && this.state.toggleFilterState === 'starred' && this.props.stars.length === 0) {
+    if (moduleComponents.length === 0 && contains(['starred', 'building'], this.state.toggleFilterState) && this.props.stars.length === 0) {
       sidebarMessage = (
-        <MutedMessage roomy={true}>No starred modules</MutedMessage>
+        <MutedMessage roomy={true}>{FILTER_MESSAGES[this.state.toggleFilterState]}</MutedMessage>
       )
     }
 

@@ -40,3 +40,8 @@ export const NO_MATCH_MESSAGES = {
   'all': '',
   'building': 'actively building'
 };
+
+export const FILTER_MESSAGES = {
+  'starred': 'No modules have been starred',
+  'building': 'No modules actively building'
+};
