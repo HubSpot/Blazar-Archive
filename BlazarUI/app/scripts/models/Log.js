@@ -5,8 +5,7 @@ class Log extends Model {
 
   constructor(buildNumber) {
 
-    const params = '';
-    this.logUrl = `${config.apiRoot}/build/${buildNumber}/log/${params}`;
+    this.buildNumber = buildNumber;
 
     this.fetchOptions = {
       dataType: 'json'
@@ -14,8 +13,27 @@ class Log extends Model {
   }
 
   url() {
-    return this.logUrl;
+    return `${config.apiRoot}/build/${this.buildNumber}/log/`;
   }
+
+  formatLog(jqxhr) {
+    let cache = [];
+
+    if (jqxhr.status !== 200) {
+      console.warn(jqxhr);
+      return "<p class='x-y-roomy'>Error loading build log. Please check your console for more detail.</p>";
+    }
+
+    const lines = jqxhr.responseJSON.data.split('\n');
+
+    lines.forEach( (line) => {
+      cache.push(`<p class='log-line'>${line}</p>`);
+    });
+
+    return cache.join('\n');
+  }
+
+
 }
 
 export default Log;

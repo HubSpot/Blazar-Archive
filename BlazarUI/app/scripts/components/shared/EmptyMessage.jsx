@@ -11,7 +11,6 @@ class EmptyMessage extends Component {
   }
 
   render() {
-    console.log('classnames: ', this.getClassNames());
     return (
       <div className={this.getClassNames()}>
         {this.props.children}
