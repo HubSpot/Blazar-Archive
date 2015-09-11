@@ -22,8 +22,13 @@ class BuildCommits extends Component {
 
     const inflection = commitInfo.newCommits.length !== 1 ? 's' : '';
     const header = (
-      <span> <span className='badge'>{commitInfo.newCommits.length}</span> new commit{inflection} since previous build </span>
-    )
+      <span> 
+        <span className='badge'>
+          {commitInfo.newCommits.length}
+        </span> 
+        new commit{inflection} since previous build 
+      </span>
+    );
 
     return (
       <Collapsable

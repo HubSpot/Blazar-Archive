@@ -17,20 +17,17 @@ class Log extends Model {
   }
 
   formatLog(jqxhr) {
-    let cache = [];
 
     if (jqxhr.status !== 200) {
       console.warn(jqxhr);
       return "<p class='x-y-roomy'>Error loading build log. Please check your console for more detail.</p>";
     }
 
-    const lines = jqxhr.responseJSON.data.split('\n');
+    const NEW_LINE = '\n';
+    return jqxhr.responseJSON.data.split(NEW_LINE).map((line) => {
+      return `<p class='log-line'>${line}</p>`;
+    }).join(NEW_LINE);
 
-    lines.forEach( (line) => {
-      cache.push(`<p class='log-line'>${line}</p>`);
-    });
-
-    return cache.join('\n');
   }
 
 
