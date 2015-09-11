@@ -4,6 +4,7 @@ import SectionLoader from '../shared/SectionLoader.jsx';
 import Collapsable from '../shared/Collapsable.jsx';
 import {has} from 'underscore';
 import {timestampFormatted} from '../Helpers';
+import MutedMessage from '../shared/MutedMessage.jsx';
 
 class BuildCommits extends Component {
 
@@ -19,8 +20,9 @@ class BuildCommits extends Component {
       return <SectionLoader />;
     }
 
+    const inflection = commitInfo.newCommits.length !== 1 ? 's' : '';
     const header = (
-      <span> ({commitInfo.newCommits.length}) new commits since previous build </span>
+      <span> <span className='badge'>{commitInfo.newCommits.length}</span> new commit{inflection} since previous build </span>
     )
 
     return (
