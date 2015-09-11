@@ -1,6 +1,6 @@
 /*global BuildHistoryActions*/
 import Reflux from 'reflux';
-import _ from 'underscore';
+import {find} from 'underscore';
 
 import Build from '../models/Build';
 import Log from '../models/Log';
@@ -34,7 +34,7 @@ function getModule() {
   const modulesPromise = branchModules.fetch();
 
   modulesPromise.done( () => {
-    gitInfo.moduleId = _.find(branchModules.data, (m) => {
+    gitInfo.moduleId = find(branchModules.data, (m) => {
       return m.name === gitInfo.module;
     }).id;
     getBuild();
@@ -57,7 +57,6 @@ function getBranchId() {
     });
 }
 
-
 function getBuild() {
   const build = new Build(gitInfo);
   const buildPromise = build.fetch();
@@ -74,26 +73,23 @@ function getBuild() {
     const log = new Log(build.data.build.id);
     const logPromise = log.fetch();
 
-    logPromise.always( (logData) => {
-      if (!logData) {
-        logData.data = '';
-      }
+    logPromise.always( (data, textStatus, jqxhr) => {
 
       BuildActions.loadBuildSuccess({
         build: build.data,
-        log: logData.data
+        log: log.formatLog(jqxhr)
       });
 
     });
 
     logPromise.error( () => {
-      BuildActions.loadBuildError('Error retrieving build log');
+      BuildActions.loadBuildError("<p class='x-y-roomy'>Error retrieving build log");
     });
 
   });
 
   buildPromise.error( () => {
-    BuildActions.loadBuildError('Error retrieving build');
+    BuildActions.loadBuildError("<p class='x-y-roomy'>Error retrieving build");
   });
 
 }

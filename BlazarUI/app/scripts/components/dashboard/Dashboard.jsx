@@ -34,7 +34,7 @@ class Dashboard extends Component {
 
     if (starredModuleTables.length === 0) {
       starredModuleTables = (
-        <MutedMessage> You have no starred repos. </MutedMessage>
+        <MutedMessage> You have no starred modules. </MutedMessage>
       );
     }
 

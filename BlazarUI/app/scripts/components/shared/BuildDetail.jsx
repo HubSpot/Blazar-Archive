@@ -65,36 +65,28 @@ class BuildDetail extends Component {
 
     return (
       <div className={this.getWrapperClassNames()}>
-        
         <div className='build-detail__topline'>
-
           <h4 className='build-detail__build-state'>
             Build {buildDetail.buildResult} {buildDetail.duration}
-          </h4>
-        
+          </h4>        
         </div>  
 
-        
         <div className='build-detail__commitInfo'>
-          
-          <p className='build-detail__sha'>
-            commit <Sha gitInfo={gitInfo} build={build} />
-          </p>
-          <p>
-            <strong>{currentCommit.author.name}</strong> authored on {timestampFormatted(currentCommit.timestamp, 'll')}
+          <p className='build-detail__sha'> commit <Sha gitInfo={gitInfo} build={build} /> </p>
+          <p> Authored by {currentCommit.author.name} </p>
+          <p> 
+            {timestampFormatted(currentCommit.timestamp, 'dddd')}, { ' ' }
+            {timestampFormatted(currentCommit.timestamp, 'lll')} 
           </p>
           <div className='build-detail__commit-desc'>
             <pre>{currentCommit.message}</pre>
           </div>
-
         </div>
-
       </div>
     );
   }
 
 }
-
 
 
 BuildDetail.propTypes = {
