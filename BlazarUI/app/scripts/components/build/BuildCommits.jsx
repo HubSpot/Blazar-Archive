@@ -25,7 +25,7 @@ class BuildCommits extends Component {
       <span> 
         <span className='badge'>
           {commitInfo.newCommits.length}
-        </span> 
+        </span> { ' ' }
         new commit{inflection} since previous build 
       </span>
     );
