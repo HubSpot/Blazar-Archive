@@ -82,13 +82,13 @@ function getBuild() {
     });
 
     logPromise.error( () => {
-      BuildActions.loadBuildError("<p class='x-y-roomy'>Error retrieving build log");
+      BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
     });
 
   });
 
   buildPromise.error( () => {
-    BuildActions.loadBuildError("<p class='x-y-roomy'>Error retrieving build");
+    BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build");
   });
 
 }

@@ -20,7 +20,7 @@ class Log extends Model {
 
     if (jqxhr.status !== 200) {
       console.warn(jqxhr);
-      return "<p class='x-y-roomy'>Error loading build log. Please check your console for more detail.</p>";
+      return "<p class='roomy-xy'>Error loading build log. Please check your console for more detail.</p>";
     }
 
     const NEW_LINE = '\n';
