@@ -8,7 +8,7 @@ cmds:
   - ./node_modules/.bin/gulp lint
   - >
       BLAZAR_API_URL=https://bootstrap.hubteam.com/blazar/v1
-      BLAZAR_APP_URI=https://tools.hubteam.com/blazar
+      BLAZAR_APP_URI=/blazar
       BLAZAR_STATIC_ROOT=https://static.hsappstatic.net/BlazarUI/static-1.$BUILD_NUMBER
       ./node_modules/.bin/gulp build
   - ./node_modules/.bin/bender-deps cdn-publish BlazarUI@1.$BUILD_NUMBER dist
