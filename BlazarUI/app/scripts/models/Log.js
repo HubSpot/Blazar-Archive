@@ -26,7 +26,7 @@ class Log extends Model {
     const NEW_LINE = '\n';
     return jqxhr.responseJSON.data.split(NEW_LINE).map((line) => {
       return `<p class='log-line'>${line}</p>`;
-    }).join(NEW_LINE);
+    }).join('');
 
   }
 
