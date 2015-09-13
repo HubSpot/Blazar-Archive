@@ -45,17 +45,18 @@ class DashboardStarredModule extends Component {
       module
     } = this.props.modules[0];
 
-    const divider = ' / ';
     const panelsAreOpen = this.props.modules.length < 5;
 
     const header = (
       <span className='dashboard-panel__header'>
         <span className='dashboard-panel__header-headline'>
           <Icon for='repo' classNames='icon-muted breadcrumb-icon' />
-          <Link to={module.blazarPath.repo}>{gitInfo.repository}</Link> {divider}
+          <Link className='crumb' to={module.blazarPath.repo}>{gitInfo.repository}</Link> 
+          
           <Icon for='branch' classNames='icon-muted breadcrumb-icon' />
-          <Link to={module.blazarPath.branch}>{gitInfo.branch}</Link> {divider}
-          <Icon for='module' classNames='icon-muted--extra breadcrumb-icon' />
+          <Link className='crumb' to={module.blazarPath.branch}>{gitInfo.branch}</Link>
+          
+          <Icon for='module' classNames='icon-muted--extra breadcrumb-icon breadcrumb-icon--thin' />
           <Link to={module.blazarPath.module}> {module.name}</Link>
         </span>
         <span className="dashboard__toggle-container">

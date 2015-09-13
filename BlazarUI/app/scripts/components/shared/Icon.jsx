@@ -6,10 +6,12 @@ class Icon extends Component {
 
   getClassNames() {
 
-    let classNames = `${(this.props.prefix ? this.props.prefix + '-' : '')}${this.props.type} ${this.props.type}-${this.props.name} ${this.props.classNames}`;
+    let classNames = 'icon ';
 
     if (this.props.for) {
-      classNames += ` ${ICON_LIST[this.props.for]}`
+      classNames += `${ICON_LIST[this.props.for]} ${this.props.classNames}`;
+    } else {
+      classNames += `${(this.props.prefix ? this.props.prefix + '-' : '')}${this.props.type} ${this.props.type}-${this.props.name} ${this.props.classNames}`;
     }
 
     return classNames;

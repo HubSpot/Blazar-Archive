@@ -22,7 +22,7 @@ export const unicode = {
 };
 
 export const ICON_LIST = {
-  'module': 'fa-folder-o',
+  'module': 'fa fa-folder-o',
   'branch': 'octicon octicon-git-branch',
   'repo': 'octicon octicon-repo'
 };
