@@ -27,7 +27,7 @@ function startPolling(params) {
 
   (function doPoll() {
     const builds = new Builds();
-    builds.set(BuildsStore.getBuilds().all);
+    builds.set(BuildsStore.getBuilds());
 
     const branches = builds.getBranchesByRepo(params);
     BranchActions.loadBranchesSuccess(branches);

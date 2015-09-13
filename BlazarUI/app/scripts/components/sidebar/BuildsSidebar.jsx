@@ -74,14 +74,14 @@ class BuildsSidebar extends Component {
   }
 
   getFilterMatches() {
-    const allBuilds = this.props.builds.all;
+    const builds = this.props.builds;
     const options = {
       extract: function(el) {
         return el.module.name;
       }
     };
 
-    const results = fuzzy.filter(this.state.filterText, allBuilds, options);
+    const results = fuzzy.filter(this.state.filterText, builds, options);
     const matches = results.map(function(el) { return el.original; });
     return matches;
   }
@@ -136,7 +136,7 @@ class BuildsSidebar extends Component {
           <SidebarLogo />
           <SidebarFilter
             loading={this.props.loading}
-            builds={this.props.builds.all}
+            builds={this.props.builds}
             filterText={this.state.filterText}
             updateResults={this.updateResults}
             setToggleState={this.setToggleState}
@@ -159,7 +159,7 @@ class BuildsSidebar extends Component {
 
 BuildsSidebar.propTypes = {
   loading: PropTypes.bool.isRequired,
-  builds: PropTypes.object.isRequired,
+  builds: PropTypes.array.isRequired,
   stars: PropTypes.array.isRequired,
   persistStarChange: PropTypes.func.isRequired
 };

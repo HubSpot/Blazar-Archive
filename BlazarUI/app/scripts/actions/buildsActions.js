@@ -16,14 +16,7 @@ BuildsActions.loadBuilds.preEmit = function() {
     const promise = builds.fetch();
 
     promise.done( () => {
-      let allBuilds = {};
-
-      allBuilds.all = builds.get();
-
-      // refactor this:
-      allBuilds.grouped = [];
-
-      BuildsActions.loadBuildsSuccess(allBuilds);
+      BuildsActions.loadBuildsSuccess(builds.get());
     });
 
     promise.always( () => {

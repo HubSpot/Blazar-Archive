@@ -19,11 +19,7 @@ class BuildsSidebarContainer extends Component {
     bindAll(this, 'persistStarChange');
 
     this.state = {
-      builds: {
-        grouped: [],
-        modules: [],
-        all: []
-      },
+      builds: [],
       stars: [],
       loadingBuilds: true,
       loadingStars: true,
