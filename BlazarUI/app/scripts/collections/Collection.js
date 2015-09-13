@@ -4,6 +4,14 @@ class Collection {
 
   parse() {}
 
+  get() {
+    return this.data;
+  }
+
+  set(data) {
+    this.data = data;
+  }
+
   fetch() {
     this.data = {};
     const promise = $.ajax({

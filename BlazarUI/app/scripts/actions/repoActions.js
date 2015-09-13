@@ -3,6 +3,8 @@ import Reflux from 'reflux';
 import Builds from '../collections/Builds';
 import ActionSettings from './utils/ActionSettings';
 
+import BuildsStore from '../stores/buildsStore';
+
 const repoActionSettings = new ActionSettings;
 
 const BranchActions = Reflux.createActions([
@@ -12,35 +14,28 @@ const BranchActions = Reflux.createActions([
   'updatePollingStatus'
 ]);
 
-BranchActions.loadBranches.preEmit = function(data) {
-  startPolling(data);
+
+BranchActions.loadBranches.preEmit = function(params) {
+  startPolling(params);
 };
 
 BranchActions.updatePollingStatus = function(status) {
   repoActionSettings.setPolling(status);
 };
 
-function startPolling(data) {
+function startPolling(params) {
 
   (function doPoll() {
     const builds = new Builds();
-    const promise = builds.fetch();
+    builds.set(BuildsStore.getBuilds().all);
 
-    promise.done( () => {
-      const branches = builds.getBranchesByRepo(data);
-      BranchActions.loadBranchesSuccess(branches);
-    });
+    const branches = builds.getBranchesByRepo(params);
+    BranchActions.loadBranchesSuccess(branches);
 
-    promise.error( () => {
-      console.warn('Error connecting to the API. Check that you are connected to the VPN');
-      BranchActions.loadBranchesError('an error occured');
-    });
+    if (repoActionSettings.polling) {
+      setTimeout(doPoll, config.buildsRefresh);
+    }
 
-    promise.always( () => {
-      if (repoActionSettings.polling) {
-        setTimeout(doPoll, config.buildsRefresh);
-      }
-    });
 
   })();
 

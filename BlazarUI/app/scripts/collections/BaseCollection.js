@@ -13,10 +13,6 @@ class BaseCollection extends Collection {
     return this.data.splice(0, limit);
   }
 
-  get() {
-    return this.data;
-  }
-
   addHelpers() {
 
     return map(this.data, (item) => {
