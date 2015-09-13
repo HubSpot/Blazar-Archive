@@ -61,7 +61,6 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
   loading: PropTypes.bool,
-  builds: PropTypes.array,
   modulesBuildHistory: PropTypes.array
 };
 
