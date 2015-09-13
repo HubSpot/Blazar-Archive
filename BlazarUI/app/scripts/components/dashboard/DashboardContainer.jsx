@@ -42,7 +42,6 @@ class DashboardContainer extends Component {
   }
 
   onStatusChange(state) {
-
     this.setState(state);
 
     const noHistoryToFetch = state.stars && state.stars.length === 0;
@@ -67,7 +66,6 @@ class DashboardContainer extends Component {
     return (
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
-          builds={this.state.builds}
           loading={this.state.loading} 
           modulesBuildHistory={this.state.modulesBuildHistory} />
       </PageContainer>

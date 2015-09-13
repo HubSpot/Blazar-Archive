@@ -18,37 +18,35 @@ const BuildHistoryActions = Reflux.createActions([
   'updatePollingStatus'
 ]);
 
-BuildHistoryActions.loadBuildHistory.preEmit = function(data) {
+BuildHistoryActions.loadBuildHistory.preEmit = (data) => {
   startPolling(data);
 };
 
-BuildHistoryActions.loadModulesBuildHistory = function(options) {
-
-  let modulesHistory = [];
+BuildHistoryActions.loadModulesBuildHistory = (options) => {
 
   if (options.modules.length === 0) {
     BuildHistoryActions.loadModulesBuildHistorySuccess([]);
     return;
   }
 
-  options.modules.forEach((module) => {
-    const buildHistory = new BuildHistory(module.moduleId);
-    const promise = buildHistory.fetch();
-
-    promise.done( () => {
-      const builds = buildHistory.limit(options.limit);
-      modulesHistory.push({
-        module: module,
-        builds: builds
+  const modulesPromises = options.modules.map((module) => {
+    return new BuildHistory(module.moduleId)
+      .fetch().then((data) => {
+        data = data.splice(0, options.limit);
+        return {
+          module: module,
+          builds: data
+        };
       });
-      BuildHistoryActions.loadModulesBuildHistorySuccess(modulesHistory);
-    });
+  });
 
+  Promise.all(modulesPromises).then(res => {
+    BuildHistoryActions.loadModulesBuildHistorySuccess(res);
   });
 
 };
 
-BuildHistoryActions.updatePollingStatus = function(status) {
+BuildHistoryActions.updatePollingStatus = (status) => {
   buildHistoryActionSettings.setPolling(status);
 };
 

@@ -26,7 +26,6 @@ class RepoContainer extends Component {
 
     // check if we already have builds in the store
     if (BuildsStore.buildsHaveLoaded) {
-      console.log('builds already loaded, lets get them');
       RepoActions.loadBranches(this.props.params)
     }
 

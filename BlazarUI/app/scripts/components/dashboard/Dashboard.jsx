@@ -19,7 +19,7 @@ class Dashboard extends Component {
         <SectionLoader />
       );
     }
-  
+
     let starredModuleTables = this.props.modulesBuildHistory.map((module) => {
 
       return (
