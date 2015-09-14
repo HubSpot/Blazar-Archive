@@ -117,15 +117,25 @@ class BuildsSidebar extends Component {
 
     if (moduleComponents.length === 0 && this.state.filterText.length > 0) {
       sidebarMessage = (
-        <MutedMessage roomy={true}>No {searchType} modules matching <strong>{this.state.filterText}</strong>.</MutedMessage>
+        <MutedMessage roomy={true}>
+          No {searchType} modules matching <strong>{this.state.filterText}</strong>.
+        </MutedMessage>
       )
     }
 
-    if (moduleComponents.length === 0 && contains(['starred', 'building'], this.state.toggleFilterState) && this.props.stars.length === 0) {
+    if (moduleComponents.length === 0 && this.state.filterText.length === 0) {
+      let message;
+      if (this.state.toggleFilterState === 'starred') {
+        message = 'No modules have been starred';
+      } else if (this.state.toggleFilterState === 'building') {
+        message = 'No modules actively building';
+      }
       sidebarMessage = (
-        <MutedMessage roomy={true}>{FILTER_MESSAGES[this.state.toggleFilterState]}</MutedMessage>
+        <MutedMessage roomy={true}>
+          {message}
+        </MutedMessage>
       )
-    }
+    } 
 
     const headerHeight = $('#primary-nav').height() + $('.sidebar__filter').height();
     const containerHeight = $(window).height() - headerHeight;
