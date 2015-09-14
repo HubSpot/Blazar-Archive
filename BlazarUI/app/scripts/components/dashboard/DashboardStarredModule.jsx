@@ -8,10 +8,10 @@
 import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
-import EmptyMessage from '../shared/EmptyMessage.jsx';
 import NotificationToggle from '../shared/NotificationToggle.jsx';
 import BuildHistoryTable from '../module/BuildHistoryTable.jsx';
 import Collapsable from '../shared/Collapsable.jsx';
+import NoBuildHistory from './NoBuildHistory.jsx';
 
 class DashboardStarredModule extends Component {
 
@@ -19,23 +19,11 @@ class DashboardStarredModule extends Component {
 
     if (this.props.modules.length === 0) {
       // to do -> pass more star detail down as props (e.g. branch)
-      const repo = this.props.modulePath.split('/')[4];
-      const branch = this.props.modulePath.split('/')[5];
       return (
-        <EmptyMessage simple={true}>
-          <p>
-            <strong>No build history for:</strong>
-          </p>
-          <span className='crumb'>
-            {repo}
-          </span>
-          <span className='crumb'>
-            {branch}
-          </span>
-          <Link to={this.props.modulePath}>
-            {this.props.moduleName}
-          </Link>
-        </EmptyMessage>
+        <NoBuildHistory 
+          modulePath={this.props.modulePath}
+          moduleName={this.props.moduleName}
+        />
       )
     }
 
