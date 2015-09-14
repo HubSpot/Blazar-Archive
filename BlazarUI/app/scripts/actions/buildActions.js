@@ -5,6 +5,7 @@ import Build from '../models/Build';
 import Log from '../models/Log';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
+import {find} from 'underscore';
 
 let gitInfo;
 
@@ -33,7 +34,7 @@ function getModule() {
   const modulesPromise = branchModules.fetch();
 
   modulesPromise.done(() => {
-    gitInfo.moduleId = branchModules.data.find((m) => {
+    gitInfo.moduleId = find(branchModules.data, (m) => {
       return m.name === gitInfo.module;
     }).id;
     getBuild();

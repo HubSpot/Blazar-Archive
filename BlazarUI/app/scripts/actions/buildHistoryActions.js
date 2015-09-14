@@ -4,7 +4,7 @@ import ActionSettings from './utils/ActionSettings';
 import BuildHistory from '../collections/BuildHistory';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
-
+import {find} from 'underscore';
 
 const buildHistoryActionSettings = new ActionSettings;
 
@@ -84,7 +84,7 @@ function getModule() {
   const modulesPromise = branchModules.fetch();
 
   modulesPromise.done( () => {
-    gitInfo.moduleId = branchModules.data.find((m) => {
+    gitInfo.moduleId = find(branchModules.data, (m) => {
       return m.name === gitInfo.module;
     }).id;
   });
