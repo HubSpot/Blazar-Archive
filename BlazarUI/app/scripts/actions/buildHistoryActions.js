@@ -5,7 +5,6 @@ import BuildHistory from '../collections/BuildHistory';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
 
-let gitInfo;
 
 const buildHistoryActionSettings = new ActionSettings;
 
@@ -18,12 +17,18 @@ const BuildHistoryActions = Reflux.createActions([
   'updatePollingStatus'
 ]);
 
+let gitInfo;
+
+// Build history for module page:
+// e.g. HubSpot/Blazar/master/BlazarUI
 BuildHistoryActions.loadBuildHistory.preEmit = (data) => {
-  startPolling(data);
+  gitInfo = data;
+  buildHistoryPoller();
 };
 
+// Build history for provided list of module IDs
+// e.g. starred modules in dashboard
 BuildHistoryActions.loadModulesBuildHistory = (options) => {
-
   if (options.modules.length === 0) {
     BuildHistoryActions.loadModulesBuildHistorySuccess([]);
     return;
@@ -50,17 +55,28 @@ BuildHistoryActions.updatePollingStatus = (status) => {
   buildHistoryActionSettings.setPolling(status);
 };
 
-function getBranchId() {
-    const branchDefinition = new BranchDefinition(gitInfo);
-    const branchPromise =  branchDefinition.fetch();
+function buildHistoryPoller() {
 
-    branchPromise.done( () => {
-      gitInfo.branchId = branchDefinition.data.id;
-      getModule();
-    });
-    branchPromise.error( () => {
-      BuildHistoryActions.loadBuildHistoryError('an error occured');
-    });
+  (function pollBuildHistory() {
+    getBranchId()
+      .then(getModule)
+      .then(getBuildHistory);
+
+    if (buildHistoryActionSettings.polling) {
+      setTimeout(pollBuildHistory, config.buildsRefresh);
+    }
+  })();
+}
+
+function getBranchId() {
+  const branchDefinition = new BranchDefinition(gitInfo);
+  const branchPromise =  branchDefinition.fetch();
+
+  branchPromise.done( () => {
+    gitInfo.branchId = branchDefinition.data.id;
+  });
+
+  return branchPromise;
 }
 
 function getModule() {
@@ -71,35 +87,22 @@ function getModule() {
     gitInfo.moduleId = branchModules.data.find((m) => {
       return m.name === gitInfo.module;
     }).id;
-    getBuildHistory();
   });
-  modulesPromise.error( () => {
-    BuildHistoryActions.loadBuildHistoryError('an error occured');
-  });
+
+  return modulesPromise;
 }
 
 function getBuildHistory() {
   const buildHistory = new BuildHistory(gitInfo.moduleId);
-  const promise = buildHistory.fetch();
+  const buildHistoryPromise = buildHistory.fetch();
 
-  promise.done( () => {
+  buildHistoryPromise.done( () => {
     BuildHistoryActions.loadBuildHistorySuccess(buildHistory.data);
   });
-  promise.error( () => {
-    BuildHistoryActions.loadBuildHistoryError('an error occured');
-  });
+
+  return buildHistoryPromise;
 }
 
-function startPolling(data) {
-  gitInfo = data;
-
-  (function doPoll() {
-    getBranchId();
-    if (buildHistoryActionSettings.polling) {
-      setTimeout(doPoll, config.buildsRefresh);
-    }
-  })();
-}
 
 
 export default BuildHistoryActions;
