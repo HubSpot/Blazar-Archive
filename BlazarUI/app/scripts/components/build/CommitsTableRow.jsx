@@ -19,15 +19,9 @@ class CommitsTableRow extends Component {
   }
 
   commitDetailModal() {
-    // to do:
-    // - get build branch in place of master
-    // - expand in table??
-    const [_, githubRoot] = this.props.commit.url.match(/(https?:\/\/.+)\/commit/);
-
     const commits = this.props.commit.modified.map( (mod, i) => {
-      const link = `${githubRoot}/tree/master/${mod}`;
       return (
-        <li key={i}> <a target='_blank' href={link}>{mod}</a> </li>
+        <li key={i}>{mod}</li>
       );
     })
 
