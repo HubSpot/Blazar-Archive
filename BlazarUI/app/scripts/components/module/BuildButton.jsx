@@ -46,7 +46,7 @@ class BuildButton extends Component {
 }
 
 BuildButton.propTypes = {
-  moduleId: PropTypes.string
+  moduleId: PropTypes.number.isRequired
 };
 
 export default BuildButton;
