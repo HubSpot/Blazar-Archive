@@ -33,7 +33,11 @@ class BuildButton extends Component {
 
   render() {
     if (this.state.loading) {
-      return <Button bsStyle="primary" disabled><Icon type="fa" name="circle-o-notch" classNames="fa-spin" /> Build Now</Button>;
+      return (
+        <Button bsStyle="primary" disabled>
+          <Icon for="spinner" /> Build Now
+        </Button>
+      );
     } else {
       return (
         <div>
