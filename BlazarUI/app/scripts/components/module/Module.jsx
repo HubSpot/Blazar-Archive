@@ -10,6 +10,7 @@ import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
 import Paginator from '../shared/Paginator.jsx';
+import BuildButton from './BuildButton.jsx';
 
 class Module extends Component {
 
@@ -53,6 +54,9 @@ class Module extends Component {
           </Headline>
         </PageHeader>
         <UIGrid>
+          <UIGridItem size={12} align='RIGHT'>
+            <BuildButton moduleId={this.props.params.moduleId} />
+          </UIGridItem>
           <UIGridItem size={12}>
             <BuildHistoryTable
               buildHistory={paginated.data}
