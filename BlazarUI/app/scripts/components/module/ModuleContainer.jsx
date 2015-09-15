@@ -11,13 +11,16 @@ class ModuleContainer extends Component {
 
     this.state = {
       buildHistory: [],
-      loading: true
+      loading: true,
+      buildTriggeringDone: true,
+      buildTriggeringError: ''
     };
   }
 
   componentDidMount() {
     this.unsubscribe = BuildHistoryStore.listen(this.onStatusChange.bind(this));
     BuildHistoryActions.loadBuildHistory(this.props.params);
+    this.buildTriggered = BuildHistoryStore.listen(this.onStatusChange.bind(this));
   }
 
   componentWillReceiveProps(nextprops) {
@@ -33,6 +36,10 @@ class ModuleContainer extends Component {
     this.setState(state);
   }
 
+  triggerBuild() {
+    BuildHistoryActions.triggerBuild(this.props.params.moduleId);
+  }
+
   render() {
     return (
       <PageContainer>
@@ -40,6 +47,8 @@ class ModuleContainer extends Component {
           params={this.props.params}
           buildHistory={this.state.buildHistory}
           loading={this.state.loading}
+          triggerBuild={this.triggerBuild.bind(this)}
+          buildTriggering={!this.state.buildTriggeringDone}
         />
       </PageContainer>
     );

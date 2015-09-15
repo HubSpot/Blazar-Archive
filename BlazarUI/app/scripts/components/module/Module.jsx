@@ -55,7 +55,7 @@ class Module extends Component {
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12} align='RIGHT'>
-            <BuildButton moduleId={this.props.params.moduleId} />
+            <BuildButton triggerBuild={this.props.triggerBuild} buildTriggering={this.props.buildTriggering} />
           </UIGridItem>
           <UIGridItem size={12}>
             <BuildHistoryTable
@@ -86,7 +86,9 @@ class Module extends Component {
 Module.propTypes = {
   loading: PropTypes.bool.isRequired,
   params: PropTypes.object.isRequired,
-  buildHistory: PropTypes.array.isRequired
+  buildHistory: PropTypes.array.isRequired,
+  triggerBuild: PropTypes.func.isRequired,
+  buildTriggering: PropTypes.bool
 };
 
 export default Module;

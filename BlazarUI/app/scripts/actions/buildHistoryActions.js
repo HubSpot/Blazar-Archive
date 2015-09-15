@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import ActionSettings from './utils/ActionSettings';
 import BuildHistory from '../collections/BuildHistory';
 import BranchDefinition from '../models/BranchDefinition';
+import BuildTrigger from '../models/BuildTrigger';
 import BranchModules from '../collections/BranchModules';
 import {find} from 'underscore';
 
@@ -14,7 +15,10 @@ const BuildHistoryActions = Reflux.createActions([
   'loadBuildHistorySuccess',
   'loadBuildHistoryError',
   'loadModulesBuildHistorySuccess',
-  'updatePollingStatus'
+  'updatePollingStatus',
+  'triggerBuildSuccess',
+  'triggerBuildError',
+  'triggerBuildStart'
 ]);
 
 let gitInfo;
@@ -53,6 +57,18 @@ BuildHistoryActions.loadModulesBuildHistory = (options) => {
 
 BuildHistoryActions.updatePollingStatus = (status) => {
   buildHistoryActionSettings.setPolling(status);
+};
+
+BuildHistoryActions.triggerBuild = function(moduleId) {
+  BuildHistoryActions.triggerBuildStart();
+  const trigger = new BuildTrigger(moduleId);
+  const promise = trigger.fetch();
+  promise.then(() => {
+    BuildHistoryActions.triggerBuildSuccess();
+  },
+  (data, textStatus, jqXHR) => {
+    BuildHistoryActions.triggerBuildError(jqXHR);
+  });
 };
 
 function buildHistoryPoller() {
