@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {Button} from 'react-bootstrap';
 import Icon from '../shared/Icon.jsx';
 import $ from 'jquery';
+import BuildsActions from '../../actions/buildsActions';
 
 class BuildButton extends Component {
 
@@ -14,10 +15,8 @@ class BuildButton extends Component {
     this.setState({
       loading: true
     });
-    $.ajax({
-      url: `${config.apiRoot}/build/module/${this.props.moduleId}`,
-      type: 'POST'
-    }).then(() => {
+
+    BuildsActions.triggerBuild(this.props.moduleId).then(() => {
       this.setState({
         loading: false,
         textStatus: ''

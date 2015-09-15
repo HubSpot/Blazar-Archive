@@ -2,6 +2,7 @@
 import Reflux from 'reflux';
 
 import Builds from '../collections/Builds';
+import BuildTrigger from '../models/BuildTrigger';
 
 const BuildsActions = Reflux.createActions([
   'loadBuilds',
@@ -32,6 +33,12 @@ BuildsActions.loadBuilds.preEmit = function() {
 
   })();
 
+};
+
+BuildsActions.triggerBuild = function(moduleId) {
+  const trigger = new BuildTrigger(moduleId);
+  const promise = trigger.fetch();
+  return promise;
 };
 
 export default BuildsActions;
