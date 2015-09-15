@@ -36,7 +36,7 @@ CREATE TABLE `builds` (
   `state` varchar(40) NOT NULL,
   `startTimestamp` bigint(20) unsigned,
   `endTimestamp` bigint(20) unsigned,
-  `commitInfo` mediumtext,
+  `commitInfo` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `sha` char(40),
   `log` varchar(2048),
   `buildConfig` mediumtext,
