@@ -17,9 +17,10 @@ public class Module {
   private final PathMatcher matcher;
   private final boolean active;
   private final long updatedTimestamp;
+  private final Optional<String> buildpack;
 
   public Module(String name, String path, String glob) {
-    this(Optional.<Integer>absent(), name, path, glob, true, System.currentTimeMillis());
+    this(Optional.<Integer>absent(), name, path, glob, true, System.currentTimeMillis(), Optional.<String>absent());
   }
 
   @JsonCreator
@@ -28,7 +29,8 @@ public class Module {
                 @JsonProperty("path") String path,
                 @JsonProperty("glob") String glob,
                 @JsonProperty("active") boolean active,
-                @JsonProperty("updatedTimestamp") long updatedTimestamp) {
+                @JsonProperty("updatedTimestamp") long updatedTimestamp,
+                @JsonProperty("buildpack") Optional<String> buildpack) {
     this.id = id;
     this.name = name;
     this.path = path;
@@ -36,6 +38,7 @@ public class Module {
     this.matcher = FileSystems.getDefault().getPathMatcher("glob:" + glob);
     this.active = active;
     this.updatedTimestamp = updatedTimestamp;
+    this.buildpack = buildpack;
   }
 
   public Optional<Integer> getId() {
@@ -67,7 +70,7 @@ public class Module {
   }
 
   public Module withId(int id) {
-    return new Module(Optional.of(id), name, path, glob, active, updatedTimestamp);
+    return new Module(Optional.of(id), name, path, glob, active, updatedTimestamp, buildpack);
   }
 
   @Override
