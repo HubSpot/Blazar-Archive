@@ -19,7 +19,7 @@ class PageHeader extends Component {
 
   handleScroll(event) {
     let position = event.target.scrollingElement.scrollTop;
-    if (position > 0) {
+    if (position > 10) {
       this.setState({
         headerClass: 'page-header-small'
       });
