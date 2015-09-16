@@ -12,11 +12,24 @@ import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
 import { BUILD_ICONS } from '../constants';
 import BuildCommits from './BuildCommits.jsx';
+import Button from 'react-bootstrap/lib/Button';
 
 class Build extends Component {
 
-  render() {
+  getAnchorButtons() {
+    return (
+      <div className="btn-group-vertical anchor-container" role="group">
+          <Button className="anchor-button" onClick={() => window.scrollTo(0, 0)} title="Go to top">
+            <Icon for="up"></Icon>
+          </Button>
+          <Button className="anchor-button" onClick={() => window.scrollTo(0, document.body.scrollHeight)} title="Go to bottom">
+            <Icon for="down"></Icon>
+          </Button>
+      </div>
+    );
+  }
 
+  render() {
     if (this.props.loading) {
       return (
         <SectionLoader />
@@ -31,6 +44,7 @@ class Build extends Component {
 
     return (
       <div>
+        {this.getAnchorButtons()}
         <PageHeader>
           <Breadcrumb
             appRoot={config.appRoot}
@@ -52,7 +66,7 @@ class Build extends Component {
             />
           </UIGridItem>
           <UIGridItem size={12}>
-            <BuildCommits 
+            <BuildCommits
               build={this.props.build}
               loading={this.props.loading}
             />

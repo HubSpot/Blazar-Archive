@@ -24,7 +24,9 @@ export const unicode = {
 export const ICON_LIST = {
   'module': 'fa fa-folder-o',
   'branch': 'octicon octicon-git-branch',
-  'repo': 'octicon octicon-repo'
+  'repo': 'octicon octicon-repo',
+  'down': 'fa fa-chevron-down',
+  'up': 'fa fa-chevron-up'
 };
 
 export const BUILD_ICONS = {
