@@ -25,12 +25,21 @@ body
   width: $layout-offset-md
   padding: 30px 0 0
   border-right 1px solid $gray
-  background-color $offwhite  
+  background-color $offwhite
   *
     user-select none
 
 .sidebar-inner
   margin-top: 105px
+
+.sidebar-collapsed
+  width 40px
+
+.sidebar-collapsed > .sidebar-inner
+  display none
+
+.sidebar-collapsed > .sidebar__collapse-button
+  left 18px
 
 .page-content
   position relative

@@ -4,12 +4,15 @@ import BuildsSidebarContainer from '../components/sidebar/BuildsSidebarContainer
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Input from 'react-bootstrap/lib/Input';
+import {bindAll} from 'underscore';
 
 class App extends Component {
 
   constructor() {
+    bindAll(this, 'collapseSidebar');
     this.state = {
-      showModal: (!window.config.apiRoot)
+      showModal: (!window.config.apiRoot),
+      sidebarCollapsed: false
     };
   }
 
@@ -52,12 +55,20 @@ class App extends Component {
     this.forceUpdate();
   }
 
+  collapseSidebar() {
+    this.setState({
+      sidebarCollapsed: !this.state.sidebarCollapsed
+    });
+  }
+
   render() {
     const modal = this.apiModal();
     return (
       <div>
         <div className="page-wrapper">
-          <BuildsSidebarContainer/>
+          <BuildsSidebarContainer
+            collapse={this.collapseSidebar}
+            isCollapsed={this.state.sidebarCollapsed} />
           <RouteHandler/>
         </div>
         {modal}

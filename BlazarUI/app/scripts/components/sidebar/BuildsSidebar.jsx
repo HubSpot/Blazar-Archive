@@ -45,7 +45,7 @@ class BuildsSidebar extends Component {
   }
 
   markStarredModules(modules) {
-    modules.map( (module) => {      
+    modules.map( (module) => {
       module.module.isStarred = false;
       this.props.stars.forEach( (star) => {
         if (star.moduleId === module.module.id) {
@@ -90,11 +90,11 @@ class BuildsSidebar extends Component {
     return modules.map( (module) => {
       if (has(module, 'module')){
         return (
-          <SidebarItem 
-            key={module.module.id} 
-            build={module} 
+          <SidebarItem
+            key={module.module.id}
+            build={module}
             isStarred={module.module.isStarred}
-            toggleStar={this.toggleStar} 
+            toggleStar={this.toggleStar}
             persistStarChange={this.props.persistStarChange} />
         )
       }
@@ -135,7 +135,7 @@ class BuildsSidebar extends Component {
           {message}
         </MutedMessage>
       )
-    } 
+    }
 
     const headerHeight = $('#primary-nav').height() + $('.sidebar__filter').height();
     const containerHeight = $(window).height() - headerHeight;

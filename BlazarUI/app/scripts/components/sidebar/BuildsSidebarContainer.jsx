@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component,PropTypes} from 'react';
 import {bindAll} from 'underscore';
 
 import BuildsSidebar from './BuildsSidebar.jsx';
@@ -15,7 +15,7 @@ class BuildsSidebarContainer extends Component {
 
   constructor(props) {
     super(props);
-    
+
     bindAll(this, 'persistStarChange');
 
     this.state = {
@@ -58,15 +58,21 @@ class BuildsSidebarContainer extends Component {
   render() {
     // BuildsNotifier.updateModules(this.state.builds.modules);
     return (
-      <Sidebar>
+      <Sidebar collapse={this.props.collapse} isCollapsed={this.props.isCollapsed}>
         <BuildsSidebar
           builds={this.state.builds}
           stars={this.state.stars}
-          loading={this.state.loading} 
+          loading={this.state.loading}
           persistStarChange={this.persistStarChange} />
       </Sidebar>
     );
   }
 }
+
+BuildsSidebarContainer.propTypes = {
+  collapse: PropTypes.func,
+  isCollapsed: PropTypes.bool
+};
+
 
 export default BuildsSidebarContainer;
