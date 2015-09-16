@@ -41,8 +41,7 @@ class Dashboard extends Component {
     return (
       <div>
         <PageHeader>
-          <br/>
-          <Headline>
+          <Headline className="headline-no-breadcrumbs">
             <Icon name="tachometer" classNames="headline-icon"></Icon>
             Dashboard
           </Headline>

@@ -4,7 +4,7 @@ class Headline extends Component{
 
   render() {
     return (
-      <h2 className='headline'>
+      <h2 className={`headline ${this.props.className}`}>
         {this.props.children}
       </h2>
     );
@@ -12,7 +12,8 @@ class Headline extends Component{
 }
 
 Headline.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
+  className: PropTypes.string
 };
 
 export default Headline;
