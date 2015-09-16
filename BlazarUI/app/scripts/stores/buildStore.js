@@ -6,9 +6,16 @@ const BuildStore = Reflux.createStore({
   init() {
     this.build = {};
 
+    this.buildTriggeringDone = true;
+    this.buildTriggeringError = '';
+
     this.listenTo(BuildActions.loadBuild, this.loadBuild);
     this.listenTo(BuildActions.loadBuildSuccess, this.loadBuildSuccess);
     this.listenTo(BuildActions.loadBuildError, this.loadBuildError);
+
+    this.listenTo(BuildActions.triggerBuildSuccess, this.triggerBuildSuccess);
+    this.listenTo(BuildActions.triggerBuildError, this.triggerBuildError);
+    this.listenTo(BuildActions.triggerBuildStart, this.triggerBuildStart);
   },
 
   loadBuild() {
@@ -30,6 +37,32 @@ const BuildStore = Reflux.createStore({
     this.trigger({
       error: error,
       loading: false
+    });
+  },
+
+  triggerBuildStart() {
+    this.buildTriggeringDone = false;
+
+    this.trigger({
+      buildTriggeringDone: false
+    });
+  },
+
+  triggerBuildSuccess() {
+    this.buildTriggeringDone = true;
+
+    this.trigger({
+      buildTriggeringDone: true
+    });
+  },
+
+  triggerBuildError(error) {
+    this.buildTriggeringDone = true;
+    this.buildTriggeringError = error;
+
+    this.trigger({
+      buildTriggeringDone: true,
+      buildTriggeringError: error
     });
   }
 

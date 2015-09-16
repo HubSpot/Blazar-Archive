@@ -2,12 +2,16 @@ import React, {Component, PropTypes} from 'react';
 import Module from './Module.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 import BuildHistoryStore from '../../stores/buildHistoryStore';
+import BuildStore from '../../stores/buildStore';
 import BuildHistoryActions from '../../actions/buildHistoryActions';
+import BuildActions from '../../actions/buildActions';
+import {bindAll} from 'underscore';
 
 class ModuleContainer extends Component {
 
   constructor(props) {
     super(props);
+    bindAll(this, 'triggerBuild', 'onStatusChange');
 
     this.state = {
       buildHistory: [],
@@ -18,9 +22,9 @@ class ModuleContainer extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = BuildHistoryStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribe = BuildHistoryStore.listen(this.onStatusChange);
     BuildHistoryActions.loadBuildHistory(this.props.params);
-    this.buildTriggered = BuildHistoryStore.listen(this.onStatusChange.bind(this));
+    this.buildTriggered = BuildStore.listen(this.onStatusChange);
   }
 
   componentWillReceiveProps(nextprops) {
@@ -37,7 +41,7 @@ class ModuleContainer extends Component {
   }
 
   triggerBuild() {
-    BuildHistoryActions.triggerBuild(this.props.params.moduleId);
+    BuildActions.triggerBuild(this.props.params.moduleId);
   }
 
   render() {
@@ -47,7 +51,7 @@ class ModuleContainer extends Component {
           params={this.props.params}
           buildHistory={this.state.buildHistory}
           loading={this.state.loading}
-          triggerBuild={this.triggerBuild.bind(this)}
+          triggerBuild={this.triggerBuild}
           buildTriggering={!this.state.buildTriggeringDone}
         />
       </PageContainer>

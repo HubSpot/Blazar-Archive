@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 
 import Build from '../models/Build';
 import Log from '../models/Log';
+import BuildTrigger from '../models/BuildTrigger';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
 import {find} from 'underscore';
@@ -18,7 +19,10 @@ const BuildActions = Reflux.createActions([
   'loadBuild',
   'loadBuildSuccess',
   'loadBuildError',
-  'reloadBuild'
+  'reloadBuild',
+  'triggerBuildSuccess',
+  'triggerBuildError',
+  'triggerBuildStart'
 ]);
 
 BuildActions.loadBuild.preEmit = function(data) {
@@ -27,6 +31,18 @@ BuildActions.loadBuild.preEmit = function(data) {
 
 BuildActions.reloadBuild = function(data) {
   fetchBuild(data);
+};
+
+BuildActions.triggerBuild = function(moduleId) {
+  BuildActions.triggerBuildStart();
+  const trigger = new BuildTrigger(moduleId);
+  const promise = trigger.fetch();
+  promise.then(() => {
+    BuildActions.triggerBuildSuccess();
+  },
+  (data, textStatus, jqXHR) => {
+    BuildActions.triggerBuildError(jqXHR);
+  });
 };
 
 function getModule() {
