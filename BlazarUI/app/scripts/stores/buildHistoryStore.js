@@ -7,7 +7,7 @@ const buildHistoryStore = Reflux.createStore({
     this.buildHistory = [];
     this.modulesBuildHistory = [];
 
-    this.buildTriggeringDone = false;
+    this.buildTriggeringDone = true;
     this.buildTriggeringError = '';
 
     this.listenTo(BuildHistoryActions.loadBuildHistory, this.loadBuildHistory);
@@ -21,6 +21,8 @@ const buildHistoryStore = Reflux.createStore({
   },
 
   loadBuildHistory() {
+    this.buildTriggeringDone = false;
+
     this.trigger({
       loading: true
     });
@@ -68,12 +70,17 @@ const buildHistoryStore = Reflux.createStore({
   },
 
   triggerBuildSuccess() {
+    this.buildTriggeringDone = true;
+
     this.trigger({
       buildTriggeringDone: true
     });
   },
 
   triggerBuildError(error) {
+    this.buildTriggeringDone = true;
+    this.buildTriggeringError = error;
+
     this.trigger({
       buildTriggeringDone: true,
       buildTriggeringError: error
