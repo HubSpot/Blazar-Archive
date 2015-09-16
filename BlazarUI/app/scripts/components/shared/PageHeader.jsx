@@ -1,23 +1,38 @@
 import React, {Component, PropTypes} from 'react';
-import $ from 'jquery';
 
 class PageHeader extends Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      headerClass: ''
+    };
+  }
+
   componentDidMount() {
-    $(document).scroll(function(){
-      if ($(this).scrollTop() > 0){
-        // animate fixed div to small size:
-        $('.page-header').stop().animate({ height: 47 }, 50, 'linear');
-      } else {
-        //  animate fixed div to original size
-        $('.page-header').stop().animate({ height: 94 }, 50, 'linear');
-      }
-    });
+    window.onscroll = this.handleScroll.bind(this);
+  }
+
+  componentWillUnmount() {
+    window.onscroll = null;
+  }
+
+  handleScroll(event) {
+    let position = event.target.scrollingElement.scrollTop;
+    if (position > 0) {
+      this.setState({
+        headerClass: 'page-header-small'
+      });
+    } else {
+      this.setState({
+        headerClass: ''
+      });
+    }
   }
 
   render() {
     return (
-      <div className='page-header'>
+      <div className={`page-header ${this.state.headerClass}`}>
         {this.props.children}
       </div>
     );
