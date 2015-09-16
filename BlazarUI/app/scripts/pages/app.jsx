@@ -12,7 +12,7 @@ class App extends Component {
     bindAll(this, 'collapseSidebar');
     this.state = {
       showModal: (!window.config.apiRoot),
-      sidebarCollapsed: false
+      sidebarCollapsed: localStorage.sidebarCollapsed === 'true' ? true : false
     };
   }
 
@@ -56,6 +56,7 @@ class App extends Component {
   }
 
   collapseSidebar() {
+    localStorage.setItem('sidebarCollapsed', !this.state.sidebarCollapsed);
     this.setState({
       sidebarCollapsed: !this.state.sidebarCollapsed
     });
