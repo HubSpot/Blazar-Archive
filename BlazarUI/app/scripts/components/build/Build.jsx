@@ -16,7 +16,7 @@ import Button from 'react-bootstrap/lib/Button';
 
 class Build extends Component {
 
-  getAnchorButtons() {
+  renderAnchorButtons() {
     return (
       <div className="btn-group-vertical anchor-container" role="group">
           <Button className="anchor-button" onClick={() => window.scrollTo(0, 0)} title="Go to top">
@@ -44,7 +44,7 @@ class Build extends Component {
 
     return (
       <div>
-        {this.getAnchorButtons()}
+        {this.renderAnchorButtons()}
         <PageHeader>
           <Breadcrumb
             appRoot={config.appRoot}
