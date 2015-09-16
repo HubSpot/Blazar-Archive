@@ -9,6 +9,7 @@ import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
 
 import Sidebar from './Sidebar.jsx';
+import SidebarLogo from './SidebarLogo.jsx';
 // import BuildsNotifier from '../BuildsNotifier';
 
 class BuildsSidebarContainer extends Component {
@@ -56,15 +57,22 @@ class BuildsSidebarContainer extends Component {
   }
 
   render() {
+    let miniLogo;
+    if (this.props.isCollapsed) {
+      miniLogo = <SidebarLogo mini={true} />
+    }
     // BuildsNotifier.updateModules(this.state.builds.modules);
     return (
-      <Sidebar collapse={this.props.collapse} isCollapsed={this.props.isCollapsed}>
-        <BuildsSidebar
-          builds={this.state.builds}
-          stars={this.state.stars}
-          loading={this.state.loading}
-          persistStarChange={this.persistStarChange} />
-      </Sidebar>
+      <div>
+        {miniLogo}
+        <Sidebar collapse={this.props.collapse} isCollapsed={this.props.isCollapsed}>
+          <BuildsSidebar
+            builds={this.state.builds}
+            stars={this.state.stars}
+            loading={this.state.loading}
+            persistStarChange={this.persistStarChange} />
+        </Sidebar>
+      </div>
     );
   }
 }
