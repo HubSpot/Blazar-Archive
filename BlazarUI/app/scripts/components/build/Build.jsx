@@ -13,16 +13,17 @@ import Icon from '../shared/Icon.jsx';
 import { BUILD_ICONS } from '../constants';
 import BuildCommits from './BuildCommits.jsx';
 import Button from 'react-bootstrap/lib/Button';
+import Helpers from '../ComponentHelpers';
 
 class Build extends Component {
 
   renderAnchorButtons() {
     return (
       <div className="btn-group-vertical anchor-container" role="group">
-          <Button className="anchor-button" onClick={() => window.scrollTo(0, 0)} title="Go to top">
+          <Button className="anchor-button" onClick={Helpers.scrollToTop} title="Go to top">
             <Icon for="up"></Icon>
           </Button>
-          <Button className="anchor-button" onClick={() => window.scrollTo(0, document.body.scrollHeight)} title="Go to bottom">
+          <Button className="anchor-button" onClick={Helpers.scrollToBottom} title="Go to bottom">
             <Icon for="down"></Icon>
           </Button>
       </div>
