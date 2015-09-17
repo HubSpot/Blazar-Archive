@@ -16,7 +16,7 @@ class App extends Component {
     };
   }
 
-  apiModal() {
+  renderApiModal() {
     return (
       <Modal show={this.state.showModal} onHide={this.close.bind(this)}>
         <Modal.Header closeButton>
@@ -46,13 +46,15 @@ class App extends Component {
   }
 
   open() {
-    this.state.showModal = true;
-    this.forceUpdate();
+    this.setState({
+      showModal: true
+    });
   }
 
   close() {
-    this.state.showModal = false;
-    this.forceUpdate();
+    this.setState({
+      showModal: false
+    });
   }
 
   collapseSidebar() {
@@ -71,7 +73,7 @@ class App extends Component {
             isCollapsed={this.state.sidebarCollapsed} />
           <RouteHandler/>
         </div>
-        {this.apiModal()}
+        {this.renderApiModal()}
       </div>
     );
   }
