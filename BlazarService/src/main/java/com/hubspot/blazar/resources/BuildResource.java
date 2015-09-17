@@ -117,8 +117,8 @@ public class BuildResource {
     HttpResponse response = asyncHttpClient.execute(request).get();
     if (response.isSuccess()) {
       return response.getAs(LogChunk.class).withNextOffset(offset + length);
-    } else if (response.getStatusCode() == 404 && url.endsWith("/service.log")) {
-      return getLog(url.replace("/service.log", "/tail_of_finished_service.log"), offset, length);
+    } else if (response.getStatusCode() == 404 && url.endsWith("/tail_of_finished_service.log")) {
+      return getLog(url.replace("/tail_of_finished_service.log", "/service.log"), offset, length);
     } else if (response.getStatusCode() == 404) {
       throw new NotFoundException("No build log found at URL " + url);
     } else {
