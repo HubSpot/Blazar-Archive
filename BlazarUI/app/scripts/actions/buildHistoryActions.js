@@ -55,6 +55,7 @@ BuildHistoryActions.updatePollingStatus = (status) => {
   buildHistoryActionSettings.setPolling(status);
 };
 
+
 function buildHistoryPoller() {
 
   (function pollBuildHistory() {
