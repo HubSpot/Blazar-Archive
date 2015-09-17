@@ -11,8 +11,8 @@ class App extends Component {
   constructor() {
     bindAll(this, 'collapseSidebar');
     this.state = {
-      showModal: (!window.config.apiRoot),
-      sidebarCollapsed: localStorage.sidebarCollapsed === 'true' ? true : false
+      showModal: !window.config.apiRoot,
+      sidebarCollapsed: localStorage.sidebarCollapsed === 'true'
     };
   }
 
@@ -63,7 +63,6 @@ class App extends Component {
   }
 
   render() {
-    const modal = this.apiModal();
     return (
       <div>
         <div className="page-wrapper">
@@ -72,7 +71,7 @@ class App extends Component {
             isCollapsed={this.state.sidebarCollapsed} />
           <RouteHandler/>
         </div>
-        {modal}
+        {this.apiModal()}
       </div>
     );
   }
