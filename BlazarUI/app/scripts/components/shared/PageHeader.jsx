@@ -12,7 +12,7 @@ class PageHeader extends Component {
   }
 
   componentDidMount() {
-    window.onscroll = this.handleScroll.bind(this);
+    window.onscroll = this.handleScroll;
   }
 
   componentWillUnmount() {
