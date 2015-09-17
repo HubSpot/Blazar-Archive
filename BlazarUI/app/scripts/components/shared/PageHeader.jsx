@@ -5,7 +5,8 @@ class PageHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      headerClass: ''
+      headerClass: '',
+      isSmall: false
     };
   }
 
@@ -19,13 +20,15 @@ class PageHeader extends Component {
 
   handleScroll(event) {
     let position = window.pageYOffset;
-    if (position > 10) {
+    if (position > 10 && !this.state.isSmall) {
       this.setState({
-        headerClass: 'page-header-small'
+        headerClass: 'page-header-small',
+        isSmall: true
       });
-    } else {
+    } else if (position < 10 && this.state.isSmall) {
       this.setState({
-        headerClass: ''
+        headerClass: '',
+        isSmall: false
       });
     }
   }
