@@ -32,10 +32,15 @@ const SIZE_CLASSES = {
   12: 'col-sm-12'
 };
 
+const ALIGN_CLASSES = {
+  LEFT: 'text-left',
+  RIGHT: 'text-right'
+};
+
 class UIGridItem extends Component {
 
   getClassName() {
-    return `${SIZE_CLASSES[this.props.size]} ${OFFSET_CLASSES[this.props.offset]} ${this.props.className}`;
+    return `${SIZE_CLASSES[this.props.size]} ${OFFSET_CLASSES[this.props.offset]} ${ALIGN_CLASSES[this.props.align]} ${this.props.className}`;
   }
 
   render() {

@@ -26,7 +26,8 @@ export const ICON_LIST = {
   'branch': 'octicon octicon-git-branch',
   'repo': 'octicon octicon-repo',
   'down': 'fa fa-chevron-down',
-  'up': 'fa fa-chevron-up'
+  'up': 'fa fa-chevron-up',
+  'spinner': 'fa fa-circle-o-notch fa-spin'
 };
 
 export const BUILD_ICONS = {

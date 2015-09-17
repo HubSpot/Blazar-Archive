@@ -20,7 +20,7 @@ body
 
 .sidebar
   position fixed
-  overflow scroll
+  overflow hidden
   top 0
   width: $layout-offset-md
   padding: 30px 0 0
@@ -42,13 +42,18 @@ body
   position fixed
   z-index 2
   width "calc(100% - %s)" % $layout-offset-md
+  height 94px
   top 0
   left $layout-offset-md
   margin 0
   padding 10px 30px 2px 30px
-  min-height 94px
   border-bottom 1px solid $gray
   background-color $offwhite
+  overflow hidden
+  transition: height 0.3s;
+
+.page-header-small
+  height 47px
 
 .page-section
   background #fff
