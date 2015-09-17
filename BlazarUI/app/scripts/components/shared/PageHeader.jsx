@@ -1,11 +1,12 @@
 import React, {Component, PropTypes} from 'react';
+import {bindAll} from 'underscore';
 
 class PageHeader extends Component {
 
   constructor(props) {
     super(props);
+    bindAll(this, 'handleScroll', 'headerClassForState');
     this.state = {
-      headerClass: '',
       isSmall: false
     };
   }
@@ -22,20 +23,22 @@ class PageHeader extends Component {
     let position = window.pageYOffset;
     if (position > 10 && !this.state.isSmall) {
       this.setState({
-        headerClass: 'page-header-small',
         isSmall: true
       });
     } else if (position < 10 && this.state.isSmall) {
       this.setState({
-        headerClass: '',
         isSmall: false
       });
     }
   }
 
+  headerClassForState() {
+    return this.state.isSmall ? 'page-header-small' : '';
+  }
+
   render() {
     return (
-      <div className={`page-header ${this.state.headerClass}`}>
+      <div className={`page-header ${this.headerClassForState()}`}>
         {this.props.children}
       </div>
     );
