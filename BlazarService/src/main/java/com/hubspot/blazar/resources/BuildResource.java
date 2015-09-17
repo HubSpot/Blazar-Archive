@@ -84,20 +84,7 @@ public class BuildResource {
       throw new NotFoundException("No build log URL found for ID " + id);
     }
 
-    HttpRequest request = HttpRequest.newBuilder()
-        .setUrl(replaceHost(logUrl.get()))
-        .addHeader("X-HubSpot-User", "jhaber")
-        .setQueryParam("offset").to(offset)
-        .setQueryParam("length").to(length)
-        .build();
-
-    HttpResponse response = asyncHttpClient.execute(request).get();
-    if (response.isSuccess()) {
-      return response.getAs(LogChunk.class).withNextOffset(offset + length);
-    } else {
-      String message = String.format("Error hitting Singularity, status code %d, response %s", response.getStatusCode(), response.getAsString());
-      throw new WebApplicationException(Response.serverError().entity(message).type(MediaType.TEXT_PLAIN_TYPE).build());
-    }
+    return getLog(replaceHost(logUrl.get()), offset, length);
   }
 
   @POST
@@ -117,6 +104,27 @@ public class BuildResource {
   public ModuleBuild update(ModuleBuild moduleBuild) {
     buildService.update(moduleBuild.getBuild());
     return moduleBuild;
+  }
+
+  private LogChunk getLog(String url, long offset, long length) throws Exception {
+    HttpRequest request = HttpRequest.newBuilder()
+        .setUrl(url)
+        .addHeader("X-HubSpot-User", "jhaber")
+        .setQueryParam("offset").to(offset)
+        .setQueryParam("length").to(length)
+        .build();
+
+    HttpResponse response = asyncHttpClient.execute(request).get();
+    if (response.isSuccess()) {
+      return response.getAs(LogChunk.class).withNextOffset(offset + length);
+    } else if (response.getStatusCode() == 404 && url.endsWith("/tail_of_finished_service.log")) {
+      return getLog(url.replace("/tail_of_finished_service.log", "/service.log"), offset, length);
+    } else if (response.getStatusCode() == 404) {
+      throw new NotFoundException("No build log found at URL " + url);
+    } else {
+      String message = String.format("Error hitting Singularity, status code %d, response %s", response.getStatusCode(), response.getAsString());
+      throw new WebApplicationException(Response.serverError().entity(message).type(MediaType.TEXT_PLAIN_TYPE).build());
+    }
   }
 
   private static String replaceHost(String url) {

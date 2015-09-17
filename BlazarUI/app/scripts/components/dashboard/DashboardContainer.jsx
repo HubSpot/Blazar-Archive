@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {contains, pluck, isEqual} from 'underscore';
 import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
@@ -17,13 +18,16 @@ class DashboardContainer extends Component {
     super(props);
 
     this.state = {
-      builds: {},
+      builds: [],
       stars: [], 
       modulesBuildHistory: [],
       loadingModulesBuildHistory: true,
       loadingStars: true,
       loading: true
     };
+
+    this.starsHistory = [];
+    this.starsHistoryChanged = false;
   }
 
   componentDidMount() {
@@ -41,8 +45,32 @@ class DashboardContainer extends Component {
     this.unsubscribeFromBuildHistory();
   }
 
+  // check if star history has changed so we
+  // can fetch the updated history
+  checkStarHistory() {
+    if (this.state.stars.length === 0) {
+      return;
+    }
+
+    const starIds = pluck(this.state.stars, 'moduleId');
+    const starredBuilds = this.state.builds.filter((build) => {
+      return contains(starIds, build.module.id);
+    });
+    
+    this.starsHistoryChanged = !isEqual(this.starsHistory, starredBuilds)
+    this.starsHistory = starredBuilds;
+
+    if (this.starsHistoryChanged) {
+      BuildHistoryActions.loadModulesBuildHistory({
+        modules: this.state.stars,
+        limit: 3
+      });
+    }
+  }
+
   onStatusChange(state) {
     this.setState(state);
+    this.checkStarHistory();
 
     const noHistoryToFetch = state.stars && state.stars.length === 0;
     const haveHistory = !this.state.loadingModulesBuildHistory && !this.state.loadingStars;
