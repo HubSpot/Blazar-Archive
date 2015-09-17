@@ -25,18 +25,38 @@ body
   width: $layout-offset-md
   padding: 30px 0 0
   border-right 1px solid $gray
-  background-color $offwhite  
+  background-color $offwhite
+  transition: all 0.1s
   *
     user-select none
 
 .sidebar-inner
   margin-top: 105px
 
+.sidebar-collapsed
+  width 50px
+
+.sidebar-collapsed > .sidebar-inner
+  display none
+
+.sidebar-collapsed > .sidebar__collapse-button
+  left 28px
+  top 72px
+
 .page-content
   position relative
   width "calc(100% - %s)" % $layout-offset-md
   margin-left $layout-offset-md
   padding 100px 10px 10px
+  transition: all 0.1s
+
+.page-content.expanded
+  width calc(100% - 50px)
+  margin-left 50px
+
+.page-content.expanded div.page-header
+  left 50px
+  width 100%
 
 .page-header
   position fixed
@@ -49,6 +69,7 @@ body
   min-height 94px
   border-bottom 1px solid $gray
   background-color $offwhite
+  transition: all 0.1s
 
 .page-section
   background #fff

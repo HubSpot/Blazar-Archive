@@ -4,17 +4,27 @@ import Image from '../shared/Image.jsx';
 
 class SidebarLogo extends Component {
 
+  renderImage() {
+    if (this.props.mini) {
+      return <Image classNames="sidebar__logo-image" src={`${window.config.staticRoot}/images/icon.png`} width={35} height={35} />;
+    } else {
+      return <Image classNames="sidebar__logo-image" src={`${window.config.staticRoot}/images/blazar-logo.png`} />;
+    }
+  }
+
   render() {
-    const imgPath = `${window.config.staticRoot}/images/blazar-logo.png`;
     return (
       <div className="sidebar__logo">
         <Link to="dashboard">
-          <Image classNames="sidebar__logo-image" src={imgPath} />
+          {this.renderImage()}
         </Link>
       </div>
     );
   }
-
 }
+
+SidebarLogo.propTypes = {
+  mini: PropTypes.bool
+};
 
 export default SidebarLogo;

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component,PropTypes} from 'react';
 import {bindAll} from 'underscore';
 
 import BuildsSidebar from './BuildsSidebar.jsx';
@@ -9,13 +9,14 @@ import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
 
 import Sidebar from './Sidebar.jsx';
+import SidebarLogo from './SidebarLogo.jsx';
 // import BuildsNotifier from '../BuildsNotifier';
 
 class BuildsSidebarContainer extends Component {
 
   constructor(props) {
     super(props);
-    
+
     bindAll(this, 'persistStarChange');
 
     this.state = {
@@ -55,18 +56,35 @@ class BuildsSidebarContainer extends Component {
     StarActions.toggleStar(isStarred, starInfo);
   }
 
+  renderMiniLogo() {
+    if (this.props.isCollapsed) {
+      return (
+        <SidebarLogo mini={true} />
+      );
+    }
+  }
+
   render() {
     // BuildsNotifier.updateModules(this.state.builds.modules);
     return (
-      <Sidebar>
-        <BuildsSidebar
-          builds={this.state.builds}
-          stars={this.state.stars}
-          loading={this.state.loading} 
-          persistStarChange={this.persistStarChange} />
-      </Sidebar>
+      <div>
+        {this.renderMiniLogo()}
+        <Sidebar collapse={this.props.collapse} isCollapsed={this.props.isCollapsed}>
+          <BuildsSidebar
+            builds={this.state.builds}
+            stars={this.state.stars}
+            loading={this.state.loading}
+            persistStarChange={this.persistStarChange} />
+        </Sidebar>
+      </div>
     );
   }
 }
+
+BuildsSidebarContainer.propTypes = {
+  collapse: PropTypes.func,
+  isCollapsed: PropTypes.bool
+};
+
 
 export default BuildsSidebarContainer;

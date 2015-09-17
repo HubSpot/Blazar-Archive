@@ -4,16 +4,19 @@ import BuildsSidebarContainer from '../components/sidebar/BuildsSidebarContainer
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Input from 'react-bootstrap/lib/Input';
+import {bindAll} from 'underscore';
 
 class App extends Component {
 
   constructor() {
+    bindAll(this, 'collapseSidebar');
     this.state = {
-      showModal: (!window.config.apiRoot)
+      showModal: !window.config.apiRoot,
+      sidebarCollapsed: localStorage.sidebarCollapsed === 'true'
     };
   }
 
-  apiModal() {
+  renderApiModal() {
     return (
       <Modal show={this.state.showModal} onHide={this.close.bind(this)}>
         <Modal.Header closeButton>
@@ -43,24 +46,34 @@ class App extends Component {
   }
 
   open() {
-    this.state.showModal = true;
-    this.forceUpdate();
+    this.setState({
+      showModal: true
+    });
   }
 
   close() {
-    this.state.showModal = false;
-    this.forceUpdate();
+    this.setState({
+      showModal: false
+    });
+  }
+
+  collapseSidebar() {
+    localStorage.setItem('sidebarCollapsed', !this.state.sidebarCollapsed);
+    this.setState({
+      sidebarCollapsed: !this.state.sidebarCollapsed
+    });
   }
 
   render() {
-    const modal = this.apiModal();
     return (
       <div>
         <div className="page-wrapper">
-          <BuildsSidebarContainer/>
+          <BuildsSidebarContainer
+            collapse={this.collapseSidebar}
+            isCollapsed={this.state.sidebarCollapsed} />
           <RouteHandler/>
         </div>
-        {modal}
+        {this.renderApiModal()}
       </div>
     );
   }

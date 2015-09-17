@@ -10,7 +10,8 @@ class PageContainer extends Component {
   getClassNames() {
     return classnames([
        'page-content',
-       this.props.classNames
+       this.props.classNames,
+       localStorage.getItem('sidebarCollapsed') === 'true' ? 'expanded' : ''
     ]);
   }
 
