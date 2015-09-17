@@ -56,15 +56,19 @@ class BuildsSidebarContainer extends Component {
     StarActions.toggleStar(isStarred, starInfo);
   }
 
-  render() {
-    let miniLogo;
+  renderMiniLogo() {
     if (this.props.isCollapsed) {
-      miniLogo = <SidebarLogo mini={true} />
+      return (
+        <SidebarLogo mini={true} />
+      );
     }
+  }
+
+  render() {
     // BuildsNotifier.updateModules(this.state.builds.modules);
     return (
       <div>
-        {miniLogo}
+        {this.renderMiniLogo()}
         <Sidebar collapse={this.props.collapse} isCollapsed={this.props.isCollapsed}>
           <BuildsSidebar
             builds={this.state.builds}

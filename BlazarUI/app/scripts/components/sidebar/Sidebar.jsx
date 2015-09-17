@@ -4,24 +4,30 @@ import Icon from '../shared/Icon.jsx';
 
 class Sidebar extends Component {
 
-  render() {
-    const collapseButton = (
+  renderCollapseButton() {
+    return (
       <Button className="sidebar__collapse-button" onClick={this.props.collapse}>
         <Icon for={this.props.isCollapsed ? 'right' : 'left'}></Icon>
       </Button>
     );
+  }
 
-    const sidebarClasses = this.props.isCollapsed ? 'sidebar-collapsed' : '';
-
-    let headline;
+  renderHeadline() {
     if (this.props.headline) {
-      headline = <h2 className='sidebar__headline'>{this.props.headline}</h2>;
+      return <h2 className='sidebar__headline'>{this.props.headline}</h2>;
     }
+  }
+
+  getSidebarClasses() {
+    return this.props.isCollapsed ? 'sidebar-collapsed' : '';
+  }
+
+  render() {
     return (
-      <div className={`sidebar ${sidebarClasses}`}>
-        {collapseButton}
+      <div className={`sidebar ${this.getSidebarClasses()}`}>
+        {this.renderCollapseButton()}
         <div className='sidebar-inner'>
-          {headline}
+          {this.renderHeadline()}
           {this.props.children}
         </div>
       </div>
