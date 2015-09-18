@@ -35,7 +35,6 @@ class DashboardContainer extends Component {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
     this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange.bind(this));
 
-    BuildsActions.loadBuilds();
     StarActions.loadStars();
   }
 
