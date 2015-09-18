@@ -38,7 +38,7 @@ export const truncate = function(str, len = 10, ellip=false) {
 };
 
 export const githubShaLink = function(info) {
-  return `https://github.com/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
+  return `https://${info.gitInfo.host}/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
 };
 
 export const events = {
