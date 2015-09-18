@@ -7,7 +7,7 @@ import BuildsStore from '../stores/buildsStore';
 
 const repoActionSettings = new ActionSettings;
 
-const BranchActions = Reflux.createActions([
+const RepoActions = Reflux.createActions([
   'loadBranches',
   'loadBranchesSuccess',
   'loadBranchesError',
@@ -15,22 +15,24 @@ const BranchActions = Reflux.createActions([
 ]);
 
 
-BranchActions.loadBranches.preEmit = function(params) {
+RepoActions.loadBranches.preEmit = function(params) {
   startPolling(params);
 };
 
-BranchActions.updatePollingStatus = function(status) {
+RepoActions.updatePollingStatus = function(status) {
   repoActionSettings.setPolling(status);
 };
 
 function startPolling(params) {
+
+  console.log('poll!');
 
   (function doPoll() {
     const builds = new Builds();
     builds.set(BuildsStore.getBuilds());
 
     const branches = builds.getBranchesByRepo(params);
-    BranchActions.loadBranchesSuccess(branches);
+    RepoActions.loadBranchesSuccess(branches);
 
     if (repoActionSettings.polling) {
       setTimeout(doPoll, config.buildsRefresh);
@@ -41,4 +43,4 @@ function startPolling(params) {
 
 }
 
-export default BranchActions;
+export default RepoActions;
