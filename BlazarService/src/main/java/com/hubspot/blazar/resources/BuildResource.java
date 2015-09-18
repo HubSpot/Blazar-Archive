@@ -1,7 +1,5 @@
 package com.hubspot.blazar.resources;
 
-import java.util.Set;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -52,15 +50,19 @@ public class BuildResource {
   @GET
   @Path("/definitions")
   @PropertyFiltering
-  public Set<BuildDefinition> getAllBuildDefinitions(@QueryParam("since") @DefaultValue("0") long since) {
-    return buildDefinitionService.getAllBuildDefinitions(since);
+  public Response getAllBuildDefinitions(@QueryParam("since") @DefaultValue("0") long since) {
+    return Response.ok(buildDefinitionService.getAllBuildDefinitions(since), MediaType.APPLICATION_JSON_TYPE)
+        .header("Offset", System.currentTimeMillis() - 5000)
+        .build();
   }
 
   @GET
   @Path("/states")
   @PropertyFiltering
-  public Set<BuildState> getAllBuildStates(@QueryParam("since") @DefaultValue("0") long since) {
-    return buildStateService.getAllBuildStates(since);
+  public Response getAllBuildStates(@QueryParam("since") @DefaultValue("0") long since) {
+    return Response.ok(buildStateService.getAllBuildStates(since), MediaType.APPLICATION_JSON_TYPE)
+        .header("Offset", System.currentTimeMillis() - 5000)
+        .build();
   }
 
   @GET
