@@ -13,8 +13,15 @@ const BranchActions = Reflux.createActions([
   'updatePollingStatus'
 ]);
 
-function startPolling(params) {
+BranchActions.loadModules.preEmit = function(data) {
+  startPolling(data);
+};
 
+BranchActions.updatePollingStatus = function(status) {
+  BranchActionSettings.setPolling(status);
+};
+
+function startPolling(params) {
   (function doPoll() {
     const builds = new Builds();
     builds.set(BuildsStore.getBuilds());
@@ -28,13 +35,5 @@ function startPolling(params) {
   })();
 
 }
-
-BranchActions.loadModules.preEmit = function(data) {
-  startPolling(data);
-};
-
-BranchActions.updatePollingStatus = function(status) {
-  BranchActionSettings.setPolling(status);
-};
 
 export default BranchActions;

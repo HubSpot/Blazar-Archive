@@ -2,6 +2,7 @@
 import Reflux from 'reflux';
 import ActionSettings from './utils/ActionSettings';
 import Builds from '../collections/Builds';
+import BuildsStore from '../stores/buildsStore';
 
 const orgActionSettings = new ActionSettings;
 
@@ -20,30 +21,18 @@ OrgActions.updatePollingStatus = function(status) {
   orgActionSettings.setPolling(status);
 };
 
-
-function startPolling(data) {
-
+function startPolling(params) {
   (function doPoll() {
-    const builds = new Builds(data);
-    const promise = builds.fetch();
+    const builds = new Builds();
+    builds.set(BuildsStore.getBuilds());
 
-    promise.done( () => {
-      const repos = builds.getReposByOrg(data);
-      OrgActions.loadReposSuccess(repos);
-    });
+    const repos = builds.getReposByOrg(params);
+    OrgActions.loadReposSuccess(repos);
 
-    promise.error( () => {
-      OrgActions.loadReposError('an error occured');
-    });
-
-    promise.always( () => {
-      if (orgActionSettings.polling) {
-        setTimeout(doPoll, config.buildsRefresh);
-      }
-    });
-
+    if (orgActionSettings.polling) {
+      setTimeout(doPoll, config.buildsRefresh);
+    }
   })();
-
 }
 
 
