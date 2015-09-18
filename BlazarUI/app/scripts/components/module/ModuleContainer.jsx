@@ -22,9 +22,10 @@ class ModuleContainer extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = BuildHistoryStore.listen(this.onStatusChange);
-    BuildHistoryActions.loadBuildHistory(this.props.params);
-    this.buildTriggered = BuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
+    this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
+
+    BuildHistoryActions.loadBuildHistory(this.props.params);    
   }
 
   componentWillReceiveProps(nextprops) {
@@ -33,7 +34,8 @@ class ModuleContainer extends Component {
 
   componentWillUnmount() {
     BuildHistoryActions.updatePollingStatus(false);
-    this.unsubscribe();
+    this.unsubscribeFromBuildHistory();
+    this.unsubscribeFromBuild();
   }
 
   onStatusChange(state) {
