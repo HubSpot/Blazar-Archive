@@ -17,16 +17,29 @@ class Builds extends BaseCollection {
   getReposByOrg(orgInfo) {
     const builds = this.hasBuildState();
     const orgBuilds = builds.filter((build) => {
-      return build.gitInfo.organization === orgInfo.org;
+      return (build.gitInfo.organization === orgInfo.org) && (build.gitInfo.host === orgInfo.host);
     });
 
     const repos = uniq(orgBuilds.map((build) => {
-      let latestBuild = (build.inProgressBuild ? build.inProgressBuild : build.lastBuild ? build.lastBuild : build.pendingBuild);
-      latestBuild.module = build.module.name;
-      latestBuild.branch = build.gitInfo.branch;
+      const {
+        gitInfo,
+        lastBuild,
+        module,
+        inProgressBuild,
+        pendingBuild
+      } = build;
+
+      let latestBuild = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
+      latestBuild.module = module.name;
+      latestBuild.branch = gitInfo.branch;
+
+      const repoBlazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
       const repo = {
-        repo: build.gitInfo.repository,
-        latestBuild: latestBuild
+        repo: gitInfo.repository,
+        latestBuild: latestBuild,
+        blazarPath: {
+          repoBlazarPath: repoBlazarPath
+        }
       };
       return repo;
     }), false, function(r) {

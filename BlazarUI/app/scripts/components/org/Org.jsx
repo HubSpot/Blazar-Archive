@@ -39,7 +39,7 @@ class org extends Component {
             <ReposTable
               repos={this.props.repos}
               org={this.props.params.org}
-              host={this.props.params.url}
+              host={this.props.params.host}
             />
           </UIGridItem>
         </UIGrid>
