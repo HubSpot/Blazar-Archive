@@ -2,6 +2,7 @@
 import Reflux from 'reflux';
 import ActionSettings from './utils/ActionSettings';
 import Builds from '../collections/Builds';
+import BuildsStore from '../stores/buildsStore';
 
 const BranchActionSettings = new ActionSettings;
 
@@ -12,35 +13,21 @@ const BranchActions = Reflux.createActions([
   'updatePollingStatus'
 ]);
 
-function startPolling(data) {
+function startPolling(params) {
 
-
-  // TO DO:
-  // DONT FETCH BUILDS HERE, USE BUILD STORE'S CACHE
   (function doPoll() {
     const builds = new Builds();
-    const promise = builds.fetch();
+    builds.set(BuildsStore.getBuilds());
 
-    promise.done( () => {
-      const branch = builds.getBranchModules(data);
-      BranchActions.loadModulesSuccess(branch.modules || []);
-    });
+    const branch = builds.getBranchModules(params);
+    BranchActions.loadModulesSuccess(branch.modules || []);
 
-    promise.error( () => {
-      console.warn('Error connecting to the API. Check that you are connected to the VPN.');
-      BranchActions.loadModulesError('error');
-    });
-
-    promise.always( () => {
-      if (BranchActionSettings.polling) {
-        setTimeout(doPoll, config.buildsRefresh);
-      }
-    });
-
+    if (BranchActionSettings.polling) {
+      setTimeout(doPoll, config.buildsRefresh);
+    }
   })();
 
 }
-
 
 BranchActions.loadModules.preEmit = function(data) {
   startPolling(data);

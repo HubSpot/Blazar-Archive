@@ -3,19 +3,29 @@ import Branch from './Branch.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
+import BuildsStore from '../../stores/buildsStore';
+
 
 class BranchContainer extends Component {
 
   constructor() {
     this.state = {
       modules: [],
+      loadingBuilds: true,
+      loadingBranchModules: false,
       loading: true
     };
   }
 
   componentDidMount() {
-    this.unsubscribe = BranchStore.listen(this.onStatusChange.bind(this));
-    BranchActions.loadModules(this.props.params);
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange.bind(this));
+    
+    // check if we already have builds in the store
+    if (BuildsStore.buildsHaveLoaded) {
+      BranchActions.loadModules(this.props.params);
+    }
+
   }
 
   componentWillReceiveProps(nextprops) {
@@ -24,11 +34,18 @@ class BranchContainer extends Component {
 
   componentWillUnmount() {
     BranchActions.updatePollingStatus(false);
-    this.unsubscribe();
+    this.unsubscribeFromBranch();
+    this.unsubscribeFromBuilds();
   }
 
   onStatusChange(state) {
     this.setState(state);
+
+    // load branch modules after we get the builds collection
+    if (!state.loadingBuilds && !this.state.loadingBranchModules) {
+      BranchActions.loadModules(this.props.params);
+      this.state.loadingBranchModules = true;
+    }
   }
 
   render() {

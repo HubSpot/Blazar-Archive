@@ -1,22 +1,19 @@
 import React, {Component, PropTypes} from 'react';
-
 import Repo from './Repo.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
-
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
-
 import BuildsStore from '../../stores/buildsStore';
-import BuildsActions from '../../actions/buildsActions';
+
 
 class RepoContainer extends Component {
 
   constructor() {
     this.state = {
       branches: [],
-      loading: true,
       loadingBuilds: true,
-      loadingRepos: false
+      loadingRepos: false,
+      loading: true,
     };
   }
 

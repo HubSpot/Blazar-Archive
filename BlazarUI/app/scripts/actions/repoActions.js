@@ -25,8 +25,6 @@ RepoActions.updatePollingStatus = function(status) {
 
 function startPolling(params) {
 
-  console.log('poll!');
-
   (function doPoll() {
     const builds = new Builds();
     builds.set(BuildsStore.getBuilds());
