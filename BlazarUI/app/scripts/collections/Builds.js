@@ -5,7 +5,7 @@ import BaseCollection from './BaseCollection';
 class Builds extends BaseCollection {
 
   url() {
-    return `${config.apiRoot}/build/states`;
+    return `${config.apiRoot}/build/states?property=!lastBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!pendingBuild.commitInfo`;
   }
 
   hasBuildState() {
