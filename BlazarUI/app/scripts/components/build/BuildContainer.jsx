@@ -49,6 +49,7 @@ class BuildContainer extends Component {
         log: state.build.log
       });
 
+      // to do - move polling into action
       if (state.build.build.build.state === 'IN_PROGRESS') {
         setTimeout( () => {
           BuildActions.reloadBuild(this.props.params);

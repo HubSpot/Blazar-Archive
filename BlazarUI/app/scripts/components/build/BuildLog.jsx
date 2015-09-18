@@ -1,10 +1,11 @@
 import React, {Component, PropTypes, findDOMNode} from 'react';
 import $ from 'jquery';
-import Collapsable from '../shared/Collapsable.jsx';
-import SectionLoader from '../shared/SectionLoader.jsx';
 import utf8 from 'utf8';
 import {bindAll} from 'underscore';
-import {events} from '../Helpers';
+import {events, humanizeText} from '../Helpers';
+import Collapsable from '../shared/Collapsable.jsx';
+import SectionLoader from '../shared/SectionLoader.jsx';
+import MutedMessage from '../shared/MutedMessage.jsx'
 
 class BuildLog extends Component {
 
@@ -54,15 +55,35 @@ class BuildLog extends Component {
       return <div />;
     }
 
+    let buildState;
+
+    if (this.props.isBuilding) {
+      buildState = (
+        <SectionLoader />
+      );
+    } else {
+      // To do: better final build state messages
+      buildState = (
+        <MutedMessage classNames='roomy'>
+          <strong>
+            Build {humanizeText(this.props.buildState)}
+          </strong>
+        </MutedMessage>
+      );
+    }
+
     return (
       <Collapsable 
         header='Build Log'
         initialToggleStateOpen={true}
       >
-        <pre id='log' 
-          ref='log'
-          className='build-log' 
-          dangerouslySetInnerHTML={this.getLogMarkup()} />
+        <div className='build-log-container'>
+          <pre id='log' 
+            ref='log'
+            className='build-log' 
+            dangerouslySetInnerHTML={this.getLogMarkup()} />
+          {buildState}
+        </div>
       </Collapsable>
     );
   }
@@ -70,6 +91,7 @@ class BuildLog extends Component {
 
 BuildLog.propTypes = {
   log: PropTypes.string,
+  buildState: PropTypes.string,
   isBuilding: PropTypes.bool,
   loading: PropTypes.bool
 };

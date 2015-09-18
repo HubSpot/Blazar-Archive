@@ -60,6 +60,7 @@ class Build extends Component {
           <UIGridItem size={12}>
             <BuildLog
               log={this.props.log}
+              buildState={build.state}
               isBuilding={build.state === 'IN_PROGRESS'}
               loading={this.props.loading}
             />
