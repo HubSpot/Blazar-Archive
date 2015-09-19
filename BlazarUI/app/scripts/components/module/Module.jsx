@@ -45,16 +45,18 @@ class Module extends Component {
             appRoot={config.appRoot}
             path={window.location.pathname}
           />
-          <Headline>
-            <Icon prefix="mega" type="octicon" name="file-directory" classNames="headline-icon" />
-            <span>{this.props.params.module}</span>
-            <HeadlineDetail>
-              Build History
-            </HeadlineDetail>
-          </Headline>
         </PageHeader>
         <UIGrid>
-          <UIGridItem size={12} align='RIGHT'>
+          <UIGridItem size={10}>
+            <Headline>
+              <Icon type="octicon" name="file-directory" classNames="headline-icon" />
+              {this.props.params.module} 
+              <HeadlineDetail>
+                Build History
+              </HeadlineDetail>
+            </Headline>
+          </UIGridItem>           
+          <UIGridItem size={2} align='RIGHT'>
             <BuildButton triggerBuild={this.props.triggerBuild} buildTriggering={this.props.buildTriggering} />
           </UIGridItem>
           <UIGridItem size={12}>

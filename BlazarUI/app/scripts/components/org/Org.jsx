@@ -26,16 +26,16 @@ class org extends Component {
             appRoot={config.appRoot}
             path={window.location.pathname}
           />
-          <Headline>
-            <Icon prefix="mega" type="octicon" name="organization" classNames="headline-icon" />
-            <span>{this.props.params.org}</span>
-            <HeadlineDetail>
-              Repositories
-            </HeadlineDetail>
-          </Headline>
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
+            <Headline>
+              <Icon type="octicon" name="organization" classNames="headline-icon" />
+              <span>{this.props.params.org}</span>
+              <HeadlineDetail>
+                Repositories
+              </HeadlineDetail>
+            </Headline>
             <ReposTable
               repos={this.props.repos}
               org={this.props.params.org}

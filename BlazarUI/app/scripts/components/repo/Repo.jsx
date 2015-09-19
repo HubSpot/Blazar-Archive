@@ -28,16 +28,16 @@ class Repo extends Component {
             appRoot={config.appRoot}
             path={window.location.pathname}
           />
-          <Headline>
-            <Icon prefix="mega" type="octicon" name="repo" classNames="headline-icon" />
-            <span>{this.props.params.repo}</span>
-            <HeadlineDetail>
-              Branches
-            </HeadlineDetail>
-          </Headline>
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
+            <Headline>
+              <Icon type="octicon" name="repo" classNames="headline-icon" />
+              <span>{this.props.params.repo}</span>
+              <HeadlineDetail>
+                Branches
+              </HeadlineDetail>
+            </Headline>
             <Branches
               branches={this.props.branches}
               loading={this.props.loading}

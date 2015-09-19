@@ -3,32 +3,29 @@
 
 .sidebar__logo
   position absolute
-  z-index 2
+  z-index 3
   top 10px
-  left 10px
+  right 15px
   
 .sidebar__logo-image
   width 85px
 
 .sidebar__filter
   padding 0
-  position fixed
   top 0
   left 0
-  z-index 99
   width 299px
-  height 134px
+  // height 134px
   background #d5d5d5
 
 .sidebar__filter-search
   position relative
-  height 94px
+  // height 94px
   padding 10px
   border-bottom 1px solid $gray
   background $offwhite
 
 .sidebar__filter-buttons
-  position absolute
   bottom 0
   width 100%
 
@@ -41,6 +38,10 @@
   background #e6e6e6
   padding 10px
   border-right 1px solid #dadada
+  text-transfprm uppercase
+  font-size 12px
+  font-weight $font-medium 
+
   &:last-child
     border-right none
   &:hover
@@ -71,7 +72,6 @@
 
 .search-input, .search-input:focus
   margin-bottom 0px
-  padding 15px
   border-radius 0
   background inherit
   border none
@@ -79,18 +79,18 @@
   -webkit-box-shadow: none
   -moz-box-shadow: none
   box-shadow: none
-  font-size 15px
+  font-size 14px
   font-weight $font-light
-  position absolute
   bottom 5px
   left 0px
-  padding-left 35px
+  padding 3px 0px 0px 30px
+  height 24px  
 
 .search-filter__icon
   position absolute
   font-size 16px
   left 15px
-  bottom 15px
+  bottom 13px
   color $gray-dark
 
 .sidebar__star

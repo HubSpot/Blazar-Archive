@@ -36,16 +36,16 @@ class Build extends Component {
             appRoot={config.appRoot}
             path={window.location.pathname}
           />
-          <Headline>
-            <Icon name={BUILD_ICONS[build.state]} classNames="headline-icon"></Icon>
-            <span>{this.props.params.module}</span>
-            <HeadlineDetail>
-              Build #{build.buildNumber}
-            </HeadlineDetail>
-          </Headline>
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
+            <Headline>
+              <Icon name={BUILD_ICONS[build.state]} classNames="headline-icon"></Icon>
+              {this.props.params.module}
+              <HeadlineDetail>
+                Build #{build.buildNumber}
+              </HeadlineDetail>
+            </Headline>
             <BuildDetail
               build={this.props.build}
               loading={this.props.loading}

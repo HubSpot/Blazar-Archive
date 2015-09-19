@@ -9,10 +9,8 @@ class Sidebar extends Component {
     }
     return (
       <div className='sidebar'>
-        <div className='sidebar-inner'>
-          {headline}
-          {this.props.children}
-        </div>
+        {headline}
+        {this.props.children}
       </div>
     );
   }

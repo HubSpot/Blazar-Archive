@@ -27,16 +27,13 @@ class Branch extends Component{
             appRoot={config.appRoot}
             path={window.location.pathname}
           />
-          <Headline>
-            <Icon prefix="mega" type="octicon" name="git-branch" classNames="headline-icon" />
-            <span>{this.props.params.branch}</span>
-            <HeadlineDetail>
-              Branch Modules
-            </HeadlineDetail>
-          </Headline>
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
+            <Headline>
+              <Icon type="octicon" name="git-branch" classNames="headline-icon" />
+              Branch Modules
+            </Headline>
             <ModulesTable
               modules={this.props.modules}
             />
