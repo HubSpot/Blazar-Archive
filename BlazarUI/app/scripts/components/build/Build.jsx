@@ -61,7 +61,6 @@ class Build extends Component {
             <BuildLog
               log={this.props.log}
               buildState={build.state}
-              isBuilding={build.state === 'IN_PROGRESS'}
               loading={this.props.loading}
             />
           </UIGridItem>

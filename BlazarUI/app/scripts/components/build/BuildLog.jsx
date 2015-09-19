@@ -6,6 +6,8 @@ import {events, humanizeText} from '../Helpers';
 import Collapsable from '../shared/Collapsable.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx'
+import BuildStates from '../../constants/BuildStates';
+
 
 class BuildLog extends Component {
 
@@ -31,7 +33,7 @@ class BuildLog extends Component {
   }
    
   componentDidUpdate(nextProps, nextState) {
-    if (nextProps.isBuilding) {
+    if (nextProps.buildState === BuildStates.IN_PROGRESS) {
       this.scrollToBottom();
     }
   }
@@ -47,17 +49,20 @@ class BuildLog extends Component {
   }
 
   render() {
+    
+    const noBuildLog = this.props.buildState === BuildStates.CANCELLED || this.props.buildState === BuildStates.QUEUED;
+
     if (this.props.loading) {
       return <SectionLoader />;
     }
 
-    if (!this.props.log || typeof this.props.log !== 'string') {
+    if (!this.props.log || typeof this.props.log !== 'string' || noBuildLog) {
       return <div />;
     }
 
     let buildState;
 
-    if (this.props.isBuilding) {
+    if (this.props.buildState === BuildStates.IN_PROGRESS) {
       buildState = (
         <SectionLoader />
       );

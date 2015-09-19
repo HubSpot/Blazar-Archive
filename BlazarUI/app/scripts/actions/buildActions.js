@@ -99,7 +99,7 @@ function getBuild() {
     });
 
     logPromise.error( () => {
-      BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
+      BuildActions.loadBuildError("<p class='roomy-xy'>No build log");
     });
 
   });

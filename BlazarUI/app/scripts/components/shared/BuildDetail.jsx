@@ -1,9 +1,10 @@
 import React, {Component, PropTypes} from 'react';
 import {has} from 'underscore';
-import Alert from 'react-bootstrap/lib/Alert';
 import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
 import Sha from '../shared/Sha.jsx';
+import BuildStates from '../../constants/BuildStates';
+import Alert from 'react-bootstrap/lib/Alert';
 
 const buildLables = {
   'SUCCEEDED': 'success',
@@ -28,6 +29,14 @@ class BuildDetail extends Component {
       build, 
       gitInfo
     } = this.props.build;
+
+    if (build.state === BuildStates.CANCELLED) {
+      return (
+        <Alert bsStyle="warning">
+          <strong>Build Cancelled</strong> 
+        </Alert>
+      )
+    }
 
     if (!has(build, 'commitInfo')) {
       return (
