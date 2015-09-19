@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
+import BuildStates from '../../constants/BuildStates.js';
 import Build from './Build.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
-
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
 
@@ -42,6 +42,7 @@ class BuildContainer extends Component {
       });
       return;
     }
+
     if (state.build) {
       this.setState({
         loading: false,
@@ -49,8 +50,10 @@ class BuildContainer extends Component {
         log: state.build.log
       });
 
+      const buildState = state.build.build.build.state
+
       // to do - move polling into action
-      if (state.build.build.build.state === 'IN_PROGRESS') {
+      if (buildState === BuildStates.IN_PROGRESS || buildState === BuildStates.QUEUED || buildState === BuildStates.LAUNCHING) {
         setTimeout( () => {
           BuildActions.reloadBuild(this.props.params);
         }, 5000);
