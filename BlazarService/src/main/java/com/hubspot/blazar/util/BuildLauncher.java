@@ -256,7 +256,7 @@ public class BuildLauncher {
           builder.addAdded(file.getFileName());
           break;
         case "modified":
-        case "changed":  
+        case "changed":
         case "renamed":
           builder.addModified(file.getFileName());
           break;
