@@ -85,7 +85,7 @@ public class BuildLauncher {
     final Build buildToLaunch;
     final Optional<Build> previousBuild;
     if (build.getState() == State.QUEUED) {
-      BuildState buildState = buildStateService.getByModule(build.getModuleId());
+      BuildState buildState = buildStateService.getByModule(build.getModuleId()).get();
       if (!buildState.getInProgressBuild().isPresent()) {
         LOG.info("No in progress build for module {}, going to launch build {}", build.getModuleId(), build.getId().get());
         buildDefinition = buildState;
@@ -96,7 +96,7 @@ public class BuildLauncher {
         return;
       }
     } else if (build.getState().isComplete()) {
-      BuildState buildState = buildStateService.getByModule(build.getModuleId());
+      BuildState buildState = buildStateService.getByModule(build.getModuleId()).get();
       if (buildState.getPendingBuild().isPresent()) {
         LOG.info("Pending build for module {}, going to launch build {}", build.getModuleId(), buildState.getPendingBuild().get().getId().get());
         buildDefinition = buildState;

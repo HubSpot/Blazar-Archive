@@ -1,13 +1,15 @@
 package com.hubspot.blazar.data.service;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildDefinition;
+import com.hubspot.blazar.data.CachingService;
 import com.hubspot.blazar.data.dao.BuildDefinitionDao;
 
+import javax.inject.Singleton;
 import java.util.Set;
 
-public class BuildDefinitionService {
+@Singleton
+public class BuildDefinitionService extends CachingService<BuildDefinition> {
   private final BuildDefinitionDao buildDefinitionDao;
 
   @Inject
@@ -15,11 +17,8 @@ public class BuildDefinitionService {
     this.buildDefinitionDao = buildDefinitionDao;
   }
 
-  public Set<BuildDefinition> getAllBuildDefinitions(long since) {
+  @Override
+  protected Set<BuildDefinition> fetch(long since) {
     return buildDefinitionDao.getAllBuildDefinitions(since);
-  }
-
-  public Optional<BuildDefinition> getByModuleId(int moduleId) {
-    return buildDefinitionDao.getByModuleId(moduleId);
   }
 }

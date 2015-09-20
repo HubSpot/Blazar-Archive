@@ -28,6 +28,8 @@ import com.hubspot.horizon.HttpResponse;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 import com.sun.jersey.api.NotFoundException;
 
+import java.util.Set;
+
 @Path("/build")
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildResource {
@@ -50,19 +52,15 @@ public class BuildResource {
   @GET
   @Path("/definitions")
   @PropertyFiltering
-  public Response getAllBuildDefinitions(@QueryParam("since") @DefaultValue("0") long since) {
-    return Response.ok(buildDefinitionService.getAllBuildDefinitions(since), MediaType.APPLICATION_JSON_TYPE)
-        .header("Offset", System.currentTimeMillis() - 5000)
-        .build();
+  public Set<BuildDefinition> getAllBuildDefinitions() {
+    return buildDefinitionService.getAll();
   }
 
   @GET
   @Path("/states")
   @PropertyFiltering
-  public Response getAllBuildStates(@QueryParam("since") @DefaultValue("0") long since) {
-    return Response.ok(buildStateService.getAllBuildStates(since), MediaType.APPLICATION_JSON_TYPE)
-        .header("Offset", System.currentTimeMillis() - 5000)
-        .build();
+  public Set<BuildState> getAllBuildStates() {
+    return buildStateService.getAll();
   }
 
   @GET
@@ -92,7 +90,7 @@ public class BuildResource {
   @POST
   @Path("/module/{moduleId}")
   public ModuleBuild trigger(@PathParam("moduleId") int moduleId) {
-    return trigger(buildDefinitionService.getByModuleId(moduleId).get());
+    return trigger(buildDefinitionService.getByModule(moduleId).get());
   }
 
   @POST

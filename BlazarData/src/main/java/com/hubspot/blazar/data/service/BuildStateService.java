@@ -2,11 +2,14 @@ package com.hubspot.blazar.data.service;
 
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildState;
+import com.hubspot.blazar.data.CachingService;
 import com.hubspot.blazar.data.dao.BuildStateDao;
 
+import javax.inject.Singleton;
 import java.util.Set;
 
-public class BuildStateService {
+@Singleton
+public class BuildStateService extends CachingService<BuildState> {
   private final BuildStateDao buildStateDao;
 
   @Inject
@@ -14,11 +17,8 @@ public class BuildStateService {
     this.buildStateDao = buildStateDao;
   }
 
-  public Set<BuildState> getAllBuildStates(long since) {
+  @Override
+  protected Set<BuildState> fetch(long since) {
     return buildStateDao.getAllBuildStates(since);
-  }
-
-  public BuildState getByModule(int moduleId) {
-    return buildStateDao.getByModule(moduleId);
   }
 }
