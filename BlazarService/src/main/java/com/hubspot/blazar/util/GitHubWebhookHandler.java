@@ -88,7 +88,7 @@ public class GitHubWebhookHandler {
 
   private Set<Module> updateModules(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
     try {
-      if (moduleDiscovery.shouldRediscover(gitInfo, pushEvent)) {
+      if (pushEvent.getForced() || moduleDiscovery.shouldRediscover(gitInfo, pushEvent)) {
         return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
       }
 
