@@ -10,7 +10,6 @@ import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
 
-
 class Repo extends Component {
 
   render() {
@@ -41,6 +40,8 @@ class Repo extends Component {
             <Branches
               branches={this.props.branches}
               loading={this.props.loading}
+              branchToggleStates={this.props.branchToggleStates}
+              updateBranchToggleState={this.props.updateBranchToggleState}
             />
           </UIGridItem>
         </UIGrid>
@@ -52,7 +53,9 @@ class Repo extends Component {
 Repo.propTypes = {
   loading: PropTypes.bool.isRequired,
   branches: PropTypes.array,
-  params: PropTypes.object.isRequired
+  params: PropTypes.object.isRequired,
+  branchToggleStates: PropTypes.object.isRequired,
+  updateBranchToggleState: PropTypes.func.isRequired
 };
 
 export default Repo;

@@ -8,7 +8,7 @@ class Branches extends Component {
 
   getBranches() {
     const branches = this.props.branches;
-    const branchList = [];
+    let branchList = [];
 
     branches.forEach((branch, i) => {
 
@@ -18,7 +18,7 @@ class Branches extends Component {
 
       if (!branch.hasBuiltOnBlazar){
         table = (
-          <EmptyMessage>
+          <EmptyMessage noBorder={true}>
             No build history.
           </EmptyMessage>
         );
@@ -30,7 +30,8 @@ class Branches extends Component {
           header={branch.branch}
           iconType='octicon'
           iconName='git-branch'
-          initialToggleStateOpen={branch.branch === 'master'}
+          initialToggleStateOpen={this.props.branchToggleStates[branch.branch]}
+          updateToggleState={this.props.updateBranchToggleState}
         >
           {table}
         </Collapsable>
@@ -56,7 +57,9 @@ class Branches extends Component {
 
 Branches.propTypes = {
   branches: PropTypes.array,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  branchToggleStates: PropTypes.object.isRequired,
+  updateBranchToggleState: PropTypes.func.isRequired
 };
 
 export default Branches;

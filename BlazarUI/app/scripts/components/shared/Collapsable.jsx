@@ -27,7 +27,11 @@ class Collapsable extends Component {
     return this.state.expanded ? 'minus' : 'plus';
   }
 
-  handleToggle() {
+  handleToggle() {    
+    if (this.props.updateToggleState) {
+      this.props.updateToggleState(this.props.header);
+    }
+
     this.setState({
       expanded: !this.state.expanded
     });
@@ -79,7 +83,9 @@ Collapsable.propTypes = {
   children: PropTypes.node,
   iconType: PropTypes.oneOf(['fa','octicon']),
   iconName: PropTypes.string,
-  noBorder: PropTypes.bool
+  noBorder: PropTypes.bool,
+  updateToggleState: PropTypes.func,
+  componentId: PropTypes.number
 };
 
 export default Collapsable;
