@@ -36,7 +36,14 @@ class Dashboard extends Component {
 
     if (starredModuleTables.length === 0) {
       starredModuleTables = (
-        <MutedMessage> You have no starred modules. </MutedMessage>
+        <div>
+          <p>You have no starred modules.</p>
+          <p>
+          ProTip: Starring modules allows you to quickly navigate to and view a modules build state from the sidebar, as well as view recent build history in the dashboard.
+          <br />
+          Star modules by clicking the 'All Tab' then clicking on the star icon next to the module.
+          </p>
+        </div>
       );
     }
 
