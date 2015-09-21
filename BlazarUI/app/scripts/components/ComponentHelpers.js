@@ -44,10 +44,6 @@ let ComponentHelpers = {
     return timeObject.format('lll');
   },
 
-  githubShaLink: function(info) {
-    return `https://github.com/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
-  },
-
   getStarredModules: function(stars, modules) {
     const starredModules = [];
 

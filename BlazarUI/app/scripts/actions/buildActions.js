@@ -61,16 +61,16 @@ function getModule() {
 }
 
 function getBranchId() {
-    const branchDefinition = new BranchDefinition(gitInfo);
-    const branchPromise =  branchDefinition.fetch();
+  const branchDefinition = new BranchDefinition(gitInfo);
+  const branchPromise =  branchDefinition.fetch();
 
-    branchPromise.done(() => {
-      gitInfo.branchId = branchDefinition.data.id;
-      getModule();
-    });
-    branchPromise.error(() => {
-      BuildHistoryActions.loadBuildHistoryError('an error occured');
-    });
+  branchPromise.done(() => {
+    gitInfo.branchId = branchDefinition.data.id;
+    getModule();
+  });
+  branchPromise.error(() => {
+    BuildHistoryActions.loadBuildHistoryError('an error occured');
+  });
 }
 
 function getBuild() {
@@ -99,7 +99,7 @@ function getBuild() {
     });
 
     logPromise.error( () => {
-      BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
+      BuildActions.loadBuildError("<p class='roomy-xy'>No build log");
     });
 
   });

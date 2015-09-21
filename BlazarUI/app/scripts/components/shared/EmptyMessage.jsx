@@ -6,7 +6,8 @@ class EmptyMessage extends Component {
   getClassNames() {
     return classNames([
       'empty-message',
-      {'simple': this.props.simple}
+      {'simple': this.props.simple},
+      {'no-border': this.props.noBorder}
     ])
   }
 
@@ -22,7 +23,8 @@ class EmptyMessage extends Component {
 
 EmptyMessage.propTypes = {
   children: PropTypes.node,
-  simple: PropTypes.bool
+  simple: PropTypes.bool,
+  noBorder: PropTypes.bool
 };
 
 export default EmptyMessage;

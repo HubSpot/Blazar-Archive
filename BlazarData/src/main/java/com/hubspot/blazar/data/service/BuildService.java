@@ -47,7 +47,7 @@ public class BuildService {
 
   public BuildState enqueue(BuildDefinition definition) {
     int moduleId = definition.getModule().getId().get();
-    BuildState buildState = buildStateService.getByModule(moduleId);
+    BuildState buildState = buildStateService.getByModule(moduleId).get();
 
     if (buildState.getPendingBuild().isPresent()) {
       long pendingBuildId = buildState.getPendingBuild().get().getId().get();

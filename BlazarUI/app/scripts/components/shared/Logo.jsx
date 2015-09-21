@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
 import Image from '../shared/Image.jsx';
 
-class SidebarLogo extends Component {
+class Logo extends Component {
 
   render() {
     const imgPath = `${window.config.staticRoot}/images/blazar-logo.png`;
@@ -17,4 +17,4 @@ class SidebarLogo extends Component {
 
 }
 
-export default SidebarLogo;
+export default Logo;

@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>12.4</version>
+    <version>12.5</version>
   </parent>
 
   <artifactId>Blazar</artifactId>
@@ -145,6 +145,11 @@
             <artifactId>annotation-indexer</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>woodstox-core-asl</artifactId>
+        <version>4.4.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

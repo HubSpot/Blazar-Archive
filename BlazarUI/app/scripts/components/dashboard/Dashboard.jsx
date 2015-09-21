@@ -1,3 +1,4 @@
+/*global config*/
 import React, {Component, PropTypes} from 'react';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import DashboardStarredModule from './DashboardStarredModule.jsx';
@@ -9,6 +10,7 @@ import Headline from '../shared/headline/Headline.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import Icon from '../shared/Icon.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
+import Breadcrumb from '../shared/Breadcrumb.jsx';
 import Helpers from '../ComponentHelpers';
 
 class Dashboard extends Component {
@@ -41,15 +43,19 @@ class Dashboard extends Component {
     return (
       <div>
         <PageHeader>
-          <Headline className="headline-no-breadcrumbs">
-            <Icon name="tachometer" classNames="headline-icon"></Icon>
-            Dashboard
-          </Headline>
+          <Breadcrumb
+            appRoot={config.appRoot}
+            path={window.location.pathname}
+          />
         </PageHeader>
 
         <UIGrid>
           <UIGridItem size={12}>
-            <h4 className="dashboard__section-title">Starred Modules</h4>
+            <h4 className="dashboard__section-title"></h4>
+            <Headline>
+              <Icon for="star" classNames="headline-icon" />
+              Starred Modules
+            </Headline>
             {starredModuleTables}
           </UIGridItem>
         </UIGrid>

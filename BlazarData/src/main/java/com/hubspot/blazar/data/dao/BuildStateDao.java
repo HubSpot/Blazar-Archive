@@ -15,16 +15,6 @@ public interface BuildStateDao {
       "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuildId = lastBuild.id) " +
       "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuildId = inProgressBuild.id) " +
       "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuildId = pendingBuild.id) " +
-      "WHERE module.updatedTimestamp > :since")
+      "WHERE module.updatedTimestamp >= :since")
   Set<BuildState> getAllBuildStates(@Bind("since") long since);
-
-  @SqlQuery("" +
-      "SELECT gitInfo.*, module.*, lastBuild.*, inProgressBuild.*, pendingBuild.* " +
-      "FROM branches AS gitInfo " +
-      "INNER JOIN modules AS module ON (gitInfo.id = module.branchId) " +
-      "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuildId = lastBuild.id) " +
-      "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuildId = inProgressBuild.id) " +
-      "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuildId = pendingBuild.id) " +
-      "WHERE module.id = :it")
-  BuildState getByModule(@Bind int moduleId);
 }

@@ -33,7 +33,7 @@ public class BuildHistoryResource {
   @Path("/module/{id}")
   @PropertyFiltering
   public List<ModuleBuild> getByModule(@PathParam("id") int moduleId) {
-    BuildDefinition definition = buildDefinitionService.getByModuleId(moduleId).get();
+    BuildDefinition definition = buildDefinitionService.getByModule(moduleId).get();
 
     List<ModuleBuild> builds = new ArrayList<>();
     for (Build build : buildService.getAllByModule(definition.getModule())) {
@@ -47,7 +47,7 @@ public class BuildHistoryResource {
   @Path("/module/{id}/build/{buildNumber}")
   @PropertyFiltering
   public Optional<ModuleBuild> getByModule(@PathParam("id") int moduleId, @PathParam("buildNumber") int buildNumber) {
-    BuildDefinition definition = buildDefinitionService.getByModuleId(moduleId).get();
+    BuildDefinition definition = buildDefinitionService.getByModule(moduleId).get();
     Optional<Build> build = buildService.getByModuleAndNumber(definition.getModule(), buildNumber);
 
     if (build.isPresent()) {

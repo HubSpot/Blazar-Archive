@@ -4,11 +4,10 @@ import PageContainer from '../shared/PageContainer.jsx';
 import OrgActions from '../../actions/orgActions';
 import OrgStore from '../../stores/orgStore';
 
+
 class OrgContainer extends Component {
 
-  constructor(props) {
-    super(props);
-
+  constructor() {
     this.state = {
       repos: [],
       loading: true
@@ -16,7 +15,7 @@ class OrgContainer extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = OrgStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromOrg = OrgStore.listen(this.onStatusChange.bind(this));
     OrgActions.loadRepos(this.props.params);
   }
 
@@ -26,7 +25,7 @@ class OrgContainer extends Component {
 
   componentWillUnmount() {
     OrgActions.updatePollingStatus(false);
-    this.unsubscribe();
+    this.unsubscribeFromOrg();
   }
 
   onStatusChange(state) {

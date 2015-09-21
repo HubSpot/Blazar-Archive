@@ -3,13 +3,11 @@ import BuildsActions from '../actions/buildsActions';
 
 const BuildsStore = Reflux.createStore({
 
+  listenables: BuildsActions,
+
   init() {
     this.builds = [];
     this.buildsLoaded = false;
-
-    this.listenTo(BuildsActions.loadBuilds, this.loadBuilds);
-    this.listenTo(BuildsActions.loadBuildsSuccess, this.loadBuildsSuccess);
-    this.listenTo(BuildsActions.loadBuildsError, this.loadBuildsError);
   },
 
   getBuilds() {

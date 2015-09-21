@@ -1,7 +1,5 @@
 package com.hubspot.blazar.resources;
 
-import java.util.Set;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,6 +28,8 @@ import com.hubspot.horizon.HttpResponse;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 import com.sun.jersey.api.NotFoundException;
 
+import java.util.Set;
+
 @Path("/build")
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildResource {
@@ -52,15 +52,15 @@ public class BuildResource {
   @GET
   @Path("/definitions")
   @PropertyFiltering
-  public Set<BuildDefinition> getAllBuildDefinitions(@QueryParam("since") @DefaultValue("0") long since) {
-    return buildDefinitionService.getAllBuildDefinitions(since);
+  public Set<BuildDefinition> getAllBuildDefinitions() {
+    return buildDefinitionService.getAll();
   }
 
   @GET
   @Path("/states")
   @PropertyFiltering
-  public Set<BuildState> getAllBuildStates(@QueryParam("since") @DefaultValue("0") long since) {
-    return buildStateService.getAllBuildStates(since);
+  public Set<BuildState> getAllBuildStates() {
+    return buildStateService.getAll();
   }
 
   @GET
@@ -90,7 +90,7 @@ public class BuildResource {
   @POST
   @Path("/module/{moduleId}")
   public ModuleBuild trigger(@PathParam("moduleId") int moduleId) {
-    return trigger(buildDefinitionService.getByModuleId(moduleId).get());
+    return trigger(buildDefinitionService.getByModule(moduleId).get());
   }
 
   @POST

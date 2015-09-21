@@ -1,34 +1,28 @@
 import React, {Component, PropTypes} from 'react';
-
+import {bindAll} from 'underscore';
 import Repo from './Repo.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
-
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
 
-import BuildsStore from '../../stores/buildsStore';
-import BuildsActions from '../../actions/buildsActions';
 
 class RepoContainer extends Component {
 
   constructor() {
+    bindAll(this, 'updateBranchToggleState');
+
     this.state = {
       branches: [],
       loading: true,
-      loadingBuilds: true,
-      loadingRepos: false
+      branchToggleStates: {
+        master: true
+      }
     };
   }
 
   componentDidMount() {
     this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange.bind(this));
-    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange.bind(this));    
-
-    // check if we already have builds in the store
-    if (BuildsStore.buildsHaveLoaded) {
-      RepoActions.loadBranches(this.props.params)
-    }
-
+    RepoActions.loadBranches(this.props.params);
   }
 
   componentWillReceiveProps(nextprops) {
@@ -38,28 +32,31 @@ class RepoContainer extends Component {
   componentWillUnmount() {
     RepoActions.updatePollingStatus(false);
     this.unsubscribeFromRepo();
-    this.unsubscribeFromBuilds();
+  }
+
+  updateBranchToggleState(branch) {
+    let updated = this.state.branchToggleStates; 
+    updated[branch] = !updated[branch];
+
+    this.setState({
+      branchToggleStates: updated
+    });
+
   }
 
   onStatusChange(state) {
     this.setState(state);
-
-    // load repo branches after we get builds collection
-    if (!state.loadingBuilds && !this.state.loadingRepos) {
-      RepoActions.loadBranches(this.props.params);
-      this.state.loadingRepos = true;
-    }
-
   }
 
   render() {
-
     return (
       <PageContainer>
         <Repo
           params={this.props.params}
           branches={this.state.branches}
           loading={this.state.loading}
+          branchToggleStates={this.state.branchToggleStates}
+          updateBranchToggleState={this.updateBranchToggleState}
         />
       </PageContainer>
     );

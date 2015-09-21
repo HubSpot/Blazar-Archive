@@ -23,11 +23,13 @@ export const unicode = {
 
 export const ICON_LIST = {
   'module': 'fa fa-folder-o',
+  'star': 'fa fa-star',
   'branch': 'octicon octicon-git-branch',
   'repo': 'octicon octicon-repo',
   'down': 'fa fa-chevron-down',
   'up': 'fa fa-chevron-up',
-  'spinner': 'fa fa-circle-o-notch fa-spin'
+  'spinner': 'fa fa-circle-o-notch fa-spin',
+  'dashboard': 'fa fa-tachometer'
 };
 
 export const BUILD_ICONS = {

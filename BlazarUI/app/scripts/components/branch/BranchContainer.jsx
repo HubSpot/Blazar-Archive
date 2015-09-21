@@ -4,6 +4,7 @@ import PageContainer from '../shared/PageContainer.jsx';
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
+
 class BranchContainer extends Component {
 
   constructor() {
@@ -14,7 +15,7 @@ class BranchContainer extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = BranchStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
     BranchActions.loadModules(this.props.params);
   }
 
@@ -24,7 +25,7 @@ class BranchContainer extends Component {
 
   componentWillUnmount() {
     BranchActions.updatePollingStatus(false);
-    this.unsubscribe();
+    this.unsubscribeFromBranch();
   }
 
   onStatusChange(state) {
@@ -32,7 +33,7 @@ class BranchContainer extends Component {
   }
 
   render() {
-
+    
     return (
       <PageContainer>
         <Branch

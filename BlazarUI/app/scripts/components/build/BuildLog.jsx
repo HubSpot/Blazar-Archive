@@ -1,10 +1,13 @@
 import React, {Component, PropTypes, findDOMNode} from 'react';
 import $ from 'jquery';
-import Collapsable from '../shared/Collapsable.jsx';
-import SectionLoader from '../shared/SectionLoader.jsx';
 import utf8 from 'utf8';
 import {bindAll} from 'underscore';
-import {events} from '../Helpers';
+import {events, humanizeText} from '../Helpers';
+import Collapsable from '../shared/Collapsable.jsx';
+import SectionLoader from '../shared/SectionLoader.jsx';
+import MutedMessage from '../shared/MutedMessage.jsx'
+import BuildStates from '../../constants/BuildStates';
+
 
 class BuildLog extends Component {
 
@@ -30,7 +33,7 @@ class BuildLog extends Component {
   }
    
   componentDidUpdate(nextProps, nextState) {
-    if (nextProps.isBuilding) {
+    if (nextProps.buildState === BuildStates.IN_PROGRESS) {
       this.scrollToBottom();
     }
   }
@@ -46,12 +49,32 @@ class BuildLog extends Component {
   }
 
   render() {
+    
+    const noBuildLog = this.props.buildState === BuildStates.CANCELLED || this.props.buildState === BuildStates.QUEUED;
+
     if (this.props.loading) {
       return <SectionLoader />;
     }
 
-    if (!this.props.log || typeof this.props.log !== 'string') {
+    if (!this.props.log || typeof this.props.log !== 'string' || noBuildLog) {
       return <div />;
+    }
+
+    let buildState;
+
+    if (this.props.buildState === BuildStates.IN_PROGRESS) {
+      buildState = (
+        <SectionLoader />
+      );
+    } else {
+      // To do: better final build state messages
+      buildState = (
+        <MutedMessage classNames='roomy'>
+          <strong>
+            Build {humanizeText(this.props.buildState)}
+          </strong>
+        </MutedMessage>
+      );
     }
 
     return (
@@ -59,10 +82,13 @@ class BuildLog extends Component {
         header='Build Log'
         initialToggleStateOpen={true}
       >
-        <pre id='log' 
-          ref='log'
-          className='build-log' 
-          dangerouslySetInnerHTML={this.getLogMarkup()} />
+        <div className='build-log-container'>
+          <pre id='log' 
+            ref='log'
+            className='build-log' 
+            dangerouslySetInnerHTML={this.getLogMarkup()} />
+          {buildState}
+        </div>
       </Collapsable>
     );
   }
@@ -70,6 +96,7 @@ class BuildLog extends Component {
 
 BuildLog.propTypes = {
   log: PropTypes.string,
+  buildState: PropTypes.string,
   isBuilding: PropTypes.bool,
   loading: PropTypes.bool
 };

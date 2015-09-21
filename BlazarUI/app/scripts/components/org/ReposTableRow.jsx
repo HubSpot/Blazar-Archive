@@ -26,10 +26,9 @@ class ReposTableRow extends Component {
       host
     } = this.props;
 
-    const repoPath = `/builds/${host}/${org}/${repo.repo}`;
-
     if (repo.latestBuild) {
       const build = repo.latestBuild;
+      // to do: move link creation to collection
       const buildLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}/${build.buildNumber}`;
       const moduleLink = `${window.config.appRoot}/builds/${host}/${org}/${repo.repo}/${build.branch}/${build.module}`;
 
@@ -54,7 +53,7 @@ class ReposTableRow extends Component {
       <tr>
         <td>
           <Icon type='octicon' name='repo' classNames="icon-roomy icon-muted" />
-          <Link to={repoPath}>{repo.repo}</Link>
+          <Link to={repo.blazarPath.repoBlazarPath}>{repo.repo}</Link>
         </td>
         <td>
           {lastBuildNumber}

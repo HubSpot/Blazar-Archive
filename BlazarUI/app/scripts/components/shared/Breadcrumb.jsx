@@ -30,10 +30,18 @@ class Breadcrumb extends Component {
 
     }.bind(this));
 
+    if (links.length === 0) {
+      return (
+        <div className='breadcrumbs'> 
+          <Icon for='dashboard' /> Dashboard
+        </div>
+      )
+    }
+
     return (
       <div className='breadcrumbs'> 
         <Link className='crumb' to='dashboard'> 
-          <Icon name='home' />
+          <Icon for='dashboard' />
         </Link>
         {links} 
       </div>

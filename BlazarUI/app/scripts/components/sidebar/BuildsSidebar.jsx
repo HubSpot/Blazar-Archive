@@ -8,7 +8,6 @@ import SectionLoader from '../shared/SectionLoader.jsx';
 import Helpers from '../ComponentHelpers';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import SidebarItem from '../sidebar/SidebarItem.jsx';
-import SidebarLogo from './SidebarLogo.jsx';
 import {FILTER_MESSAGES, NO_MATCH_MESSAGES} from '../constants';
 
 let Link = require('react-router').Link;
@@ -143,7 +142,6 @@ class BuildsSidebar extends Component {
     return (
       <div>
         <div className="sidebar__filter">
-          <SidebarLogo />
           <SidebarFilter
             loading={this.props.loading}
             builds={this.props.builds}
