@@ -122,4 +122,5 @@ public class BuildResource {
   private static String replaceHost(String url) {
     return UriBuilder.fromUri(url).host(System.getenv("SINGULARITY_HOST")).build().toString();
   }
+
 }

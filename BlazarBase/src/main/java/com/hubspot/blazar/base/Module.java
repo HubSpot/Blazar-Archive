@@ -3,6 +3,7 @@ package com.hubspot.blazar.base;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.ConfigParts.Buildpack;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -17,10 +18,10 @@ public class Module {
   private final PathMatcher matcher;
   private final boolean active;
   private final long updatedTimestamp;
-  private final Optional<String> buildpack;
+  private final Optional<Buildpack> buildpack;
 
-  public Module(String name, String path, String glob) {
-    this(Optional.<Integer>absent(), name, path, glob, true, System.currentTimeMillis(), Optional.<String>absent());
+  public Module(String name, String path, String glob, Optional<Buildpack> buildpack) {
+    this(Optional.<Integer>absent(), name, path, glob, true, System.currentTimeMillis(), buildpack);
   }
 
   @JsonCreator
@@ -30,7 +31,7 @@ public class Module {
                 @JsonProperty("glob") String glob,
                 @JsonProperty("active") boolean active,
                 @JsonProperty("updatedTimestamp") long updatedTimestamp,
-                @JsonProperty("buildpack") Optional<String> buildpack) {
+                @JsonProperty("buildpack") Optional<Buildpack> buildpack) {
     this.id = id;
     this.name = name;
     this.path = path;
@@ -63,6 +64,10 @@ public class Module {
 
   public long getUpdatedTimestamp() {
     return updatedTimestamp;
+  }
+
+  public Optional<Buildpack> getBuildpack() {
+    return buildpack;
   }
 
   public boolean contains(Path path) {

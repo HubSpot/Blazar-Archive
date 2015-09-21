@@ -7,28 +7,33 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.hubspot.blazar.base.ConfigParts.Buildpack;
 
 public class BuildConfig {
   private final List<String> cmds;
   private final Map<String, String> env;
   private final List<String> buildDeps;
   private final List<String> webhooks;
+  private final Optional<Buildpack> buildpack;
 
   @JsonCreator
   public BuildConfig(@JsonProperty("cmds") List<String> cmds,
                      @JsonProperty("env") Map<String, String> env,
                      @JsonProperty("buildDeps") List<String> buildDeps,
-                     @JsonProperty("webhooks") List<String> webhooks) {
+                     @JsonProperty("webhooks") List<String> webhooks,
+                     @JsonProperty("buildpack") Optional<Buildpack> buildpack) {
 
     this.cmds = Objects.firstNonNull(cmds, ImmutableList.of("runbuildpack"));
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
+    this.buildpack = buildpack;
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null);
+    return new BuildConfig(null, null, null, null, Optional.<Buildpack>absent());
   }
 
   public List<String> getCmds() {
@@ -45,5 +50,9 @@ public class BuildConfig {
 
   public List<String> getWebhooks() {
     return webhooks;
+  }
+
+  public Optional<Buildpack> getBuildpack() {
+    return buildpack;
   }
 }
