@@ -110,7 +110,7 @@ class BuildsSidebar extends Component {
 
     if (this.props.loading) {
       return (
-        <SectionLoader />
+        <SectionLoader roomy={true} />
       );
     }
 
