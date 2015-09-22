@@ -1,0 +1,16 @@
+@import 'variables'
+@import 'mixins'
+
+.star
+  &.unselected
+    color $gray
+
+  &.selected
+    color $color-starred
+    
+  &:hover
+    cursor pointer
+
+  &.disabled
+      &:hover
+        cursor default

@@ -90,11 +90,12 @@ class BuildsSidebar extends Component {
       if (has(module, 'module')){
         return (
           <SidebarItem 
-            key={module.module.id} 
+            key={module.module.id}
             build={module} 
             isStarred={module.module.isStarred}
             toggleStar={this.toggleStar} 
-            persistStarChange={this.props.persistStarChange} />
+            persistStarChange={this.props.persistStarChange} 
+          />
         )
       }
     });

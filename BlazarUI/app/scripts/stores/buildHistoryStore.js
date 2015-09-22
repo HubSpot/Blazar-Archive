@@ -15,7 +15,7 @@ const buildHistoryStore = Reflux.createStore({
 
   loadBuildHistory() {
     this.trigger({
-      loading: true
+      loadingHistory: true
     });
   },
 
@@ -24,7 +24,7 @@ const buildHistoryStore = Reflux.createStore({
 
     this.trigger({
       buildHistory: this.buildHistory,
-      loading: false
+      loadingHistory: false
     });
   },
 
@@ -50,7 +50,7 @@ const buildHistoryStore = Reflux.createStore({
   loadBuildHistoryError(error) {
     this.trigger({
       error: error,
-      loading: false
+      loadingHistory: false
     });
   }
 

@@ -60,14 +60,20 @@ class SidebarItem extends Component {
       }
     }
 
-    const star = (
-      <Star 
-        isStarred={this.props.isStarred}
-        toggleStar={this.props.toggleStar} 
-        modulePath={this.props.build.module.blazarPath.module}
-        moduleName={this.props.build.module.name}
-        moduleId={this.props.build.module.id} />
-    );
+    let star
+    if (this.props.isStarred) {
+      star = (
+        <Star 
+          isStarred={this.props.isStarred}
+          toggleStar={this.props.toggleStar} 
+          modulePath={this.props.build.module.blazarPath.module}
+          moduleName={this.props.build.module.name}
+          moduleId={this.props.build.module.id} 
+          disabled={!this.props.isStarred}
+          className='sidebar__star'
+        />
+      );
+    }
 
     const moduleLink = (
       <Link to={build.module.blazarPath.module} className='sidebar-item__module-name'>

@@ -1,22 +1,30 @@
 import React, {Component, PropTypes} from 'react';
+import {bindAll} from 'underscore';
+
 import Module from './Module.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
+
 import BuildHistoryStore from '../../stores/buildHistoryStore';
 import BuildStore from '../../stores/buildStore';
 import BuildHistoryActions from '../../actions/buildHistoryActions';
 import BuildActions from '../../actions/buildActions';
-import {bindAll} from 'underscore';
+import StarStore from '../../stores/starStore';
+import StarActions from '../../actions/starActions';
+import LocationStore from '../../stores/locationStore';
 
 class ModuleContainer extends Component {
 
   constructor(props) {
     super(props);
-    bindAll(this, 'triggerBuild', 'onStatusChange');
+    bindAll(this, 'triggerBuild', 'onStatusChange', 'toggleStar');
 
     this.state = {
       buildHistory: [],
-      loading: true,
+      stars: [],
       buildTriggeringDone: true,
+      loadingHistory: true,
+      loadingStars: true,
+      loading: true,
       buildTriggeringError: ''
     };
   }
@@ -24,8 +32,10 @@ class ModuleContainer extends Component {
   componentDidMount() {
     this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
 
     BuildHistoryActions.loadBuildHistory(this.props.params);    
+    StarActions.loadStars();
   }
 
   componentWillReceiveProps(nextprops) {
@@ -36,14 +46,30 @@ class ModuleContainer extends Component {
     BuildHistoryActions.updatePollingStatus(false);
     this.unsubscribeFromBuildHistory();
     this.unsubscribeFromBuild();
+    this.unsubscribeFromStars();
   }
 
   onStatusChange(state) {
     this.setState(state);
+
+    if (!this.state.loadingHistory && !this.state.loadingStars) {
+      this.setState({
+        loading: false
+      })
+    }
+
+  }
+
+  getPathname() {
+    return LocationStore.pathname;
   }
 
   triggerBuild() {
     BuildActions.triggerBuild(this.props.params.moduleId);
+  }
+
+  toggleStar(isStarred, starInfo) {
+    StarActions.toggleStar(isStarred, starInfo);
   }
 
   render() {
@@ -52,9 +78,12 @@ class ModuleContainer extends Component {
         <Module
           params={this.props.params}
           buildHistory={this.state.buildHistory}
+          stars={this.state.stars}
+          pathname={this.getPathname()}
           loading={this.state.loading}
           triggerBuild={this.triggerBuild}
           buildTriggering={!this.state.buildTriggeringDone}
+          toggleStar={this.toggleStar}
         />
       </PageContainer>
     );

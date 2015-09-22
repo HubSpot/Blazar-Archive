@@ -1,5 +1,7 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
+import {some} from 'underscore';
+
 import PageHeader from '../shared/PageHeader.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -11,6 +13,7 @@ import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
 import Paginator from '../shared/Paginator.jsx';
 import BuildButton from './BuildButton.jsx';
+import Star from '../shared/Star.jsx';
 
 class Module extends Component {
 
@@ -26,6 +29,12 @@ class Module extends Component {
   onPage(page) {
     this.state.pagination.page = page;
     this.forceUpdate();
+  }
+
+  getIsStarredState() {
+    return some(this.props.stars, (star) => {
+      return star.moduleId === this.props.params.moduleId;
+    }.bind(this));
   }
 
   render() {
@@ -49,7 +58,15 @@ class Module extends Component {
         <UIGrid>
           <UIGridItem size={10}>
             <Headline>
-              <Icon type="octicon" name="file-directory" classNames="headline-icon" />
+              <Star
+                className='icon-roomy'
+                isStarred={this.getIsStarredState()}
+                toggleStar={this.props.toggleStar} 
+                modulePath={this.props.pathname}
+                moduleName={this.props.params.module}
+                moduleId={this.props.params.moduleId}
+                updateWithState={true}
+              />
               {this.props.params.module} 
               <HeadlineDetail>
                 Build History
@@ -89,8 +106,11 @@ Module.propTypes = {
   loading: PropTypes.bool.isRequired,
   params: PropTypes.object.isRequired,
   buildHistory: PropTypes.array.isRequired,
+  pathname: PropTypes.string.isRequired,
+  stars: PropTypes.array.isRequired,
   triggerBuild: PropTypes.func.isRequired,
-  buildTriggering: PropTypes.bool
+  buildTriggering: PropTypes.bool,
+  toggleStar: PropTypes.func.isRequired
 };
 
 export default Module;

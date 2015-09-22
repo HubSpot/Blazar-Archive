@@ -2,7 +2,7 @@
 
 const appConfig = {
   // sidebar polling frequency in ms
-  buildsRefresh: 5000,
+  buildsRefresh: 55000,
 
   appRoot: process.env.BLAZAR_APP_URI || '',
   // If we have an env variable, gulp is proxying it through /api.
