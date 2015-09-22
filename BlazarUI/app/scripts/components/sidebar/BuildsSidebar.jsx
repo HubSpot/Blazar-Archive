@@ -76,7 +76,7 @@ class BuildsSidebar extends Component {
     const builds = this.props.builds;
     const options = {
       extract: function(el) {
-        return el.module.name;
+        return el.module.name + el.gitInfo.branch;
       }
     };
 
