@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
-import {labels, iconStatus} from '../constants';
 import {bindAll, has} from 'underscore';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';

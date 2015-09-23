@@ -1,9 +1,10 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
+import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import { contains } from 'underscore';
 import Helpers from '../ComponentHelpers';
-import {labels, iconStatus} from '../constants';
+import {LABELS, iconStatus} from '../constants';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -11,13 +12,13 @@ import Sha from '../shared/Sha.jsx';
 class BuildHistoryTableRow extends Component {
 
   getRowClassNames() {
-    if (this.props.build.build.state === 'FAILED') {
+    if (this.props.build.build.state === BuildStates.FAILED) {
       return 'bgc-danger';
     }
   }
 
   getBuildResult(result) {
-    const classNames = labels[result];
+    const classNames = LABELS[result];
 
     return (
       <Icon
@@ -44,7 +45,7 @@ class BuildHistoryTableRow extends Component {
       duration = Helpers.timestampDuration(build.endTimestamp - build.startTimestamp);
     }
 
-    if (contains(['IN_PROGRESS', 'QUEUED', 'LAUNCHING'], build.state)) {
+    if (contains([BuildStates.IN_PROGRESS, BuildStates.QUEUED, BuildStates.LAUNCHING], build.state)) {
       duration = Helpers.humanizeText(build.state) + '...';
     }
 

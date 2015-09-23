@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import BuildStates from '../../constants/BuildStates.js';
+import BuildStates from '../../constants/BuildStates';
 import Build from './Build.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 import BuildStore from '../../stores/buildStore';

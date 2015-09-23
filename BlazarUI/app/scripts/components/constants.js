@@ -1,4 +1,4 @@
-export const labels = {
+export const LABELS = {
   'SUCCEEDED': 'success',
   'FAILED': 'danger',
   'CANCELLED': 'warning',

@@ -1,13 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import Helpers from '../ComponentHelpers';
-import {labels, iconStatus} from '../constants';
+import {LABELS, iconStatus} from '../constants';
 import Icon from '../shared/Icon.jsx';
 import { Link } from 'react-router';
 
 class ReposTableRow extends Component {
 
   getBuildResult(result) {
-    const classNames = labels[result] + ' icon-roomy';
+    const classNames = LABELS[result] + ' icon-roomy';
 
     return (
       <Icon

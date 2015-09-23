@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import BuildStates from '../../constants/BuildStates.js';
 import {map, filter, reduce} from 'underscore';
 import BuildHistoryTableHeader from './BuildHistoryTableHeader.jsx';
 import BuildHistoryTableRow from './BuildHistoryTableRow.jsx';
@@ -11,7 +12,7 @@ class BuildHistoryTable extends Component {
     const avgTime = this.averageBuildTime();
 
     return builds.map((build, i) => {
-      if (build.build.state === 'IN_PROGRESS') {
+      if (build.build.state === BuildStates.IN_PROGRESS) {
         const elapsedTime = new Date().getTime() - build.build.startTimestamp;
         const progress = Math.round((elapsedTime / avgTime) * 100);
 

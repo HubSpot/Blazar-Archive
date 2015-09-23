@@ -8,6 +8,8 @@ import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
 import {find} from 'underscore';
 
+import BuildStates from '../constants/BuildStates';
+
 let gitInfo;
 
 function fetchBuild(data) {
@@ -78,8 +80,7 @@ function getBuild() {
   const buildPromise = build.fetch();
 
   buildPromise.done( () => {
-
-    if (build.data.build.state === 'LAUNCHING') {
+    if (build.data.build.state === BuildStates.LAUNCHING) {
       BuildActions.loadBuildSuccess({
         build: build.data
       });

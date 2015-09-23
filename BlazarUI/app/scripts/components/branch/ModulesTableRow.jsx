@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
+import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
-import {labels, iconStatus} from '../constants';
+import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
 
 import Helpers from '../ComponentHelpers';
@@ -11,14 +12,14 @@ import Sha from '../shared/Sha.jsx';
 class ModulesTableRow extends Component {
 
   getRowClassNames(build) {
-    if (build.state === 'FAILED') {
+    if (build.state === BuildStates.FAILED) {
       return 'bgc-danger';
     }
   }
 
   getBuildResult(build) {
     const result = build.state;
-    const classNames = `icon-roomy ${labels[result]}`;
+    const classNames = `icon-roomy ${LABELS[result]}`;
 
     return (
       <Icon
@@ -63,7 +64,7 @@ class ModulesTableRow extends Component {
     }
 
     let duration = build.duration;
-    if (build.state === 'IN_PROGRESS') {
+    if (build.state === BuildStates.IN_PROGRESS) {
       duration = 'In Progress...';
     }
 

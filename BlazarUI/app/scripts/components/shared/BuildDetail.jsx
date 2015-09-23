@@ -1,25 +1,20 @@
 import React, {Component, PropTypes} from 'react';
-import {has} from 'underscore';
+import {has, contains} from 'underscore';
 import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
+
 import Sha from '../shared/Sha.jsx';
-import BuildStates from '../../constants/BuildStates';
 import Alert from 'react-bootstrap/lib/Alert';
 
-const buildLables = {
-  'SUCCEEDED': 'success',
-  'FAILED': 'danger',
-  'IN_PROGRESS': 'info',
-  'QUEUED': 'info',
-  'LAUNCHING': 'info',
-  'CANCELLED': 'warning'
-};
+import BuildStates from '../../constants/BuildStates';
+import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
+import {LABELS} from '../constants';
 
 class BuildDetail extends Component {
 
   getWrapperClassNames() {
     return classNames([
-      `build-detail alert alert-${buildLables[this.props.build.build.state]}`
+      `build-detail alert alert-${LABELS[this.props.build.build.state]}`
     ]);
   }
 
@@ -56,14 +51,14 @@ class BuildDetail extends Component {
       buildResult: humanizeText(build.state)
     }
 
-    if (build.state !== 'IN_PROGRESS' && build.state !== 'QUEUED' && build.state !== 'LAUNCHING') {
+    if (contains(FINAL_BUILD_STATES, build.state)) {
       buildDetail.endtime = timestampFormatted(build.endTimestamp)
       buildDetail.duration = (
         <small>in {build.duration}</small>
       );
     }
 
-    if (build.state === 'IN_PROGRESS') {
+    if (build.state === BuildStates.IN_PROGRESS) {
       buildDetail.duration = (
         <small>started {timestampFormatted(build.startTimestamp)}</small>
       );
