@@ -57,6 +57,14 @@ let ComponentHelpers = {
     });
 
     return starredModules;
+  },
+
+  scrollToTop: function() {
+    window.scrollTo(0, 0);
+  },
+
+  scrollToBottom: function() {
+    window.scrollTo(0, document.body.scrollHeight);
   }
 
 };

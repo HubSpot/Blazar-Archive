@@ -12,11 +12,11 @@ import SectionLoader from '../shared/SectionLoader.jsx';
 import Icon from '../shared/Icon.jsx';
 import { BUILD_ICONS } from '../constants';
 import BuildCommits from './BuildCommits.jsx';
+import AnchorButtons from '../shared/AnchorButtons.jsx';
 
 class Build extends Component {
 
   render() {
-
     if (this.props.loading) {
       return (
         <SectionLoader />
@@ -31,6 +31,7 @@ class Build extends Component {
 
     return (
       <div>
+        <AnchorButtons/>
         <PageHeader>
           <Breadcrumb
             appRoot={config.appRoot}
@@ -52,7 +53,7 @@ class Build extends Component {
             />
           </UIGridItem>
           <UIGridItem size={12}>
-            <BuildCommits 
+            <BuildCommits
               build={this.props.build}
               loading={this.props.loading}
             />
