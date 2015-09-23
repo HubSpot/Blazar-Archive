@@ -2,6 +2,7 @@
 import React, {Component, PropTypes} from 'react';
 import {some} from 'underscore';
 
+import {getIsStarredState} from '../Helpers.js';
 import PageHeader from '../shared/PageHeader.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -31,12 +32,6 @@ class Module extends Component {
     this.forceUpdate();
   }
 
-  getIsStarredState() {
-    return some(this.props.stars, (star) => {
-      return star.moduleId === this.props.params.moduleId;
-    }.bind(this));
-  }
-
   render() {
     const pagination = this.state.pagination || {};
     const paginated = Paginator.paginate(this.props.buildHistory, pagination);
@@ -52,7 +47,7 @@ class Module extends Component {
         <PageHeader>
           <Breadcrumb
             appRoot={config.appRoot}
-            path={window.location.pathname}
+            path={this.props.pathname}
           />
         </PageHeader>
         <UIGrid>
@@ -60,7 +55,7 @@ class Module extends Component {
             <Headline>
               <Star
                 className='icon-roomy'
-                isStarred={this.getIsStarredState()}
+                isStarred={getIsStarredState(this.props.stars, this.props.params.moduleId)}
                 toggleStar={this.props.toggleStar} 
                 modulePath={this.props.pathname}
                 moduleName={this.props.params.module}

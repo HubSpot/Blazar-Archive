@@ -1,5 +1,5 @@
 // Using in favor of Deprecated ComponentHelpers.js
-
+import {some} from 'underscore';
 import moment from 'moment';
 
 // 1234567890 => 1 Aug 1991 15:00
@@ -48,4 +48,10 @@ export const events = {
   removeListener: function(event, cb) {
     window.removeEventListener(event, cb);
   }
+};
+
+export const getIsStarredState = function(stars, id) {
+  return some(stars, (star) => {
+    return star.moduleId === id;
+  });
 };

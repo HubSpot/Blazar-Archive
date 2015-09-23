@@ -33,13 +33,16 @@ class ModuleContainer extends Component {
     this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
-
-    BuildHistoryActions.loadBuildHistory(this.props.params);    
+    BuildHistoryActions.loadBuildHistory(this.props.params);
     StarActions.loadStars();
   }
 
   componentWillReceiveProps(nextprops) {
     BuildHistoryActions.loadBuildHistory(nextprops.params);
+    this.setState({
+      loading: true,
+      loadingHistory: true
+    });
   }
 
   componentWillUnmount() {
@@ -51,7 +54,6 @@ class ModuleContainer extends Component {
 
   onStatusChange(state) {
     this.setState(state);
-
     if (!this.state.loadingHistory && !this.state.loadingStars) {
       this.setState({
         loading: false

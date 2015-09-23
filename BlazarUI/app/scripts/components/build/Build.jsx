@@ -4,14 +4,12 @@ import PageHeader from '../shared/PageHeader.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-import BuildDetail from '../shared/BuildDetail.jsx';
-import BuildLog from './BuildLog.jsx';
-import Headline from '../shared/headline/Headline.jsx';
-import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
-import Icon from '../shared/Icon.jsx';
-import { BUILD_ICONS } from '../constants';
+
+import BuildHeadline from './BuildHeadline.jsx';
+import BuildDetail from '../shared/BuildDetail.jsx';
 import BuildCommits from './BuildCommits.jsx';
+import BuildLog from './BuildLog.jsx';
 
 class Build extends Component {
 
@@ -39,13 +37,14 @@ class Build extends Component {
         </PageHeader>
         <UIGrid>
           <UIGridItem size={12}>
-            <Headline>
-              <Icon name={BUILD_ICONS[build.state]} classNames="headline-icon"></Icon>
-              {this.props.params.module}
-              <HeadlineDetail>
-                Build #{build.buildNumber}
-              </HeadlineDetail>
-            </Headline>
+            <BuildHeadline 
+              moduleName={this.props.params.module}
+              moduleId={this.props.params.moduleId}
+              modulePath={this.props.pathname}
+              buildNumber={build.buildNumber}
+              isStarred={this.props.isStarred}
+              toggleStar={this.props.toggleStar}
+            />
             <BuildDetail
               build={this.props.build}
               loading={this.props.loading}
@@ -79,7 +78,10 @@ Build.propTypes = {
   }),
   log: PropTypes.string,
   params: PropTypes.object,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  toggleStar: PropTypes.func.isRequired,
+  isStarred: PropTypes.bool.isRequired,
+  pathname: PropTypes.string.isRequired
 };
 
 export default Build;

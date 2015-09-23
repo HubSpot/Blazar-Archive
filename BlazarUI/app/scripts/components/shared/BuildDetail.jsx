@@ -5,6 +5,8 @@ import classNames from 'classnames';
 
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
+import Icon from '../shared/Icon.jsx';
+import { BUILD_ICONS } from '../constants';
 
 import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
@@ -71,8 +73,9 @@ class BuildDetail extends Component {
       <div className={this.getWrapperClassNames()}>
         <div className='build-detail__topline'>
           <h4 className='build-detail__build-state'>
+            <Icon name={BUILD_ICONS[build.state]} classNames="headline-icon"></Icon>
             Build {buildDetail.buildResult} {buildDetail.duration}
-          </h4>        
+          </h4>
         </div>  
 
         <div className='build-detail__commitInfo'>

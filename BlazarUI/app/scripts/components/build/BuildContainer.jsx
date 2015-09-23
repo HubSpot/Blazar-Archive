@@ -1,14 +1,23 @@
 import React, {Component, PropTypes} from 'react';
-import BuildStates from '../../constants/BuildStates';
+import {bindAll, contains, some} from 'underscore';
+import {ACTIVE_BUILD_STATES} from '../../constants/ActiveBuildStates.js';
+import {BuildStates} from '../../constants/BuildStates.js';
+import {getIsStarredState} from '../Helpers.js';
 import Build from './Build.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
+
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
+import StarStore from '../../stores/starStore';
+import StarActions from '../../actions/starActions';
+import LocationStore from '../../stores/locationStore';
 
 class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
+
+    bindAll(this, 'toggleStar');
 
     this.state = {
       loading: true,
@@ -17,30 +26,44 @@ class BuildContainer extends Component {
         gitInfo: {},
         module: { name: ''}
       },
-      log: ''
+      log: '',
+      stars: [],
     };
   }
 
   componentDidMount() {
-    this.unsubscribe = BuildStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
     BuildActions.loadBuild(this.props.params);
+    StarActions.loadStars();
   }
 
   componentWillReceiveProps(nextprops) {
-    this.state.loading = true;
+    console.log('will receive da props');
+    this.setState({
+      loading: true
+    });
     BuildActions.loadBuild(nextprops.params);
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
+    this.unsubscribeFromBuild();
+    this.unsubscribeFromStars();
   }
 
   onStatusChange(state) {
+
     if (state.loading) {
       this.setState({
         loading: true
       });
       return;
+    }
+
+    if (state.stars) {
+      this.setState({
+        stars: state.stars
+      });
     }
 
     if (state.build) {
@@ -50,21 +73,16 @@ class BuildContainer extends Component {
         log: state.build.log
       });
 
-      const buildState = state.build.build.build.state
-
-      // to do - move polling into action
-      if (buildState === BuildStates.IN_PROGRESS || buildState === BuildStates.QUEUED || buildState === BuildStates.LAUNCHING) {
+      if (contains(ACTIVE_BUILD_STATES, state.build.build.build.state)){
         setTimeout( () => {
           BuildActions.reloadBuild(this.props.params);
         }, 5000);
       }
-    } else {
-      this.setState({
-        loading: false,
-        log: state.error
-      });
     }
+  }
 
+  toggleStar(isStarred, starInfo) {
+    StarActions.toggleStar(isStarred, starInfo);
   }
 
   render() {
@@ -75,6 +93,9 @@ class BuildContainer extends Component {
           log={this.state.log}
           params={this.props.params}
           loading={this.state.loading}
+          pathname={LocationStore.pathname}
+          toggleStar={this.toggleStar}
+          isStarred={getIsStarredState(this.state.stars, this.props.params.moduleId)}
         />
       </PageContainer>
     );
