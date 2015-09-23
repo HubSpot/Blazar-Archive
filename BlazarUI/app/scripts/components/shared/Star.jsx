@@ -8,21 +8,6 @@ class Star extends Component {
   constructor(props) {
     super(props);
     bindAll(this, 'handleClick');
-
-    this.state = {
-      isStarredWithState: null
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (!this.props.updateWithState) {
-      return;
-    }
-
-    this.setState({
-      isStarredWithState: nextProps.isStarred
-    });
-
   }
 
   handleClick(event) {
@@ -38,48 +23,23 @@ class Star extends Component {
       modulePath: this.props.modulePath
     };
 
-    let starredState = !this.props.isStarred
-
-    // we want to show change w/out waiting for new props
-    if (this.props.updateWithState) {
-
-      if (this.state.isStarredWithState === null) { 
-        starredState = !this.props.isStarred;
-      } else {
-        starredState = !this.state.isStarredWithState;
-      }
-
-      this.setState({
-        isStarredWithState: starredState
-      });
-
-    }
-
-    this.props.toggleStar(!starredState, starInfo);
-  }
-
-  getStarredState() {
-    return this.state.isStarredWithState !== null ? this.state.isStarredWithState : this.props.isStarred;
+    this.props.toggleStar(this.props.isStarred, starInfo);
   }
 
   getContainerClassNames() {
-    const starredState = this.getStarredState();
-
     return classnames([
        'star',
        this.props.className,
        {disabled: this.props.disabled},
-       {selected: starredState},
-       {unselected: !starredState}
+       {selected: this.props.isStarred},
+       {unselected: !this.props.isStarred}
     ]);
   }
 
   getIconClassNames() {
-    const starredState = this.getStarredState();
-
     return classnames([
-       {'star': starredState},
-       {'star-o': !starredState}
+       {'star': this.props.isStarred},
+       {'star-o': !this.props.isStarred}
     ]);
   }
 
@@ -106,7 +66,7 @@ Star.propTypes = {
   modulePath: PropTypes.string.isRequired,
   moduleName: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
-  updateWithState: PropTypes.bool
+  updateWithState: PropTypes.bool // remove this ---
 };
 
 export default Star;
