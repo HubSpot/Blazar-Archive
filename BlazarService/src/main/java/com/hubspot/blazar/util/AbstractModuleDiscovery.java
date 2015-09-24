@@ -1,7 +1,11 @@
 package com.hubspot.blazar.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.net.UrlEscapers;
+import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
@@ -11,6 +15,7 @@ import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GitHub;
 
 import javax.inject.Inject;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,9 +26,27 @@ public abstract class AbstractModuleDiscovery implements ModuleDiscovery {
   @Inject
   Map<String, GitHub> gitHubByHost;
 
+  @Inject
+  ObjectMapper mapper;
+
+  @Inject
+  YAMLFactory yamlFactory;
+
   @Override
   public boolean allowDuplicates() {
     return true;
+  }
+
+  protected Optional<BuildConfig> configFor(String path, GHRepository repository, GitInfo gitInfo) throws IOException {
+    String configPath = (path.contains("/") ? path.substring(0, path.lastIndexOf('/') + 1) : "") + ".blazar.yaml";
+    final String config;
+    try {
+      config = contentsFor(configPath, repository, gitInfo);
+    } catch (FileNotFoundException e) {
+      return Optional.absent();
+    }
+
+    return Optional.of(mapper.readValue(yamlFactory.createParser(config), BuildConfig.class));
   }
 
   protected String contentsFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
