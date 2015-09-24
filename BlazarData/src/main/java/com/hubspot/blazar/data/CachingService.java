@@ -5,6 +5,7 @@ import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.Module;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,13 +27,21 @@ public abstract class CachingService<T extends BuildDefinition> {
 
   protected abstract Set<T> fetch(long since);
 
-  public Set<T> getAll() {
+  public Set<T> getAll(long since) {
     update();
 
     Lock readLock = lock.readLock();
     readLock.lock();
     try {
-      return new HashSet<>(cache.values());
+      Set<T> values = new HashSet<>(cache.values());
+      for (Iterator<T> iterator = values.iterator(); iterator.hasNext(); ) {
+        T value = iterator.next();
+        if (value.getModule().getUpdatedTimestamp() < since) {
+          iterator.remove();
+        }
+      }
+
+      return values;
     } finally {
       readLock.unlock();
     }
