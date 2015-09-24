@@ -24,6 +24,7 @@ CREATE TABLE `modules` (
   `inProgressBuildId` bigint(20) unsigned,
   `pendingBuildId` bigint(20) unsigned,
   `updatedTimestamp` bigint(20) unsigned NOT NULL,
+  `buildpack` mediumtext,
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`branchId`, `name`),
   INDEX (`updatedTimestamp`)
