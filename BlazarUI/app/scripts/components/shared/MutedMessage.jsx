@@ -21,7 +21,8 @@ class MutedMessage extends Component {
 
 MutedMessage.propTypes = {
   classNames: PropTypes.string,
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  roomy: PropTypes.bool
 };
 
 export default MutedMessage;

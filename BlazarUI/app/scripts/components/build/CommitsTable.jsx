@@ -18,7 +18,7 @@ class CommitsTable extends Component {
   render() {
     if (this.props.commits.length === 0) {
       return (
-        <MutedMessage>
+        <MutedMessage roomy={true}>
           No new commits since previous build
         </MutedMessage>
       )
