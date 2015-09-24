@@ -3,7 +3,7 @@ package com.hubspot.blazar.base;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
-import com.hubspot.blazar.base.ConfigParts.Buildpack;
+import com.hubspot.rosetta.annotations.StoredAsJson;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -18,9 +18,10 @@ public class Module {
   private final PathMatcher matcher;
   private final boolean active;
   private final long updatedTimestamp;
-  private final Optional<Buildpack> buildpack;
+  @StoredAsJson
+  private final Optional<GitInfo> buildpack;
 
-  public Module(String name, String path, String glob, Optional<Buildpack> buildpack) {
+  public Module(String name, String path, String glob, Optional<GitInfo> buildpack) {
     this(Optional.<Integer>absent(), name, path, glob, true, System.currentTimeMillis(), buildpack);
   }
 
@@ -31,7 +32,7 @@ public class Module {
                 @JsonProperty("glob") String glob,
                 @JsonProperty("active") boolean active,
                 @JsonProperty("updatedTimestamp") long updatedTimestamp,
-                @JsonProperty("buildpack") Optional<Buildpack> buildpack) {
+                @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
     this.id = id;
     this.name = name;
     this.path = path;
@@ -66,7 +67,7 @@ public class Module {
     return updatedTimestamp;
   }
 
-  public Optional<Buildpack> getBuildpack() {
+  public Optional<GitInfo> getBuildpack() {
     return buildpack;
   }
 
@@ -93,11 +94,12 @@ public class Module {
         Objects.equals(id, module.id) &&
         Objects.equals(name, module.name) &&
         Objects.equals(path, module.path) &&
-        Objects.equals(glob, module.glob);
+        Objects.equals(glob, module.glob) &&
+        Objects.equals(buildpack, module.buildpack);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, path, glob, active);
+    return Objects.hash(id, name, path, glob, active, buildpack);
   }
 }

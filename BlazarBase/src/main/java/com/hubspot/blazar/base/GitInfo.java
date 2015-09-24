@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 
+import java.util.List;
 import java.util.Objects;
 
 public class GitInfo {
@@ -93,5 +95,17 @@ public class GitInfo {
   @Override
   public int hashCode() {
     return Objects.hash(id, host, organization, repository, repositoryId, branch, active);
+  }
+
+  @JsonCreator
+  public static GitInfo fromString(String uri) {
+    List<String> parts = Splitter.on('#').splitToList(uri);
+    String ref = parts.get(1);
+    parts = Splitter.on('/').splitToList(parts.get(0));
+    String host = parts.get(0);
+    String organization = parts.get(1);
+    String repository = parts.get(2);
+
+    return new GitInfo(Optional.<Integer>absent(), host, organization, repository, 0, ref, false);
   }
 }

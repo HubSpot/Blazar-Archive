@@ -3,7 +3,7 @@ package com.hubspot.blazar.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Optional;
-import com.hubspot.blazar.base.ConfigParts.Buildpack;
+import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
@@ -19,8 +19,10 @@ import java.util.Set;
 
 @Singleton
 public class MavenModuleDiscovery extends AbstractModuleDiscovery {
+  private static final Optional<GitInfo> DEFAULT_BUILDPACK =
+      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#stable"));
+
   private final XmlMapper xmlMapper;
-  private static final Optional<Buildpack> BUILDPACK = Optional.of(new Buildpack("git@git.hubteam.com:paas/Blazar-Buildpack-Java.git", "stable"));
 
   @Inject
   public MavenModuleDiscovery(XmlMapper xmlMapper) {
@@ -60,7 +62,17 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
       } else {
         glob = (pom.contains("/") ? pom.substring(0, pom.lastIndexOf('/') + 1) : "") + "**";
       }
-      modules.add(new Module(artifactId, pom, glob, BUILDPACK));
+
+      Optional<BuildConfig> buildConfig = configFor(pom, repository, gitInfo);
+
+      final Optional<GitInfo> buildpack;
+      if (buildConfig.isPresent() && buildConfig.get().getBuildpack().isPresent()) {
+        buildpack = buildConfig.get().getBuildpack();
+      } else {
+        buildpack = DEFAULT_BUILDPACK;
+      }
+
+      modules.add(new Module(artifactId, pom, glob, buildpack));
     }
 
     return modules;

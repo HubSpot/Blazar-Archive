@@ -1,9 +1,5 @@
 package com.hubspot.blazar.util;
 
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Optional;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
@@ -20,14 +16,9 @@ import java.util.Set;
 
 @Singleton
 public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
-  private final ObjectMapper mapper;
-  private final YAMLFactory yamlFactory;
 
   @Inject
-  public BlazarConfigModuleDiscovery(ObjectMapper mapper, YAMLFactory yamlFactory) {
-    this.mapper = mapper;
-    this.yamlFactory = yamlFactory;
-  }
+  public BlazarConfigModuleDiscovery() {}
 
   @Override
   public boolean allowDuplicates() {
@@ -59,7 +50,7 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
 
     Set<Module> modules = new HashSet<>();
     for (String blazarConfig : blazarConfigs) {
-      BuildConfig buildConfig = getBuildConfigFromString(contentsFor(blazarConfig, repository, gitInfo));
+      BuildConfig buildConfig = configFor(blazarConfig, repository, gitInfo).get();
       if (canBuild(buildConfig)) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
@@ -67,10 +58,6 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
       }
     }
     return modules;
-  }
-
-  private BuildConfig getBuildConfigFromString(String configString) throws IOException {
-    return mapper.readValue(yamlFactory.createParser(configString), BuildConfig.class);
   }
 
   private boolean canBuild(BuildConfig buildConfig) {
