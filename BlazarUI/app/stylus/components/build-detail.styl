@@ -1,19 +1,32 @@
 @import 'variables'
 
+topline-status(color)
+    .build-detail__topline
+      border-bottom 1px solid color
+  
 .build-detail
-  padding 10px
+  padding 0
   float left
   width 100%
   .commit
     margin 10px 0
-
+  
+  &.alert-success
+    topline-status($success-dark)
+      
+  &.alert-danger
+    topline-status($danger-dark)
+    
+  &.alert-info
+    topline-status($info-dark)
+      
 .build-detail__build-state
   font-weight $font-medium
 
 .build-detail__topline
-  border-bottom 1px solid $gray
   padding-bottom 10px
   margin-bottom 10px
+  padding 10px 10px 0 10px
 
 .build-detail__sha
   padding-left 10px
@@ -36,6 +49,7 @@
     line-height 1
     
 .build-detail__commitInfo
+  padding 5px 10px 15px 10px
   p
     margin: 0 0 3px
     font-size 13px

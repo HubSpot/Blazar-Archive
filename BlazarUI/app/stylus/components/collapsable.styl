@@ -6,7 +6,8 @@ header-state(state)
 
 .collapsable
   margin 5px 0
-  border 1px solid $gray
+  border 1px solid $blue-gray-darker
+  border-radius 3px
   background white
   padding 0
   
@@ -14,10 +15,12 @@ header-state(state)
     border none
 
 .collapsable__header
-  background $gray-lighter
+  background $blue-gray
   margin 0
-  font-size 14px
-  font-weight 400
+  border-radius 3px
+  font-size 13px
+  font-weight $font-medium
+  color $color-text-light
   &:hover
     cursor pointer
     
@@ -33,3 +36,4 @@ header-state(state)
 .collapsable__header-icon
   font-size 12px
   padding 12px 10px 10px
+  color $color-text-lighter
