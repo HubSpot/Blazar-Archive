@@ -2,13 +2,14 @@ import React, {Component, PropTypes} from 'react';
 import $ from 'jquery';
 import LazyRender from '../shared/LazyRender.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
-import fuzzy from 'fuzzy';
+
 import {bindAll, filter, contains, has, contains} from 'underscore';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import Helpers from '../ComponentHelpers';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import SidebarItem from '../sidebar/SidebarItem.jsx';
 import {FILTER_MESSAGES, NO_MATCH_MESSAGES} from '../constants';
+import Search from '../../utils/search';
 
 let Link = require('react-router').Link;
 
@@ -74,15 +75,13 @@ class BuildsSidebar extends Component {
 
   getFilterMatches() {
     const builds = this.props.builds;
-    const options = {
-      extract: function(el) {
-        return el.module.name + el.gitInfo.branch;
-      }
-    };
 
-    const results = fuzzy.filter(this.state.filterText, builds, options);
-    const matches = results.map(function(el) { return el.original; });
-    return matches;
+    if (builds.length === 0) {
+      return [];
+    }
+
+    const modulesSearch = new Search({ records: builds });
+    return modulesSearch.match(this.state.filterText);
   }
 
   buildModuleComponents(modules) {
