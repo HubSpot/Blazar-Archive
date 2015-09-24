@@ -72,6 +72,9 @@ public abstract class CachingService<T extends BuildDefinition> {
       } finally {
         writeLock.unlock();
       }
+    } else {
+      writeLock.lock();
+      writeLock.unlock();
     }
   }
 }
