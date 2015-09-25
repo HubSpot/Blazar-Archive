@@ -1,4 +1,4 @@
-package com.hubspot.blazar.util;
+package com.hubspot.blazar.discovery;
 
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.GitInfo;

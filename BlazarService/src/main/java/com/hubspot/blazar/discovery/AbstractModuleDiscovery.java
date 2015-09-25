@@ -1,4 +1,4 @@
-package com.hubspot.blazar.util;
+package com.hubspot.blazar.discovery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
