@@ -131,7 +131,7 @@ public class BuildLauncher {
       LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
       buildService.begin(launching);
       LOG.info("About to launch build {}", launching.getId().get());
-      HttpResponse response = asyncHttpClient.execute(buildRequest(definition.getModule(), launching)).get();
+      HttpResponse response = asyncHttpClient.execute(buildRequest(definition, launching)).get();
       LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
     } else {
       LOG.info("Failing build {}", queued.getId().get());
@@ -140,12 +140,12 @@ public class BuildLauncher {
     }
   }
 
-  private HttpRequest buildRequest(Module module, Build build) {
+  private HttpRequest buildRequest(BuildDefinition definition, Build build) {
     String host = System.getenv("SINGULARITY_HOST");
     String url = String.format("http://%s/singularity/v2/api/requests/request/blazar-executor/run", host);
 
     String buildId = String.valueOf(build.getId().get());
-    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(module));
+    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(definition));
 
     return HttpRequest.newBuilder()
         .setMethod(Method.POST)
@@ -155,15 +155,15 @@ public class BuildLauncher {
         .build();
   }
 
-  private String buildCommand(Module module) {
-    if (module.getPath().endsWith(".blazar.yaml")) {
+  private String buildCommand(BuildDefinition definition) {
+    if (definition.getModule().getPath().endsWith(".blazar.yaml")) {
       return "--safe_mode";
     }
 
     String whitelist = Objects.firstNonNull(System.getenv("BUILD_WHITELIST"), "");
 
-    List<String> modulesToBuild = Splitter.on(',').omitEmptyStrings().splitToList(whitelist);
-    return modulesToBuild.contains(module.getName()) ? "--safe_mode" : "--dry_run";
+    List<String> reposToBuild = Splitter.on(',').omitEmptyStrings().splitToList(whitelist);
+    return reposToBuild.contains(definition.getGitInfo().getRepository()) ? "--safe_mode" : "--dry_run";
   }
 
   private Optional<BuildConfig> configAtSha(BuildDefinition definition, String sha) throws IOException {
