@@ -40,7 +40,6 @@ import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.BuildStateService;
 import com.hubspot.horizon.AsyncHttpClient;

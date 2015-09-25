@@ -62,7 +62,7 @@ public class ModuleService {
   private static Map<String, Module> mapByName(Set<Module> modules) {
     Map<String, Module> modulesByName = new HashMap<>();
     for (Module module : modules) {
-      modulesByName.put(module.getName(), module);
+      modulesByName.put(module.getName().toLowerCase(), module);
     }
 
     return modulesByName;
