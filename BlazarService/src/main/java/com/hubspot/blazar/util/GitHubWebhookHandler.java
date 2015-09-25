@@ -9,6 +9,7 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;

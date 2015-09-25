@@ -5,12 +5,12 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
-import com.hubspot.blazar.util.BlazarConfigModuleDiscovery;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
+import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
@@ -29,11 +29,11 @@ import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.IndexResource;
 import com.hubspot.blazar.util.BlazarServiceLoader;
 import com.hubspot.blazar.util.BuildLauncher;
-import com.hubspot.blazar.util.CompositeModuleDiscovery;
+import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
-import com.hubspot.blazar.util.MavenModuleDiscovery;
-import com.hubspot.blazar.util.ModuleDiscovery;
+import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
+import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
@@ -99,8 +99,8 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
   @Provides
   @Singleton
-  public XmlMapper providesXmlMapper() {
-    return new XmlMapper();
+  public XmlFactory providesXmlFactory() {
+    return new XmlFactory();
   }
 
   @Provides

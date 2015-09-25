@@ -1,4 +1,4 @@
-package com.hubspot.blazar.util;
+package com.hubspot.blazar.discovery;
 
 import com.google.common.collect.ImmutableSet;
 import com.hubspot.blazar.base.GitInfo;
