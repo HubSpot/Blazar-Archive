@@ -18,6 +18,9 @@ import java.util.Set;
 
 @Singleton
 public class MavenModuleDiscovery extends AbstractModuleDiscovery {
+  private static final Optional<GitInfo> BUILDPACK =
+      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#stable"));
+
   private final XmlMapper xmlMapper;
 
   @Inject
@@ -58,7 +61,8 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
       } else {
         glob = (pom.contains("/") ? pom.substring(0, pom.lastIndexOf('/') + 1) : "") + "**";
       }
-      modules.add(new Module(artifactId, pom, glob));
+
+      modules.add(new Module(artifactId, pom, glob, BUILDPACK));
     }
 
     return modules;

@@ -13,14 +13,14 @@ import java.util.Set;
 public interface ModuleDao {
   String NOW = "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)";
 
-  @SqlQuery("SELECT id, name, path, glob, active, updatedTimestamp FROM modules WHERE branchId = :branchId")
+  @SqlQuery("SELECT id, name, path, glob, active, buildpack, updatedTimestamp FROM modules WHERE branchId = :branchId")
   Set<Module> getByBranch(@Bind("branchId") int branchId);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO modules (branchId, name, path, glob, active, updatedTimestamp) VALUES (:branchId, :name, :path, :glob, :active, " + NOW + ")")
+  @SqlUpdate("INSERT INTO modules (branchId, name, path, glob, active, buildpack, updatedTimestamp) VALUES (:branchId, :name, :path, :glob, :active, :buildpack, " + NOW + ")")
   int insert(@Bind("branchId") int branchId, @BindWithRosetta Module module);
 
-  @SqlUpdate("UPDATE modules SET path = :path, glob = :glob, active = :active, updatedTimestamp = " + NOW + " WHERE id = :id")
+  @SqlUpdate("UPDATE modules SET path = :path, glob = :glob, active = :active, buildpack = :buildpack, updatedTimestamp = " + NOW + " WHERE id = :id")
   int update(@BindWithRosetta Module module);
 
   @SqlUpdate("UPDATE modules SET active = 0, updatedTimestamp = " + NOW + " WHERE id = :id")

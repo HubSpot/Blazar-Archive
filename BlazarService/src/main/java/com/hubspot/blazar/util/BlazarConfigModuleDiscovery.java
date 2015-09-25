@@ -1,9 +1,6 @@
 package com.hubspot.blazar.util;
 
-import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Optional;
+import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
@@ -19,14 +16,9 @@ import java.util.Set;
 
 @Singleton
 public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
-  private final ObjectMapper mapper;
-  private final YAMLFactory yamlFactory;
 
   @Inject
-  public BlazarConfigModuleDiscovery(ObjectMapper mapper, YAMLFactory yamlFactory) {
-    this.mapper = mapper;
-    this.yamlFactory = yamlFactory;
-  }
+  public BlazarConfigModuleDiscovery() {}
 
   @Override
   public boolean allowDuplicates() {
@@ -58,19 +50,18 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
 
     Set<Module> modules = new HashSet<>();
     for (String blazarConfig : blazarConfigs) {
-      if (hasCommandsSection(contentsFor(blazarConfig, repository, gitInfo))) {
+      BuildConfig buildConfig = configFor(blazarConfig, repository, gitInfo).get();
+      if (canBuild(buildConfig)) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
-        modules.add(new Module(moduleName, blazarConfig, glob));
+        modules.add(new Module(moduleName, blazarConfig, glob, buildConfig.getBuildpack()));
       }
     }
-
     return modules;
   }
 
-  private boolean hasCommandsSection(String config) throws IOException {
-    TreeNode node = mapper.readTree(yamlFactory.createParser(config));
-    return node.get("cmds") != null;
+  private boolean canBuild(BuildConfig buildConfig) {
+    return (buildConfig.getCmds().size() > 0 || buildConfig.getBuildpack().isPresent());
   }
 
   private static String moduleName(GitInfo gitInfo, String path) {

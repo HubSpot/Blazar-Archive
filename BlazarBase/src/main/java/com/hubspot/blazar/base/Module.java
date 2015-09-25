@@ -3,6 +3,7 @@ package com.hubspot.blazar.base;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
+import com.hubspot.rosetta.annotations.StoredAsJson;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -17,9 +18,11 @@ public class Module {
   private final PathMatcher matcher;
   private final boolean active;
   private final long updatedTimestamp;
+  @StoredAsJson
+  private final Optional<GitInfo> buildpack;
 
-  public Module(String name, String path, String glob) {
-    this(Optional.<Integer>absent(), name, path, glob, true, System.currentTimeMillis());
+  public Module(String name, String path, String glob, Optional<GitInfo> buildpack) {
+    this(Optional.<Integer>absent(), name, path, glob, true, System.currentTimeMillis(), buildpack);
   }
 
   @JsonCreator
@@ -28,7 +31,8 @@ public class Module {
                 @JsonProperty("path") String path,
                 @JsonProperty("glob") String glob,
                 @JsonProperty("active") boolean active,
-                @JsonProperty("updatedTimestamp") long updatedTimestamp) {
+                @JsonProperty("updatedTimestamp") long updatedTimestamp,
+                @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
     this.id = id;
     this.name = name;
     this.path = path;
@@ -36,6 +40,7 @@ public class Module {
     this.matcher = FileSystems.getDefault().getPathMatcher("glob:" + glob);
     this.active = active;
     this.updatedTimestamp = updatedTimestamp;
+    this.buildpack = buildpack;
   }
 
   public Optional<Integer> getId() {
@@ -62,12 +67,16 @@ public class Module {
     return updatedTimestamp;
   }
 
+  public Optional<GitInfo> getBuildpack() {
+    return buildpack;
+  }
+
   public boolean contains(Path path) {
     return matcher.matches(path);
   }
 
   public Module withId(int id) {
-    return new Module(Optional.of(id), name, path, glob, active, updatedTimestamp);
+    return new Module(Optional.of(id), name, path, glob, active, updatedTimestamp, buildpack);
   }
 
   @Override
@@ -85,11 +94,12 @@ public class Module {
         Objects.equals(id, module.id) &&
         Objects.equals(name, module.name) &&
         Objects.equals(path, module.path) &&
-        Objects.equals(glob, module.glob);
+        Objects.equals(glob, module.glob) &&
+        Objects.equals(buildpack, module.buildpack);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, path, glob, active);
+    return Objects.hash(id, name, path, glob, active, buildpack);
   }
 }
