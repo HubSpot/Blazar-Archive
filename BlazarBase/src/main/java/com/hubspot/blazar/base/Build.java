@@ -34,6 +34,8 @@ public class Build {
   private final Optional<String> log;
   @StoredAsJson
   private final Optional<BuildConfig> buildConfig;
+  @StoredAsJson
+  private final Optional<BuildConfig> resolvedConfig;
 
   @JsonCreator
   public Build(@JsonProperty("id") Optional<Long> id,
@@ -45,7 +47,8 @@ public class Build {
                @JsonProperty("sha") Optional<String> sha,
                @JsonProperty("commitInfo") Optional<CommitInfo> commitInfo,
                @JsonProperty("log") Optional<String> log,
-               @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig) {
+               @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig,
+               @JsonProperty("resolvedConfig") Optional<BuildConfig> resolvedConfig) {
     this.id = id;
     this.moduleId = moduleId;
     this.buildNumber = buildNumber;
@@ -56,15 +59,16 @@ public class Build {
     this.commitInfo = commitInfo;
     this.log = log;
     this.buildConfig = buildConfig;
+    this.resolvedConfig = resolvedConfig;
   }
 
   public static Build queuedBuild(Module module, int buildNumber) {
     Optional<Long> absentLong = Optional.absent();
     Optional<String> absentString = Optional.absent();
     Optional<CommitInfo> commitInfo = Optional.absent();
-    Optional<BuildConfig> buildConfig = Optional.absent();
+    Optional<BuildConfig> config = Optional.absent();
 
-    return new Build(absentLong, module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, commitInfo, absentString, buildConfig);
+    return new Build(absentLong, module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, commitInfo, absentString, config, config);
   }
 
   public Optional<Long> getId() {
@@ -107,33 +111,41 @@ public class Build {
     return buildConfig;
   }
 
+  public Optional<BuildConfig> getResolvedConfig() {
+    return resolvedConfig;
+  }
+
   public Build withId(long id) {
-    return new Build(Optional.of(id), moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, buildConfig);
+    return new Build(Optional.of(id), moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, buildConfig, resolvedConfig);
   }
 
   public Build withCommitInfo(CommitInfo commitInfo) {
     Optional<String> sha = Optional.of(commitInfo.getCurrent().getId());
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, Optional.of(commitInfo), log, buildConfig);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, Optional.of(commitInfo), log, buildConfig, resolvedConfig);
   }
 
   public Build withState(State state) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, buildConfig);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, buildConfig, resolvedConfig);
   }
 
   public Build withStartTimestamp(long startTimestamp) {
-    return new Build(id, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, commitInfo, log, buildConfig);
+    return new Build(id, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, commitInfo, log, buildConfig, resolvedConfig);
   }
 
   public Build withEndTimestamp(long endTimestamp) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), sha, commitInfo, log, buildConfig);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), sha, commitInfo, log, buildConfig, resolvedConfig);
   }
 
   public Build withLog(String log) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, Optional.of(log), buildConfig);
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, Optional.of(log), buildConfig, resolvedConfig);
   }
 
   public Build withBuildConfig(BuildConfig buildConfig) {
-    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, Optional.of(buildConfig));
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, Optional.of(buildConfig), resolvedConfig);
+  }
+
+  public Build withResolvedConfig(BuildConfig resolvedConfig) {
+    return new Build(id, moduleId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, log, buildConfig, Optional.of(resolvedConfig));
   }
 
   @Override

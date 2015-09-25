@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,8 @@ import javax.inject.Singleton;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.User;
@@ -121,11 +124,13 @@ public class BuildLauncher {
       buildConfig = Optional.absent();
     }
 
-    if (buildConfig.isPresent()) {
+    Optional<BuildConfig> resolvedConfig;
+    if (buildConfig.isPresent() && (resolvedConfig = resolveConfig(buildConfig.get(), definition)).isPresent()) {
       Build launching = queued.withStartTimestamp(System.currentTimeMillis())
           .withState(State.LAUNCHING)
           .withCommitInfo(commitInfo.get())
-          .withBuildConfig(buildConfig.get());
+          .withBuildConfig(buildConfig.get())
+          .withResolvedConfig(resolvedConfig.get());
 
       LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
       buildService.begin(launching);
@@ -137,6 +142,41 @@ public class BuildLauncher {
       buildService.begin(queued.withState(State.LAUNCHING));
       buildService.update(queued.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
     }
+  }
+
+  private Optional<BuildConfig> resolveConfig(BuildConfig buildConfig, BuildDefinition definition) throws IOException {
+    if (buildConfig.getBuildpack().isPresent()) {
+      Optional<BuildConfig> buildpackConfig = fetchBuildpack(buildConfig.getBuildpack().get());
+      if (buildpackConfig.isPresent()) {
+        return Optional.of(mergeConfig(buildConfig, buildpackConfig.get()));
+      } else {
+        return Optional.absent();
+      }
+    } else if (definition.getModule().getBuildpack().isPresent()) {
+      Optional<BuildConfig> buildpackConfig = fetchBuildpack(definition.getModule().getBuildpack().get());
+      if (buildpackConfig.isPresent()) {
+        return Optional.of(mergeConfig(buildConfig, buildpackConfig.get()));
+      } else {
+        return Optional.absent();
+      }
+    } else {
+      return Optional.of(buildConfig);
+    }
+  }
+
+  private Optional<BuildConfig> fetchBuildpack(GitInfo gitInfo) throws IOException {
+    return configAtSha(gitInfo, ".blazar-buildpack.yaml", gitInfo.getBranch());
+  }
+
+  private static BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
+    List<String> cmds = primary.getCmds().isEmpty() ? secondary.getCmds() : primary.getCmds();
+    Map<String, String> env = new HashMap<>();
+    env.putAll(secondary.getEnv());
+    env.putAll(primary.getEnv());
+    List<String> buildDeps = Lists.newArrayList(Iterables.concat(secondary.getBuildDeps(), primary.getBuildDeps()));
+    List<String> webhooks = Lists.newArrayList(Iterables.concat(secondary.getWebhooks(), primary.getWebhooks()));
+
+    return new BuildConfig(cmds, env, buildDeps, webhooks, Optional.<GitInfo>absent());
   }
 
   private HttpRequest buildRequest(BuildDefinition definition, Build build) {
@@ -166,14 +206,18 @@ public class BuildLauncher {
   }
 
   private Optional<BuildConfig> configAtSha(BuildDefinition definition, String sha) throws IOException {
-    GitHub gitHub = gitHubFor(definition.getGitInfo());
-    GHRepository repository = gitHub.getRepository(definition.getGitInfo().getFullRepositoryName());
-
     String modulePath = definition.getModule().getPath();
     String moduleFolder = modulePath.contains("/") ? modulePath.substring(0, modulePath.lastIndexOf('/') + 1) : "";
     String configPath = moduleFolder + ".blazar.yaml";
 
-    String repositoryName = definition.getGitInfo().getFullRepositoryName();
+    return configAtSha(definition.getGitInfo(), configPath, sha);
+  }
+
+  private Optional<BuildConfig> configAtSha(GitInfo gitInfo, String configPath, String sha) throws IOException {
+    GitHub gitHub = gitHubFor(gitInfo);
+    GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
+
+    String repositoryName = gitInfo.getFullRepositoryName();
     LOG.info("Going to fetch config for path {} in repo {}@{}", configPath, repositoryName, sha);
 
     try {
