@@ -4,7 +4,7 @@ import BuildsSidebarContainer from '../components/sidebar/BuildsSidebarContainer
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Input from 'react-bootstrap/lib/Input';
-import Logo from '../components/shared/Logo.jsx';
+
 
 class App extends Component {
 
@@ -59,7 +59,6 @@ class App extends Component {
       <div>
         <div className="page-wrapper">
           <BuildsSidebarContainer/>
-          <Logo />
           <RouteHandler/>
         </div>
         {modal}

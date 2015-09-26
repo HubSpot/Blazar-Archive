@@ -47,7 +47,7 @@ class Module extends Component {
         <PageHeader>
           <Breadcrumb
             appRoot={config.appRoot}
-            path={this.props.pathname}
+            params={this.props.originalParams}
           />
         </PageHeader>
         <UIGrid>

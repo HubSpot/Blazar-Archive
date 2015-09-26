@@ -25,7 +25,7 @@ class Branch extends Component{
         <PageHeader>
           <Breadcrumb
             appRoot={config.appRoot}
-            path={window.location.pathname}
+            params={this.props.params}
           />
         </PageHeader>
         <UIGrid>

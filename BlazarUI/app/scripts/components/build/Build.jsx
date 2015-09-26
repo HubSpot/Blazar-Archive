@@ -32,7 +32,7 @@ class Build extends Component {
         <PageHeader>
           <Breadcrumb
             appRoot={config.appRoot}
-            path={window.location.pathname}
+            params={this.props.originalParams}
           />
         </PageHeader>
         <UIGrid>
@@ -77,6 +77,7 @@ Build.propTypes = {
     module: PropTypes.object
   }),
   log: PropTypes.string,
+  originalParams: PropTypes.object,
   params: PropTypes.object,
   loading: PropTypes.bool,
   toggleStar: PropTypes.func.isRequired,

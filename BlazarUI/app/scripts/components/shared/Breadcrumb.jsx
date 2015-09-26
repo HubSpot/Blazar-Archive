@@ -1,47 +1,45 @@
 import React, {Component, PropTypes} from 'react';
+import {values} from 'underscore';
 const Link = require('react-router').Link;
 import Icon from './Icon.jsx';
+import Logo from './Logo.jsx';
 
 class Breadcrumb extends Component {
 
   render() {
-    const appRootSplit = this.props.appRoot.split('/');
-    let path = this.props.path.split('/');
-    path.shift()
+    
+    const appRoot = this.props.appRoot;
+    const pages = values(this.props.params);
+    const appRootClean = this.props.appRoot.replace(/^\/|\/$/g, '');
 
-    const pages = path.slice(appRootSplit.length, path.length);
-
-    let links = [];
-
-    pages.forEach(function(page, i) {
-      let link;
-      const key = page + i;
-
-      if (i !== pages.length - 1 && i !== 0) {
-        const pageLink = pages.slice(0, i + 1).join('/');
-        link = <Link key={key} className='crumb' to={`${this.props.appRoot}/builds/${pageLink}`}>{page}</Link>;
-      } else if (i === 0) {
-        link = <span key={key} className='crumb'>{page}</span>
-      } else {
-        link = <span key={key} className='crumb-active'> {page} </span>
+    const links = pages.map((page, i) => {
+      let pageLinks = '';
+      for (let i = 0; i < pages.length; i++) {
+        pageLinks += `/${pages[i]}`;
+        if (page === pages[i]) {
+          break;
+        }
       }
 
-      links.push(link);
+      return (
+        <Link key={page + i} className='crumb' to={`${this.props.appRoot}/builds${pageLinks}`}>{page}</Link>
+      );
 
-    }.bind(this));
+    })
 
     if (links.length === 0) {
       return (
         <div className='breadcrumbs'> 
-          <Icon for='dashboard' /> Dashboard
+          <Logo /> 
         </div>
       )
     }
 
     return (
-      <div className='breadcrumbs'> 
-        <Link className='crumb' to='dashboard'> 
-          <Icon for='dashboard' />
+      <div className='breadcrumbs'>
+        <Logo /> 
+        <Link className='crumb' to='hosts'> 
+          All Hosts
         </Link>
         {links} 
       </div>
@@ -52,7 +50,7 @@ class Breadcrumb extends Component {
 
 
 Breadcrumb.propTypes = {
-  path: PropTypes.string.isRequired,
+  params: PropTypes.object.isRequired,
   appRoot: PropTypes.string.isRequired,
 };
 

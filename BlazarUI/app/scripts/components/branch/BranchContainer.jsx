@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import Branch from './Branch.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
+
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 

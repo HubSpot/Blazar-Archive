@@ -7,9 +7,9 @@ class Logo extends Component {
   render() {
     const imgPath = `${window.config.staticRoot}/images/blazar-logo.png`;
     return (
-      <div className="sidebar__logo">
+      <div className="logo crumb">
         <Link to="dashboard">
-          <Image classNames="sidebar__logo-image" src={imgPath} />
+          <Image classNames="logo-image" src={imgPath} />
         </Link>
       </div>
     );

@@ -1,9 +1,9 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll} from 'underscore';
+import {bindAll, clone} from 'underscore';
+import {getPathname} from '../Helpers';
 
 import Module from './Module.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
-
 import BuildHistoryStore from '../../stores/buildHistoryStore';
 import BuildStore from '../../stores/buildStore';
 import BuildHistoryActions from '../../actions/buildHistoryActions';
@@ -30,6 +30,7 @@ class ModuleContainer extends Component {
   }
 
   componentDidMount() {
+    this.originalParams = clone(this.props.params);
     this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
@@ -62,10 +63,6 @@ class ModuleContainer extends Component {
 
   }
 
-  getPathname() {
-    return LocationStore.pathname;
-  }
-
   triggerBuild() {
     BuildActions.triggerBuild(this.props.params.moduleId);
   }
@@ -78,10 +75,11 @@ class ModuleContainer extends Component {
     return (
       <PageContainer>
         <Module
+          originalParams={this.originalParams}
           params={this.props.params}
+          pathname={getPathname()}
           buildHistory={this.state.buildHistory}
           stars={this.state.stars}
-          pathname={this.getPathname()}
           loading={this.state.loading}
           triggerBuild={this.triggerBuild}
           buildTriggering={!this.state.buildTriggeringDone}

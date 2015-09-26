@@ -19,8 +19,18 @@
     color: #818da7;
     padding 0 6px
     
-.crumb-active
-  font-weight $font-normal
+  &.logo
+    &:after
+      position relative
+      top 4px
+    
+  &.active
+    font-weight $font-normal
+    color $color-text-standard
+    &:after
+      content ''
+    &:hover
+      cursor default
 
 .breadcrumb-icon
   padding-right 5px

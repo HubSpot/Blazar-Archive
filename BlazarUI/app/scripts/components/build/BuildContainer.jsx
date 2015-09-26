@@ -1,10 +1,11 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll, contains, some} from 'underscore';
+import {bindAll, contains, some, clone} from 'underscore';
 import {ACTIVE_BUILD_STATES} from '../../constants/ActiveBuildStates.js';
 import {BuildStates} from '../../constants/BuildStates.js';
 import {getIsStarredState} from '../Helpers.js';
 import Build from './Build.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
+import {getPathname} from '../Helpers';
 
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
@@ -32,6 +33,7 @@ class BuildContainer extends Component {
   }
 
   componentDidMount() {
+    this.originalParams = clone(this.props.params);
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange.bind(this));
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
     BuildActions.loadBuild(this.props.params);
@@ -39,7 +41,6 @@ class BuildContainer extends Component {
   }
 
   componentWillReceiveProps(nextprops) {
-    console.log('will receive da props');
     this.setState({
       loading: true
     });
@@ -91,9 +92,10 @@ class BuildContainer extends Component {
         <Build
           build={this.state.build}
           log={this.state.log}
+          originalParams={this.originalParams}
           params={this.props.params}
           loading={this.state.loading}
-          pathname={LocationStore.pathname}
+          pathname={getPathname()}
           toggleStar={this.toggleStar}
           isStarred={getIsStarredState(this.state.stars, this.props.params.moduleId)}
         />

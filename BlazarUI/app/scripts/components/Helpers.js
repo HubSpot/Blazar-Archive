@@ -55,3 +55,7 @@ export const getIsStarredState = function(stars, id) {
     return star.moduleId === id;
   });
 };
+
+export const getPathname = function() {
+  return window.location.pathname;
+};
