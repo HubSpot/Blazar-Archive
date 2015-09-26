@@ -5,9 +5,9 @@ class Home extends Component {
 
   render() {
     return (
-      <div>
-          <DashboardContainer />
-      </div>
+        <DashboardContainer 
+          params={this.props.params}
+        />
     );
   }
 }

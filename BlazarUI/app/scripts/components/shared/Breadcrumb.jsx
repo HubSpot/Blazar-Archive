@@ -30,7 +30,7 @@ class Breadcrumb extends Component {
     if (links.length === 0) {
       return (
         <div className='breadcrumbs'>
-          <Logo />
+        <Logo crumb={false} />
         </div>
       )
     }

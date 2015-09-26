@@ -94,7 +94,9 @@ class DashboardContainer extends Component {
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
           loading={this.state.loading} 
-          modulesBuildHistory={this.state.modulesBuildHistory} />
+          modulesBuildHistory={this.state.modulesBuildHistory} 
+          params={this.props.params}
+        />
       </PageContainer>
     );
   }

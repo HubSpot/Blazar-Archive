@@ -49,7 +49,7 @@ class Dashboard extends Component {
         <PageHeader>
           <Breadcrumb
             appRoot={config.appRoot}
-            path={window.location.pathname}
+            params={this.props.params}
           />
         </PageHeader>
 
@@ -71,7 +71,8 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
   loading: PropTypes.bool,
-  modulesBuildHistory: PropTypes.array
+  modulesBuildHistory: PropTypes.array,
+  params: PropTypes.object
 };
 
 export default Dashboard;
