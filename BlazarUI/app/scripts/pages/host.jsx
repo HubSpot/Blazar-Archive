@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-// import HostContainer from '../components/Host/BranchContainer.jsx';
+import HostContainer from '../components/host/HostContainer.jsx';
 
 class Host extends Component {
 
@@ -9,9 +9,9 @@ class Host extends Component {
 
   render() {
     return (
-      <div>
-        Host page here...
-      </div>
+      <HostContainer
+        params={this.props.params}
+      /> 
     );
   }
 }

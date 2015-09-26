@@ -7,7 +7,7 @@ import Logo from './Logo.jsx';
 class Breadcrumb extends Component {
 
   render() {
-    
+
     const appRoot = this.props.appRoot;
     const pages = values(this.props.params);
     const appRootClean = this.props.appRoot.replace(/^\/|\/$/g, '');
@@ -29,19 +29,19 @@ class Breadcrumb extends Component {
 
     if (links.length === 0) {
       return (
-        <div className='breadcrumbs'> 
-          <Logo /> 
+        <div className='breadcrumbs'>
+          <Logo />
         </div>
       )
     }
 
     return (
       <div className='breadcrumbs'>
-        <Logo /> 
-        <Link className='crumb' to='hosts'> 
-          All Hosts
+        <Logo />
+        <Link className='crumb' to='hosts'>
+          Hosts
         </Link>
-        {links} 
+        {links}
       </div>
     );
 
