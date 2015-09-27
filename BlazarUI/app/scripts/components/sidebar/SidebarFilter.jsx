@@ -13,7 +13,6 @@ class SidebarFilter extends Component {
     };
 
     bindAll(this, 'setInputValue', 'toggleFilter');
-
   }
 
   setInputValue(value) {
@@ -36,7 +35,6 @@ class SidebarFilter extends Component {
           <SearchFilter
             ref="buildFilterSearch"
             placeholder='Filter modules...'
-            inputValue={this.props.filterText}
             onChange={this.setInputValue} />
         </div>
         <SidebarToggle
