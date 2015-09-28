@@ -172,7 +172,7 @@ public class BuildLauncher {
     String url = String.format("http://%s/singularity/v2/api/requests/request/blazar-executor/run", host);
 
     String buildId = String.valueOf(build.getId().get());
-    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(definition));
+    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(definition, build));
 
     return HttpRequest.newBuilder()
         .setMethod(Method.POST)
@@ -182,8 +182,8 @@ public class BuildLauncher {
         .build();
   }
 
-  private String buildCommand(BuildDefinition definition) {
-    if (definition.getModule().getPath().endsWith(".blazar.yaml")) {
+  private String buildCommand(BuildDefinition definition, Build build) {
+    if (!build.getResolvedConfig().get().getCmds().isEmpty()) {
       return "--safe_mode";
     }
 
