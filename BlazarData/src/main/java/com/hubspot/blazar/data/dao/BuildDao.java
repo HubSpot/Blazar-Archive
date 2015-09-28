@@ -35,7 +35,7 @@ public interface BuildDao {
   @SqlUpdate("INSERT INTO builds (moduleId, buildNumber, state) VALUES (:moduleId, :buildNumber, :state)")
   long enqueue(@BindWithRosetta Build build);
 
-  @SqlUpdate("UPDATE builds SET startTimestamp = :startTimestamp, sha = :sha, state = :state, commitInfo = :commitInfo, buildConfig = :buildConfig WHERE id = :id AND state = 'QUEUED'")
+  @SqlUpdate("UPDATE builds SET startTimestamp = :startTimestamp, sha = :sha, state = :state, commitInfo = :commitInfo, buildConfig = :buildConfig, resolvedConfig = :resolvedConfig WHERE id = :id AND state = 'QUEUED'")
   int begin(@BindWithRosetta Build build);
 
   @SqlUpdate("UPDATE builds SET log = :log, state = :state WHERE id = :id AND state IN ('LAUNCHING', 'IN_PROGRESS')")

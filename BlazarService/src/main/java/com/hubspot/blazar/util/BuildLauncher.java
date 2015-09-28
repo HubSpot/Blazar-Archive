@@ -18,6 +18,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.hubspot.blazar.base.CommitInfo;
+import com.hubspot.blazar.exception.NonRetryableBuildException;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.User;
 import org.kohsuke.github.GHBranch;
@@ -112,59 +113,46 @@ public class BuildLauncher {
       return;
     }
 
-    startBuild(buildDefinition, buildToLaunch, previousBuild);
+    try {
+      startBuild(buildDefinition, buildToLaunch, previousBuild);
+    } catch (NonRetryableBuildException e) {
+      LOG.warn("Failing build {}", buildToLaunch.getId().get(), e);
+      buildService.begin(buildToLaunch.withState(State.LAUNCHING));
+      buildService.update(buildToLaunch.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+    }
   }
 
   private synchronized void startBuild(BuildDefinition definition, Build queued, Optional<Build> previous) throws Exception {
-    Optional<CommitInfo> commitInfo = commitInfo(definition.getGitInfo(), commit(previous));
-    final Optional<BuildConfig> buildConfig;
-    if (commitInfo.isPresent()) {
-      buildConfig = configAtSha(definition, commitInfo.get().getCurrent().getId());
-    } else {
-      buildConfig = Optional.absent();
-    }
+    CommitInfo commitInfo = commitInfo(definition.getGitInfo(), commit(previous));
+    BuildConfig buildConfig = configAtSha(definition, commitInfo.getCurrent().getId());
+    BuildConfig resolvedConfig = resolveConfig(buildConfig, definition);
 
-    Optional<BuildConfig> resolvedConfig;
-    if (buildConfig.isPresent() && (resolvedConfig = resolveConfig(buildConfig.get(), definition)).isPresent()) {
-      Build launching = queued.withStartTimestamp(System.currentTimeMillis())
-          .withState(State.LAUNCHING)
-          .withCommitInfo(commitInfo.get())
-          .withBuildConfig(buildConfig.get())
-          .withResolvedConfig(resolvedConfig.get());
+    Build launching = queued.withStartTimestamp(System.currentTimeMillis())
+        .withState(State.LAUNCHING)
+        .withCommitInfo(commitInfo)
+        .withBuildConfig(buildConfig)
+        .withResolvedConfig(resolvedConfig);
 
-      LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
-      buildService.begin(launching);
-      LOG.info("About to launch build {}", launching.getId().get());
-      HttpResponse response = asyncHttpClient.execute(buildRequest(definition, launching)).get();
-      LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
-    } else {
-      LOG.info("Failing build {}", queued.getId().get());
-      buildService.begin(queued.withState(State.LAUNCHING));
-      buildService.update(queued.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
-    }
+    LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
+    buildService.begin(launching);
+    LOG.info("About to launch build {}", launching.getId().get());
+    HttpResponse response = asyncHttpClient.execute(buildRequest(definition, launching)).get();
+    LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
   }
 
-  private Optional<BuildConfig> resolveConfig(BuildConfig buildConfig, BuildDefinition definition) throws IOException {
+  private BuildConfig resolveConfig(BuildConfig buildConfig, BuildDefinition definition) throws IOException, NonRetryableBuildException {
     if (buildConfig.getBuildpack().isPresent()) {
-      Optional<BuildConfig> buildpackConfig = fetchBuildpack(buildConfig.getBuildpack().get());
-      if (buildpackConfig.isPresent()) {
-        return Optional.of(mergeConfig(buildConfig, buildpackConfig.get()));
-      } else {
-        return Optional.absent();
-      }
+      BuildConfig buildpackConfig = fetchBuildpack(buildConfig.getBuildpack().get());
+      return mergeConfig(buildConfig, buildpackConfig);
     } else if (definition.getModule().getBuildpack().isPresent()) {
-      Optional<BuildConfig> buildpackConfig = fetchBuildpack(definition.getModule().getBuildpack().get());
-      if (buildpackConfig.isPresent()) {
-        return Optional.of(mergeConfig(buildConfig, buildpackConfig.get()));
-      } else {
-        return Optional.absent();
-      }
+      BuildConfig buildpackConfig = fetchBuildpack(definition.getModule().getBuildpack().get());
+      return mergeConfig(buildConfig, buildpackConfig);
     } else {
-      return Optional.of(buildConfig);
+      return buildConfig;
     }
   }
 
-  private Optional<BuildConfig> fetchBuildpack(GitInfo gitInfo) throws IOException {
+  private BuildConfig fetchBuildpack(GitInfo gitInfo) throws IOException, NonRetryableBuildException {
     return configAtSha(gitInfo, ".blazar-buildpack.yaml", gitInfo.getBranch());
   }
 
@@ -205,7 +193,7 @@ public class BuildLauncher {
     return reposToBuild.contains(definition.getGitInfo().getRepository()) ? "--safe_mode" : "--dry_run";
   }
 
-  private Optional<BuildConfig> configAtSha(BuildDefinition definition, String sha) throws IOException {
+  private BuildConfig configAtSha(BuildDefinition definition, String sha) throws IOException, NonRetryableBuildException {
     String modulePath = definition.getModule().getPath();
     String moduleFolder = modulePath.contains("/") ? modulePath.substring(0, modulePath.lastIndexOf('/') + 1) : "";
     String configPath = moduleFolder + ".blazar.yaml";
@@ -213,7 +201,7 @@ public class BuildLauncher {
     return configAtSha(definition.getGitInfo(), configPath, sha);
   }
 
-  private Optional<BuildConfig> configAtSha(GitInfo gitInfo, String configPath, String sha) throws IOException {
+  private BuildConfig configAtSha(GitInfo gitInfo, String configPath, String sha) throws IOException, NonRetryableBuildException {
     GitHub gitHub = gitHubFor(gitInfo);
     GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
 
@@ -224,17 +212,17 @@ public class BuildLauncher {
       GHContent configContent = repository.getFileContent(configPath, sha);
       LOG.info("Found config for path {} in repo {}@{}", configPath, repositoryName, sha);
       JsonParser parser = yamlFactory.createParser(configContent.getContent());
-      return Optional.of(objectMapper.readValue(parser, BuildConfig.class));
+      return objectMapper.readValue(parser, BuildConfig.class);
     } catch (FileNotFoundException e) {
       LOG.info("No config found for path {} in repo {}@{}, using default values", configPath, repositoryName, sha);
-      return Optional.of(BuildConfig.makeDefaultBuildConfig());
+      return BuildConfig.makeDefaultBuildConfig();
     } catch (JsonProcessingException e) {
-      LOG.info("Invalid config found for path {} in repo {}@{}, failing build", configPath, repositoryName, sha);
-      return Optional.absent();
+      String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", configPath, repositoryName, sha);
+      throw new NonRetryableBuildException(message, e);
     }
   }
 
-  private Optional<CommitInfo> commitInfo(GitInfo gitInfo, Optional<Commit> previousCommit) throws IOException {
+  private CommitInfo commitInfo(GitInfo gitInfo, Optional<Commit> previousCommit) throws IOException, NonRetryableBuildException {
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
     GitHub gitHub = gitHubFor(gitInfo);
 
@@ -242,14 +230,13 @@ public class BuildLauncher {
     try {
       repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
     } catch (FileNotFoundException e) {
-      LOG.info("Couldn't find repository {}", gitInfo.getFullRepositoryName());
-      return Optional.absent();
+      throw new NonRetryableBuildException("Couldn't find repository " + gitInfo.getFullRepositoryName(), e);
     }
 
     GHBranch branch = repository.getBranches().get(gitInfo.getBranch());
     if (branch == null) {
-      LOG.info("Couldn't find branch {} for repository {}", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
-      return Optional.absent();
+      String message = String.format("Couldn't find branch %s for repository %s", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
+      throw new NonRetryableBuildException(message);
     } else {
       LOG.info("Found sha {} for branch {}/{}", branch.getSHA1(), gitInfo.getRepository(), gitInfo.getBranch());
 
@@ -274,7 +261,7 @@ public class BuildLauncher {
         newCommits = Collections.emptyList();
       }
 
-      return Optional.of(new CommitInfo(commit, previousCommit, newCommits, truncated));
+      return new CommitInfo(commit, previousCommit, newCommits, truncated);
     }
   }
 
