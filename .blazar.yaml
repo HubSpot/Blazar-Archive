@@ -1,4 +1,1 @@
-buildDeps:
-  - hs-build-tools
-
 buildpack: git.hubteam.com/paas/Blazar-Buildpack-Java#publish
