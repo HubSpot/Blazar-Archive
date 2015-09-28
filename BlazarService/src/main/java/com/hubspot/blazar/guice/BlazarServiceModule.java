@@ -52,6 +52,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
   protected void configure(Binder binder, BlazarConfiguration configuration) {
     binder.install(new BlazarDataModule());
     binder.install(new BlazarZooKeeperModule());
+    binder.install(new BlazarSingularityModule());
 
     binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 

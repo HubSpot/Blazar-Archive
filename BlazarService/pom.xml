@@ -28,6 +28,14 @@
       <artifactId>RosettaCore</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.hubspot</groupId>
+      <artifactId>SingularityBase</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.hubspot</groupId>
+      <artifactId>SingularityClient</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.hubspot.jackson</groupId>
       <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
     </dependency>

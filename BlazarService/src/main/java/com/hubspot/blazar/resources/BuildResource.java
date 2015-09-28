@@ -11,9 +11,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
@@ -26,8 +26,13 @@ import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpResponse;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
+import com.hubspot.mesos.json.MesosFileChunkObject;
+import com.hubspot.singularity.SingularityS3Log;
+import com.hubspot.singularity.client.SingularityClient;
 import com.sun.jersey.api.NotFoundException;
 
+import java.net.URI;
+import java.util.Collection;
 import java.util.Set;
 
 @Path("/build")
@@ -36,16 +41,19 @@ public class BuildResource {
   private final BuildDefinitionService buildDefinitionService;
   private final BuildStateService buildStateService;
   private final BuildService buildService;
+  private final SingularityClient singularityClient;
   private final AsyncHttpClient asyncHttpClient;
 
   @Inject
   public BuildResource(BuildDefinitionService buildDefinitionService,
                        BuildStateService buildStateService,
                        BuildService buildService,
+                       SingularityClient singularityClient,
                        AsyncHttpClient asyncHttpClient) {
     this.buildDefinitionService = buildDefinitionService;
     this.buildStateService = buildStateService;
     this.buildService = buildService;
+    this.singularityClient = singularityClient;
     this.asyncHttpClient = asyncHttpClient;
   }
 
@@ -84,7 +92,28 @@ public class BuildResource {
       throw new NotFoundException("No build log URL found for ID " + id);
     }
 
-    return getLog(replaceHost(logUrl.get()), offset, length);
+    String taskId = parseTaskId(logUrl.get());
+    String path = taskId + "/service.log";
+    Optional<String> grep = Optional.absent();
+
+    Optional<MesosFileChunkObject> chunk = singularityClient.readSandBoxFile(taskId, path, grep, Optional.of(offset), Optional.of(length));
+    if (chunk.isPresent()) {
+      return new LogChunk(chunk.get().getData(), chunk.get().getOffset(), chunk.get().getOffset() + length);
+    } else {
+      Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId);
+      if (s3Logs.isEmpty()) {
+        throw new NotFoundException("No S3 log found for ID " + id);
+      } else if (s3Logs.size() > 1) {
+        throw new NotFoundException("Multiple S3 logs found for ID " + id);
+      }
+
+      SingularityS3Log s3Log = s3Logs.iterator().next();
+      if (offset >= s3Log.getSize()) {
+        return new LogChunk("", s3Log.getSize(), s3Log.getSize() + length);
+      }
+
+      return fetchS3Log(s3Log.getGetUrl(), offset, length);
+    }
   }
 
   @POST
@@ -106,28 +135,29 @@ public class BuildResource {
     return moduleBuild;
   }
 
-  private LogChunk getLog(String url, long offset, long length) throws Exception {
+  private LogChunk fetchS3Log(String url, long offset, long length) throws Exception {
     HttpRequest request = HttpRequest.newBuilder()
         .setUrl(url)
-        .addHeader("X-HubSpot-User", "jhaber")
-        .setQueryParam("offset").to(offset)
-        .setQueryParam("length").to(length)
+        .addHeader("Range", String.format("bytes=%d-%d", offset, offset + length))
         .build();
 
     HttpResponse response = asyncHttpClient.execute(request).get();
     if (response.isSuccess()) {
-      return response.getAs(LogChunk.class).withNextOffset(offset + length);
-    } else if (response.getStatusCode() == 404 && url.endsWith("/tail_of_finished_service.log")) {
-      return getLog(url.replace("/tail_of_finished_service.log", "/service.log"), offset, length);
-    } else if (response.getStatusCode() == 404) {
-      throw new NotFoundException("No build log found at URL " + url);
+      return new LogChunk(response.getAsString(), offset, offset + length);
     } else {
-      String message = String.format("Error hitting Singularity, status code %d, response %s", response.getStatusCode(), response.getAsString());
+      String message = String.format("Error reading S3 log, status code %d, response %s", response.getStatusCode(), response.getAsString());
       throw new WebApplicationException(Response.serverError().entity(message).type(MediaType.TEXT_PLAIN_TYPE).build());
     }
   }
 
-  private static String replaceHost(String url) {
-    return UriBuilder.fromUri(url).host(System.getenv("SINGULARITY_HOST")).build().toString();
+  private static String parseTaskId(String url) {
+    String path = URI.create(url).getPath();
+    for (String part : Splitter.on('/').omitEmptyStrings().split(path)) {
+      if (part.startsWith("blazar-executor")) {
+        return part;
+      }
+    }
+
+    throw new IllegalArgumentException("Could not parse task ID from log URL " + url);
   }
 }
