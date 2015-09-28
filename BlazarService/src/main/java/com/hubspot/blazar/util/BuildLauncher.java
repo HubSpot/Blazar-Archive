@@ -144,7 +144,7 @@ public class BuildLauncher {
     if (buildConfig.getBuildpack().isPresent()) {
       BuildConfig buildpackConfig = fetchBuildpack(buildConfig.getBuildpack().get());
       return mergeConfig(buildConfig, buildpackConfig);
-    } else if (definition.getModule().getBuildpack().isPresent()) {
+    } else if (definition.getModule().getBuildpack() != null && definition.getModule().getBuildpack().isPresent()) {
       BuildConfig buildpackConfig = fetchBuildpack(definition.getModule().getBuildpack().get());
       return mergeConfig(buildConfig, buildpackConfig);
     } else {
