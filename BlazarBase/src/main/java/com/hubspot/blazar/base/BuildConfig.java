@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 
 public class BuildConfig {
   private final List<String> cmds;
@@ -24,7 +23,7 @@ public class BuildConfig {
                      @JsonProperty("webhooks") List<String> webhooks,
                      @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
 
-    this.cmds = Objects.firstNonNull(cmds, ImmutableList.of("runbuildpack"));
+    this.cmds = Objects.firstNonNull(cmds, Collections.<String>emptyList());
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
