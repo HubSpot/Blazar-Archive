@@ -47,6 +47,28 @@ public abstract class CachingService<T extends BuildDefinition> {
     }
   }
 
+  public Set<T> getAllActive(long since) {
+    Set<T> values = getAll(since);
+    for (Iterator<T> iterator = values.iterator(); iterator.hasNext(); ) {
+      T value = iterator.next();
+      if (!value.getModule().isActive()) {
+        iterator.remove();
+      }
+    }
+    return values;
+  }
+
+  public Set<T> getAllInActive(long since) {
+    Set<T> values = getAll(since);
+    for (Iterator<T> iterator = values.iterator(); iterator.hasNext(); ) {
+      T value = iterator.next();
+      if (value.getModule().isActive()){
+        iterator.remove();
+      }
+    }
+    return values;
+  }
+
   public Optional<T> getByModule(int moduleId) {
     update();
 
