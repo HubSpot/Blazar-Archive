@@ -61,14 +61,14 @@ public class BuildResource {
   @Path("/definitions")
   @PropertyFiltering
   public Set<BuildDefinition> getAllBuildDefinitions(@QueryParam("since") @DefaultValue("0") long since) {
-    return buildDefinitionService.getAll(since);
+    return buildDefinitionService.getAllActive(since);
   }
 
   @GET
   @Path("/states")
   @PropertyFiltering
   public Set<BuildState> getAllBuildStates(@QueryParam("since") @DefaultValue("0") long since) {
-    return buildStateService.getAll(since);
+    return buildStateService.getAllActive(since);
   }
 
   @GET
