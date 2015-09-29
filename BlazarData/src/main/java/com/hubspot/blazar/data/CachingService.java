@@ -30,11 +30,10 @@ public abstract class CachingService<T extends BuildDefinition> {
     this.active = new Predicate<T>() {
       @Override
       public boolean apply(T definition) {
-        return definition.getModule().isActive();
+        return definition.getGitInfo().isActive() && definition.getModule().isActive();
       }
     };
   }
-
 
   protected abstract Set<T> fetch(long since);
 
