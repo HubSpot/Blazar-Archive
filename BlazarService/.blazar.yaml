@@ -1,1 +1,1 @@
-buildpack: git.hubteam.com/paas/Blazar-Buildpack-Java#publish
+buildpack: git.hubteam.com/paas/Blazar-Buildpack-Java#deployable
