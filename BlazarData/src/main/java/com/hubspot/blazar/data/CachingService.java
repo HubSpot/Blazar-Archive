@@ -1,6 +1,9 @@
 package com.hubspot.blazar.data;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.Module;
 
@@ -18,12 +21,20 @@ public abstract class CachingService<T extends BuildDefinition> {
   private final Map<Integer, T> cache;
   private final AtomicLong cacheTime;
   private final ReadWriteLock lock;
+  private final Predicate<T> active;
 
   public CachingService() {
     this.cache = new ConcurrentHashMap<>();
     this.cacheTime = new AtomicLong(0);
     this.lock = new ReentrantReadWriteLock();
+    this.active = new Predicate<T>() {
+      @Override
+      public boolean apply(T definition) {
+        return definition.getModule().isActive();
+      }
+    };
   }
+
 
   protected abstract Set<T> fetch(long since);
 
@@ -48,25 +59,11 @@ public abstract class CachingService<T extends BuildDefinition> {
   }
 
   public Set<T> getAllActive(long since) {
-    Set<T> values = getAll(since);
-    for (Iterator<T> iterator = values.iterator(); iterator.hasNext(); ) {
-      T value = iterator.next();
-      if (!value.getModule().isActive()) {
-        iterator.remove();
-      }
-    }
-    return values;
+    return Sets.filter(getAll(since), active);
   }
 
   public Set<T> getAllInActive(long since) {
-    Set<T> values = getAll(since);
-    for (Iterator<T> iterator = values.iterator(); iterator.hasNext(); ) {
-      T value = iterator.next();
-      if (value.getModule().isActive()){
-        iterator.remove();
-      }
-    }
-    return values;
+    return Sets.filter(getAll(since), Predicates.not(active));
   }
 
   public Optional<T> getByModule(int moduleId) {
