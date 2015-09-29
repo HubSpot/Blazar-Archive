@@ -61,7 +61,7 @@ public abstract class CachingService<T extends BuildDefinition> {
     return Sets.filter(getAll(since), active);
   }
 
-  public Set<T> getAllInActive(long since) {
+  public Set<T> getAllInactive(long since) {
     return Sets.filter(getAll(since), Predicates.not(active));
   }
 
