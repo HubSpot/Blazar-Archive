@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,8 +24,12 @@ import java.util.Set;
 @Singleton
 public class MavenModuleDiscovery extends AbstractModuleDiscovery {
   private static final Logger LOG = LoggerFactory.getLogger(MavenModuleDiscovery.class);
-  private static final Optional<GitInfo> BUILDPACK =
+  private static final Optional<GitInfo> BRANCH_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#stable"));
+  private static final Optional<GitInfo> MASTER_BUILDPACK =
+      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#publish"));
+  private static final Optional<GitInfo> DEPLOYABLE_BUILDPACK =
+      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#deployable"));
 
   private final ObjectMapper objectMapper;
   private final XmlFactory xmlFactory;
@@ -77,10 +82,30 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
         glob = (path.contains("/") ? path.substring(0, path.lastIndexOf('/') + 1) : "") + "**";
       }
 
-      modules.add(new Module(pom.getArtifactId(), path, glob, BUILDPACK));
+      modules.add(new Module(pom.getArtifactId(), path, glob, buildpackFor(path, repository, gitInfo)));
     }
 
     return modules;
+  }
+
+  private Optional<GitInfo> buildpackFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
+    if (!"master".equals(gitInfo.getBranch())) {
+      return BRANCH_BUILDPACK;
+    } else if (isDeployable(file, repository, gitInfo)) {
+      return DEPLOYABLE_BUILDPACK;
+    } else {
+      return MASTER_BUILDPACK;
+    }
+  }
+
+  private boolean isDeployable(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
+    String folder = file.contains("/") ? file.substring(0, file.lastIndexOf('/') + 1) : "";
+    try {
+      contentsFor(folder + ".build-executable", repository, gitInfo);
+      return true;
+    } catch (FileNotFoundException e) {
+      return false;
+    }
   }
 
   private static boolean isPom(String path) {
