@@ -67,7 +67,7 @@ public class GithubStatusHandler {
     GHCommitState state = toGHCommitState(build.getState());
     String sha = build.getSha().get();
     String description = getStateDescription(build.getState());
-    String context = module.getName() + " - blazar";
+    String context = module.getName() + "/blazar";
 
     GitHub gitHub = Preconditions.checkNotNull(gitHubByHost.get(git.getHost()));
 
