@@ -10,6 +10,7 @@ import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -20,17 +21,16 @@ import com.hubspot.blazar.base.Build.State;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.data.service.BuildDefinitionService;
 
-import io.dropwizard.Configuration;
-
 @Singleton
 public class GithubStatusHandler {
 
-  private final Map<String, GitHub> gitHubByHost;
-  private final BuildDefinitionService buildDefinitionService;
   private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(GithubStatusHandler.class);
 
+  private final Map<String, GitHub> gitHubByHost;
+  private final BuildDefinitionService buildDefinitionService;
+
   @Inject
-  public GithubStatusHandler (EventBus eventBus, Map<String, GitHub> gitHubByHost, BuildDefinitionService buildDefinitionService) {
+  public GithubStatusHandler(EventBus eventBus, Map<String, GitHub> gitHubByHost, BuildDefinitionService buildDefinitionService) {
     this.gitHubByHost = gitHubByHost;
     this.buildDefinitionService = buildDefinitionService;
 
@@ -67,7 +67,7 @@ public class GithubStatusHandler {
     String description = getStateDescription(build.getState());
     String context = "CI-blazar";
 
-    GitHub gitHubApi = gitHubByHost.get(gitHost);
+    GitHub gitHubApi = Preconditions.checkNotNull(gitHubByHost.get(gitHost));
 
     GHRepository gitHubApiRepo = gitHubApi.getRepository(definition.getGitInfo().getFullRepositoryName());
     LOG.info("Setting status of commit {} on module {}:{} (moduleId: {}) to {}", sha, definition.getGitInfo().getFullRepositoryName(), gitBranch, build.getModuleId(), description);
