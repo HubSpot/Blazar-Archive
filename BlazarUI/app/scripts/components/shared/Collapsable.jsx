@@ -20,14 +20,22 @@ class Collapsable extends Component {
   }
 
   getHeaderClassNames() {
-    return 'collapsable__header ' + this.props.headerClassNames;
+    return classNames([
+      'collapsable__header',
+      this.props.headerClassNames,
+      {'collapsable__header--disabled-toggle': this.props.disableToggle}
+    ]);
   }
 
   getIconState() {
     return this.state.expanded ? 'minus' : 'plus';
   }
 
-  handleToggle() {    
+  handleToggle() {
+    if (this.props.disableToggle) {
+      return;
+    }
+
     if (this.props.updateToggleState) {
       this.props.updateToggleState(this.props.header);
     }
@@ -49,6 +57,16 @@ class Collapsable extends Component {
     return classNames;
   }
 
+  getRenderedIcon() {
+    if (this.props.disableToggle) {
+      return null;
+    }
+
+    return (
+      <Icon classNames='collapsable__header-icon' type='fa' name={this.getIconState()} />
+    );
+  }
+
   render() {
     let icon;
     const branch = this.props.branch;
@@ -59,7 +77,7 @@ class Collapsable extends Component {
     return (
       <div className={this.getWrapperClassNames()}>
         <h4 onClick={this.handleToggle} className={this.getHeaderClassNames()}>
-          <Icon classNames='collapsable__header-icon' type='fa' name={this.getIconState()} />
+          {this.getRenderedIcon()}
           {icon}
           {this.props.header}
         </h4>
@@ -75,7 +93,8 @@ class Collapsable extends Component {
 Collapsable.defaultProps = {
   headerClassNames: '',
   initialToggleStateOpen: false,
-  noBorder: false
+  noBorder: false,
+  disableToggle: false
 };
 
 Collapsable.propTypes = {
@@ -85,7 +104,8 @@ Collapsable.propTypes = {
   iconName: PropTypes.string,
   noBorder: PropTypes.bool,
   updateToggleState: PropTypes.func,
-  componentId: PropTypes.number
+  componentId: PropTypes.number,
+  disableToggle: PropTypes.bool
 };
 
 export default Collapsable;

@@ -81,6 +81,7 @@ class BuildLog extends Component {
       <Collapsable 
         header='Build Log'
         initialToggleStateOpen={true}
+        disableToggle={true}
       >
         <div className='build-log-container'>
           <pre id='log' 
