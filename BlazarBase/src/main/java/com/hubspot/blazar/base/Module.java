@@ -40,7 +40,7 @@ public class Module {
     this.matcher = FileSystems.getDefault().getPathMatcher("glob:" + glob);
     this.active = active;
     this.updatedTimestamp = updatedTimestamp;
-    this.buildpack = buildpack;
+    this.buildpack = com.google.common.base.Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
   }
 
   public Optional<Integer> getId() {

@@ -56,7 +56,7 @@ public class Build {
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.sha = sha;
-    this.commitInfo = commitInfo;
+    this.commitInfo = com.google.common.base.Objects.firstNonNull(commitInfo, Optional.<CommitInfo>absent());
     this.log = log;
     this.buildConfig = buildConfig;
     this.resolvedConfig = resolvedConfig;

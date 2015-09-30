@@ -27,11 +27,11 @@ public class BuildConfig {
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
-    this.buildpack = buildpack;
+    this.buildpack = Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null, Optional.<GitInfo>absent());
+    return new BuildConfig(null, null, null, null, null);
   }
 
   public List<String> getCmds() {

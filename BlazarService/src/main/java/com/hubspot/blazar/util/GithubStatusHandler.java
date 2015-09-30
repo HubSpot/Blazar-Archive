@@ -1,9 +1,14 @@
 package com.hubspot.blazar.util;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+import com.hubspot.blazar.base.BuildConfig;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
 import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -20,11 +25,13 @@ import com.hubspot.blazar.base.Build;
 import com.hubspot.blazar.base.Build.State;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.data.service.BuildDefinitionService;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.UriBuilder;
 
 @Singleton
 public class GithubStatusHandler {
-
-  private static final Logger LOG = org.slf4j.LoggerFactory.getLogger(GithubStatusHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GithubStatusHandler.class);
 
   private final Map<String, GitHub> gitHubByHost;
   private final BuildDefinitionService buildDefinitionService;
@@ -39,42 +46,62 @@ public class GithubStatusHandler {
 
   @Subscribe
   public void handleBuildStateChange(Build build) throws IOException {
-    LOG.info("Got event for a buildId: {}", build.getBuildNumber());
-    if (build.getState() == State.QUEUED) {
-      return;
-    }
-
     BuildDefinition definition = buildDefinitionService.getByModule(build.getModuleId()).get();
-    String whitelist = Objects.firstNonNull(System.getenv("BUILD_WHITELIST"), "");
-    List<String> whitelistedRepos= Splitter.on(',').omitEmptyStrings().splitToList(whitelist);
-
-    if (!whitelistedRepos.contains(definition.getGitInfo().getRepository())) {
+    if (!shouldUpdateStatus(definition, build)) {
+      LOG.info("Not setting status for build {} with state {}", build.getId().get(), build.getState());
       return;
     }
 
-    String uiHost = "https://tools.hubteam.com";
-    String appRoot = "blazar";
-    String gitHost = definition.getGitInfo().getHost();
-    String gitOrg = definition.getGitInfo().getOrganization();
-    String gitRepo = definition.getGitInfo().getRepository();
-    String gitBranch  = definition.getGitInfo().getBranch();
-    String moduleName = definition.getModule().getName();
-    String buildNumber = Integer.toString(build.getBuildNumber());
+    GitInfo git = definition.getGitInfo();
+    Module module = definition.getModule();
 
-    String url = uiHost + "/" + appRoot + "/builds" + "/" + gitHost + "/" + gitOrg + "/" + gitRepo + "/" + gitBranch + "/" + moduleName + "/" + buildNumber;
+    String url = UriBuilder.fromUri("https://tools.hubteam.com/blazar/builds")
+        .segment(git.getHost())
+        .segment(git.getOrganization())
+        .segment(git.getRepository())
+        .segment(git.getBranch())
+        .segment(module.getName())
+        .segment(String.valueOf(build.getBuildNumber()))
+        .build()
+        .toString();
     GHCommitState state = toGHCommitState(build.getState());
     String sha = build.getSha().get();
     String description = getStateDescription(build.getState());
     String context = "CI-blazar";
 
-    GitHub gitHubApi = Preconditions.checkNotNull(gitHubByHost.get(gitHost));
+    GitHub gitHub = Preconditions.checkNotNull(gitHubByHost.get(git.getHost()));
 
-    GHRepository gitHubApiRepo = gitHubApi.getRepository(definition.getGitInfo().getFullRepositoryName());
-    LOG.info("Setting status of commit {} on module {}:{} (moduleId: {}) to {}", sha, definition.getGitInfo().getFullRepositoryName(), gitBranch, build.getModuleId(), description);
-    gitHubApiRepo.createCommitStatus(sha, state, url, description, context);
+    final GHRepository repository;
+    try {
+      repository = gitHub.getRepository(git.getFullRepositoryName());
+    } catch (FileNotFoundException e) {
+      LOG.warn("Couldn't find repository {}", git.getFullRepositoryName(), e);
+      return;
+    }
+
+    LOG.info("Setting status of commit {} to {} for build {}", sha, state, build.getId().get());
+    repository.createCommitStatus(sha, state, url, description, context);
   }
 
-  private String getStateDescription (State state) {
+  private boolean shouldUpdateStatus(BuildDefinition definition, Build build) {
+    Optional<BuildConfig> buildConfig = build.getBuildConfig();
+    if (build.getState() == State.QUEUED) {
+      return false;
+    } else if (buildConfig.isPresent() && manualBuildSpecified(buildConfig.get())) {
+      return true;
+    } else {
+      String whitelist = Objects.firstNonNull(System.getenv("BUILD_WHITELIST"), "");
+      List<String> whitelistedRepos= Splitter.on(',').trimResults().omitEmptyStrings().splitToList(whitelist);
+
+      return whitelistedRepos.contains(definition.getGitInfo().getRepository());
+    }
+  }
+
+  private static boolean manualBuildSpecified(BuildConfig buildConfig) {
+    return !buildConfig.getCmds().isEmpty() || buildConfig.getBuildpack().isPresent();
+  }
+
+  private static String getStateDescription(State state) {
      switch (state) {
       case QUEUED:
         throw new IllegalArgumentException("Queued builds have no analagous GH Commit State");
@@ -93,7 +120,7 @@ public class GithubStatusHandler {
     }
   }
 
-  private GHCommitState toGHCommitState (State state) {
+  private static GHCommitState toGHCommitState(State state) {
     switch (state) {
       case QUEUED:
         throw new IllegalArgumentException("Queued builds have no analagous GH Commit State");

@@ -144,7 +144,7 @@ public class BuildLauncher {
     if (buildConfig.getBuildpack().isPresent()) {
       BuildConfig buildpackConfig = fetchBuildpack(buildConfig.getBuildpack().get());
       return mergeConfig(buildConfig, buildpackConfig);
-    } else if (definition.getModule().getBuildpack() != null && definition.getModule().getBuildpack().isPresent()) {
+    } else if (definition.getModule().getBuildpack().isPresent()) {
       BuildConfig buildpackConfig = fetchBuildpack(definition.getModule().getBuildpack().get());
       return mergeConfig(buildConfig, buildpackConfig);
     } else {
@@ -327,7 +327,7 @@ public class BuildLauncher {
   }
 
   private static Optional<Commit> commit(Optional<Build> build) {
-    if (build.isPresent() && build.get().getCommitInfo() != null && build.get().getCommitInfo().isPresent()) {
+    if (build.isPresent() && build.get().getCommitInfo().isPresent()) {
       return Optional.of(build.get().getCommitInfo().get().getCurrent());
     } else {
       return Optional.absent();
