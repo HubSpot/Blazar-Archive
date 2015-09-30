@@ -104,12 +104,19 @@ function getBuild() {
 
         BuildActions.loadBuildSuccess({
           build: build.data,
-          log: logLines
+          log: logLines,
+          fetchingLog: true
         });
 
         if (jqxhr.responseJSON.data.length > 0) {
           offset = offset + 90000;
           fetchLog();
+        } else {
+          BuildActions.loadBuildSuccess({
+            build: build.data,
+            log: logLines,
+            fetchingLog: false
+          });
         }
 
       });
@@ -124,7 +131,7 @@ function getBuild() {
   });
 
   buildPromise.error( () => {
-    BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build");
+    BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
   });
 
 }

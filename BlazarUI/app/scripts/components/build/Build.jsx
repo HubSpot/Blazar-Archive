@@ -59,6 +59,7 @@ class Build extends Component {
           <UIGridItem size={12}>
             <BuildLog
               log={this.props.log}
+              fetchingLog={this.props.fetchingLog}
               buildState={build.state}
               loading={this.props.loading}
             />
@@ -77,6 +78,7 @@ Build.propTypes = {
     module: PropTypes.object
   }),
   log: PropTypes.string,
+  fetchingLog: PropTypes.bool,
   originalParams: PropTypes.object,
   params: PropTypes.object,
   loading: PropTypes.bool,

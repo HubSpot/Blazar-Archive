@@ -62,7 +62,7 @@ class BuildLog extends Component {
 
     let buildState;
 
-    if (this.props.buildState === BuildStates.IN_PROGRESS) {
+    if (this.props.buildState === BuildStates.IN_PROGRESS || this.props.fetchingLog) {
       buildState = (
         <SectionLoader />
       );
@@ -99,6 +99,7 @@ class BuildLog extends Component {
 
 BuildLog.propTypes = {
   log: PropTypes.string,
+  fetchingLog: PropTypes.bool,
   buildState: PropTypes.string,
   isBuilding: PropTypes.bool,
   loading: PropTypes.bool
