@@ -6,8 +6,8 @@ import {events, humanizeText} from '../Helpers';
 import Collapsable from '../shared/Collapsable.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx'
+import ScrollTo from '../shared/ScrollTo.jsx';
 import BuildStates from '../../constants/BuildStates';
-
 
 class BuildLog extends Component {
 
@@ -62,7 +62,7 @@ class BuildLog extends Component {
 
     let buildState;
 
-    if (this.props.buildState === BuildStates.IN_PROGRESS) {
+    if (this.props.buildState === BuildStates.IN_PROGRESS || this.props.fetchingLog) {
       buildState = (
         <SectionLoader />
       );
@@ -81,13 +81,16 @@ class BuildLog extends Component {
       <Collapsable 
         header='Build Log'
         initialToggleStateOpen={true}
+        disableToggle={true}
       >
         <div className='build-log-container'>
           <pre id='log' 
             ref='log'
             className='build-log' 
-            dangerouslySetInnerHTML={this.getLogMarkup()} />
+            dangerouslySetInnerHTML={this.getLogMarkup()} 
+          />
           {buildState}
+          <ScrollTo className='build-log-scroll' />
         </div>
       </Collapsable>
     );
@@ -96,6 +99,7 @@ class BuildLog extends Component {
 
 BuildLog.propTypes = {
   log: PropTypes.string,
+  fetchingLog: PropTypes.bool,
   buildState: PropTypes.string,
   isBuilding: PropTypes.bool,
   loading: PropTypes.bool

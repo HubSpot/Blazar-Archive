@@ -3,17 +3,18 @@ import Model from './Model';
 
 class Log extends Model {
 
-  constructor(buildNumber) {
-
-    this.buildNumber = buildNumber;
+  constructor(options) {
+    this.offset = options.offset;
+    this.buildNumber = options.buildNumber;
 
     this.fetchOptions = {
       dataType: 'json'
     };
+
   }
 
   url() {
-    return `${config.apiRoot}/build/${this.buildNumber}/log/`;
+    return `${config.apiRoot}/build/${this.buildNumber}/log?offset=${this.offset}`;
   }
 
   formatLog(jqxhr) {

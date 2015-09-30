@@ -28,6 +28,7 @@ class BuildContainer extends Component {
         module: { name: ''}
       },
       log: '',
+      fetchingLog: true,
       stars: [],
     };
   }
@@ -71,7 +72,8 @@ class BuildContainer extends Component {
       this.setState({
         loading: false,
         build: state.build.build,
-        log: state.build.log
+        log: state.build.log,
+        fetchingLog: state.build.fetchingLog
       });
 
       if (contains(ACTIVE_BUILD_STATES, state.build.build.build.state)){
@@ -92,6 +94,7 @@ class BuildContainer extends Component {
         <Build
           build={this.state.build}
           log={this.state.log}
+          fetchingLog={this.state.fetchingLog}
           originalParams={this.originalParams}
           params={this.props.params}
           loading={this.state.loading}

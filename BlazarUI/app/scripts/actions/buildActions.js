@@ -76,6 +76,8 @@ function getBranchId() {
 }
 
 function getBuild() {
+  let logLines = '';
+  let offset = 0;
   const build = new Build(gitInfo);
   const buildPromise = build.fetch();
 
@@ -87,26 +89,56 @@ function getBuild() {
       return;
     }
 
-    const log = new Log(build.data.build.id);
-    const logPromise = log.fetch();
-
-    logPromise.always( (data, textStatus, jqxhr) => {
-
-      BuildActions.loadBuildSuccess({
-        build: build.data,
-        log: log.formatLog(jqxhr)
+    (function fetchLog() {
+      const log = new Log({
+        buildNumber: build.data.build.id,
+        offset: offset
       });
 
-    });
+      const logPromise = log.fetch();
 
-    logPromise.error( () => {
-      BuildActions.loadBuildError("<p class='roomy-xy'>No build log");
-    });
+      logPromise.always( (data, textStatus, jqxhr) => {
+
+        logLines += log.formatLog(jqxhr);
+
+        BuildActions.loadBuildSuccess({
+          build: build.data,
+          log: logLines,
+          fetchingLog: true
+        });
+
+        if (jqxhr.responseJSON === undefined || textStatus === 'error') {
+          BuildActions.loadBuildSuccess({
+            build: {},
+            log: '',
+            fetchingLog: false
+          });
+        }
+
+        if (jqxhr.responseJSON.data.length > 0) {
+          offset = offset + 90000;
+          fetchLog();
+        } else {
+          BuildActions.loadBuildSuccess({
+            build: build.data,
+            log: logLines,
+            fetchingLog: false
+          });
+        }
+
+      });
+
+      logPromise.error( () => {
+        BuildActions.loadBuildError("<p class='roomy-xy'>No build log");
+      });
+
+    })();
+
 
   });
 
   buildPromise.error( () => {
-    BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build");
+    BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
   });
 
 }

@@ -59,3 +59,11 @@ export const getIsStarredState = function(stars, id) {
 export const getPathname = function() {
   return window.location.pathname;
 };
+
+export const scrollTo = function(direction) {
+  if (direction === 'bottom') {
+    window.scrollTo(0, document.body.scrollHeight);
+  } else if (direction === 'top') {
+    window.scrollTo(0, 0);
+  }
+};
