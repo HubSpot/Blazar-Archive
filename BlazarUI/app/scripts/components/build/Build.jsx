@@ -41,7 +41,7 @@ class Build extends Component {
               moduleName={this.props.params.module}
               moduleId={this.props.params.moduleId}
               modulePath={this.props.pathname}
-              buildNumber={build.buildNumber}
+              buildNumber={parseInt(this.props.params.buildNumber)}
               isStarred={this.props.isStarred}
               toggleStar={this.props.toggleStar}
             />

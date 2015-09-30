@@ -90,7 +90,6 @@ function getBuild() {
     }
 
     (function fetchLog() {
-
       const log = new Log({
         buildNumber: build.data.build.id,
         offset: offset
@@ -107,6 +106,14 @@ function getBuild() {
           log: logLines,
           fetchingLog: true
         });
+
+        if (jqxhr.responseJSON === undefined || textStatus === 'error') {
+          BuildActions.loadBuildSuccess({
+            build: {},
+            log: '',
+            fetchingLog: false
+          });
+        }
 
         if (jqxhr.responseJSON.data.length > 0) {
           offset = offset + 90000;
