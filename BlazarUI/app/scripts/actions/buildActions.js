@@ -76,6 +76,8 @@ function getBranchId() {
 }
 
 function getBuild() {
+  let logLines = '';
+  let offset = 0;
   const build = new Build(gitInfo);
   const buildPromise = build.fetch();
 
@@ -87,21 +89,37 @@ function getBuild() {
       return;
     }
 
-    const log = new Log(build.data.build.id);
-    const logPromise = log.fetch();
+    (function fetchLog() {
 
-    logPromise.always( (data, textStatus, jqxhr) => {
-
-      BuildActions.loadBuildSuccess({
-        build: build.data,
-        log: log.formatLog(jqxhr)
+      const log = new Log({
+        buildNumber: build.data.build.id,
+        offset: offset
       });
 
-    });
+      const logPromise = log.fetch();
 
-    logPromise.error( () => {
-      BuildActions.loadBuildError("<p class='roomy-xy'>No build log");
-    });
+      logPromise.always( (data, textStatus, jqxhr) => {
+
+        logLines += log.formatLog(jqxhr);
+
+        BuildActions.loadBuildSuccess({
+          build: build.data,
+          log: logLines
+        });
+
+        if (jqxhr.responseJSON.data.length > 0) {
+          offset = offset + 90000;
+          fetchLog();
+        }
+
+      });
+
+      logPromise.error( () => {
+        BuildActions.loadBuildError("<p class='roomy-xy'>No build log");
+      });
+
+    })();
+
 
   });
 
