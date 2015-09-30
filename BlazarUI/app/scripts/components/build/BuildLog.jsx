@@ -6,8 +6,8 @@ import {events, humanizeText} from '../Helpers';
 import Collapsable from '../shared/Collapsable.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx'
+import ScrollTo from '../shared/ScrollTo.jsx';
 import BuildStates from '../../constants/BuildStates';
-
 
 class BuildLog extends Component {
 
@@ -87,8 +87,10 @@ class BuildLog extends Component {
           <pre id='log' 
             ref='log'
             className='build-log' 
-            dangerouslySetInnerHTML={this.getLogMarkup()} />
+            dangerouslySetInnerHTML={this.getLogMarkup()} 
+          />
           {buildState}
+          <ScrollTo className='build-log-scroll' />
         </div>
       </Collapsable>
     );
