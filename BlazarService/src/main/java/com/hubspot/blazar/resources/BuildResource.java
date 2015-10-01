@@ -99,9 +99,7 @@ public class BuildResource {
 
     Optional<MesosFileChunkObject> chunk = singularityClient.readSandBoxFile(taskId, path, grep, Optional.of(offset), Optional.of(length));
     if (chunk.isPresent()) {
-      String data = chunk.get().getData();
-      offset = chunk.get().getOffset();
-      return new LogChunk(data, offset, offset + data.getBytes(StandardCharsets.UTF_8).length);
+      return new LogChunk(chunk.get().getData(), chunk.get().getOffset());
     } else {
       Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId);
       if (s3Logs.isEmpty()) {
@@ -112,7 +110,7 @@ public class BuildResource {
 
       SingularityS3Log s3Log = s3Logs.iterator().next();
       if (offset >= s3Log.getSize()) {
-        return new LogChunk("", s3Log.getSize(), s3Log.getSize());
+        return new LogChunk("", s3Log.getSize());
       }
 
       return fetchS3Log(s3Log.getGetUrl(), offset, length);
@@ -146,8 +144,7 @@ public class BuildResource {
 
     HttpResponse response = asyncHttpClient.execute(request).get();
     if (response.isSuccess()) {
-      byte[] data = response.getAsBytes();
-      return new LogChunk(new String(data, StandardCharsets.UTF_8), offset, offset + data.length);
+      return new LogChunk(response.getAsBytes(), offset);
     } else {
       String message = String.format("Error reading S3 log, status code %d, response %s", response.getStatusCode(), response.getAsString());
       throw new WebApplicationException(Response.serverError().entity(message).type(MediaType.TEXT_PLAIN_TYPE).build());
