@@ -12,13 +12,27 @@ class Breadcrumb extends Component {
     const pages = values(this.props.params);
     const appRootClean = this.props.appRoot.replace(/^\/|\/$/g, '');
 
+    let noLink = false;
+
     const links = pages.map((page, i) => {
       let pageLinks = '';
-      for (let i = 0; i < pages.length; i++) {
-        pageLinks += `/${pages[i]}`;
-        if (page === pages[i]) {
+
+      if (i === pages.length - 1) {
+        noLink = true;
+      }
+
+      for (let g = 0; g < pages.length; g++) {
+        pageLinks += `/${pages[g]}`;
+
+        if (i === g) {
           break;
         }
+      }
+
+      if (noLink) {
+        return (
+          <span key={page + i} className='crumb active'>{page}</span>
+        );        
       }
 
       return (
