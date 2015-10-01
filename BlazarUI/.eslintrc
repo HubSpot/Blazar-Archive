@@ -24,7 +24,7 @@
     "no-alert": 0,
     "no-else-return": 1,
     "strict": [2, "global"],
-    "brace-style": [1, "1tbs"],
+    "brace-style": [2, "stroustrup"],
     "comma-style": [1, "last"],
     "no-lonely-if": 1,
     "no-multi-spaces": 0,

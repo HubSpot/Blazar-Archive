@@ -8,7 +8,8 @@ const StarredProvider = {
 
     if (isStarred) {
       this.removeStar(repo, branch);
-    } else {
+    }
+    else {
       this.addStar(repo, branch);
     }
   },
