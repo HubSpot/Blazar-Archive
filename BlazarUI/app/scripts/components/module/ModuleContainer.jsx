@@ -31,14 +31,18 @@ class ModuleContainer extends Component {
 
   componentDidMount() {
     this.originalParams = clone(this.props.params);
+
     this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
+
     BuildHistoryActions.loadBuildHistory(this.props.params);
     StarActions.loadStars();
   }
 
   componentWillReceiveProps(nextprops) {
+    this.originalParams = clone(nextprops.params);
+
     BuildHistoryActions.loadBuildHistory(nextprops.params);
     this.setState({
       loading: true,

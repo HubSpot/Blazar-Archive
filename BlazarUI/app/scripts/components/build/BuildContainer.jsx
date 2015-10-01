@@ -41,6 +41,8 @@ class BuildContainer extends Component {
   }
 
   componentWillReceiveProps(nextprops) {
+    this.originalParams = clone(nextprops.params);
+
     this.setState({
       loading: true
     });
