@@ -49,7 +49,7 @@ class BuildLog extends Component {
   }
 
   render() {
-    
+    let spinner;
     const noBuildLog = this.props.buildState === BuildStates.CANCELLED || this.props.buildState === BuildStates.QUEUED;
 
     if (this.props.loading) {
@@ -60,21 +60,11 @@ class BuildLog extends Component {
       return <div />;
     }
 
-    let buildState;
-
-    if (this.props.buildState === BuildStates.IN_PROGRESS || this.props.fetchingLog) {
-      buildState = (
+    if (this.props.fetchingLog) {
+      spinner = (
         <SectionLoader />
       );
-    } else {
-      // To do: better final build state messages
-      buildState = (
-        <MutedMessage classNames='roomy'>
-          <strong>
-            Build {humanizeText(this.props.buildState)}
-          </strong>
-        </MutedMessage>
-      );
+
     }
 
     return (
@@ -89,7 +79,7 @@ class BuildLog extends Component {
             className='build-log' 
             dangerouslySetInnerHTML={this.getLogMarkup()} 
           />
-          {buildState}
+          {spinner}
           <ScrollTo className='build-log-scroll' />
         </div>
       </Collapsable>

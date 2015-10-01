@@ -7,15 +7,8 @@ import BuildTrigger from '../models/BuildTrigger';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
 import {find} from 'underscore';
-
 import BuildStates from '../constants/BuildStates';
 
-let gitInfo;
-
-function fetchBuild(data) {
-  gitInfo = data;
-  getBranchId();
-}
 
 const BuildActions = Reflux.createActions([
   'loadBuild',
@@ -27,12 +20,19 @@ const BuildActions = Reflux.createActions([
   'triggerBuildStart'
 ]);
 
+BuildActions.prepareBuildInfo = function(data) {
+  BuildActions.data = {
+    gitInfo: data
+  };
+  getBranchId();
+};
+
 BuildActions.loadBuild.preEmit = function(data) {
-  fetchBuild(data);
+  BuildActions.prepareBuildInfo(data);
 };
 
 BuildActions.reloadBuild = function(data) {
-  fetchBuild(data);
+  BuildActions.prepareBuildInfo(data);
 };
 
 BuildActions.triggerBuild = function(moduleId) {
@@ -48,12 +48,12 @@ BuildActions.triggerBuild = function(moduleId) {
 };
 
 function getModule() {
-  const branchModules = new BranchModules(gitInfo.branchId);
+  const branchModules = new BranchModules(BuildActions.data.gitInfo.branchId);
   const modulesPromise = branchModules.fetch();
 
   modulesPromise.done(() => {
-    gitInfo.moduleId = find(branchModules.data, (m) => {
-      return m.name === gitInfo.module;
+    BuildActions.data.gitInfo.moduleId = find(branchModules.data, (m) => {
+      return m.name === BuildActions.data.gitInfo.module;
     }).id;
     getBuild();
   });
@@ -63,11 +63,11 @@ function getModule() {
 }
 
 function getBranchId() {
-  const branchDefinition = new BranchDefinition(gitInfo);
+  const branchDefinition = new BranchDefinition(BuildActions.data.gitInfo);
   const branchPromise =  branchDefinition.fetch();
 
   branchPromise.done(() => {
-    gitInfo.branchId = branchDefinition.data.id;
+    BuildActions.data.gitInfo.branchId = branchDefinition.data.id;
     getModule();
   });
   branchPromise.error(() => {
@@ -76,71 +76,129 @@ function getBranchId() {
 }
 
 function getBuild() {
-  let logLines = '';
-  let offset = 0;
-  const build = new Build(gitInfo);
+  const build = new Build(BuildActions.data.gitInfo);
   const buildPromise = build.fetch();
 
-  buildPromise.done( () => {
-    if (build.data.build.state === BuildStates.LAUNCHING) {
-      BuildActions.loadBuildSuccess({
-        build: build.data
-      });
-      return;
-    }
+  buildPromise.done(() => {
+    processBuild(build);
+  });
 
-    (function fetchLog() {
-      const log = new Log({
-        buildNumber: build.data.build.id,
-        offset: offset
-      });
+  buildPromise.error(() => {
+    BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
+  });
+}
 
-      const logPromise = log.fetch();
+function processBuild(build) {
+  if (build.data.build.state === BuildStates.LAUNCHING) {
+    BuildActions.loadBuildSuccess({
+      build: build.data
+    });
+    return;
+  }
 
-      logPromise.always( (data, textStatus, jqxhr) => {
+  if (build.data.build.state === BuildStates.IN_PROGRESS) {
+    processInProgressBuild(build);
+  }
 
-        logLines += log.formatLog(jqxhr);
+  else {
+    processInactiveBuild(build);
+  }
+}
 
+function processInProgressBuild(build) {
+  let inProgressBuild = {
+    active: false,
+    logLines: '',
+    offset: 0
+  };
+
+  (function fetchLog() {
+    const log = new Log({
+      buildNumber: build.data.build.id,
+      offset: inProgressBuild.offset
+    });
+
+    const logPromise = log.fetch();
+    logPromise.always( (data, textStatus, jqxhr) => {
+
+      inProgressBuild.logLines += log.formatLog(jqxhr);
+      inProgressBuild.offset = data.nextOffset;
+
+      // build complete
+      if (data.nextOffset === -1) {
         BuildActions.loadBuildSuccess({
           build: build.data,
-          log: logLines,
+          log: inProgressBuild.logLines,
+          fetchingLog: false
+        });
+      }
+
+      // still building
+      else {
+        BuildActions.loadBuildSuccess({
+          build: build.data,
+          log: inProgressBuild.logLines,
           fetchingLog: true
         });
 
-        if (jqxhr.responseJSON === undefined || textStatus === 'error') {
-          BuildActions.loadBuildSuccess({
-            build: {},
-            log: '',
-            fetchingLog: false
-          });
-        }
-
-        if (jqxhr.responseJSON.data.length > 0) {
-          offset = offset + 90000;
+        setTimeout(() => {
           fetchLog();
-        } else {
-          BuildActions.loadBuildSuccess({
-            build: build.data,
-            log: logLines,
-            fetchingLog: false
-          });
-        }
+        }, 5000);
+      }
 
+    });
+
+  })();
+}
+
+function processInactiveBuild(build) {
+  let logLines = '';
+  let offset = 0;
+
+  (function fetchLog() {
+    const log = new Log({
+      buildNumber: build.data.build.id,
+      offset: offset
+    });
+
+    const logPromise = log.fetch();
+    logPromise.always( (data, textStatus, jqxhr) => {
+
+      logLines += log.formatLog(jqxhr);
+
+      if (jqxhr.responseJSON === undefined || textStatus !== 'success') {
+        BuildActions.loadBuildSuccess({
+          build: build,
+          log: `<p class='roomy-xy'>${data.responseText}</p>`,
+          fetchingLog: false
+        });
+        return;
+      }
+
+      BuildActions.loadBuildSuccess({
+        build: build.data,
+        log: logLines,
+        fetchingLog: true
       });
 
-      logPromise.error( () => {
-        BuildActions.loadBuildError("<p class='roomy-xy'>No build log");
-      });
+      // more log lines exist
+      if (jqxhr.responseJSON.nextOffset !== -1) {
+        offset = jqxhr.responseJSON.nextOffset;
+        fetchLog();
+      }
 
-    })();
+      // got all log lines
+      else {
+        BuildActions.loadBuildSuccess({
+          build: build.data,
+          log: logLines,
+          fetchingLog: false
+        });
+      }
 
+    });
 
-  });
-
-  buildPromise.error( () => {
-    BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
-  });
-
+  })();
 }
 
 export default BuildActions;

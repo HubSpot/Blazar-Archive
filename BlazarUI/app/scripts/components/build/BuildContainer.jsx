@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll, contains, some, clone} from 'underscore';
-import {ACTIVE_BUILD_STATES} from '../../constants/ActiveBuildStates.js';
-import {BuildStates} from '../../constants/BuildStates.js';
+import BuildStates from '../../constants/BuildStates.js';
 import {getIsStarredState} from '../Helpers.js';
 import Build from './Build.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
@@ -76,7 +75,7 @@ class BuildContainer extends Component {
         fetchingLog: state.build.fetchingLog
       });
 
-      if (contains(ACTIVE_BUILD_STATES, state.build.build.build.state)){
+      if (contains([BuildStates.QUEUED, BuildStates.LAUNCHING], state.build.build.build.state)){
         setTimeout( () => {
           BuildActions.reloadBuild(this.props.params);
         }, 5000);
