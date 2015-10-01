@@ -3,12 +3,21 @@ package com.hubspot.blazar.base;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class LogChunk {
   private final String data;
   private final long offset;
   private final long nextOffset;
+
+  public LogChunk(String data, long offset) {
+    this(data, offset, offset + data.getBytes(StandardCharsets.UTF_8).length);
+  }
+
+  public LogChunk(byte[] data, long offset) {
+    this(new String(data, StandardCharsets.UTF_8), offset, offset + data.length);
+  }
 
   @JsonCreator
   public LogChunk(@JsonProperty("data") String data,
