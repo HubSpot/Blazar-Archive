@@ -44,7 +44,10 @@ class ModulesTableRow extends Component {
     if (!has(this.props.module, 'lastBuild')) {
       return (
         <tr> 
-          <td>{module.name}</td>  
+          <td>
+            <Icon type='octicon' name='file-directory' classNames="icon-roomy icon-muted" />
+            <Link to={modulePath}>{module.name}</Link>
+          </td>  
           <td>No History</td>
           <td></td>
           <td></td>

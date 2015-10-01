@@ -37,7 +37,6 @@ class ModulesTable extends Component {
       {label: 'Commit', key: 'commit'}
     ];
 
-    // TO DO: empty table
     return (
       <table className="table table-hover table-striped">
         <TableHead
