@@ -21,7 +21,8 @@ const StarProvider = {
 
     if (isStarred) {
       this.removeStar();
-    } else {
+    }
+    else {
       this.addStar();
     }
     return this.starCache;

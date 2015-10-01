@@ -63,7 +63,8 @@ export const getPathname = function() {
 export const scrollTo = function(direction) {
   if (direction === 'bottom') {
     window.scrollTo(0, document.body.scrollHeight);
-  } else if (direction === 'top') {
+  }
+  else if (direction === 'top') {
     window.scrollTo(0, 0);
   }
 };
