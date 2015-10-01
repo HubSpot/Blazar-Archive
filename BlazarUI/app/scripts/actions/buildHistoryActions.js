@@ -22,6 +22,7 @@ let gitInfo;
 // Build history for module page:
 // e.g. HubSpot/Blazar/master/BlazarUI
 BuildHistoryActions.loadBuildHistory.preEmit = (data) => {
+  BuildHistoryActions.updatePollingStatus(true);
   gitInfo = data;
   buildHistoryPoller();
 };
