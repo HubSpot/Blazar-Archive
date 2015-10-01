@@ -88,6 +88,7 @@ public class BuildResource {
       throw new NotFoundException("No build found for ID " + id);
     }
 
+    boolean completed = build.get().getBuild().getState().isComplete();
     Optional<String> logUrl = build.get().getBuild().getLog();
     if (!logUrl.isPresent()) {
       throw new NotFoundException("No build log URL found for ID " + id);
@@ -99,7 +100,11 @@ public class BuildResource {
 
     Optional<MesosFileChunkObject> chunk = singularityClient.readSandBoxFile(taskId, path, grep, Optional.of(offset), Optional.of(length));
     if (chunk.isPresent()) {
-      return new LogChunk(chunk.get().getData(), chunk.get().getOffset());
+      if (completed && chunk.get().getData().isEmpty()) {
+        return new LogChunk(chunk.get().getData(), chunk.get().getOffset(), -1);
+      } else {
+        return new LogChunk(chunk.get().getData(), chunk.get().getOffset());
+      }
     } else {
       Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId);
       if (s3Logs.isEmpty()) {
@@ -110,7 +115,7 @@ public class BuildResource {
 
       SingularityS3Log s3Log = s3Logs.iterator().next();
       if (offset >= s3Log.getSize()) {
-        return new LogChunk("", s3Log.getSize());
+        return new LogChunk("", s3Log.getSize(), -1);
       }
 
       return fetchS3Log(s3Log.getGetUrl(), offset, length);
