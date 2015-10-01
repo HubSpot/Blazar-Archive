@@ -86,7 +86,6 @@ class ModuleContainer extends Component {
           stars={this.state.stars}
           loading={this.state.loading}
           triggerBuild={this.triggerBuild}
-          buildTriggering={!this.state.buildTriggeringDone}
           toggleStar={this.toggleStar}
         />
       </PageContainer>

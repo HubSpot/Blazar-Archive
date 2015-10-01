@@ -69,7 +69,7 @@ class Module extends Component {
             </Headline>
           </UIGridItem>           
           <UIGridItem size={2} align='RIGHT'>
-            <BuildButton triggerBuild={this.props.triggerBuild} buildTriggering={this.props.buildTriggering} />
+            <BuildButton triggerBuild={this.props.triggerBuild} />
           </UIGridItem>
           <UIGridItem size={12}>
             <BuildHistoryTable
@@ -104,7 +104,6 @@ Module.propTypes = {
   pathname: PropTypes.string.isRequired,
   stars: PropTypes.array.isRequired,
   triggerBuild: PropTypes.func.isRequired,
-  buildTriggering: PropTypes.bool,
   toggleStar: PropTypes.func.isRequired
 };
 
