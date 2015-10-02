@@ -42,6 +42,7 @@ CREATE TABLE `builds` (
   `log` varchar(2048),
   `buildConfig` mediumtext,
   `resolvedConfig` mediumtext,
+  `taskId` varchar(500),
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`moduleId`, `buildNumber`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
