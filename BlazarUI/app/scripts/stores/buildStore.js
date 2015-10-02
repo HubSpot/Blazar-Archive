@@ -3,19 +3,13 @@ import BuildActions from '../actions/buildActions';
 
 const BuildStore = Reflux.createStore({
 
+  listenables: BuildActions,
+
   init() {
     this.build = {};
 
     this.buildTriggeringDone = true;
     this.buildTriggeringError = '';
-
-    this.listenTo(BuildActions.loadBuild, this.loadBuild);
-    this.listenTo(BuildActions.loadBuildSuccess, this.loadBuildSuccess);
-    this.listenTo(BuildActions.loadBuildError, this.loadBuildError);
-
-    this.listenTo(BuildActions.triggerBuildSuccess, this.triggerBuildSuccess);
-    this.listenTo(BuildActions.triggerBuildError, this.triggerBuildError);
-    this.listenTo(BuildActions.triggerBuildStart, this.triggerBuildStart);
   },
 
   loadBuild() {

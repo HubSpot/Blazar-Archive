@@ -1,4 +1,3 @@
-/*global BuildHistoryActions*/
 import Reflux from 'reflux';
 
 import Build from '../models/Build';
@@ -8,7 +7,7 @@ import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
 import {find} from 'underscore';
 import BuildStates from '../constants/BuildStates';
-
+import BuildHistoryActions from '../actions/buildHistoryActions';
 
 const BuildActions = Reflux.createActions([
   'loadBuild',
@@ -41,6 +40,7 @@ BuildActions.triggerBuild = function(moduleId) {
   const promise = trigger.fetch();
   promise.then(() => {
     BuildActions.triggerBuildSuccess();
+    BuildHistoryActions.fetchLatestHistory();
   },
   (data, textStatus, jqXHR) => {
     BuildActions.triggerBuildError(jqXHR);

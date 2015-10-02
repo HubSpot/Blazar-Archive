@@ -21,13 +21,14 @@ const BranchStore = Reflux.createStore({
   },
 
   getModules() {
-    this.trigger({
-      loading: true
-    });
 
     if (!BuildsStore.buildsHaveLoaded || this.params === undefined) {
       return;
     }
+
+    this.trigger({
+      loading: true
+    });
 
     const builds = new Builds();
     builds.set(BuildsStore.getBuilds());

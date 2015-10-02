@@ -30,7 +30,6 @@ class RepoContainer extends Component {
   }
 
   componentWillUnmount() {
-    RepoActions.updatePollingStatus(false);
     this.unsubscribeFromRepo();
   }
 

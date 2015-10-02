@@ -3,14 +3,12 @@ import BuildHistoryActions from '../actions/buildHistoryActions';
 
 const buildHistoryStore = Reflux.createStore({
 
+  listenables: BuildHistoryActions,
+
   init() {
     this.buildHistory = [];
     this.modulesBuildHistory = [];
 
-    this.listenTo(BuildHistoryActions.loadBuildHistory, this.loadBuildHistory);
-    this.listenTo(BuildHistoryActions.loadBuildHistorySuccess, this.loadBuildHistorySuccess);
-    this.listenTo(BuildHistoryActions.loadModulesBuildHistorySuccess, this.loadModulesBuildHistorySuccess);
-    this.listenTo(BuildHistoryActions.loadBuildHistoryError, this.loadBuildHistoryError);
   },
 
   loadBuildHistory() {

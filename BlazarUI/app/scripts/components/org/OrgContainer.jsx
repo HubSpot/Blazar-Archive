@@ -24,7 +24,6 @@ class OrgContainer extends Component {
   }
 
   componentWillUnmount() {
-    OrgActions.updatePollingStatus(false);
     this.unsubscribeFromOrg();
   }
 

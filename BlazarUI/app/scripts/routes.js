@@ -6,7 +6,6 @@ import { Route, DefaultRoute, NotFoundRoute } from 'react-router';
 import App from './pages/app.jsx';
 import Dashboard from './pages/dashboard.jsx';
 import Org from './pages/org.jsx';
-import Hosts from './pages/hosts.jsx';
 import Host from './pages/host.jsx';
 import Repo from './pages/repo.jsx';
 import Branch from './pages/branch.jsx';
@@ -22,7 +21,6 @@ const routes = (
   <Route name='app' path='/' handler={ App }>
     <DefaultRoute handler={ Dashboard } />
     <Route name='dashboard' path={pagePath('/?')} handler={ Dashboard } />
-    <Route name='hosts' path={pagePath('/builds/?')} handler={Hosts}/>
     <Route name='host' path={pagePath('/builds/:host/?')} handler={Host}/>
     <Route name='org' path={pagePath('/builds/:host/:org/?')} handler={Org}/>
     <Route name='repo' path={pagePath('/builds/:host/:org/:repo/?')} handler={Repo}/>

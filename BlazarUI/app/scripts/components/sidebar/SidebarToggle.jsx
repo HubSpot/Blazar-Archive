@@ -43,7 +43,7 @@ class SidebarToggle extends Component {
           id="building"
           className={this.getButtonClassNames('building')}
           onClick={this.handleToggle}>
-            <span>building</span>
+            building
         </a>
 
       </div>

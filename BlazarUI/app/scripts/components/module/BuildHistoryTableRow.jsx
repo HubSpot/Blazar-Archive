@@ -42,7 +42,7 @@ class BuildHistoryTableRow extends Component {
     let sha, duration;
 
     if (build.startTimestamp !== undefined && build.endTimestamp !== undefined) {
-      duration = Helpers.timestampDuration(build.endTimestamp - build.startTimestamp);
+      duration = build.duration;
     }
 
     if (contains([BuildStates.IN_PROGRESS, BuildStates.QUEUED, BuildStates.LAUNCHING], build.state)) {

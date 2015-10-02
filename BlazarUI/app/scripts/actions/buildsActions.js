@@ -1,6 +1,5 @@
 /*global config*/
 import Reflux from 'reflux';
-
 import Builds from '../collections/Builds';
 
 const BuildsActions = Reflux.createActions([
@@ -12,27 +11,38 @@ const BuildsActions = Reflux.createActions([
 BuildsActions.loadBuilds.preEmit = function() {
 
   (function doPoll() {
-    const builds = new Builds();
-    const promise = builds.fetch();
-
-    promise.done( () => {
-      BuildsActions.loadBuildsSuccess(builds.get());
-    });
-
-    promise.always( () => {
+    fetchBuilds(() => {
       setTimeout(doPoll, config.buildsRefresh);
     });
-
-    promise.error( (err) => {
-      console.warn('Error connecting to the API. Check that you are connected to the VPN ', err);
-      // To do
-      BuildsActions.loadBuildsError('an error occured');
-    });
-
-
   })();
 
 };
+
+BuildsActions.fetchBuilds = () => {
+  fetchBuilds();
+};
+
+function fetchBuilds(cb) {
+  const builds = new Builds();
+  const promise = builds.fetch();
+
+  promise.done( () => {
+    BuildsActions.loadBuildsSuccess(builds.get());
+  });
+
+  promise.always( () => {
+    if (typeof cb === 'function') {
+      cb();
+    }
+  });
+
+  promise.error( (err) => {
+    console.warn('Error connecting to the API. Check that you are connected to the VPN ', err);
+    // To do - make note in the view
+    BuildsActions.loadBuildsError('an error occured');
+  });
+
+}
 
 
 

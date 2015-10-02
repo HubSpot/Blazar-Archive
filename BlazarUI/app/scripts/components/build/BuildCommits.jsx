@@ -21,19 +21,32 @@ class BuildCommits extends Component {
     }
 
     const inflection = commitInfo.newCommits.length !== 1 ? 's' : '';
-    const header = (
-      <span> 
-        <span className='badge roomy-x'>
-          {commitInfo.newCommits.length}
-        </span> 
-        new commit{inflection} since previous build 
-      </span>
-    );
+
+
+    let header;
+
+    if (commitInfo.newCommits.length === 0) {
+      header = (
+        <span>No new commits since previous build</span>
+      );
+    }
+
+    else {
+      header = (
+        <span>
+          <span className='badge roomy-x'>
+            {commitInfo.newCommits.length}
+          </span> 
+          new commit{inflection} since previous build 
+        </span>
+      );
+    }
 
     return (
       <Collapsable
         header={header}
         initialToggleStateOpen={false}
+        disableToggle={commitInfo.newCommits.length === 0}
       >
         <CommitsTable 
           commits={this.props.build.build.commitInfo.newCommits}

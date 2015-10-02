@@ -27,10 +27,9 @@
   background #e6e6e6
   padding 10px
   border-right 1px solid #dadada
-  text-transfprm uppercase
-  font-size 12px
+  text-transform uppercase
+  font-size 10px
   font-weight $font-medium 
-
   &:last-child
     border-right none
   &:hover
@@ -40,11 +39,12 @@
     outline none
   &.active
     background $offwhite
-  &.starred, &.building
+  &.starred
     span
       visibility hidden
     &:after
       font-family FontAwesome
+      content '\f005'
       font-style normal
       font-weight normal
       text-decoration inherit
@@ -52,12 +52,6 @@
       left 50%
       margin-left -4px
       z-index 1
-  &.starred
-    &:after
-      content '\f005'
-  &.building
-      &:after
-        content '\f0e7'
 
 .search-input, .search-input:focus
   margin-bottom 0px

@@ -3,13 +3,14 @@ import $ from 'jquery';
 import LazyRender from '../shared/LazyRender.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
 
-import {bindAll, filter, contains, has, contains} from 'underscore';
+import {bindAll, contains, has, contains} from 'underscore';
+import {markStarredModules} from '../../utils/starHelpers';
+import {getFilterMatches, filterByToggle} from '../../utils/buildsHelpers';
+import {FILTER_MESSAGES, NO_MATCH_MESSAGES} from '../constants';
+
 import SectionLoader from '../shared/SectionLoader.jsx';
-import Helpers from '../ComponentHelpers';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import SidebarItem from '../sidebar/SidebarItem.jsx';
-import {FILTER_MESSAGES, NO_MATCH_MESSAGES} from '../constants';
-import Search from '../../utils/search';
 
 let Link = require('react-router').Link;
 
@@ -44,46 +45,6 @@ class BuildsSidebar extends Component {
     this.props.persistStarChange(isStarred, moduleInfo)
   }
 
-  markStarredModules(modules) {
-    modules.map( (module) => {      
-      module.module.isStarred = false;
-      this.props.stars.forEach( (star) => {
-        if (star.moduleId === module.module.id) {
-          module.module.isStarred = true;
-          return;
-        }
-      });
-    });
-
-    return modules;
-  }
-
-  filterByToggle(modules) {
-    if (this.state.toggleFilterState === 'starred') {
-      const starredModules = Helpers.getStarredModules(this.props.stars, modules);
-      return starredModules;
-    }
-
-    if (this.state.toggleFilterState === 'building') {
-      modules = filter(modules, (module) => {
-        return has(module, 'inProgressBuild');
-      });
-    }
-
-    return modules;
-  }
-
-  getFilterMatches() {
-    const builds = this.props.builds;
-
-    if (builds.length === 0) {
-      return [];
-    }
-
-    const modulesSearch = new Search({ records: builds });
-    return modulesSearch.match(this.state.filterText);
-  }
-
   buildModuleComponents(modules) {
     return modules.map( (module) => {
       if (has(module, 'module')){
@@ -101,9 +62,9 @@ class BuildsSidebar extends Component {
   }
 
   render() {
-    const matches = this.getFilterMatches();
-    const markStarred = this.markStarredModules(matches);
-    const filteredByToggle = this.filterByToggle(markStarred);
+    const matches = getFilterMatches(this.props.builds, this.state.filterText);
+    const markStarred = markStarredModules(matches, this.props.stars);
+    const filteredByToggle = filterByToggle(this.state.toggleFilterState, markStarred, this.props.stars)
     const moduleComponents = this.buildModuleComponents(filteredByToggle);
     const searchType = NO_MATCH_MESSAGES[this.state.toggleFilterState];
     let sidebarMessage;

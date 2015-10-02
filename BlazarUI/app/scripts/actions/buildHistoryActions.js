@@ -27,6 +27,10 @@ BuildHistoryActions.loadBuildHistory.preEmit = (data) => {
   buildHistoryPoller();
 };
 
+BuildHistoryActions.fetchLatestHistory = () => {
+  fetchHistory();
+};
+
 // Build history for provided list of module IDs
 // e.g. starred modules in dashboard
 BuildHistoryActions.loadModulesBuildHistory = (options) => {
@@ -56,18 +60,21 @@ BuildHistoryActions.updatePollingStatus = (status) => {
   buildHistoryActionSettings.setPolling(status);
 };
 
-
 function buildHistoryPoller() {
 
   (function pollBuildHistory() {
-    getBranchId()
-      .then(getModule)
-      .then(getBuildHistory);
+    fetchHistory();
 
     if (buildHistoryActionSettings.polling) {
       setTimeout(pollBuildHistory, config.buildsRefresh);
     }
   })();
+}
+
+function fetchHistory() {
+  getBranchId()
+    .then(getModule)
+    .then(getBuildHistory);
 }
 
 function getBranchId() {

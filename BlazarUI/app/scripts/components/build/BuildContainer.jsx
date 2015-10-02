@@ -80,7 +80,7 @@ class BuildContainer extends Component {
       if (contains([BuildStates.QUEUED, BuildStates.LAUNCHING], state.build.build.build.state)){
         setTimeout( () => {
           BuildActions.reloadBuild(this.props.params);
-        }, 5000);
+        }, 2000);
       }
     }
   }

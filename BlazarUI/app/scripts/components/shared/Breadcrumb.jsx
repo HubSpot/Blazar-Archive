@@ -52,9 +52,6 @@ class Breadcrumb extends Component {
     return (
       <div className='breadcrumbs'>
         <Logo />
-        <Link className='crumb' to='hosts'>
-          Hosts
-        </Link>
         {links}
       </div>
     );
