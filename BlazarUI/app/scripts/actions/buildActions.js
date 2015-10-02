@@ -126,11 +126,22 @@ function processInProgressBuild(build) {
 
       // build complete
       if (data.nextOffset === -1) {
-        BuildActions.loadBuildSuccess({
-          build: build.data,
-          log: inProgressBuild.logLines,
-          fetchingLog: false
+        // To do: refactor this...
+        // temporary fix to get latest
+        // build info when the log tailing
+        // is finished.
+        const lastBuild = new Build(BuildActions.data.gitInfo);
+        const buildPromise = lastBuild.fetch();
+
+        buildPromise.done(() => {
+          BuildActions.loadBuildSuccess({
+            build: lastBuild.data,
+            log: inProgressBuild.logLines,
+            fetchingLog: false
+          });
+
         });
+
       }
 
       // still building
