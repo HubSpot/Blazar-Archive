@@ -90,11 +90,17 @@ public class BuildResource {
 
     boolean completed = build.get().getBuild().getState().isComplete();
     Optional<String> logUrl = build.get().getBuild().getLog();
-    if (!logUrl.isPresent()) {
-      throw new NotFoundException("No build log URL found for ID " + id);
+    Optional<String> taskIdOptional = build.get().getBuild().getTaskId();
+    if (!logUrl.isPresent() && !taskIdOptional.isPresent()) {
+      throw new NotFoundException("No build log URL or taskId found for ID " + id);
     }
 
-    String taskId = parseTaskId(logUrl.get());
+    String taskId;
+    if (taskIdOptional.isPresent()) {
+      taskId = taskIdOptional.get();
+    } else {
+      taskId = parseTaskId(logUrl.get());
+    }
     String path = taskId + "/service.log";
     Optional<String> grep = Optional.absent();
 
