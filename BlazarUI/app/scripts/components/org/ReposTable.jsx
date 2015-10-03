@@ -18,13 +18,15 @@ class ReposTable extends Component {
 
   render() {
     if (this.props.loading) {
-      return <div></div>;
+      return null;
     }
 
     const columnNames = [
       {label: 'Repository', key: 'name'},
-      {label: 'Latest Build', key: 'lastBuild'},
-      {label: '', key: 'lastBuildTime'}
+      {label: 'Latest Building Module', key: 'module'},
+      {label: 'Build', key: 'lastBuild'},
+      {label: 'Start Time', key: 'startTime'},
+      {label: 'Commit', key: 'commit'}
     ];
 
     // TO DO: empty table

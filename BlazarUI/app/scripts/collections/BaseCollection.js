@@ -34,7 +34,7 @@ class BaseCollection extends Collection {
 
       if (has(item, 'inProgressBuild')) {
         item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`;
-        // build.startTimestamp - Date.now()
+        item.inProgressBuild.duration = Date.now() - item.inProgressBuild.startTimestamp;
       }
 
       if (has(item, 'lastBuild')) {

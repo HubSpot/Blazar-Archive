@@ -36,6 +36,8 @@ class Builds extends BaseCollection {
       const repoBlazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
       const repo = {
         repo: gitInfo.repository,
+        host: gitInfo.host,
+        organization: gitInfo.organization,
         latestBuild: latestBuild,
         blazarPath: {
           repoBlazarPath: repoBlazarPath
