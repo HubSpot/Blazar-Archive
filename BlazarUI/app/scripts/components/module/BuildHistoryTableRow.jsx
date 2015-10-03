@@ -4,8 +4,7 @@ import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import { contains } from 'underscore';
 
-import Helpers from '../ComponentHelpers';
-import {truncate} from '../Helpers';
+import {truncate, humanizeText, timestampFormatted} from '../Helpers';
 
 import {LABELS, iconStatus} from '../constants';
 import { Link } from 'react-router';
@@ -27,7 +26,7 @@ class BuildHistoryTableRow extends Component {
       <Icon
         name={iconStatus[result]}
         classNames={classNames}
-        title={Helpers.humanizeText(result)}
+        title={humanizeText(result)}
       />
     );
   }
@@ -39,8 +38,9 @@ class BuildHistoryTableRow extends Component {
       module
     } = this.props.build;
 
+    // to do: move build link to collection
     const buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
-    const startTime = Helpers.timestampFormatted(build.startTimestamp);
+    const startTime = timestampFormatted(build.startTimestamp);
     const buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
     let sha, duration;
 
@@ -49,7 +49,7 @@ class BuildHistoryTableRow extends Component {
     }
 
     if (contains([BuildStates.IN_PROGRESS, BuildStates.QUEUED, BuildStates.LAUNCHING], build.state)) {
-      duration = Helpers.humanizeText(build.state) + '...';
+      duration = humanizeText(build.state) + '...';
     }
 
     if (build.sha !== undefined) {
@@ -102,14 +102,7 @@ BuildHistoryTableRow.propTypes = {
     build: PropTypes.shape({
       buildNumber: PropTypes.number,
       commitSha: PropTypes.string,
-      state: PropTypes.oneOf([
-        'SUCCEEDED',
-        'FAILED',
-        'IN_PROGRESS',
-        'CANCELLED',
-        'QUEUED',
-        'LAUNCHING'
-      ]),
+      state: PropTypes.oneOf([ 'SUCCEEDED', 'FAILED', 'IN_PROGRESS', 'CANCELLED', 'QUEUED', 'LAUNCHING']),
       startTime: PropTypes.number,
       endTime: PropTypes.number
     }),
