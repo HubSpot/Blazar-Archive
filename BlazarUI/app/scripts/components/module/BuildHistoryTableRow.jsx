@@ -3,7 +3,10 @@ import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import { contains } from 'underscore';
+
 import Helpers from '../ComponentHelpers';
+import {truncate} from '../Helpers';
+
 import {LABELS, iconStatus} from '../constants';
 import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
@@ -80,6 +83,9 @@ class BuildHistoryTableRow extends Component {
         </td>
         <td>
           {sha}
+        </td>
+        <td>
+          <span className='pre-text' title={build.commitInfo.current.message}>{truncate(build.commitInfo.current.message, 40, true)}</span>
         </td>
         <td>
           <div className="progress-container">

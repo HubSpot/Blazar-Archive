@@ -91,6 +91,7 @@ class BuildHistoryTable extends Component {
       {label: 'Start Time', key: 'startTime'},
       {label: 'Duration', key: 'duration'},
       {label: 'Commit', key: 'commit'},
+      {label: 'Commit Message', key: 'commitMessage'},
       {label: '', key: 'progress'}
     ];
 
