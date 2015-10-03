@@ -1,13 +1,11 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
+import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
-import { contains } from 'underscore';
-
+import {contains, has} from 'underscore';
 import {truncate, humanizeText, timestampFormatted} from '../Helpers';
-
 import {LABELS, iconStatus} from '../constants';
-import { Link } from 'react-router';
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
@@ -20,7 +18,7 @@ class BuildHistoryTableRow extends Component {
   }
 
   getBuildResult(result) {
-    const classNames = LABELS[result];
+    const classNames = LABELS[result];  
 
     return (
       <Icon
@@ -66,6 +64,13 @@ class BuildHistoryTableRow extends Component {
       }
       progressBar = <ProgressBar active now={this.props.progress} bsStyle={style} className="build-progress" label={label} />;
     }
+    
+    let commitMessage;
+    if (has(build, 'commitInfo')){
+      commitMessage = (
+        <span className='pre-text' title={build.commitInfo.current.message}>{truncate(build.commitInfo.current.message, 40, true)}</span>  
+      );
+    }
 
     return (
       <tr className={this.getRowClassNames()}>
@@ -85,7 +90,7 @@ class BuildHistoryTableRow extends Component {
           {sha}
         </td>
         <td>
-          <span className='pre-text' title={build.commitInfo.current.message}>{truncate(build.commitInfo.current.message, 40, true)}</span>
+          {commitMessage}
         </td>
         <td>
           <div className="progress-container">
