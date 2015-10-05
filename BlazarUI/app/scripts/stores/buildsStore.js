@@ -1,19 +1,10 @@
 import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
-import {pluck} from 'underscore';
-
-
-function getBuildsIds(builds) {
-  return pluck(pluck(builds, 'module'), 'id');
-}
 
 function updateBuilds(latest, builds) {
-
-  const latestIds = getBuildsIds(latest);
-
   for (let i = 0, len = builds.length; i < len; i++) {
-    for (let g = 0, len = latestIds.length; g < len; g++) {
-      if (latestIds[g] === builds[i].module.id) {
+    for (let g = 0, len = latest.length; g < len; g++) {
+      if (latest[g].module.id === builds[i].module.id) {
         builds[i] = latest[g];
         break;
       }
@@ -21,9 +12,7 @@ function updateBuilds(latest, builds) {
   }
 
   return builds;
-
 }
-
 
 const BuildsStore = Reflux.createStore({
 
