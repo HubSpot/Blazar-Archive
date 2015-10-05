@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.BuildDefinition;
+import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
@@ -79,8 +80,10 @@ public class GitHubWebhookHandler {
     gitInfo = branchService.upsert(gitInfo);
 
     try {
-      Set<Module> modules = moduleDiscovery.discover(gitInfo);
-      return moduleService.setModules(gitInfo, modules);
+      Set<DiscoveredModule> discovered = moduleDiscovery.discover(gitInfo);
+      Set<Module> modules = moduleService.setModules(gitInfo, discovered);
+      triggerBuilds(gitInfo, modules);
+      return modules;
     } catch (FileNotFoundException e) {
       branchService.delete(gitInfo);
       return Collections.emptySet();
@@ -109,7 +112,11 @@ public class GitHubWebhookHandler {
       }
     }
 
-    for (Module module : toBuild) {
+    triggerBuilds(gitInfo, toBuild);
+  }
+
+  private void triggerBuilds(GitInfo gitInfo, Set<Module> modules) throws IOException {
+    for (Module module : modules) {
       LOG.info("Going to build module {}", module.getId().get());
       if ("true".equals(System.getenv("TRIGGER_BUILDS"))) {
         buildService.enqueue(new BuildDefinition(gitInfo, module));

@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import com.hubspot.blazar.base.DependencyInfo;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -22,15 +24,24 @@ public class ProjectObjectModel {
   private final Set<String> depends;
 
   @JsonCreator
-  public ProjectObjectModel(@JsonProperty("parent") Map<String, String> parent,
+  public ProjectObjectModel(@JsonProperty("parent") final Map<String, String> parent,
                             @JsonProperty("groupId") Optional<String> groupId,
                             @JsonProperty("artifactId") String artifactId,
                             @JsonProperty("packaging") Optional<String> packaging,
                             @JsonProperty("dependencies") List<Map<String, String>> dependencies) {
-    this.groupId = Preconditions.checkNotNull(groupId.or(parent.get("groupId")));
+    this.groupId = groupId.or(new Supplier<String>() {
+
+      @Override
+      public String get() {
+        return parent.get("groupId");
+      }
+    });
     this.artifactId = Preconditions.checkNotNull(artifactId);
     this.packaging = packaging.or("jar");
-    this.dependencies = Objects.firstNonNull(dependencies, Collections.<Map<String, String>>emptyList());
+    this.dependencies = Objects.firstNonNull(dependencies, new ArrayList<Map<String, String>>());
+    if (parent != null) {
+      this.dependencies.add(parent);
+    }
     this.depends = toDepends(dependencies);
   }
 
