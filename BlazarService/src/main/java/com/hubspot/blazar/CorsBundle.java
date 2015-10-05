@@ -1,6 +1,7 @@
 package com.hubspot.blazar;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterators;
 import io.dropwizard.Bundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -13,7 +14,6 @@ import javax.servlet.ServletContext;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Enumeration;
-import java.util.Map;
 
 public class CorsBundle implements Bundle {
   private static final String FILTER_NAME = "Cross Origin Request Filter";
@@ -24,8 +24,6 @@ public class CorsBundle implements Bundle {
   @Override
   public void run(Environment environment) {
     final Filter corsFilter = new CrossOriginFilter();
-
-    final Map<String, String> parameters = Collections.singletonMap(CrossOriginFilter.EXPOSED_HEADERS_PARAM, "Offset");
     final FilterConfig corsFilterConfig = new FilterConfig() {
 
       @Override
@@ -40,12 +38,12 @@ public class CorsBundle implements Bundle {
 
       @Override
       public String getInitParameter(final String name) {
-        return parameters.get(name);
+        return null;
       }
 
       @Override
       public Enumeration<String> getInitParameterNames() {
-        return Collections.enumeration(parameters.keySet());
+        return Iterators.asEnumeration(Collections.<String>emptyIterator());
       }
     };
 

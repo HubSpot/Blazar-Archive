@@ -64,7 +64,7 @@ public class BuildResource {
     Set<BuildDefinition> buildDefinitions = buildDefinitionService.getAllActive(since);
     long offset = Math.max(maxUpdatedTimestamp(buildDefinitions), since);
 
-    return Response.ok(buildDefinitions).header("Offset", offset).build();
+    return Response.ok(buildDefinitions).header("x-last-modified-timestamp", offset).build();
   }
 
   @GET
@@ -74,7 +74,7 @@ public class BuildResource {
     Set<BuildState> buildStates = buildStateService.getAllActive(since);
     long offset = Math.max(maxUpdatedTimestamp(buildStates), since);
 
-    return Response.ok(buildStates).header("Offset", offset).build();
+    return Response.ok(buildStates).header("x-last-modified-timestamp", offset).build();
   }
 
   @GET
