@@ -5,7 +5,6 @@ import BaseCollection from './BaseCollection';
 class Builds extends BaseCollection {
 
   constructor() {
-    this.cache = null;
     this.updatedTimestamp = '';
   }
 
