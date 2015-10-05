@@ -23,6 +23,7 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
+import com.hubspot.blazar.discovery.docker.DockerModuleDiscovery;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
 import com.hubspot.blazar.resources.BuildResource;
@@ -77,6 +78,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
     multibinder.addBinding().to(BlazarConfigModuleDiscovery.class);
     multibinder.addBinding().to(MavenModuleDiscovery.class);
+    multibinder.addBinding().to(DockerModuleDiscovery.class);
     for (Class<? extends ModuleDiscovery> moduleDiscovery : BlazarServiceLoader.load(ModuleDiscovery.class)) {
       multibinder.addBinding().to(moduleDiscovery);
     }
