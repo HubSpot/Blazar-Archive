@@ -8,6 +8,9 @@ const BuildsActions = Reflux.createActions([
   'loadBuildsError'
 ]);
 
+
+let latestFetch = '';
+
 BuildsActions.loadBuilds.preEmit = function() {
 
   (function doPoll() {
@@ -23,11 +26,17 @@ BuildsActions.fetchBuilds = () => {
 };
 
 function fetchBuilds(cb) {
+
   const builds = new Builds();
+  builds.updatedTimestamp = latestFetch;
   const promise = builds.fetch();
 
   promise.done( () => {
     BuildsActions.loadBuildsSuccess(builds.get());
+
+    // store latest timestamp so we can
+    // use in our since parameter when fetching
+    latestFetch = builds.updatedTimestamp;
   });
 
   promise.always( () => {

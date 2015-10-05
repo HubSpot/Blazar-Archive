@@ -4,8 +4,17 @@ import BaseCollection from './BaseCollection';
 
 class Builds extends BaseCollection {
 
+  constructor() {
+    this.cache = null;
+    this.updatedTimestamp = '';
+  }
+
+  parse() {
+    super.parse();
+  }
+
   url() {
-    return `${config.apiRoot}/build/states?property=!lastBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!pendingBuild.commitInfo`;
+    return `${config.apiRoot}/build/states?property=!lastBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!pendingBuild.commitInfo&since=${this.updatedTimestamp}`;
   }
 
   hasBuildState() {
@@ -53,7 +62,7 @@ class Builds extends BaseCollection {
   }
 
   getBranchModules(branchInfo) {
-    const modules = findWhere(this.groupBuildsByRepo(), {
+    const modules = findWhere(this.groupByRepo(), {
       organization: branchInfo.org,
       repository: branchInfo.repo,
       branch: branchInfo.branch
@@ -63,7 +72,7 @@ class Builds extends BaseCollection {
   }
 
   getBranchesByRepo(repoInfo) {
-    const groupedBuilds = this.groupBuildsByRepo();
+    const groupedBuilds = this.groupByRepo();
     let branches = groupedBuilds.filter((repo) => {
       return (repo.organization === repoInfo.org) && (repo.repository === repoInfo.repo);
     });
@@ -85,8 +94,7 @@ class Builds extends BaseCollection {
     return branches;
   }
 
-
-  groupBuildsByRepo() {
+  groupByRepo() {
     // group and generate key, by org::repo[branch]
     const grouped = groupBy(this.data, function(o) {
       return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
