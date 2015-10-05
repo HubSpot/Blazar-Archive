@@ -32,7 +32,6 @@ import com.hubspot.singularity.client.SingularityClient;
 import com.sun.jersey.api.NotFoundException;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Set;
 
@@ -61,15 +60,21 @@ public class BuildResource {
   @GET
   @Path("/definitions")
   @PropertyFiltering
-  public Set<BuildDefinition> getAllBuildDefinitions(@QueryParam("since") @DefaultValue("0") long since) {
-    return buildDefinitionService.getAllActive(since);
+  public Response getAllBuildDefinitions(@QueryParam("since") @DefaultValue("0") long since) {
+    Set<BuildDefinition> buildDefinitions = buildDefinitionService.getAllActive(since);
+    long offset = Math.max(maxUpdatedTimestamp(buildDefinitions), since);
+
+    return Response.ok(buildDefinitions).header("Offset", offset).build();
   }
 
   @GET
   @Path("/states")
   @PropertyFiltering
-  public Set<BuildState> getAllBuildStates(@QueryParam("since") @DefaultValue("0") long since) {
-    return buildStateService.getAllActive(since);
+  public Response getAllBuildStates(@QueryParam("since") @DefaultValue("0") long since) {
+    Set<BuildState> buildStates = buildStateService.getAllActive(since);
+    long offset = Math.max(maxUpdatedTimestamp(buildStates), since);
+
+    return Response.ok(buildStates).header("Offset", offset).build();
   }
 
   @GET
@@ -160,6 +165,17 @@ public class BuildResource {
       String message = String.format("Error reading S3 log, status code %d, response %s", response.getStatusCode(), response.getAsString());
       throw new WebApplicationException(Response.serverError().entity(message).type(MediaType.TEXT_PLAIN_TYPE).build());
     }
+  }
+
+  private static long maxUpdatedTimestamp(Collection<? extends BuildDefinition> definitions) {
+    long maxUpdatedTimestamp = 0;
+    for (BuildDefinition definition : definitions) {
+      if (definition.getModule().getUpdatedTimestamp() > maxUpdatedTimestamp) {
+        maxUpdatedTimestamp = definition.getModule().getUpdatedTimestamp();
+      }
+    }
+
+    return maxUpdatedTimestamp;
   }
 
   private static String parseTaskId(String url) {
