@@ -8,8 +8,7 @@ const BuildsActions = Reflux.createActions([
   'loadBuildsError'
 ]);
 
-
-let latestFetch = '';
+let latestFetch = 0;
 
 BuildsActions.loadBuilds.preEmit = function() {
 

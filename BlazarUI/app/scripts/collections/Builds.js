@@ -5,7 +5,7 @@ import BaseCollection from './BaseCollection';
 class Builds extends BaseCollection {
 
   constructor() {
-    this.updatedTimestamp = '';
+    this.updatedTimestamp = 0;
   }
 
   parse() {
