@@ -30,8 +30,6 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#stable"));
   private static final Optional<GitInfo> MASTER_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#publish"));
-  private static final Optional<GitInfo> DEPLOYABLE_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#deployable"));
 
   @Inject
   public DockerModuleDiscovery() {}
@@ -94,25 +92,12 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   private Optional<GitInfo> buildpackFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
-    if (!"master".equals(gitInfo.getBranch())) {
-      LOG.info("Picked branch buildpack {} for {}", BRANCH_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
-      return BRANCH_BUILDPACK;
-    } else if (isDeployable(file, repository, gitInfo)) {
-      LOG.info("Picked deployable buildpack {} for {}", DEPLOYABLE_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
-      return DEPLOYABLE_BUILDPACK;
-    } else {
+    if ("master".equals(gitInfo.getBranch())) {
       LOG.info("Picked master buildpack {} for {}", MASTER_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
       return MASTER_BUILDPACK;
-    }
-  }
-
-  private boolean isDeployable(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
-    String folder = file.contains("/") ? file.substring(0, file.lastIndexOf('/') + 1) : "";
-    try {
-      contentsFor(folder + ".build-executable", repository, gitInfo);
-      return true;
-    } catch (FileNotFoundException e) {
-      return false;
+    } else {
+      LOG.info("Picked branch buildpack {} for {}", BRANCH_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
+      return BRANCH_BUILDPACK;
     }
   }
 
