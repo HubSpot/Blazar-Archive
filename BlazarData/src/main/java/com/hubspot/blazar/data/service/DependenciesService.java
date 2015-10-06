@@ -4,7 +4,6 @@ import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.data.dao.DependenciesDao;
 
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 public class DependenciesService {
   private final DependenciesDao dependenciesDao;
@@ -14,19 +13,19 @@ public class DependenciesService {
     this.dependenciesDao = dependenciesDao;
   }
 
-  @Transactional
+  //@Transactional
   public void insert(DiscoveredModule module) {
     dependenciesDao.insertProvides(module.getProvides());
     dependenciesDao.insertDepends(module.getDepends());
   }
 
-  @Transactional
+  //@Transactional
   public void update(DiscoveredModule module) {
     updateProvides(module);
     updateDepends(module);
   }
 
-  @Transactional
+  //@Transactional
   public void delete(int moduleId) {
     dependenciesDao.deleteProvides(moduleId);
     dependenciesDao.deleteDepends(moduleId);
