@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.kohsuke.github.GHContent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
@@ -15,8 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.DependencyInfo;
+import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.discovery.AbstractModuleDiscovery;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 
@@ -50,7 +52,7 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   @Override
-  public Set<Module> discover(GitInfo gitInfo) throws IOException {
+  public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
     GHRepository repository = repositoryFor(gitInfo);
     GHTree tree = treeFor(repository, gitInfo);
 
@@ -61,13 +63,34 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
       }
     }
 
-    Set<Module> modules = new HashSet<>();
+    Set<DiscoveredModule> modules = new HashSet<>();
     for (String dockerFile: dockerFiles) {
       String moduleName = moduleName(gitInfo, dockerFile);
       String glob = (dockerFile.contains("/") ? dockerFile.substring(0, dockerFile.lastIndexOf('/') + 1) : "") + "**";
-      modules.add(new Module(moduleName, dockerFile, glob, buildpackFor(dockerFile, repository, gitInfo)));
+      DependencyInfo dependencyInfo = getDockerfileDeps(dockerFile, repository, gitInfo, moduleName);
+      modules.add(new DiscoveredModule(moduleName, dockerFile, glob, buildpackFor(dockerFile, repository, gitInfo), dependencyInfo));
     }
     return modules;
+  }
+
+  private DependencyInfo getDockerfileDeps(String path, GHRepository repository, GitInfo gitInfo, String moduleName) throws IOException {
+    GHContent fileContents = repository.getFileContent(path, gitInfo.getBranch());
+    String content = fileContents.getContent();
+    HashSet<String> emtpySet = new HashSet<>();
+    if (!content.startsWith("FROM: ")) {
+      return new DependencyInfo(emtpySet, emtpySet);
+    }
+    String firstLine = content.split("\\n")[0];
+    String dockerImageString = firstLine.substring(firstLine.indexOf("FROM: "));
+    DockerImage image = DockerImage.parseFromImageName(dockerImageString);
+
+    HashSet<String> depends = new HashSet<>();
+    depends.add(String.format("docker-%s", image.getImage()));
+
+    HashSet<String> provides = new HashSet<>();
+    provides.add(String.format("docker-%s", moduleName));
+
+    return new DependencyInfo(depends, provides);
   }
 
   private Optional<GitInfo> buildpackFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
