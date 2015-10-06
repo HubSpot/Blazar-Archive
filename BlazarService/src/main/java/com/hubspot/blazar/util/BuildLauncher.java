@@ -183,7 +183,8 @@ public class BuildLauncher {
   }
 
   private String buildCommand(BuildDefinition definition, Build build) {
-    if (!build.getResolvedConfig().get().getCmds().isEmpty()) {
+    BuildConfig buildConfig = build.getBuildConfig().get();
+    if (!buildConfig.getCmds().isEmpty() || buildConfig.getBuildpack().isPresent()) {
       return "--safe_mode";
     }
 
