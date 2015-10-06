@@ -9,6 +9,11 @@ import {find} from 'underscore';
 import BuildStates from '../constants/BuildStates';
 import BuildHistoryActions from '../actions/buildHistoryActions';
 
+// builds we are polling
+let builds = {};
+// requested build params
+let requestedBuild = {};
+
 const BuildActions = Reflux.createActions([
   'loadBuild',
   'loadBuildSuccess',
@@ -19,19 +24,36 @@ const BuildActions = Reflux.createActions([
   'triggerBuildStart'
 ]);
 
-BuildActions.prepareBuildInfo = function(data) {
-  BuildActions.data = {
-    gitInfo: data
-  };
-  getBranchId();
-};
-
 BuildActions.loadBuild.preEmit = function(data) {
-  BuildActions.prepareBuildInfo(data);
+  BuildActions.setupBuildRequest(data);
 };
 
 BuildActions.reloadBuild = function(data) {
-  BuildActions.prepareBuildInfo(data);
+  BuildActions.setupBuildRequest(data);
+};
+
+BuildActions.setupBuildRequest = function(data) {
+  requestedBuild.gitInfo = data;
+
+  getBranchId()
+    .then(getModule)
+    .then(getBuild)
+    .then(processBuild.bind(this));
+};
+
+BuildActions.stopWatchingBuild = function(moduleId) {
+  if (builds[moduleId]) {
+    console.info('set build #' + builds[moduleId].build.buildNumber + ' to inactive');
+    builds[moduleId].isActive = false;
+  }
+  else {
+    // Hack - if user tries to navigate too quickly from one
+    // build to the next, we dont have time to load the moduleId
+    // and check if we need to clear polling
+    // To do: find a better approach
+    window.location.reload();
+  }
+
 };
 
 BuildActions.triggerBuild = function(moduleId) {
@@ -47,72 +69,85 @@ BuildActions.triggerBuild = function(moduleId) {
   });
 };
 
-function getModule() {
-  const branchModules = new BranchModules(BuildActions.data.gitInfo.branchId);
-  const modulesPromise = branchModules.fetch();
-
-  modulesPromise.done(() => {
-    BuildActions.data.gitInfo.moduleId = find(branchModules.data, (m) => {
-      return m.name === BuildActions.data.gitInfo.module;
-    }).id;
-    getBuild();
-  });
-  modulesPromise.error(() => {
-    BuildHistoryActions.loadBuildHistoryError('an error occured');
-  });
-}
 
 function getBranchId() {
-  const branchDefinition = new BranchDefinition(BuildActions.data.gitInfo);
+  const branchDefinition = new BranchDefinition(requestedBuild.gitInfo);
   const branchPromise =  branchDefinition.fetch();
 
   branchPromise.done(() => {
-    BuildActions.data.gitInfo.branchId = branchDefinition.data.id;
-    getModule();
+    requestedBuild.gitInfo.branchId = branchDefinition.data.id;
   });
   branchPromise.error(() => {
     BuildHistoryActions.loadBuildHistoryError('an error occured');
   });
+
+  return branchPromise;
+}
+
+function getModule() {
+  const branchModules = new BranchModules(requestedBuild.gitInfo.branchId);
+  const modulesPromise = branchModules.fetch();
+
+  modulesPromise.done(() => {
+    requestedBuild.gitInfo.moduleId = find(branchModules.data, (m) => {
+      return m.name === requestedBuild.gitInfo.module;
+    }).id;
+  });
+  modulesPromise.error(() => {
+    BuildHistoryActions.loadBuildHistoryError('an error occured');
+  });
+
+  return modulesPromise;
 }
 
 function getBuild() {
-  const build = new Build(BuildActions.data.gitInfo);
-  const buildPromise = build.fetch();
-
-  buildPromise.done(() => {
-    processBuild(build);
-  });
+  builds[requestedBuild.gitInfo.moduleId] = new Build(requestedBuild.gitInfo);
+  builds[requestedBuild.gitInfo.moduleId].isActive = true;
+  console.info(`setting build #${requestedBuild.gitInfo.buildNumber} to active`);
+  const buildPromise = builds[requestedBuild.gitInfo.moduleId].fetch();
 
   buildPromise.error(() => {
     BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
   });
+
+  return buildPromise;
 }
 
-function processBuild(build) {
-  if (build.data.build.state === BuildStates.LAUNCHING) {
+function processBuild() {
+  const buildToProcess = builds[requestedBuild.gitInfo.moduleId];
+
+  if (!buildToProcess.isActive) {
+    return;
+  }
+
+  if (buildToProcess.data.build.state === BuildStates.LAUNCHING) {
     BuildActions.loadBuildSuccess({
-      build: build.data
+      build: buildToProcess.data
     });
     return;
   }
 
-  if (build.data.build.state === BuildStates.IN_PROGRESS) {
-    processInProgressBuild(build);
+  if (buildToProcess.data.build.state === BuildStates.IN_PROGRESS) {
+    processInProgressBuild(buildToProcess);
   }
 
   else {
-    processInactiveBuild(build);
+    processInactiveBuild(buildToProcess);
   }
 }
 
 function processInProgressBuild(build) {
   let inProgressBuild = {
-    active: false,
     logLines: '',
     offset: 0
   };
 
   (function fetchLog() {
+    if (!builds[build.data.module.id].isActive) {
+      console.info(`build # ${build.data.build.buildNumber} is not active, do not continue polling for build log.`);
+      return;
+    }
+
     const log = new Log({
       buildNumber: build.data.build.id,
       offset: inProgressBuild.offset
@@ -120,17 +155,14 @@ function processInProgressBuild(build) {
 
     const logPromise = log.fetch();
     logPromise.always( (data, textStatus, jqxhr) => {
-
+      console.info(`Promise complete for build #${build.data.build.buildNumber }. isActive: ${build.isActive}`);
       inProgressBuild.logLines += log.formatLog(jqxhr);
       inProgressBuild.offset = data.nextOffset;
 
-      // build complete
       if (data.nextOffset === -1) {
-        // To do: refactor this...
-        // temporary fix to get latest
-        // build info when the log tailing
-        // is finished.
-        const lastBuild = new Build(BuildActions.data.gitInfo);
+        // get latest build detail when log fetching is complete
+        // so we can update status section at top of build page
+        const lastBuild = new Build(requestedBuild.gitInfo);
         const buildPromise = lastBuild.fetch();
 
         buildPromise.done(() => {
@@ -139,9 +171,7 @@ function processInProgressBuild(build) {
             log: inProgressBuild.logLines,
             fetchingLog: false
           });
-
         });
-
       }
 
       // still building

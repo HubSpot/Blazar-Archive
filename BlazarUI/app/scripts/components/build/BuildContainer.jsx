@@ -12,46 +12,52 @@ import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
 import LocationStore from '../../stores/locationStore';
 
+const initialState = {
+  loading: true,
+  build: {
+    buildState: {},
+    gitInfo: {},
+    module: { name: ''}
+  },
+  log: '',
+  fetchingLog: true,
+  stars: [],
+};
+
 class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
-
     bindAll(this, 'toggleStar');
-
-    this.state = {
-      loading: true,
-      build: {
-        buildState: {},
-        gitInfo: {},
-        module: { name: ''}
-      },
-      log: '',
-      fetchingLog: true,
-      stars: [],
-    };
+    this.state = initialState;
   }
 
   componentDidMount() {
-    this.originalParams = clone(this.props.params);
+    this.setup(this.props);
+  }
+
+  setup(props) {
+    this.originalParams = clone(props.params);
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange.bind(this));
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
-    BuildActions.loadBuild(this.props.params);
+    BuildActions.loadBuild(props.params);
     StarActions.loadStars();
   }
 
-  componentWillReceiveProps(nextprops) {
-    this.originalParams = clone(nextprops.params);
+  tearDown() {
+    this.unsubscribeFromBuild();
+    this.unsubscribeFromStars();
+    BuildActions.stopWatchingBuild(this.props.params.moduleId)
+  }
 
-    this.setState({
-      loading: true
-    });
-    BuildActions.loadBuild(nextprops.params);
+  componentWillReceiveProps(nextProps) {
+    this.tearDown();
+    this.setup(nextProps);
+    this.setState(initialState);
   }
 
   componentWillUnmount() {
-    this.unsubscribeFromBuild();
-    this.unsubscribeFromStars();
+    this.tearDown()
   }
 
   onStatusChange(state) {
