@@ -5,7 +5,7 @@ import Log from '../models/Log';
 import BuildTrigger from '../models/BuildTrigger';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
-import {find} from 'underscore';
+import {find, has} from 'underscore';
 import BuildStates from '../constants/BuildStates';
 import BuildHistoryActions from '../actions/buildHistoryActions';
 
@@ -69,7 +69,6 @@ BuildActions.triggerBuild = function(moduleId) {
   });
 };
 
-
 function getBranchId() {
   const branchDefinition = new BranchDefinition(requestedBuild.gitInfo);
   const branchPromise =  branchDefinition.fetch();
@@ -115,6 +114,11 @@ function getBuild() {
 
 function processBuild() {
   const buildToProcess = builds[requestedBuild.gitInfo.moduleId];
+
+  // to do: find out why we dont have state at this point
+  if (!has(buildToProcess.data.build, 'state')) {
+    return;
+  }
 
   if (!buildToProcess.isActive) {
     return;
