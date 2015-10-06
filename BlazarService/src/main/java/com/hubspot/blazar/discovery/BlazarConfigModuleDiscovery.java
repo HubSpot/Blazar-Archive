@@ -1,8 +1,9 @@
 package com.hubspot.blazar.discovery;
 
 import com.hubspot.blazar.base.BuildConfig;
+import com.hubspot.blazar.base.DependencyInfo;
+import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
@@ -37,7 +38,7 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   @Override
-  public Set<Module> discover(GitInfo gitInfo) throws IOException {
+  public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
     GHRepository repository = repositoryFor(gitInfo);
     GHTree tree = treeFor(repository, gitInfo);
 
@@ -48,13 +49,13 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
       }
     }
 
-    Set<Module> modules = new HashSet<>();
+    Set<DiscoveredModule> modules = new HashSet<>();
     for (String blazarConfig : blazarConfigs) {
       BuildConfig buildConfig = configFor(blazarConfig, repository, gitInfo).get();
       if (canBuild(buildConfig)) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
-        modules.add(new Module(moduleName, blazarConfig, glob, buildConfig.getBuildpack()));
+        modules.add(new DiscoveredModule(moduleName, blazarConfig, glob, buildConfig.getBuildpack(), DependencyInfo.unknown()));
       }
     }
     return modules;

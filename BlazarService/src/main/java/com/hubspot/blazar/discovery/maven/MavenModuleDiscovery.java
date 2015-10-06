@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.discovery.AbstractModuleDiscovery;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import org.kohsuke.github.GHRepository;
@@ -52,7 +52,7 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   @Override
-  public Set<Module> discover(GitInfo gitInfo) throws IOException {
+  public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
     GHRepository repository = repositoryFor(gitInfo);
     GHTree tree = treeFor(repository, gitInfo);
 
@@ -63,7 +63,7 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
       }
     }
 
-    Set<Module> modules = new HashSet<>();
+    Set<DiscoveredModule> modules = new HashSet<>();
     for (String path : poms) {
       final ProjectObjectModel pom;
 
@@ -82,7 +82,8 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
         glob = (path.contains("/") ? path.substring(0, path.lastIndexOf('/') + 1) : "") + "**";
       }
 
-      modules.add(new Module(pom.getArtifactId(), path, glob, buildpackFor(path, repository, gitInfo)));
+      Optional<GitInfo> buildpack = buildpackFor(path, repository, gitInfo);
+      modules.add(new DiscoveredModule(pom.getArtifactId(), path, glob, buildpack, pom.getDependencyInfo()));
     }
 
     return modules;

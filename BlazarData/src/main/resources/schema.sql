@@ -30,6 +30,18 @@ CREATE TABLE `modules` (
   INDEX (`updatedTimestamp`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
+CREATE TABLE `module_provides` (
+  `moduleId` int(11) unsigned NOT NULL,
+  `name` varchar(250) NOT NULL,
+  UNIQUE INDEX (`moduleId`, `name`)
+) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `module_depends` (
+  `moduleId` int(11) unsigned NOT NULL,
+  `name` varchar(250) NOT NULL,
+  UNIQUE INDEX (`moduleId`, `name`)
+) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
+
 CREATE TABLE `builds` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `moduleId` int(11) unsigned NOT NULL,
