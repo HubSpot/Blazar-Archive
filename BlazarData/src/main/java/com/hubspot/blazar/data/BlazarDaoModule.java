@@ -8,6 +8,7 @@ import com.hubspot.blazar.data.dao.BranchDao;
 import com.hubspot.blazar.data.dao.BuildDao;
 import com.hubspot.blazar.data.dao.BuildDefinitionDao;
 import com.hubspot.blazar.data.dao.BuildStateDao;
+import com.hubspot.blazar.data.dao.DependenciesDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 import com.hubspot.guice.transactional.DataSourceLocator;
 import com.hubspot.guice.transactional.TransactionalDataSource;
@@ -34,10 +35,11 @@ public class BlazarDaoModule extends AbstractModule {
     bindDao(binder(), BranchDao.class);
     bindDao(binder(), ModuleDao.class);
     bindDao(binder(), BuildDao.class);
+    bindDao(binder(), DependenciesDao.class);
   }
 
   private static <T> void bindDao(Binder binder, Class<T> type) {
-    binder.bind(type).toProvider(new DaoProvider<T>(type)).in(Scopes.SINGLETON);
+    binder.bind(type).toProvider(new DaoProvider<>(type)).in(Scopes.SINGLETON);
   }
 
   @Provides
