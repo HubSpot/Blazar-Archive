@@ -30,14 +30,14 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.UriBuilder;
 
 @Singleton
-public class GithubStatusHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(GithubStatusHandler.class);
+public class GithubStatusHandlerTemp {
+  private static final Logger LOG = LoggerFactory.getLogger(GithubStatusHandlerTemp.class);
 
   private final Map<String, GitHub> gitHubByHost;
   private final BuildDefinitionService buildDefinitionService;
 
   @Inject
-  public GithubStatusHandler(EventBus eventBus, Map<String, GitHub> gitHubByHost, BuildDefinitionService buildDefinitionService) {
+  public GithubStatusHandlerTemp(EventBus eventBus, Map<String, GitHub> gitHubByHost, BuildDefinitionService buildDefinitionService) {
     this.gitHubByHost = gitHubByHost;
     this.buildDefinitionService = buildDefinitionService;
 

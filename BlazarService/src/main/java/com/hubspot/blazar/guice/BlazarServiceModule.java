@@ -31,7 +31,7 @@ import com.hubspot.blazar.util.BlazarServiceLoader;
 import com.hubspot.blazar.util.BuildLauncher;
 import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
-import com.hubspot.blazar.util.GithubStatusHandler;
+import com.hubspot.blazar.util.GithubStatusHandlerTemp;
 import com.hubspot.blazar.util.LoggingHandler;
 import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
@@ -68,7 +68,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
     binder.bind(BuildLauncher.class);
-    binder.bind(GithubStatusHandler.class);
+    binder.bind(GithubStatusHandlerTemp.class);
 
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 
