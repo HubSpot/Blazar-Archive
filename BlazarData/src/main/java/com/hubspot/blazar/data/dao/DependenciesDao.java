@@ -16,9 +16,9 @@ public interface DependenciesDao {
   @SqlBatch("INSERT INTO module_depends (moduleId, name) VALUES (:moduleId, :name)")
   void insertDepends(@BindWithRosetta Set<ModuleDependency> dependencies);
 
-  @SqlUpdate("DELETE FROM module_provides WHERE moduleId = :it")
+  @SqlUpdate("DELETE FROM module_provides WHERE moduleId = :moduleId")
   void deleteProvides(@Bind("moduleId") int moduleId);
 
-  @SqlUpdate("DELETE FROM module_depends WHERE moduleId = :it")
+  @SqlUpdate("DELETE FROM module_depends WHERE moduleId = :moduleId")
   void deleteDepends(@Bind("moduleId") int moduleId);
 }
