@@ -5,17 +5,12 @@ import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
 
 import Helpers from '../ComponentHelpers';
+import {tableRowBuildState} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
 class ModulesTableRow extends Component {
-
-  getRowClassNames(build) {
-    if (build.state === BuildStates.FAILED) {
-      return 'bgc-danger';
-    }
-  }
 
   getBuildResult(build) {
     const result = build.state;
@@ -72,7 +67,7 @@ class ModulesTableRow extends Component {
     }
 
     return (
-      <tr className={this.getRowClassNames(build)}>
+      <tr className={tableRowBuildState(build.state)}>
         <td>
           <Icon type='octicon' name='file-directory' classNames="icon-roomy icon-muted" />
           <Link to={modulePath}>{module.name}</Link>

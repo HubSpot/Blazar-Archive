@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
 import Helpers from '../ComponentHelpers';
+import {tableRowBuildState} from '../Helpers';
 import {LABELS, iconStatus} from '../constants';
 import BuildStates from '../../constants/BuildStates';
 import Icon from '../shared/Icon.jsx';
@@ -65,9 +66,8 @@ class ReposTableRow extends Component {
       );
     }
 
-
     return (
-      <tr>
+      <tr className={tableRowBuildState(build.state)}>
         <td>
           <Icon type='octicon' name='repo' classNames="icon-roomy icon-muted" />
           <Link to={repo.blazarPath.repoBlazarPath}>{repo.repo}</Link>

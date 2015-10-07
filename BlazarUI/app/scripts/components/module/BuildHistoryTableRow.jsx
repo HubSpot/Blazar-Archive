@@ -4,18 +4,13 @@ import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import {contains, has} from 'underscore';
-import {truncate, humanizeText, timestampFormatted} from '../Helpers';
+import {humanizeText, timestampFormatted, tableRowBuildState} from '../Helpers';
 import {LABELS, iconStatus} from '../constants';
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
+import CommitMessage from '../shared/CommitMessage.jsx';
 
 class BuildHistoryTableRow extends Component {
-
-  getRowClassNames() {
-    if (this.props.build.build.state === BuildStates.FAILED) {
-      return 'bgc-danger';
-    }
-  }
 
   getBuildResult(result) {
     const classNames = LABELS[result];  
@@ -68,12 +63,12 @@ class BuildHistoryTableRow extends Component {
     let commitMessage;
     if (has(build, 'commitInfo')){
       commitMessage = (
-        <span className='pre-text' title={build.commitInfo.current.message}>{truncate(build.commitInfo.current.message, 40, true)}</span>  
+        <CommitMessage message={build.commitInfo.current.message} />
       );
     }
 
     return (
-      <tr className={this.getRowClassNames()}>
+      <tr className={tableRowBuildState(build.state)}>
         <td className='build-status'>
           {this.getBuildResult(build.state)}
         </td>

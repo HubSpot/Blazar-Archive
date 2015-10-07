@@ -1,6 +1,7 @@
 // Using in favor of Deprecated ComponentHelpers.js
 import {some} from 'underscore';
 import moment from 'moment';
+import BuildStates from '../constants/BuildStates.js';
 
 // 1234567890 => 1 Aug 1991 15:00
 export const timestampFormatted = function(timestamp, format='lll') {
@@ -66,5 +67,14 @@ export const scrollTo = function(direction) {
   }
   else if (direction === 'top') {
     window.scrollTo(0, 0);
+  }
+};
+
+export const tableRowBuildState = function(state) {
+  if (state === BuildStates.FAILED) {
+    return 'bgc-danger';
+  }
+  else if (state === BuildStates.CANCELLED) {
+    return 'bgc-warning';
   }
 };
