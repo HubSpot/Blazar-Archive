@@ -4,11 +4,13 @@ import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.BuildDefinition;
+import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BuildService;
+import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
@@ -26,7 +28,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Singleton
@@ -37,17 +41,20 @@ public class GitHubWebhookHandler {
   private final ModuleService moduleService;
   private final ModuleDiscovery moduleDiscovery;
   private final BuildService buildService;
+  private final DependenciesService dependenciesService;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
                               ModuleService moduleService,
                               ModuleDiscovery moduleDiscovery,
                               BuildService buildService,
+                              DependenciesService dependenciesService,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.moduleDiscovery = moduleDiscovery;
     this.buildService = buildService;
+    this.dependenciesService = dependenciesService;
 
     eventBus.register(this);
   }
@@ -116,7 +123,16 @@ public class GitHubWebhookHandler {
   }
 
   private void triggerBuilds(GitInfo gitInfo, Set<Module> modules) throws IOException {
+    DependencyGraph graph = dependenciesService.buildDependencyGraph(gitInfo);
+
+    Map<Integer, Module> moduleMap = new HashMap<>();
     for (Module module : modules) {
+      moduleMap.put(module.getId().get(), module);
+    }
+
+    moduleMap.keySet().retainAll(graph.removeRedundantModules(moduleMap.keySet()));
+
+    for (Module module : moduleMap.values()) {
       LOG.info("Going to build module {}", module.getId().get());
       if ("true".equals(System.getenv("TRIGGER_BUILDS"))) {
         buildService.enqueue(new BuildDefinition(gitInfo, module));
