@@ -3,16 +3,13 @@ package com.hubspot.blazar.util;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.Build;
 import com.hubspot.blazar.base.Build.State;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildDefinition;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.ModuleDependency;
+import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.data.service.BuildDefinitionService;
 import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.DependenciesService;
@@ -21,11 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class DependencyBuilder {
@@ -52,24 +45,14 @@ public class DependencyBuilder {
     if (build.getState() == State.SUCCEEDED && shouldTriggerDownstreamBuilds(build)) {
       int moduleId = build.getModuleId();
       BuildDefinition definition = buildDefinitionService.getByModule(moduleId).get();
-      Multimap<Integer, Integer> graph = buildGraph(definition.getGitInfo());
-
-      Collection<Integer> downstreamModules = graph.get(moduleId);
-      if (downstreamModules == null) {
-        LOG.info("No downstream modules found for module {}", moduleId);
-      } else {
-        LOG.info("Found downstream modules {} for modules {}", downstreamModules, moduleId);
-        Set<Integer> modulesToBuild = new HashSet<>(downstreamModules);
-        for (int module : downstreamModules) {
-          if (graph.containsKey(module)) {
-            modulesToBuild.removeAll(graph.get(module));
-          }
-        }
-
-        LOG.info("Going to trigger builds for modules {}", modulesToBuild);
-        for (int module : modulesToBuild) {
-          buildService.enqueue(buildDefinitionService.getByModule(module).get());
-        }
+      DependencyGraph graph = dependenciesService.buildDependencyGraph(definition.getGitInfo());
+      LOG.info("Computed dependency graph {}", graph);
+      Set<Integer> downstreamModules = graph.getDownstreamModules(moduleId);
+      LOG.info("Found downstream modules {} for module {}", downstreamModules, moduleId);
+      Set<Integer> modulesToBuild = graph.removeRedundantModules(downstreamModules);
+      LOG.info("Going to trigger builds for modules {}", modulesToBuild);
+      for (int module : modulesToBuild) {
+        buildService.enqueue(buildDefinitionService.getByModule(module).get());
       }
     }
   }
@@ -89,27 +72,5 @@ public class DependencyBuilder {
 
   private static boolean manualBuildSpecified(BuildConfig buildConfig) {
     return !buildConfig.getCmds().isEmpty() || buildConfig.getBuildpack().isPresent();
-  }
-
-  private Multimap<Integer, Integer> buildGraph(GitInfo gitInfo) {
-    Map<String, Integer> providerMap = asMap(dependenciesService.getProvides(gitInfo));
-
-    Multimap<Integer, Integer> graph = HashMultimap.create();
-    for (ModuleDependency dependency : dependenciesService.getDepends(gitInfo)) {
-      if (providerMap.containsKey(dependency.getName())) {
-        graph.put(providerMap.get(dependency.getName()), dependency.getModuleId());
-      }
-    }
-
-    return graph;
-  }
-
-  private Map<String, Integer> asMap(Set<ModuleDependency> dependencies) {
-    Map<String, Integer> dependencyMap = new HashMap<>();
-    for (ModuleDependency dependency : dependencies) {
-      dependencyMap.put(dependency.getName(), dependency.getModuleId());
-    }
-
-    return dependencyMap;
   }
 }
