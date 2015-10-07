@@ -1,10 +1,13 @@
 package com.hubspot.blazar.data.service;
 
 import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.ModuleDependency;
 import com.hubspot.blazar.data.dao.DependenciesDao;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.Set;
 
 public class DependenciesService {
   private final DependenciesDao dependenciesDao;
@@ -12,6 +15,14 @@ public class DependenciesService {
   @Inject
   public DependenciesService(DependenciesDao dependenciesDao) {
     this.dependenciesDao = dependenciesDao;
+  }
+
+  public Set<ModuleDependency> getProvides(GitInfo gitInfo) {
+    return dependenciesDao.getProvides(gitInfo);
+  }
+
+  public Set<ModuleDependency> getDepends(GitInfo gitInfo) {
+    return dependenciesDao.getDepends(gitInfo);
   }
 
   @Transactional
