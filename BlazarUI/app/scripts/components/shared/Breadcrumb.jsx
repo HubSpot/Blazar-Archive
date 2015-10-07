@@ -3,6 +3,7 @@ import {values} from 'underscore';
 const Link = require('react-router').Link;
 import Icon from './Icon.jsx';
 import Logo from './Logo.jsx';
+import ClassNames from 'classnames';
 
 class Breadcrumb extends Component {
 
@@ -12,15 +13,26 @@ class Breadcrumb extends Component {
     const pages = values(this.props.params);
     const appRootClean = this.props.appRoot.replace(/^\/|\/$/g, '');
 
-    let noLink = false;
-
     const links = pages.map((page, i) => {
       let pageLinks = '';
-
+      let noLink = false;
+      let isActivePage = false;
+      let nextCrumb = true;
+      let linkToDashboard = false;
+  
+      // active page
       if (i === pages.length - 1) {
         noLink = true;
+        isActivePage = true;
+      }
+      
+      // hosts page
+      if (i === 0) {
+        noLink = true;
+        nextCrumb = false;
       }
 
+      // generate route path for each link
       for (let g = 0; g < pages.length; g++) {
         pageLinks += `/${pages[g]}`;
 
@@ -30,8 +42,13 @@ class Breadcrumb extends Component {
       }
 
       if (noLink) {
+        const classNames = ClassNames([
+          'crumb',
+          {'active': isActivePage}
+        ]);
+        
         return (
-          <span key={page + i} className='crumb active'>{page}</span>
+          <span key={page + i} className={classNames}>{page}</span>
         );        
       }
 
