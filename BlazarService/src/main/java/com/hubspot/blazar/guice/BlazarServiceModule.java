@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
+import com.hubspot.blazar.util.DependencyBuilder;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -69,6 +70,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(LoggingHandler.class);
     binder.bind(BuildLauncher.class);
     binder.bind(GitHubStatusHandler.class);
+    binder.bind(DependencyBuilder.class);
 
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 

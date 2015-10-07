@@ -33,13 +33,15 @@ CREATE TABLE `modules` (
 CREATE TABLE `module_provides` (
   `moduleId` int(11) unsigned NOT NULL,
   `name` varchar(250) NOT NULL,
-  UNIQUE INDEX (`moduleId`, `name`)
+  UNIQUE INDEX (`moduleId`, `name`),
+  INDEX (`name`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `module_depends` (
   `moduleId` int(11) unsigned NOT NULL,
   `name` varchar(250) NOT NULL,
-  UNIQUE INDEX (`moduleId`, `name`)
+  UNIQUE INDEX (`moduleId`, `name`),
+  INDEX (`name`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `builds` (

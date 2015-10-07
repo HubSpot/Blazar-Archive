@@ -162,6 +162,11 @@
         <artifactId>woodstox-core-asl</artifactId>
         <version>4.4.1</version>
       </dependency>
+      <dependency>
+        <groupId>org.jgrapht</groupId>
+        <artifactId>jgrapht-core</artifactId>
+        <version>0.9.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

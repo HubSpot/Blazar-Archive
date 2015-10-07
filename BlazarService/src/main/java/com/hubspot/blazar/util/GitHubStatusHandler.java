@@ -37,7 +37,9 @@ public class GitHubStatusHandler {
   private final BuildDefinitionService buildDefinitionService;
 
   @Inject
-  public GitHubStatusHandler(EventBus eventBus, Map<String, GitHub> gitHubByHost, BuildDefinitionService buildDefinitionService) {
+  public GitHubStatusHandler(Map<String, GitHub> gitHubByHost,
+                             BuildDefinitionService buildDefinitionService,
+                             EventBus eventBus) {
     this.gitHubByHost = gitHubByHost;
     this.buildDefinitionService = buildDefinitionService;
 
