@@ -47,7 +47,7 @@ public class GitHubStatusHandler {
   }
 
   @Subscribe
-  public void handleBuildStateChange(Build build) throws IOException {
+  public void updateGitHubStatus(Build build) throws IOException {
     BuildDefinition definition = buildDefinitionService.getByModule(build.getModuleId()).get();
     if (!shouldUpdateStatus(definition, build)) {
       LOG.info("Not setting status for build {} with state {}", build.getId().get(), build.getState());

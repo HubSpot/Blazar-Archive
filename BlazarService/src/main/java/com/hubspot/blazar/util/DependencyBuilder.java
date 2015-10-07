@@ -17,10 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Set;
 
+@Singleton
 public class DependencyBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(DependencyBuilder.class);
 
@@ -41,7 +42,7 @@ public class DependencyBuilder {
   }
 
   @Subscribe
-  public void handleBuildStateChange(Build build) throws IOException {
+  public void triggerDownstreamBuilds(Build build) {
     if (build.getState() == State.SUCCEEDED && shouldTriggerDownstreamBuilds(build)) {
       int moduleId = build.getModuleId();
       BuildDefinition definition = buildDefinitionService.getByModule(moduleId).get();
