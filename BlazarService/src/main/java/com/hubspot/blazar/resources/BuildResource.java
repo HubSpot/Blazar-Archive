@@ -100,12 +100,13 @@ public class BuildResource {
       throw new NotFoundException("No build log URL or taskId found for ID " + id);
     }
 
-    String taskId;
+    final String taskId;
     if (taskIdOptional.isPresent()) {
       taskId = taskIdOptional.get();
     } else {
       taskId = parseTaskId(logUrl.get());
     }
+    
     String path = taskId + "/service.log";
     Optional<String> grep = Optional.absent();
 
