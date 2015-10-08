@@ -27,15 +27,15 @@ class Builds extends BaseCollection {
 
     return uniqBuilds.map((item) => {
       return item.gitInfo[prop];
-    });  
+    });
   }
 
   // To do: add blazarPath object for org links
   _orgsByHost(hosts) {
     return hosts.map((host) => {
       const filterOrgBuilds = this._OrgBuildsByHost(host);
-      const uniqueOrgs = this._uniqueProperty(filterOrgBuilds, 'organization')
-      
+      const uniqueOrgs = this._uniqueProperty(filterOrgBuilds, 'organization');
+
       return {
         name: host,
         orgs: uniqueOrgs
