@@ -6,7 +6,8 @@ class SectionLoader extends Component {
   getRenderedClassNames() {
     return Classnames([
       'section-loader',
-      {'roomy': this.props.roomy }
+      {'roomy': this.props.roomy },
+      this.props.align
     ]);
   }
 
@@ -18,9 +19,13 @@ class SectionLoader extends Component {
 
 }
 
+SectionLoader.defaultProps = {
+  align: 'center'
+};
+
 SectionLoader.propTypes = {
-  roomy: PropTypes.bool
+  roomy: PropTypes.bool,
+  align: PropTypes.oneOf(['center','left','right'])
 };
 
 export default SectionLoader;
-
