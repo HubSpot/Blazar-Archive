@@ -106,7 +106,7 @@ public class BuildResource {
     } else {
       taskId = parseTaskId(logUrl.get());
     }
-    
+
     String path = taskId + "/service.log";
     Optional<String> grep = Optional.absent();
 
