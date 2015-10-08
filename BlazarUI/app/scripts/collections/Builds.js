@@ -8,85 +8,42 @@ class Builds extends BaseCollection {
     return `${config.apiRoot}/build/states?property=!lastBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!pendingBuild.commitInfo`;
   }
 
-  hasBuildState() {
+  _hasBuildState() {
     return this.data.filter((item) => {
       return has(item, 'lastBuild') || has(item, 'inProgressBuild') || has(item, 'pendingBuild');
     });
   }
 
-  getReposByOrg(orgInfo) {
-    const builds = this.hasBuildState();
-    const orgBuilds = builds.filter((build) => {
-      return (build.gitInfo.organization === orgInfo.org) && (build.gitInfo.host === orgInfo.host);
+  _OrgBuildsByHost(host) {
+    return this.data.filter((build) => {
+      return build.gitInfo.host === host;
+    });
+  }
+
+  _uniqueProperty(builds, prop) {
+    const uniqBuilds = uniq(builds, (build) => {
+      return build.gitInfo[prop];
     });
 
-    const repos = uniq(orgBuilds.map((build) => {
-      const {
-        gitInfo,
-        lastBuild,
-        module,
-        inProgressBuild,
-        pendingBuild
-      } = build;
+    return uniqBuilds.map((item) => {
+      return item.gitInfo[prop];
+    });  
+  }
 
-      let latestBuild = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
-      latestBuild.module = module.name;
-      latestBuild.branch = gitInfo.branch;
-
-      const repoBlazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
-      const repo = {
-        repo: gitInfo.repository,
-        host: gitInfo.host,
-        organization: gitInfo.organization,
-        latestBuild: latestBuild,
-        blazarPath: {
-          repoBlazarPath: repoBlazarPath
-        }
+  // To do: add blazarPath object for org links
+  _orgsByHost(hosts) {
+    return hosts.map((host) => {
+      const filterOrgBuilds = this._OrgBuildsByHost(host);
+      const uniqueOrgs = this._uniqueProperty(filterOrgBuilds, 'organization')
+      
+      return {
+        name: host,
+        orgs: uniqueOrgs
       };
-      return repo;
-    }), false, function(r) {
-      return r.repo;
-    });
-    return sortBy(repos, function(r) {
-      return r.repo.toLowerCase();
     });
   }
 
-  getBranchModules(branchInfo) {
-    const modules = findWhere(this.groupBuildsByRepo(), {
-      organization: branchInfo.org,
-      repository: branchInfo.repo,
-      branch: branchInfo.branch
-    });
-
-    return modules || {};
-  }
-
-  getBranchesByRepo(repoInfo) {
-    const groupedBuilds = this.groupBuildsByRepo();
-    let branches = groupedBuilds.filter((repo) => {
-      return (repo.organization === repoInfo.org) && (repo.repository === repoInfo.repo);
-    });
-
-    branches.sort( (a, b) => {
-      return b.branch - a.branch;
-    });
-
-    // move master to top of branches list
-    const masterIndex = branches.map(function(el) {
-      return el.branch;
-    }).indexOf('master');
-
-    if (masterIndex > 0) {
-      const master = branches.splice(masterIndex, masterIndex + 1);
-      branches = master.concat(branches);
-    }
-
-    return branches;
-  }
-
-
-  groupBuildsByRepo() {
+  _groupBuildsByRepo() {
     // group and generate key, by org::repo[branch]
     const grouped = groupBy(this.data, function(o) {
       return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
@@ -148,6 +105,81 @@ class Builds extends BaseCollection {
     });
 
     return groupedInArray;
+  }
+
+  getHosts() {
+    return this._orgsByHost(this._uniqueProperty(this.data, 'host'));
+  }
+
+  getReposByOrg(params) {
+    const builds = this._hasBuildState();
+    const orgBuilds = builds.filter((build) => {
+      return (build.gitInfo.organization === params.org) && (build.gitInfo.host === params.host);
+    });
+
+    const repos = uniq(orgBuilds.map((build) => {
+      const {
+        gitInfo,
+        lastBuild,
+        module,
+        inProgressBuild,
+        pendingBuild
+      } = build;
+
+      let latestBuild = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
+      latestBuild.module = module.name;
+      latestBuild.branch = gitInfo.branch;
+
+      const repoBlazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
+      const repo = {
+        repo: gitInfo.repository,
+        host: gitInfo.host,
+        organization: gitInfo.organization,
+        latestBuild: latestBuild,
+        blazarPath: {
+          repoBlazarPath: repoBlazarPath
+        }
+      };
+      return repo;
+    }), false, function(r) {
+      return r.repo;
+    });
+    return sortBy(repos, function(r) {
+      return r.repo.toLowerCase();
+    });
+  }
+
+  getBranchModules(branchInfo) {
+    const modules = findWhere(this._groupBuildsByRepo(), {
+      organization: branchInfo.org,
+      repository: branchInfo.repo,
+      branch: branchInfo.branch
+    });
+
+    return modules || {};
+  }
+
+  getBranchesByRepo(params) {
+    const groupedBuilds = this._groupBuildsByRepo();
+    let branches = groupedBuilds.filter((repo) => {
+      return (repo.organization === params.org) && (repo.repository === params.repo);
+    });
+
+    branches.sort( (a, b) => {
+      return b.branch - a.branch;
+    });
+
+    // move master to top of branches list
+    const masterIndex = branches.map(function(el) {
+      return el.branch;
+    }).indexOf('master');
+
+    if (masterIndex > 0) {
+      const master = branches.splice(masterIndex, masterIndex + 1);
+      branches = master.concat(branches);
+    }
+
+    return branches;
   }
 
 
