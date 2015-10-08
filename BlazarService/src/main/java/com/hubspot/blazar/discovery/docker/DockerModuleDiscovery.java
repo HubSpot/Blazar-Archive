@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,11 +30,6 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
 
   @Inject
   public DockerModuleDiscovery() {}
-
-  @Override
-  public boolean allowDuplicates() {
-    return false;
-  }
 
   @Override
   public boolean shouldRediscover(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
@@ -68,7 +64,7 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
 
   private DependencyInfo getDockerfileDeps() throws IOException {
     // todo Currently not supporting deps because most builds are not in the same repository and deps builds are limited to repo committed to
-    HashSet<String> emtpySet = new HashSet<>();
+    Set<String> emtpySet = Collections.emptySet();
     return new DependencyInfo(emtpySet, emtpySet);
   }
 
