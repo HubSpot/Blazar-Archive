@@ -1,26 +1,22 @@
 package com.hubspot.blazar.discovery.docker;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.kohsuke.github.GHContent;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GHTreeEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.DependencyInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.discovery.AbstractModuleDiscovery;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHTree;
+import org.kohsuke.github.GHTreeEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 @Singleton
 public class DockerModuleDiscovery extends AbstractModuleDiscovery {
@@ -65,33 +61,18 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
     for (String dockerFile: dockerFiles) {
       String moduleName = moduleName(gitInfo, dockerFile);
       String glob = (dockerFile.contains("/") ? dockerFile.substring(0, dockerFile.lastIndexOf('/') + 1) : "") + "**";
-      DependencyInfo dependencyInfo = getDockerfileDeps(dockerFile, repository, gitInfo, moduleName);
-      modules.add(new DiscoveredModule(moduleName, dockerFile, glob, buildpackFor(dockerFile, repository, gitInfo), dependencyInfo));
+      modules.add(new DiscoveredModule(moduleName, dockerFile, glob, buildpackFor(dockerFile, gitInfo), getDockerfileDeps()));
     }
     return modules;
   }
 
-  private DependencyInfo getDockerfileDeps(String path, GHRepository repository, GitInfo gitInfo, String moduleName) throws IOException {
-    GHContent fileContents = repository.getFileContent(path, gitInfo.getBranch());
-    String content = fileContents.getContent();
+  private DependencyInfo getDockerfileDeps() throws IOException {
+    // todo Currently not supporting deps because most builds are not in the same repository and deps builds are limited to repo committed to
     HashSet<String> emtpySet = new HashSet<>();
-    if (!content.startsWith("FROM: ")) {
-      return new DependencyInfo(emtpySet, emtpySet);
-    }
-    String firstLine = content.split("\\n")[0];
-    String dockerImageString = firstLine.substring(firstLine.indexOf("FROM: "));
-    DockerImage image = DockerImage.parseFromImageName(dockerImageString);
-
-    HashSet<String> depends = new HashSet<>();
-    depends.add(String.format("docker-%s", image.getImage()));
-
-    HashSet<String> provides = new HashSet<>();
-    provides.add(String.format("docker-%s", moduleName));
-
-    return new DependencyInfo(depends, provides);
+    return new DependencyInfo(emtpySet, emtpySet);
   }
 
-  private Optional<GitInfo> buildpackFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
+  private Optional<GitInfo> buildpackFor(String file, GitInfo gitInfo) throws IOException {
     if ("master".equals(gitInfo.getBranch())) {
       LOG.info("Picked master buildpack {} for {}", MASTER_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
       return MASTER_BUILDPACK;
