@@ -111,10 +111,14 @@ public class GitHubWebhookHandler {
 
   private void triggerBuilds(PushEvent pushEvent, GitInfo gitInfo, Set<Module> modules) throws IOException {
     Set<Module> toBuild = new HashSet<>();
-    for (String path : affectedPaths(pushEvent)) {
-      for (Module module : modules) {
-        if (module.contains(FileSystems.getDefault().getPath(path))) {
-          toBuild.add(module);
+    if (pushEvent.getForced()) {
+      toBuild = modules;
+    } else {
+      for (String path : affectedPaths(pushEvent)) {
+        for (Module module : modules) {
+          if (module.contains(FileSystems.getDefault().getPath(path))) {
+            toBuild.add(module);
+          }
         }
       }
     }
