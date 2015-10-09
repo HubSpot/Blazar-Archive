@@ -9,6 +9,9 @@ import BuildsStore from '../../stores/buildsStore';
 import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
 
+import HostsStore from '../../stores/hostsStore';
+import HostsActions from '../../actions/hostsActions';
+
 import BuildHistoryActions from '../../actions/buildHistoryActions';
 import BuildHistoryStore from '../../stores/buildHistoryStore';
 
@@ -17,11 +20,15 @@ class DashboardContainer extends Component {
   constructor(props) {
     super(props);
 
+    this.onStatusChange = this.onStatusChange.bind(this);
+
     this.state = {
       builds: [],
-      stars: [], 
+      stars: [],
+      hosts: [],
       modulesBuildHistory: [],
       loadingModulesBuildHistory: true,
+      loadingHosts: true,
       loadingStars: true,
       loading: true
     };
@@ -31,17 +38,21 @@ class DashboardContainer extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange.bind(this));
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
-    this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange.bind(this));
+    // try:    
+    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
+    this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
+    this.unsubscribeFromHosts = HostsStore.listen(this.onStatusChange);
 
     StarActions.loadStars();
+    HostsActions.loadHosts();
   }
 
   componentWillUnmount() {
     this.unsubscribeFromBuilds();
     this.unsubscribeFromStars();
     this.unsubscribeFromBuildHistory();
+    this.unsubscribeFromHosts();
   }
 
   // check if star history has changed so we
@@ -96,6 +107,8 @@ class DashboardContainer extends Component {
           loading={this.state.loading} 
           modulesBuildHistory={this.state.modulesBuildHistory} 
           params={this.props.params}
+          hosts={this.state.hosts}
+          loadingHosts={this.state.loadingHosts}
         />
       </PageContainer>
     );
