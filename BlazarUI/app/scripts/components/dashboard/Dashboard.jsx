@@ -11,6 +11,7 @@ import Icon from '../shared/Icon.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
 import Breadcrumb from '../shared/Breadcrumb.jsx';
 import Helpers from '../ComponentHelpers';
+import Hosts from './Hosts.jsx';
 
 class Dashboard extends Component {
 
@@ -31,7 +32,17 @@ class Dashboard extends Component {
         </PageHeader>
 
         <UIGrid>
-          <UIGridItem size={12}>
+          <UIGridItem size={12} classname='dashboard-unit'>
+            <Headline>
+              Organizations
+            </Headline>
+            <Hosts 
+              hosts={this.props.hosts}
+              loadingHosts={this.props.loadingHosts}
+            />
+          </UIGridItem>
+                
+          <UIGridItem size={12} classname='dashboard-unit'>
             <Headline>
               Starred Modules
             </Headline>
@@ -49,7 +60,9 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
   loading: PropTypes.bool,
+  loadingHosts: PropTypes.bool,
   modulesBuildHistory: PropTypes.array,
+  hosts: PropTypes.array,
   params: PropTypes.object
 };
 
