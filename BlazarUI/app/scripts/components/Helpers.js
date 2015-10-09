@@ -1,7 +1,10 @@
 // Using in favor of Deprecated ComponentHelpers.js
+import React from 'react';
 import {some} from 'underscore';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
+import {LABELS, iconStatus} from './constants';
+import Icon from './shared/Icon.jsx';
 
 // 1234567890 => 1 Aug 1991 15:00
 export const timestampFormatted = function(timestamp, format='lll') {
@@ -77,4 +80,18 @@ export const tableRowBuildState = function(state) {
   else if (state === BuildStates.CANCELLED) {
     return 'bgc-warning';
   }
+};
+
+
+// Components
+export const buildResultIcon = function(result) {
+  const classNames = LABELS[result];
+
+  return (
+    <Icon
+      name={iconStatus[result]}
+      classNames={classNames}
+      title={humanizeText(result)}
+    />
+  );
 };

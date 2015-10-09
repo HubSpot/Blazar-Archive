@@ -22,6 +22,7 @@ class BaseCollection extends Collection {
 
       if (has(item, 'build')) {
         item.build.duration = humanizeDuration(item.build.endTimestamp - item.build.startTimestamp, {round: true});
+        item.build.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${item.build.buildNumber}`;
       }
 
       if (has(item, 'module')) {

@@ -12,6 +12,7 @@ import CommitMessage from '../shared/CommitMessage.jsx';
 
 class BuildHistoryTableRow extends Component {
 
+  // to do: use helper
   getBuildResult(result) {
     const classNames = LABELS[result];  
 
