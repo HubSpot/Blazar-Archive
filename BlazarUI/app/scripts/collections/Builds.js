@@ -35,10 +35,16 @@ class Builds extends BaseCollection {
     return hosts.map((host) => {
       const filterOrgBuilds = this._OrgBuildsByHost(host);
       const uniqueOrgs = this._uniqueProperty(filterOrgBuilds, 'organization');
+      const orgsWithDetail = uniqueOrgs.map((org) => {
+        return {
+          name: org,
+          blazarPath: `${config.appRoot}/builds/${host}/${org}`
+        };
+      });
 
       return {
         name: host,
-        orgs: uniqueOrgs
+        orgs: orgsWithDetail
       };
     });
   }

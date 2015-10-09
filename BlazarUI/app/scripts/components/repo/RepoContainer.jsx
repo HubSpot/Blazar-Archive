@@ -2,14 +2,14 @@ import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import Repo from './Repo.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
+
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
-
 
 class RepoContainer extends Component {
 
   constructor() {
-    bindAll(this, 'updateBranchToggleState');
+    bindAll(this, 'updateBranchToggleState', 'onStatusChange');
 
     this.state = {
       branches: [],
@@ -21,7 +21,7 @@ class RepoContainer extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
     RepoActions.loadBranches(this.props.params);
   }
 
@@ -48,6 +48,7 @@ class RepoContainer extends Component {
   }
 
   render() {
+
     return (
       <PageContainer>
         <Repo
@@ -61,7 +62,6 @@ class RepoContainer extends Component {
     );
   }
 }
-
 
 RepoContainer.propTypes = {
   params: PropTypes.object.isRequired

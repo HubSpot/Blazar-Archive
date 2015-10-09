@@ -15,19 +15,13 @@ const HostsStore = Reflux.createStore({
     this.componentListening = false;
   },
 
-  loadBranches() {
-    this.trigger({
-      loading: true
-    });
-  },
-
   setListenStatus(state) {
     this.componentListening = state;
   },
 
   getHosts() {
     this.trigger({
-      loading: true
+      loadingHosts: true
     });
 
     if (!BuildsStore.buildsHaveLoaded || !this.componentListening) {

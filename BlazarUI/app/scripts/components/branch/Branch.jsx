@@ -1,7 +1,5 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
-import PageHeader from '../shared/PageHeader.jsx';
-import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
@@ -21,25 +19,17 @@ class Branch extends Component{
     }
 
     return (
-      <div>
-        <PageHeader>
-          <Breadcrumb
-            appRoot={config.appRoot}
-            params={this.props.params}
+      <UIGrid>
+        <UIGridItem size={12}>
+          <Headline>
+            <Icon type="octicon" name="git-branch" classNames="headline-icon" />
+            Branch Modules
+          </Headline>
+          <ModulesTable
+            modules={this.props.modules}
           />
-        </PageHeader>
-        <UIGrid>
-          <UIGridItem size={12}>
-            <Headline>
-              <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-              Branch Modules
-            </Headline>
-            <ModulesTable
-              modules={this.props.modules}
-            />
-          </UIGridItem>
-        </UIGrid>
-      </div>
+        </UIGridItem>
+      </UIGrid>
     );
   }
 

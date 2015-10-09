@@ -9,9 +9,6 @@ import BuildsStore from '../../stores/buildsStore';
 import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
 
-import HostsStore from '../../stores/hostsStore';
-import HostsActions from '../../actions/hostsActions';
-
 import BuildHistoryActions from '../../actions/buildHistoryActions';
 import BuildHistoryStore from '../../stores/buildHistoryStore';
 
@@ -25,10 +22,8 @@ class DashboardContainer extends Component {
     this.state = {
       builds: [],
       stars: [],
-      hosts: [],
       modulesBuildHistory: [],
       loadingModulesBuildHistory: true,
-      loadingHosts: true,
       loadingStars: true,
       loading: true
     };
@@ -38,21 +33,17 @@ class DashboardContainer extends Component {
   }
 
   componentDidMount() {
-    // try:    
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
-    this.unsubscribeFromHosts = HostsStore.listen(this.onStatusChange);
 
     StarActions.loadStars();
-    HostsActions.loadHosts();
   }
 
   componentWillUnmount() {
     this.unsubscribeFromBuilds();
     this.unsubscribeFromStars();
     this.unsubscribeFromBuildHistory();
-    this.unsubscribeFromHosts();
   }
 
   // check if star history has changed so we
@@ -107,8 +98,6 @@ class DashboardContainer extends Component {
           loading={this.state.loading} 
           modulesBuildHistory={this.state.modulesBuildHistory} 
           params={this.props.params}
-          hosts={this.state.hosts}
-          loadingHosts={this.state.loadingHosts}
         />
       </PageContainer>
     );

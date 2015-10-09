@@ -38,3 +38,72 @@
   
 .breadcrumb-icon--thin
   padding-right 2px
+  
+  
+// Dropdown of organizations
+.org-nav
+  cursor default
+  
+  .fa-caret-down
+    position relative
+    top 1px
+    margin-right 5px
+    color $link-color
+
+.org-nav__headline
+  display inline-block
+  font-size 12px
+  color $link-color
+  margin 0 0 0 5px
+  &:hover
+    cursor pointer
+
+.org-nav__links
+  position absolute
+  z-index 3
+  left -16px
+  top 26px
+  border 1px solid $gray
+  background $blue-gray
+  border-bottom-left-radius 3px
+  border-bottom-right-radius 3px
+  padding 10px 10px 0 10px
+  font-size 13px
+  min-width 100px
+
+  ul
+    margin 0
+    list-style none
+  
+  &:after
+    border-bottom: 8px solid $blue-gray;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    content: "";
+    display: inline-block;
+    left: 17px;
+    position: absolute;
+    top: -8px;
+
+  &:before
+    border-bottom: 9px solid $gray;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    content: "";
+    display: inline-block;
+    left: 16px;
+    position: absolute;
+    top: -9px;
+
+
+.org-nav__host
+  margin 0 0 15px 0
+  font-size 12px
+  font-weight $font-medium
+  
+.org-nav__host-orgs
+  padding-left 0
+  li
+    margin-top 3px
+    font-weight $font-light
+    font-size 13px

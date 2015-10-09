@@ -7,6 +7,7 @@ const HostsActions = Reflux.createActions([
 
 HostsActions.loadHosts = function() {
   HostsActions.setListenStatus(true);
+  HostsActions.getHosts();
 };
 
 export default HostsActions;

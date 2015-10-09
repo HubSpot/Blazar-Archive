@@ -2,26 +2,41 @@ import React, {Component, PropTypes} from 'react';
 import Collapsable from '../shared/Collapsable.jsx';
 import { Link } from 'react-router';
 import SectionLoader from '../shared/SectionLoader.jsx';
-// import DashboardHost from './DashboardHost.jsx';
 
 class Hosts extends Component {
 
   render() {
-    
-    console.log('renaaaring: ', this.props);
 
     if (this.props.loadingHosts) {
       return <SectionLoader align='left' />;
     }
 
     const hostComponents = this.props.hosts.map((host, i) => {
-      return <li key={i}>{host.name}</li>
-    })
+      const orgs = host.orgs.map((org, i) => {
+        return (
+          <li key={i}> 
+            <Link to={org.blazarPath}>{org.name}</Link> 
+          </li>
+        );
+      });
+      
+      return (
+        <Collapsable
+          header={host.name}
+          initialToggleStateOpen={true}
+          disableToggle={true}
+        >  
+          <ul>
+            {orgs}
+          </ul>
+        </Collapsable> 
+      );
+    });
     
     return (
-      <ul>
+      <div>
         {hostComponents}
-      </ul>
+      </div>
     );
     
   }

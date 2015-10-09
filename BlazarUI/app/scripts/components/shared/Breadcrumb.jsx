@@ -1,17 +1,19 @@
 import React, {Component, PropTypes} from 'react';
-import {values} from 'underscore';
+import {values, pick} from 'underscore';
 const Link = require('react-router').Link;
 import Icon from './Icon.jsx';
 import Logo from './Logo.jsx';
 import ClassNames from 'classnames';
+import HostDropdownBreadcrumb from './HostDropdownBreadcrumb.jsx';
 
 class Breadcrumb extends Component {
 
   render() {
 
-    const appRoot = this.props.appRoot;
-    const pages = values(this.props.params);
-    const appRootClean = this.props.appRoot.replace(/^\/|\/$/g, '');
+    const appRoot = this.props.appRoot;  
+    //remove any unwanted params that may have been added
+    const cleanParams = pick(this.props.params, 'host','org','repo','branch','module','buildNumber')
+    const pages = values(cleanParams);
 
     const links = pages.map((page, i) => {
       let pageLinks = '';
@@ -19,6 +21,7 @@ class Breadcrumb extends Component {
       let isActivePage = false;
       let nextCrumb = true;
       let linkToDashboard = false;
+      let host;
   
       // active page
       if (i === pages.length - 1) {
@@ -28,8 +31,7 @@ class Breadcrumb extends Component {
       
       // hosts page
       if (i === 0) {
-        noLink = true;
-        nextCrumb = false;
+        host = true;
       }
 
       // generate route path for each link
@@ -39,6 +41,17 @@ class Breadcrumb extends Component {
         if (i === g) {
           break;
         }
+      }
+      
+      if (host) {
+        return (
+          <HostDropdownBreadcrumb 
+            key={i}
+            page={page}
+            hosts={this.props.hosts} 
+            navigationIsActive={this.props.navigationIsActive}
+          />
+        );
       }
 
       if (noLink) {
@@ -67,9 +80,11 @@ class Breadcrumb extends Component {
     }
 
     return (
-      <div className='breadcrumbs'>
-        <Logo />
-        {links}
+      <div>
+        <div className='breadcrumbs'>
+          <Logo />
+          {links}
+        </div>
       </div>
     );
 
@@ -80,6 +95,9 @@ class Breadcrumb extends Component {
 Breadcrumb.propTypes = {
   params: PropTypes.object.isRequired,
   appRoot: PropTypes.string.isRequired,
+  loadingHosts: PropTypes.bool,
+  hosts: PropTypes.array,
+  navigationIsActive: PropTypes.bool
 };
 
 

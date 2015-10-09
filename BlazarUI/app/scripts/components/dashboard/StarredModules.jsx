@@ -40,7 +40,7 @@ class StarredModules extends Component {
     ];
 
     return (
-      <table className="table table-hover table-striped">
+      <table className="table table-hover table-striped table-border">
         <TableHead
           columnNames={columnNames}
         />

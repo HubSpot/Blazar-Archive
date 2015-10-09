@@ -3,8 +3,6 @@ import React, {Component, PropTypes} from 'react';
 import {some} from 'underscore';
 
 import {getIsStarredState} from '../Helpers.js';
-import PageHeader from '../shared/PageHeader.jsx';
-import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
@@ -44,12 +42,6 @@ class Module extends Component {
 
     return (
       <div>
-        <PageHeader>
-          <Breadcrumb
-            appRoot={config.appRoot}
-            params={this.props.originalParams}
-          />
-        </PageHeader>
         <UIGrid>
           <UIGridItem size={10}>
             <Headline>

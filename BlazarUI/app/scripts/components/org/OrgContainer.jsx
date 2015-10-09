@@ -20,6 +20,9 @@ class OrgContainer extends Component {
   }
 
   componentWillReceiveProps(nextprops) {
+    this.setState({
+      loading: true
+    });
     OrgActions.loadRepos(nextprops.params);
   }
 

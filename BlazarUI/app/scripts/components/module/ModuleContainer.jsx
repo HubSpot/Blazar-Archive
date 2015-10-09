@@ -30,8 +30,6 @@ class ModuleContainer extends Component {
   }
 
   componentDidMount() {
-    this.originalParams = clone(this.props.params);
-
     this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
@@ -41,8 +39,6 @@ class ModuleContainer extends Component {
   }
 
   componentWillReceiveProps(nextprops) {
-    this.originalParams = clone(nextprops.params);
-
     BuildHistoryActions.loadBuildHistory(nextprops.params);
     this.setState({
       loading: true,
@@ -79,7 +75,6 @@ class ModuleContainer extends Component {
     return (
       <PageContainer>
         <Module
-          originalParams={this.originalParams}
           params={this.props.params}
           pathname={getPathname()}
           buildHistory={this.state.buildHistory}

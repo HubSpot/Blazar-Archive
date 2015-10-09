@@ -1,7 +1,5 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
-import PageHeader from '../shared/PageHeader.jsx';
-import Breadcrumb from '../shared/Breadcrumb.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import SectionLoader from '../shared/SectionLoader.jsx';
@@ -28,44 +26,36 @@ class Build extends Component {
     } = this.props.build;
 
     return (
-      <div>
-        <PageHeader>
-          <Breadcrumb
-            appRoot={config.appRoot}
-            params={this.props.originalParams}
+      <UIGrid>
+        <UIGridItem size={12}>
+          <BuildHeadline 
+            moduleName={this.props.params.module}
+            moduleId={this.props.params.moduleId}
+            modulePath={this.props.pathname}
+            buildNumber={parseInt(this.props.params.buildNumber)}
+            isStarred={this.props.isStarred}
+            toggleStar={this.props.toggleStar}
           />
-        </PageHeader>
-        <UIGrid>
-          <UIGridItem size={12}>
-            <BuildHeadline 
-              moduleName={this.props.params.module}
-              moduleId={this.props.params.moduleId}
-              modulePath={this.props.pathname}
-              buildNumber={parseInt(this.props.params.buildNumber)}
-              isStarred={this.props.isStarred}
-              toggleStar={this.props.toggleStar}
-            />
-            <BuildDetail
-              build={this.props.build}
-              loading={this.props.loading}
-            />
-          </UIGridItem>
-          <UIGridItem size={12}>
-            <BuildCommits 
-              build={this.props.build}
-              loading={this.props.loading}
-            />
-          </UIGridItem>
-          <UIGridItem size={12}>
-            <BuildLog
-              log={this.props.log}
-              fetchingLog={this.props.fetchingLog}
-              buildState={build.state}
-              loading={this.props.loading}
-            />
-          </UIGridItem>
-        </UIGrid>
-      </div>
+          <BuildDetail
+            build={this.props.build}
+            loading={this.props.loading}
+          />
+        </UIGridItem>
+        <UIGridItem size={12}>
+          <BuildCommits 
+            build={this.props.build}
+            loading={this.props.loading}
+          />
+        </UIGridItem>
+        <UIGridItem size={12}>
+          <BuildLog
+            log={this.props.log}
+            fetchingLog={this.props.fetchingLog}
+            buildState={build.state}
+            loading={this.props.loading}
+          />
+        </UIGridItem>
+      </UIGrid>
     );
   }
 
