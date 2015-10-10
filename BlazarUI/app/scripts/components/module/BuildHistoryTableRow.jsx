@@ -52,6 +52,7 @@ class BuildHistoryTableRow extends Component {
 
     let progressBar;
     if (this.props.progress) {
+      // TO DO: refactor this into container component for reuse
       let style = 'default';
       let label = '';
       if (this.props.progress > 100) {

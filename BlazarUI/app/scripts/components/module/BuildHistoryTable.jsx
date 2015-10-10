@@ -1,20 +1,18 @@
 import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
-import {map, filter, reduce} from 'underscore';
 import BuildHistoryTableHeader from './BuildHistoryTableHeader.jsx';
 import BuildHistoryTableRow from './BuildHistoryTableRow.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
+import Progress from '../../utils/progress';
 
 class BuildHistoryTable extends Component {
 
   getRows() {
     const builds = this.props.buildHistory;
-    const avgTime = this.averageBuildTime();
 
     return builds.map((build, i) => {
       if (build.build.state === BuildStates.IN_PROGRESS) {
-        const elapsedTime = new Date().getTime() - build.build.startTimestamp;
-        const progress = Math.round((elapsedTime / avgTime) * 100);
+        const progress = Progress(build.build.startTimestamp, builds)
 
         return (
           <BuildHistoryTableRow
@@ -32,45 +30,6 @@ class BuildHistoryTable extends Component {
         />
       );
     });
-  }
-
-  filterOutliers(durations) {
-    const values = durations.concat();
-    values.sort(function(a, b) {
-      return a - b;
-    });
-    const q1 = values[Math.floor((values.length / 4))];
-    const q3 = values[Math.ceil((values.length * (3 / 4)))];
-    const iqr = q3 - q1;
-    const maxValue = q3 + iqr * 1.5;
-    const minValue = q1 - iqr * 1.5;
-    const filteredValues = values.filter(function(x) {
-        return (x < maxValue) && (x > minValue);
-    });
-    return filteredValues;
-  }
-
-  averageBuildTime() {
-    // Get build durations from list of builds
-    let durations = map(this.props.buildHistory, (build) => {
-      let duration = '';
-      if (build.build.startTimestamp !== undefined && build.build.endTimestamp !== undefined) {
-        duration = build.build.endTimestamp - build.build.startTimestamp;
-      }
-      return duration ? duration : undefined;
-    });
-    // Remove invalid values
-    durations = filter(durations, (d) => {
-      return  d !== undefined && d > 0;
-    });
-    // Filter outliers if possible
-    if (durations.length > 4) {
-      durations = this.filterOutliers(durations);
-    }
-    // Take the average
-    return reduce(durations, (sum, d) => {
-      return sum + d;
-    }) / durations.length;
   }
 
   render() {
