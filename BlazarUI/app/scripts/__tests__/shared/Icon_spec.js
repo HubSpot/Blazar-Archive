@@ -1,4 +1,5 @@
 jest.dontMock('../../components/shared/Icon.jsx');
+jest.dontMock('classnames');
 
 import React from 'react/addons';
 import Icon from '../../components/shared/Icon.jsx';
@@ -13,9 +14,14 @@ function renderedOutput(elt) {
 
 describe('<Icon />', () => {
 
-  it('should generate all the class names', () => {
+  it('should generate correct classes for octicons', () => {
     const result = renderedOutput(<Icon type='octicon' name='file-directory' classNames="icon-roomy" />);
-    expect(result.props.className).toEqual('octicon octicon-file-directory icon-roomy');
+    expect(result.props.className).toEqual('icon icon-roomy octicon octicon-file-directory');
+  });
+
+  it('should generate correct classes for font-awesome icons', () => {
+    const result = renderedOutput(<Icon name='arrow-circle-up' />);
+    expect(result.props.className).toEqual('icon fa fa-arrow-circle-up');
   });
 
   it('should generate the correct title', () => {
