@@ -5,7 +5,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import ReposTable from './ReposTable.jsx';
-import SectionLoader from '../shared/SectionLoader.jsx';
+import Loader from '../shared/Loader.jsx';
 import Icon from '../shared/Icon.jsx';
 
 class org extends Component {
@@ -13,7 +13,7 @@ class org extends Component {
   render() {
     if (this.props.loading) {
       return (
-        <SectionLoader />
+        <Loader align='top-center' />
       );
     }
 

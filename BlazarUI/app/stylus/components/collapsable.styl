@@ -1,5 +1,5 @@
-
 @import 'variables'
+@import 'mixins'
 
 header-state(state)
   border-left 3px solid state
@@ -24,7 +24,8 @@ header-state(state)
   font-weight $font-medium
   color $color-text-light
   border-radius 3px
-  
+  no-select()
+
   .badge
     margin-bottom 2px
 

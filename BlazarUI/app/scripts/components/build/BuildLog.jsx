@@ -4,7 +4,7 @@ import utf8 from 'utf8';
 import {bindAll} from 'underscore';
 import {events, humanizeText} from '../Helpers';
 import Collapsable from '../shared/Collapsable.jsx';
-import SectionLoader from '../shared/SectionLoader.jsx';
+import Loader from '../shared/Loader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx'
 import ScrollTo from '../shared/ScrollTo.jsx';
 import BuildStates from '../../constants/BuildStates';
@@ -53,7 +53,7 @@ class BuildLog extends Component {
     const noBuildLog = this.props.buildState === BuildStates.CANCELLED || this.props.buildState === BuildStates.QUEUED;
 
     if (this.props.loading) {
-      return <SectionLoader />;
+      <Loader align='top-center' />
     }
 
     if (!this.props.log || typeof this.props.log !== 'string' || noBuildLog) {
@@ -62,7 +62,7 @@ class BuildLog extends Component {
 
     if (this.props.fetchingLog) {
       spinner = (
-        <SectionLoader />
+        <Loader align='left' roomy={true} />
       );
 
     }

@@ -5,7 +5,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import ModulesTable from './ModulesTable.jsx';
-import SectionLoader from '../shared/SectionLoader.jsx';
+import Loader from '../shared/Loader.jsx';
 import Icon from '../shared/Icon.jsx';
 
 class Branch extends Component{
@@ -14,7 +14,7 @@ class Branch extends Component{
 
     if (this.props.loading) {
       return (
-        <SectionLoader />
+        <Loader align='top-center' />
       );
     }
 

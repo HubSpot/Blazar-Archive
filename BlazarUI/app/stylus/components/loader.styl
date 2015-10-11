@@ -1,0 +1,48 @@
+
+.section-loader 
+  position relative
+  vertical-align middle
+  width 35px
+  height 7px
+  
+  &.roomy
+    margin: 10px
+    
+  &.center
+    margin 10px auto
+  
+  &.top-center
+    margin 0 auto
+    top 10%
+    left 50%
+    margin-left -15px
+      
+  &.center-center
+    margin 0 auto
+    top 50%
+    left 50%
+    margin-left -15px
+    margin-top -3px
+    
+  span
+    vertical-align top
+    display inline-block
+    width 7px
+    height 7px
+    margin 0 1.5px
+    border-radius 50%
+    background #7D7D8E
+    animation loader 1s infinite ease-in-out
+    animation-fill-mode both
+
+    &.dot1
+      animation-delay -.32s
+
+    &.dot2
+      animation-delay -.16s
+
+  @keyframes loader
+    0%, 100%, 80%
+      opacity 0
+    40%
+      opacity 1

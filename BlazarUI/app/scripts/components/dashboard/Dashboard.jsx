@@ -2,7 +2,8 @@
 import React, {Component, PropTypes} from 'react';
 import StarredModules from './StarredModules.jsx';
 
-import SectionLoader from '../shared/SectionLoader.jsx';
+import Loader from '../shared/Loader.jsx';
+
 import Headline from '../shared/headline/Headline.jsx';
 import PageHeader from '../shared/PageHeader.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -19,7 +20,7 @@ class Dashboard extends Component {
   render() {
     if (this.props.loading) {
       return (
-        <SectionLoader />
+        <Loader align='top-center' />
       );
     }
 

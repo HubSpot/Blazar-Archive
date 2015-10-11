@@ -2,7 +2,7 @@
 import React, {Component, PropTypes} from 'react';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-import SectionLoader from '../shared/SectionLoader.jsx';
+import Loader from '../shared/Loader.jsx';
 
 import BuildHeadline from './BuildHeadline.jsx';
 import BuildDetail from '../shared/BuildDetail.jsx';
@@ -15,7 +15,7 @@ class Build extends Component {
 
     if (this.props.loading) {
       return (
-        <SectionLoader />
+        <Loader align='top-center' />
       );
     }
 

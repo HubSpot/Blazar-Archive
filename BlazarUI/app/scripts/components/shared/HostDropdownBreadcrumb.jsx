@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 const Link = require('react-router').Link;
 import Icon from './Icon.jsx';
 import {bindAll} from 'underscore';
-import SectionLoader from './SectionLoader.jsx';
+import Loader from './Loader.jsx';
 
 class HostDropdownBreadcrumb extends Component {
 
@@ -56,7 +56,7 @@ class HostDropdownBreadcrumb extends Component {
       let loader;
       if (orgItems.length === 0) {
         loader = (
-          <SectionLoader size='mini' roomy={true} />
+          <Loader align='center' />
         );
       }
       

@@ -8,7 +8,7 @@ import {markStarredModules} from '../../utils/starHelpers';
 import {getFilterMatches, filterByToggle} from '../../utils/buildsHelpers';
 import {FILTER_MESSAGES, NO_MATCH_MESSAGES} from '../constants';
 
-import SectionLoader from '../shared/SectionLoader.jsx';
+import Loader from '../shared/Loader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import SidebarItem from '../sidebar/SidebarItem.jsx';
 
@@ -71,7 +71,7 @@ class BuildsSidebar extends Component {
 
     if (this.props.loading) {
       return (
-        <SectionLoader roomy={true} />
+        <Loader align='top-center' />
       );
     }
 

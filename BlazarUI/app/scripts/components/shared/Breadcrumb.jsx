@@ -82,7 +82,7 @@ class Breadcrumb extends Component {
     return (
       <div>
         <div className='breadcrumbs'>
-          <Logo />
+          <Logo crumb={false} />
           {links}
         </div>
       </div>

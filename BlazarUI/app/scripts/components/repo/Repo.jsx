@@ -5,7 +5,7 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
-import SectionLoader from '../shared/SectionLoader.jsx';
+import Loader from '../shared/Loader.jsx';
 import Icon from '../shared/Icon.jsx';
 
 class Repo extends Component {
@@ -26,7 +26,7 @@ class Repo extends Component {
 
     if (this.props.loading) {
       return (
-        <SectionLoader roomy={true} />
+        <Loader align='top-center' />
       );
     }
 
