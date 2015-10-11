@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import OrgContainer from '../components/org/OrgContainer.jsx';
-import PageHeaderContainer from '../components/PageHeader/PageHeaderContainer.jsx';
+import HeaderContainer from '../components/header/HeaderContainer.jsx';
 
 class Org extends Component {
 
@@ -11,7 +11,7 @@ class Org extends Component {
   render() {
     return (
       <div>
-        <PageHeaderContainer 
+        <HeaderContainer 
           params={this.props.params}
         />
         <OrgContainer

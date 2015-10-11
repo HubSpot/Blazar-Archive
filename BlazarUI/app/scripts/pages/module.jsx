@@ -1,14 +1,14 @@
 import React, {Component, PropTypes} from 'react';
 import {clone} from 'underscore';
 import ModuleContainer from '../components/module/ModuleContainer.jsx';
-import PageHeaderContainer from '../components/PageHeader/PageHeaderContainer.jsx';
+import HeaderContainer from '../components/header/HeaderContainer.jsx';
 
 class Module extends Component {
 
   render() {
     return (
       <div>
-        <PageHeaderContainer 
+        <HeaderContainer 
           params={this.props.params}
         />
         <ModuleContainer

@@ -1,12 +1,12 @@
 import React, {Component, PropTypes} from 'react';
 import {values, pick} from 'underscore';
 const Link = require('react-router').Link;
-import Icon from './Icon.jsx';
-import Logo from './Logo.jsx';
+import Icon from '../shared/Icon.jsx';
+import Logo from '../shared/Logo.jsx';
 import ClassNames from 'classnames';
 import HostDropdownBreadcrumb from './HostDropdownBreadcrumb.jsx';
 
-class Breadcrumb extends Component {
+class Breadcrumbs extends Component {
 
   render() {
 
@@ -92,7 +92,7 @@ class Breadcrumb extends Component {
 }
 
 
-Breadcrumb.propTypes = {
+Breadcrumbs.propTypes = {
   params: PropTypes.object.isRequired,
   appRoot: PropTypes.string.isRequired,
   loadingHosts: PropTypes.bool,
@@ -101,4 +101,4 @@ Breadcrumb.propTypes = {
 };
 
 
-export default Breadcrumb;
+export default Breadcrumbs;

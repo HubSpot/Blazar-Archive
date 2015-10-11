@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import BuildContainer from '../components/build/BuildContainer.jsx';
-import PageHeaderContainer from '../components/PageHeader/PageHeaderContainer.jsx';
+import HeaderContainer from '../components/header/HeaderContainer.jsx';
 
 class Project extends Component {
 
@@ -11,7 +11,7 @@ class Project extends Component {
   render() {
     return (
       <div>
-        <PageHeaderContainer 
+        <HeaderContainer 
           params={this.props.params}
         />
         <BuildContainer

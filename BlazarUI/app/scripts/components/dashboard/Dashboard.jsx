@@ -11,7 +11,6 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import Icon from '../shared/Icon.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
-import Breadcrumb from '../shared/Breadcrumb.jsx';
 import Helpers from '../ComponentHelpers';
 
 
@@ -25,28 +24,17 @@ class Dashboard extends Component {
     }
 
     return (
-      <div>
-        <PageHeader>
-          <Breadcrumb
-            appRoot={config.appRoot}
-            params={this.props.params}
+      <UIGrid>                
+        <UIGridItem size={12} className='dashboard-unit'>
+          <Headline>
+            Starred Modules
+          </Headline>
+          <StarredModules 
+            modulesBuildHistory={this.props.modulesBuildHistory}
+            loading={this.props.loading}
           />
-        </PageHeader>
-
-        <UIGrid>
-                
-          <UIGridItem size={12} className='dashboard-unit'>
-            <Headline>
-              Starred Modules
-            </Headline>
-            <StarredModules 
-              modulesBuildHistory={this.props.modulesBuildHistory}
-              loading={this.props.loading}
-            />
-          </UIGridItem>
-        </UIGrid>
-
-      </div>
+        </UIGridItem>
+      </UIGrid>
     );
   }
 }

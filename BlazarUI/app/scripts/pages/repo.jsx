@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import RepoContainer from '../components/repo/RepoContainer.jsx';
-import PageHeaderContainer from '../components/PageHeader/PageHeaderContainer.jsx';
+import HeaderContainer from '../components/header/HeaderContainer.jsx';
 
 class Repo extends Component {
 
@@ -11,7 +11,7 @@ class Repo extends Component {
   render() {
     return (
       <div>
-        <PageHeaderContainer 
+        <HeaderContainer 
           params={this.props.params}
         />
         <RepoContainer

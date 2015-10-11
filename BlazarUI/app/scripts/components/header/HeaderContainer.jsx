@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {clone} from 'underscore';
 
 import PageHeader from '../shared/PageHeader.jsx';
-import Breadcrumb from '../shared/Breadcrumb.jsx';
+import Breadcrumbs from './Breadcrumbs.jsx';
 
 import ConfigStore from '../../stores/configStore';
 import HostsStore from '../../stores/hostsStore';
@@ -13,7 +13,7 @@ const initialState = {
   loadingHosts: true
 };
 
-class PageHeaderContainer extends Component {
+class HeaderContainer extends Component {
   
   constructor(props) {
     this.onStatusChange = this.onStatusChange.bind(this);
@@ -50,7 +50,7 @@ class PageHeaderContainer extends Component {
   render() {
     return (
       <PageHeader>
-        <Breadcrumb
+        <Breadcrumbs
           appRoot={ConfigStore.appRoot}
           params={this.props.params}
           hosts={this.state.hosts}
@@ -61,8 +61,8 @@ class PageHeaderContainer extends Component {
   }
 }
 
-PageHeaderContainer.propTypes = {
+HeaderContainer.propTypes = {
   params: PropTypes.object.isRequired
 };
 
-export default PageHeaderContainer;
+export default HeaderContainer;

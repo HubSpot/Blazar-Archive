@@ -31,7 +31,7 @@ Loader.defaultProps = {
 
 Loader.propTypes = {
   roomy: PropTypes.bool,
-  align: PropTypes.oneOf(['center', 'center-center', 'left', 'right']),
+  align: PropTypes.oneOf(['center', 'center-center', 'top-center', 'left', 'right']),
   size: PropTypes.oneOf(['standard', 'mini'])
 };
 

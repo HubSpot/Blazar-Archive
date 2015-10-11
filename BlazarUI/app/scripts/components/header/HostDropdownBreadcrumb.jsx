@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 const Link = require('react-router').Link;
-import Icon from './Icon.jsx';
+import Icon from '../shared/Icon.jsx';
 import {bindAll} from 'underscore';
-import Loader from './Loader.jsx';
+import Loader from '../shared/Loader.jsx';
 
 class HostDropdownBreadcrumb extends Component {
 
