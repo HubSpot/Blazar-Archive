@@ -15,3 +15,9 @@ module.exports = {
     simulate('click', node);
   }
 };
+
+export const renderedOutput = function(elt) {
+  const shallowRenderer = TestUtils.createRenderer();
+  shallowRenderer.render(elt);
+  return shallowRenderer.getRenderOutput();
+}

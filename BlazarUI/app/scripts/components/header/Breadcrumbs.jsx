@@ -80,11 +80,9 @@ class Breadcrumbs extends Component {
     }
 
     return (
-      <div>
-        <div className='breadcrumbs'>
-          <Logo crumb={false} />
-          {links}
-        </div>
+      <div className='breadcrumbs'>
+        <Logo crumb={false} />
+        {links}
       </div>
     );
 

@@ -1,4 +1,5 @@
 jest.dontMock('../../components/shared/PageContainer.jsx');
+jest.dontMock('classnames');
 
 import React from 'react/addons';
 import PageContainer from '../../components/shared/PageContainer.jsx';
@@ -43,9 +44,9 @@ describe('<PageContainer />', () => {
   });
 
   // To do
-  // it('should have the correct class names', () => {
-  //   expect().toEqual('page-content banana');
-  // });
+  it('should have the correct class names', () => {
+    expect(pageContainer.props.className).toEqual('page-content banana');
+  });
 
 
 });
