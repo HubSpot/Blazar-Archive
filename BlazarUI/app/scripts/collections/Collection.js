@@ -22,6 +22,11 @@ class Collection {
 
     promise.done( (resp) => {
       this.data = resp;
+      const timestampHeader = promise.getResponseHeader('x-last-modified-timestamp');
+      if (timestampHeader) {
+        this.updatedTimestamp = timestampHeader;
+      }
+
       this.parse();
     });
 

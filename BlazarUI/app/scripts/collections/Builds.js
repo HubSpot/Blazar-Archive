@@ -4,8 +4,16 @@ import BaseCollection from './BaseCollection';
 
 class Builds extends BaseCollection {
 
+  constructor() {
+    this.updatedTimestamp = 0;
+  }
+
+  parse() {
+    super.parse();
+  }
+
   url() {
-    return `${config.apiRoot}/build/states?property=!lastBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!pendingBuild.commitInfo`;
+    return `${config.apiRoot}/build/states?property=!lastBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!pendingBuild.commitInfo&since=${this.updatedTimestamp}`;
   }
 
   _hasBuildState() {

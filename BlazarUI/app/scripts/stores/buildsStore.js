@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
+import {updateBuilds} from '../utils/buildsHelpers';
 
 const BuildsStore = Reflux.createStore({
 
@@ -8,14 +9,11 @@ const BuildsStore = Reflux.createStore({
   init() {
     this.builds = [];
     this.buildsLoaded = false;
+    this.buildsHaveLoaded = false;
   },
 
   getBuilds() {
     return this.builds;
-  },
-
-  haveBuildsLoaded() {
-    return this.buildsLoaded;
   },
 
   loadBuilds() {
@@ -24,14 +22,23 @@ const BuildsStore = Reflux.createStore({
     });
   },
 
-  loadBuildsSuccess(builds) {
-    this.builds = builds;
-    this.buildsHaveLoaded = true;
+  loadBuildsSuccess(incomingBuilds) {
+    // initial fetch
+    if (!this.buildsHaveLoaded) {
+      this.builds = incomingBuilds;
+    }
+    // subsequent fetches
+    else {
+      const updatedBuilds = updateBuilds(incomingBuilds, this.builds);
+      this.builds = updatedBuilds;
+    }
 
     this.trigger({
       builds: this.builds,
       loadingBuilds: false
     });
+
+    this.buildsHaveLoaded = true;
   },
 
   loadBuildsError(error) {
