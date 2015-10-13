@@ -20,17 +20,24 @@ function progress(startTimestamp, history) {
 
 function _filterOutliers(durations) {
   const values = durations.concat();
+
+  if (durations.length < 3) {
+    return durations;
+  }
+
   values.sort(function(a, b) {
     return a - b;
   });
+
   const q1 = values[Math.floor((values.length / 4))];
   const q3 = values[Math.ceil((values.length * (3 / 4)))];
   const iqr = q3 - q1;
   const maxValue = q3 + iqr * 1.5;
   const minValue = q1 - iqr * 1.5;
   const filteredValues = values.filter(function(x) {
-      return (x < maxValue) && (x > minValue);
+    return (x < maxValue) && (x > minValue);
   });
+
   return filteredValues;
 }
 
