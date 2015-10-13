@@ -58,3 +58,10 @@ export const updateBuilds = (latestBuilds, currentBuilds) => {
 
   return currentBuilds;
 };
+
+
+export const sortBuilds = (builds) => {
+  return sortBy(builds, function(b) {
+    return b.module.name;
+  });
+};

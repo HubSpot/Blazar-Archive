@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
-import {updateBuilds} from '../utils/buildsHelpers';
+import {updateBuilds, sortBuilds} from '../utils/buildsHelpers';
 
 const BuildsStore = Reflux.createStore({
 
@@ -25,11 +25,11 @@ const BuildsStore = Reflux.createStore({
   loadBuildsSuccess(incomingBuilds) {
     // initial fetch
     if (!this.buildsHaveLoaded) {
-      this.builds = incomingBuilds;
+      this.builds = sortBuilds(incomingBuilds);
     }
     // subsequent fetches
     else {
-      const updatedBuilds = updateBuilds(incomingBuilds, this.builds);
+      const updatedBuilds = sortBuilds(updateBuilds(incomingBuilds, this.builds));
       this.builds = updatedBuilds;
     }
 
