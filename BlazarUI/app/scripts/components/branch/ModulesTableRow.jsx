@@ -73,8 +73,10 @@ class ModulesTableRow extends Component {
           <Link to={modulePath}>{module.name}</Link>
         </td>
         <td className='build-result-link'>
-          {this.getBuildResult(build)}
-          <Link to={buildLink}>{build.buildNumber}</Link>
+          <Link to={buildLink}>
+            {this.getBuildResult(build)}
+            {build.buildNumber}
+          </Link>
         </td>
         <td>
           {startTime}

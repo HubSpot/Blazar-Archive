@@ -41,10 +41,10 @@ class ReposTableRow extends Component {
     }
 
     lastBuildNumber = (
-      <span>
+      <Link to={buildLink}>
         {this.getBuildResult(build.state)}
-        <Link to={buildLink}>#{build.buildNumber}</Link>
-      </span>
+        {build.buildNumber}
+      </Link>
     );
 
     lastBuildModule = (

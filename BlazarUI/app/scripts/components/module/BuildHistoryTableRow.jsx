@@ -35,7 +35,11 @@ class BuildHistoryTableRow extends Component {
     // to do: move build link to collection
     const buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
     const startTime = timestampFormatted(build.startTimestamp);
-    const buildNumber = <Link to={buildLink}>{build.buildNumber}</Link>;
+    const buildNumber = (
+      <Link to={buildLink} className='table-cell-link'>
+        {build.buildNumber}
+      </Link>
+    );
     let sha, duration;
 
     if (build.startTimestamp !== undefined && build.endTimestamp !== undefined) {
@@ -74,7 +78,7 @@ class BuildHistoryTableRow extends Component {
         <td className='build-status'>
           {this.getBuildResult(build.state)}
         </td>
-        <td>
+        <td className='table-cell-link'>
           {buildNumber}
         </td>
         <td>
