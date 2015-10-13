@@ -12,8 +12,44 @@ class Builds extends BaseCollection {
     super.parse();
   }
 
+  getUrl() {
+    const params = [
+      'gitInfo',
+      'module.id',
+      'module.name',
+      'lastBuild.id',
+      'lastBuild.buildNumber',
+      'lastBuild.state',
+      'lastBuild.startTimestamp',
+      'lastBuild.endTimestamp',
+      'lastBuild.sha',
+      'inProgressBuild.id',
+      'inProgressBuild.buildNumber',
+      'inProgressBuild.state',
+      'inProgressBuild.startTimestamp',
+      'inProgressBuild.endTimestamp',
+      'inProgressBuild.sha',
+      'pendingBuild.id',
+      'pendingBuild.buildNumber',
+      'pendingBuild.state',
+      'pendingBuild.startTimestamp',
+      'pendingBuild.endTimestamp',
+      'pendingBuild.sha'
+    ];
+
+    let url = `${config.apiRoot}/build/states?`;
+
+    params.forEach((prop) => {
+      url += `&property=${prop}`;
+    });
+
+    url += `&since=${this.updatedTimestamp}`;
+
+    return url;
+  }
+
   url() {
-    return `${config.apiRoot}/build/states?property=!lastBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!pendingBuild.commitInfo&since=${this.updatedTimestamp}`;
+    return this.getUrl();
   }
 
   _hasBuildState() {
