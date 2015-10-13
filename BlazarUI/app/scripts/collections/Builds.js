@@ -37,13 +37,11 @@ class Builds extends BaseCollection {
       'pendingBuild.sha'
     ];
 
-    let url = `${config.apiRoot}/build/states?`;
+    let url = `${config.apiRoot}/build/states?since=${this.updatedTimestamp}`;
 
     params.forEach((prop) => {
       url += `&property=${prop}`;
     });
-
-    url += `&since=${this.updatedTimestamp}`;
 
     return url;
   }
