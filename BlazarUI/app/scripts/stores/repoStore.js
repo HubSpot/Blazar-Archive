@@ -9,9 +9,7 @@ const RepoStore = Reflux.createStore({
 
   init() {
     this.branches = [];
-
     this.listenTo(RepoActions.setParams, this.setParams);
-    this.listenTo(BuildsStore, this.getBranches);
   },
 
   loadBranches() {
@@ -21,7 +19,14 @@ const RepoStore = Reflux.createStore({
   },
 
   setParams(params) {
+    if (!params) {
+      this.stopListeningTo(BuildsStore);
+      return false;
+    }
+
+    this.listenTo(BuildsStore, this.getBranches);
     this.params = params;
+
     if (BuildsStore.buildsHaveLoaded) {
       this.getBranches();
     }

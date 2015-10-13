@@ -9,13 +9,18 @@ const orgStore = Reflux.createStore({
 
   init() {
     this.repos = [];
-
     this.listenTo(OrgActions.setParams, this.setParams);
-    this.listenTo(BuildsStore, this.getRepos);
   },
 
   setParams(params) {
+    if (!params) {
+      this.stopListeningTo(BuildsStore);
+      return false;
+    }
+
     this.params = params;
+    this.listenTo(BuildsStore, this.getRepos);
+
     if (BuildsStore.buildsHaveLoaded) {
       this.getRepos();
     }
@@ -26,7 +31,7 @@ const orgStore = Reflux.createStore({
       loading: true
     });
 
-    if (!BuildsStore.buildsHaveLoaded || this.params === undefined) {
+    if (!BuildsStore.buildsHaveLoaded) {
       return;
     }
 

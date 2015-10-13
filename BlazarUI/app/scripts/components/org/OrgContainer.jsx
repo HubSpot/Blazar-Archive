@@ -27,6 +27,7 @@ class OrgContainer extends Component {
   }
 
   componentWillUnmount() {
+    OrgActions.loadRepos(false);
     this.unsubscribeFromOrg();
   }
 

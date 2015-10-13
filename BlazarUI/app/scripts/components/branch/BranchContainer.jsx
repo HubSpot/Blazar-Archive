@@ -26,6 +26,7 @@ class BranchContainer extends Component {
 
   componentWillUnmount() {
     BranchActions.updatePollingStatus(false);
+    BranchActions.loadModules(false);
     this.unsubscribeFromBranch();
   }
 

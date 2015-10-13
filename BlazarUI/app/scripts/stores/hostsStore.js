@@ -11,12 +11,15 @@ const HostsStore = Reflux.createStore({
 
   init() {
     this.hosts = [];
-    this.listenTo(BuildsStore, this.getHosts);
-    this.componentListening = false;
   },
 
   setListenStatus(state) {
-    this.componentListening = state;
+    if (state) {
+      this.listenTo(BuildsStore, this.getHosts);
+    }
+    else {
+      this.stopListeningTo(BuildsStore);
+    }
   },
 
   getHosts() {
@@ -24,7 +27,7 @@ const HostsStore = Reflux.createStore({
       loadingHosts: true
     });
 
-    if (!BuildsStore.buildsHaveLoaded || !this.componentListening) {
+    if (!BuildsStore.buildsHaveLoaded) {
       return;
     }
 

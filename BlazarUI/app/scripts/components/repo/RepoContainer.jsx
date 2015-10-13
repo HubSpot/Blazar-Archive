@@ -30,6 +30,7 @@ class RepoContainer extends Component {
   }
 
   componentWillUnmount() {
+    RepoActions.loadBranches(false);
     this.unsubscribeFromRepo();
   }
 
@@ -48,7 +49,6 @@ class RepoContainer extends Component {
   }
 
   render() {
-
     return (
       <PageContainer>
         <Repo

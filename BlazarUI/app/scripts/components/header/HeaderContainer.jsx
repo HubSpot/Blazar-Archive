@@ -26,10 +26,11 @@ class HeaderContainer extends Component {
 
   setup(props) {
     this.unsubscribeFromHosts = HostsStore.listen(this.onStatusChange);
-    HostsActions.loadHosts()
+    HostsActions.loadHosts(true)
   }
 
   tearDown() {
+    HostsActions.loadHosts(false)
     this.unsubscribeFromHosts();
   }
 

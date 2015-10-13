@@ -8,21 +8,25 @@ const BranchStore = Reflux.createStore({
 
   init() {
     this.modules = [];
-
     this.listenTo(BranchActions.setParams, this.setParams);
-    this.listenTo(BuildsStore, this.getModules);
   },
 
   setParams(params) {
+    if (!params) {
+      this.stopListeningTo(BuildsStore);
+      return false;
+    }
+
     this.params = params;
+    this.listenTo(BuildsStore, this.getModules);
+
     if (BuildsStore.buildsHaveLoaded) {
       this.getModules();
     }
   },
 
   getModules() {
-
-    if (!BuildsStore.buildsHaveLoaded || this.params === undefined) {
+    if (!BuildsStore.buildsHaveLoaded) {
       return;
     }
 

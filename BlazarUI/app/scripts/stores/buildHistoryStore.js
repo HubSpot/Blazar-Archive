@@ -8,7 +8,6 @@ const buildHistoryStore = Reflux.createStore({
   init() {
     this.buildHistory = [];
     this.modulesBuildHistory = [];
-
   },
 
   loadBuildHistory() {
