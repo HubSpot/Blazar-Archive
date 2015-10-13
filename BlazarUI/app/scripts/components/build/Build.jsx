@@ -5,7 +5,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Loader from '../shared/Loader.jsx';
 
 import BuildHeadline from './BuildHeadline.jsx';
-import BuildDetail from '../shared/BuildDetail.jsx';
+import BuildDetail from './BuildDetail.jsx';
 import BuildCommits from './BuildCommits.jsx';
 import BuildLog from './BuildLog.jsx';
 
