@@ -12,8 +12,9 @@ class BuildHistoryTable extends Component {
 
     return builds.map((build, i) => {
       if (build.build.state === BuildStates.IN_PROGRESS) {
-        const progress = Progress(build.build.startTimestamp, builds)
 
+        const progress = builds.length > 1 ? Progress(build.build.startTimestamp, builds) : false;
+        
         return (
           <BuildHistoryTableRow
             build={builds[i]}
