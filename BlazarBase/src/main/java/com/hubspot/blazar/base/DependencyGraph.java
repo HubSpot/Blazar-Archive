@@ -1,33 +1,38 @@
 package com.hubspot.blazar.base;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class DependencyGraph {
-  private final Multimap<Integer, Integer> graph;
+  private final SetMultimap<Integer, Integer> transitiveReduction;
+  private final SetMultimap<Integer, Integer> paths;
 
-  public DependencyGraph(Multimap<Integer, Integer> graph) {
-    this.graph = graph;
+  public DependencyGraph(SetMultimap<Integer, Integer> transitiveReduction, SetMultimap<Integer, Integer> paths) {
+    this.transitiveReduction = transitiveReduction;
+    this.paths = paths;
   }
 
-  public Set<Integer> getDownstreamModules(int moduleId) {
-    return new HashSet<>(graph.get(moduleId));
+  public Set<Integer> reachableVertices(int moduleId) {
+    return transitiveReduction.get(moduleId);
   }
 
-  public Set<Integer> removeRedundantModules(Set<Integer> modules) {
-    Set<Integer> trimmed = new HashSet<>(modules);
-    for (int module : modules) {
-      trimmed.removeAll(graph.get(module));
+  public Set<Integer> reduceVertices(Set<Integer> modules) {
+    Set<Integer> reduced = new HashSet<>(modules);
+    for (int source : modules) {
+      for (int target : modules) {
+        if (paths.get(source).contains(target)) {
+          reduced.remove(target);
+        }
+      }
     }
 
-    return trimmed;
+    return reduced;
   }
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("graph", graph).toString();
+    return transitiveReduction.toString();
   }
 }

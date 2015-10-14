@@ -48,10 +48,8 @@ public class DependencyBuilder {
       BuildDefinition definition = buildDefinitionService.getByModule(moduleId).get();
       DependencyGraph graph = dependenciesService.buildDependencyGraph(definition.getGitInfo());
       LOG.info("Computed dependency graph {}", graph);
-      Set<Integer> downstreamModules = graph.getDownstreamModules(moduleId);
-      LOG.info("Found downstream modules {} for module {}", downstreamModules, moduleId);
-      Set<Integer> modulesToBuild = graph.removeRedundantModules(downstreamModules);
-      LOG.info("Going to trigger builds for modules {}", modulesToBuild);
+      Set<Integer> modulesToBuild = graph.reachableVertices(moduleId);
+      LOG.info("Found downstream modules {} for module {}", modulesToBuild, moduleId);
       for (int module : modulesToBuild) {
         buildService.enqueue(buildDefinitionService.getByModule(module).get());
       }

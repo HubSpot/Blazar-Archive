@@ -1,12 +1,13 @@
 package com.hubspot.blazar.data.service;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleDependency;
 import com.hubspot.blazar.data.dao.DependenciesDao;
+import com.hubspot.blazar.data.util.GraphUtils;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -25,14 +26,17 @@ public class DependenciesService {
   public DependencyGraph buildDependencyGraph(GitInfo gitInfo) {
     Map<String, Integer> providerMap = asMap(getProvides(gitInfo));
 
-    Multimap<Integer, Integer> graph = HashMultimap.create();
+    SetMultimap<Integer, Integer> edges = HashMultimap.create();
     for (ModuleDependency dependency : getDepends(gitInfo)) {
       if (providerMap.containsKey(dependency.getName())) {
-        graph.put(providerMap.get(dependency.getName()), dependency.getModuleId());
+        edges.put(providerMap.get(dependency.getName()), dependency.getModuleId());
       }
     }
 
-    return new DependencyGraph(graph);
+    SetMultimap<Integer, Integer> paths = GraphUtils.INSTANCE.findAllPaths(edges);
+    SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(paths);
+
+    return new DependencyGraph(transitiveReduction, paths);
   }
 
   @Transactional

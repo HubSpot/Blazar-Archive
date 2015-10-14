@@ -134,7 +134,7 @@ public class GitHubWebhookHandler {
       moduleMap.put(module.getId().get(), module);
     }
 
-    moduleMap.keySet().retainAll(graph.removeRedundantModules(moduleMap.keySet()));
+    moduleMap.keySet().retainAll(graph.reduceVertices(moduleMap.keySet()));
 
     for (Module module : moduleMap.values()) {
       LOG.info("Going to build module {}", module.getId().get());
