@@ -33,12 +33,13 @@ const BuildsStore = Reflux.createStore({
       this.builds = updatedBuilds;
     }
 
+    this.buildsHaveLoaded = true;
+    
     this.trigger({
       builds: this.builds,
       loadingBuilds: false
     });
 
-    this.buildsHaveLoaded = true;
   },
 
   loadBuildsError(error) {

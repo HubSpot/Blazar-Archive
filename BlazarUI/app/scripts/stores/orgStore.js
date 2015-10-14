@@ -27,10 +27,6 @@ const orgStore = Reflux.createStore({
   },
 
   getRepos() {
-    this.trigger({
-      loading: true
-    });
-
     if (!BuildsStore.buildsHaveLoaded) {
       return;
     }
