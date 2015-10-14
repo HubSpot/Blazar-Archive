@@ -147,6 +147,17 @@ public class BuildResource {
     return new ModuleBuild(buildState.getGitInfo(), buildState.getModule(), buildState.getPendingBuild().get());
   }
 
+  @POST
+  @Path("/{id}/cancel")
+  public void cancel(@PathParam("id") long id) {
+    Optional<ModuleBuild> build = get(id);
+    if (!build.isPresent()) {
+      throw new NotFoundException("No build found for ID " + id);
+    }
+
+    buildService.cancel(build.get().getBuild());
+  }
+
   @PUT
   public ModuleBuild update(ModuleBuild moduleBuild) {
     buildService.update(moduleBuild.getBuild());
