@@ -61,7 +61,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
     binder.bind(GitHubWebhookResource.class);
     if (!configuration.isWebhookOnly()) {
-      binder.bind(IndexResource.class);
       binder.bind(BranchResource.class);
       binder.bind(BuildResource.class);
       binder.bind(BuildHistoryResource.class);

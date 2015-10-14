@@ -1,6 +1,5 @@
 package com.hubspot.blazar.config;
 
-import java.util.Collections;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -11,14 +10,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
-import org.hibernate.validator.constraints.NotEmpty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BlazarConfiguration extends Configuration {
 
-  @NotEmpty
+  @NotNull
   @JsonProperty("github")
-  private Map<String, GitHubConfiguration> gitHubConfiguration = Collections.emptyMap();
+  private Map<String, GitHubConfiguration> gitHubConfiguration;
 
   @Valid
   @NotNull
