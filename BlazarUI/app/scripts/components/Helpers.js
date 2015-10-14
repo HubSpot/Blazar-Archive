@@ -83,10 +83,9 @@ export const tableRowBuildState = function(state) {
 };
 
 export const dataTagValue = function(e, tagName) {
-  const currentTarget = e.currentTarget
-  return currentTarget.getAttribute(`data-${tagName}`)
-}
-
+  const currentTarget = e.currentTarget;
+  return currentTarget.getAttribute(`data-${tagName}`);
+};
 
 // Components
 export const buildResultIcon = function(result) {
