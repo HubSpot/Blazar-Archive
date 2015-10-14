@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
 import com.hubspot.blazar.util.DependencyBuilder;
+import com.hubspot.blazar.util.SingularityTaskKiller;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -28,7 +29,6 @@ import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
 import com.hubspot.blazar.resources.BuildResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
-import com.hubspot.blazar.resources.IndexResource;
 import com.hubspot.blazar.util.BlazarServiceLoader;
 import com.hubspot.blazar.util.BuildLauncher;
 import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
@@ -71,6 +71,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(BuildLauncher.class);
     binder.bind(GitHubStatusHandler.class);
     binder.bind(DependencyBuilder.class);
+    binder.bind(SingularityTaskKiller.class);
 
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 

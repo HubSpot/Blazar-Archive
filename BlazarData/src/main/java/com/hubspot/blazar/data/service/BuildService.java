@@ -93,6 +93,20 @@ public class BuildService {
   }
 
   @Transactional
+  public void cancel(Build build) {
+    if (build.getState().isComplete()) {
+      throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
+    }
+
+    if (build.getState() == Build.State.QUEUED) {
+      checkAffectedRowCount(buildDao.delete(build));
+      checkAffectedRowCount(moduleDao.deletePendingBuild(build));
+    } else {
+      update(build.withState(Build.State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
+    }
+  }
+
+  @Transactional
   public void update(Build build) {
     if (build.getState().isComplete()) {
       Preconditions.checkArgument(build.getEndTimestamp().isPresent());
