@@ -16,6 +16,15 @@ github:
     organizations:
       - org3
 
+singularity:
+  host: singularity.mycompany.com
+  # optional, defaults to /singularity/api
+  path: /my/singularity/api
+  # optional
+  credentials:
+    headerName: Auth-Key
+    token: my-singularity-auth-key
+
 zookeeper:
   quorum: my.zk.host:2181
   namespace: blazar

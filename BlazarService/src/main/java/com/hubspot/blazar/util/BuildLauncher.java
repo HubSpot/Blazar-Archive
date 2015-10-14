@@ -18,9 +18,12 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.hubspot.blazar.base.CommitInfo;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.User;
+import com.hubspot.singularity.SingularityClientCredentials;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCompare;
@@ -58,6 +61,7 @@ public class BuildLauncher {
   private final BuildStateService buildStateService;
   private final BuildService buildService;
   private final AsyncHttpClient asyncHttpClient;
+  private final SingularityConfiguration singularityConfiguration;
   private final Map<String, GitHub> gitHubByHost;
   private final ObjectMapper objectMapper;
   private final YAMLFactory yamlFactory;
@@ -66,6 +70,7 @@ public class BuildLauncher {
   public BuildLauncher(BuildStateService buildStateService,
                        BuildService buildService,
                        AsyncHttpClient asyncHttpClient,
+                       BlazarConfiguration configuration,
                        Map<String, GitHub> gitHubByHost,
                        EventBus eventBus,
                        ObjectMapper objectMapper,
@@ -73,6 +78,7 @@ public class BuildLauncher {
     this.buildStateService = buildStateService;
     this.buildService = buildService;
     this.asyncHttpClient = asyncHttpClient;
+    this.singularityConfiguration = configuration.getSingularityConfiguration();
     this.gitHubByHost = gitHubByHost;
     this.objectMapper = objectMapper;
     this.yamlFactory = yamlFactory;
@@ -172,18 +178,31 @@ public class BuildLauncher {
   }
 
   private HttpRequest buildRequest(BuildDefinition definition, Build build) {
-    String host = System.getenv("SINGULARITY_HOST");
-    String url = String.format("http://%s/singularity/v2/api/requests/request/blazar-executor/run", host);
-
     String buildId = String.valueOf(build.getId().get());
     List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_api_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(definition, build));
 
-    return HttpRequest.newBuilder()
+    return buildRequest(body);
+  }
+
+  private HttpRequest buildRequest(Object body) {
+    Optional<SingularityClientCredentials> credentials = singularityConfiguration.getCredentials();
+
+    HttpRequest.Builder builder = HttpRequest.newBuilder()
         .setMethod(Method.POST)
-        .addHeader("X-HubSpot-User", "jhaber")
-        .setUrl(url)
-        .setBody(body)
-        .build();
+        .setUrl(buildUrl())
+        .setBody(body);
+
+    if (credentials.isPresent()) {
+      builder.addHeader(credentials.get().getHeaderName(), credentials.get().getToken());
+    }
+
+    return builder.build();
+  }
+
+  private String buildUrl() {
+    String host = singularityConfiguration.getHost();
+    String path = singularityConfiguration.getPath().or("singularity/api");
+    return String.format("http://%s/%s/requests/request/blazar-executor/run", host, path);
   }
 
   private String buildCommand(BuildDefinition definition, Build build) {

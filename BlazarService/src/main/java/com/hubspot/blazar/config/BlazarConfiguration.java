@@ -4,23 +4,34 @@ import java.util.Collections;
 import java.util.Map;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BlazarConfiguration extends Configuration {
 
+  @NotEmpty
   @JsonProperty("github")
   private Map<String, GitHubConfiguration> gitHubConfiguration = Collections.emptyMap();
 
   @Valid
+  @NotNull
+  @JsonProperty("singularity")
+  private SingularityConfiguration singularityConfiguration;
+
+  @Valid
+  @NotNull
   @JsonProperty("zookeeper")
   private ZooKeeperConfiguration zooKeeperConfiguration;
 
+  @Valid
+  @NotNull
   @JsonProperty("database")
   private DataSourceFactory databaseConfiguration;
 
@@ -36,6 +47,15 @@ public class BlazarConfiguration extends Configuration {
 
   public BlazarConfiguration setGitHubConfiguration(Map<String, GitHubConfiguration> gitHubConfiguration) {
     this.gitHubConfiguration = gitHubConfiguration;
+    return this;
+  }
+
+  public SingularityConfiguration getSingularityConfiguration() {
+    return singularityConfiguration;
+  }
+
+  public BlazarConfiguration setSingularityConfiguration(SingularityConfiguration singularityConfiguration) {
+    this.singularityConfiguration = singularityConfiguration;
     return this;
   }
 

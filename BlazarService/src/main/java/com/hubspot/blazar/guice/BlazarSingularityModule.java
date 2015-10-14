@@ -2,16 +2,22 @@ package com.hubspot.blazar.guice;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.hubspot.singularity.SingularityClientCredentials;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.singularity.client.SingularityClientModule;
 
-public class BlazarSingularityModule implements Module {
+public class BlazarSingularityModule extends ConfigurationAwareModule<BlazarConfiguration> {
 
   @Override
-  public void configure(Binder binder) {
-    binder.install(new SingularityClientModule(ImmutableList.of(System.getenv("SINGULARITY_HOST"))));
-    SingularityClientModule.bindContextPath(binder).toInstance("singularity/v2/api");
-    SingularityClientModule.bindCredentials(binder).toInstance(new SingularityClientCredentials("X-HubSpot-User", "jhaber"));
+  protected void configure(Binder binder, BlazarConfiguration configuration) {
+    SingularityConfiguration singularityConfiguration = configuration.getSingularityConfiguration();
+
+    binder.install(new SingularityClientModule(ImmutableList.of(singularityConfiguration.getHost())));
+    if (singularityConfiguration.getPath().isPresent()) {
+      SingularityClientModule.bindContextPath(binder).toInstance(singularityConfiguration.getPath().get());
+    }
+    if (singularityConfiguration.getCredentials().isPresent()) {
+      SingularityClientModule.bindCredentials(binder).toInstance(singularityConfiguration.getCredentials().get());
+    }
   }
 }
