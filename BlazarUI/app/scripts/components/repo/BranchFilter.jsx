@@ -59,7 +59,6 @@ class BranchFilter extends Component {
         <Select
           onFocus={this.handleFilterFocus}
           onBlur={this.handleFilterBlur}
-          multi={true}
           placeholder='Filter by branch'
           className='branch-filter-input'
           name="branchFilter"
