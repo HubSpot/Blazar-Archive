@@ -16,12 +16,6 @@ const BuildsStore = Reflux.createStore({
     return this.builds;
   },
 
-  loadBuilds() {
-    this.trigger({
-      loadingBuilds: true
-    });
-  },
-
   loadBuildsSuccess(incomingBuilds) {
     // initial fetch
     if (!this.buildsHaveLoaded) {

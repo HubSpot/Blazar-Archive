@@ -16,7 +16,7 @@ class BuildsSidebarContainer extends Component {
   constructor(props) {
     super(props);
     
-    bindAll(this, 'persistStarChange');
+    bindAll(this, 'persistStarChange', 'onBuildsStatusChange', 'onStarStatusChange');
 
     this.state = {
       builds: [],
@@ -28,8 +28,8 @@ class BuildsSidebarContainer extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange.bind(this));
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromBuilds = BuildsStore.listen(this.onBuildsStatusChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStarStatusChange);
 
     BuildsActions.loadBuilds();
     StarActions.loadStars();
@@ -40,15 +40,18 @@ class BuildsSidebarContainer extends Component {
     this.unsubscribeFromStars();
   }
 
-  onStatusChange(state) {
-    this.setState(state);
-
-    if (!this.state.loadingBuilds && !this.state.loadingStars) {
-      this.setState({
-        loading: false
-      })
+  onStarStatusChange(state) {
+    if (!this.state.loadingBuilds && !state.loadingStars) {
+      state.loading = false;
     }
+    this.setState(state);
+  }
 
+  onBuildsStatusChange(state) {
+    if (!this.state.loadingStars && !state.loadingStars) {
+      state.loading = false;
+    }
+    this.setState(state);
   }
 
   persistStarChange(isStarred, starInfo) {

@@ -13,9 +13,10 @@ const BuildStore = Reflux.createStore({
   },
 
   loadBuild() {
-    this.trigger({
-      loading: true
-    });
+    console.log('triggger?');
+    // this.trigger({
+    //   loading: true
+    // });
   },
 
   loadBuildSuccess(build) {
