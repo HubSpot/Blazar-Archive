@@ -127,8 +127,7 @@ public class BuildLauncher {
       startBuild(buildDefinition, buildToLaunch, previousBuild);
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", buildToLaunch.getId().get(), e);
-      buildService.begin(buildToLaunch.withState(State.LAUNCHING));
-      buildService.update(buildToLaunch.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+      buildService.fail(buildToLaunch);
     }
   }
 

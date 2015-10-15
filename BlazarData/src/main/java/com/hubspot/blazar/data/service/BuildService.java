@@ -93,6 +93,19 @@ public class BuildService {
   }
 
   @Transactional
+  public void fail(Build build) {
+    if (build.getState().isComplete()) {
+      throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
+    }
+
+    if (build.getState() == Build.State.QUEUED) {
+      begin(build.withState(Build.State.LAUNCHING));
+    }
+
+    update(build.withState(Build.State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+  }
+
+  @Transactional
   public void cancel(Build build) {
     if (build.getState().isComplete()) {
       throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
