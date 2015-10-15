@@ -1,9 +1,9 @@
 import React, {Component, PropTypes} from 'react';
 import TableMaker from '../shared/TableMaker.jsx';
-import ModulesTableRow from './ModulesTableRow.jsx';
+import BranchesTableRow from './BranchesTableRow.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
 
-class ModulesTable extends Component {
+class BranchesTable extends Component {
 
   render() {
     if (this.props.loading) {
@@ -17,6 +17,7 @@ class ModulesTable extends Component {
     }
 
     const columnNames = [
+      {label: 'Branch', key: 'branch'},
       {label: 'Module', key: 'module'},
       {label: 'Latest Build', key: 'latestBuild'},
       {label: 'Start Time', key: 'startTime'},
@@ -27,14 +28,14 @@ class ModulesTable extends Component {
     return this.props.buildTable({
       data: this.props.modules,
       columnNames: columnNames,
-      rowComponent: ModulesTableRow
+      rowComponent: BranchesTableRow
     });
   }
 }
 
-ModulesTable.propTypes = {
+BranchesTable.propTypes = {
   loading: PropTypes.bool,
   modules: PropTypes.array.isRequired
 };
 
-export default TableMaker(ModulesTable, {showProgress: false});
+export default TableMaker(BranchesTable, {showProgress: false});

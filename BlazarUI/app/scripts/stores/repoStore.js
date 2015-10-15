@@ -13,9 +13,7 @@ const RepoStore = Reflux.createStore({
   },
 
   loadBranches() {
-    this.trigger({
-      loading: true
-    });
+    console.log('load branches');
   },
 
   setParams(params) {
@@ -33,10 +31,6 @@ const RepoStore = Reflux.createStore({
   },
 
   getBranches() {
-    this.trigger({
-      loading: true
-    });
-
     if (!BuildsStore.buildsHaveLoaded || this.params === undefined) {
       return;
     }

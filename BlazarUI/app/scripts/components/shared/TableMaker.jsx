@@ -4,9 +4,9 @@ import BuildStates from '../../constants/BuildStates.js';
 import TableHead from './TableHead.jsx';
 import Pagination from './Pagination.jsx';
 import Progress from '../../utils/progress';
-import {bindAll} from 'underscore';
+import {bindAll, has} from 'underscore';
 
-function TableMaker(RenderedComponent) {
+function TableMaker(RenderedComponent, options) {
   
   class Table extends Component {
     
@@ -17,50 +17,51 @@ function TableMaker(RenderedComponent) {
         rowsPerPage: 10
       }
     }
-    
+
     changePage(page) {
       this.setState({
         page: page
       })
     }
 
-    buildTable(options) {
+    buildTable(tableOptions) {
       return (
         <div className='table-wrapper'>
           <table className="fixed-table table table-hover table-striped">
             <TableHead
-              columnNames={options.columnNames}
+              columnNames={tableOptions.columnNames}
             />
             <tbody>
-              {this.getRows(options.data, options.rowComponent)}
+              {this.getRows(tableOptions.data, tableOptions.rowComponent)}
             </tbody>
           </table>
-          {Pagination(options.data, this.state, this.changePage)}
+          {options.paginate ? Pagination(tableOptions.data, this.state, this.changePage) : null}
         </div>
       );
     }
 
-    getRows(builds, TableRow) {
+    getRows(data, TableRow) {
       const pageStart = this.state.page * this.state.rowsPerPage;
-      const pageEnd = pageStart + this.state.rowsPerPage;
-      const currentRows = builds.slice(pageStart, pageEnd);
+      const pageEnd = pageStart + this.state.rowsPerPage;      
+      const currentRows = options.paginate ? data.slice(pageStart, pageEnd) : data;
 
-      return currentRows.map((build, i) => {
-        if (build.build.state === BuildStates.IN_PROGRESS) {
-          const progress = builds.length > 1 ? Progress(build.build.startTimestamp, builds) : false;
-
-          return (
-            <TableRow
-              build={build}
-              key={i}
-              progress={progress}
-            />
-          );
+      return currentRows.map((item, i) => {
+        if (has(item, 'build')) {
+          if (item.build.state === BuildStates.IN_PROGRESS && options.showProgress) {
+            const progress = data.length > 1 ? Progress(item.build.startTimestamp, data) : false;
+            return (
+              <TableRow
+                data={item}
+                key={i}
+                progress={progress}
+              />
+            );
+          }
         }
 
         return (
           <TableRow
-            build={build}
+            data={item}
             key={i}
           />
         );

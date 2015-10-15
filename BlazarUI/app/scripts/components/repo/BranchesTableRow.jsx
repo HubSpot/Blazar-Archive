@@ -10,7 +10,7 @@ import {tableRowBuildState} from '../Helpers';
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
-class ModulesTableRow extends Component {
+class BranchesTableRow extends Component {
 
   getBuildResult(build) {
     const result = build.state;
@@ -39,7 +39,11 @@ class ModulesTableRow extends Component {
       return (
         <tr> 
           <td>
-            <Icon type='octicon' name='file-directory' classNames="icon-roomy icon-muted" />
+            <Icon for='branch' classNames="icon-roomy icon-muted" />
+            <Link to={modulePath}>{gitInfo.branch}</Link>
+          </td>
+          <td>
+            <Icon for='module' classNames="icon-roomy icon-muted" />
             <Link to={modulePath}>{module.name}</Link>
           </td>  
           <td>No History</td>
@@ -48,13 +52,12 @@ class ModulesTableRow extends Component {
           <td></td>
         </tr> 
       )
+      
     }
 
     let sha;
-    const build = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
-    const buildLink = `${window.config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
-    const startTime = Helpers.timestampFormatted(build.startTimestamp);
-
+    const build = inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild;
+    
     if (build.sha !== undefined) {
       sha = <Sha gitInfo={gitInfo} build={build} />;
     }
@@ -67,17 +70,21 @@ class ModulesTableRow extends Component {
     return (
       <tr className={tableRowBuildState(build.state)}>
         <td>
-          <Icon type='octicon' name='file-directory' classNames="icon-roomy icon-muted" />
+          <Icon for='branch' classNames="icon-roomy icon-muted" />
+          <Link to={module.blazarPath.branch}>{gitInfo.branch}</Link>
+        </td>
+        <td>
+          <Icon for='module' classNames="icon-roomy icon-muted" />
           <Link to={modulePath}>{module.name}</Link>
         </td>
         <td className='build-result-link'>
-          <Link to={buildLink}>
+          <Link to={lastBuild.blazarPath}>
             {this.getBuildResult(build)}
             {build.buildNumber}
           </Link>
         </td>
         <td>
-          {startTime}
+          {Helpers.timestampFormatted(build.startTimestamp)}
         </td>
         <td>
           {duration}
@@ -90,8 +97,8 @@ class ModulesTableRow extends Component {
   }
 }
 
-ModulesTableRow.propTypes = {
+BranchesTableRow.propTypes = {
   data: PropTypes.object.isRequired
 };
 
-export default ModulesTableRow;
+export default BranchesTableRow;

@@ -213,21 +213,10 @@ class Builds extends BaseCollection {
       return (repo.organization === params.org) && (repo.repository === params.repo);
     });
 
-    branches.sort( (a, b) => {
-      return b.branch - a.branch;
+    return sortBy(branches, function(b) {
+      return b.branch.toLowerCase();
     });
 
-    // move master to top of branches list
-    const masterIndex = branches.map(function(el) {
-      return el.branch;
-    }).indexOf('master');
-
-    if (masterIndex > 0) {
-      const master = branches.splice(masterIndex, masterIndex + 1);
-      branches = master.concat(branches);
-    }
-
-    return branches;
   }
 
 

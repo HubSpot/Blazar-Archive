@@ -30,7 +30,7 @@ class BuildHistoryTableRow extends Component {
       build, 
       gitInfo, 
       module
-    } = this.props.build;
+    } = this.props.data;
 
     // to do: move build link to collection
     const buildLink = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;

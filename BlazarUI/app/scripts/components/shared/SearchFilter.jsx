@@ -24,10 +24,6 @@ class SearchFilter extends Component {
     this.focusInput();
   }
 
-  componentDidUpdate() {
-    this.focusInput();
-  }
-
   componentWillUnmount() {
     window.removeEventListener('keyup', this.handleKeyup);
   }

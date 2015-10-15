@@ -1,6 +1,6 @@
 // Using in favor of Deprecated ComponentHelpers.js
 import React from 'react';
-import {some} from 'underscore';
+import {some, uniq, flatten, filter} from 'underscore';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
 import {LABELS, iconStatus} from './constants';
@@ -45,6 +45,112 @@ export const githubShaLink = function(info) {
   return `https://${info.gitInfo.host}/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
 };
 
+export const getIsStarredState = function(stars, id) {
+  return some(stars, (star) => {
+    return star.moduleId === id;
+  });
+};
+
+// Data Helpers
+export const uniqueBranches = function(branches) {
+  const uniqueBranches = uniq(branches, false, (b) => {
+    return b.branch;
+  });
+  
+  return uniqueBranches.map((b) => {
+    return {
+      value: b.branch,
+      label: b.branch
+    }
+  });
+}
+
+export const uniqueModules = function(branches) {
+  const modules = flatten(branches.map((branch) => {
+    return branch.modules;
+  }));
+
+  const uniqueModules = uniq(modules, false, (m) => {
+    return m.module.name;
+  });
+
+  return uniqueModules.map((m) => {
+    return {
+      value: m.module.name,
+      label: m.module.name
+    }
+  });
+}
+
+export const tableRowBuildState = function(state) {
+  if (state === BuildStates.FAILED) {
+    return 'bgc-danger';
+  }
+  else if (state === BuildStates.CANCELLED) {
+    return 'bgc-warning';
+  }
+};
+
+export const getFilteredModules = function(filters, branches) {
+  const branchFilters = filters.branch;
+  const moduleFilters = filters.module;
+
+  const allModules = flatten(branches.map((branch) => {
+    return branch.modules;
+  }));
+  
+  const filteredModules = allModules.filter((m) => {
+    let passGo = false;
+
+    // not filtering
+    if (branchFilters.length === 0 && moduleFilters.length === 0) {
+      return true;
+    }
+
+    // filtering both branch and module
+    if (branchFilters.length > 0 && moduleFilters.length > 0) {
+      let branchMatch = false;
+      let moduleMatch = false;
+
+      branchFilters.some((branch) => {
+        if (branch.value === m.gitInfo.branch) {
+          branchMatch = true;
+        }
+      });
+
+      moduleFilters.some((module) => {
+        if (module.value === m.module.name) {
+          moduleMatch = true;
+        }
+      });
+      
+      return branchMatch && moduleMatch
+
+    }
+
+    if (branchFilters.length > 0) {        
+      branchFilters.forEach((bf) => {
+        if (m.gitInfo.branch === bf.value) {
+          passGo = true;
+        }
+      });
+    }
+
+    if (moduleFilters.length > 0) {        
+      moduleFilters.forEach((mf) => {
+        if (m.module.name === mf.value) {
+          passGo = true;
+        }
+      });
+    }
+
+    return passGo;
+  });
+
+  return filteredModules;
+}
+
+// DOM Helpers
 export const events = {
   listenTo: function(event, cb) {
     window.addEventListener(event, cb);
@@ -54,14 +160,9 @@ export const events = {
   }
 };
 
-export const getIsStarredState = function(stars, id) {
-  return some(stars, (star) => {
-    return star.moduleId === id;
-  });
-};
-
-export const getPathname = function() {
-  return window.location.pathname;
+export const dataTagValue = function(e, tagName) {
+  const currentTarget = e.currentTarget;
+  return currentTarget.getAttribute(`data-${tagName}`);
 };
 
 export const scrollTo = function(direction) {
@@ -73,18 +174,8 @@ export const scrollTo = function(direction) {
   }
 };
 
-export const tableRowBuildState = function(state) {
-  if (state === BuildStates.FAILED) {
-    return 'bgc-danger';
-  }
-  else if (state === BuildStates.CANCELLED) {
-    return 'bgc-warning';
-  }
-};
-
-export const dataTagValue = function(e, tagName) {
-  const currentTarget = e.currentTarget;
-  return currentTarget.getAttribute(`data-${tagName}`);
+export const getPathname = function() {
+  return window.location.pathname;
 };
 
 // Components

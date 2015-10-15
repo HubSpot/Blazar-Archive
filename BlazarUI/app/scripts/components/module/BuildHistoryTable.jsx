@@ -29,7 +29,8 @@ class BuildHistoryTable extends Component {
     return this.props.buildTable({
       data: this.props.buildHistory,
       columnNames: columnNames,
-      rowComponent: BuildHistoryTableRow
+      rowComponent: BuildHistoryTableRow,
+      showProgress: true
     });
   }
 }
@@ -39,4 +40,9 @@ BuildHistoryTable.propTypes = {
   buildHistory: PropTypes.array.isRequired
 };
 
-export default TableMaker(BuildHistoryTable);
+export default TableMaker(BuildHistoryTable, 
+  {
+    showProgress: true,
+    paginate: true
+  }
+);
