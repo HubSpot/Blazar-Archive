@@ -51,7 +51,8 @@ class CancelBuildButton extends Component {
   }
 
   render() {
-    if (contains(FINAL_BUILD_STATES, this.props.build.build.state)) {
+    
+    if (this.props.build.build.state === undefined || contains(FINAL_BUILD_STATES, this.props.build.build.state)) {
       return null;
     }
     
