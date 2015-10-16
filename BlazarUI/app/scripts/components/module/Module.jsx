@@ -8,20 +8,20 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
-import Loader from '../shared/Loader.jsx';
 import Icon from '../shared/Icon.jsx';
 import BuildButton from './BuildButton.jsx';
 import Star from '../shared/Star.jsx';
 
 class Module extends Component {
 
-  render() {
-    if (this.props.loading) {
-      return (
-        <Loader align='top-center' />
-      );
+  getLoadingState() {
+    if (!this.props.loadingStars && !this.props.loadingHistory) {
+      return false
     }
+    return true;
+  }
 
+  render() {
     return (
       <UIGrid>
         <UIGridItem size={10}>
@@ -42,12 +42,15 @@ class Module extends Component {
           </Headline>
         </UIGridItem>           
         <UIGridItem size={2} align='RIGHT'>
-          <BuildButton triggerBuild={this.props.triggerBuild} />
+          <BuildButton 
+            triggerBuild={this.props.triggerBuild} 
+            loading={this.getLoadingState()}
+          />
         </UIGridItem>
         <UIGridItem size={12}>
           <BuildHistoryTable
             buildHistory={this.props.buildHistory}
-            loading={this.props.loading}
+            loading={this.getLoadingState()}
           />
         </UIGridItem>
       </UIGrid>
@@ -56,7 +59,8 @@ class Module extends Component {
 }
 
 Module.propTypes = {
-  loading: PropTypes.bool.isRequired,
+  loadingHistory: PropTypes.bool.isRequired,
+  loadingStars: PropTypes.bool.isRequired,
   params: PropTypes.object.isRequired,
   buildHistory: PropTypes.array.isRequired,
   pathname: PropTypes.string.isRequired,

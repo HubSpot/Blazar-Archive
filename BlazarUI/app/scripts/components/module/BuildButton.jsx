@@ -15,6 +15,13 @@ class BuildButton extends Component {
   }
 
   render() {
+    
+    if (this.props.loading) {
+      return (
+        <div />
+      );
+    }
+
     if (this.props.buildTriggering) {
       return (
         <Button bsStyle="primary" disabled>
@@ -31,7 +38,8 @@ class BuildButton extends Component {
 
 BuildButton.propTypes = {
   triggerBuild: PropTypes.func.isRequired,
-  buildTriggering: PropTypes.bool
+  buildTriggering: PropTypes.bool,
+  loading: PropTypes.bool.isRequired
 };
 
 export default BuildButton;

@@ -24,7 +24,6 @@ class ModuleContainer extends Component {
       buildTriggeringDone: true,
       loadingHistory: true,
       loadingStars: true,
-      loading: true,
       buildTriggeringError: ''
     };
   }
@@ -41,7 +40,7 @@ class ModuleContainer extends Component {
   componentWillReceiveProps(nextprops) {
     BuildHistoryActions.loadBuildHistory(nextprops.params);
     this.setState({
-      loading: true,
+      loadingStars: true,
       loadingHistory: true
     });
   }
@@ -55,12 +54,6 @@ class ModuleContainer extends Component {
 
   onStatusChange(state) {
     this.setState(state);
-    if (!this.state.loadingHistory && !this.state.loadingStars) {
-      this.setState({
-        loading: false
-      })
-    }
-
   }
 
   triggerBuild() {
@@ -79,7 +72,8 @@ class ModuleContainer extends Component {
           pathname={getPathname()}
           buildHistory={this.state.buildHistory}
           stars={this.state.stars}
-          loading={this.state.loading}
+          loadingStars={this.state.loadingStars}
+          loadingHistory={this.state.loadingHistory}
           triggerBuild={this.triggerBuild}
           toggleStar={this.toggleStar}
         />

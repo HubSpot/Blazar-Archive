@@ -12,9 +12,9 @@ const RepoStore = Reflux.createStore({
   },
 
   loadStars() {
-    this.trigger({
-      loadingStars: true
-    });
+    // this.trigger({
+    //   loadingStars: true
+    // });
   },
 
   loadStarsSuccess(stars) {

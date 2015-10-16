@@ -2,12 +2,16 @@ import React, {Component, PropTypes} from 'react';
 import TableMaker from '../shared/TableMaker.jsx';
 import BuildHistoryTableRow from './BuildHistoryTableRow.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
+import Loader from '../shared/Loader.jsx';
 
 class BuildHistoryTable extends Component {
 
   render() {
+    
     if (this.props.loading) {
-      return <div></div>;
+      return (
+        <Loader align='top-center' />
+      );
     }
 
     if (this.props.buildHistory.length === 0) {
