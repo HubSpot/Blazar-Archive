@@ -13,20 +13,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class CachingService<T extends BuildDefinition> {
   private final Map<Integer, T> cache;
   private final AtomicLong cacheTime;
-  private final ReadWriteLock lock;
+  private final AtomicLong updateCount;
   private final Predicate<T> active;
 
   public CachingService() {
     this.cache = new ConcurrentHashMap<>();
     this.cacheTime = new AtomicLong(0);
-    this.lock = new ReentrantReadWriteLock();
+    this.updateCount = new AtomicLong(0);
     this.active = new Predicate<T>() {
       @Override
       public boolean apply(T definition) {
@@ -40,21 +37,15 @@ public abstract class CachingService<T extends BuildDefinition> {
   public Set<T> getAll(long since) {
     update();
 
-    Lock readLock = lock.readLock();
-    readLock.lock();
-    try {
-      Set<T> values = new HashSet<>(cache.values());
-      for (Iterator<T> iterator = values.iterator(); iterator.hasNext(); ) {
-        T value = iterator.next();
-        if (value.getModule().getUpdatedTimestamp() < since) {
-          iterator.remove();
-        }
+    Set<T> values = new HashSet<>(cache.values());
+    for (Iterator<T> iterator = values.iterator(); iterator.hasNext(); ) {
+      T value = iterator.next();
+      if (value.getModule().getUpdatedTimestamp() < since) {
+        iterator.remove();
       }
-
-      return values;
-    } finally {
-      readLock.unlock();
     }
+
+    return values;
   }
 
   public Set<T> getAllActive(long since) {
@@ -72,9 +63,9 @@ public abstract class CachingService<T extends BuildDefinition> {
   }
 
   private void update() {
-    Lock writeLock = lock.writeLock();
-    if (writeLock.tryLock()) {
-      try {
+    long count = updateCount.get();
+    synchronized (this) {
+      if (updateCount.get() == count) {
         Set<T> changes = fetch(cacheTime.get());
 
         long maxTime = cacheTime.get();
@@ -87,12 +78,8 @@ public abstract class CachingService<T extends BuildDefinition> {
         }
 
         cacheTime.set(maxTime);
-      } finally {
-        writeLock.unlock();
+        updateCount.incrementAndGet();
       }
-    } else {
-      writeLock.lock();
-      writeLock.unlock();
     }
   }
 }

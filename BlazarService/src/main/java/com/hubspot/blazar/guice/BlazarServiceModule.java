@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
+import com.hubspot.blazar.resources.BuildStateResource;
 import com.hubspot.blazar.util.DependencyBuilder;
 import com.hubspot.blazar.util.SingularityTaskKiller;
 import org.kohsuke.github.GitHub;
@@ -63,6 +64,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     if (!configuration.isWebhookOnly()) {
       binder.bind(BranchResource.class);
       binder.bind(BuildResource.class);
+      binder.bind(BuildStateResource.class);
       binder.bind(BuildHistoryResource.class);
     }
 

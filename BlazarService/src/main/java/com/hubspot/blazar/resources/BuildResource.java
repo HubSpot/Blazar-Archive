@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
@@ -21,7 +20,6 @@ import com.hubspot.blazar.base.LogChunk;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.data.service.BuildDefinitionService;
 import com.hubspot.blazar.data.service.BuildService;
-import com.hubspot.blazar.data.service.BuildStateService;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpResponse;
@@ -31,7 +29,6 @@ import com.hubspot.singularity.SingularityS3Log;
 import com.hubspot.singularity.client.SingularityClient;
 import com.sun.jersey.api.NotFoundException;
 
-import java.net.URI;
 import java.util.Collection;
 import java.util.Set;
 
@@ -39,19 +36,16 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildResource {
   private final BuildDefinitionService buildDefinitionService;
-  private final BuildStateService buildStateService;
   private final BuildService buildService;
   private final SingularityClient singularityClient;
   private final AsyncHttpClient asyncHttpClient;
 
   @Inject
   public BuildResource(BuildDefinitionService buildDefinitionService,
-                       BuildStateService buildStateService,
                        BuildService buildService,
                        SingularityClient singularityClient,
                        AsyncHttpClient asyncHttpClient) {
     this.buildDefinitionService = buildDefinitionService;
-    this.buildStateService = buildStateService;
     this.buildService = buildService;
     this.singularityClient = singularityClient;
     this.asyncHttpClient = asyncHttpClient;
@@ -65,16 +59,6 @@ public class BuildResource {
     long offset = Math.max(maxUpdatedTimestamp(buildDefinitions), since);
 
     return Response.ok(buildDefinitions).header("x-last-modified-timestamp", offset).build();
-  }
-
-  @GET
-  @Path("/states")
-  @PropertyFiltering
-  public Response getAllBuildStates(@QueryParam("since") @DefaultValue("0") long since) {
-    Set<BuildState> buildStates = buildStateService.getAllActive(since);
-    long offset = Math.max(maxUpdatedTimestamp(buildStates), since);
-
-    return Response.ok(buildStates).header("x-last-modified-timestamp", offset).build();
   }
 
   @GET
@@ -94,23 +78,15 @@ public class BuildResource {
     }
 
     boolean completed = build.get().getBuild().getState().isComplete();
-    Optional<String> logUrl = build.get().getBuild().getLog();
-    Optional<String> taskIdOptional = build.get().getBuild().getTaskId();
-    if (!logUrl.isPresent() && !taskIdOptional.isPresent()) {
-      throw new NotFoundException("No build log URL or taskId found for ID " + id);
+    Optional<String> taskId = build.get().getBuild().getTaskId();
+    if (!taskId.isPresent()) {
+      throw new NotFoundException("No taskId found for build ID " + id);
     }
 
-    final String taskId;
-    if (taskIdOptional.isPresent()) {
-      taskId = taskIdOptional.get();
-    } else {
-      taskId = parseTaskId(logUrl.get());
-    }
-
-    String path = taskId + "/service.log";
+    String path = taskId.get() + "/service.log";
     Optional<String> grep = Optional.absent();
 
-    Optional<MesosFileChunkObject> chunk = singularityClient.readSandBoxFile(taskId, path, grep, Optional.of(offset), Optional.of(length));
+    Optional<MesosFileChunkObject> chunk = singularityClient.readSandBoxFile(taskId.get(), path, grep, Optional.of(offset), Optional.of(length));
     if (chunk.isPresent()) {
       if (completed && chunk.get().getData().isEmpty()) {
         return new LogChunk(chunk.get().getData(), chunk.get().getOffset(), -1);
@@ -118,7 +94,7 @@ public class BuildResource {
         return new LogChunk(chunk.get().getData(), chunk.get().getOffset());
       }
     } else {
-      Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId);
+      Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId.get());
       if (s3Logs.isEmpty()) {
         throw new NotFoundException("No S3 log found for ID " + id);
       } else if (s3Logs.size() > 1) {
@@ -188,16 +164,5 @@ public class BuildResource {
     }
 
     return maxUpdatedTimestamp;
-  }
-
-  private static String parseTaskId(String url) {
-    String path = URI.create(url).getPath();
-    for (String part : Splitter.on('/').omitEmptyStrings().split(path)) {
-      if (part.startsWith("blazar-executor")) {
-        return part;
-      }
-    }
-
-    throw new IllegalArgumentException("Could not parse task ID from log URL " + url);
   }
 }
