@@ -2,8 +2,6 @@
 import React, {Component, PropTypes} from 'react';
 import StarredModules from './StarredModules.jsx';
 
-import Loader from '../shared/Loader.jsx';
-
 import Headline from '../shared/headline/Headline.jsx';
 import PageHeader from '../shared/PageHeader.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -17,12 +15,6 @@ import Helpers from '../ComponentHelpers';
 class Dashboard extends Component {
 
   render() {
-    if (this.props.loading) {
-      return (
-        <Loader align='top-center' />
-      );
-    }
-
     return (
       <UIGrid>                
         <UIGridItem size={12} className='dashboard-unit'>
@@ -31,7 +23,9 @@ class Dashboard extends Component {
           </Headline>
           <StarredModules 
             modulesBuildHistory={this.props.modulesBuildHistory}
-            loading={this.props.loading}
+            loadingStars={this.props.loadingStars}
+            loadingModulesBuildHistory={this.props.loadingModulesBuildHistory}
+            loadingStars={this.props.loadingStars}
           />
         </UIGridItem>
       </UIGrid>
@@ -40,7 +34,8 @@ class Dashboard extends Component {
 }
 
 Dashboard.propTypes = {
-  loading: PropTypes.bool,
+  loadingModulesBuildHistory: PropTypes.bool,
+  loadingStars: PropTypes.bool,
   loadingHosts: PropTypes.bool,
   modulesBuildHistory: PropTypes.array,
   params: PropTypes.object

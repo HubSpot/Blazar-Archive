@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 const Link = require('react-router').Link;
 import Alert from 'react-bootstrap/lib/Alert';
-
+import Loader from '../shared/Loader.jsx';
 import TableHead from '../shared/TableHead.jsx';
 import StarredModulesTableRow from './StarredModulesTableRow.jsx';
 
@@ -18,7 +18,13 @@ class StarredModules extends Component {
     });
   }
 
-  render() {
+  render() {  
+    if (this.props.loadingModulesBuildHistory || this.props.loadingStars) {
+      return (
+        <Loader align='top-center' />
+      );
+    }
+    
     if (this.props.modulesBuildHistory.length === 0) {
       return(
         <Alert bsStyle='info'>
@@ -54,7 +60,8 @@ class StarredModules extends Component {
 }
 
 StarredModules.propTypes = {
-  loading: PropTypes.bool,
+  loadingModulesBuildHistory: PropTypes.bool,
+  loadingStars: PropTypes.bool,
   modulesBuildHistory: PropTypes.array,
 };
 

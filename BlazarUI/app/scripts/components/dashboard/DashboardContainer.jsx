@@ -24,8 +24,7 @@ class DashboardContainer extends Component {
       stars: [],
       modulesBuildHistory: [],
       loadingModulesBuildHistory: true,
-      loadingStars: true,
-      loading: true
+      loadingStars: true
     };
 
     this.starsHistory = [];
@@ -83,20 +82,15 @@ class DashboardContainer extends Component {
       });
     }
 
-    // now that we have builds and stars, let's render the page
-    if (noHistoryToFetch || haveHistory) {
-      this.setState({
-        loading: false
-      });
-    }
   }
 
   render() {
     return (
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
-          loading={this.state.loading} 
           modulesBuildHistory={this.state.modulesBuildHistory} 
+          loadingModulesBuildHistory={this.state.loadingModulesBuildHistory}
+          loadingStars={this.state.loadingStars}
           params={this.props.params}
         />
       </PageContainer>
