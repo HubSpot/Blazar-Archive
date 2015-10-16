@@ -6,7 +6,10 @@ import $ from 'jquery';
 class Model {
 
   constructor() {
-    this.fetchOptions = {};
+    this.fetchOptions = {
+      parse: true
+    };
+
     this.fetch = this.fetch.bind(this);
   }
 
@@ -22,6 +25,9 @@ class Model {
 
     promise.done((resp) => {
       this.data = resp;
+      if (!this.fetchOptions.parse) {
+        return;
+      }
       this.parse();
     });
 

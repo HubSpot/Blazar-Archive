@@ -10,6 +10,17 @@ class Build extends Model {
   parse() {
     this.addTimeHelpers();
   }
+  
+  cancel(id) {
+    this.fetchOptions = {
+      type: 'POST',
+      url: `${config.apiRoot}/build/${id}/cancel`,
+      parse: false
+    }
+    return this.fetch({
+      parse: false
+    });
+  }
 
   url() {
     const build = this.build;

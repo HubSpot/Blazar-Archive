@@ -21,7 +21,8 @@ const BuildActions = Reflux.createActions([
   'reloadBuild',
   'triggerBuildSuccess',
   'triggerBuildError',
-  'triggerBuildStart'
+  'triggerBuildStart',
+  'loadBuildCancelError'
 ]);
 
 BuildActions.loadBuild.preEmit = function(data) {
@@ -43,7 +44,6 @@ BuildActions.setupBuildRequest = function(data) {
 
 BuildActions.stopWatchingBuild = function(moduleId) {
   if (builds[moduleId]) {
-    console.info('set build #' + builds[moduleId].build.buildNumber + ' to inactive');
     builds[moduleId].isActive = false;
   }
   else {
@@ -53,9 +53,21 @@ BuildActions.stopWatchingBuild = function(moduleId) {
     // To do: find a better approach
     window.location.reload();
   }
-
 };
 
+BuildActions.cancelBuild = function(id) {
+  const build = new Build;
+  const cancel = build.cancel(id);
+  
+  cancel.error((err) => {
+    BuildActions.loadBuildCancelError({
+      status: err.status,
+      responseText: JSON.parse(err.responseText).message
+    });
+  });
+};
+
+// To do: move into build model
 BuildActions.triggerBuild = function(moduleId) {
   BuildActions.triggerBuildStart();
   const trigger = new BuildTrigger(moduleId);
@@ -102,7 +114,6 @@ function getModule() {
 function getBuild() {
   builds[requestedBuild.gitInfo.moduleId] = new Build(requestedBuild.gitInfo);
   builds[requestedBuild.gitInfo.moduleId].isActive = true;
-  console.info(`setting build #${requestedBuild.gitInfo.buildNumber} to active`);
   const buildPromise = builds[requestedBuild.gitInfo.moduleId].fetch();
 
   buildPromise.error(() => {
@@ -148,7 +159,6 @@ function processInProgressBuild(build) {
 
   (function fetchLog() {
     if (!builds[build.data.module.id].isActive) {
-      console.info(`build # ${build.data.build.buildNumber} is not active, do not continue polling for build log.`);
       return;
     }
 
@@ -159,7 +169,6 @@ function processInProgressBuild(build) {
 
     const logPromise = log.fetch();
     logPromise.always( (data, textStatus, jqxhr) => {
-      console.info(`Promise complete for build #${build.data.build.buildNumber }. isActive: ${build.isActive}`);
       inProgressBuild.logLines += log.formatLog(jqxhr);
       inProgressBuild.offset = data.nextOffset;
 

@@ -12,13 +12,6 @@ const BuildStore = Reflux.createStore({
     this.buildTriggeringError = '';
   },
 
-  loadBuild() {
-    console.log('triggger?');
-    // this.trigger({
-    //   loading: true
-    // });
-  },
-
   loadBuildSuccess(build) {
     this.build = build;
 
@@ -48,6 +41,12 @@ const BuildStore = Reflux.createStore({
 
     this.trigger({
       buildTriggeringDone: true
+    });
+  },
+  
+  loadBuildCancelError(error) {    
+    this.trigger({
+      loadBuildCancelError: error
     });
   },
 

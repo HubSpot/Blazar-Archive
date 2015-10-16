@@ -22,13 +22,14 @@ const initialState = {
   log: '',
   fetchingLog: true,
   stars: [],
+  error: false
 };
 
 class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
-    bindAll(this, 'toggleStar');
+    bindAll(this, 'toggleStar', 'triggerCancelBuild');
     this.state = initialState;
   }
 
@@ -59,8 +60,17 @@ class BuildContainer extends Component {
   componentWillUnmount() {
     this.tearDown()
   }
+  
+  triggerCancelBuild(id) {
+    BuildActions.cancelBuild(id);
+  }
 
   onStatusChange(state) {
+    if (state.loadBuildCancelError) {
+      this.setState({
+        error: state.loadBuildCancelError
+      })
+    }
 
     if (state.loading) {
       this.setState({
@@ -99,6 +109,7 @@ class BuildContainer extends Component {
     return (
       <PageContainer>
         <Build
+          error={this.state.error}
           build={this.state.build}
           log={this.state.log}
           fetchingLog={this.state.fetchingLog}
@@ -106,6 +117,7 @@ class BuildContainer extends Component {
           params={this.props.params}
           loading={this.state.loading}
           pathname={getPathname()}
+          triggerCancelBuild={this.triggerCancelBuild}
           toggleStar={this.toggleStar}
           isStarred={getIsStarredState(this.state.stars, this.props.params.moduleId)}
         />
