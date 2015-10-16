@@ -21,17 +21,22 @@ class Breadcrumbs extends Component {
       let isActivePage = false;
       let nextCrumb = true;
       let linkToDashboard = false;
-      let host;
+      let isOrg;
   
       // active page
       if (i === pages.length - 1) {
         noLink = true;
         isActivePage = true;
       }
-      
-      // hosts page
+
+      // repo 
       if (i === 0) {
-        host = true;
+        noLink = true;
+      }
+
+      // org page
+      if (i === 1) {
+        isOrg = true;
       }
 
       // generate route path for each link
@@ -43,13 +48,15 @@ class Breadcrumbs extends Component {
         }
       }
       
-      if (host) {
+      if (isOrg) {
+        
         return (
           <HostDropdownBreadcrumb 
             key={i}
             page={page}
             hosts={this.props.hosts} 
             navigationIsActive={this.props.navigationIsActive}
+            activePage={isActivePage}
           />
         );
       }
@@ -64,7 +71,8 @@ class Breadcrumbs extends Component {
           <span key={page + i} className={classNames}>{page}</span>
         );        
       }
-
+      
+      
       return (
         <Link key={page + i} className='crumb' to={`${this.props.appRoot}/builds${pageLinks}`}>{page}</Link>
       );

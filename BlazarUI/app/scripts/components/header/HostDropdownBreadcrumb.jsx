@@ -3,6 +3,7 @@ const Link = require('react-router').Link;
 import Icon from '../shared/Icon.jsx';
 import {bindAll} from 'underscore';
 import Loader from '../shared/Loader.jsx';
+import ClassNames from 'classnames';
 
 class HostDropdownBreadcrumb extends Component {
 
@@ -25,13 +26,21 @@ class HostDropdownBreadcrumb extends Component {
       active: false
     });
   }
+  
+  getContainerClassNames() {
+    return ClassNames([
+      'crumb',
+      'org-nav',
+      {'active-page': this.props.activePage}
+    ])
+  }
 
   render() {
     const page = this.props.page;
     let HostsWithOrgs;
     
     const orgItems = this.props.hosts.map((host, i) => {
-      
+
       const orgs = host.orgs.map((org, i) => {
         return (
           <li key={i}>
@@ -51,7 +60,7 @@ class HostDropdownBreadcrumb extends Component {
         </div>
       );
     });
-  
+
     if (this.state.active) {
       let loader;
       if (orgItems.length === 0) {
@@ -59,7 +68,7 @@ class HostDropdownBreadcrumb extends Component {
           <Loader align='center' />
         );
       }
-      
+
       HostsWithOrgs = (
         <div className='org-nav__links'>
           {orgItems}
@@ -69,7 +78,7 @@ class HostDropdownBreadcrumb extends Component {
     }
 
     return (
-      <span className='crumb org-nav'>
+      <span className={this.getContainerClassNames()}>
         <span className='org-nav__headline' onClick={this.handleOrgClick}>
           <Icon name='caret-down' />
           {page}
