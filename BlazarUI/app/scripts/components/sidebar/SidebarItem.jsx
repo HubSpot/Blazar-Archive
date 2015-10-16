@@ -2,7 +2,7 @@
 import React, {Component, PropTypes} from 'react';
 import classnames from 'classnames';
 import {has} from 'underscore';
-
+import {truncate} from '../Helpers.js';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
@@ -74,10 +74,15 @@ class SidebarItem extends Component {
         />
       );
     }
+    
+    let buildNumberSpace = 0;
+    if (build.lastBuild) {
+      buildNumberSpace = build.lastBuild.buildNumber.toString().length
+    }
 
     const moduleLink = (
-      <Link to={build.module.blazarPath.module} className='sidebar-item__module-name'>
-        {build.module.name}
+      <Link title={build.module.name} to={build.module.blazarPath.module} className='sidebar-item__module-name'>
+        {truncate(build.module.name, 35 - buildNumberSpace, true)}
       </Link>
     );
 
@@ -85,7 +90,7 @@ class SidebarItem extends Component {
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='icon-muted'/>{ ' ' }
         <Link to={build.module.blazarPath.repo} className='sidebar-item__module-branch-name'>
-          {build.gitInfo.repository}
+          {truncate(build.gitInfo.repository, 30, true)}
         </Link>
       </div>
     );
@@ -94,7 +99,7 @@ class SidebarItem extends Component {
       <div className='sidebar-item__branch-link'>
         <Icon type='octicon' name='git-branch' classNames='icon-muted'/>{ ' ' }
         <Link to={build.module.blazarPath.branch} className='sidebar-item__module-branch-name'>
-          {build.gitInfo.branch}
+          {truncate(build.gitInfo.branch, 40, true)}
         </Link>
       </div>
     );
