@@ -22,7 +22,8 @@ const BuildActions = Reflux.createActions([
   'triggerBuildSuccess',
   'triggerBuildError',
   'triggerBuildStart',
-  'loadBuildCancelError'
+  'loadBuildCancelError',
+  'loadBuildCancelled'
 ]);
 
 BuildActions.loadBuild.preEmit = function(data) {
@@ -42,7 +43,7 @@ BuildActions.setupBuildRequest = function(data) {
     .then(processBuild.bind(this));
 };
 
-BuildActions.stopWatchingBuild = function(moduleId) {
+BuildActions.stopWatchingBuild = function(buildId, moduleId) {
   if (builds[moduleId]) {
     builds[moduleId].isActive = false;
   }
@@ -55,9 +56,17 @@ BuildActions.stopWatchingBuild = function(moduleId) {
   }
 };
 
-BuildActions.cancelBuild = function(id) {
+BuildActions.cancelBuild = function(buildId, moduleId) {
+  builds[moduleId].isActive = false;
+
   const build = new Build;
-  const cancel = build.cancel(id);
+  const cancel = build.cancel(buildId);
+  
+  cancel.done((d, t, j) => {
+    if (j.status === 204) {
+      BuildActions.loadBuildCancelled()
+    }
+  })
   
   cancel.error((err) => {
     BuildActions.loadBuildCancelError({

@@ -61,8 +61,8 @@ class BuildContainer extends Component {
     this.tearDown()
   }
   
-  triggerCancelBuild(id) {
-    BuildActions.cancelBuild(id);
+  triggerCancelBuild(buildId, moduleId) {
+    BuildActions.cancelBuild(buildId, moduleId);
   }
 
   onStatusChange(state) {

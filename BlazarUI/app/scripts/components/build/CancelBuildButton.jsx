@@ -22,7 +22,7 @@ class CancelBuildButton extends Component {
   }
   
   cancelBuild() {
-    this.props.triggerCancelBuild(this.props.build.build.id);
+    this.props.triggerCancelBuild(this.props.build.build.id, this.props.build.module.id);
 
     this.setState({
       cancelling: true,

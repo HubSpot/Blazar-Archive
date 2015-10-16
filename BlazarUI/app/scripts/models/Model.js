@@ -23,8 +23,11 @@ class Model {
       dataType: this.fetchOptions.dataType || 'json'
     });
 
-    promise.done((resp) => {
-      this.data = resp;
+    promise.done((data, textStatus, jqXHR) => {
+      this.data = data;
+      this.textStatus = textStatus;
+      this.jqXHR = jqXHR;
+
       if (!this.fetchOptions.parse) {
         return;
       }

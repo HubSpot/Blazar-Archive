@@ -28,6 +28,13 @@ const BuildStore = Reflux.createStore({
     });
   },
 
+  loadBuildCancelled() {
+    this.build.build.build.state = 'CANCELLED';
+    this.trigger({
+      build: this.build
+    })
+  },
+
   triggerBuildStart() {
     this.buildTriggeringDone = false;
 
