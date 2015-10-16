@@ -48,7 +48,7 @@ class BuildContainer extends Component {
   tearDown() {
     this.unsubscribeFromBuild();
     this.unsubscribeFromStars();
-    BuildActions.stopWatchingBuild(this.props.params.moduleId)
+    BuildActions.stopWatchingBuild(this.props.params.buildId, this.props.params.moduleId)
   }
 
   componentWillReceiveProps(nextProps) {
