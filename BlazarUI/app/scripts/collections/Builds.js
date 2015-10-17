@@ -2,6 +2,11 @@
 import {has, uniq, sortBy, findWhere, groupBy} from 'underscore';
 import BaseCollection from './BaseCollection';
 
+// move out
+function cmp(x, y) {
+  return x > y ? 1 : x < y ? -1 : 0;
+}
+
 class Builds extends BaseCollection {
 
   constructor() {
@@ -144,10 +149,6 @@ class Builds extends BaseCollection {
     });
 
     // sort by if building then by most recent build time
-    function cmp(x, y) {
-      return x > y ? 1 : x < y ? -1 : 0;
-    }
-
     groupedInArray.sort( (a, b) => {
       return cmp(b.isBuilding, a.isBuilding) || cmp(a.mostRecentBuild, b.mostRecentBuild);
     });
@@ -165,7 +166,7 @@ class Builds extends BaseCollection {
       return (build.gitInfo.organization === params.org) && (build.gitInfo.host === params.host);
     });
 
-    const repos = uniq(orgBuilds.map((build) => {
+    const repos = orgBuilds.map((build) => {
       const {
         gitInfo,
         lastBuild,
@@ -173,26 +174,56 @@ class Builds extends BaseCollection {
         inProgressBuild,
         pendingBuild
       } = build;
+      
+      let latestBuild;
+      let startTime;
 
-      let latestBuild = (inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild);
+      if (has(build, 'inProgressBuild')) {
+        latestBuild = inProgressBuild;
+        startTime = inProgressBuild.startTimestamp;
+      }
+      
+      else if (has(build, 'lastBuild')) {
+        latestBuild = lastBuild;
+        startTime = lastBuild.startTimestamp;
+      }
+
+      else if (has(build, 'pendingBuild')) {
+        latestBuild = pendingBuild
+      }
+
+      else {
+        return false
+      }
+
       latestBuild.module = module.name;
       latestBuild.branch = gitInfo.branch;
 
       const repoBlazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
       const repo = {
+        module: module.name,
         repo: gitInfo.repository,
-        host: gitInfo.host,
         organization: gitInfo.organization,
+        host: gitInfo.host,
+        startTime: startTime,
         latestBuild: latestBuild,
         blazarPath: {
           repoBlazarPath: repoBlazarPath
         }
       };
+      
       return repo;
-    }), false, function(r) {
+    });
+
+    repos.sort( (a, b) => {
+      return cmp(b.repo, a.repo) || cmp(b.startTime, a.startTime);
+    });
+
+    const uniqRepos = uniq(repos, (r) => {
       return r.repo;
     });
-    return sortBy(repos, function(r) {
+
+    return sortBy(uniqRepos, function(r) {
       return r.repo.toLowerCase();
     });
   }
