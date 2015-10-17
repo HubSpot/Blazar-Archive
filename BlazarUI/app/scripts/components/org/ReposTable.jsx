@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import TableHead from '../shared/TableHead.jsx';
 import ReposTableRow from './ReposTableRow.jsx';
+import Loader from '../shared/Loader.jsx';
 
 class ReposTable extends Component {
 
@@ -18,9 +19,10 @@ class ReposTable extends Component {
 
   render() {
     if (this.props.loading) {
-      return null;
+      return (
+        <Loader align='left' />
+      );
     }
-
     const columnNames = [
       {label: 'Repository', key: 'name'},
       {label: 'Latest Building Module', key: 'module'},
