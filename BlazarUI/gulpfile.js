@@ -133,10 +133,8 @@ gulp.task('watch', function() {
   gulp.watch(app + 'images/**/*.{png,jpg,jpeg,gif,svg}', ['images']);
   gulp.watch(app + 'stylus/**/*.styl', ['styles']);
   gulp.watch(app + 'index.mustache', ['html']);
-  // gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
-  // gulp.watch(app + 'scripts/**/*.js', ['scripts', 'lint']);
-  gulp.watch(app + 'scripts/**/*.jsx', ['scripts']);
-  gulp.watch(app + 'scripts/**/*.js', ['scripts']);
+  gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
+  gulp.watch(app + 'scripts/**/*.js', ['scripts', 'lint']);
 });
 
 // remove bundles
