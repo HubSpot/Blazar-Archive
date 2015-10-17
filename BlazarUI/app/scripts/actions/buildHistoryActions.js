@@ -63,18 +63,23 @@ BuildHistoryActions.updatePollingStatus = (status) => {
 function buildHistoryPoller() {
 
   (function pollBuildHistory() {
-    fetchHistory();
-
-    if (buildHistoryActionSettings.polling) {
-      setTimeout(pollBuildHistory, config.buildsRefresh);
-    }
+    fetchHistory(() => {
+      if (buildHistoryActionSettings.polling) {
+        setTimeout(pollBuildHistory, config.buildsRefresh);
+      }
+    });
   })();
 }
 
-function fetchHistory() {
+function fetchHistory(cb) {
   getBranchId()
     .then(getModule)
-    .then(getBuildHistory);
+    .then(getBuildHistory)
+    .then(() => {
+      if (cb) {
+        cb();
+      }
+    });
 }
 
 function getBranchId() {
