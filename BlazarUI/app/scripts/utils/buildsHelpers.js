@@ -1,6 +1,6 @@
+import React, {Component} from 'react';
 import Search from './search';
-import {getStarredModules} from './starHelpers';
-import {filter, has, sortBy} from 'underscore';
+import {sortBy} from 'underscore';
 import bs from 'binary-search';
 
 export const getFilterMatches = (builds, filterText) => {
@@ -10,25 +10,6 @@ export const getFilterMatches = (builds, filterText) => {
 
   const modulesSearch = new Search({ records: builds });
   return modulesSearch.match(filterText);
-};
-
-export const filterByToggle = (filterState, modules, stars) => {
-  if (filterState === 'starred') {
-    const starredModules = getStarredModules(stars, modules);
-    return starredModules;
-  }
-
-  if (filterState === 'building') {
-    const buildingModules = filter(modules, (module) => {
-      return has(module, 'inProgressBuild');
-    });
-
-    modules = sortBy(buildingModules, function(r) {
-      return -r.inProgressBuild.startTimestamp;
-    });
-  }
-
-  return modules;
 };
 
 function binarySearch(haystack, needle) {
@@ -59,9 +40,22 @@ export const updateBuilds = (latestBuilds, currentBuilds) => {
   return currentBuilds;
 };
 
+export const sortBuilds = (builds, type) => {
+  switch (type) {
+    case 'building':
+      return sortBy(builds, function(b) {
+        return -b.inProgressBuild.startTimestamp;
+      });
+    break;
 
-export const sortBuilds = (builds) => {
-  return sortBy(builds, function(b) {
-    return b.module.name;
-  });
+    case 'abc':
+      return sortBy(builds, function(b) {
+        return b.module.name;
+      });
+    break;
+
+    default:
+      return builds;
+  }
+
 };

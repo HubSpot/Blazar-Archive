@@ -19,11 +19,11 @@ const BuildsStore = Reflux.createStore({
   loadBuildsSuccess(incomingBuilds) {
     // initial fetch
     if (!this.buildsHaveLoaded) {
-      this.builds = sortBuilds(incomingBuilds);
+      this.builds = sortBuilds(incomingBuilds, 'abc');
     }
     // subsequent fetches
     else {
-      const updatedBuilds = sortBuilds(updateBuilds(incomingBuilds, this.builds));
+      const updatedBuilds = sortBuilds(updateBuilds(incomingBuilds, this.builds), 'abc');
       this.builds = updatedBuilds;
     }
 

@@ -9,8 +9,8 @@ function cmp(x, y) {
 
 class Builds extends BaseCollection {
 
-  constructor() {
-    this.updatedTimestamp = 0;
+  constructor(options) {
+    this.options = options;    
   }
 
   parse() {
@@ -41,12 +41,27 @@ class Builds extends BaseCollection {
       'pendingBuild.endTimestamp',
       'pendingBuild.sha'
     ];
-
-    let url = `${config.apiRoot}/build/states?since=${this.updatedTimestamp}`;
+    
+    let url = `${config.apiRoot}/build/states?since=0`;
 
     params.forEach((prop) => {
       url += `&property=${prop}`;
     });
+  
+    switch (this.options.request) {
+      case 'starred':
+        this.options.stars.forEach((star) => {
+          url += `&moduleId=${star.moduleId}`
+        });
+        break;
+
+      case 'all':
+        break;
+
+      case 'building':
+        url+= '&buildState=LAUNCHING&buildState=IN_PROGRESS'
+        break;
+    }
 
     return url;
   }

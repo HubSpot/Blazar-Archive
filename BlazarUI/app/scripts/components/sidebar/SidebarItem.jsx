@@ -65,7 +65,6 @@ class SidebarItem extends Component {
       star = (
         <Star 
           isStarred={this.props.isStarred}
-          toggleStar={this.props.toggleStar} 
           modulePath={this.props.build.module.blazarPath.module}
           moduleName={this.props.build.module.name}
           moduleId={this.props.build.module.id} 
@@ -119,8 +118,7 @@ class SidebarItem extends Component {
 
 SidebarItem.propTypes = {
   isStarred: PropTypes.bool,
-  build: PropTypes.object.isRequired,
-  toggleStar: PropTypes.func.isRequired
+  build: PropTypes.object.isRequired
 };
 
 export default SidebarItem;
