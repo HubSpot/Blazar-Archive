@@ -41,12 +41,6 @@ class BranchContainer extends Component {
   }
 
   render() {
-    if (this.state.loading) {
-      return (
-        <Loader align='top-center' />
-      );
-    }
-    
     return (
       <PageContainer>
         <UIGrid>
@@ -57,6 +51,7 @@ class BranchContainer extends Component {
             </Headline>
             <ModulesTable
               modules={this.state.modules}
+              loading={this.state.loading}
             />
           </UIGridItem>
         </UIGrid>

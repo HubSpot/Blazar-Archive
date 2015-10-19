@@ -49,9 +49,7 @@ class BranchFilter extends Component {
 
   render() {
     if (this.props.loading) {
-      return (
-        <Loader align='top-center' />
-      );
+      return null;
     }
 
     return (

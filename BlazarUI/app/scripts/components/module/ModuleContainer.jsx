@@ -1,9 +1,17 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll, clone} from 'underscore';
+import {bindAll, clone, some} from 'underscore';
 import {getPathname} from '../Helpers';
-
-import Module from './Module.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
+import {getIsStarredState} from '../Helpers.js';
+import UIGrid from '../shared/grid/UIGrid.jsx';
+import UIGridItem from '../shared/grid/UIGridItem.jsx';
+import BuildHistoryTable from './BuildHistoryTable.jsx';
+import Headline from '../shared/headline/Headline.jsx';
+import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
+import Icon from '../shared/Icon.jsx';
+import BuildButton from './BuildButton.jsx';
+import Star from '../shared/Star.jsx';
+
 import BuildHistoryStore from '../../stores/buildHistoryStore';
 import BuildStore from '../../stores/buildStore';
 import BuildHistoryActions from '../../actions/buildHistoryActions';
@@ -67,16 +75,37 @@ class ModuleContainer extends Component {
   render() {
     return (
       <PageContainer>
-        <Module
-          params={this.props.params}
-          pathname={getPathname()}
-          buildHistory={this.state.buildHistory}
-          stars={this.state.stars}
-          loadingStars={this.state.loadingStars}
-          loadingHistory={this.state.loadingHistory}
-          triggerBuild={this.triggerBuild}
-          toggleStar={this.toggleStar}
-        />
+        <UIGrid>
+          <UIGridItem size={10}>
+            <Headline>
+              <Star
+                className='icon-roomy'
+                isStarred={getIsStarredState(this.state.stars, this.props.params.moduleId)}
+                toggleStar={this.toggleStar}
+                modulePath={getPathname()}
+                moduleName={this.props.params.module}
+                moduleId={this.props.params.moduleId}
+                updateWithState={true}
+              />
+              {this.props.params.module} 
+              <HeadlineDetail>
+                Build History
+              </HeadlineDetail>
+            </Headline>
+          </UIGridItem>           
+          <UIGridItem size={2} align='RIGHT'>
+            <BuildButton 
+              triggerBuild={this.triggerBuild} 
+              loading={!this.state.loadingStars || !this.state.loadingHistory}
+            />
+          </UIGridItem>
+          <UIGridItem size={12}>
+            <BuildHistoryTable
+              buildHistory={this.state.buildHistory}
+              loading={this.state.loadingStars || this.state.loadingHistory}
+            />
+          </UIGridItem>
+        </UIGrid>
       </PageContainer>
     );
   }

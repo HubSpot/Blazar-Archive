@@ -7,13 +7,6 @@ import Loader from '../shared/Loader.jsx';
 class BuildHistoryTable extends Component {
 
   render() {
-    
-    if (this.props.loading) {
-      return (
-        <Loader align='top-center' />
-      );
-    }
-
     if (this.props.buildHistory.length === 0) {
       return (
         <EmptyMessage> No build history </EmptyMessage>

@@ -56,12 +56,6 @@ class RepoContainer extends Component {
   }
 
   render() {
-    if (this.state.loading) {
-      return (
-        <Loader align='top-center' />
-      );
-    }
-
     return (
       <PageContainer>
         <UIGrid>
@@ -78,9 +72,11 @@ class RepoContainer extends Component {
               branchFilter={this.state.branchFilter}
               filters={this.state.filters}
               updateFilters={this.updateFilters}
+              loading={this.state.loading}
             />
             <BranchesTable 
-              modules={getFilteredModules(this.state.filters, this.state.branches)} 
+              modules={getFilteredModules(this.state.filters, this.state.branches)}
+              loading={this.state.loading}
             />
           </UIGridItem>
         </UIGrid>
