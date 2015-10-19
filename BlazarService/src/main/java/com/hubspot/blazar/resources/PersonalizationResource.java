@@ -55,8 +55,10 @@ public class PersonalizationResource {
 
   @GET
   @Path("/subscriptions/{userName}")
-  public Set<BuildState> getUserSubscriptions(@PathParam("userName") String userName, @QueryParam("gitHubHost") @DefaultValue("git.hubteam.com") String gitHubHost) throws IOException {
-    final Set<BuildState> buildStates = buildStateService.getAllActive(1444692939000L);
+  public Set<BuildState> getUserSubscriptions(@PathParam("userName") String userName,
+                                              @QueryParam("gitHubHost") @DefaultValue("github.com") String gitHubHost,
+                                              @QueryParam("since") @DefaultValue("0") long since) throws IOException {
+    final Set<BuildState> buildStates = buildStateService.getAllActive(since);
     GitHub gitHub = Preconditions.checkNotNull(gitHubByHost.get(gitHubHost));
     List<GHRepository> subs = gitHub.getUser(userName).listSubscriptions().asList();
     Set<BuildState> states = new HashSet<>();
