@@ -3,21 +3,10 @@ package com.hubspot.blazar.util;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.hubspot.blazar.base.BuildDefinition;
-import com.hubspot.blazar.base.DependencyGraph;
-import com.hubspot.blazar.base.DiscoveredModule;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.data.service.BuildService;
-import com.hubspot.blazar.data.service.DependenciesService;
-import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.base.*;
+import com.hubspot.blazar.data.service.*;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
-import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
-import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
-import com.hubspot.blazar.github.GitHubProtos.PushEvent;
-import com.hubspot.blazar.github.GitHubProtos.Repository;
+import com.hubspot.blazar.github.GitHubProtos.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Singleton
 public class GitHubWebhookHandler {
@@ -42,6 +27,7 @@ public class GitHubWebhookHandler {
   private final ModuleDiscovery moduleDiscovery;
   private final BuildService buildService;
   private final DependenciesService dependenciesService;
+  private EventService eventService;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
@@ -49,12 +35,14 @@ public class GitHubWebhookHandler {
                               ModuleDiscovery moduleDiscovery,
                               BuildService buildService,
                               DependenciesService dependenciesService,
+                              EventService eventService,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.moduleDiscovery = moduleDiscovery;
     this.buildService = buildService;
     this.dependenciesService = dependenciesService;
+    this.eventService = eventService;
 
     eventBus.register(this);
   }
@@ -62,7 +50,8 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handleCreateEvent(CreateEvent createEvent) throws IOException {
     if ("branch".equalsIgnoreCase(createEvent.getRefType())) {
-      processBranch(gitInfo(createEvent));
+      Set<Module> modules = processBranch(gitInfo(createEvent));
+      recordEvents(modules,  createEvent.getSender().getLogin());
     }
   }
 
@@ -80,6 +69,17 @@ public class GitHubWebhookHandler {
 
       Set<Module> modules = updateModules(gitInfo, pushEvent);
       triggerBuilds(pushEvent, gitInfo, modules);
+      recordEvents(modules, pushEvent.getPusher().getUsername());
+    }
+  }
+
+  @Subscribe
+  public void handlePullRequestEvent(PullRequestEvent pullRequest) {
+    if (pullRequest.getAction().equalsIgnoreCase("opened") || pullRequest.getAction().equalsIgnoreCase("reopened")) {
+      GitInfo gitInfo = gitInfo(pullRequest);
+      Optional<GitInfo> fullGitInfo = branchService.lookup(gitInfo.getHost(), gitInfo.getOrganization(),gitInfo.getRepository(), gitInfo.getBranch());
+      Set<Module> modules = moduleService.getByBranch(fullGitInfo.get().getId().get());
+      recordEvents(modules, pullRequest.getPullRequestOrBuilder().getUser().getUsername());
     }
   }
 
@@ -156,6 +156,10 @@ public class GitHubWebhookHandler {
     return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), true);
   }
 
+  private GitInfo gitInfo(PullRequestEvent pullRequest) {
+    return gitInfo(pullRequest.getPullRequestOrBuilder().getRepository(), pullRequest.getPullRequestOrBuilder().getHead().getRef(), true);
+  }
+
   private GitInfo gitInfo(Repository repository, String ref, boolean active) {
     String host = URI.create(repository.getUrl()).getHost();
     if ("api.github.com".equals(host)) {
@@ -179,5 +183,14 @@ public class GitHubWebhookHandler {
     }
 
     return affectedPaths;
+  }
+
+  private void recordEvents(Set<Module> modules, String username){
+    String lowercaseName = username.toLowerCase();
+    long now = System.currentTimeMillis();
+    Optional<Integer> absentInt = Optional.absent();
+    for (Module module : modules) {
+      eventService.add(new Event(absentInt, module.getId().get(), now, lowercaseName));
+    }
   }
 }

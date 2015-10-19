@@ -7,10 +7,7 @@ import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.Module;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
