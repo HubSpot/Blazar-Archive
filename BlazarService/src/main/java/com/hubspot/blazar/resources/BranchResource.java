@@ -8,6 +8,7 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BuildStateService;
 import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -44,6 +45,7 @@ public class BranchResource {
 
   @GET
   @Path("/search")
+  @PropertyFiltering
   public Set<GitInfo> search(@QueryParam("host") Optional<String> host,
                              @QueryParam("organization") Optional<String> organization,
                              @QueryParam("repository") Optional<String> repository,
