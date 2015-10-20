@@ -11,6 +11,7 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import java.util.List;
 
 public interface EventDao {
+  
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO branches (moduleId, timestamp, username) VALUES (:moduleId, :timestamp, :username)")
   int insert(@BindWithRosetta Event event);
@@ -27,6 +28,5 @@ public interface EventDao {
       "WHERE events.timestamp >= :since" +
       "AND module.host = :gitHubHost" +
       "AND events.username = :username")
-
   List<BuildState> getAllEventsForUser(@Bind("username") String username, @Bind("gitHubHost") String gitHubHost, @Bind("since") long since);
 }
