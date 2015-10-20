@@ -21,10 +21,10 @@ public interface EventDao {
       "LEFT OUTER JOIN builds AS lastBuild ON (module.lastBuildId = lastBuild.id) " +
       "LEFT OUTER JOIN builds AS inProgressBuild ON (module.inProgressBuildId = inProgressBuild.id) " +
       "LEFT OUTER JOIN builds AS pendingBuild ON (module.pendingBuildId = pendingBuild.id) " +
-      "LEFT OUTER JOIN events AS events ON (module.id = events.moduleId)" +
-      "LEFT OUTER JOIN branches AS branches ON (module.branchid = branches.id)" +
-      "WHERE events.timestamp >= :since" +
-      "AND module.host = :gitHubHost" +
+      "LEFT OUTER JOIN events AS events ON (module.id = events.moduleId) " +
+      "LEFT OUTER JOIN branches AS branches ON (module.branchid = branches.id) " +
+      "WHERE events.timestamp >= :since " +
+      "AND gitInfo.host = :gitHubHost " +
       "AND events.username = :username")
   List<BuildState> getAllEventsForUser(@Bind("username") String username, @Bind("gitHubHost") String gitHubHost, @Bind("since") long since);
 }
