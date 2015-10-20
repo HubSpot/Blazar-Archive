@@ -93,7 +93,9 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
       return Optional.absent();
     }
 
-    if (!"master".equals(gitInfo.getBranch())) {
+    if (buildpackConfiguration.get().getRepoBuildpack().containsKey(gitInfo)) {
+      return Optional.of(buildpackConfiguration.get().getRepoBuildpack().get(gitInfo));
+    } else if (!"master".equals(gitInfo.getBranch())) {
       return Optional.fromNullable(buildpackConfiguration.get().getBranchBuildpack().get(gitInfo.getBranch()));
     } else if (isDeployable(file, repository, gitInfo)) {
       return buildpackConfiguration.get().getDeployableBuildpack();
