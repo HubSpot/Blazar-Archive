@@ -91,12 +91,18 @@ public class GitHubWebhookHandler {
   }
 
   @Subscribe
-  public void handlePullRequestEvent(PullRequestEvent pullRequest) {
-    if (pullRequest.getAction().equalsIgnoreCase("opened") || pullRequest.getAction().equalsIgnoreCase("reopened")) {
-      GitInfo gitInfo = gitInfo(pullRequest);
-      Optional<GitInfo> fullGitInfo = branchService.lookup(gitInfo.getHost(), gitInfo.getOrganization(),gitInfo.getRepository(), gitInfo.getBranch());
-      Set<Module> modules = moduleService.getByBranch(fullGitInfo.get().getId().get());
-      recordEvents(modules, pullRequest.getPullRequestOrBuilder().getUser().getUsername());
+  public void handlePullRequestEvent(PullRequestEvent pullRequestEvent) {
+
+    if (pullRequestEvent.getAction().equals(PullRequestEvent.Action.opened) || pullRequestEvent.getAction().equals(PullRequestEvent.Action.reopened)) {
+
+      GitInfo gitInfo = gitInfo(pullRequestEvent);
+      Optional<GitInfo> fullGitInfo = branchService.lookup(gitInfo.getHost(), gitInfo.getOrganization(), gitInfo.getRepository(), gitInfo.getBranch());
+      if (fullGitInfo.isPresent()) {
+        Set<Module> modules = moduleService.getByBranch(fullGitInfo.get().getId().get());
+        recordEvents(modules, pullRequestEvent.getPullRequestOrBuilder().getUser().getUsername());
+      } else {
+        LOG.info("Not creating events for pr# {} on repository {}, no matching branches found", pullRequestEvent.getNumber(), pullRequestEvent.getRepository().getFullName());
+      }
     }
   }
 
@@ -173,8 +179,8 @@ public class GitHubWebhookHandler {
     return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), true);
   }
 
-  private GitInfo gitInfo(PullRequestEvent pullRequest) {
-    return gitInfo(pullRequest.getPullRequestOrBuilder().getRepository(), pullRequest.getPullRequestOrBuilder().getHead().getRef(), true);
+  private GitInfo gitInfo(PullRequestEvent pullRequestEvent) {
+    return gitInfo(pullRequestEvent.getRepository(), pullRequestEvent.getPullRequestOrBuilder().getHead().getRef(), true);
   }
 
   private GitInfo gitInfo(Repository repository, String ref, boolean active) {

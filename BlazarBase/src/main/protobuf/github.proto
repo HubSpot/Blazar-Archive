@@ -39,18 +39,20 @@ message PushEvent {
 
 message PullRequestEvent {
     enum Action {
-        OPENED = 0;
-        REOPENED = 1;
-        CLOSED = 2;
-        SYNCHRONIZE = 3;
-        LABELED = 4;
-        UNASSIGNED = 5;
-        ASSIGNED = 6;
+        opened = 0;
+        reopened = 1;
+        closed = 2;
+        synchronize = 3;
+        labeled = 4;
+        unassigned = 5;
+        assigned = 6;
     }
     optional Action action = 1;
     optional int64 number = 2;
     optional PullRequest pull_request = 3;
-    optional Sender sender = 4;
+    optional Repository repository = 4;
+    optional Organization organization = 5;
+    optional Sender sender = 6;
 }
 
 message User {
@@ -113,8 +115,9 @@ message PullRequest {
     optional string issue_url = 6;
     optional int32 number = 7;
     enum State {
-        OPENED = 1;
-        CLOSED = 2;
+        open = 1;
+        closed = 2;
+        all = 3;
     }
     optional State state = 8;
     optional bool locked = 9;
