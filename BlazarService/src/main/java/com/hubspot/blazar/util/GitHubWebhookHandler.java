@@ -68,8 +68,7 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handleCreateEvent(CreateEvent createEvent) throws IOException {
     if ("branch".equalsIgnoreCase(createEvent.getRefType())) {
-      Set<Module> modules = processBranch(gitInfo(createEvent));
-      recordEvents(modules,  createEvent.getSender().getLogin());
+      processBranch(gitInfo(createEvent));
     }
   }
 
@@ -87,7 +86,7 @@ public class GitHubWebhookHandler {
 
       Set<Module> modules = updateModules(gitInfo, pushEvent);
       triggerBuilds(pushEvent, gitInfo, modules);
-      recordEvents(modules, pushEvent.getPusher().getUsername());
+      recordEvents(modules, pushEvent.getPusher().getName());
     }
   }
 

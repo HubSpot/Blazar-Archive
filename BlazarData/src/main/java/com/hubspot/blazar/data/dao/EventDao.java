@@ -4,7 +4,6 @@ import com.hubspot.blazar.base.BuildState;
 import com.hubspot.blazar.base.Event;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 import org.skife.jdbi.v2.sqlobject.Bind;
-import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 
@@ -12,8 +11,7 @@ import java.util.List;
 
 public interface EventDao {
   
-  @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO branches (moduleId, timestamp, username) VALUES (:moduleId, :timestamp, :username)")
+  @SqlUpdate("INSERT INTO events (moduleId, timestamp, username) VALUES (:moduleId, :timestamp, :username)")
   int insert(@BindWithRosetta Event event);
 
   @SqlQuery("" +
