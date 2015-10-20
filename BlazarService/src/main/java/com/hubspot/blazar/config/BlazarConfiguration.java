@@ -1,5 +1,6 @@
 package com.hubspot.blazar.config;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -36,6 +37,11 @@ public class BlazarConfiguration extends Configuration {
   @Valid
   @JsonProperty("ui")
   private UiConfiguration uiConfiguration = new UiConfiguration();
+
+  @Valid
+  @NotNull
+  @JsonProperty("moduleBuildpacks")
+  private Map<String, BuildpackConfiguration> moduleBuildpackConfiguration = new HashMap<>();
 
   private boolean webhookOnly = false;
 
@@ -81,6 +87,15 @@ public class BlazarConfiguration extends Configuration {
 
   public BlazarConfiguration setUiConfiguration(UiConfiguration uiConfiguration) {
     this.uiConfiguration = uiConfiguration;
+    return this;
+  }
+
+  public Map<String, BuildpackConfiguration> getModuleBuildpackConfiguration() {
+    return moduleBuildpackConfiguration;
+  }
+
+  public BlazarConfiguration setModuleBuildpackConfiguration(Map<String, BuildpackConfiguration> moduleBuildpackConfiguration) {
+    this.moduleBuildpackConfiguration = moduleBuildpackConfiguration;
     return this;
   }
 

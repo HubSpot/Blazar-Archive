@@ -1,43 +1,42 @@
 package com.hubspot.blazar.discovery.maven;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.DiscoveredModule;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.discovery.AbstractModuleDiscovery;
-import com.hubspot.blazar.github.GitHubProtos.PushEvent;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
+import com.google.common.base.Optional;
+import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BuildpackConfiguration;
+import com.hubspot.blazar.discovery.AbstractModuleDiscovery;
+import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 
 @Singleton
 public class MavenModuleDiscovery extends AbstractModuleDiscovery {
-  private static final Logger LOG = LoggerFactory.getLogger(MavenModuleDiscovery.class);
-  private static final Optional<GitInfo> BRANCH_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#stable"));
-  private static final Optional<GitInfo> MASTER_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#publish"));
-  private static final Optional<GitInfo> DEPLOYABLE_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#deployable"));
+  public static final String NAME = "maven";
 
-  private final ObjectMapper objectMapper;
+  private static final Logger LOG = LoggerFactory.getLogger(MavenModuleDiscovery.class);
+
   private final XmlFactory xmlFactory;
+  private final Optional<BuildpackConfiguration> buildpackConfiguration;
 
   @Inject
-  public MavenModuleDiscovery(ObjectMapper objectMapper, XmlFactory xmlFactory) {
-    this.objectMapper = objectMapper;
+  public MavenModuleDiscovery(XmlFactory xmlFactory, BlazarConfiguration configuration) {
     this.xmlFactory = xmlFactory;
+    this.buildpackConfiguration = Optional.fromNullable(configuration.getModuleBuildpackConfiguration().get(NAME));
   }
 
   @Override
@@ -69,7 +68,7 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
 
       try {
         JsonParser parser = xmlFactory.createParser(contentsFor(path, repository, gitInfo));
-        pom = objectMapper.readValue(parser, ProjectObjectModel.class);
+        pom = mapper.readValue(parser, ProjectObjectModel.class);
       } catch (IOException e) {
         LOG.error("Error parsing POM at path {} for repo {}@{}", path, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
         continue;
@@ -90,12 +89,16 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   private Optional<GitInfo> buildpackFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
+    if (!buildpackConfiguration.isPresent()) {
+      return Optional.absent();
+    }
+
     if (!"master".equals(gitInfo.getBranch())) {
-      return BRANCH_BUILDPACK;
+      return Optional.fromNullable(buildpackConfiguration.get().getBranchBuildpack().get(gitInfo.getBranch()));
     } else if (isDeployable(file, repository, gitInfo)) {
-      return DEPLOYABLE_BUILDPACK;
+      return buildpackConfiguration.get().getDeployableBuildpack();
     } else {
-      return MASTER_BUILDPACK;
+      return buildpackConfiguration.get().getDefaultBuildpack();
     }
   }
 
