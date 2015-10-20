@@ -3,10 +3,24 @@ package com.hubspot.blazar.util;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.hubspot.blazar.base.*;
-import com.hubspot.blazar.data.service.*;
+import com.hubspot.blazar.base.BuildDefinition;
+import com.hubspot.blazar.base.DependencyGraph;
+import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.Event;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.BuildService;
+import com.hubspot.blazar.data.service.DependenciesService;
+import com.hubspot.blazar.data.service.EventService;
+import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
-import com.hubspot.blazar.github.GitHubProtos.*;
+import com.hubspot.blazar.github.GitHubProtos.Commit;
+import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
+import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
+import com.hubspot.blazar.github.GitHubProtos.PullRequestEvent;
+import com.hubspot.blazar.github.GitHubProtos.PushEvent;
+import com.hubspot.blazar.github.GitHubProtos.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +30,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Singleton
 public class GitHubWebhookHandler {
