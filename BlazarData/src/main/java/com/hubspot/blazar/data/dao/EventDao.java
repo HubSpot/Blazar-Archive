@@ -10,7 +10,7 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import java.util.List;
 
 public interface EventDao {
-  
+
   @SqlUpdate("INSERT INTO events (moduleId, timestamp, username) VALUES (:moduleId, :timestamp, :username)")
   int insert(@BindWithRosetta Event event);
 
