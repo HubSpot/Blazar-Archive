@@ -42,23 +42,23 @@ public class BuildStateResource {
     Set<BuildState> builds = buildStateService.getAllActive(since);
     long offset = Math.max(maxUpdatedTimestamp(builds), since);
 
-    Predicate<BuildState> predicate = new BuildStateFilter(moduleIds, branchIds, buildStates, repositoryIds);
+    Predicate<BuildState> predicate = new BuildStateQuery(moduleIds, branchIds, buildStates, repositoryIds);
     builds = ImmutableSet.copyOf(Iterables.filter(builds, predicate));
 
     return Response.ok(builds).header("x-last-modified-timestamp", offset).build();
   }
 
-  private static class BuildStateFilter implements Predicate<BuildState> {
+  private static class BuildStateQuery implements Predicate<BuildState> {
     private final Set<Integer> moduleIds;
     private final Set<Integer> branchIds;
     private final Set<Build.State> buildStates;
     private final Set<Long> repositoryIds;
     private final boolean acceptAll;
 
-    public BuildStateFilter(Set<Integer> moduleIds,
-                            Set<Integer> branchIds,
-                            Set<State> buildStates,
-                            Set<Long> repositoryIds) {
+    public BuildStateQuery(Set<Integer> moduleIds,
+                           Set<Integer> branchIds,
+                           Set<State> buildStates,
+                           Set<Long> repositoryIds) {
       this.moduleIds = moduleIds;
       this.branchIds = branchIds;
       this.buildStates = buildStates;

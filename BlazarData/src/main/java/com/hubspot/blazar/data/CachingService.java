@@ -34,6 +34,10 @@ public abstract class CachingService<T extends BuildDefinition> {
 
   protected abstract Set<T> fetch(long since);
 
+  public Set<T> getAll() {
+    return getAll(0);
+  }
+
   public Set<T> getAll(long since) {
     update();
 
@@ -48,8 +52,16 @@ public abstract class CachingService<T extends BuildDefinition> {
     return values;
   }
 
+  public Set<T> getAllActive() {
+    return getAllActive(0);
+  }
+
   public Set<T> getAllActive(long since) {
     return Sets.filter(getAll(since), active);
+  }
+
+  public Set<T> getAllInactive() {
+    return getAllInactive(0);
   }
 
   public Set<T> getAllInactive(long since) {
