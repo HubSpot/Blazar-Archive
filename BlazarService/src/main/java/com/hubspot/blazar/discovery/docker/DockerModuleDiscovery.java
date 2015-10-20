@@ -1,35 +1,40 @@
 package com.hubspot.blazar.discovery.docker;
 
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.DependencyInfo;
-import com.hubspot.blazar.base.DiscoveredModule;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.discovery.AbstractModuleDiscovery;
-import com.hubspot.blazar.github.GitHubProtos.PushEvent;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import com.hubspot.blazar.base.DependencyInfo;
+import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BuildpackConfiguration;
+import com.hubspot.blazar.discovery.AbstractModuleDiscovery;
+import com.hubspot.blazar.github.GitHubProtos.PushEvent;
+import com.google.common.base.Optional;
 
 @Singleton
 public class DockerModuleDiscovery extends AbstractModuleDiscovery {
+  public static final String NAME = "docker";
 
   private static final Logger LOG = LoggerFactory.getLogger(DockerModuleDiscovery.class);
-  private static final Optional<GitInfo> BRANCH_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#stable"));
-  private static final Optional<GitInfo> MASTER_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#publish"));
+
+  private final Optional<BuildpackConfiguration> buildpackConfiguration;
 
   @Inject
-  public DockerModuleDiscovery() {}
+  public DockerModuleDiscovery(BlazarConfiguration configuration) {
+    buildpackConfiguration = Optional.fromNullable(configuration.getModuleBuildpackConfiguration().get(NAME));
+  }
 
   @Override
   public boolean shouldRediscover(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
@@ -69,12 +74,19 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   private Optional<GitInfo> buildpackFor(String file, GitInfo gitInfo) throws IOException {
-    if ("master".equals(gitInfo.getBranch())) {
-      LOG.info("Picked master buildpack {} for {}", MASTER_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
-      return MASTER_BUILDPACK;
+    if (!buildpackConfiguration.isPresent()) {
+      return Optional.absent();
+    }
+    if (buildpackConfiguration.get().getRepoBuildpack().containsKey(gitInfo)) {
+      LOG.info("Picked repo-specific buildpack {} for {}", buildpackConfiguration.get().getRepoBuildpack().get(gitInfo), String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
+      return Optional.of(buildpackConfiguration.get().getRepoBuildpack().get(gitInfo));
+    } else if ("master".equals(gitInfo.getBranch())) {
+      LOG.info("Picked master buildpack {} for {}", buildpackConfiguration.get().getDefaultBuildpack(), String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
+      return buildpackConfiguration.get().getDefaultBuildpack();
     } else {
-      LOG.info("Picked branch buildpack {} for {}", BRANCH_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
-      return BRANCH_BUILDPACK;
+      final Optional<GitInfo> branchBuildpack = Optional.fromNullable(buildpackConfiguration.get().getBranchBuildpack().get(gitInfo.getBranch()));
+      LOG.info("Picked branch buildpack {} for {}", branchBuildpack, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
+      return branchBuildpack;
     }
   }
 

@@ -27,7 +27,7 @@ public abstract class AbstractModuleDiscovery implements ModuleDiscovery {
   Map<String, GitHub> gitHubByHost;
 
   @Inject
-  ObjectMapper mapper;
+  protected ObjectMapper mapper;
 
   @Inject
   YAMLFactory yamlFactory;
