@@ -38,8 +38,17 @@ message PushEvent {
 }
 
 message PullRequestEvent {
-    optional string action = 1;
-    optional string number = 2;
+    enum Action {
+        OPENED = 0;
+        REOPENED = 1;
+        CLOSED = 2;
+        SYNCHRONIZE = 3;
+        LABELED = 4;
+        UNASSIGNED = 5;
+        ASSIGNED = 6;
+    }
+    optional Action action = 1;
+    optional int64 number = 2;
     optional PullRequest pull_request = 3;
     optional Sender sender = 4;
 }
@@ -103,7 +112,11 @@ message PullRequest {
     optional string patch_url = 5;
     optional string issue_url = 6;
     optional int32 number = 7;
-    optional string state = 8;
+    enum State {
+        OPENED = 1;
+        CLOSED = 2;
+    }
+    optional State state = 8;
     optional bool locked = 9;
     optional string title = 10;
     optional User user = 11;
