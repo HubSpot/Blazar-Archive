@@ -86,6 +86,8 @@ public class BuildService {
 
   @Transactional
   public void begin(Build build) {
+    Preconditions.checkArgument(build.getStartTimestamp().isPresent());
+
     checkAffectedRowCount(buildDao.begin(build));
     checkAffectedRowCount(moduleDao.updateInProgressBuild(build));
 
@@ -99,7 +101,7 @@ public class BuildService {
     }
 
     if (build.getState() == Build.State.QUEUED) {
-      begin(build.withState(Build.State.LAUNCHING));
+      begin(build.withState(Build.State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
     }
 
     update(build.withState(Build.State.FAILED).withEndTimestamp(System.currentTimeMillis()));
