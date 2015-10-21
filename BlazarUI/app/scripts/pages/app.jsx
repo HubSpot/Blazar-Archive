@@ -5,7 +5,6 @@ import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Input from 'react-bootstrap/lib/Input';
 
-
 class App extends Component {
 
   constructor() {

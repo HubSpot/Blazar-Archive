@@ -5,6 +5,7 @@ import TableHead from './TableHead.jsx';
 import Pagination from './Pagination.jsx';
 import Progress from '../../utils/progress';
 import {bindAll, has} from 'underscore';
+import Loader from '../shared/Loader.jsx';
 
 function TableMaker(RenderedComponent, options) {
   
@@ -14,7 +15,7 @@ function TableMaker(RenderedComponent, options) {
       bindAll(this, 'buildTable', 'getRows', 'changePage');
       this.state = {
         page: 0,
-        rowsPerPage: 10
+        rowsPerPage: 15
       }
     }
 
@@ -70,6 +71,12 @@ function TableMaker(RenderedComponent, options) {
     }
 
     render() {
+      if (this.props.loading) {
+        return(
+          <Loader align='left' />
+        )
+      }
+
       return (
         <RenderedComponent 
           {...this.props} 

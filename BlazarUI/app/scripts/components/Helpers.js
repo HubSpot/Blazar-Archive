@@ -45,6 +45,10 @@ export const githubShaLink = function(info) {
   return `https://${info.gitInfo.host}/${info.gitInfo.organization}/${info.gitInfo.repository}/commit/${info.build.sha}/`;
 };
 
+export const cmp = function(x, y) {
+  return x > y ? 1 : x < y ? -1 : 0;
+};
+
 export const getIsStarredState = function(stars, id) {
   return some(stars, (star) => {
     return star.moduleId === id;
@@ -54,22 +58,18 @@ export const getIsStarredState = function(stars, id) {
 // Data Helpers
 export const uniqueBranches = function(branches) {
   const uniqueBranches = uniq(branches, false, (b) => {
-    return b.branch;
+    return b.gitInfo.branch;
   });
-  
+
   return uniqueBranches.map((b) => {
     return {
-      value: b.branch,
-      label: b.branch
+      value: b.gitInfo.branch,
+      label: b.gitInfo.branch
     }
   });
 }
 
-export const uniqueModules = function(branches) {
-  const modules = flatten(branches.map((branch) => {
-    return branch.modules;
-  }));
-
+export const uniqueModules = function(modules) {
   const uniqueModules = uniq(modules, false, (m) => {
     return m.module.name;
   });
@@ -91,15 +91,11 @@ export const tableRowBuildState = function(state) {
   }
 };
 
-export const getFilteredModules = function(filters, branches) {
+export const getFilteredModules = function(filters, modules) {
   const branchFilters = filters.branch;
   const moduleFilters = filters.module;
 
-  const allModules = flatten(branches.map((branch) => {
-    return branch.modules;
-  }));
-  
-  const filteredModules = allModules.filter((m) => {
+  const filteredModules = modules.filter((m) => {
     let passGo = false;
 
     // not filtering
@@ -147,7 +143,10 @@ export const getFilteredModules = function(filters, branches) {
     return passGo;
   });
 
-  return filteredModules;
+  //finallay sort by branch and module name
+  return filteredModules.sort( (a, b) => {
+    return cmp(a.gitInfo.branch, b.gitInfo.branch) || cmp(a.module.name, b.module.name);
+  });  
 }
 
 // DOM Helpers

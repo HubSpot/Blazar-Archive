@@ -7,7 +7,6 @@ const BuildStore = Reflux.createStore({
 
   init() {
     this.build = {};
-
     this.buildTriggeringDone = true;
     this.buildTriggeringError = '';
   },

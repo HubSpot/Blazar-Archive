@@ -62,11 +62,10 @@ Star.propTypes = {
   className: PropTypes.string,
   isStarred: PropTypes.bool.isRequired,
   toggleStar: PropTypes.func.isRequired,
-  moduleId: PropTypes.number.isRequired,
+  moduleId: PropTypes.number,
   modulePath: PropTypes.string.isRequired,
   moduleName: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
-  updateWithState: PropTypes.bool // remove this ---
+  disabled: PropTypes.bool
 };
 
 export default Star;

@@ -40,7 +40,9 @@ BuildHistoryActions.loadModulesBuildHistory = (options) => {
   }
 
   const modulesPromises = options.modules.map((module) => {
-    return new BuildHistory(module.moduleId)
+    return new BuildHistory({
+      moduleId: module.moduleId
+    })
       .fetch().then((data) => {
         data = data.splice(0, options.limit);
         return {
@@ -94,7 +96,10 @@ function getBranchId() {
 }
 
 function getModule() {
-  const branchModules = new BranchModules(gitInfo.branchId);
+  const branchModules = new BranchModules({
+    branchId: gitInfo.branchId
+  });
+
   const modulesPromise = branchModules.fetch();
 
   modulesPromise.done( () => {
@@ -107,7 +112,10 @@ function getModule() {
 }
 
 function getBuildHistory() {
-  const buildHistory = new BuildHistory(gitInfo.moduleId);
+  const buildHistory = new BuildHistory({
+    moduleId: gitInfo.moduleId
+  });
+
   const buildHistoryPromise = buildHistory.fetch();
 
   buildHistoryPromise.done( () => {

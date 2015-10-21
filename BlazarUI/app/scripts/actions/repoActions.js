@@ -1,12 +1,59 @@
 import Reflux from 'reflux';
+import Builds from '../collections/Builds';
+import Poller from '../utils/poller'
+import BranchSearch from '../collections/BranchSearch';
 
 const RepoActions = Reflux.createActions([
-  'getBranches',
-  'setParams'
+  'loadBranchesSuccess',
+  'stopPolling'
 ]);
 
+let poller;
+
 RepoActions.loadBranches = function(params) {
-  RepoActions.setParams(params);
-};
+
+  const branchIds = new BranchSearch({
+    params: [
+      { property: 'host', value: params.host },
+      { property: 'organization', value: params.org }, 
+      { property: 'repository', value: params.repo } 
+    ]
+  });
+
+  branchIds.fetch().done((branchIds) => {
+    _createPoller(branchIds);
+  });
+}
+
+function _createPoller(branchIds) {
+
+  const collection = new Builds({
+    request: 'branchIds',
+    branchIds: branchIds,
+    mergeOnFetch: true
+  });
+
+  poller = new Poller({
+    collection: collection
+  });
+
+  poller.startPolling((resp) => {
+    if (resp.textStatus === 'success') {
+      RepoActions.loadBranchesSuccess(collection.sortByBranchName());
+    }
+
+    else {
+      console.warn('Error loading repositories')
+      // OrgActions.loadReposError();
+    }
+    
+  });
+  
+  
+}
+    
+RepoActions.stopPolling = function() {
+  poller.stopPolling();
+}
 
 export default RepoActions;

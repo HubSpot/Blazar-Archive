@@ -6,6 +6,7 @@ class Loader extends Component {
   getRenderedClassNames() {
     return Classnames([
       'section-loader',
+      this.props.className,
       this.props.size,
       this.props.align,
       {'roomy': this.props.roomy}
@@ -31,6 +32,7 @@ Loader.defaultProps = {
 
 Loader.propTypes = {
   roomy: PropTypes.bool,
+  className: PropTypes.string,
   align: PropTypes.oneOf(['center', 'center-center', 'top-center', 'left', 'right']),
   size: PropTypes.oneOf(['standard', 'mini'])
 };

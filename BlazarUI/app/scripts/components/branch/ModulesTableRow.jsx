@@ -31,8 +31,7 @@ class ModulesTableRow extends Component {
       inProgressBuild,
       pendingBuild,
       module,
-      gitInfo,
-      modulePath
+      gitInfo
     } = this.props.data;
 
     if (!has(this.props.data, 'lastBuild') ) {
@@ -40,7 +39,7 @@ class ModulesTableRow extends Component {
         <tr> 
           <td>
             <Icon type='octicon' name='file-directory' classNames="icon-roomy icon-muted" />
-            <Link to={modulePath}>{module.name}</Link>
+            <Link to={module.blazarPath.module}>{module.name}</Link>
           </td>  
           <td>No History</td>
           <td></td>
@@ -68,7 +67,7 @@ class ModulesTableRow extends Component {
       <tr className={tableRowBuildState(build.state)}>
         <td>
           <Icon type='octicon' name='file-directory' classNames="icon-roomy icon-muted" />
-          <Link to={modulePath}>{module.name}</Link>
+          <Link to={module.blazarPath.module}>{module.name}</Link>
         </td>
         <td className='build-result-link'>
           <Link to={buildLink}>

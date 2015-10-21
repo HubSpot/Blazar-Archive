@@ -1,41 +1,101 @@
 /*global config*/
 import Reflux from 'reflux';
 import Builds from '../collections/Builds';
+import StarActions from './starActions';
+import StarStore from '../stores/starStore';
 
 const BuildsActions = Reflux.createActions([
   'loadBuilds',
   'loadBuildsSuccess',
-  'loadBuildsError'
+  'loadBuildsError',
+  'loadBuildOfType',
+  'stopListening'
 ]);
 
-let latestFetch = 0;
+let stars = [];
+let filterType;
+let filterHasChanged = false;
+let shouldPoll = true;
+let initialStarLoad;
+let subscribedStores = {};
+let buildCollections = {
+  starred: {},
+  all: {},
+  building: {}
+};
 
-BuildsActions.loadBuilds.preEmit = function() {
+BuildsActions.loadBuilds.preEmit = function(newFilterType) {
+  filterType = newFilterType;
+  shouldPoll = true;
+  initialStarLoad = true;
 
-  (function doPoll() {
-    fetchBuilds(() => {
-      setTimeout(doPoll, config.buildsRefresh);
+  // Keep the starred sidebar list up to date
+  subscribedStores.unsubscribeFromStars = StarStore.listen(onStarStatusChange);
+  
+  // Starred toggle needs to load stars before we can poll
+  if (filterType !== 'starred') {
+    _pollForBuilds();
+  }
+};
+
+// Change type of build we want to view (sidebar toggle buttons)
+BuildsActions.loadBuildOfType = function(newFilterType) {
+  filterType = newFilterType;
+  filterHasChanged = true;
+  _fetchBuilds(() => {
+    filterHasChanged = false;
+  });
+  
+};
+
+BuildsActions.stopListening = function() {
+  shouldPoll = false;
+}
+
+// When user toggles a star update the sidebar
+// Also run on initial page load as starred is default
+function onStarStatusChange(newStars) {
+  stars = newStars.stars;
+  
+  if (stars.length === 0) {
+    BuildsActions.loadBuildsSuccess([], 'starred', true);
+    return;
+  }
+  
+  if (filterType === 'starred' && initialStarLoad) {
+    _pollForBuilds();
+    initialStarLoad = false;
+  } 
+  else {
+    _fetchBuilds();
+  }
+};
+
+function _pollForBuilds() {
+  if (!shouldPoll || (filterType === 'starred' && stars.length === 0)) {
+    return;
+  }
+
+  (function _doPoll() {
+    if (!shouldPoll) {
+      return;
+    }
+    _fetchBuilds(() => {
+      setTimeout(_doPoll, config.buildsRefresh);
     });
-  })();
+  })();  
+}
 
-};
+function _fetchBuilds(cb) {
+  buildCollections[filterType] = new Builds({
+    request: filterType,
+    stars: stars
+  });
 
-BuildsActions.fetchBuilds = () => {
-  fetchBuilds();
-};
-
-function fetchBuilds(cb) {
-
-  const builds = new Builds();
-  builds.updatedTimestamp = latestFetch;
-  const promise = builds.fetch();
+  const promise = buildCollections[filterType].fetch();
 
   promise.done( () => {
-    BuildsActions.loadBuildsSuccess(builds.get());
-
-    // store latest timestamp so we can
-    // use in our since parameter when fetching
-    latestFetch = builds.updatedTimestamp;
+    BuildsActions.loadBuildsSuccess(buildCollections[filterType].get(), filterType, filterHasChanged);
   });
 
   promise.always( () => {
@@ -46,12 +106,8 @@ function fetchBuilds(cb) {
 
   promise.error( (err) => {
     console.warn('Error connecting to the API. Check that you are connected to the VPN ', err);
-    // To do - make note in the view
-    BuildsActions.loadBuildsError('an error occured');
+    // BuildsActions.loadBuildsError('an error occured');
   });
-
 }
-
-
 
 export default BuildsActions;

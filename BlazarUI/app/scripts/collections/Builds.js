@@ -1,17 +1,9 @@
 /*global config*/
 import {has, uniq, sortBy, findWhere, groupBy} from 'underscore';
 import BaseCollection from './BaseCollection';
-
-// move out
-function cmp(x, y) {
-  return x > y ? 1 : x < y ? -1 : 0;
-}
+import {cmp} from '../components/Helpers';
 
 class Builds extends BaseCollection {
-
-  constructor() {
-    this.updatedTimestamp = 0;
-  }
 
   parse() {
     super.parse();
@@ -41,12 +33,43 @@ class Builds extends BaseCollection {
       'pendingBuild.endTimestamp',
       'pendingBuild.sha'
     ];
+    
+    let url = `${config.apiRoot}/build/states`;
 
-    let url = `${config.apiRoot}/build/states?since=${this.updatedTimestamp}`;
-
-    params.forEach((prop) => {
-      url += `&property=${prop}`;
+    params.forEach((prop, i) => {
+      const seperator = i === 0 ? '?' : '&';
+      url += `${seperator}property=${prop}`;
     });
+  
+    switch (this.options.request) {
+      case 'starred':
+        this.options.stars.forEach((star) => {
+          url += `&moduleId=${star.moduleId}`
+        });
+        url+= '&since=0';
+        break;
+
+      case 'all':
+        url+= `&since=${this.updatedTimestamp}`;
+        break;
+        
+      case 'branches':
+        url = `${config.apiRoot}/branch/search?&host=${this.options.params.host}`;
+        url += `&organization=${this.options.params.org}`;
+        url += `&repository=${this.options.params.repo}`;
+        url += `&property=id&since=${this.updatedTimestamp}`;
+
+      case 'building':
+        url += '&since=0&buildState=LAUNCHING&buildState=IN_PROGRESS'
+        break;
+        
+      case 'branchIds':
+        this.options.branchIds.forEach((m) => {
+          url += `&branchId=${m.id}`
+        });
+        url += `&since=${this.updatedTimestamp}`
+        break;
+    }
 
     return url;
   }
@@ -96,75 +119,13 @@ class Builds extends BaseCollection {
     });
   }
 
-  _groupBuildsByRepo() {
-    // group and generate key, by org::repo[branch]
-    const grouped = groupBy(this.data, function(o) {
-      return `${o.gitInfo.organization}::${o.gitInfo.repository}[${o.gitInfo.branch}]`;
-    });
-
-    // move groupedBy object into an easier-to-work-with array
-    let groupedInArray = [];
-    for (let repo in grouped) {
-      groupedInArray.push({
-        repoModuleKey: repo,
-        repository: grouped[repo][0].gitInfo.repository,
-        isBuilding: grouped[repo].moduleIsBuilding,
-        modules: grouped[repo]
-      });
-    }
-
-    // store some helper properites
-    groupedInArray.forEach( (repo) => {
-      if (repo.modules[0].inProgressBuild) {
-        repo.mostRecentBuild = repo.modules[0].inProgressBuild.startTimestamp;
-      }
-      repo.host = repo.modules[0].gitInfo.host;
-      repo.branch = repo.modules[0].gitInfo.branch;
-      repo.organization = repo.modules[0].gitInfo.organization;
-      repo.id = `${repo.host}_${repo.branch}_${repo.organization}_${repo.repository}`;
-      repo.branchPath = `${config.appRoot}/builds/${repo.modules[0].gitInfo.host}/${repo.modules[0].gitInfo.organization}/${repo.modules[0].gitInfo.repository}/${repo.modules[0].gitInfo.branch}`;
-
-      let timesBuiltOnBlazar = 0;
-      repo.hasBuiltOnBlazar = false;
-
-      repo.modules.forEach( (module) => {
-        module.modulePath = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}`;
-
-        if (has(module, 'lastBuild')) {
-          timesBuiltOnBlazar++;
-        }
-
-        if (module.inProgressBuild) {
-          module.inProgressBuild.buildLink = `${config.appRoot}/builds/${module.gitInfo.host}/${module.gitInfo.organization}/${module.gitInfo.repository}/${module.gitInfo.branch}/${module.module.name}/${module.inProgressBuild.buildNumber}`;
-          if (module.inProgressBuild.startTimestamp < repo.mostRecentBuild) {
-            repo.mostRecentBuild = module.inProgressBuild.startTimestamp;
-          }
-        }
-      });
-
-      if (timesBuiltOnBlazar > 0) {
-        repo.hasBuiltOnBlazar = true;
-      }
-
-    });
-
-    // sort by if building then by most recent build time
-    groupedInArray.sort( (a, b) => {
-      return cmp(b.isBuilding, a.isBuilding) || cmp(a.mostRecentBuild, b.mostRecentBuild);
-    });
-
-    return groupedInArray;
-  }
 
   getHosts() {
     return this._orgsByHost(this._uniqueProperty(this.data, 'host'));
   }
 
-  getReposByOrg(params) {
-    const builds = this._hasBuildState();
-    const orgBuilds = builds.filter((build) => {
-      return (build.gitInfo.organization === params.org) && (build.gitInfo.host === params.host);
-    });
+  getReposByOrg() {
+    const orgBuilds = this._hasBuildState();
 
     const repos = orgBuilds.map((build) => {
       const {
@@ -182,18 +143,24 @@ class Builds extends BaseCollection {
         latestBuild = inProgressBuild;
         startTime = inProgressBuild.startTimestamp;
       }
-      
-      else if (has(build, 'lastBuild')) {
-        latestBuild = lastBuild;
-        startTime = lastBuild.startTimestamp;
-      }
-
+    
+      // dont include for now as we dont have
+      // a timestamp to sort by
       else if (has(build, 'pendingBuild')) {
         latestBuild = pendingBuild
       }
 
+      else if (has(build, 'lastBuild')) {
+        latestBuild = lastBuild;
+        startTime = lastBuild.startTimestamp ? lastBuild.startTimestamp : lastBuild.endTimestamp;
+      }
+
       else {
         return false
+      }
+
+      if (startTime === 'undefined') {
+        return false;
       }
 
       latestBuild.module = module.name;
@@ -216,7 +183,7 @@ class Builds extends BaseCollection {
     });
 
     repos.sort( (a, b) => {
-      return cmp(b.repo, a.repo) || cmp(b.startTime, a.startTime);
+      return cmp(b.repo.toLowerCase(), a.repo.toLowerCase()) || cmp(b.startTime, a.startTime);
     });
 
     const uniqRepos = uniq(repos, (r) => {
@@ -228,26 +195,17 @@ class Builds extends BaseCollection {
     });
   }
 
-  getBranchModules(branchInfo) {
-    const modules = findWhere(this._groupBuildsByRepo(), {
-      organization: branchInfo.org,
-      repository: branchInfo.repo,
-      branch: branchInfo.branch
-    });
 
-    return modules || {};
+  sortByModuleName() {    
+    return sortBy(this.data, (m) => {
+      return m.module.name.toLowerCase();
+    });
   }
 
-  getBranchesByRepo(params) {
-    const groupedBuilds = this._groupBuildsByRepo();
-    let branches = groupedBuilds.filter((repo) => {
-      return (repo.organization === params.org) && (repo.repository === params.repo);
-    });
-
-    return sortBy(branches, function(b) {
-      return b.branch.toLowerCase();
-    });
-
+  sortByBranchName() {
+    return sortBy(this.data, (m) => {
+      return m.gitInfo.branch.toLowerCase();
+    })
   }
 
 

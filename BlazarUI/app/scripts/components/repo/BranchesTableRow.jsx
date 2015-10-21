@@ -31,8 +31,7 @@ class BranchesTableRow extends Component {
       inProgressBuild,
       pendingBuild,
       module,
-      gitInfo,
-      modulePath
+      gitInfo
     } = this.props.data;
 
     if (!has(this.props.data, 'lastBuild') ) {
@@ -40,11 +39,11 @@ class BranchesTableRow extends Component {
         <tr> 
           <td>
             <Icon for='branch' classNames="icon-roomy icon-muted" />
-            <Link to={modulePath}>{gitInfo.branch}</Link>
+            <Link to={module.blazarPath.branch}>{gitInfo.branch}</Link>
           </td>
           <td>
             <Icon for='module' classNames="icon-roomy icon-muted" />
-            <Link to={modulePath}>{module.name}</Link>
+            <Link to={module.blazarPath.module}>{module.name}</Link>
           </td>  
           <td>No History</td>
           <td></td>
@@ -75,7 +74,7 @@ class BranchesTableRow extends Component {
         </td>
         <td>
           <Icon for='module' classNames="icon-roomy icon-muted" />
-          <Link to={modulePath}>{module.name}</Link>
+          <Link to={module.blazarPath.module}>{module.name}</Link>
         </td>
         <td className='build-result-link'>
           <Link to={lastBuild.blazarPath}>

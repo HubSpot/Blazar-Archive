@@ -25,7 +25,7 @@ class SidebarFilter extends Component {
 
   render() {
 
-    if (this.props.loading || this.props.builds.length === 0) {
+    if (this.props.loading) {
       return <div />;
     }
 

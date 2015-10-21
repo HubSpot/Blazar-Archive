@@ -15,7 +15,6 @@ class BuildButton extends Component {
   }
 
   render() {
-    
     if (this.props.loading) {
       return (
         <div />

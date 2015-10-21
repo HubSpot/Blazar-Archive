@@ -29,15 +29,18 @@ class Breadcrumbs extends Component {
         isActivePage = true;
       }
 
-      // repo 
-      if (i === 0) {
+      // repo and org pages
+      if (i === 0 || i === 1) {
         noLink = true;
       }
-
-      // org page
-      if (i === 1) {
-        isOrg = true;
-      }
+      
+      // Note - removing for now, doesnt
+      // work with new endpoints setup
+      
+      // // org page
+      // if (i === 1) {
+      //   isOrg = true;
+      // }
 
       // generate route path for each link
       for (let g = 0; g < pages.length; g++) {
@@ -48,18 +51,18 @@ class Breadcrumbs extends Component {
         }
       }
       
-      if (isOrg) {
-        
-        return (
-          <HostDropdownBreadcrumb 
-            key={i}
-            page={page}
-            hosts={this.props.hosts} 
-            navigationIsActive={this.props.navigationIsActive}
-            activePage={isActivePage}
-          />
-        );
-      }
+      // if (isOrg) {
+      //   
+      //   return (
+      //     <HostDropdownBreadcrumb 
+      //       key={i}
+      //       page={page}
+      //       hosts={this.props.hosts} 
+      //       navigationIsActive={this.props.navigationIsActive}
+      //       activePage={isActivePage}
+      //     />
+      //   );
+      // }
 
       if (noLink) {
         const classNames = ClassNames([
@@ -101,8 +104,6 @@ class Breadcrumbs extends Component {
 Breadcrumbs.propTypes = {
   params: PropTypes.object.isRequired,
   appRoot: PropTypes.string.isRequired,
-  loadingHosts: PropTypes.bool,
-  hosts: PropTypes.array,
   navigationIsActive: PropTypes.bool
 };
 
