@@ -59,7 +59,6 @@ class BuildsSidebarContainer extends Component {
   }
   
   getBuildsOfType(type) {
-    console.log('got type: ', type);
     this.setState({
       changingBuildsType: true
     });
@@ -67,7 +66,6 @@ class BuildsSidebarContainer extends Component {
     //
     // Temporary until we have a searchable endpoint
     if (type === 'all') {
-      console.log('start polling all');
       BuildsActions.stopListening();
       GlobalBuildsActions.loadBuilds();
     }

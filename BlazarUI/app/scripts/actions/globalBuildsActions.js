@@ -18,7 +18,6 @@ const globalBuildsCollection = new Builds({
 });
 
 GlobalBuildsActions.loadBuilds = function() {
-  console.log('load builds...');
 
   poller = new Poller({
     collection: globalBuildsCollection
@@ -26,7 +25,6 @@ GlobalBuildsActions.loadBuilds = function() {
 
   poller.startPolling((resp) => {
     if (resp.textStatus === 'success') {
-      console.log('poll success');
       GlobalBuildsActions.loadBuildsSuccess(globalBuildsCollection.data);
     }
     else {
@@ -45,7 +43,6 @@ GlobalBuildsActions.stopPolling = function() {
 }
 
 GlobalBuildsActions.loadBuildsOnce = function() {
-  console.log('load once...');
   const promise = globalBuildsCollection.fetch();
   promise.done((data) => {
     GlobalBuildsActions.loadBuildsOnceSuccess(globalBuildsCollection.data);
