@@ -1,6 +1,7 @@
 package com.hubspot.blazar.util;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.BuildDefinition;
@@ -82,27 +83,38 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handlePushEvent(PushEvent pushEvent) throws IOException {
     if (!pushEvent.getRef().startsWith("refs/tags/")) {
-      GitInfo gitInfo = branchService.upsert(gitInfo(pushEvent));
+      GitInfo eventGitInfo = gitInfo(pushEvent);
+      Optional<GitInfo> gitInfo = branchService.lookup(eventGitInfo.getHost(),eventGitInfo.getOrganization(), eventGitInfo.getRepository(), eventGitInfo.getBranch());
+      Set<Module> modules;
 
-      Set<Module> modules = updateModules(gitInfo, pushEvent);
-      triggerBuilds(pushEvent, gitInfo, modules);
-      recordEvents(modules, pushEvent.getPusher().getName());
+      if (!gitInfo.isPresent()) {
+        LOG.info("Branch {} does not exist on repo {} creating in an inactive state", eventGitInfo.getBranch(), eventGitInfo.getFullRepositoryName());
+      } else {
+        modules = updateModules(gitInfo.get(), pushEvent);
+        recordEvents(modules, pushEvent.getPusher().getName());
+
+        if (gitInfo.get().isActive()) {
+          LOG.info("There is an open PR for branch {} on repo {}, triggering build", gitInfo.get().getBranch(), gitInfo.get().getFullRepositoryName());
+          triggerBuilds(pushEvent, gitInfo.get(), modules);
+        } else { // not active => no open PullRequest
+          LOG.info("Branch {} on repo {} is not active (No open pull request) not triggering builds", gitInfo.get().getBranch(), gitInfo.get().getFullRepositoryName());
+        }
+      }
     }
   }
 
   @Subscribe
-  public void handlePullRequestEvent(PullRequestEvent pullRequestEvent) {
-
+  public void handlePullRequestEvent(PullRequestEvent pullRequestEvent) throws IOException {
+    Set<PullRequestEvent.Action> openActions = Sets.newHashSet(PullRequestEvent.Action.opened, PullRequestEvent.Action.reopened);
+    GitInfo gitInfo = branchService.upsert(gitInfo(pullRequestEvent, openActions.contains(pullRequestEvent.getAction())));
     if (pullRequestEvent.getAction().equals(PullRequestEvent.Action.opened) || pullRequestEvent.getAction().equals(PullRequestEvent.Action.reopened)) {
-
-      GitInfo gitInfo = gitInfo(pullRequestEvent);
-      Optional<GitInfo> fullGitInfo = branchService.lookup(gitInfo.getHost(), gitInfo.getOrganization(), gitInfo.getRepository(), gitInfo.getBranch());
-      if (fullGitInfo.isPresent()) {
-        Set<Module> modules = moduleService.getByBranch(fullGitInfo.get().getId().get());
-        recordEvents(modules, pullRequestEvent.getPullRequestOrBuilder().getUser().getUsername());
-      } else {
-        LOG.info("Not creating events for pr# {} on repository {}, no matching branches found", pullRequestEvent.getNumber(), pullRequestEvent.getRepository().getFullName());
-      }
+      Set<Module> modules = moduleService.getByBranch(gitInfo.getId().get());
+      triggerBuilds(gitInfo, modules);
+      recordEvents(modules, pullRequestEvent.getPullRequestOrBuilder().getUser().getUsername());
+    } else if (pullRequestEvent.getAction().equals(PullRequestEvent.Action.closed)) {
+      branchService.delete(gitInfo);
+    } else {
+      LOG.info("Pull request action {} has no impact on builds, not doing anything", pullRequestEvent.getAction());
     }
   }
 
@@ -112,7 +124,6 @@ public class GitHubWebhookHandler {
     try {
       Set<DiscoveredModule> discovered = moduleDiscovery.discover(gitInfo);
       Set<Module> modules = moduleService.setModules(gitInfo, discovered);
-      triggerBuilds(gitInfo, modules);
       return modules;
     } catch (FileNotFoundException e) {
       branchService.delete(gitInfo);
@@ -168,7 +179,14 @@ public class GitHubWebhookHandler {
   }
 
   private GitInfo gitInfo(CreateEvent createEvent) {
-    return gitInfo(createEvent.getRepository(), createEvent.getRef(), true);
+    String ref = createEvent.getRef();
+    String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()): ref;
+    String defaultBranch = createEvent.getRepository().getDefaultBranch();
+    if (defaultBranch.equals(branch)) {
+      return gitInfo(createEvent.getRepository(), createEvent.getRef(), true);
+    } else {
+      return gitInfo(createEvent.getRepository(), createEvent.getRef(), false);
+    }
   }
 
   private GitInfo gitInfo(DeleteEvent deleteEvent) {
@@ -176,11 +194,11 @@ public class GitHubWebhookHandler {
   }
 
   private GitInfo gitInfo(PushEvent pushEvent) {
-    return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), true);
+    return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), false);
   }
 
-  private GitInfo gitInfo(PullRequestEvent pullRequestEvent) {
-    return gitInfo(pullRequestEvent.getRepository(), pullRequestEvent.getPullRequestOrBuilder().getHead().getRef(), true);
+  private GitInfo gitInfo(PullRequestEvent pullRequestEvent, boolean active) {
+    return gitInfo(pullRequestEvent.getRepository(), pullRequestEvent.getPullRequestOrBuilder().getHead().getRef(), active);
   }
 
   private GitInfo gitInfo(Repository repository, String ref, boolean active) {
