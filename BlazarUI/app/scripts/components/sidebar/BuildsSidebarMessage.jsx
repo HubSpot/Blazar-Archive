@@ -1,7 +1,9 @@
 import React, {Component, PropTypes} from 'react';
 import MutedMessage from '../shared/MutedMessage.jsx';
+import {NO_MATCH_MESSAGES} from '../constants';
 
 class BuildsSidebarMessage extends Component {
+
 
   render() {
     let message = null;
@@ -9,7 +11,7 @@ class BuildsSidebarMessage extends Component {
     if (this.props.numModules === 0 && this.props.filterText.length > 0) {      
         message = (
           <span>
-            No {searchType} modules matching <strong>{this.props.filterText}</strong>.
+            No {NO_MATCH_MESSAGES[this.props.toggleFilterState]} modules matching <strong>{this.props.filterText}</strong>.
           </span>
         ) 
     }

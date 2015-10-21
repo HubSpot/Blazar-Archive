@@ -16,37 +16,48 @@ import {getFilteredModules} from '../Helpers.js'
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
 
+let initialState = {
+  branches: [],
+  loading: true,
+  filters: {
+    branch: [],
+    module: []
+  }
+};
+
 class RepoContainer extends Component {
 
   constructor() {
     bindAll(this, 'onStatusChange', 'updateFilters');
-
-    this.state = {
-      branches: [],
-      loading: true,
-      filters: {
-        branch: [],
-        module: []
-      }
-    };
+    this.state = initialState;
   }
 
   componentDidMount() {
-    this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
-    RepoActions.loadBranches(this.props.params);
+    this.setup(this.props.params);
   }
 
   componentWillReceiveProps(nextprops) {
-    RepoActions.loadBranches(nextprops.params);
+    this.setState(initialState);
+    this.tearDown();
+    this.setup(nextprops.params);
   }
 
   componentWillUnmount() {
-    RepoActions.loadBranches(false);
-    this.unsubscribeFromRepo();
+    this.tearDown();
   }
 
   onStatusChange(state) {
     this.setState(state);
+  }
+
+  setup(params) {
+    this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
+    RepoActions.loadBranches(params);
+  }
+  
+  tearDown() {
+    RepoActions.stopPolling();
+    this.unsubscribeFromRepo();
   }
   
   updateFilters(newFilters) {

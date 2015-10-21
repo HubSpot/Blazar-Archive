@@ -1,15 +1,15 @@
 import humanizeDuration from 'humanize-duration';
+import {extend} from 'underscore';
 import $ from 'jquery';
-
-
 
 class Model {
 
-  constructor() {
-    this.fetchOptions = {
+  constructor(options) {    
+    const defaultOptions = {
       parse: true
-    };
+    }
 
+    this.options = extend(defaultOptions, options);
     this.fetch = this.fetch.bind(this);
   }
 
@@ -18,9 +18,9 @@ class Model {
   fetch() {
     this.data = {};
     const promise = $.ajax({
-      url: this.fetchOptions.url || this.url(),
-      type: this.fetchOptions.type || 'GET',
-      dataType: this.fetchOptions.dataType || 'json'
+      url: this.options.url || this.url(),
+      type: this.options.type || 'GET',
+      dataType: this.options.dataType || 'json'
     });
 
     promise.done((data, textStatus, jqXHR) => {
@@ -28,7 +28,7 @@ class Model {
       this.textStatus = textStatus;
       this.jqXHR = jqXHR;
 
-      if (!this.fetchOptions.parse) {
+      if (!this.options.parse) {
         return;
       }
       this.parse();

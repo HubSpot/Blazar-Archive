@@ -9,9 +9,7 @@ import {find, has} from 'underscore';
 import BuildStates from '../constants/BuildStates';
 import BuildHistoryActions from '../actions/buildHistoryActions';
 
-// builds we are polling
 let builds = {};
-// requested build params
 let requestedBuild = {};
 
 const BuildActions = Reflux.createActions([
@@ -59,8 +57,11 @@ BuildActions.stopWatchingBuild = function(buildId, moduleId) {
 BuildActions.cancelBuild = function(buildId, moduleId) {
   builds[moduleId].isActive = false;
 
-  const build = new Build;
-  const cancel = build.cancel(buildId);
+  const build = new Build({
+    buildId: buildId
+  });
+
+  const cancel = build.cancel();
   
   cancel.done((d, t, j) => {
     if (j.status === 204) {
@@ -79,7 +80,12 @@ BuildActions.cancelBuild = function(buildId, moduleId) {
 // To do: move into build model
 BuildActions.triggerBuild = function(moduleId) {
   BuildActions.triggerBuildStart();
-  const trigger = new BuildTrigger(moduleId);
+  
+  
+  const trigger = new BuildTrigger({
+    moduleId: moduleId
+  });
+  
   const promise = trigger.fetch();
   promise.then(() => {
     BuildActions.triggerBuildSuccess();
@@ -105,7 +111,10 @@ function getBranchId() {
 }
 
 function getModule() {
-  const branchModules = new BranchModules(requestedBuild.gitInfo.branchId);
+  const branchModules = new BranchModules({
+    branchId: requestedBuild.gitInfo.branchId
+  });
+
   const modulesPromise = branchModules.fetch();
 
   modulesPromise.done(() => {
@@ -170,23 +179,24 @@ function processInProgressBuild(build) {
     if (!builds[build.data.module.id].isActive) {
       return;
     }
-
+    
     const log = new Log({
+      dataType: 'json',
       buildNumber: build.data.build.id,
       offset: inProgressBuild.offset
     });
-
+    
     const logPromise = log.fetch();
     logPromise.always( (data, textStatus, jqxhr) => {
       inProgressBuild.logLines += log.formatLog(jqxhr);
       inProgressBuild.offset = data.nextOffset;
-
+    
       if (data.nextOffset === -1) {
         // get latest build detail when log fetching is complete
         // so we can update status section at top of build page
         const lastBuild = new Build(requestedBuild.gitInfo);
         const buildPromise = lastBuild.fetch();
-
+    
         buildPromise.done(() => {
           BuildActions.loadBuildSuccess({
             build: lastBuild.data,
@@ -195,7 +205,7 @@ function processInProgressBuild(build) {
           });
         });
       }
-
+    
       // still building
       else {
         BuildActions.loadBuildSuccess({
@@ -203,12 +213,12 @@ function processInProgressBuild(build) {
           log: inProgressBuild.logLines,
           fetchingLog: true
         });
-
+    
         setTimeout(() => {
           fetchLog();
         }, 5000);
       }
-
+    
     });
 
   })();
@@ -231,7 +241,7 @@ function processInactiveBuild(build) {
 
       if (jqxhr.responseJSON === undefined || textStatus !== 'success') {
         BuildActions.loadBuildSuccess({
-          build: build,
+          build: build.data,
           log: `<p class='roomy-xy'>${data.responseText}</p>`,
           fetchingLog: false
         });

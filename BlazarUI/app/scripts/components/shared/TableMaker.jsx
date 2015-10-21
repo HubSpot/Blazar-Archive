@@ -15,7 +15,7 @@ function TableMaker(RenderedComponent, options) {
       bindAll(this, 'buildTable', 'getRows', 'changePage');
       this.state = {
         page: 0,
-        rowsPerPage: 10
+        rowsPerPage: 15
       }
     }
 

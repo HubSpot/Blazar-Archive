@@ -8,10 +8,15 @@ import {FILTER_MESSAGES, NO_MATCH_MESSAGES} from '../constants';
 import Loader from '../shared/Loader.jsx';
 import LazyRender from '../shared/LazyRender.jsx';
 import SidebarItem from './SidebarItem.jsx';
+
 let Link = require('react-router').Link;
 
-import StarredBuildsStore from '../../stores/starredBuildsStore';
-import StarredBuildsActions from '../../actions/starredBuildsActions';
+import BuildsStore from '../../stores/buildsStore';
+import BuildsActions from '../../actions/buildsActions';
+import StarActions from '../../actions/starActions';
+
+import GlobalBuildsStore from '../../stores/globalBuildsStore';
+import GlobalBuildsActions from '../../actions/globalBuildsActions';
 
 import Sidebar from './Sidebar.jsx';
 
@@ -28,25 +33,51 @@ class BuildsSidebarContainer extends Component {
       loading: true,
       changingBuildsType: false,
       filterText: '',
-      toggleFilterState: 'starred'
+      toggleFilterState: 'starred',
+      sidebarHeight: $(window).height() - $('#primary-nav').height() + $('.sidebar__filter').height()
     };
   }
 
   componentDidMount() {
-    this.unsubscribeFromStarredBuilds = StarredBuildsStore.listen(this.onBuildsStatusChange);
-    StarredBuildsActions.loadBuilds(this.state.toggleFilterState);
+    StarActions.loadStars();
+    //
+    // temporarily load global builds until we have a searchable endpoint
+    this.unsubscribeFromGlobalBuilds = GlobalBuildsStore.listen(this.onBuildsStatusChange);
+    //
+    
+    this.unsubscribeFromStarredBuilds = BuildsStore.listen(this.onBuildsStatusChange);
+    BuildsActions.loadBuilds(this.state.toggleFilterState);
+    // initially load global builds so we have quick access
+    // we will remove this when we have a searchable endpoint
+    GlobalBuildsActions.loadBuildsOnce();
+    //
   }
 
   componentWillUnmount() {
-    StarredBuildsActions.stopListening();
+    BuildsActions.stopListening();
     this.unsubscribeFromStarredBuilds();
   }
   
-  getBuildsOfType(type) {    
+  getBuildsOfType(type) {
+    console.log('got type: ', type);
     this.setState({
       changingBuildsType: true
     });
-    StarredBuildsActions.loadBuildOfType(type)
+
+    //
+    // Temporary until we have a searchable endpoint
+    if (type === 'all') {
+      console.log('start polling all');
+      BuildsActions.stopListening();
+      GlobalBuildsActions.loadBuilds();
+    }
+    //
+
+    else {
+      GlobalBuildsActions.stopPolling();
+      BuildsActions.loadBuildOfType(type)  
+    }
+    
   }
 
   onBuildsStatusChange(state) {  
@@ -101,16 +132,18 @@ class BuildsSidebarContainer extends Component {
     return (
       <LazyRender 
         childHeight={71} 
-        maxHeight={$(window).height() - $('#primary-nav').height() + $('.sidebar__filter').height()}>
+        maxHeight={this.state.sidebarHeight}>
         {modulesList}
       </LazyRender>
     );
   }
-  
+
   render() {
     if (this.state.loading) {
       return (
-        <Loader align='top-center' />
+        <Sidebar>
+          <Loader align='top-center' />
+        </Sidebar>
       );
     }
     // filter builds by search input
@@ -119,6 +152,7 @@ class BuildsSidebarContainer extends Component {
     const moduleComponentsList = this.buildModuleComponents(this.state.changingBuildsType, matches);
     // pass type of builds we are searching to provide messages
     const searchType = NO_MATCH_MESSAGES[this.state.toggleFilterState];
+
     return (
       <Sidebar>
         <div className="sidebar__filter">
@@ -135,7 +169,7 @@ class BuildsSidebarContainer extends Component {
           {moduleComponentsList}
           <BuildsSidebarMessage
             searchType={searchType}
-            numModules={moduleComponentsList.length}
+            numModules={matches.length}
             filterText={this.state.filterText}
             toggleFilterState={this.state.toggleFilterState}
           />

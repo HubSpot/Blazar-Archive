@@ -3,8 +3,7 @@ import {contains, pluck, isEqual} from 'underscore';
 import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
-import BuildsActions from '../../actions/buildsActions';
-import BuildsStore from '../../stores/buildsStore';
+import BuildsStore from '../../stores/buildsStore'; // use deprecated name...
 
 import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';

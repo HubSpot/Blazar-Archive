@@ -2,17 +2,15 @@
 import Model from './Model';
 
 class BuildTrigger extends Model {
-  constructor(moduleId) {
-    super();
-    this.moduleId = moduleId;
-    this.fetchOptions = {
-      type: 'POST'
-    };
+  
+  constructor(options) {
+    options.type = 'POST';
+    super(options);
   }
 
   url() {
     const moduleId = this.moduleId;
-    return `${config.apiRoot}/build/module/${moduleId}`;
+    return `${config.apiRoot}/build/module/${this.options.moduleId}`;
   }
 }
 

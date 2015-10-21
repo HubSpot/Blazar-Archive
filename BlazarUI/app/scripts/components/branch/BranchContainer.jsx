@@ -11,33 +11,43 @@ import Icon from '../shared/Icon.jsx';
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
+let initialState = {
+  modules: [],
+  loading: true
+};
 
 class BranchContainer extends Component {
 
   constructor() {
-    this.state = {
-      modules: [],
-      loading: true
-    };
+    this.state = initialState;
   }
 
   componentDidMount() {
-    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
-    BranchActions.loadModules(this.props.params);
+    this.setup(this.props.params);
   }
 
   componentWillReceiveProps(nextprops) {
-    BranchActions.loadModules(nextprops.params);
+    this.tearDown();
+    this.setup(nextprops.params);
+    this.setState(initialState);
   }
 
   componentWillUnmount() {
-    BranchActions.updatePollingStatus(false);
-    BranchActions.loadModules(false);
-    this.unsubscribeFromBranch();
+    this.tearDown();
   }
 
   onStatusChange(state) {
     this.setState(state);
+  }
+    
+  setup(params) {
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
+    BranchActions.loadModules(params);
+  }
+  
+  tearDown() {
+    BranchActions.stopPolling();
+    this.unsubscribeFromBranch();
   }
 
   render() {

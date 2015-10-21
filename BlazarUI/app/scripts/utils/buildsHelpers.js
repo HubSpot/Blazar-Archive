@@ -12,34 +12,13 @@ export const getFilterMatches = (builds, filterText) => {
   return modulesSearch.match(filterText);
 };
 
-function binarySearch(haystack, needle) {
+export const binarySearch = (haystack, needle) => {
   return bs(haystack, needle, (a, b) => {
     return a.module.id - b.module.id;
   });
 }
 
-export const updateBuilds = (latestBuilds, currentBuilds) => {
-
-  currentBuilds.sort((a, b) => {
-    return a.module.id - b.module.id;
-  });
-
-  for (let i = 0, len = latestBuilds.length; i < len; i++) {
-    const buildIndex = binarySearch(currentBuilds, latestBuilds[i]);
-
-    if (buildIndex > 0) {
-      currentBuilds[buildIndex] = latestBuilds[i];
-    }
-
-    else {
-      currentBuilds.push(latestBuilds[i]);
-    }
-
-  }
-
-  return currentBuilds;
-};
-
+// to do - make this more reusable by property type
 export const sortBuilds = (builds, type) => {
   switch (type) {
     case 'building':
@@ -47,10 +26,17 @@ export const sortBuilds = (builds, type) => {
         return -b.inProgressBuild.startTimestamp;
       });
     break;
-
+    
+    // change to module name..
     case 'abc':
       return sortBy(builds, function(b) {
         return b.module.name;
+      });
+    break;
+    
+    case 'repo':
+      return sortBy(builds, function(b) {
+        return b.repo;
       });
     break;
 

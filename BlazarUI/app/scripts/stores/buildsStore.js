@@ -1,38 +1,51 @@
 import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
-import {updateBuilds, sortBuilds} from '../utils/buildsHelpers';
+import {sortBuilds} from '../utils/buildsHelpers';
 
 const BuildsStore = Reflux.createStore({
 
   listenables: BuildsActions,
 
   init() {
-    this.builds = [];
-    this.buildsLoaded = false;
-    this.buildsHaveLoaded = false;
+    this.builds = {
+      starred: { 
+        builds: [] 
+      },
+      all: { 
+        builds: [],
+        haveLoaded: false
+      },
+      building: { 
+        builds: [] 
+      }
+    }
   },
 
   getBuilds() {
     return this.builds;
   },
 
-  loadBuildsSuccess(incomingBuilds) {
-    // initial fetch
-    if (!this.buildsHaveLoaded) {
-      this.builds = sortBuilds(incomingBuilds, 'abc');
+  loadBuildsSuccess(incomingBuilds, filterType, filterHasChanged) {
+    this.builds[filterType].builds = incomingBuilds;
+
+    let sortedBuilds;
+    if (filterType === 'building') {
+      sortedBuilds = sortBuilds(this.builds[filterType].builds, 'building');
     }
-    // subsequent fetches
     else {
-      const updatedBuilds = sortBuilds(updateBuilds(incomingBuilds, this.builds), 'abc');
-      this.builds = updatedBuilds;
+      sortedBuilds = sortBuilds(this.builds[filterType].builds, 'abc');
     }
 
-    this.buildsHaveLoaded = true;
-
-    this.trigger({
-      builds: this.builds,
+    const triggerPayload = {
+      builds: sortedBuilds,
       loadingBuilds: false
-    });
+    }
+    
+    if (filterHasChanged) {
+      triggerPayload.filterHasChanged = true;
+    }
+
+    this.trigger(triggerPayload);
 
   },
 

@@ -2,19 +2,15 @@
 import Model from './Model';
 
 class Build extends Model {
-  constructor(build) {
-    super();
-    this.build = build;
-  }
-
+  
   parse() {
     this.addTimeHelpers();
   }
-  
-  cancel(id) {
-    this.fetchOptions = {
+
+  cancel() {
+    this.options = {
       type: 'POST',
-      url: `${config.apiRoot}/build/${id}/cancel`,
+      url: `${config.apiRoot}/build/${this.options.buildId}/cancel`,
       parse: false
     }
     return this.fetch({
@@ -23,8 +19,7 @@ class Build extends Model {
   }
 
   url() {
-    const build = this.build;
-    return `${config.apiRoot}/build/history/module/${build.moduleId}/build/${build.buildNumber}/`;
+    return `${config.apiRoot}/build/history/module/${this.options.moduleId}/build/${this.options.buildNumber}/`;
   }
 }
 

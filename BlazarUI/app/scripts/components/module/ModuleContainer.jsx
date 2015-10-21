@@ -20,41 +20,48 @@ import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
 import LocationStore from '../../stores/locationStore';
 
+let initialState = {
+  buildHistory: [],
+  stars: [],
+  buildTriggeringDone: true,
+  loadingHistory: true,
+  loadingStars: true,
+  buildTriggeringError: ''
+};
+
 class ModuleContainer extends Component {
 
   constructor(props) {
     super(props);
     bindAll(this, 'triggerBuild', 'onStatusChange', 'toggleStar');
-
-    this.state = {
-      buildHistory: [],
-      stars: [],
-      buildTriggeringDone: true,
-      loadingHistory: true,
-      loadingStars: true,
-      buildTriggeringError: ''
-    };
+    this.state = initialState;
   }
 
   componentDidMount() {
-    this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
-    this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
-
-    BuildHistoryActions.loadBuildHistory(this.props.params);
-    StarActions.loadStars();
+    this.setup(this.props.params);
   }
 
   componentWillReceiveProps(nextprops) {
-    BuildHistoryActions.loadBuildHistory(nextprops.params);
-    this.setState({
-      loadingStars: true,
-      loadingHistory: true
-    });
+    this.tearDown()
+    this.setup(nextprops.params);
+    this.setState(initialState);
   }
 
   componentWillUnmount() {
     BuildHistoryActions.updatePollingStatus(false);
+    this.tearDown()
+  }
+  
+  setup(params) {
+    this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
+    this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
+    
+    BuildHistoryActions.loadBuildHistory(params);
+    StarActions.loadStars();
+  }
+  
+  tearDown() {
     this.unsubscribeFromBuildHistory();
     this.unsubscribeFromBuild();
     this.unsubscribeFromStars();
@@ -96,7 +103,7 @@ class ModuleContainer extends Component {
           <UIGridItem size={2} align='RIGHT'>
             <BuildButton 
               triggerBuild={this.triggerBuild} 
-              loading={!this.state.loadingStars || !this.state.loadingHistory}
+              loading={this.state.loadingHistory}
             />
           </UIGridItem>
           <UIGridItem size={12}>
