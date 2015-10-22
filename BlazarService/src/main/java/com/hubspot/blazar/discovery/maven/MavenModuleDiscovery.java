@@ -24,12 +24,14 @@ import java.util.Set;
 @Singleton
 public class MavenModuleDiscovery extends AbstractModuleDiscovery {
   private static final Logger LOG = LoggerFactory.getLogger(MavenModuleDiscovery.class);
+
   private static final Optional<GitInfo> BRANCH_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#stable"));
   private static final Optional<GitInfo> MASTER_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#publish"));
   private static final Optional<GitInfo> DEPLOYABLE_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#deployable"));
+  private static final String EXECUTABLE_MARKER = ".build-executable";
 
   private final ObjectMapper objectMapper;
   private final XmlFactory xmlFactory;
@@ -43,7 +45,7 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
   @Override
   public boolean shouldRediscover(GitInfo gitInfo, PushEvent pushEvent) {
     for (String path : affectedPaths(pushEvent)) {
-      if (isPom(path)) {
+      if (isPom(path) || isExecutableMarker(path)) {
         return true;
       }
     }
@@ -102,7 +104,7 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
   private boolean isDeployable(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
     String folder = file.contains("/") ? file.substring(0, file.lastIndexOf('/') + 1) : "";
     try {
-      contentsFor(folder + ".build-executable", repository, gitInfo);
+      contentsFor(folder + EXECUTABLE_MARKER, repository, gitInfo);
       return true;
     } catch (FileNotFoundException e) {
       return false;
@@ -111,5 +113,9 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
 
   private static boolean isPom(String path) {
     return "pom.xml".equals(path) || path.endsWith("/pom.xml");
+  }
+
+  private static boolean isExecutableMarker(String path) {
+    return EXECUTABLE_MARKER.equals(path) || path.endsWith("/" + EXECUTABLE_MARKER);
   }
 }
