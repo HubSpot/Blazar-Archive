@@ -7,12 +7,14 @@ function getPagination(data, state, changePage) {
   const totalPages = Math.ceil(data.length / state.rowsPerPage);
   const blockFloor = Math.floor(state.page / linksTotal) * linksTotal;
 
+  const backPages = 0;
   let start;
   let end;
 
+
   // no pagination necessary
   if (totalPages == 1) {
-    return <div/>;
+    return null;
   }
 
   // have less than linksTotal to show
@@ -35,33 +37,27 @@ function getPagination(data, state, changePage) {
     start = blockFloor;
     end = blockFloor + linksTotal;
   }
-  
-  // Link to beginning
-  if (state.page > linksTotal - 1) {
-    paginationLinks.push( 
-      <PaginationLink
-        key='first'
-        label='« First'
-        page={0}
-        changePage={changePage}
-      /> 
-    );
-  }        
-
-  // Back one block
-  if (state.page > linksTotal - 1) {
-    const backPages = 0;
-    paginationLinks.push( 
-      <PaginationLink
-        key='back'
-        label='‹'
-        page={blockFloor - linksTotal}
-        changePage={changePage}
-      /> 
-    );          
-  }
-  
-  //build the inner page links
+  // To beginning
+  paginationLinks.push(
+    <PaginationLink
+      key='first'
+      label='« First'
+      disabled={state.page === 0}
+      page={0}
+      changePage={changePage}
+    /> 
+  );  
+  // Back one 
+  paginationLinks.push( 
+    <PaginationLink
+      key='backBlock'
+      label='‹ Previous'
+      disabled={state.page === 0}
+      page={state.page - 1}
+      changePage={changePage}
+    /> 
+  );
+  // Inner page links
   for (let i = start; i < end; i++) {
     paginationLinks.push( 
       <PaginationLink
@@ -72,34 +68,35 @@ function getPagination(data, state, changePage) {
       /> 
     );
   }
+  // Forward one
+  paginationLinks.push(
+    <PaginationLink
+      key='next'
+      label='Next ›'
+      disabled={state.page + 1 === totalPages}
+      page={state.page + 1}
+      changePage={changePage}
+    /> 
+  );
+  // Last
+  paginationLinks.push( 
+    <PaginationLink
+      key='last'
+      label='Last »'
+      page={totalPages - 1}
+      disabled={state.page + 1 === totalPages}
+      changePage={changePage}
+    />  
+  );
   
-  // Not at a beginning or ending pagination block
-  if (state.page < totalPages && end !== totalPages) {
-    const backPages = 0;
-    paginationLinks.push(
-      <PaginationLink
-        key='next'
-        label='›'
-        page={start + linksTotal}
-        changePage={changePage}
-      /> 
-    );
-
-    paginationLinks.push( 
-      <PaginationLink
-        key='last'
-        label='Last »'
-        page={totalPages - 1}
-        changePage={changePage}
-      />  
-    );
-  }
+  
 
   return (
     <div className='pagination-wrapper'>
       <ul className='pagination'>
         {paginationLinks}
       </ul>
+      <p className='pagination-footer'>Page {state.page + 1} of {totalPages}</p>
     </div>
   );
 }
