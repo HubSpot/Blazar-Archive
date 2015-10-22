@@ -8,7 +8,7 @@ class BuildsSidebarMessage extends Component {
   render() {
     let message = null;
     // dont display any messages while we are toggling
-    if (this.props.changingBuilds) {
+    if (this.props.dontDisplay) {
       return null;
     }
 
