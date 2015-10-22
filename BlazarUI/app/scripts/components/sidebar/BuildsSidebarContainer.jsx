@@ -174,7 +174,8 @@ class BuildsSidebarContainer extends Component {
         <div className='sidebar__list'>
           {moduleComponentsList}
           <BuildsSidebarMessage
-            loadingStars={!this.state.loadingStars && !this.state.loading}
+            loading={this.state.loading}
+            changingBuilds={this.state.changingBuildsType}
             searchType={searchType}
             numModules={matches.length}
             filterText={this.state.filterText}

@@ -69,8 +69,6 @@ class ModuleContainer extends Component {
     BuildActions.triggerBuild(this.props.params.moduleId);
   }
 
-  
-
   render() {
     return (
       <PageContainer>

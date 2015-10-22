@@ -7,8 +7,12 @@ class BuildsSidebarMessage extends Component {
 
   render() {
     let message = null;
+    // dont display any messages while we are toggling
+    if (this.props.changingBuilds) {
+      return null;
+    }
 
-    if (this.props.numModules === 0 && this.props.filterText.length > 0) {      
+    if (this.props.numModules === 0 && this.props.filterText.length > 0) {
         message = (
           <span>
             No {NO_MATCH_MESSAGES[this.props.toggleFilterState]} modules matching <strong>{this.props.filterText}</strong>.
@@ -16,7 +20,7 @@ class BuildsSidebarMessage extends Component {
         ) 
     }
 
-    else if (this.props.numModules === 0 && this.props.filterText.length === 0 && !this.props.loadingStars) {
+    else if (this.props.numModules === 0 && this.props.filterText.length === 0) {
       if (this.props.toggleFilterState === 'starred') {
         message = 'No modules have been starred';
       } 

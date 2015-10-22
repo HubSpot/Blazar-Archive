@@ -53,6 +53,7 @@ BuildsActions.loadBuildOfType = function(newFilterType) {
   if (!shouldPoll) {
     shouldPoll = true;
     _pollForBuilds();
+    return;
   }
 
   // fetch latest builds while the polling catches up
