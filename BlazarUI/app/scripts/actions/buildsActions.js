@@ -43,6 +43,11 @@ BuildsActions.loadBuildOfType = function(newFilterType) {
   filterType = newFilterType;
   filterHasChanged = true;
 
+  // no starred builds to show
+  if (stars.length === 0 && newFilterType === 'starred') {
+    BuildsActions.loadBuildsSuccess([], 'starred', true);
+    return;
+  }
   // if we stopped polling (.e.g were on 'all' builds) 
   // get back to work
   if (!shouldPoll) {
