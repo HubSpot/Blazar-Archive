@@ -8,7 +8,8 @@ const BuildsActions = Reflux.createActions([
   'loadBuildsSuccess',
   'loadBuildsError',
   'loadBuildOfType',
-  'stopListening'
+  'stopListening',
+  'setFilterType'
 ]);
 
 let stars = [];
@@ -52,13 +53,18 @@ BuildsActions.stopListening = function() {
   shouldPoll = false;
 }
 
+BuildsActions.setFilterType = function(newFilterType) {
+  filterType = newFilterType;
+}
+
 // When user toggles a star update the sidebar
 // Also run on initial page load as starred is default
 function onStarStatusChange(newStars) {
-  if (newStars.source !== 'sidebar') {
-    return
-  }
   stars = newStars.stars;
+
+  if (filterType !== 'starred') {
+    return;
+  }
   
   if (stars.length === 0) {
     BuildsActions.loadBuildsSuccess([], 'starred', true);

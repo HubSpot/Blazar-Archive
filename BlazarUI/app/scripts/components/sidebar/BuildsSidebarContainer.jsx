@@ -66,6 +66,7 @@ class BuildsSidebarContainer extends Component {
     //
     // Temporary until we have a searchable endpoint
     if (type === 'all') {
+      BuildsActions.setFilterType('all');
       BuildsActions.stopListening();
       GlobalBuildsActions.loadBuilds();
     }
@@ -78,7 +79,7 @@ class BuildsSidebarContainer extends Component {
     
   }
 
-  onBuildsStatusChange(state) {  
+  onBuildsStatusChange(state) {
     if (state.filterHasChanged) {
       state.changingBuildsType = false;
     }
