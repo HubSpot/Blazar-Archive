@@ -75,7 +75,7 @@ class RepoContainer extends Component {
               <Icon type="octicon" name="repo" classNames="headline-icon" />
               <span>{this.props.params.repo}</span>
               <HeadlineDetail>
-                All Modules
+                All branches and modules
               </HeadlineDetail>
             </Headline>
             <BranchFilter 
