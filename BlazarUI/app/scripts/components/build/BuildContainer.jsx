@@ -42,7 +42,7 @@ class BuildContainer extends Component {
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange.bind(this));
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
     BuildActions.loadBuild(props.params);
-    StarActions.loadStars();
+    StarActions.loadStars('buildContainer');
   }
 
   tearDown() {

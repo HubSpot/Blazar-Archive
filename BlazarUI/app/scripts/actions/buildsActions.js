@@ -1,7 +1,6 @@
 /*global config*/
 import Reflux from 'reflux';
 import Builds from '../collections/Builds';
-import StarActions from './starActions';
 import StarStore from '../stores/starStore';
 
 const BuildsActions = Reflux.createActions([
@@ -42,6 +41,7 @@ BuildsActions.loadBuilds.preEmit = function(newFilterType) {
 BuildsActions.loadBuildOfType = function(newFilterType) {
   filterType = newFilterType;
   filterHasChanged = true;
+
   _fetchBuilds(() => {
     filterHasChanged = false;
   });
@@ -55,6 +55,9 @@ BuildsActions.stopListening = function() {
 // When user toggles a star update the sidebar
 // Also run on initial page load as starred is default
 function onStarStatusChange(newStars) {
+  if (newStars.source !== 'sidebar') {
+    return
+  }
   stars = newStars.stars;
   
   if (stars.length === 0) {

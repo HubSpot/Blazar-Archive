@@ -3,24 +3,22 @@ import StarActions from '../actions/starActions';
 
 const RepoStore = Reflux.createStore({
 
+  listenables: StarActions,
+
   init() {
     this.stars = [];
-
-    this.listenTo(StarActions.loadStars, this.loadStars);
-    this.listenTo(StarActions.loadStarsSuccess, this.loadStarsSuccess);
-    this.listenTo(StarActions.loadStarsError, this.loadStarsError);
+    this.source = null;
   },
-
-  loadStars() {
-    // this.trigger({
-    //   loadingStars: true
-    // });
+  
+  setSource(source) {
+    this.source = source;
   },
 
   loadStarsSuccess(stars) {
     this.stars = stars;
 
     this.trigger({
+      source: this.source,
       stars: this.stars,
       loadingStars: false
     });

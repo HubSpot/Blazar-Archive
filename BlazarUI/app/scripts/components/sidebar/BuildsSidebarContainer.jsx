@@ -39,7 +39,7 @@ class BuildsSidebarContainer extends Component {
   }
 
   componentDidMount() {
-    StarActions.loadStars();
+    StarActions.loadStars('sidebar');
     //
     // temporarily load global builds until we have a searchable endpoint
     this.unsubscribeFromGlobalBuilds = GlobalBuildsStore.listen(this.onBuildsStatusChange);
@@ -73,7 +73,7 @@ class BuildsSidebarContainer extends Component {
 
     else {
       GlobalBuildsActions.stopPolling();
-      BuildsActions.loadBuildOfType(type)  
+      BuildsActions.loadBuildOfType(type);
     }
     
   }
@@ -146,6 +146,7 @@ class BuildsSidebarContainer extends Component {
     }
     // filter builds by search input
     const matches = getFilterMatches(this.state.builds, this.state.filterText);
+
     // build list item components
     const moduleComponentsList = this.buildModuleComponents(this.state.changingBuildsType, matches);
     // pass type of builds we are searching to provide messages

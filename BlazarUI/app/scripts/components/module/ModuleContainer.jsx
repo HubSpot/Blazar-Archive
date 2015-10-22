@@ -54,11 +54,11 @@ class ModuleContainer extends Component {
   
   setup(params) {
     this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
-    this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);  
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
-    
+  
     BuildHistoryActions.loadBuildHistory(params);
-    StarActions.loadStars();
+    StarActions.loadStars('moduleContainer');
   }
   
   tearDown() {

@@ -4,10 +4,12 @@ import StarProvider from '../utils/starProvider';
 const StarActions = Reflux.createActions([
   'loadStars',
   'loadStarsSuccess',
-  'loadStarsError'
+  'loadStarsError',
+  'setSource'
 ]);
 
-StarActions.loadStars.preEmit = function() {
+StarActions.loadStars.preEmit = function(source) {
+  StarActions.setSource(source)
   StarActions.loadStarsSuccess(StarProvider.getStars());
 };
 
