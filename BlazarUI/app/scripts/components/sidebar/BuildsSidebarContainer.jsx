@@ -58,6 +58,7 @@ class BuildsSidebarContainer extends Component {
     this.unsubscribeFromStarredBuilds();
   }
   
+  // fetch builds based on toggle selection
   getBuildsOfType(type) {
     this.setState({
       changingBuildsType: true
@@ -70,8 +71,6 @@ class BuildsSidebarContainer extends Component {
       BuildsActions.stopListening();
       GlobalBuildsActions.loadBuilds();
     }
-    //
-
     else {
       GlobalBuildsActions.stopPolling();
       BuildsActions.loadBuildOfType(type);

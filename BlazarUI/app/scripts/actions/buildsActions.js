@@ -43,10 +43,17 @@ BuildsActions.loadBuildOfType = function(newFilterType) {
   filterType = newFilterType;
   filterHasChanged = true;
 
+  // if we stopped polling (.e.g were on 'all' builds) 
+  // get back to work
+  if (!shouldPoll) {
+    shouldPoll = true;
+    _pollForBuilds();
+  }
+
+  // fetch latest builds while the polling catches up
   _fetchBuilds(() => {
     filterHasChanged = false;
   });
-  
 };
 
 BuildsActions.stopListening = function() {
@@ -62,6 +69,7 @@ BuildsActions.setFilterType = function(newFilterType) {
 function onStarStatusChange(newStars) {
   stars = newStars.stars;
 
+  // dont update if we are not viewing starred builds
   if (filterType !== 'starred') {
     return;
   }
@@ -70,7 +78,7 @@ function onStarStatusChange(newStars) {
     BuildsActions.loadBuildsSuccess([], 'starred', true);
     return;
   }
-  
+
   if (filterType === 'starred' && initialStarLoad) {
     _pollForBuilds();
     initialStarLoad = false;
