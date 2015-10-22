@@ -68,6 +68,39 @@ public class BuildResource {
   }
 
   @GET
+  @Path("/{id}/log/size")
+  public long getLogSize(@PathParam("id") long id) {
+    Optional<ModuleBuild> build = get(id);
+    if (!build.isPresent()) {
+      throw new NotFoundException("No build found for ID " + id);
+    }
+
+    Optional<String> taskId = build.get().getBuild().getTaskId();
+    if (!taskId.isPresent()) {
+      throw new NotFoundException("No taskId found for build ID " + id);
+    }
+
+    String path = taskId.get() + "/service.log";
+    Optional<Long> absent = Optional.absent();
+    Optional<String> grep = Optional.absent();
+
+    Optional<MesosFileChunkObject> chunk = singularityClient.readSandBoxFile(taskId.get(), path, grep, absent, absent);
+    if (chunk.isPresent()) {
+      return chunk.get().getOffset();
+    } else {
+      Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId.get());
+      if (s3Logs.isEmpty()) {
+        throw new NotFoundException("No S3 log found for ID " + id);
+      } else if (s3Logs.size() > 1) {
+        throw new NotFoundException("Multiple S3 logs found for ID " + id);
+      }
+
+      SingularityS3Log s3Log = s3Logs.iterator().next();
+      return s3Log.getSize();
+    }
+  }
+
+  @GET
   @Path("/{id}/log")
   public LogChunk getLog(@PathParam("id") long id,
                          @QueryParam("offset") @DefaultValue("0") long offset,
