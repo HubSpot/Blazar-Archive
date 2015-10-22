@@ -13,6 +13,7 @@ let Link = require('react-router').Link;
 
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
+import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
 
 import GlobalBuildsStore from '../../stores/globalBuildsStore';
@@ -30,6 +31,7 @@ class BuildsSidebarContainer extends Component {
     this.state = {
       builds: [],
       loadingBuilds: true,
+      loadingStars: true,
       loading: true,
       changingBuildsType: false,
       filterText: '',
@@ -40,6 +42,8 @@ class BuildsSidebarContainer extends Component {
 
   componentDidMount() {
     StarActions.loadStars('sidebar');
+
+    this.unsubscribeFromStars = StarStore.listen(this.onBuildsStatusChange);
     //
     // temporarily load global builds until we have a searchable endpoint
     this.unsubscribeFromGlobalBuilds = GlobalBuildsStore.listen(this.onBuildsStatusChange);
@@ -109,10 +113,13 @@ class BuildsSidebarContainer extends Component {
   }
 
   buildModuleComponents(changingBuildsType, modules) {
-    if (changingBuildsType && this.state.toggleFilterState === 'all') {
+    if (changingBuildsType) {
       return (
         <Loader align='top-center' className='sidebar-loader' />
       );
+    }
+    else if (changingBuildsType) {
+      return <div />
     }
 
     const modulesList = modules.map( (module) => {
@@ -167,6 +174,7 @@ class BuildsSidebarContainer extends Component {
         <div className='sidebar__list'>
           {moduleComponentsList}
           <BuildsSidebarMessage
+            loadingStars={!this.state.loadingStars && !this.state.loading}
             searchType={searchType}
             numModules={matches.length}
             filterText={this.state.filterText}

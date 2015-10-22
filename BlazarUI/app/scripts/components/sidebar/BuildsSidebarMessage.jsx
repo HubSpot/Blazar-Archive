@@ -16,7 +16,7 @@ class BuildsSidebarMessage extends Component {
         ) 
     }
 
-    else if (this.props.numModules === 0 && this.props.filterText.length === 0) {
+    else if (this.props.numModules === 0 && this.props.filterText.length === 0 && !this.props.loadingStars) {
       if (this.props.toggleFilterState === 'starred') {
         message = 'No modules have been starred';
       } 
