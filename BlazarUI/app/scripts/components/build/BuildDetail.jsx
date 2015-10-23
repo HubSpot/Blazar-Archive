@@ -14,6 +14,27 @@ import {LABELS} from '../constants';
 
 class BuildDetail extends Component {
 
+  constructor() {
+    this.handleResize = this.handleResize.bind(this);
+    this.state = {
+      windowWidth: window.innerWidth
+    }
+  }
+
+  handleResize(e) {
+    this.setState({
+      windowWidth: window.innerWidth
+    });
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
+  
   getWrapperClassNames() {
     return classNames([
       `build-detail alert alert-${LABELS[this.props.build.build.state]}`
@@ -21,7 +42,6 @@ class BuildDetail extends Component {
   }
 
   render() {
-
     const {
       build, 
       gitInfo
@@ -56,39 +76,42 @@ class BuildDetail extends Component {
     if (contains(FINAL_BUILD_STATES, build.state)) {
       buildDetail.endtime = timestampFormatted(build.endTimestamp)
       buildDetail.duration = (
-        <small>in {build.duration}</small>
+        <span>in {build.duration}</span>
       );
     }
 
     if (build.state === BuildStates.IN_PROGRESS) {
       buildDetail.duration = (
-        <small>started {timestampFormatted(build.startTimestamp)}</small>
+        <span> started {timestampFormatted(build.startTimestamp)}</span>
       );
     }
 
-    const sha = build.sha;
-    const shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${sha}`;
+    const shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}`;
 
     return (
       <div className={this.getWrapperClassNames()}>
-        <div className='build-detail__topline'>
-          <h4 className='build-detail__build-state'>
+        
+        <div className='build-detail-header'>
+          <p className='build-detail-header__build-state'>
             <Icon name={BUILD_ICONS[build.state]} classNames="headline-icon"></Icon>
-            Build {buildDetail.buildResult} {buildDetail.duration}
-          </h4>
-        </div>  
-
-        <div className='build-detail__commitInfo'>
-          <p className='build-detail__sha'> commit <Sha gitInfo={gitInfo} build={build} /> </p>
-          <p> Authored by {currentCommit.author.name} </p>
-          <p> 
-            {timestampFormatted(currentCommit.timestamp, 'dddd')}, { ' ' }
-            {timestampFormatted(currentCommit.timestamp, 'lll')} 
+            Build {buildDetail.buildResult} 
+            <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
           </p>
-          <div className='build-detail__commit-desc'>
-            <pre>{currentCommit.message}</pre>
-          </div>
+        </div>  
+        
+        <div className='build-detail-body'>
+          <pre title={currentCommit.message} className='build-detail-body__commit-desc'>{truncate(currentCommit.message, this.state.windowWidth * .08, true)}</pre>
         </div>
+        
+        <div className='build-detail-footer'> 
+          Authored by <strong>{currentCommit.author.name}</strong> on { ' ' }
+          {timestampFormatted(currentCommit.timestamp, 'dddd')}, { ' ' }
+          {timestampFormatted(currentCommit.timestamp, 'llll')} 
+          <span className='build-detail__sha'> 
+            commit <Sha gitInfo={gitInfo} build={build} />
+          </span>
+        </div>
+        
       </div>
     );
   }
