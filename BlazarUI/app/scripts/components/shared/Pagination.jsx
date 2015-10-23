@@ -10,8 +10,7 @@ function getPagination(data, state, changePage) {
   const backPages = 0;
   let start;
   let end;
-
-
+  
   // no pagination necessary
   if (totalPages == 1) {
     return null;
@@ -88,17 +87,19 @@ function getPagination(data, state, changePage) {
       changePage={changePage}
     />  
   );
-  
-  
 
   return (
     <div className='pagination-wrapper'>
       <ul className='pagination'>
         {paginationLinks}
       </ul>
-      <p className='pagination-footer'>Page {state.page + 1} of {totalPages}</p>
+      <p className='pagination-footer'>
+        Page {state.page + 1} of {totalPages}
+      </p>
     </div>
-  );
+  );    
+
+
 }
 
 export default getPagination;
