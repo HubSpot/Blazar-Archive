@@ -88,6 +88,7 @@ class ModuleContainer extends Component {
           </UIGridItem>
           <UIGridItem size={12}>
             <BuildHistoryTable
+              params={this.props.params}
               buildHistory={this.state.buildHistory}
               loading={this.state.loadingStars || this.state.loadingHistory}
             />

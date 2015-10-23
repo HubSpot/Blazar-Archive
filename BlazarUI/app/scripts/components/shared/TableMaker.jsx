@@ -8,14 +8,23 @@ import {bindAll, has} from 'underscore';
 import Loader from '../shared/Loader.jsx';
 
 function TableMaker(RenderedComponent, options) {
-  
+
+  let initialState = {
+    page: 0,
+    rowsPerPage: 15,
+    paginate: options.paginate
+  };
+
   class Table extends Component {
     
     constructor() {      
       bindAll(this, 'buildTable', 'getRows', 'changePage');
-      this.state = {
-        page: 0,
-        rowsPerPage: 15
+      this.state = initialState;
+    }
+
+    componentWillReceiveProps(nextProps) {
+      if (nextProps.params !== this.props.params) {
+        this.setState(initialState);
       }
     }
 
