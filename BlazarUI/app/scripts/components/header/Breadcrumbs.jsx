@@ -4,7 +4,14 @@ const Link = require('react-router').Link;
 import Icon from '../shared/Icon.jsx';
 import Logo from '../shared/Logo.jsx';
 import ClassNames from 'classnames';
-import HostDropdownBreadcrumb from './HostDropdownBreadcrumb.jsx';
+
+
+const ICON_MAP = {
+  1: 'org',
+  2: 'repo',
+  3: 'branch',
+  4: 'module'
+};
 
 class Breadcrumbs extends Component {
 
@@ -33,14 +40,6 @@ class Breadcrumbs extends Component {
       if (i === 0 || i === 1) {
         noLink = true;
       }
-      
-      // Note - removing for now, doesnt
-      // work with new endpoints setup
-      
-      // // org page
-      // if (i === 1) {
-      //   isOrg = true;
-      // }
 
       // generate route path for each link
       for (let g = 0; g < pages.length; g++) {
@@ -50,19 +49,6 @@ class Breadcrumbs extends Component {
           break;
         }
       }
-      
-      // if (isOrg) {
-      //   
-      //   return (
-      //     <HostDropdownBreadcrumb 
-      //       key={i}
-      //       page={page}
-      //       hosts={this.props.hosts} 
-      //       navigationIsActive={this.props.navigationIsActive}
-      //       activePage={isActivePage}
-      //     />
-      //   );
-      // }
 
       if (noLink) {
         const classNames = ClassNames([
@@ -71,13 +57,19 @@ class Breadcrumbs extends Component {
         ]);
         
         return (
-          <span key={page + i} className={classNames}>{page}</span>
+          <span key={page + i} className={classNames}>
+            { ICON_MAP[i] ? <Icon classNames='breadcrumb-icon' for={ICON_MAP[i]} />  : null}
+            {page}
+          </span>
         );        
       }
       
       
       return (
-        <Link key={page + i} className='crumb' to={`${this.props.appRoot}/builds${pageLinks}`}>{page}</Link>
+        <Link key={page + i} className='crumb' to={`${this.props.appRoot}/builds${pageLinks}`}>
+          { ICON_MAP[i] ? <Icon classNames='breadcrumb-icon' for={ICON_MAP[i]} />  : null}
+          {page}
+        </Link>
       );
 
     })

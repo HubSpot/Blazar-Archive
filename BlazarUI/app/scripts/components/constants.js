@@ -25,6 +25,7 @@ export const ICON_LIST = {
   'module': 'fa fa-folder-o',
   'star': 'fa fa-star',
   'branch': 'octicon octicon-git-branch',
+  'org': 'octicon octicon-organization',
   'repo': 'octicon octicon-repo',
   'spinner': 'fa fa-circle-o-notch fa-spin',
   'dashboard': 'fa fa-tachometer',
