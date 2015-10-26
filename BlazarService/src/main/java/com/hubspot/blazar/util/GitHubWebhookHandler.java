@@ -1,7 +1,23 @@
 package com.hubspot.blazar.util;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.FileSystems;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.BuildDefinition;
@@ -22,20 +38,6 @@ import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PullRequestEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystems;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 @Singleton
 public class GitHubWebhookHandler {
@@ -84,7 +86,7 @@ public class GitHubWebhookHandler {
   public void handlePushEvent(PushEvent pushEvent) throws IOException {
     if (!pushEvent.getRef().startsWith("refs/tags/")) {
       GitInfo eventGitInfo = gitInfo(pushEvent);
-      Optional<GitInfo> gitInfo = branchService.lookup(eventGitInfo.getHost(),eventGitInfo.getOrganization(), eventGitInfo.getRepository(), eventGitInfo.getBranch());
+      Optional<GitInfo> gitInfo = branchService.lookup(eventGitInfo.getHost(), eventGitInfo.getOrganization(), eventGitInfo.getRepository(), eventGitInfo.getBranch());
       Set<Module> modules;
 
       if (!gitInfo.isPresent()) {
@@ -105,7 +107,7 @@ public class GitHubWebhookHandler {
 
   @Subscribe
   public void handlePullRequestEvent(PullRequestEvent pullRequestEvent) throws IOException {
-    Set<PullRequestEvent.Action> openActions = Sets.newHashSet(PullRequestEvent.Action.opened, PullRequestEvent.Action.reopened);
+    Set<PullRequestEvent.Action> openActions = EnumSet.of(PullRequestEvent.Action.opened, PullRequestEvent.Action.reopened);
     GitInfo gitInfo = branchService.upsert(gitInfo(pullRequestEvent, openActions.contains(pullRequestEvent.getAction())));
     if (pullRequestEvent.getAction().equals(PullRequestEvent.Action.opened) || pullRequestEvent.getAction().equals(PullRequestEvent.Action.reopened)) {
       Set<Module> modules = moduleService.getByBranch(gitInfo.getId().get());
