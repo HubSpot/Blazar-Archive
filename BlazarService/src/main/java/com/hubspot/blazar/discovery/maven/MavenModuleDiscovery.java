@@ -25,9 +25,7 @@ import java.util.Set;
 public class MavenModuleDiscovery extends AbstractModuleDiscovery {
   private static final Logger LOG = LoggerFactory.getLogger(MavenModuleDiscovery.class);
 
-  private static final Optional<GitInfo> BRANCH_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#stable"));
-  private static final Optional<GitInfo> MASTER_BUILDPACK =
+  private static final Optional<GitInfo> STANDARD_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#publish"));
   private static final Optional<GitInfo> DEPLOYABLE_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#deployable"));
@@ -92,12 +90,10 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
   }
 
   private Optional<GitInfo> buildpackFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
-    if (!"master".equals(gitInfo.getBranch())) {
-      return BRANCH_BUILDPACK;
-    } else if (isDeployable(file, repository, gitInfo)) {
+    if (isDeployable(file, repository, gitInfo)) {
       return DEPLOYABLE_BUILDPACK;
     } else {
-      return MASTER_BUILDPACK;
+      return STANDARD_BUILDPACK;
     }
   }
 
