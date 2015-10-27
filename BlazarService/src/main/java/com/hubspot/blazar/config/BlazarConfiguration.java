@@ -37,6 +37,10 @@ public class BlazarConfiguration extends Configuration {
   @JsonProperty("ui")
   private UiConfiguration uiConfiguration = new UiConfiguration();
 
+  @Valid
+  @JsonProperty("slack")
+  private SlackConfiguration slackConfiguration;
+
   private boolean webhookOnly = false;
 
   public Map<String, GitHubConfiguration> getGitHubConfiguration() {
@@ -82,6 +86,14 @@ public class BlazarConfiguration extends Configuration {
   public BlazarConfiguration setUiConfiguration(UiConfiguration uiConfiguration) {
     this.uiConfiguration = uiConfiguration;
     return this;
+  }
+
+  public SlackConfiguration getSlackConfiguration() {
+    return slackConfiguration;
+  }
+
+  public void setSlackConfiguration(SlackConfiguration slackConfiguration) {
+    this.slackConfiguration = slackConfiguration;
   }
 
   public boolean isWebhookOnly() {
