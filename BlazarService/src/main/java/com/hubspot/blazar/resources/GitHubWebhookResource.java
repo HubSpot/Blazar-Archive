@@ -5,6 +5,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.github.GitHubProtos.PullRequestEvent;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
@@ -35,6 +36,12 @@ public class GitHubWebhookResource {
   @Path("/create")
   public void processCreateEvent(CreateEvent createEvent) {
     eventBus.post(createEvent);
+  }
+
+  @POST
+  @Path("/pullRequest")
+  public void processPullRequestEvent(PullRequestEvent pullRequestEvent) {
+    eventBus.post(pullRequestEvent);
   }
 
   @POST

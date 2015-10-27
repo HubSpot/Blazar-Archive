@@ -6,16 +6,19 @@ import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.Event;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.DependenciesService;
+import com.hubspot.blazar.data.service.EventService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
+import com.hubspot.blazar.github.GitHubProtos.PullRequestEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
 import org.slf4j.Logger;
@@ -42,6 +45,7 @@ public class GitHubWebhookHandler {
   private final ModuleDiscovery moduleDiscovery;
   private final BuildService buildService;
   private final DependenciesService dependenciesService;
+  private EventService eventService;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
@@ -49,12 +53,14 @@ public class GitHubWebhookHandler {
                               ModuleDiscovery moduleDiscovery,
                               BuildService buildService,
                               DependenciesService dependenciesService,
+                              EventService eventService,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.moduleDiscovery = moduleDiscovery;
     this.buildService = buildService;
     this.dependenciesService = dependenciesService;
+    this.eventService = eventService;
 
     eventBus.register(this);
   }
@@ -80,6 +86,23 @@ public class GitHubWebhookHandler {
 
       Set<Module> modules = updateModules(gitInfo, pushEvent);
       triggerBuilds(pushEvent, gitInfo, modules);
+      recordEvents(modules, pushEvent.getPusher().getName());
+    }
+  }
+
+  @Subscribe
+  public void handlePullRequestEvent(PullRequestEvent pullRequestEvent) {
+
+    if (pullRequestEvent.getAction().equals(PullRequestEvent.Action.opened) || pullRequestEvent.getAction().equals(PullRequestEvent.Action.reopened)) {
+
+      GitInfo gitInfo = gitInfo(pullRequestEvent);
+      Optional<GitInfo> fullGitInfo = branchService.lookup(gitInfo.getHost(), gitInfo.getOrganization(), gitInfo.getRepository(), gitInfo.getBranch());
+      if (fullGitInfo.isPresent()) {
+        Set<Module> modules = moduleService.getByBranch(fullGitInfo.get().getId().get());
+        recordEvents(modules, pullRequestEvent.getPullRequestOrBuilder().getUser().getUsername());
+      } else {
+        LOG.info("Not creating events for pr# {} on repository {}, no matching branches found", pullRequestEvent.getNumber(), pullRequestEvent.getRepository().getFullName());
+      }
     }
   }
 
@@ -156,6 +179,10 @@ public class GitHubWebhookHandler {
     return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), true);
   }
 
+  private GitInfo gitInfo(PullRequestEvent pullRequestEvent) {
+    return gitInfo(pullRequestEvent.getRepository(), pullRequestEvent.getPullRequestOrBuilder().getHead().getRef(), true);
+  }
+
   private GitInfo gitInfo(Repository repository, String ref, boolean active) {
     String host = URI.create(repository.getUrl()).getHost();
     if ("api.github.com".equals(host)) {
@@ -179,5 +206,14 @@ public class GitHubWebhookHandler {
     }
 
     return affectedPaths;
+  }
+
+  private void recordEvents(Set<Module> modules, String username){
+    String lowercaseName = username.toLowerCase();
+    long now = System.currentTimeMillis();
+    Optional<Integer> absentInt = Optional.absent();
+    for (Module module : modules) {
+      eventService.add(new Event(absentInt, module.getId().get(), now, lowercaseName));
+    }
   }
 }

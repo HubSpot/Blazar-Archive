@@ -37,6 +37,24 @@ message PushEvent {
     optional Sender sender = 14;
 }
 
+message PullRequestEvent {
+    enum Action {
+        opened = 0;
+        reopened = 1;
+        closed = 2;
+        synchronize = 3;
+        labeled = 4;
+        unassigned = 5;
+        assigned = 6;
+    }
+    optional Action action = 1;
+    optional int64 number = 2;
+    optional PullRequest pull_request = 3;
+    optional Repository repository = 4;
+    optional Organization organization = 5;
+    optional Sender sender = 6;
+}
+
 message User {
     optional string name = 1;
     optional string email = 2;
@@ -86,6 +104,60 @@ message Sender {
     optional string type = 16;
     optional string site_admin = 17;
     optional string ldap_dn = 18;
+}
+
+message PullRequest {
+    optional string url = 1;
+    optional int64 id = 2;
+    optional string html_url = 3;
+    optional string diff_url = 4;
+    optional string patch_url = 5;
+    optional string issue_url = 6;
+    optional int32 number = 7;
+    enum State {
+        open = 1;
+        closed = 2;
+        all = 3;
+    }
+    optional State state = 8;
+    optional bool locked = 9;
+    optional string title = 10;
+    optional User user = 11;
+    optional string body = 12;
+    optional string created_at = 13;
+    optional string updated_at = 14;
+    optional string closed_at = 15;
+    optional string merged_at = 16;
+    optional string merge_commit_sha = 17;
+    optional User assignee = 18;
+    optional string milestone = 19;
+    optional string commits_url = 20;
+    optional string review_comments_url = 21;
+    optional string review_comment_url = 22;
+    optional string comments_url = 23;
+    optional string statuses_url = 24;
+    optional PullRequestMarker head = 25;
+    optional PullRequestMarker base = 26;
+    optional bool merged = 28;
+    optional bool mergeable = 29;
+    optional string mergeable_state = 30;
+    optional User merged_by = 31;
+    optional int32 comments = 32;
+    optional int32 review_comments = 33;
+    optional int32 commits = 34;
+    optional int32 additions = 35;
+    optional int32 deletions = 36;
+    optional int32 changed_files = 37;
+    optional Repository repository = 38;
+    optional User sender = 39;
+}
+
+message PullRequestMarker {
+    optional string label = 1;
+    optional string ref = 2;
+    optional string sha = 3;
+    optional User user = 4;
+    optional Repository repo = 5;
 }
 
 message Repository {
