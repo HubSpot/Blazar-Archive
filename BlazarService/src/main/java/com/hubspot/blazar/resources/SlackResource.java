@@ -34,10 +34,6 @@ public class SlackResource {
   @POST
   @Path("/")
   public void sendMessage(Feedback feedback) throws IOException {
-    if (!slackConfiguration.isPresent() && slackConfiguration.get().getToken().isEmpty() || slackConfiguration.get().getRoom().isEmpty()) {
-      throw new IllegalArgumentException("Slack is not configured properly");
-    }
-
     long adjustedTimestamp = (feedback.getTimestamp()/1000)*1000;
 
     ZonedDateTime ESTMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(adjustedTimestamp), ZoneId.of("America/New_York"));

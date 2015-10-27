@@ -11,25 +11,16 @@ public class SlackConfiguration {
 
   @NotNull
   @NotEmpty
-  private final String token;
-  @NotNull
-  @NotEmpty
   private final String room;
   @NotNull
   @NotEmpty
   private String url;
 
   @JsonCreator
-  public SlackConfiguration(@JsonProperty("token") String token,
-                            @JsonProperty("room") String room,
+  public SlackConfiguration(@JsonProperty("room") String room,
                             @JsonProperty("url") String url) {
-    this.token = token;
     this.room = room;
     this.url = url;
-  }
-
-  public String getToken() {
-    return token;
   }
 
   public String getRoom() {
