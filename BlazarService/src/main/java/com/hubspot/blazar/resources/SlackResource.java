@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.feedback.Feedback;
@@ -20,7 +21,7 @@ import in.ashwanthkumar.slack.webhook.SlackAttachment;
 @Path("/slack")
 public class SlackResource {
 
-  private final SlackConfiguration slackConfiguration;
+  private final Optional<SlackConfiguration> slackConfiguration;
   private DateTimeFormatter timeFormat = DateTimeFormatter.ISO_LOCAL_TIME;
   private DateTimeFormatter dateFormat = DateTimeFormatter.ISO_LOCAL_DATE;
 
@@ -33,7 +34,7 @@ public class SlackResource {
   @POST
   @Path("/")
   public void sendMessage(Feedback feedback) throws IOException {
-    if (slackConfiguration.getToken().isEmpty() || slackConfiguration.getRoom().isEmpty()) {
+    if (!slackConfiguration.isPresent() && slackConfiguration.get().getToken().isEmpty() || slackConfiguration.get().getRoom().isEmpty()) {
       throw new IllegalArgumentException("Slack is not configured properly");
     }
 
@@ -42,7 +43,7 @@ public class SlackResource {
     ZonedDateTime ESTMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(adjustedTimestamp), ZoneId.of("America/New_York"));
     SlackAttachment.Field date = new SlackAttachment.Field("Date", String.format("%s %s", ESTMillis.format(dateFormat), ESTMillis.format(timeFormat)), true);
 
-    Slack api = new Slack(slackConfiguration.getSlackWebhookUrl()).displayName("Blazar").icon(":fire:");
+    Slack api = new Slack(slackConfiguration.get().getUrl()).displayName("Blazar").icon(":fire:");
 
     SlackAttachment attachment = new SlackAttachment(feedback.getMessage()).addField(date);
     if (feedback.getOther().isPresent()) {

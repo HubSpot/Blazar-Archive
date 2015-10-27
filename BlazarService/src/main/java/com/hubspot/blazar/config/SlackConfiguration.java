@@ -1,23 +1,31 @@
 package com.hubspot.blazar.config;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SlackConfiguration {
 
+  @NotNull
+  @NotEmpty
   private final String token;
+  @NotNull
+  @NotEmpty
   private final String room;
-  private String slackWebhookUrl;
-  private static final String BASE_URL = "https://slack.com/api";
-  private static final String BLAZAR_ICON_LINK = "https://static.hsappstatic.net/BlazarUI/static-1.32246/images/blazar-logo.png";
+  @NotNull
+  @NotEmpty
+  private String url;
 
   @JsonCreator
   public SlackConfiguration(@JsonProperty("token") String token,
                             @JsonProperty("room") String room,
-                            @JsonProperty("url") String slackWebhookUrl) {
+                            @JsonProperty("url") String url) {
     this.token = token;
     this.room = room;
-    this.slackWebhookUrl = slackWebhookUrl;
+    this.url = url;
   }
 
   public String getToken() {
@@ -28,15 +36,7 @@ public class SlackConfiguration {
     return room;
   }
 
-  public String getSlackWebhookUrl() {
-    return slackWebhookUrl;
-  }
-
-  public String getBaseUrl() {
-    return BASE_URL;
-  }
-
-  public String getBlazarIconLink() {
-    return BLAZAR_ICON_LINK;
+  public String getUrl() {
+    return url;
   }
 }

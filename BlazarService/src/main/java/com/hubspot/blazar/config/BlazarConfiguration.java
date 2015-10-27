@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.google.common.base.Optional;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 
@@ -39,7 +39,7 @@ public class BlazarConfiguration extends Configuration {
 
   @Valid
   @JsonProperty("slack")
-  private SlackConfiguration slackConfiguration;
+  private Optional<SlackConfiguration> slackConfiguration = Optional.absent();
 
   private boolean webhookOnly = false;
 
@@ -88,11 +88,11 @@ public class BlazarConfiguration extends Configuration {
     return this;
   }
 
-  public SlackConfiguration getSlackConfiguration() {
+  public Optional<SlackConfiguration> getSlackConfiguration() {
     return slackConfiguration;
   }
 
-  public void setSlackConfiguration(SlackConfiguration slackConfiguration) {
+  public void setSlackConfiguration(Optional<SlackConfiguration> slackConfiguration) {
     this.slackConfiguration = slackConfiguration;
   }
 
