@@ -87,7 +87,7 @@ public class GitHubStatusHandler {
 
   private boolean shouldUpdateStatus(BuildDefinition definition, Build build) {
     Optional<BuildConfig> buildConfig = build.getBuildConfig();
-    if (build.getState() == State.QUEUED) {
+    if (build.getState() == State.QUEUED || !build.getSha().isPresent()) {
       return false;
     } else if (buildConfig.isPresent() && manualBuildSpecified(buildConfig.get())) {
       return true;
