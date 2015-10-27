@@ -269,8 +269,13 @@ public class BuildLauncher {
       if (previousCommit.isPresent()) {
         newCommits = new ArrayList<>();
 
-        GHCompare compare = repository.getCompare(previousCommit.get().getId(), commit.getId());
-        List<GHCompare.Commit> commits = Arrays.asList(compare.getCommits());
+        List<GHCompare.Commit> commits = Collections.emptyList();
+        try {
+          GHCompare compare = repository.getCompare(previousCommit.get().getId(), commit.getId());
+          commits = Arrays.asList(compare.getCommits());
+        } catch (FileNotFoundException e) {
+          LOG.warn("Error generating compare from sha {} to sha {}", previousCommit.get().getId(), commit.getId(), e);
+        }
 
         if (commits.size() > 10) {
           commits = commits.subList(commits.size() - 10, commits.size());
