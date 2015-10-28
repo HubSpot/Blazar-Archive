@@ -66,8 +66,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
       binder.bind(BuildResource.class);
       binder.bind(BuildStateResource.class);
       binder.bind(BuildHistoryResource.class);
-    }
-    if (configuration.getSlackConfiguration().isPresent()) {
       binder.bind(SlackResource.class);
     }
 

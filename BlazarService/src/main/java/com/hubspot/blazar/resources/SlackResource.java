@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -34,6 +35,11 @@ public class SlackResource {
   @POST
   @Path("/")
   public void sendMessage(Feedback feedback) throws IOException {
+    if (!slackConfiguration.isPresent()) {
+      throw new WebApplicationException(new Throwable("Slack is not configured"));
+    }
+
+
     long adjustedTimestamp = (feedback.getTimestamp()/1000)*1000;
 
     ZonedDateTime ESTMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(adjustedTimestamp), ZoneId.of("America/New_York"));

@@ -14,7 +14,7 @@ public class SlackConfiguration {
   private final String room;
   @NotNull
   @NotEmpty
-  private String url;
+  private final String url;
 
   @JsonCreator
   public SlackConfiguration(@JsonProperty("room") String room,
