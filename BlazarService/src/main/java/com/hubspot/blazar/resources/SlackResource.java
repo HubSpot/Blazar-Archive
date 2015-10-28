@@ -1,10 +1,6 @@
 package com.hubspot.blazar.resources;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,13 +15,10 @@ import com.hubspot.blazar.config.SlackConfiguration;
 import in.ashwanthkumar.slack.webhook.Slack;
 import in.ashwanthkumar.slack.webhook.SlackAttachment;
 
-@Path("/slack")
+@Path("/Feedback")
 public class SlackResource {
 
   private final Optional<SlackConfiguration> slackConfiguration;
-  private DateTimeFormatter timeFormat = DateTimeFormatter.ISO_LOCAL_TIME;
-  private DateTimeFormatter dateFormat = DateTimeFormatter.ISO_LOCAL_DATE;
-
 
   @Inject
   public SlackResource(BlazarConfiguration configuration) {
@@ -33,29 +26,20 @@ public class SlackResource {
   }
 
   @POST
-  @Path("/")
+  @Path("/feedback")
   public void sendMessage(Feedback feedback) throws IOException {
     if (!slackConfiguration.isPresent()) {
       throw new WebApplicationException(new Throwable("Slack is not configured"));
     }
 
-
-    long adjustedTimestamp = (feedback.getTimestamp()/1000)*1000;
-
-    ZonedDateTime ESTMillis = ZonedDateTime.ofInstant(Instant.ofEpochMilli(adjustedTimestamp), ZoneId.of("America/New_York"));
-    SlackAttachment.Field date = new SlackAttachment.Field("Date", String.format("%s %s", ESTMillis.format(dateFormat), ESTMillis.format(timeFormat)), true);
-
     Slack api = new Slack(slackConfiguration.get().getUrl()).displayName("Blazar").icon(":fire:");
-
-    SlackAttachment attachment = new SlackAttachment(feedback.getMessage()).addField(date);
+    SlackAttachment attachment = new SlackAttachment(feedback.getMessage());
     if (feedback.getOther().isPresent()) {
-      attachment = attachment.addField(new SlackAttachment.Field("OtherData", feedback.getOther().get(), true));
+      attachment = attachment.addField(new SlackAttachment.Field("OtherData", feedback.getOther().get(), false));
     }
-
     attachment = attachment
         .title(String.format("New Feedback from %s", feedback.getUsername()), feedback.getPage())
         .fallback(String.format("New Feedback from %s: %s", feedback.getUsername(), feedback.getMessage()));
-
     api.push(ImmutableList.of(attachment));
   }
 }

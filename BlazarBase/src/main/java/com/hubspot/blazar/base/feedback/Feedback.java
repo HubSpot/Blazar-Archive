@@ -9,19 +9,16 @@ public class Feedback {
   private final String username;
   private final String message;
   private final String page;
-  private final long timestamp;
   private final Optional<String> other;
 
   @JsonCreator
   public Feedback(@JsonProperty("username") String username,
                   @JsonProperty("message") String message,
                   @JsonProperty("page") String page,
-                  @JsonProperty("timestamp") long timestamp,
                   @JsonProperty("other") Optional<String> other) {
     this.username = username;
     this.message = message;
     this.page = page;
-    this.timestamp = timestamp;
     this.other = other;
   }
 
@@ -35,10 +32,6 @@ public class Feedback {
 
   public String getPage() {
     return page;
-  }
-
-  public long getTimestamp() {
-    return timestamp;
   }
 
   public Optional<String> getOther() {
