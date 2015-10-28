@@ -6,15 +6,20 @@ import {bindAll} from 'underscore';
 class FeedbackForm extends Component {
 
   constructor() {
-    bindAll(this, 'toggleShow');
+    bindAll(this, 'toggleShow', 'submitFeedback', 'handleNameChange', 'handleMessageChange');
     this.state = {
-      visable: false
+      visable: false,
+      nameValue: '',
+      messageValue: '',
+      submitDisabled: true,
+      submitted: false
     }
   }
 
   toggleShow() {
     this.setState({
-      visable: !this.state.visable
+      visable: !this.state.visable,
+      submitted: false
     });
   }
 
@@ -26,8 +31,71 @@ class FeedbackForm extends Component {
     }
   }
 
-  submitFeedback() {
+  handleNameChange() {
+    this.setState({
+      nameValue: this.refs.name.getValue(),
+      submitDisabled: !(this.refs.name.getValue() && this.refs.message.getValue())
+    });
+  }
 
+  handleMessageChange() {
+    this.setState({
+      messageValue: this.refs.message.getValue(),
+      submitDisabled: !(this.refs.name.getValue() && this.refs.message.getValue())
+    });
+  }
+
+  submitFeedback() {
+    let name = this.state.nameValue;
+    let message = this.state.messageValue;
+    let url = window.location.href;
+    let userAgent = navigator.userAgent;
+    console.log(name, message, url, userAgent);
+    this.setState({
+      submitted: true,
+      nameValue: '',
+      messageValue: ''
+    });
+  }
+
+  renderContent() {
+    if (this.state.submitted) {
+      return this.renderThanks();
+    }
+    else {
+      return this.renderForm();
+    }
+  }
+
+  renderThanks() {
+    return (
+      <div>
+        <p>Thanks for your help in improving Blazar!</p>
+        <p>To join the conversation, hit up #blazar in Slack.</p>
+      </div>
+    );
+  }
+
+  renderForm() {
+    return (
+      <div>
+        <Input
+          type="text"
+          label="Name"
+          ref="name"
+          value={this.state.nameValue}
+          onChange={this.handleNameChange} />
+        <Input
+          className="message-area"
+          type="textarea"
+          label="Message"
+          ref="message"
+          help="The URL of the page you are on (and other data) will be submitted with this form."
+          value={this.state.messageValue}
+          onChange={this.handleMessageChange} />
+        <Button bsStyle="info" block disabled={this.state.submitDisabled} onClick={this.submitFeedback}>Submit</Button>
+      </div>
+    );
   }
 
   render() {
@@ -37,17 +105,7 @@ class FeedbackForm extends Component {
           Give Feedback
         </div>
         <div className="feedback-form">
-          <Input
-            type="text"
-            label="Name"
-            ref="name" />
-          <Input
-            className="message-area"
-            type="textarea"
-            label="Message"
-            ref="message"
-            help="The URL of the page you are on (and other data) will be submitted with this form." />
-          <Button bsStyle="info" block>Submit</Button>
+          {this.renderContent()}
         </div>
       </div>
     );
