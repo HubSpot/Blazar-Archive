@@ -1,0 +1,31 @@
+
+.feedback-container
+  position fixed
+  bottom 0
+  right 0
+  overflow hidden
+  max-height 40px
+  transition all 0.75s
+
+  &.visable
+    max-height 999px
+
+.feedback-title
+  float right
+  margin-right 10px
+  height 40px
+  padding 10px
+  border 1px solid $gray-light
+  border-bottom none
+  background-color white
+  cursor pointer
+
+.feedback-form
+  margin-top 40px
+  padding 10px
+  background-color $gray-lightest
+  border 1px solid $gray-light
+  border-bottom none
+
+.feedback-form .message-area
+  height 100px
