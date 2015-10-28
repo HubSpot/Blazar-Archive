@@ -3,6 +3,7 @@ import Input from 'react-bootstrap/lib/Input';
 import Button from 'react-bootstrap/lib/Button';
 import {bindAll} from 'underscore';
 import Feedback from '../../models/Feedback'
+import Icon from '../shared/Icon.jsx';
 
 class FeedbackForm extends Component {
 
@@ -73,8 +74,9 @@ class FeedbackForm extends Component {
   renderThanks() {
     return (
       <div className="thanks">
-        <p>Thanks for your help in improving Blazar!</p>
-        <p>To join the conversation, hit up #blazar in Slack.</p>
+        <p className="thanks-text">Thanks for helping us improve Blazar!</p>
+        <p className="big-icon"><Icon for="circle-check"/></p>
+        <p className="thanks-text">To join the conversation, hit up #blazar in Slack.</p>
       </div>
     );
   }
