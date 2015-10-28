@@ -76,7 +76,7 @@ class FeedbackForm extends Component {
       <div className="thanks">
         <p className="thanks-text">Thanks for helping us improve Blazar!</p>
         <p className="big-icon"><Icon for="circle-check"/></p>
-        <p className="thanks-text">To join the conversation, hit up #blazar in Slack.</p>
+        <p className="thanks-text">To join the conversation, hit up <span className="channel-name">#blazar</span> in Slack.</p>
       </div>
     );
   }
