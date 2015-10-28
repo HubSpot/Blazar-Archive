@@ -166,7 +166,7 @@
         <groupId>in.ashwanthkumar</groupId>
         <artifactId>slack-java-webhook</artifactId>
         <version>0.0.4</version>
-    </dependency>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
