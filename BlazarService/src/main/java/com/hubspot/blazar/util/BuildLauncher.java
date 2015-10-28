@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -167,13 +167,14 @@ public class BuildLauncher {
 
   private static BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
     List<String> cmds = primary.getCmds().isEmpty() ? secondary.getCmds() : primary.getCmds();
-    Map<String, String> env = new HashMap<>();
+    Map<String, String> env = new LinkedHashMap<>();
     env.putAll(secondary.getEnv());
     env.putAll(primary.getEnv());
     List<String> buildDeps = Lists.newArrayList(Iterables.concat(secondary.getBuildDeps(), primary.getBuildDeps()));
     List<String> webhooks = Lists.newArrayList(Iterables.concat(secondary.getWebhooks(), primary.getWebhooks()));
+    List<String> cache = Lists.newArrayList(Iterables.concat(secondary.getCache(), primary.getCache()));
 
-    return new BuildConfig(cmds, env, buildDeps, webhooks, Optional.<GitInfo>absent());
+    return new BuildConfig(cmds, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent());
   }
 
   private HttpRequest buildRequest(BuildDefinition definition, Build build) {
