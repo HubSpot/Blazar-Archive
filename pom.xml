@@ -34,7 +34,7 @@
     <developer>
       <name>Kevin Moses</name>
       <email>kmoses@hubspot.com</email>
-    </developer>    
+    </developer>
   </developers>
 
   <properties>
@@ -161,6 +161,11 @@
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>woodstox-core-asl</artifactId>
         <version>4.4.1</version>
+      </dependency>
+      <dependency>
+        <groupId>in.ashwanthkumar</groupId>
+        <artifactId>slack-java-webhook</artifactId>
+        <version>0.0.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

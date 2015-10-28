@@ -5,15 +5,11 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
-import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
-import com.hubspot.blazar.resources.BuildStateResource;
-import com.hubspot.blazar.util.DependencyBuilder;
-import com.hubspot.blazar.util.SingularityTaskKiller;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
@@ -25,19 +21,24 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
+import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
+import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
+import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.discovery.docker.DockerModuleDiscovery;
+import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
 import com.hubspot.blazar.resources.BuildResource;
+import com.hubspot.blazar.resources.BuildStateResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
+import com.hubspot.blazar.resources.FeedbackResource;
 import com.hubspot.blazar.util.BlazarServiceLoader;
 import com.hubspot.blazar.util.BuildLauncher;
-import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
-import com.hubspot.blazar.util.GitHubWebhookHandler;
+import com.hubspot.blazar.util.DependencyBuilder;
 import com.hubspot.blazar.util.GitHubStatusHandler;
+import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
-import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
-import com.hubspot.blazar.discovery.ModuleDiscovery;
+import com.hubspot.blazar.util.SingularityTaskKiller;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
@@ -46,7 +47,6 @@ import com.hubspot.horizon.RetryStrategy;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
-
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Environment;
 
@@ -66,6 +66,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
       binder.bind(BuildResource.class);
       binder.bind(BuildStateResource.class);
       binder.bind(BuildHistoryResource.class);
+      binder.bind(FeedbackResource.class);
     }
 
     binder.bind(GitHubWebhookHandler.class);
