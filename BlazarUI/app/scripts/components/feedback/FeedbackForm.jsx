@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import Input from 'react-bootstrap/lib/Input';
 import Button from 'react-bootstrap/lib/Button';
 import {bindAll} from 'underscore';
+import Feedback from '../../models/Feedback'
 
 class FeedbackForm extends Component {
 
@@ -50,12 +51,14 @@ class FeedbackForm extends Component {
     let message = this.state.messageValue;
     let url = window.location.href;
     let userAgent = navigator.userAgent;
-    console.log(name, message, url, userAgent);
-    this.setState({
-      submitted: true,
-      nameValue: '',
-      messageValue: ''
-    });
+    let feedback = new Feedback(name, message, url, userAgent);
+    feedback.submit().done(() =>
+      this.setState({
+        submitted: true,
+        nameValue: '',
+        messageValue: ''
+      })
+    );
   }
 
   renderContent() {
@@ -69,7 +72,7 @@ class FeedbackForm extends Component {
 
   renderThanks() {
     return (
-      <div>
+      <div className="thanks">
         <p>Thanks for your help in improving Blazar!</p>
         <p>To join the conversation, hit up #blazar in Slack.</p>
       </div>
