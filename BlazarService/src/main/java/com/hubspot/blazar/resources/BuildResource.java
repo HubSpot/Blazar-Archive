@@ -29,7 +29,9 @@ import com.hubspot.singularity.SingularityS3Log;
 import com.hubspot.singularity.client.SingularityClient;
 import com.sun.jersey.api.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Path("/build")
@@ -88,15 +90,7 @@ public class BuildResource {
     if (chunk.isPresent()) {
       return chunk.get().getOffset();
     } else {
-      Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId.get());
-      if (s3Logs.isEmpty()) {
-        throw new NotFoundException("No S3 log found for ID " + id);
-      } else if (s3Logs.size() > 1) {
-        throw new NotFoundException("Multiple S3 logs found for ID " + id);
-      }
-
-      SingularityS3Log s3Log = s3Logs.iterator().next();
-      return s3Log.getSize();
+      return findS3ServiceLog(taskId.get()).getSize();
     }
   }
 
@@ -127,19 +121,12 @@ public class BuildResource {
         return new LogChunk(chunk.get().getData(), chunk.get().getOffset());
       }
     } else {
-      Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId.get());
-      if (s3Logs.isEmpty()) {
-        throw new NotFoundException("No S3 log found for ID " + id);
-      } else if (s3Logs.size() > 1) {
-        throw new NotFoundException("Multiple S3 logs found for ID " + id);
-      }
-
-      SingularityS3Log s3Log = s3Logs.iterator().next();
+      SingularityS3Log s3Log = findS3ServiceLog(taskId.get());
       if (offset >= s3Log.getSize()) {
         return new LogChunk("", s3Log.getSize(), -1);
       }
 
-      return fetchS3Log(s3Log.getGetUrl(), offset, length);
+      return readS3LogChunk(s3Log.getGetUrl(), offset, length);
     }
   }
 
@@ -173,7 +160,25 @@ public class BuildResource {
     return moduleBuild;
   }
 
-  private LogChunk fetchS3Log(String url, long offset, long length) throws Exception {
+  private SingularityS3Log findS3ServiceLog(String taskId) {
+    Collection<SingularityS3Log> s3Logs = singularityClient.getTaskLogs(taskId);
+    List<SingularityS3Log> serviceLogs = new ArrayList<>();
+    for (SingularityS3Log s3Log : s3Logs) {
+      if (s3Log.getGetUrl().contains("service.log")) {
+        serviceLogs.add(s3Log);
+      }
+    }
+
+    if (serviceLogs.isEmpty()) {
+      throw new NotFoundException("No S3 log found for task " + taskId);
+    } else if (serviceLogs.size() > 1) {
+      throw new NotFoundException("Multiple S3 logs found for task " + taskId);
+    }
+
+    return serviceLogs.get(0);
+  }
+
+  private LogChunk readS3LogChunk(String url, long offset, long length) throws Exception {
     HttpRequest request = HttpRequest.newBuilder()
         .setUrl(url)
         .addHeader("Range", String.format("bytes=%d-%d", offset, offset + length))
