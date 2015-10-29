@@ -57,7 +57,8 @@ class FeedbackForm extends Component {
       this.setState({
         submitted: true,
         nameValue: '',
-        messageValue: ''
+        messageValue: '',
+        submitDisabled: true
       })
     );
   }
