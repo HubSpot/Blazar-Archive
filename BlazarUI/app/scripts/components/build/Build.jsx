@@ -50,7 +50,7 @@ class Build extends Component {
                 build={this.props.build}
               />
               <BuildLogNavigation 
-                navigateLogChange={this.props.navigateLogChange}
+                changeOffsetWithNavigation={this.props.changeOffsetWithNavigation}
               />
             </UIGridItem>
           </UIGrid>
@@ -67,7 +67,7 @@ class Build extends Component {
           <div>  
             <BuildLog
               log={this.props.log}
-              navigating={this.props.navigating}
+              positionChange={this.props.positionChange}
               fetchingLog={this.props.fetchingLog}
               pageUp={this.props.pageUp}
               scrollToOffset={this.props.scrollToOffset}
@@ -91,8 +91,8 @@ Build.propTypes = {
     module: PropTypes.object
   }),
   error: PropTypes.node,
-  navigating: PropTypes.string,
-  navigateLogChange: PropTypes.func.isRequired,
+  positionChange: PropTypes.string,
+  changeOffsetWithNavigation: PropTypes.func.isRequired,
   log: PropTypes.array,
   scrollToOffset: PropTypes.number,
   fetchingLog: PropTypes.bool,

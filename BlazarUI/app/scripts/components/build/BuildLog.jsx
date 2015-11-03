@@ -8,6 +8,12 @@ import Loader from '../shared/Loader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx'
 import BuildStates from '../../constants/BuildStates';
 
+window.$ = $
+
+
+
+
+
 
 class BuildLog extends Component {
 
@@ -23,11 +29,8 @@ class BuildLog extends Component {
     }
   }
   
-  
   componentDidMount() {
     this.scrollId = `offset-${this.props.currrentOffsetLine}`;
-    
-    console.log('did Mount, set scrollId: ', this.props.currrentOffsetLine);
     this.scrollToBottom();
     $('#log').on('scroll', this.handleScroll)
   }
@@ -39,35 +42,39 @@ class BuildLog extends Component {
   }
 
   componentDidUpdate(nextProps, nextState) {
-    console.log('Component Did Update');
-    
-    // store next scroll to value so we can set it
-    // set it after our requestAnimationFrame is complete
-    
-    // If navigating using the 'To Top' and 'To Bottom' buttons
-    if (this.props.navigating) {
-      this.nextScrollId = `offset-${this.props.scrollToOffset}`;
+    // If positionChange using the 'To Top' and 'To Bottom' buttons
+    if (this.props.positionChange) {
+      this.scrollId = `offset-${this.props.scrollToOffset}`;
     }
-    
+    // store next scroll to value so we can set it
+    // set it after our requestAnimationFrame is complete  
     else {
-      console.log('setting scrollId to: ', this.props.currrentOffsetLine);
       this.nextScrollId = `offset-${this.props.currrentOffsetLine}`;
     }
-
-    this.scrollToOffset();
-    // window.requestAnimationFrame(() => {
-    //   this.scrollToOffset();
-    // });
+    // positionChange using 'To Top' and 'To Bottom' buttons
+    // Move to separate method?
+    if (this.props.positionChange) {
+      this.scrollForNavigatonChange();
+    }
+    else {
+      this.scrollToOffset();
+    }
     
-
-
-    // Active builds... --> check position
+    // To Do:
+    // Handle active builds
     // if (nextProps.buildState === BuildStates.IN_PROGRESS) {
   }
   
   componentWillUnmount() {
     $('#log').off('scroll', this.handleScroll)
   }
+  
+
+  // checkPosition() {
+  //   if (this.state.isTailing) {
+  //     this.scrollToBottom();
+  //   }
+  // }
   
   handlePageUp() {
     if (!this.state.hasPaged) {
@@ -76,7 +83,6 @@ class BuildLog extends Component {
   }
 
   handleScroll() {  
-
     const logPosition = $('#log').scrollTop();
     const logHeight = $('#log')[0].scrollHeight - 240
     
@@ -87,10 +93,8 @@ class BuildLog extends Component {
         });
       }
     } 
-    
     // at top of page
     else if ( logPosition <= 30 && !this.state.isPaging) {
-      console.log('handle Page up');
       this.handlePageUp();
         this.setState({
           isPaging: true
@@ -105,73 +109,26 @@ class BuildLog extends Component {
       }
     }
     
-    
-    // // at bottom of page
-    // if ($(window).scrollTop() === $(document).height() - $(window).height()  ) {
-    //   if (this.props.buildState === BuildStates.IN_PROGRESS) {
-    //     this.setState({
-    //       isTailing: true
-    //     });
-    //   }
-    // } 
-    // 
-    // // at top of page
-    // else if ($(window).scrollTop() <= 30 && !this.state.isPaging) {
-    //   this.handlePageUp();
-    //   // show loader at top of build log
-    //   this.setState({
-    //     isPaging: true
-    //   });
-    // }
-    // 
-    // else {
-    //   if (this.props.buildState === BuildStates.IN_PROGRESS) {
-    //     this.setState({
-    //       isTailing: false,
-    //       isPaging: false
-    //     });
-    //   }
-    // }
-    
-    
   }
-  
-  
-  
-  
   
   scrollToOffset() {
     if (!this.scrollId) {
       return;
     }
 
-
     window.requestAnimationFrame(() => {
-      console.log('request animation, scroll to: ', this.scrollId);
       document.getElementById(this.scrollId).scrollIntoView();
       this.scrollId = this.nextScrollId;
     });
     
-    // const scrolledY = window.scrollY;
-    // if (this.props.navigating === 'bottom') {
-    //   window.scroll(0, scrolledY)
-    // }
-    // // hit "To Top" button
-    // else if (this.props.navigating === 'top') {
-    //   // a little hack to expose the current offset
-    //   // line which is hidden behind the fixed header 
-    //   const headerHt = 270;
-    //   if(scrolledY){
-    //     window.scroll(0, scrolledY - headerHt);
-    //   }
-    // }
-    
   }
-
-
-  checkPosition() {
-    if (this.state.isTailing) {
-      this.scrollToBottom();
+  
+  scrollForNavigatonChange() {
+    if (this.props.positionChange === 'bottom') {
+      $('#log').scrollTop($('#log')[0].scrollHeight);
+    }
+    else if (this.props.positionChange === 'top') {
+      $('#log').scrollTop(0);
     }
   }
   
@@ -221,7 +178,7 @@ class BuildLog extends Component {
 
 BuildLog.propTypes = {
   log: PropTypes.array,
-  navigating: PropTypes.string,
+  positionChange: PropTypes.string,
   scrollToOffset: PropTypes.number,
   fetchingLog: PropTypes.bool,
   position: PropTypes.string,

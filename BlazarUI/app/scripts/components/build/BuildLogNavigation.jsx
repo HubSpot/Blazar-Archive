@@ -8,7 +8,7 @@ class BuildLogNavigation extends Component {
 
   handleNavClick(e) {
     const position = dataTagValue(e, 'position');
-    this.props.navigateLogChange(position);
+    this.props.changeOffsetWithNavigation(position);
   }
 
   render() {
@@ -22,7 +22,7 @@ class BuildLogNavigation extends Component {
 }
 // 
 BuildLogNavigation.propTypes = {
-  navigateLogChange: PropTypes.func.isRequired
+  changeOffsetWithNavigation: PropTypes.func.isRequired
 };
 
 export default BuildLogNavigation;

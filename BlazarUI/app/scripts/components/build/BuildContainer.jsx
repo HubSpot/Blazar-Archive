@@ -20,7 +20,7 @@ const initialState = {
     module: { name: ''}
   },
   log: [],
-  navigating: null,
+  positionChange: null,
   fetchingLog: false,
   currentOffset: 0,
   currrentOffsetLine: 0,
@@ -32,7 +32,7 @@ class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
-    bindAll(this, 'toggleStar', 'triggerCancelBuild', 'pageUp', 'navigateLogChange');
+    bindAll(this, 'toggleStar', 'triggerCancelBuild', 'pageUp', 'changeOffsetWithNavigation');
     this.state = initialState;
   }
 
@@ -73,11 +73,11 @@ class BuildContainer extends Component {
     BuildActions.pageUp(this.props.params.moduleId);
   }
   
-  navigateLogChange(position) {
+  changeOffsetWithNavigation(position) {
     console.log('navigation change: ', position);
-    BuildActions.navigateLogChange(this.props.params.moduleId, position)
+    BuildActions.changeOffsetWithNavigation(this.props.params.moduleId, position)
     // this.setState({
-    //   navigating: position
+    //   positionChange: position
     // })
   }
   
@@ -115,12 +115,13 @@ class BuildContainer extends Component {
     }
 
     if (state.build) {
+      console.log('state change: ', state.build);
       this.setState({
         loading: false,
         build: state.build.build,
         log: state.build.log,
         fetchingLog: state.build.fetchingLog,
-        
+        positionChange: state.build.positionChange,
         scrollToOffset: state.build.scrollToOffset,
         currentOffset: state.build.currentOffset,
         currrentOffsetLine: state.build.currrentOffsetLine
@@ -145,8 +146,8 @@ class BuildContainer extends Component {
           error={this.state.error}
           build={this.state.build}
           log={this.state.log}
-          navigating={this.state.navigating}
-          navigateLogChange={this.navigateLogChange}
+          positionChange={this.state.positionChange}
+          changeOffsetWithNavigation={this.changeOffsetWithNavigation}
           currentOffset={this.state.currentOffset}
           currrentOffsetLine={this.state.currrentOffsetLine}
           scrollToOffset={this.state.scrollToOffset}

@@ -25,7 +25,7 @@ const BuildActions = Reflux.createActions([
   'triggerBuildStart',
   'loadBuildCancelError',
   'loadBuildCancelled',
-  'navigateLogChange',
+  'changeOffsetWithNavigation',
   'pageUp'
 ]);
 
@@ -41,7 +41,7 @@ BuildActions.pageUp = function(moduleId) {
   pageBuild(builds[moduleId]);
 };
 
-BuildActions.navigateLogChange = function(moduleId, position) {
+BuildActions.changeOffsetWithNavigation = function(moduleId, position) {
   const build = builds[moduleId];
   const updatedOffset = position === 'top' ? 0 : build.log.options.lastOffset;
 
@@ -197,6 +197,9 @@ function processBuild() {
 
 
 
+
+
+
 function processInProgressBuild(build) {
   let inProgressBuild = {
     logLines: '',
@@ -249,6 +252,10 @@ function processInProgressBuild(build) {
 
   })();
 }
+
+
+
+
 //
 // Inactive Build Methods
 //
@@ -275,7 +282,13 @@ function fetchInactiveBuildLog(build) {
   });
 };
 
-// share?
+
+
+
+
+//
+// Shared Methods
+//
 function updateStore(build, log, data, textStatus, jqxhr) {
   if (jqxhr.responseJSON === undefined || textStatus !== 'success') {
     BuildActions.loadBuildSuccess({
@@ -292,12 +305,11 @@ function updateStore(build, log, data, textStatus, jqxhr) {
     fetchingLog: false,
     currentOffset: log.options.offset,
     currrentOffsetLine: log.currrentOffsetLine,
-    scrollToOffset: log.scrollToOffset
+    scrollToOffset: log.scrollToOffset,
+    positionChange: build.log.positionChange
   });
 }
-//
-// Shared Methods
-//
+
 function getLogSize(build, cb) {
   const logSize = new LogSize({
     buildNumber: build.data.build.id
@@ -326,12 +338,10 @@ function loadOffset(options) {
     .setOffset(updatedOffset)
     .fetch()
     .always((data, textStatus, jqxhr) => {
-      
       if (position) {
         build.log.scrollToOffset = position === 'top' ? build.log.currrentOffsetLine : build.log.lastOffsetLine;
         build.log.positionChange = position;
       }
-
       updateStore(build, build.log, data, textStatus, jqxhr)
   });
 
