@@ -1,7 +1,10 @@
+/*global config*/
 import Reflux from 'reflux';
 
 import Build from '../models/Build';
 import Log from '../models/Log';
+import LogSize from '../models/LogSize';
+
 import BuildTrigger from '../models/BuildTrigger';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
@@ -21,7 +24,9 @@ const BuildActions = Reflux.createActions([
   'triggerBuildError',
   'triggerBuildStart',
   'loadBuildCancelError',
-  'loadBuildCancelled'
+  'loadBuildCancelled',
+  'navigateLogChange',
+  'pageUp'
 ]);
 
 BuildActions.loadBuild.preEmit = function(data) {
@@ -31,6 +36,21 @@ BuildActions.loadBuild.preEmit = function(data) {
 BuildActions.reloadBuild = function(data) {
   BuildActions.setupBuildRequest(data);
 };
+
+BuildActions.pageUp = function(moduleId) {
+  pageBuild(builds[moduleId]);
+};
+
+BuildActions.navigateLogChange = function(moduleId, position) {
+  const build = builds[moduleId];
+  const updatedOffset = position === 'top' ? 0 : build.log.options.lastOffset;
+
+  loadOffset({
+    updatedOffset: updatedOffset,
+    build: build,
+    position: position
+  });
+}
 
 BuildActions.setupBuildRequest = function(data) {
   requestedBuild.gitInfo = data;
@@ -169,6 +189,14 @@ function processBuild() {
   }
 }
 
+
+
+
+
+
+
+
+
 function processInProgressBuild(build) {
   let inProgressBuild = {
     logLines: '',
@@ -205,7 +233,6 @@ function processInProgressBuild(build) {
           });
         });
       }
-    
       // still building
       else {
         BuildActions.loadBuildSuccess({
@@ -218,60 +245,98 @@ function processInProgressBuild(build) {
           fetchLog();
         }, 5000);
       }
-    
     });
 
   })();
 }
-
+//
+// Inactive Build Methods
+//
 function processInactiveBuild(build) {
-  let logLines = '';
-  let offset = 0;
-
-  (function fetchLog() {
-    const log = new Log({
-      buildNumber: build.data.build.id,
-      offset: offset
-    });
-
-    const logPromise = log.fetch();
-    logPromise.always( (data, textStatus, jqxhr) => {
-
-      logLines += log.formatLog(jqxhr);
-
-      if (jqxhr.responseJSON === undefined || textStatus !== 'success') {
-        BuildActions.loadBuildSuccess({
-          build: build.data,
-          log: `<p class='roomy-xy'>${data.responseText}</p>`,
-          fetchingLog: false
-        });
-        return;
-      }
-
-      BuildActions.loadBuildSuccess({
-        build: build.data,
-        log: logLines,
-        fetchingLog: true
-      });
-
-      // more log lines exist
-      if (jqxhr.responseJSON.nextOffset !== -1) {
-        offset = jqxhr.responseJSON.nextOffset;
-        fetchLog();
-      }
-
-      // got all log lines
-      else {
-        BuildActions.loadBuildSuccess({
-          build: build.data,
-          log: logLines,
-          fetchingLog: false
-        });
-      }
-
-    });
-
-  })();
+  getLogSize(build, (size) => {
+    builds[build.data.module.id].log = createLogModel(build, size);
+    fetchInactiveBuildLog(build);
+  });
 }
+
+function createLogModel(build, size) {  
+  return new Log({
+    buildNumber: build.data.build.id,
+    lastOffset: Math.max(size - config.offsetLength, 0),
+    offset: Math.max(size - config.offsetLength, 0)
+  });
+}
+
+function fetchInactiveBuildLog(build) {
+  const log = builds[build.data.module.id].log;
+  const logPromise = log.fetch();
+  logPromise.always((data, textStatus, jqxhr) => {
+    updateStore(build, log, data, textStatus, jqxhr)
+  });
+};
+
+// share?
+function updateStore(build, log, data, textStatus, jqxhr) {
+  if (jqxhr.responseJSON === undefined || textStatus !== 'success') {
+    BuildActions.loadBuildSuccess({
+      build: build.data,
+      log: [{ text: data.responseText}],
+      fetchingLog: false
+    });
+    return;
+  }
+
+  BuildActions.loadBuildSuccess({
+    build: build.data,
+    log: log.logLines,
+    fetchingLog: false,
+    currentOffset: log.options.offset,
+    currrentOffsetLine: log.currrentOffsetLine,
+    scrollToOffset: log.scrollToOffset
+  });
+}
+//
+// Shared Methods
+//
+function getLogSize(build, cb) {
+  const logSize = new LogSize({
+    buildNumber: build.data.build.id
+  }).fetch().done((data) => {
+    cb(data);
+  });
+}
+
+// fetch earlier offsets (e.g. during log scroll-up)
+function pageBuild(build) {
+  if (build.log.options.offset === 0) {
+    return;
+  }
+  
+  build.log.pageUp().fetch().always((data, textStatus, jqxhr) => {
+    updateStore(build, build.log, data, textStatus, jqxhr)
+  });
+}
+
+// go to a specific offset number
+function loadOffset(options) {
+  const { build, updatedOffset, position } = options;
+
+  build.log
+    .reset()
+    .setOffset(updatedOffset)
+    .fetch()
+    .always((data, textStatus, jqxhr) => {
+      
+      if (position) {
+        build.log.scrollToOffset = position === 'top' ? build.log.currrentOffsetLine : build.log.lastOffsetLine;
+        build.log.positionChange = position;
+      }
+
+      updateStore(build, build.log, data, textStatus, jqxhr)
+  });
+
+}
+
+
 
 export default BuildActions;

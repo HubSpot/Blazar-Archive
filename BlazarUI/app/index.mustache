@@ -32,6 +32,7 @@
         staticRoot: "{{{staticRoot}}}",
         {{#buildsRefresh}}buildsRefresh: {{{buildsRefresh}}},{{/buildsRefresh}}
         appRoot: "{{{appRoot}}}",
+        offsetLength: "{{{offsetLength}}}",
         {{#apiRoot}}apiRoot: "{{{apiRoot}}}",{{/apiRoot}}
         {{^apiRoot}}apiRoot: localStorage.getItem("apiRootOverride"),{{/apiRoot}}
       }
