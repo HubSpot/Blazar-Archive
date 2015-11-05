@@ -8,27 +8,17 @@ import Loader from '../shared/Loader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx'
 import BuildStates from '../../constants/BuildStates';
 
-window.$ = $
-
-
-
-
-
 
 class BuildLog extends Component {
 
   constructor(props, context) {
     super(props, context);    
     this.handleScroll = this.handleScroll.bind(this);
-    this.scrollId = 'offset-0';
-
     this.state = {
-      isTailing: this.props.fetchingLog,
-      isPaging: false,
-      hasPaged: false
+      isTailing: this.props.fetchingLog
     }
   }
-  
+
   componentDidMount() {
     this.scrollId = `offset-${this.props.currrentOffsetLine}`;
     this.scrollToBottom();
@@ -36,79 +26,87 @@ class BuildLog extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      isPaging: false
-    });
   }
 
   componentDidUpdate(nextProps, nextState) {
-    // If positionChange using the 'To Top' and 'To Bottom' buttons
+    
+    // Used 'To Top' or 'To Bottom' buttons
     if (this.props.positionChange) {
-      this.scrollId = `offset-${this.props.scrollToOffset}`;
-    }
-    // store next scroll to value so we can set it
-    // set it after our requestAnimationFrame is complete  
-    else {
-      this.nextScrollId = `offset-${this.props.currrentOffsetLine}`;
-    }
-    // positionChange using 'To Top' and 'To Bottom' buttons
-    // Move to separate method?
-    if (this.props.positionChange) {
+      if (this.props.positionChange === 'top') {
+        this.scrollId = `offset-${this.props.lastOffsetLine}`;  
+      }
+      else {
+        // need to store current offest if we start scrollin gup again
+        this.usedNavigationScrollId = `offset-${this.props.currrentOffsetLine}`;
+        this.scrollId = `offset-${this.props.lastOffsetLine}`;
+        this.usedNavigation = true;
+      }
+
       this.scrollForNavigatonChange();
     }
+
+    // User scrolled up or down
     else {
+      // if we have navigated down, and now want to scroll up...
+      if (this.usedNavigation) {
+          this.scrollId = this.usedNavigationScrollId;
+      }
+      // Store nextScrollId so we can set scroll
+      // to the correct position with our requestAnimationFrame
+      this.nextScrollId = `offset-${this.props.currrentOffsetLine}`;
       this.scrollToOffset();
     }
-    
+
     // To Do:
     // Handle active builds
     // if (nextProps.buildState === BuildStates.IN_PROGRESS) {
+    // }
   }
-  
+
   componentWillUnmount() {
     $('#log').off('scroll', this.handleScroll)
   }
-  
 
   // checkPosition() {
   //   if (this.state.isTailing) {
   //     this.scrollToBottom();
   //   }
   // }
-  
-  handlePageUp() {
-    if (!this.state.hasPaged) {
-      this.props.pageUp();
-    }
-  }
 
-  handleScroll() {  
-    const logPosition = $('#log').scrollTop();
-    const logHeight = $('#log')[0].scrollHeight - 240
-    
-    if (logPosition === logHeight ) {
-      if (this.props.buildState === BuildStates.IN_PROGRESS) {
-        this.setState({
-          isTailing: true
-        });
-      }
-    } 
-    // at top of page
-    else if ( logPosition <= 30 && !this.state.isPaging) {
-      this.handlePageUp();
-        this.setState({
-          isPaging: true
-        });
+  handleScroll() {
+     const $log = $('#log');
+
+    // `Debounce` on animation requests so we 
+    // only do this when the browser is ready for it
+    if (this.frameRequest != null) {
+      cancelAnimationFrame(this.frameRequest);
     }
-    
-    else {
-      if (this.props.buildState === BuildStates.IN_PROGRESS) {
-        this.setState({
-          isTailing: false
-        });
+
+    window.requestAnimationFrame(() => {
+      const scrollTop = $log.scrollTop()
+      const scrollHeight = $log[0].scrollHeight
+      const contentsHeight = $log.outerHeight()
+
+      const atBottom = scrollTop >= scrollHeight - contentsHeight
+      const atTop = scrollTop === 0
+
+      if (atBottom && !atTop) {
+        // To do: start tailing...
+        this.props.pageLog('down');
+        this.pagingDirection = 'down';
       }
-    }
-    
+
+      else if (atTop && !atBottom) {
+        this.props.pageLog('up');
+        this.pagingDirection = 'up';
+      }
+
+      else{
+        // To do: stop tailing...
+      }
+
+    });
+
   }
   
   scrollToOffset() {
@@ -117,10 +115,21 @@ class BuildLog extends Component {
     }
 
     window.requestAnimationFrame(() => {
-      document.getElementById(this.scrollId).scrollIntoView();
+      const currentPosition = $('#log').scrollTop();
+
+      if (this.pagingDirection === 'up') {
+        const scrollToEl = document.getElementById(this.scrollId)
+        scrollToEl.scrollIntoView();
+      }
+
       this.scrollId = this.nextScrollId;
+      // move the user to the log line that was in view
+      // before it hit the buffer to page down.
+      if (this.pagingDirection === 'down') {
+        $('#log').scrollTop(currentPosition)
+      }
     });
-    
+
   }
   
   scrollForNavigatonChange() {
@@ -147,7 +156,9 @@ class BuildLog extends Component {
   }
 
   render() {
-    let spinner;
+    let tailingSpinner;
+    let pagingUpSpinner;
+    
     const noBuildLog = this.props.buildState === BuildStates.CANCELLED || this.props.buildState === BuildStates.QUEUED;
 
     if (this.props.loading) {
@@ -159,7 +170,7 @@ class BuildLog extends Component {
     }
 
     if (this.state.isTailing && this.props.buildState === BuildStates.IN_PROGRESS) {
-      spinner = (
+      tailingSpinner = (
         <Loader align='left' roomy={true} />
       );
     }
@@ -170,7 +181,7 @@ class BuildLog extends Component {
         className='build-log' 
       >
         {this.generateLines()}
-        {spinner}
+        {tailingSpinner}
       </pre>
     );
   }
@@ -178,8 +189,7 @@ class BuildLog extends Component {
 
 BuildLog.propTypes = {
   log: PropTypes.array,
-  positionChange: PropTypes.string,
-  scrollToOffset: PropTypes.number,
+  positionChange: PropTypes.node,
   fetchingLog: PropTypes.bool,
   position: PropTypes.string,
   pageUp: PropTypes.func,

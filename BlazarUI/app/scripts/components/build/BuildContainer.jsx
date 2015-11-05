@@ -32,7 +32,7 @@ class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
-    bindAll(this, 'toggleStar', 'triggerCancelBuild', 'pageUp', 'changeOffsetWithNavigation');
+    bindAll(this, 'toggleStar', 'triggerCancelBuild', 'pageLog', 'changeOffsetWithNavigation');
     this.state = initialState;
   }
 
@@ -64,21 +64,12 @@ class BuildContainer extends Component {
     this.tearDown()
   }
   
-  pageUp() {
-    //
-    //
-    // To Do:
-    // Do we need build id???
-    // BuildActions.pageUp(this.state.build.build.id, this.props.params.moduleId);
-    BuildActions.pageUp(this.props.params.moduleId);
+  pageLog(direction) {
+    BuildActions.pageLog(this.props.params.moduleId, direction);
   }
   
   changeOffsetWithNavigation(position) {
-    console.log('navigation change: ', position);
     BuildActions.changeOffsetWithNavigation(this.props.params.moduleId, position)
-    // this.setState({
-    //   positionChange: position
-    // })
   }
   
   triggerCancelBuild(buildId, moduleId) {
@@ -86,7 +77,6 @@ class BuildContainer extends Component {
   }
 
   onStatusChange(state) {
-    
     let stateUpdate = {}
     
     if (state.loadBuildCancelError) {
@@ -115,16 +105,15 @@ class BuildContainer extends Component {
     }
 
     if (state.build) {
-      console.log('state change: ', state.build);
       this.setState({
         loading: false,
         build: state.build.build,
         log: state.build.log,
         fetchingLog: state.build.fetchingLog,
         positionChange: state.build.positionChange,
-        scrollToOffset: state.build.scrollToOffset,
         currentOffset: state.build.currentOffset,
-        currrentOffsetLine: state.build.currrentOffsetLine
+        currrentOffsetLine: state.build.currrentOffsetLine,
+        lastOffsetLine: state.build.lastOffsetLine
       });
 
       if (contains([BuildStates.QUEUED, BuildStates.LAUNCHING], state.build.build.build.state)){
@@ -150,9 +139,10 @@ class BuildContainer extends Component {
           changeOffsetWithNavigation={this.changeOffsetWithNavigation}
           currentOffset={this.state.currentOffset}
           currrentOffsetLine={this.state.currrentOffsetLine}
-          scrollToOffset={this.state.scrollToOffset}
+          lastOffsetLine={this.state.lastOffsetLine}
+          finalOffset={this.state.finalOffset}
           fetchingLog={this.state.fetchingLog}
-          pageUp={this.pageUp}
+          pageLog={this.pageLog}
           originalParams={this.originalParams}
           params={this.props.params}
           loading={this.state.loading}

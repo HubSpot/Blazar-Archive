@@ -69,12 +69,12 @@ class Build extends Component {
               log={this.props.log}
               positionChange={this.props.positionChange}
               fetchingLog={this.props.fetchingLog}
-              pageUp={this.props.pageUp}
-              scrollToOffset={this.props.scrollToOffset}
+              pageLog={this.props.pageLog}
               buildState={build.state}
               loading={this.props.loading}
               currentOffset={this.props.currentOffset}
               currrentOffsetLine={this.props.currrentOffsetLine}
+              lastOffsetLine={this.props.lastOffsetLine}
             />
           </div>
         </div>
@@ -91,10 +91,9 @@ Build.propTypes = {
     module: PropTypes.object
   }),
   error: PropTypes.node,
-  positionChange: PropTypes.string,
+  positionChange: PropTypes.node,
   changeOffsetWithNavigation: PropTypes.func.isRequired,
   log: PropTypes.array,
-  scrollToOffset: PropTypes.number,
   fetchingLog: PropTypes.bool,
   currentOffset: PropTypes.number,
   params: PropTypes.object,
