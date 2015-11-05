@@ -10,7 +10,7 @@ import BuildCommits from './BuildCommits.jsx';
 import BuildLogNavigation from './BuildLogNavigation.jsx';
 import BuildLog from './BuildLog.jsx';
 import CancelBuildButton from './CancelBuildButton.jsx';
-import ErrorAlert from '../shared/ErrorAlert.jsx';
+import AjaxErrorAlert from '../shared/AjaxErrorAlert.jsx';
 
 class Build extends Component {
 
@@ -32,7 +32,7 @@ class Build extends Component {
         <div className='build-header'>
           <UIGrid>
             <UIGridItem size={8}>
-              <ErrorAlert 
+              <AjaxErrorAlert 
                 error={this.props.error}
               />
               <BuildHeadline 
@@ -51,6 +51,7 @@ class Build extends Component {
               />
               <BuildLogNavigation 
                 changeOffsetWithNavigation={this.props.changeOffsetWithNavigation}
+                buildState={build.state}
               />
             </UIGridItem>
           </UIGrid>

@@ -63,7 +63,7 @@ class BuildContainer extends Component {
   componentWillUnmount() {
     this.tearDown()
   }
-  
+
   pageLog(direction) {
     BuildActions.pageLog(this.props.params.moduleId, direction);
   }
@@ -77,24 +77,15 @@ class BuildContainer extends Component {
   }
 
   onStatusChange(state) {
-    let stateUpdate = {}
+    // let stateUpdate = {}
     
-    if (state.loadBuildCancelError) {
-      this.setState({
-        error: state.loadBuildCancelError
-      });
-      
-      // TO DO
-      // stateUpdate.error = state.loadBuildCancelError
-    }
+    // To do: handle cancelled build error
 
     if (state.loading) {
       this.setState({
         loading: true
       });
-      
-      // stateUpdate.loading = true;
-      // this.setState(stateUpdate)
+
       return;
     }
 

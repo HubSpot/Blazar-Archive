@@ -21,6 +21,7 @@ class BuildLog extends Component {
 
   componentDidMount() {
     this.scrollId = `offset-${this.props.currrentOffsetLine}`;
+
     this.scrollToBottom();
     $('#log').on('scroll', this.handleScroll)
   }
@@ -148,6 +149,15 @@ class BuildLog extends Component {
   }
 
   generateLines() {
+    if (this.props.buildState === BuildStates.LAUNCHING || this.props.buildState === BuildStates.QUEUED) {
+      return (
+        <div>
+          <BuildLogLine text='Polling for updates...' />
+          <Loader align='left' roomy={true} />
+        </div>
+      );
+    }
+
     return this.props.log.map((line, i) => {
       return (
         <BuildLogLine offset={line.offset} text={line.text} key={i} />

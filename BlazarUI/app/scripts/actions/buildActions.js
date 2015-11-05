@@ -177,6 +177,15 @@ function getLogSize() {
     requestedBuild.logSize = size;
     build.log = createLogModel(build, requestedBuild.logSize);
   });
+  
+  sizePromise.error((err) => {
+    console.warn(err);
+    BuildActions.loadBuildSuccess({
+      log: [{ text: `Error loading log, we don't have the log size. View your console for more detail.`}],
+      build: build.data
+    });
+    
+  });
 
   return sizePromise;
 }
