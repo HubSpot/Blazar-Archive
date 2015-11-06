@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import CommitsTable from './CommitsTable.jsx';
 import Loader from '../shared/Loader.jsx';
-import Collapsable from '../shared/Collapsable.jsx';
+
 import {has} from 'underscore';
 import {timestampFormatted} from '../Helpers';
 import MutedMessage from '../shared/MutedMessage.jsx';
@@ -9,50 +9,25 @@ import MutedMessage from '../shared/MutedMessage.jsx';
 class BuildCommits extends Component {
 
   render() {
-
-    if (!has(this.props.build.build,'commitInfo')) {
-      return <div />;
+    
+    if (!this.props.showCommits) {
+      return null;
     }
 
-    const commitInfo = this.props.build.build.commitInfo;
+    if (!has(this.props.build.build,'commitInfo')) {
+      return (
+        <div>No commit info</div>
+      )
+    }
 
     if (this.props.loading) {
       return <Loader />;
     }
 
-    const inflection = commitInfo.newCommits.length !== 1 ? 's' : '';
-
-
-    let header;
-
-    if (commitInfo.newCommits.length === 0) {
-      header = (
-        <span>No new commits since previous build</span>
-      );
-    }
-
-    else {
-      header = (
-        <span>
-          <span className='badge roomy-x'>
-            {commitInfo.newCommits.length}
-          </span> 
-          new commit{inflection} since previous build 
-        </span>
-      );
-    }
-
     return (
-      <Collapsable
-        header={header}
-        initialToggleStateOpen={false}
-        disableToggle={commitInfo.newCommits.length === 0}
-      >
-        <CommitsTable 
-          commits={this.props.build.build.commitInfo.newCommits}
-        />
-
-      </Collapsable>
+      <CommitsTable 
+        commits={this.props.build.build.commitInfo.newCommits}
+      />
     );
   }
 
@@ -60,6 +35,7 @@ class BuildCommits extends Component {
 
 BuildCommits.propTypes = {
   build: PropTypes.object,
+  showCommits: PropTypes.bool.isRequired,
   loading: PropTypes.bool
 };
 

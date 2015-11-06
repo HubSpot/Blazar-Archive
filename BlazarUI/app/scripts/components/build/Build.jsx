@@ -6,7 +6,7 @@ import Loader from '../shared/Loader.jsx';
 
 import BuildHeadline from './BuildHeadline.jsx';
 import BuildDetail from './BuildDetail.jsx';
-import BuildCommits from './BuildCommits.jsx';
+
 import BuildLogNavigation from './BuildLogNavigation.jsx';
 import BuildLog from './BuildLog.jsx';
 import AjaxErrorAlert from '../shared/AjaxErrorAlert.jsx';

@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react';
-import {has, contains} from 'underscore';
+import {has, contains, bindAll} from 'underscore';
 import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
+import BuildCommits from './BuildCommits.jsx';
 
 import CancelBuildButton from './CancelBuildButton.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -16,16 +17,11 @@ import {LABELS} from '../constants';
 class BuildDetail extends Component {
 
   constructor() {
-    this.handleResize = this.handleResize.bind(this);
+    bindAll(this, 'handleCommitsToggle', 'handleResize')
     this.state = {
-      windowWidth: window.innerWidth
+      windowWidth: window.innerWidth,
+      showCommits: false
     }
-  }
-
-  handleResize(e) {
-    this.setState({
-      windowWidth: window.innerWidth
-    });
   }
 
   componentDidMount() {
@@ -40,6 +36,27 @@ class BuildDetail extends Component {
     return classNames([
       `build-detail alert alert-${LABELS[this.props.build.build.state]}`
     ]);
+  }
+  
+  getCommitsIcon() {
+    if (this.state.showCommits) {
+      return <Icon name='times' />
+    }
+    else {
+      return <Icon type='octicon' name='git-commit' />
+    }
+  }
+  
+  handleResize(e) {
+    this.setState({
+      windowWidth: window.innerWidth
+    });
+  }
+  
+  handleCommitsToggle() {
+    this.setState({
+      showCommits: !this.state.showCommits
+    });
   }
 
   render() {
@@ -89,6 +106,7 @@ class BuildDetail extends Component {
 
     const shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}`;
 
+    
     return (
       <div className={this.getWrapperClassNames()}>
         
@@ -105,7 +123,15 @@ class BuildDetail extends Component {
         </div>  
         
         <div className='build-detail-body'>
-          <pre title={currentCommit.message} className='build-detail-body__commit-desc'>{truncate(currentCommit.message, this.state.windowWidth * .08, true)}</pre>
+          <div className='build-detail-body__commits-trigger' title='View commits since previous build' onClick={this.handleCommitsToggle}>
+            {this.getCommitsIcon()}
+          </div>
+          <pre className='build-detail-body__commit-desc' title={currentCommit.message}>{truncate(currentCommit.message, this.state.windowWidth * .08, true)}</pre>
+          <BuildCommits
+            build={this.props.build}
+            loading={this.props.loading}
+            showCommits={this.state.showCommits}
+          />
         </div>
         
         <div className='build-detail-footer'> 

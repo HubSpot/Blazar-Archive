@@ -40,10 +40,20 @@ build-status(color)
   margin-left 5px
     
 .build-detail-body
+  position relative
   p
     margin: 0
     font-size 13px
 
+.build-detail-body__commits-trigger
+  position absolute
+  color $link-color
+  left 0
+  top 5px
+  padding 0 10px
+  &:hover
+    cursor: pointer
+      
 .build-detail-body__commit-desc
   height 30px
   overflow hidden
@@ -52,7 +62,7 @@ build-status(color)
   background inherit
   border none
   padding 0 10px
-  margin 0
+  margin 0 0 0 20px
   color $gray-darker
   font-size 12px
   line-height 2.5
