@@ -1,7 +1,7 @@
 import React, {Component, PropTypes, findDOMNode} from 'react';
 import $ from 'jquery';
 import {debounce} from 'underscore';
-import {events, humanizeText} from '../Helpers';
+import {events, humanizeText, buildIsOnDeck, buildIsInactve} from '../Helpers';
 import BuildLogLine from './BuildLogLine.jsx';
 import Collapsable from '../shared/Collapsable.jsx';
 import Loader from '../shared/Loader.jsx';
@@ -21,12 +21,13 @@ class BuildLog extends Component {
 
   componentDidMount() {
     this.scrollId = `offset-${this.props.currrentOffsetLine}`;
-
-    this.scrollToBottom();
     $('#log').on('scroll', this.handleScroll)
-  }
 
-  componentWillReceiveProps(nextProps) {
+    if (buildIsOnDeck(this.props.buildState)) {
+      return;
+    }
+    
+    this.scrollToBottom();    
   }
 
   componentDidUpdate(nextProps, nextState) {
