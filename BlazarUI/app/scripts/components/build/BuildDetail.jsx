@@ -3,6 +3,7 @@ import {has, contains} from 'underscore';
 import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
 
+import CancelBuildButton from './CancelBuildButton.jsx';
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
 import Icon from '../shared/Icon.jsx';
@@ -97,6 +98,10 @@ class BuildDetail extends Component {
             Build {buildDetail.buildResult} 
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
           </p>
+          <CancelBuildButton 
+            triggerCancelBuild={this.props.triggerCancelBuild}
+            build={this.props.build}
+          />
         </div>  
         
         <div className='build-detail-body'>

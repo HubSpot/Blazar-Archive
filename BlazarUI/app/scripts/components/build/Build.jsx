@@ -9,7 +9,6 @@ import BuildDetail from './BuildDetail.jsx';
 import BuildCommits from './BuildCommits.jsx';
 import BuildLogNavigation from './BuildLogNavigation.jsx';
 import BuildLog from './BuildLog.jsx';
-import CancelBuildButton from './CancelBuildButton.jsx';
 import AjaxErrorAlert from '../shared/AjaxErrorAlert.jsx';
 
 class Build extends Component {
@@ -45,10 +44,6 @@ class Build extends Component {
               />
             </UIGridItem>
             <UIGridItem size={4}>
-              <CancelBuildButton 
-                triggerCancelBuild={this.props.triggerCancelBuild}
-                build={this.props.build}
-              />
               <BuildLogNavigation 
                 changeOffsetWithNavigation={this.props.changeOffsetWithNavigation}
                 buildState={build.state}
@@ -60,6 +55,7 @@ class Build extends Component {
               <BuildDetail
                 build={this.props.build}
                 loading={this.props.loading}
+                triggerCancelBuild={this.props.triggerCancelBuild}
               />
             </UIGridItem>
           </UIGrid>  

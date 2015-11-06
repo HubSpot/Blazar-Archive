@@ -10,6 +10,7 @@ build-status(color)
     border-top 1px solid color
 
 .build-detail
+  position relative
   padding 0
   margin 0
   
@@ -22,6 +23,12 @@ build-status(color)
   &.alert-info
     build-status($info-dark)
       
+.build-detail-header
+  .cancel-build-button 
+    position absolute
+    top 4px
+    right 4px
+
 .build-detail-header__build-state
   font-weight $font-medium
   margin 0

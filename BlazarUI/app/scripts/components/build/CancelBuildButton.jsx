@@ -71,8 +71,8 @@ class CancelBuildButton extends Component {
       );
     } else {
       return (
-        <div className='text-right'>
-          <Button bsStyle="danger" onClick={this.handleCancelBuild}>
+        <div className='cancel-build-button text-right'>
+          <Button bsSize='xsmall' bsStyle='danger' onClick={this.handleCancelBuild}>
             Cancel Build
           </Button>
           {this.cancelModal()}
