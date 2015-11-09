@@ -55,7 +55,9 @@ class BranchesTableRow extends Component {
     }
 
     let sha;
-    const build = inProgressBuild ? inProgressBuild : lastBuild ? lastBuild : pendingBuild;
+    const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
+    
+    console.log('build: ', build);
     
     if (build.sha !== undefined) {
       sha = <Sha gitInfo={gitInfo} build={build} />;
@@ -77,7 +79,7 @@ class BranchesTableRow extends Component {
           <Link to={module.blazarPath.module}>{module.name}</Link>
         </td>
         <td className='build-result-link'>
-          <Link to={lastBuild.blazarPath}>
+          <Link to={build.blazarPath}>
             {this.getBuildResult(build)}
             {build.buildNumber}
           </Link>
