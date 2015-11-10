@@ -21,7 +21,7 @@ function progress(startTimestamp, history) {
 function _filterOutliers(durations) {
   const values = durations.concat();
 
-  if (durations.length < 3) {
+  if (durations.length < 4) {
     return durations;
   }
 
