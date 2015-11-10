@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.HostAndPort;
 import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
@@ -30,21 +31,22 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class BlazarZooKeeperModule extends AbstractModule {
+public class BlazarZooKeeperModule extends ConfigurationAwareModule<BlazarConfiguration> {
 
   @Override
-  protected void configure() {
-    bind(CuratorFramework.class).toProvider(BlazarCuratorProvider.class).in(Scopes.SINGLETON);
-    bind(LeaderLatch.class).to(BlazarLeaderLatch.class);
-    bind(ZooKeeperEventBus.class);
+  protected void configure(Binder binder, BlazarConfiguration configuration) {
+    binder.bind(CuratorFramework.class).toProvider(BlazarCuratorProvider.class).in(Scopes.SINGLETON);
+    binder.bind(ZooKeeperEventBus.class);
+    Multibinder.newSetBinder(binder, ConnectionStateListener.class); // TODO
 
-    bind(ScheduledExecutorService.class)
-        .annotatedWith(Names.named("QueueProcessor"))
-        .toProvider(new ManagedScheduledExecutorServiceProvider(10, "QueueProcessor"))
-        .in(Scopes.SINGLETON);
-
-    Multibinder.newSetBinder(binder(), ConnectionStateListener.class); // TODO
-    Multibinder.newSetBinder(binder(), LeaderLatchListener.class).addBinding().to(QueueProcessor.class);
+    if (!configuration.isWebhookOnly()) {
+      binder.bind(LeaderLatch.class).to(BlazarLeaderLatch.class);
+      Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(QueueProcessor.class);
+      binder.bind(ScheduledExecutorService.class)
+          .annotatedWith(Names.named("QueueProcessor"))
+          .toProvider(new ManagedScheduledExecutorServiceProvider(10, "QueueProcessor"))
+          .in(Scopes.SINGLETON);
+    }
   }
 
   @Provides

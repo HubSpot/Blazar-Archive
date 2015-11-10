@@ -54,20 +54,25 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
   @Override
   protected void configure(Binder binder, BlazarConfiguration configuration) {
-    binder.install(new BlazarDataModule());
     binder.install(new BlazarZooKeeperModule());
+    binder.bind(GitHubWebhookResource.class);
+    Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
+
+    if (configuration.isWebhookOnly()) {
+      return;
+    }
+
+    binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule());
 
-    binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
+    binder.bind(BranchResource.class);
+    binder.bind(BuildResource.class);
+    binder.bind(BuildStateResource.class);
+    binder.bind(BuildHistoryResource.class);
+    binder.bind(FeedbackResource.class);
 
-    binder.bind(GitHubWebhookResource.class);
-    if (!configuration.isWebhookOnly()) {
-      binder.bind(BranchResource.class);
-      binder.bind(BuildResource.class);
-      binder.bind(BuildStateResource.class);
-      binder.bind(BuildHistoryResource.class);
-      binder.bind(FeedbackResource.class);
-    }
+    binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
+    binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
@@ -75,8 +80,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(GitHubStatusHandler.class);
     binder.bind(DependencyBuilder.class);
     binder.bind(SingularityTaskKiller.class);
-
-    Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 
     Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
     multibinder.addBinding().to(BlazarConfigModuleDiscovery.class);
@@ -93,12 +96,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
       String host = entry.getKey();
       mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
     }
-  }
-
-  @Provides
-  @Singleton
-  public DataSourceFactory providesDataSourceFactory(BlazarConfiguration configuration) {
-    return configuration.getDatabaseConfiguration();
   }
 
   @Provides
