@@ -98,7 +98,7 @@ public class BuildResource {
   @Path("/{id}/log")
   public LogChunk getLog(@PathParam("id") long id,
                          @QueryParam("offset") @DefaultValue("0") long offset,
-                         @QueryParam("length") @DefaultValue("90000") long length) throws Exception {
+                         @QueryParam("length") @DefaultValue("65536") long length) throws Exception {
     Optional<ModuleBuild> build = get(id);
     if (!build.isPresent()) {
       throw new NotFoundException("No build found for ID " + id);
