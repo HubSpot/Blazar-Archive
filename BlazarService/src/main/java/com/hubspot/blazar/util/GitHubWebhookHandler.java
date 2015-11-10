@@ -75,7 +75,7 @@ public class GitHubWebhookHandler {
 
   @Subscribe
   public void handlePushEvent(PushEvent pushEvent) throws IOException {
-    if (!pushEvent.getRef().startsWith("refs/tags/")) {
+    if (!pushEvent.getRef().startsWith("refs/tags/") && !pushEvent.getDeleted()) {
       GitInfo gitInfo = branchService.upsert(gitInfo(pushEvent));
 
       Set<Module> modules = updateModules(gitInfo, pushEvent);
