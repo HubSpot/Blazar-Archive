@@ -14,16 +14,24 @@ class BuildLog extends Component {
   constructor(props, context) {
     super(props, context);    
     this.handleScroll = this.handleScroll.bind(this);
-    this.state = {
-      isTailing: this.props.fetchingLog
-    }
+    this.initialState = this.props.buildState;
+    this.isTailing = true;
+    
+    // To do: 
+    // can we handle with state... running into issues
+    //
+
+    // this.state = {
+    //   isTailing: true
+    // }
+    
   }
 
   componentDidMount() {
     this.scrollId = `offset-${this.props.currrentOffsetLine}`;
     $('#log').on('scroll', this.handleScroll)
 
-    if (buildIsOnDeck(this.props.buildState)) {
+    if (buildIsOnDeck(this.props.buildState) || this.props.log.length === 0) {
       return;
     }
     
@@ -31,7 +39,6 @@ class BuildLog extends Component {
   }
 
   componentDidUpdate(nextProps, nextState) {
-    
     // Used 'To Top' or 'To Bottom' buttons
     if (this.props.positionChange) {
       if (this.props.positionChange === 'top') {
@@ -46,12 +53,16 @@ class BuildLog extends Component {
 
       this.scrollForNavigatonChange();
     }
+    
+    else if (this.props.buildState === BuildStates.IN_PROGRESS && this.isTailing) {
+      this.scrollToBottom();
+    }
 
     // User scrolled up or down
     else {
       // if we have navigated down, and now want to scroll up...
       if (this.usedNavigation) {
-          this.scrollId = this.usedNavigationScrollId;
+        this.scrollId = this.usedNavigationScrollId;
       }
       // Store nextScrollId so we can set scroll
       // to the correct position with our requestAnimationFrame
@@ -59,21 +70,11 @@ class BuildLog extends Component {
       this.scrollToOffset();
     }
 
-    // To Do:
-    // Handle active builds
-    // if (nextProps.buildState === BuildStates.IN_PROGRESS) {
-    // }
   }
 
   componentWillUnmount() {
     $('#log').off('scroll', this.handleScroll)
   }
-
-  // checkPosition() {
-  //   if (this.state.isTailing) {
-  //     this.scrollToBottom();
-  //   }
-  // }
 
   handleScroll() {
      const $log = $('#log');
@@ -89,22 +90,25 @@ class BuildLog extends Component {
       const scrollHeight = $log[0].scrollHeight
       const contentsHeight = $log.outerHeight()
 
-      const atBottom = scrollTop >= scrollHeight - contentsHeight
+      const bottomScrollBuffer = 1
+      const atBottom = scrollTop >= scrollHeight - contentsHeight - bottomScrollBuffer
       const atTop = scrollTop === 0
 
+      // at bottom og page...
       if (atBottom && !atTop) {
-        // To do: start tailing...
+        this.isTailing = true
         this.props.pageLog('down');
         this.pagingDirection = 'down';
       }
-
+      
+      // at top of page
       else if (atTop && !atBottom) {
         this.props.pageLog('up');
         this.pagingDirection = 'up';
       }
 
-      else{
-        // To do: stop tailing...
+      else {
+        this.isTailing = false;
       }
 
     });
@@ -120,6 +124,7 @@ class BuildLog extends Component {
       const currentPosition = $('#log').scrollTop();
 
       if (this.pagingDirection === 'up') {
+        // console.log('scroll into view: ', this.scrollId);
         const scrollToEl = document.getElementById(this.scrollId)
         scrollToEl.scrollIntoView();
       }
@@ -140,6 +145,7 @@ class BuildLog extends Component {
     }
     else if (this.props.positionChange === 'top') {
       $('#log').scrollTop(0);
+      
     }
   }
   
@@ -158,6 +164,15 @@ class BuildLog extends Component {
         </div>
       );
     }
+    
+    else if (this.props.log.length === 0) {
+      
+      return (
+        <div>
+          <BuildLogLine text='No log available' />
+        </div>
+      );
+    }
 
     return this.props.log.map((line, i) => {
       return (
@@ -169,18 +184,12 @@ class BuildLog extends Component {
   render() {
     let tailingSpinner;
     let pagingUpSpinner;
-    
-    const noBuildLog = this.props.buildState === BuildStates.CANCELLED || this.props.buildState === BuildStates.QUEUED;
 
     if (this.props.loading) {
       <Loader align='top-center' />
     }
 
-    if (!this.props.log || noBuildLog) {
-      return null;
-    }
-
-    if (this.state.isTailing && this.props.buildState === BuildStates.IN_PROGRESS) {
+    if (this.isTailing && this.props.buildState === BuildStates.IN_PROGRESS) {
       tailingSpinner = (
         <Loader align='left' roomy={true} />
       );
