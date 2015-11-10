@@ -32,11 +32,6 @@ public abstract class AbstractModuleDiscovery implements ModuleDiscovery {
   @Inject
   YAMLFactory yamlFactory;
 
-  @Override
-  public boolean allowDuplicates() {
-    return true;
-  }
-
   protected Optional<BuildConfig> configFor(String path, GHRepository repository, GitInfo gitInfo) throws IOException {
     String configPath = (path.contains("/") ? path.substring(0, path.lastIndexOf('/') + 1) : "") + ".blazar.yaml";
     final String config;

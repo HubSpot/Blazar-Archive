@@ -22,11 +22,6 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
   public BlazarConfigModuleDiscovery() {}
 
   @Override
-  public boolean allowDuplicates() {
-    return false;
-  }
-
-  @Override
   public boolean shouldRediscover(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
     for (String path : affectedPaths(pushEvent)) {
       if (isBlazarConfig(path)) {

@@ -11,21 +11,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 @Singleton
 public class CompositeModuleDiscovery implements ModuleDiscovery {
   private final Set<ModuleDiscovery> delegates;
+  private final BlazarConfigModuleDiscovery configDiscovery;
 
   @Inject
-  public CompositeModuleDiscovery(Set<ModuleDiscovery> delegates) {
+  public CompositeModuleDiscovery(Set<ModuleDiscovery> delegates, BlazarConfigModuleDiscovery configDiscovery) {
     this.delegates = delegates;
-  }
-
-  @Override
-  public boolean allowDuplicates() {
-    return true;
+    this.configDiscovery = configDiscovery;
   }
 
   @Override
@@ -36,46 +32,37 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
       }
     }
 
-    return false;
+    return configDiscovery.shouldRediscover(gitInfo, pushEvent);
   }
 
   @Override
   public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
-    Map<String, Set<DiscoveredModule>> allModules = new HashMap<>();
-    Map<String, Set<DiscoveredModule>> noDuplicates = new HashMap<>();
+    Map<String, Set<DiscoveredModule>> modulesByPath = new HashMap<>();
 
     for (ModuleDiscovery delegate : delegates) {
-      final Map<String, Set<DiscoveredModule>> target;
-      if (delegate.allowDuplicates()) {
-        target = allModules;
-      } else {
-        target = noDuplicates;
-      }
-
       for (DiscoveredModule module : delegate.discover(gitInfo)) {
         String folder = folderFor(module.getPath());
 
-        Set<DiscoveredModule> modules = target.get(folder);
+        Set<DiscoveredModule> modules = modulesByPath.get(folder);
         if (modules == null) {
           modules = new HashSet<>();
-          target.put(folder, modules);
+          modulesByPath.put(folder, modules);
         }
 
         modules.add(module);
       }
     }
 
-    for (Entry<String, Set<DiscoveredModule>> entry : noDuplicates.entrySet()) {
-      String folder = entry.getKey();
-      Set<DiscoveredModule> modules = ImmutableSet.of(entry.getValue().iterator().next());
+    for (DiscoveredModule module : configDiscovery.discover(gitInfo)) {
+      String folder = folderFor(module.getPath());
 
-      if (!allModules.containsKey(folder)) {
-        allModules.put(folder, modules);
+      if (!modulesByPath.containsKey(folder)) {
+        modulesByPath.put(folder, ImmutableSet.of(module));
       }
     }
 
     Set<DiscoveredModule> modules = new HashSet<>();
-    for (Set<DiscoveredModule> folderModules : allModules.values()) {
+    for (Set<DiscoveredModule> folderModules : modulesByPath.values()) {
       modules.addAll(folderModules);
     }
 
