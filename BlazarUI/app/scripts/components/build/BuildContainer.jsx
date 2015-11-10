@@ -15,7 +15,7 @@ import LocationStore from '../../stores/locationStore';
 const initialState = {
   loading: true,
   build: {
-    buildState: {},
+    build: {},
     gitInfo: {},
     module: { name: ''}
   },
@@ -66,6 +66,14 @@ class BuildContainer extends Component {
   }
 
   onStatusChange(state) {
+    
+    if (state.error) {
+      this.setState({
+        loading: false,
+        error: state.error
+      })
+    }
+
     if (state.loadBuildCancelError) {
       this.setState({
         error: state.loadBuildCancelError

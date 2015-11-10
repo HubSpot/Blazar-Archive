@@ -135,7 +135,7 @@ function getBuild() {
   const buildPromise = builds[requestedBuild.gitInfo.moduleId].fetch();
 
   buildPromise.error(() => {
-    BuildActions.loadBuildError("<p class='roomy-xy'>Error retrieving build log");
+    BuildActions.loadBuildError("Error retrieving build. Build does not exist or no longer exists.");
   });
 
   return buildPromise;

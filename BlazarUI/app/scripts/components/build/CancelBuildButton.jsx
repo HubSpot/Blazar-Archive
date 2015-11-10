@@ -58,7 +58,7 @@ class CancelBuildButton extends Component {
     
     if (this.props.buildCancelTriggered || this.state.cancelling) {
       return (
-        <div>
+        <div className='text-right'>
           <Button bsStyle="danger" disabled>
             <Icon for="spinner" /> Cancelling
           </Button>
@@ -67,7 +67,7 @@ class CancelBuildButton extends Component {
       );
     } else {
       return (
-        <div>
+        <div className='text-right'>
           <Button bsStyle="danger" onClick={this.handleCancelBuild}>
             Cancel Build
           </Button>

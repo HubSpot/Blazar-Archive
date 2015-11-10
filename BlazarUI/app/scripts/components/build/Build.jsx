@@ -9,7 +9,8 @@ import BuildDetail from './BuildDetail.jsx';
 import BuildCommits from './BuildCommits.jsx';
 import BuildLog from './BuildLog.jsx';
 import CancelBuildButton from './CancelBuildButton.jsx';
-import ErrorAlert from '../shared/ErrorAlert.jsx';
+
+import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 class Build extends Component {
 
@@ -31,9 +32,6 @@ class Build extends Component {
       <div>
         <UIGrid>
           <UIGridItem size={10}>
-            <ErrorAlert 
-              error={this.props.error}
-            />
             <BuildHeadline 
               moduleName={this.props.params.module}
               moduleId={this.props.params.moduleId}
@@ -52,6 +50,9 @@ class Build extends Component {
         </UIGrid>
         <UIGrid>
           <UIGridItem size={12}>
+            <GenericErrorMessage
+              message={this.props.error}
+            />
             <BuildDetail
               build={this.props.build}
               loading={this.props.loading}
