@@ -57,7 +57,7 @@ public class DockerModuleDiscovery extends AbstractModuleDiscovery {
     for (String dockerFile: dockerFiles) {
       String moduleName = moduleName(gitInfo, dockerFile);
       String glob = (dockerFile.contains("/") ? dockerFile.substring(0, dockerFile.lastIndexOf('/') + 1) : "") + "**";
-      modules.add(new DiscoveredModule(moduleName, dockerFile, glob, buildpackFor(dockerFile, gitInfo), getDockerfileDeps()));
+      modules.add(new DiscoveredModule(moduleName, "docker", dockerFile, glob, buildpackFor(dockerFile, gitInfo), getDockerfileDeps()));
     }
     return modules;
   }

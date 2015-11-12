@@ -13,6 +13,7 @@ import java.util.Objects;
 public class Module {
   private final Optional<Integer> id;
   private final String name;
+  private final String type;
   private final String path;
   private final String glob;
   private final PathMatcher matcher;
@@ -21,13 +22,10 @@ public class Module {
   @StoredAsJson
   private final Optional<GitInfo> buildpack;
 
-  public Module(String name, String path, String glob, Optional<GitInfo> buildpack) {
-    this(Optional.<Integer>absent(), name, path, glob, true, System.currentTimeMillis(), buildpack);
-  }
-
   @JsonCreator
   public Module(@JsonProperty("id") Optional<Integer> id,
                 @JsonProperty("name") String name,
+                @JsonProperty("type") String type,
                 @JsonProperty("path") String path,
                 @JsonProperty("glob") String glob,
                 @JsonProperty("active") boolean active,
@@ -35,6 +33,7 @@ public class Module {
                 @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
     this.id = id;
     this.name = name;
+    this.type = type;
     this.path = path;
     this.glob = glob;
     this.matcher = FileSystems.getDefault().getPathMatcher("glob:" + glob);
@@ -49,6 +48,10 @@ public class Module {
 
   public String getName() {
     return name;
+  }
+
+  public String getType() {
+    return type;
   }
 
   public String getPath() {
@@ -76,7 +79,7 @@ public class Module {
   }
 
   public Module withId(int id) {
-    return new Module(Optional.of(id), name, path, glob, active, updatedTimestamp, buildpack);
+    return new Module(Optional.of(id), name, type, path, glob, active, updatedTimestamp, buildpack);
   }
 
   @Override
@@ -93,6 +96,7 @@ public class Module {
     return Objects.equals(active, module.active) &&
         Objects.equals(id, module.id) &&
         Objects.equals(name, module.name) &&
+        Objects.equals(type, module.type) &&
         Objects.equals(path, module.path) &&
         Objects.equals(glob, module.glob) &&
         Objects.equals(buildpack, module.buildpack);
@@ -100,6 +104,6 @@ public class Module {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, path, glob, active, buildpack);
+    return Objects.hash(id, name, type, path, glob, active, buildpack);
   }
 }

@@ -83,7 +83,7 @@ public class MavenModuleDiscovery extends AbstractModuleDiscovery {
       }
 
       Optional<GitInfo> buildpack = buildpackFor(path, repository, gitInfo);
-      modules.add(new DiscoveredModule(pom.getArtifactId(), path, glob, buildpack, pom.getDependencyInfo()));
+      modules.add(new DiscoveredModule(pom.getArtifactId(), "maven", path, glob, buildpack, pom.getDependencyInfo()));
     }
 
     return modules;
