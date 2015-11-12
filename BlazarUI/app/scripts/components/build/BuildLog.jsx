@@ -30,14 +30,14 @@ class BuildLog extends Component {
     this.scrollId = `offset-${this.props.log.currrentOffsetLine}`;
     this.scrollToBottom();
   }
-  
+
   componentWillReceiveProps(nextProps) {
   
     const buildInProgress = nextProps.buildState === BuildStates.IN_PROGRESS;
     
-    if (!buildInProgress) {
-      return;
-    }
+    // if (!buildInProgress) {
+    //   return;
+    // }
     
     if (buildInProgress && nextProps.log.fetchCount === 1 && nextProps.log.positionChange === 'bottom') {
       this.isTailing = true;
@@ -47,7 +47,8 @@ class BuildLog extends Component {
     if (nextProps.log.options.offset < nextProps.log.options.offsetLength) {
       this.showPagingSpinnerUp = false;
       this.showPagingSpinnerDown = true;
-    } else {
+    } 
+    else {
       this.showPagingSpinnerUp = true;
     }
     

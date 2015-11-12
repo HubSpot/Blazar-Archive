@@ -87,9 +87,7 @@ class BuildContainer extends Component {
     BuildActions.fetchStartOfLog(this.props.params.moduleId);
   }
   
-  fetchEndOfLog(options) {
-    console.log('fetch from other ', options);
-    
+  fetchEndOfLog(options) {    
     BuildActions.fetchEndOfLog(this.props.params.moduleId, options);
   }
 
