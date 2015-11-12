@@ -66,7 +66,7 @@ BuildActions.pageLog = function(moduleId, direction) {
 
 BuildActions.fetchStartOfLog = function(moduleId, options={}) {
   builds[moduleId].shouldPoll = false;
-  
+
   if (options.position) {
     builds[moduleId].log.positionChange = options.position;
   }
@@ -353,16 +353,21 @@ function handleScroll(build, direction, isActive) {
   build.log.direction = direction;
   build.log.positionChange = undefined;
   
+  // Log size is smaller than one offsetLength so nothing more to fetch
+  if (build.log.options.logSize < config.offsetLength) {
+    return;
+  }
+
   if (direction === 'down') {
     // if we are at the end of the log, started at the end and since scrolled up,
     // or our log is less than one offset length
     if (build.log.endOfLogLoaded || build.log.options.logSize < config.offsetLength + 1) {
       return;
     }
-
   }
 
   else if (direction === 'up') {
+    // If we made it to the top, dont fetch anything
     if (build.log.previousOffset < config.offsetLength) {
       return;
     }
