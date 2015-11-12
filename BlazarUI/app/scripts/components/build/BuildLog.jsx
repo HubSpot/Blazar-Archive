@@ -16,6 +16,8 @@ class BuildLog extends Component {
     this.handleScroll = this.handleScroll.bind(this);
     this.initialState = this.props.buildState;
     this.isTailing = true;
+    this.showPagingSpinnerUp = false;
+    this.showPagingSpinnerDown = false;
   }
 
   componentDidMount() {
@@ -26,15 +28,30 @@ class BuildLog extends Component {
     }
     
     this.scrollId = `offset-${this.props.log.currrentOffsetLine}`;
-    this.scrollToBottom();    
+    this.scrollToBottom();
   }
   
   componentWillReceiveProps(nextProps) {
+  
     const buildInProgress = nextProps.buildState === BuildStates.IN_PROGRESS;
+    
+    if (!buildInProgress) {
+      return;
+    }
     
     if (buildInProgress && nextProps.log.fetchCount === 1 && nextProps.log.positionChange === 'bottom') {
       this.isTailing = true;
     }
+
+
+    // if we are at the top - remove the paging spinner
+    if (nextProps.log.options.offset === 0) {
+      this.showPagingSpinnerUp = false;
+      this.showPagingSpinnerDown = true;
+    } else {
+      this.showPagingSpinnerUp = true;
+    }
+    
   }
 
   componentDidUpdate() {
@@ -48,7 +65,6 @@ class BuildLog extends Component {
       if (log.positionChange === 'top') {
         this.isTailing = false;
         this.scrollId = `offset-${log.lastOffsetLine}`;
-        
         this.scrollToTop();
         return;
       }
@@ -121,7 +137,7 @@ class BuildLog extends Component {
             this.props.fetchEndOfLog({poll: true});  
           }
         }
-        
+
         else {
           this.props.pageLog('down');
           this.pagingDirection = 'down';  
@@ -219,13 +235,41 @@ class BuildLog extends Component {
   }
 
   render() {
+    let pagingSpinnerUp;
+    let pagingSpinnerDown;
     let tailingSpinner;
+    let endOfLogMessage;
+    
+    const buildInProgress = this.props.buildState === BuildStates.IN_PROGRESS;
 
     if (this.props.loading) {
       <Loader align='top-center' />
     }
+    
+    if (this.showPagingSpinnerUp) {
+      pagingSpinnerUp = (
+        <div>
+          <Loader align='left' roomy={true} />
+        </div>
+      )
+    }
 
-    if (this.isTailing && this.props.buildState === BuildStates.IN_PROGRESS) {
+    if (this.props.log.endOfLogLoaded && !buildInProgress) {
+      endOfLogMessage = (
+        <p className='log-line log-line-end'>You've reached the end of the log</p>
+      )
+    }
+
+    if (this.showPagingSpinnerDown && !this.props.log.endOfLogLoaded) {
+      pagingSpinnerDown = (
+        <div>
+          <Loader align='left' roomy={true} />
+        </div>
+      )
+    }
+    
+
+    if (this.isTailing && buildInProgress) {
       tailingSpinner = (
         <Loader align='left' roomy={true} />
       );
@@ -236,8 +280,11 @@ class BuildLog extends Component {
         ref='log'
         className='build-log' 
       >
+        {pagingSpinnerUp}
         {this.generateLines()}
+        {pagingSpinnerDown}
         {tailingSpinner}
+        {endOfLogMessage}
       </pre>
     );
   }
