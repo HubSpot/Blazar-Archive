@@ -17,7 +17,7 @@ import {LABELS} from '../constants';
 class BuildDetail extends Component {
 
   constructor() {
-    bindAll(this, 'handleCommitsToggle', 'handleResize')
+    bindAll(this, 'handleResize')
     this.state = {
       windowWidth: window.innerWidth,
       showCommits: false
@@ -38,24 +38,9 @@ class BuildDetail extends Component {
     ]);
   }
   
-  getCommitsIcon() {
-    if (this.state.showCommits) {
-      return <Icon name='times' />
-    }
-    else {
-      return <Icon type='octicon' name='git-commit' />
-    }
-  }
-  
   handleResize(e) {
     this.setState({
       windowWidth: window.innerWidth
-    });
-  }
-  
-  handleCommitsToggle() {
-    this.setState({
-      showCommits: !this.state.showCommits
     });
   }
 
@@ -123,15 +108,7 @@ class BuildDetail extends Component {
         </div>  
         
         <div className='build-detail-body'>
-          <div className='build-detail-body__commits-trigger' title='View commits since previous build' onClick={this.handleCommitsToggle}>
-            {this.getCommitsIcon()}
-          </div>
           <pre className='build-detail-body__commit-desc' title={currentCommit.message}>{truncate(currentCommit.message, this.state.windowWidth * .08, true)}</pre>
-          <BuildCommits
-            build={this.props.build}
-            loading={this.props.loading}
-            showCommits={this.state.showCommits}
-          />
         </div>
         
         <div className='build-detail-footer'> 
