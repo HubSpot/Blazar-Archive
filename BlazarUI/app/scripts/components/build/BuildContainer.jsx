@@ -1,10 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll, contains, some, clone} from 'underscore';
+import {bindAll, some, clone} from 'underscore';
 import BuildStates from '../../constants/BuildStates.js';
 import {getIsStarredState} from '../Helpers.js';
 import Build from './Build.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
-import {getPathname} from '../Helpers';
+import {getPathname, buildIsOnDeck} from '../Helpers';
 
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
@@ -15,15 +15,17 @@ import LocationStore from '../../stores/locationStore';
 const initialState = {
   loading: true,
   build: {
-    buildState: {},
+    build: {},
     gitInfo: {},
     module: { name: ''}
   },
-  log: [],
-  positionChange: null,
+  log: {
+    logLines: [],
+    fetchingLog: false,
+    currrentOffsetLine: 0,
+    positionChange: null
+  },
   fetchingLog: false,
-  currentOffset: 0,
-  currrentOffsetLine: 0,
   stars: [],
   error: false
 };
@@ -32,7 +34,15 @@ class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
-    bindAll(this, 'toggleStar', 'triggerCancelBuild', 'pageLog', 'changeOffsetWithNavigation');
+    bindAll(this, 
+      'toggleStar', 
+      'triggerCancelBuild', 
+      'pageLog', 
+      'changeOffsetWithNavigation',
+      'fetchStartOfLog',
+      'fetchEndOfLog',
+      'shouldPoll'
+    );
     this.state = initialState;
   }
 
@@ -64,12 +74,33 @@ class BuildContainer extends Component {
     this.tearDown()
   }
 
+  shouldPoll(state) {
+    BuildActions.shouldPoll(this.props.params.moduleId, state);
+  }
+  
   pageLog(direction) {
     BuildActions.pageLog(this.props.params.moduleId, direction);
   }
   
-  changeOffsetWithNavigation(position) {
-    BuildActions.changeOffsetWithNavigation(this.props.params.moduleId, position)
+  // maybe dont need...
+  fetchStartOfLog() {
+    BuildActions.fetchStartOfLog(this.props.params.moduleId);
+  }
+  
+  fetchEndOfLog(options) {
+    console.log('fetch from other ', options);
+    
+    BuildActions.fetchEndOfLog(this.props.params.moduleId, options);
+  }
+
+  changeOffsetWithNavigation(position) {    
+    if (position === 'top') {
+      BuildActions.fetchStartOfLog(this.props.params.moduleId, position)
+    }
+    
+    else if (position === 'bottom') {
+      BuildActions.fetchEndOfLog(this.props.params.moduleId, {position: position, poll: true})
+    }
   }
   
   triggerCancelBuild(buildId, moduleId) {
@@ -77,9 +108,12 @@ class BuildContainer extends Component {
   }
 
   onStatusChange(state) {
-    // let stateUpdate = {}
-    
-    // To do: handle cancelled build error
+    if (state.error) {
+      this.setState({
+        loading: false,
+        error: state.error
+      })
+    }
 
     if (state.loading) {
       this.setState({
@@ -99,15 +133,11 @@ class BuildContainer extends Component {
       this.setState({
         loading: false,
         build: state.build.build,
-        log: state.build.log,
+        log: state.build.log || initialState.log,
         fetchingLog: state.build.fetchingLog,
-        positionChange: state.build.positionChange,
-        currentOffset: state.build.currentOffset,
-        currrentOffsetLine: state.build.currrentOffsetLine,
-        lastOffsetLine: state.build.lastOffsetLine
       });
 
-      if (contains([BuildStates.QUEUED, BuildStates.LAUNCHING], state.build.build.build.state)){
+      if (buildIsOnDeck(state.build.build.build.state)) {
         setTimeout( () => {
           BuildActions.reloadBuild(this.props.params);
         }, 2000);
@@ -125,15 +155,13 @@ class BuildContainer extends Component {
         <Build
           error={this.state.error}
           build={this.state.build}
+          fetchStartOfLog={this.fetchStartOfLog}
+          fetchEndOfLog={this.fetchEndOfLog}
           log={this.state.log}
-          positionChange={this.state.positionChange}
-          changeOffsetWithNavigation={this.changeOffsetWithNavigation}
-          currentOffset={this.state.currentOffset}
-          currrentOffsetLine={this.state.currrentOffsetLine}
-          lastOffsetLine={this.state.lastOffsetLine}
-          finalOffset={this.state.finalOffset}
           fetchingLog={this.state.fetchingLog}
           pageLog={this.pageLog}
+          shouldPoll={this.shouldPoll}
+          changeOffsetWithNavigation={this.changeOffsetWithNavigation}
           originalParams={this.originalParams}
           params={this.props.params}
           loading={this.state.loading}

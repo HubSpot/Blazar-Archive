@@ -9,7 +9,7 @@ import BuildDetail from './BuildDetail.jsx';
 
 import BuildLogNavigation from './BuildLogNavigation.jsx';
 import BuildLog from './BuildLog.jsx';
-import AjaxErrorAlert from '../shared/AjaxErrorAlert.jsx';
+import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 class Build extends Component {
 
@@ -31,9 +31,6 @@ class Build extends Component {
         <div className='build-header'>
           <UIGrid>
             <UIGridItem size={8}>
-              <AjaxErrorAlert 
-                error={this.props.error}
-              />
               <BuildHeadline 
                 moduleName={this.props.params.module}
                 moduleId={this.props.params.moduleId}
@@ -52,6 +49,9 @@ class Build extends Component {
           </UIGrid>
           <UIGrid>
             <UIGridItem size={12}>
+              <GenericErrorMessage 
+                message={this.props.error}
+              />
               <BuildDetail
                 build={this.props.build}
                 loading={this.props.loading}
@@ -63,15 +63,14 @@ class Build extends Component {
         <div className='build-body'>
           <div>  
             <BuildLog
-              log={this.props.log}
-              positionChange={this.props.positionChange}
               fetchingLog={this.props.fetchingLog}
+              shouldPoll={this.props.shouldPoll}
+              fetchStartOfLog={this.props.fetchStartOfLog}
+              fetchEndOfLog={this.props.fetchEndOfLog}
               pageLog={this.props.pageLog}
               buildState={build.state}
               loading={this.props.loading}
-              currentOffset={this.props.currentOffset}
-              currrentOffsetLine={this.props.currrentOffsetLine}
-              lastOffsetLine={this.props.lastOffsetLine}
+              log={this.props.log}
             />
           </div>
         </div>
@@ -88,17 +87,18 @@ Build.propTypes = {
     module: PropTypes.object
   }),
   error: PropTypes.node,
-  positionChange: PropTypes.node,
+  fetchStartOfLog: PropTypes.func.isRequired,
+  fetchEndOfLog: PropTypes.func.isRequired,
+  shouldPoll: PropTypes.func.isRequired,
   changeOffsetWithNavigation: PropTypes.func.isRequired,
-  log: PropTypes.array,
+  log: PropTypes.object,
   fetchingLog: PropTypes.bool,
-  currentOffset: PropTypes.number,
   params: PropTypes.object,
   loading: PropTypes.bool,
+  triggerCancelBuild: PropTypes.func.isRequired,
   toggleStar: PropTypes.func.isRequired,
   isStarred: PropTypes.bool.isRequired,
-  pathname: PropTypes.string.isRequired,
-  triggerCancelBuild: PropTypes.func.isRequired
+  pathname: PropTypes.string.isRequired
 };
 
 export default Build;

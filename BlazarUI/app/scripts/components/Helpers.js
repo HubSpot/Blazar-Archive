@@ -150,7 +150,7 @@ export const getFilteredModules = function(filters, modules) {
 }
 
 export const buildIsOnDeck = function(buildState) {
-  return contains([BuildStates.LAUNCHING, buildState.QUEUED], buildState);
+  return contains([BuildStates.LAUNCHING, BuildStates.QUEUED], buildState);
 }
 
 export const buildIsInactive = function(buildState) {
