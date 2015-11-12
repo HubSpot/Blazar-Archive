@@ -95,7 +95,7 @@ class BuildContainer extends Component {
 
   changeOffsetWithNavigation(position) {    
     if (position === 'top') {
-      BuildActions.fetchStartOfLog(this.props.params.moduleId, position)
+      BuildActions.fetchStartOfLog(this.props.params.moduleId, {position: position})
     }
     
     else if (position === 'bottom') {

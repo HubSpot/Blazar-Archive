@@ -1,23 +1,23 @@
 /*global config*/
 import Reflux from 'reflux';
+import {find, has} from 'underscore';
+import {buildIsOnDeck} from '../components/Helpers';
 
 import Build from '../models/Build';
 import Log from '../models/Log';
 import LogSize from '../models/LogSize';
-
 import BuildTrigger from '../models/BuildTrigger';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
-import {find, has} from 'underscore';
-import {buildIsOnDeck} from '../components/Helpers';
+
 import BuildStates from '../constants/BuildStates';
 import BuildHistoryActions from '../actions/buildHistoryActions';
 
-// map to store builds and keep 
-// track of if we are polling a build
+// map to keep track of builds being viewed
+// in the event that we navigate to other builds
 let builds = {};
-// temporary storage for a build we are 
-// loading details for
+// temporary storage for a build
+// we are loading details for
 let requestedBuild = {};
 
 const BuildActions = Reflux.createActions([
@@ -64,9 +64,12 @@ BuildActions.pageLog = function(moduleId, direction) {
   handleScroll(builds[moduleId], direction, isActive);
 };
 
-BuildActions.fetchStartOfLog = function(moduleId) {
-
+BuildActions.fetchStartOfLog = function(moduleId, options={}) {
   builds[moduleId].shouldPoll = false;
+  
+  if (options.position) {
+    builds[moduleId].log.positionChange = options.position;
+  }
 
   resetBuild({
     build: builds[moduleId],
@@ -84,14 +87,11 @@ BuildActions.fetchEndOfLog = function(moduleId, options={}) {
     build.shouldPoll = true;
   }
   
-  
   logSizePromise.done((size) => {
     build.log.reset().setOffset(getLastOffset(size))
-    
 
     if (options.position) {
-      // use another word for this?
-      // shouldNotFetchMore....
+      build.log.positionChange = options.position;
       build.log.hasNavigatedWithButtons = true;
     }
 
@@ -108,11 +108,6 @@ BuildActions.fetchEndOfLog = function(moduleId, options={}) {
     
   });
 }
-
-
-
-
-
 
 BuildActions.stopWatchingBuild = function(buildId, moduleId) {
   if (builds[moduleId]) {
@@ -142,8 +137,7 @@ BuildActions.cancelBuild = function(buildId, moduleId) {
       BuildActions.loadBuildCancelled()
     }
   })
-  
-  
+
   cancel.error((err) => {
     BuildActions.loadBuildCancelError({
       status: err.status,
@@ -161,6 +155,7 @@ BuildActions.triggerBuild = function(moduleId) {
   });
   
   const promise = trigger.fetch();
+
   promise.then(() => {
     BuildActions.triggerBuildSuccess();
     BuildHistoryActions.fetchLatestHistory();
@@ -245,10 +240,6 @@ function getLogSize() {
   return sizePromise;
 }
 
-
-
-
-
 function processBuild() {
   const buildToProcess = builds[requestedBuild.gitInfo.moduleId];
 
@@ -257,19 +248,19 @@ function processBuild() {
     return;
   }
 
-  // Launching, Queued
+  // States: Launching, Queued
   if (buildIsOnDeck(buildToProcess.data.build.state)) {
     BuildActions.loadBuildSuccess({
       build: buildToProcess.data
     });
     return;
   }
-  // In Progress
+  // State: In Progress
   if (buildToProcess.data.build.state === BuildStates.IN_PROGRESS) {
     buildToProcess.shouldPoll = true;
     processInProgressBuild(buildToProcess);
   }
-  // Failed, Cancelled
+  // State: Failed, Cancelled
   else {
     processInactiveBuild(buildToProcess);
   }
@@ -288,8 +279,7 @@ function processInProgressBuild(build) {
   if (!build.isActive || !build.shouldPoll) {
     return;
   }
-  // user has paged, stop polling
-  // if (build.log.hasNavigatedWithButtons || !build.log.canPoll) {
+  // user has paged up, stop polling
   if (build.log.navigationPosition === 'up') {
     return;
   }
@@ -300,6 +290,7 @@ function processInProgressBuild(build) {
     build.log.nextOffset = data.nextOffset;
     build.log.setOffset(data.nextOffset);
 
+    // reached end of log
     if (data.nextOffset === -1) {
       // get latest build detail when log fetching is complete
       // so we can update status section at top of build page
@@ -325,11 +316,10 @@ function processInProgressBuild(build) {
       
       setTimeout(() => {
         processInProgressBuild(build)
-      }, 5000);
+      }, config.activeBuildRefresh);
     }
   });  
 }
-
 
 //
 // Shared Methods Across Build States
@@ -366,7 +356,6 @@ function handleScroll(build, direction, isActive) {
   if (direction === 'down') {
     // if we are at the end of the log, started at the end and since scrolled up,
     // or our log is less than one offset length
-    
     if (build.log.endOfLogLoaded || build.log.options.logSize < config.offsetLength + 1) {
       return;
     }
@@ -414,7 +403,6 @@ function updateStore(build, log, data, textStatus, jqxhr) {
     fetchingLog: false
   });
 }
-
 
 
 export default BuildActions;

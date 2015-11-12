@@ -8,8 +8,6 @@ import Loader from '../shared/Loader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx'
 import BuildStates from '../../constants/BuildStates';
 
-// for development
-window.$ = $
 
 class BuildLog extends Component {
 
@@ -30,14 +28,18 @@ class BuildLog extends Component {
     this.scrollId = `offset-${this.props.log.currrentOffsetLine}`;
     this.scrollToBottom();    
   }
-
-  componentDidUpdate() {
-    const inProgressBuild = this.props.buildState === BuildStates.IN_PROGRESS;
-    const log = this.props.log;
+  
+  componentWillReceiveProps(nextProps) {
+    const buildInProgress = nextProps.buildState === BuildStates.IN_PROGRESS;
     
-    if (inProgressBuild && log.fetchCount === 1) {
+    if (buildInProgress && nextProps.log.fetchCount === 1 && nextProps.log.positionChange === 'bottom') {
       this.isTailing = true;
     }
+  }
+
+  componentDidUpdate() {
+    const buildInProgress = this.props.buildState === BuildStates.IN_PROGRESS;
+    const log = this.props.log;
 
     // Used 'To Top' or 'To Bottom' buttons with Inactive build
     // Or used 'To Bottom' in an In Progress Build
@@ -62,7 +64,7 @@ class BuildLog extends Component {
     }
     
     // If we were not tailing, but we used the "to bottom button"
-    else if (inProgressBuild && (this.isTailing || log.fetchCount === 1)) {
+    else if (buildInProgress && (this.isTailing || log.fetchCount === 1)) {
       if (log.fetchCount === 1) {
           
         this.scrollId = `offset-${this.props.log.currrentOffsetLine}`;
@@ -90,7 +92,7 @@ class BuildLog extends Component {
 
   handleScroll() {
     const $log = $('#log');
-    const log = this.props.log
+    const log = this.props.log;
 
     // `Debounce` on animation requests so we 
     // only do this when the browser is ready for it
@@ -99,19 +101,20 @@ class BuildLog extends Component {
     }
 
     window.requestAnimationFrame(() => {
-      const scrollTop = $log.scrollTop()
-      const scrollHeight = $log[0].scrollHeight
-      const contentsHeight = $log.outerHeight()
-
-      const bottomScrollBuffer = 1
-      const atBottom = scrollTop >= scrollHeight - contentsHeight - bottomScrollBuffer
-      const atTop = scrollTop === 0
+      const scrollTop = $log.scrollTop();
+      const scrollHeight = $log[0].scrollHeight;
+      const contentsHeight = $log.outerHeight();
+      const buildInProgress = this.props.buildState === BuildStates.IN_PROGRESS;
+      
+      const bottomScrollBuffer = 1;
+      const atBottom = scrollTop >= scrollHeight - contentsHeight - bottomScrollBuffer;
+      const atTop = scrollTop === 0;
 
       // at bottom of page...
       if (atBottom && !atTop) {
         // if we stopped tailing, and are now
         // at the end of the log, start tailing again
-        if (this.props.buildState === BuildStates.IN_PROGRESS && !this.isTailing && log.endOfLogLoaded) {
+        if (buildInProgress && !this.isTailing && log.endOfLogLoaded) {
           this.isTailing = true;
           // Dont fetch if we already are fetching from nav button
           if (!log.hasNavigatedWithButtons) {
@@ -217,7 +220,6 @@ class BuildLog extends Component {
 
   render() {
     let tailingSpinner;
-    let pagingUpSpinner;
 
     if (this.props.loading) {
       <Loader align='top-center' />
