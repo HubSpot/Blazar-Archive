@@ -17,6 +17,8 @@ public class GitInfo {
   private final long repositoryId;
   private final String branch;
   private final boolean active;
+  private final long createdTimestamp;
+  private final long updatedTimestamp;
 
   @JsonCreator
   public GitInfo(@JsonProperty("id") Optional<Integer> id,
@@ -25,7 +27,9 @@ public class GitInfo {
                  @JsonProperty("repository") String repository,
                  @JsonProperty("repositoryId") long repositoryId,
                  @JsonProperty("branch") String branch,
-                 @JsonProperty("active") boolean active) {
+                 @JsonProperty("active") boolean active,
+                 @JsonProperty("createdTimestamp") long createdTimestamp,
+                 @JsonProperty("updatedTimestamp") long updatedTimestamp) {
     this.id = id;
     this.host = host;
     this.organization = organization;
@@ -33,6 +37,8 @@ public class GitInfo {
     this.repositoryId = repositoryId;
     this.branch = branch;
     this.active = active;
+    this.createdTimestamp = createdTimestamp;
+    this.updatedTimestamp = updatedTimestamp;
   }
 
   public Optional<Integer> getId() {
@@ -63,13 +69,21 @@ public class GitInfo {
     return active;
   }
 
+  public long getCreatedTimestamp() {
+    return createdTimestamp;
+  }
+
+  public long getUpdatedTimestamp() {
+    return updatedTimestamp;
+  }
+
   @JsonIgnore
   public String getFullRepositoryName() {
     return getOrganization() + '/' + getRepository();
   }
 
   public GitInfo withId(int id) {
-    return new GitInfo(Optional.of(id), host, organization, repository, repositoryId, branch, active);
+    return new GitInfo(Optional.of(id), host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp);
   }
 
   @Override
@@ -106,6 +120,6 @@ public class GitInfo {
     String organization = parts.get(1);
     String repository = parts.get(2);
 
-    return new GitInfo(Optional.<Integer>absent(), host, organization, repository, 0, ref, false);
+    return new GitInfo(Optional.<Integer>absent(), host, organization, repository, 0, ref, false, System.currentTimeMillis(), System.currentTimeMillis());
   }
 }

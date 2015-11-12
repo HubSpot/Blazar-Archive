@@ -18,6 +18,7 @@ public class Module {
   private final String glob;
   private final PathMatcher matcher;
   private final boolean active;
+  private final long createdTimestamp;
   private final long updatedTimestamp;
   @StoredAsJson
   private final Optional<GitInfo> buildpack;
@@ -29,6 +30,7 @@ public class Module {
                 @JsonProperty("path") String path,
                 @JsonProperty("glob") String glob,
                 @JsonProperty("active") boolean active,
+                @JsonProperty("createdTimestamp") long createdTimestamp,
                 @JsonProperty("updatedTimestamp") long updatedTimestamp,
                 @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
     this.id = id;
@@ -38,6 +40,7 @@ public class Module {
     this.glob = glob;
     this.matcher = FileSystems.getDefault().getPathMatcher("glob:" + glob);
     this.active = active;
+    this.createdTimestamp = createdTimestamp;
     this.updatedTimestamp = updatedTimestamp;
     this.buildpack = com.google.common.base.Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
   }
@@ -66,6 +69,10 @@ public class Module {
     return active;
   }
 
+  public long getCreatedTimestamp() {
+    return createdTimestamp;
+  }
+
   public long getUpdatedTimestamp() {
     return updatedTimestamp;
   }
@@ -79,7 +86,7 @@ public class Module {
   }
 
   public Module withId(int id) {
-    return new Module(Optional.of(id), name, type, path, glob, active, updatedTimestamp, buildpack);
+    return new Module(Optional.of(id), name, type, path, glob, active, createdTimestamp, updatedTimestamp, buildpack);
   }
 
   @Override
