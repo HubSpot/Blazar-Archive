@@ -43,9 +43,8 @@ class BuildLog extends Component {
       this.isTailing = true;
     }
 
-
     // if we are at the top - remove the paging spinner
-    if (nextProps.log.options.offset === 0) {
+    if (nextProps.log.options.offset < nextProps.log.options.offsetLength) {
       this.showPagingSpinnerUp = false;
       this.showPagingSpinnerDown = true;
     } else {
