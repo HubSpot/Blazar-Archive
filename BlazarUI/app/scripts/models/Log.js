@@ -144,8 +144,8 @@ class Log extends Model {
 
     // If offset is less than our offsetLength when scrolling up,
     // and we havent used the 'To Top' navigation button
-    // we need to omit any overlap from last fetch..
-    if (this.previousOffset < config.offsetLength && this.direction === 'up' && this.options.offset !== 0) {
+    // we need to omit any overlap from last fetch..    
+    if (this.options.offset < config.offsetLength && this.direction === 'up') {
       logData = logData.substring(0, this.getByteLength(logData) - (config.offsetLength - this.previousOffset))
     }
 
