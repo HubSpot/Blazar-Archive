@@ -34,15 +34,18 @@ class BuildLog extends Component {
   componentWillReceiveProps(nextProps) {
   
     const buildInProgress = nextProps.buildState === BuildStates.IN_PROGRESS;
+    const onDeck = buildIsOnDeck(nextProps.buildState);
+
+    if (!buildInProgress && onDeck) {
+      return;
+    }
     
-    // if (!buildInProgress) {
-    //   return;
-    // }
-    
+    // if we use navigation buttons to 
+    // navigate down to the bottom of the log
     if (buildInProgress && nextProps.log.fetchCount === 1 && nextProps.log.positionChange === 'bottom') {
       this.isTailing = true;
     }
-
+  
     // if we are at the top - remove the paging spinner
     if (nextProps.log.options.offset < nextProps.log.options.offsetLength) {
       this.showPagingSpinnerUp = false;
