@@ -8,6 +8,7 @@ import Loader from '../shared/Loader.jsx';
 import MutedMessage from '../shared/MutedMessage.jsx'
 import BuildStates from '../../constants/BuildStates';
 
+window.$ = $;
 
 class BuildLog extends Component {
 
@@ -31,13 +32,14 @@ class BuildLog extends Component {
     this.scrollToBottom();
   }
 
-  componentWillReceiveProps(nextProps) {  
+  componentWillReceiveProps(nextProps) {
     const buildInProgress = nextProps.buildState === BuildStates.IN_PROGRESS;
+    const buildCancelled = nextProps.buildState === BuildStates.CANCELLED;
     const nextLog = nextProps.log;
     const onDeck = buildIsOnDeck(nextProps.buildState);
     
-    // still waiting to build
-    if (!buildInProgress && onDeck) {
+    // still waiting to build or cancelled
+    if ((!buildInProgress && onDeck) || buildCancelled) {
       return;
     }
 
@@ -75,6 +77,10 @@ class BuildLog extends Component {
     // Or used 'To Bottom' in an In Progress Build
     if (log.positionChange) {
 
+      // prevent our navigationi change from
+      // triggering a scroll event
+      this.ignoreScrollEvent = true;
+      
       if (log.positionChange === 'top') {
         this.isTailing = false;
         this.scrollId = `offset-${log.lastOffsetLine}`;
@@ -106,12 +112,14 @@ class BuildLog extends Component {
       // if we have navigated down, and now want to scroll up...
       if (this.usedNavigation) {
         this.scrollId = this.usedNavigationScrollId;
+        this.usedNavigation = false;
       }
       // Store nextScrollId so we can set scroll
       // to the correct position with our requestAnimationFrame
       this.nextScrollId = `offset-${this.props.log.currrentOffsetLine}`;
       this.scrollToOffset();
     }
+
   }
   
   componentWillUnmount() {
@@ -119,9 +127,15 @@ class BuildLog extends Component {
   }
 
   handleScroll() {
+    if (this.ignoreScrollEvent) {
+      this.ignoreScrollEvent = false;
+      return;
+    }
+
     const $log = $('#log');
     const log = this.props.log;
-
+    
+  
     // `Debounce` on animation requests so we 
     // only do this when the browser is ready for it
     if (this.frameRequest != null) {
@@ -176,6 +190,7 @@ class BuildLog extends Component {
   }
   
   scrollToOffset() {
+    
     if (this.buildCompleteOnLoad) {
       this.scrollToBottom();
     }
@@ -205,7 +220,8 @@ class BuildLog extends Component {
   
   scrollToBottom() {
     window.requestAnimationFrame(() => {
-      $('#log').scrollTop($('#log')[0].scrollHeight - 240);
+      const lastEl = $('.log-line:eq(-2)')[0]
+      lastEl.scrollIntoView();
     });
   }
   
