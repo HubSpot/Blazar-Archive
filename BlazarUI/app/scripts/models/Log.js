@@ -2,6 +2,7 @@
 import Model from './Model';
 import BuildStates from '../constants/BuildStates';
 import utf8 from 'utf8';
+import {rest, initial, first, last, find} from 'underscore';
 
 class Log extends Model {
   
@@ -14,55 +15,71 @@ class Log extends Model {
   }
 
   url() {
-    return `${config.apiRoot}/build/${this.options.buildNumber}/log?offset=${this.options.offset}&length=50000`;
-  }
-  
-  parseInProgressBuild() {
-    // initial load
-    if (!this.hasFetched) {
-      this.logLines = this.formatLog();
-      this.hasFetched = true;
-    }
-    
-    // paging up - prepend log lines
-    else if (this.isPaging && (this.positionChange === 'top' || this.direction === 'up')) {
-      const newLogLines = this.formatLog();
-      this.logLines = newLogLines.concat(this.logLines);
-    }
-
-    // paging dow - append log lines
-    else {
-      this.logLines = this.logLines.concat(this.formatLog());
-    }
-
-  }
-  
-  parseInactiveBuild() {
-    // paging up
-    if (this.isPaging && (this.positionChange === 'top' || this.direction === 'up')  ) {
-      const newLogLines = this.formatLog();
-      this.logLines = newLogLines.concat(this.logLines);
-    }
-    // initial offset load or paging down
-    else {
-      this.logLines = this.logLines.concat(this.formatLog());
-    }
-
+    return `${config.apiRoot}/build/${this.options.buildNumber}/log?offset=${this.options.offset}&length=${config.offsetLength}`;
   }
   
   parse() {
     this.fetchCount++;
-    if (this.options.buildState === BuildStates.IN_PROGRESS) {
-      this.parseInProgressBuild();
-    }
-    else {
-      this.parseInactiveBuild();
-    }
-
-    // keep track of if we've loaded the last page
+    let newLogLines = this.formatLog();
+  
     if (this.options.offset === this.options.lastOffset) {
       this.endOfLogLoaded = true;
     }
+    
+    if (this.options.offset === 0) {
+      this.startOfLogLoaded = true;
+    }
+
+    // nothing new, nothing to do
+    if (newLogLines.length === 0) {
+      this.logLines = this.logLines;
+      return;
+    }
+
+    // scrolling up, but not navigating up
+    if (this.isPaging && this.direction === 'up' && this.positionChange !== 'top') {
+      
+      // save first line so we can 
+      // append it during the next fetch
+      const tempFirst = first(newLogLines);
+
+      this.lastLine = last(newLogLines);
+      newLogLines = rest(newLogLines);
+
+      // append any extra text to last log line
+      newLogLines[newLogLines.length - 1].text = newLogLines[newLogLines.length - 1].text + this.firstLine.text;
+      
+      this.logLines = newLogLines.concat(this.logLines);
+      this.firstLine = tempFirst;
+    }
+
+    // initial offset load, used nav buttons, or paging down
+    else {
+      // If we only have one page, nothing to do here
+      if (this.options.offset === 0 && this.options.logSize < config.offsetLength) {}
+      // bottom of page
+      else if (this.options.startingOffset === this.options.offset) {
+        this.lastLine = last(newLogLines);
+        this.firstLine = first(newLogLines);
+        newLogLines = rest(newLogLines);
+      }
+      // top of page
+      else if (this.options.offset === 0) {
+        this.lastLine = last(newLogLines);
+        newLogLines = initial(newLogLines);
+      }
+      // in between top and bottom
+      else {
+        const tempLast = last(newLogLines);
+        newLogLines = initial(newLogLines);
+        // append any extra text to first log line
+        newLogLines[0].text = this.lastLine.text + newLogLines[0].text;
+        this.lastLine = tempLast;
+      }
+
+      this.logLines = this.logLines.concat(newLogLines);
+    }
+
 
   }
 
@@ -73,29 +90,35 @@ class Log extends Model {
     if (direction === 'up') {
       // Builds In Progress
       if (this.options.buildState === BuildStates.IN_PROGRESS) {
-        this.options.offset = Math.max(this.runningOffset - config.offsetLength, 0);
+        this.options.offset = Math.max(this.runningOffset - config.offsetLength - 1, 0);
         this.runningOffset -= config.offsetLength;
       }
       // Finished Builds
       else {
-        this.options.offset = Math.max(this.options.offset - config.offsetLength, 0);
-      }
-    }
-  
-    else if (direction === 'down') {      
-      
-      if (this.options.offset === 0) {
-        this.options.offset = config.offsetLength;
-      }
-      else {
-        this.options.offset = Math.min(this.options.offset + config.offsetLength, this.options.lastOffset);
+        this.options.offset = Math.max(this.options.offset - config.offsetLength - 1, 0);
       }
 
-      // if we've loaded a partial offset
-      if (this.options.offset < config.offsetLength && this.options.offset > 0) {        
-        this.options.offset = config.offsetLength;
-        this.endOfLogLoaded = true;
+    }
+  
+    else if (direction === 'down') {
+      
+      if (this.options.offset === 0) {
+        this.options.offset = config.offsetLength + 1;
       }
+      else {
+        // this.options.offset = Math.min(this.options.offset + config.offsetLength, this.options.lastOffset);
+        this.options.offset = this.options.offset + config.offsetLength + 1;
+        
+        if ((this.options.offset + config.offsetLength + 1) > this.options.logSize) {
+          this.endOfLogLoaded = true;
+        }
+
+      }
+      // if we've loaded a partial offset
+      // if (this.options.offset < config.offsetLength  && this.options.offset > 0) {
+      //   this.options.offset = config.offsetLength;
+      //   this.endOfLogLoaded = true;
+      // }
     }
 
     return this;
@@ -107,7 +130,7 @@ class Log extends Model {
     this.logLines = [];
     return this;
   }
-  
+
   setOffset(offset) {
     this.options.currentOffset = offset;
     this.options.offset = offset;
@@ -146,7 +169,7 @@ class Log extends Model {
     // and we havent used the 'To Top' navigation button
     // we need to omit any overlap from last fetch..    
     if (this.options.offset < config.offsetLength && this.direction === 'up') {
-      logData = logData.substring(0, this.getByteLength(logData) - (config.offsetLength - this.previousOffset))
+      logData = logData.substring(0, this.getByteLength(logData) - (config.offsetLength + 1 - this.previousOffset))
     }
 
     if (logData.length === 0) {
@@ -156,10 +179,11 @@ class Log extends Model {
     const splitLines = logData.split(NEW_LINE);
     
     return splitLines.map((line, i) => {
-      if (i === 0) {
+      // store second line because we may chop off the first
+      if (i === 1) {
         this.currrentOffsetLine = offsetRunningTotal + this.getByteLength(line);
       }
-      
+
       if (i === splitLines.length - 1) {
         this.lastOffsetLine = offsetRunningTotal + this.getByteLength(length);
       }
@@ -168,10 +192,8 @@ class Log extends Model {
         text:  utf8.decode(line),
         offset: offsetRunningTotal += this.getByteLength(line)
       }
-  });
-  // omit last line that may be incomplete
-  // }).splice(0, splitLines.length - 1);
-    
+    });
+
   }
 
 }

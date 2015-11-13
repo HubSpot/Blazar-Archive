@@ -1,7 +1,7 @@
 import React, {Component, PropTypes, findDOMNode} from 'react';
 import $ from 'jquery';
 import {debounce} from 'underscore';
-import {events, humanizeText, buildIsOnDeck, buildIsInactve} from '../Helpers';
+import {events, humanizeText, buildIsOnDeck, buildIsInactive} from '../Helpers';
 import BuildLogLine from './BuildLogLine.jsx';
 import Collapsable from '../shared/Collapsable.jsx';
 import Loader from '../shared/Loader.jsx';
@@ -31,15 +31,24 @@ class BuildLog extends Component {
     this.scrollToBottom();
   }
 
-  componentWillReceiveProps(nextProps) {
-  
+  componentWillReceiveProps(nextProps) {  
     const buildInProgress = nextProps.buildState === BuildStates.IN_PROGRESS;
+    const nextLog = nextProps.log;
     const onDeck = buildIsOnDeck(nextProps.buildState);
-
+    
+    // still waiting to build
     if (!buildInProgress && onDeck) {
       return;
     }
-    
+
+    // fast build: waiting for build and it is complete on first render
+    else if (!buildInProgress && !nextLog.positionChange && !nextLog.direction && nextLog.fetchCount === 1) {
+      this.showPagingSpinnerUp = false;
+      this.showPagingSpinnerDown = false;
+      this.buildCompleteOnLoad = true;
+      return;
+    }
+
     // if we use navigation buttons to 
     // navigate down to the bottom of the log
     if (buildInProgress && nextProps.log.fetchCount === 1 && nextProps.log.positionChange === 'bottom') {
@@ -50,11 +59,12 @@ class BuildLog extends Component {
     if (nextProps.log.options.offset < nextProps.log.options.offsetLength) {
       this.showPagingSpinnerUp = false;
       this.showPagingSpinnerDown = true;
-    } 
+    }
+
     else {
       this.showPagingSpinnerUp = true;
-    }
-    
+    }  
+  
   }
 
   componentDidUpdate() {
@@ -85,7 +95,6 @@ class BuildLog extends Component {
     // If we were not tailing, but we used the "to bottom button"
     else if (buildInProgress && (this.isTailing || log.fetchCount === 1)) {
       if (log.fetchCount === 1) {
-          
         this.scrollId = `offset-${this.props.log.currrentOffsetLine}`;
       }
 
@@ -131,8 +140,7 @@ class BuildLog extends Component {
 
       // at bottom of page...
       if (atBottom && !atTop) {
-        // if we stopped tailing, and are now
-        // at the end of the log, start tailing again
+        // if we're not tailing, but reached the end of the log, start tailing
         if (buildInProgress && !this.isTailing && log.endOfLogLoaded) {
           this.isTailing = true;
           // Dont fetch if we already are fetching from nav button
@@ -168,7 +176,11 @@ class BuildLog extends Component {
   }
   
   scrollToOffset() {
-    if (!this.scrollId) {
+    if (this.buildCompleteOnLoad) {
+      this.scrollToBottom();
+    }
+    
+    else if (!this.scrollId) {
       return;
     }
 
@@ -186,6 +198,7 @@ class BuildLog extends Component {
       if (this.pagingDirection === 'down') {
         $('#log').scrollTop(currentPosition)
       }
+
     });
 
   }
@@ -259,7 +272,7 @@ class BuildLog extends Component {
 
     if (this.props.log.endOfLogLoaded && !buildInProgress) {
       endOfLogMessage = (
-        <p className='log-line log-line-end'>You've reached the end of the log</p>
+        <p className='log-line log-line-end'>End of log</p>
       )
     }
 

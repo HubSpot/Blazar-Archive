@@ -368,7 +368,7 @@ function handleScroll(build, direction, isActive) {
 
   else if (direction === 'up') {
     // If we made it to the top, dont fetch anything
-    if (build.log.previousOffset < config.offsetLength) {
+    if (build.log.startOfLogLoaded) {
       return;
     }
   }
@@ -388,6 +388,7 @@ function resetBuild(options) {
   } = options;
 
   build.log.endOfLogLoaded = false;
+  build.log.startOfLogLoaded = false;
 
   build.log
     .reset()
