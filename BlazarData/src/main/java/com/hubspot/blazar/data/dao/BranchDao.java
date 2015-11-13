@@ -10,6 +10,7 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
 public interface BranchDao {
+  String NOW = "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)";
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM branches WHERE repositoryId = :repositoryId AND branch = :branch")
@@ -20,12 +21,12 @@ public interface BranchDao {
   Optional<GitInfo> lookup(@Bind("host") String host, @Bind("organization") String organization, @Bind("repository") String repository, @Bind("branch") String branch);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO branches (host, organization, repository, repositoryId, branch, active) VALUES (:host, :organization, :repository, :repositoryId, :branch, :active)")
+  @SqlUpdate("INSERT INTO branches (host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp) VALUES (:host, :organization, :repository, :repositoryId, :branch, :active, " + NOW + ", " + NOW + ")")
   int insert(@BindWithRosetta GitInfo gitInfo);
 
-  @SqlUpdate("UPDATE branches SET organization = :organization, repository = :repository, active = :active WHERE id = :id")
+  @SqlUpdate("UPDATE branches SET organization = :organization, repository = :repository, active = :active, updatedTimestamp = " + NOW + " WHERE id = :id")
   int update(@BindWithRosetta GitInfo gitInfo);
 
-  @SqlUpdate("UPDATE branches SET active = 0 WHERE repositoryId = :repositoryId AND branch = :branch")
+  @SqlUpdate("UPDATE branches SET active = 0, updatedTimestamp = " + NOW + " WHERE repositoryId = :repositoryId AND branch = :branch")
   int delete(@BindWithRosetta GitInfo gitInfo);
 }

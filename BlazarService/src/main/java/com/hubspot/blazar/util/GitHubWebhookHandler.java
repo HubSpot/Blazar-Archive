@@ -167,7 +167,7 @@ public class GitHubWebhookHandler {
     long repositoryId = repository.getId();
     String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
 
-    return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, branch, active);
+    return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, branch, active, System.currentTimeMillis(), System.currentTimeMillis());
   }
 
   private static Set<String> affectedPaths(PushEvent pushEvent) {
