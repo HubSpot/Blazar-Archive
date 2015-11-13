@@ -350,9 +350,9 @@ function createLogModel(build, size) {
 // fetch previous/next offsets when scrolling up/down log
 function handleScroll(build, direction, isActive) {
   build.log.hasNavigatedWithButtons = false;
+  build.log.positionChange = false
   build.log.direction = direction;
-  build.log.positionChange = undefined;
-  
+
   // Log size is smaller than one offsetLength so nothing more to fetch
   if (build.log.options.logSize < config.offsetLength) {
     return;

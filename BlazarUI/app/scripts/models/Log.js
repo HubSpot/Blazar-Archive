@@ -2,7 +2,7 @@
 import Model from './Model';
 import BuildStates from '../constants/BuildStates';
 import utf8 from 'utf8';
-import {rest, initial, first, last, find} from 'underscore';
+import {rest, initial, first, last, find, compact} from 'underscore';
 
 class Log extends Model {
   
@@ -72,15 +72,17 @@ class Log extends Model {
       else {
         const tempLast = last(newLogLines);
         newLogLines = initial(newLogLines);
-        // append any extra text to first log line
-        newLogLines[0].text = this.lastLine.text + newLogLines[0].text;
+        
+        // append any extra text to first log line            
+        if (newLogLines[0] && this.lastLine) {
+          newLogLines[0].text = this.lastLine.text + newLogLines[0].text;
+        }
+
         this.lastLine = tempLast;
       }
 
       this.logLines = this.logLines.concat(newLogLines);
     }
-
-
   }
 
   pageLog(direction) {
@@ -88,7 +90,7 @@ class Log extends Model {
     this.previousOffset = this.options.offset;
 
     if (direction === 'up') {
-      // Builds In Progress
+      // Builds In Progresse
       if (this.options.buildState === BuildStates.IN_PROGRESS) {
         this.options.offset = Math.max(this.runningOffset - config.offsetLength - 1, 0);
         this.runningOffset -= config.offsetLength;
@@ -106,7 +108,6 @@ class Log extends Model {
         this.options.offset = config.offsetLength + 1;
       }
       else {
-        // this.options.offset = Math.min(this.options.offset + config.offsetLength, this.options.lastOffset);
         this.options.offset = this.options.offset + config.offsetLength + 1;
         
         if ((this.options.offset + config.offsetLength + 1) > this.options.logSize) {
@@ -115,10 +116,10 @@ class Log extends Model {
 
       }
       // if we've loaded a partial offset
-      // if (this.options.offset < config.offsetLength  && this.options.offset > 0) {
-      //   this.options.offset = config.offsetLength;
-      //   this.endOfLogLoaded = true;
-      // }
+      if (this.options.offset < config.offsetLength  && this.options.offset > 0) {
+        this.options.offset = config.offsetLength;
+        this.endOfLogLoaded = true;
+      }
     }
 
     return this;
@@ -176,8 +177,7 @@ class Log extends Model {
       return [];
     }
 
-    const splitLines = logData.split(NEW_LINE);
-    
+    const splitLines = compact(logData.split(NEW_LINE));
     return splitLines.map((line, i) => {
       // store second line because we may chop off the first
       if (i === 1) {
