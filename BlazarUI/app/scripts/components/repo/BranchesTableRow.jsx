@@ -57,8 +57,6 @@ class BranchesTableRow extends Component {
     let sha;
     const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
     
-    console.log('build: ', build);
-    
     if (build.sha !== undefined) {
       sha = <Sha gitInfo={gitInfo} build={build} />;
     }

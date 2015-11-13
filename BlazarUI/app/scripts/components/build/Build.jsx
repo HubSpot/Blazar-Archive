@@ -44,6 +44,7 @@ class Build extends Component {
               <BuildLogNavigation 
                 changeOffsetWithNavigation={this.props.changeOffsetWithNavigation}
                 buildState={build.state}
+                loading={this.props.loading}
               />
             </UIGridItem>
           </UIGrid>

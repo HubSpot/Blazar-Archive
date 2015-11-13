@@ -3,12 +3,31 @@ import {dataTagValue} from '../Helpers';
 import BuildStates from '../../constants/BuildStates';
 
 class BuildLogNavigation extends Component {
-  constructor() {
+
+  constructor(props) {
+    super(props);
     this.handleNavClick = this.handleNavClick.bind(this);
+    
+    this.state = {
+      topDisabled: this.props.loading,
+      bottomDisabled: this.props.loading
+    }
+  }
+  
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      topDisabled: nextProps.loading,
+      bottomDisabled: nextProps.loading
+    })
   }
 
   handleNavClick(e) {
     const position = dataTagValue(e, 'position');
+
+    this.setState({
+      [position + 'Disabled']: true
+    })
+
     this.props.changeOffsetWithNavigation(position);
   }
 
@@ -19,8 +38,8 @@ class BuildLogNavigation extends Component {
 
     return (
       <nav className='text-right'>
-        <button data-position='top' onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Top</button>
-        <button data-position='bottom' onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Bottom</button>
+        <button data-position='top' disabled={this.state.topDisabled} onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Top</button>
+        <button data-position='bottom' disabled={this.state.bottomDisabled} onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Bottom</button>
       </nav>
     );
   }
