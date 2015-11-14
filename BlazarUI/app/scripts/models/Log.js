@@ -21,7 +21,9 @@ class Log extends Model {
   parse() {
     this.fetchCount++;
     let newLogLines = this.formatLog();
-  
+
+    const buildInProgress = this.options.buildState === BuildStates.IN_PROGRESS;
+
     if (this.options.offset === this.options.lastOffset) {
       this.endOfLogLoaded = true;
     }
@@ -34,6 +36,13 @@ class Log extends Model {
     if (newLogLines.length === 0) {
       this.logLines = this.logLines;
       return;
+    }
+    
+    // if build is In Progress and we are just starting
+    if (this.fetchCount === 1 && buildInProgress) {
+      console.log('here we go...');
+      this.firstLine = first(newLogLines);
+      newLogLines = rest(newLogLines)
     }
 
     // scrolling up, but not navigating up
@@ -57,17 +66,19 @@ class Log extends Model {
     else {
       // If we only have one page, nothing to do here
       if (this.options.offset === 0 && this.options.logSize < config.offsetLength) {}
+      
       // bottom of page
-      else if (this.options.startingOffset === this.options.offset) {
+      else if (this.options.startingOffset === this.options.offset && (!buildInProgress || this.fetchCount !== 1) ) {
         this.lastLine = last(newLogLines);
         this.firstLine = first(newLogLines);
         newLogLines = rest(newLogLines);
       }
-      // top of page
+      // fetching for top of page 
       else if (this.options.offset === 0) {
         this.lastLine = last(newLogLines);
         newLogLines = initial(newLogLines);
       }
+      
       // in between top and bottom
       else {
         const tempLast = last(newLogLines);
@@ -75,7 +86,13 @@ class Log extends Model {
         
         // append any extra text to first log line            
         if (newLogLines[0] && this.lastLine) {
-          newLogLines[0].text = this.lastLine.text + newLogLines[0].text;
+          if (buildInProgress && this.nextOffset !== config.offsetLength) {
+            newLogLines.unshift(this.lastLine)
+          }
+          else {
+            newLogLines[0].text = this.lastLine.text + newLogLines[0].text;  
+          }
+
         }
 
         this.lastLine = tempLast;
@@ -105,10 +122,12 @@ class Log extends Model {
     else if (direction === 'down') {
       
       if (this.options.offset === 0) {
-        this.options.offset = config.offsetLength + 1;
+        // this.options.offset = config.offsetLength + 1;
+        this.options.offset = config.offsetLength ;
       }
       else {
-        this.options.offset = this.options.offset + config.offsetLength + 1;
+        // this.options.offset = this.options.offset + config.offsetLength + 1;
+        this.options.offset = this.options.offset + config.offsetLength;
         
         if ((this.options.offset + config.offsetLength + 1) > this.options.logSize) {
           this.endOfLogLoaded = true;
