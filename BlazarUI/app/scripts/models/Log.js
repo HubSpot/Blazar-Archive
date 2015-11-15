@@ -40,14 +40,12 @@ class Log extends Model {
     
     // if build is In Progress and we are just starting
     if (this.fetchCount === 1 && buildInProgress) {
-      console.log('here we go...');
       this.firstLine = first(newLogLines);
       newLogLines = rest(newLogLines)
     }
 
     // scrolling up, but not navigating up
     if (this.isPaging && this.direction === 'up' && this.positionChange !== 'top') {
-      
       // save first line so we can 
       // append it during the next fetch
       const tempFirst = first(newLogLines);
@@ -200,7 +198,7 @@ class Log extends Model {
     return splitLines.map((line, i) => {
       // store second line because we may chop off the first
       if (i === 1) {
-        this.currrentOffsetLine = offsetRunningTotal + this.getByteLength(line);
+        this.currentOffsetLine = offsetRunningTotal + this.getByteLength(line);
       }
 
       if (i === splitLines.length - 1) {

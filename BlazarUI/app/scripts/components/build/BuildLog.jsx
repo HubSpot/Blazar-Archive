@@ -28,7 +28,7 @@ class BuildLog extends Component {
       return;
     }
     
-    this.scrollId = `offset-${this.props.log.currrentOffsetLine}`;
+    this.scrollId = `offset-${this.props.log.currentOffsetLine}`;
     this.scrollToBottom();
   }
 
@@ -89,7 +89,7 @@ class BuildLog extends Component {
       }
       else {
         // store the current offest if we start scrolling up again
-        this.usedNavigationScrollId = `offset-${log.currrentOffsetLine}`;
+        this.usedNavigationScrollId = `offset-${log.currentOffsetLine}`;
         this.scrollId = `offset-${log.lastOffsetLine}`;
         this.usedNavigation = true;
         this.isTailing = true;
@@ -101,7 +101,7 @@ class BuildLog extends Component {
     // If we were not tailing, but we used the "to bottom button"
     else if (buildInProgress && (this.isTailing || log.fetchCount === 1)) {
       if (log.fetchCount === 1) {
-        this.scrollId = `offset-${this.props.log.currrentOffsetLine}`;
+        this.scrollId = `offset-${this.props.log.currentOffsetLine}`;
       }
 
       this.scrollToBottom();
@@ -116,7 +116,7 @@ class BuildLog extends Component {
       }
       // Store nextScrollId so we can set scroll
       // to the correct position with our requestAnimationFrame
-      this.nextScrollId = `offset-${this.props.log.currrentOffsetLine}`;
+      this.nextScrollId = `offset-${this.props.log.currentOffsetLine}`;
       this.scrollToOffset();
     }
 

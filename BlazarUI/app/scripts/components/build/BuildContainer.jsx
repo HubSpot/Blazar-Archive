@@ -22,7 +22,7 @@ const initialState = {
   log: {
     logLines: [],
     fetchingLog: false,
-    currrentOffsetLine: 0,
+    currentOffsetLine: 0,
     positionChange: null
   },
   fetchingLog: false,
