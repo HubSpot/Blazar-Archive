@@ -2,6 +2,7 @@
 import Model from './Model';
 import BuildStates from '../constants/BuildStates';
 import utf8 from 'utf8';
+import {getByteLength} from '../utils/logHelpers';
 import {rest, initial, first, last, find, compact} from 'underscore';
 
 class Log extends Model {
@@ -17,8 +18,41 @@ class Log extends Model {
   url() {
     return `${config.apiRoot}/build/${this.options.buildNumber}/log?offset=${this.options.offset}&length=${config.offsetLength}`;
   }
+
+  // Helper for parse, used to manage incomplete lines
+  handleLinesOnPageDown(options = {}) {
+    let {newLogLines} = options;
+    // save incomplete last line so we can prepend it to the
+    // incomplete first line of the next fetch if we continue to scroll down
+    const tempLast = last(newLogLines);
+    // chop off last incomplete line
+    newLogLines = initial(newLogLines);
+    // prepend the rest of the first line that was cutoff last fetch
+    newLogLines[0].text = this.lastLine.text + newLogLines[0].text;
+    this.lastLine = tempLast;
+    this.logLines = [...this.logLines, ...newLogLines];
+  }
   
-  parse() {
+  // Helper for parse, used to manage incomplete lines
+  handleLinesOnPageUp(options = {}) {
+    let {newLogLines, removeFirstLine} = options;
+    // save incomplete first line so we can append it to the 
+    // incomplete last line of the next fetch if we continue to scroll up
+    const tempFirst = first(newLogLines);
+    // remove the first line which may be incomplete
+    // as long as we are not at the beginning of the log
+    if (this.options.offset !== 0 || removeFirstLine) {
+      newLogLines = rest(newLogLines);
+    }
+    // append extra text to last log line that is incomplete
+    newLogLines[newLogLines.length - 1].text = newLogLines[newLogLines.length - 1].text + this.firstLine.text;
+    // prepend new logLines to existing logLines
+    this.firstLine = tempFirst;
+    this.logLines = [...newLogLines, ...this.logLines];
+  }
+
+
+  parse() {    
     this.fetchCount++;
     let newLogLines = this.formatLog();
 
@@ -37,96 +71,113 @@ class Log extends Model {
       this.logLines = this.logLines;
       return;
     }
-
-    // If build is In Progress and we are not starting at the beginning
-    // we need to get rid of first line and keep track of it if user scrolls up
-    if (this.fetchCount === 1 && buildInProgress) {
-      this.lastLine = last(newLogLines); // .........
-      this.firstLine = first(newLogLines);
-      
-      // newLogLines = rest(newLogLines);
-      
-      if (this.options.offset > 0) {
-        this.firstLine = first(newLogLines);
-        newLogLines = rest(newLogLines);
-      }
-
-    }
-
-    // Scrolling up, but not Navigating up
-    if (this.isPaging && this.direction === 'up' && this.positionChange !== 'top') {
-      // save incomplete first line so we can append it to the 
-      // incomplete last line of the next fetch  if we scroll up
-      const tempFirst = first(newLogLines);
-      // remove the first line which may be incomplete
-      newLogLines = rest(newLogLines);
-
-      // append any extra text to last log line
-      newLogLines[newLogLines.length - 1].text = newLogLines[newLogLines.length - 1].text + this.firstLine.text;
-      
-      this.logLines = newLogLines.concat(this.logLines);
-      this.firstLine = tempFirst;
-    }
-
-
-    // Initial load with finished builds, used nav buttons, or scrolling down
-    else {
-      // If we started with a log size less than one offset we dont need to fix any lines.
-      // e.g. we have been tailing the log from the very start
-      if (this.options.logSize < config.offsetLength) {}
-
-      // Button Navigated to the end of the log
-      else if (this.options.startingOffset === this.options.offset && (!buildInProgress || this.fetchCount !== 1) ) {
-        // save the first incomplete line so we can append it to 
-        // the last incomplete line on the next fetch if we scroll up        
-        this.firstLine = first(newLogLines);
-        // remove the first incomplete line
-        newLogLines = rest(newLogLines);
-      }
-      
-      // Button Navigated to the top of a finished build
-      // or scrolling down
-      else {
-        // save incomplete last line so we can prepend it to 
-        // the incomplete first line of next fetch if we scroll down
-        const tempLast = last(newLogLines); 
-
-        if (!buildInProgress) {
+    
+    
+    if (buildInProgress) {
+      // Initial Log Request
+      if (this.fetchCount === 1) {
+        // we already have at least 1 offset
+        if (this.options.offset > 0) {
+          // save and remove incomplete first line so we can append it to the 
+          // incomplete last line of the next fetch if we continue to scroll up
+          this.firstLine = first(newLogLines);
+          newLogLines = rest(newLogLines);
+        }
+        // our log is larger than at least 1 offset
+        // e.g. we used the "To Top" button
+        else if (this.options.logSize > config.offsetLength) {
+          // save and chop off last incomplete line
+          this.lastLine = last(newLogLines);
           newLogLines = initial(newLogLines);
         }
 
-        // append any extra text to first log line            
-        if (newLogLines[0] && this.lastLine) {
-          // if we are loading less than 1 offset at a time
-          if (buildInProgress && this.nextOffset !== config.offsetLength) {
-            if (!this.isPolling) {
-              newLogLines = initial(newLogLines)
-            }
-          }
-          // if we have a full offset to load
-          else {
-            if (!this.isPolling) {
-              newLogLines = initial(newLogLines);
-            }
-            // only prepend lastLine if we are scrolling down, not navigating up
-            if (this.positionChange !== 'top') {
-              newLogLines[0].text = this.lastLine.text + newLogLines[0].text;                
-            }
-          }
-        }
-
-        this.lastLine = tempLast;
+        this.logLines = newLogLines;
       }
 
-      this.logLines = this.logLines.concat(newLogLines);
-    }
-  }
+      // Not our first request
+      else {
+        // if we are tailing/actively polling
+        if (this.isPolling) {
+          // if our next offset is offsetLength, we need to 
+          // do some chopping as we may have incomplete lines
+          if (this.data.nextOffset - this.data.offset >= config.offsetLength) {
+            // cutoff last line and save it
+            this.lastLine = last(newLogLines);
+            newLogLines = initial(newLogLines);
+          }
+          // as long as our offset is less than offsetLength
+          // we dont need to worry about lines being cutoff
+          this.logLines = [...this.logLines, ...newLogLines];
+        }
+        // if we are not polling
+        else if (!this.isPolling) {
+          // if we are not polling, a scroll must have triggered this fetch
+          if (this.hasScrolled === 'up') {
+            this.handleLinesOnPageUp({
+              newLogLines: newLogLines,
+              removeFirstLine: true
+            });
+          }
+          if (this.hasScrolled === 'down') {
+            this.handleLinesOnPageDown({
+              newLogLines: newLogLines
+            });
+          }
+        }
+        
+      }
 
-  pageLog(direction) {
+    }
+
+    else if (!buildInProgress) {    
+      // Initial Log Request
+      if (this.fetchCount === 1) {
+        // Only one offset to ever load
+        if (this.options.offset === 0 && this.options.logSize < config.offsetLength) {
+          this.logLines = newLogLines;
+        }
+        // at the first page but we have more offsets to load
+        else if (this.options.offset === 0) {
+          // save incomplete last line so we can prepend it to the beginning of
+          // the first incomplete line on the next fetch if we keep scrolling down
+          this.lastLine = last(newLogLines);
+          // chop off incomplete last line
+          this.logLines = initial(newLogLines)
+        }
+        // we have more than one offset
+        else {
+          // save first incomplete line
+          this.firstLine = first(newLogLines);
+          // chop off first incomplete line
+          this.logLines = rest(newLogLines);
+        }
+      }
+      // Not Initial Log Request
+      else {
+        // Users scrolled up
+        if (this.hasScrolled === 'up') {
+          this.handleLinesOnPageUp({
+            newLogLines: newLogLines
+          });
+        }
+        // User scrolled down
+        else if (this.hasScrolled === 'down') {
+          this.handleLinesOnPageDown({
+            newLogLines: newLogLines
+          });
+        }
+      }
+    
+    }
+    
+  }
+  
+  // Update our fetch offset
+  pageLog(hasScrolled) {
     this.isPaging = true;
     this.previousOffset = this.options.offset;
 
-    if (direction === 'up') {
+    if (hasScrolled === 'up') {
       // Builds In Progresse
       if (this.options.buildState === BuildStates.IN_PROGRESS) {
         this.options.offset = Math.max(this.runningOffset - config.offsetLength - 1, 0);
@@ -139,7 +190,7 @@ class Log extends Model {
 
     }
   
-    else if (direction === 'down') {
+    else if (hasScrolled === 'down') {
       const offsetIncrement = config.offsetLength;
 
       if (this.options.offset === 0) {
@@ -178,23 +229,6 @@ class Log extends Model {
     return this;
   }
 
-  getByteLength(normal_val) {
-      // Force string type
-      normal_val = String(normal_val);
-
-      let byteLen = 0;
-      for (let i = 0; i < normal_val.length; i++) {
-          const c = normal_val.charCodeAt(i);
-          byteLen += c < (1 <<  7) ? 1 :
-                     c < (1 << 11) ? 2 :
-                     c < (1 << 16) ? 3 :
-                     c < (1 << 21) ? 4 :
-                     c < (1 << 26) ? 5 :
-                     c < (1 << 31) ? 6 : Number.NaN;
-      }
-      return byteLen;
-  }
-
   formatLog() {
     if (this.jqXHR.status !== 200) {
       console.warn(this.jqXHR);
@@ -208,8 +242,9 @@ class Log extends Model {
 
     // If we've reached the top when scrolling up,
     // we need to omit any overlap from last fetch..
-    if (this.options.offset === 0 && this.direction === 'up') {
-      logData = logData.substring(0, this.getByteLength(logData) - (config.offsetLength + 1 - this.previousOffset))
+    if (this.options.offset === 0 && this.hasScrolled === 'up') { ///////============== && this.hasScrolled === 'up'
+      console.log('log scrolling up and reached top of long.. SUBSTRING TIME');
+      logData = logData.substring(0, getByteLength(logData) - (config.offsetLength + 1 - this.previousOffset))
     }
 
     if (logData.length === 0) {
@@ -220,16 +255,16 @@ class Log extends Model {
     return splitLines.map((line, i) => {
       // store second line because we may chop off the first
       if (i === 1) {
-        this.currentOffsetLine = offsetRunningTotal + this.getByteLength(line);
+        this.currentOffsetLine = offsetRunningTotal + getByteLength(line);
       }
 
       if (i === splitLines.length - 1) {
-        this.lastOffsetLine = offsetRunningTotal + this.getByteLength(length);
+        this.lastOffsetLine = offsetRunningTotal + getByteLength(length);
       }
 
       return {
         text:  utf8.decode(line),
-        offset: offsetRunningTotal += this.getByteLength(line)
+        offset: offsetRunningTotal += getByteLength(line)
       }
     });
 

@@ -9,7 +9,9 @@
     "objectLiteralShorthandMethods": true,
     "objectLiteralShorthandProperties": true,
     "templateStrings": true,
-    "jsx": true
+    "jsx": true,
+    "restParams": true,
+    "spread": true
   },
   "env": {
     "browser": true,
@@ -47,7 +49,9 @@
     "react/react-in-jsx-scope": 1,
     "new-parens": 0,
     "no-use-before-define": 0,
-    "no-shadow": 0
+    "no-shadow": 0,
+    "no-lonely-if": 0
+    
   },
   "globals": {
     "__BROWSER__": false,

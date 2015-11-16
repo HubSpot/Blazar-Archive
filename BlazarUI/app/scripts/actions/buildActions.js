@@ -60,17 +60,19 @@ BuildActions.shouldPoll = function(moduleId, state) {
 };
 
 // Scrolling up or down log
-BuildActions.pageLog = function(moduleId, direction) {  
+BuildActions.pageLog = function(moduleId, hasScrolled) {  
   const isActive = builds[moduleId].data.build.state === BuildStates.IN_PROGRESS;
-  handlePageLogRequest(builds[moduleId], direction, isActive);
+  handlePageLogRequest(builds[moduleId], hasScrolled, isActive);
 };
 
 BuildActions.fetchStartOfLog = function(moduleId, options={}) {
-  builds[moduleId].shouldPoll = false;
-  builds[moduleId].log.isPolling = false;
+  const build = builds[moduleId]
+  build.shouldPoll = false;
+  build.log.isPolling = false;
+  build.log.hasScrolled = false;
 
   if (options.position) {
-    builds[moduleId].log.positionChange = options.position;
+    build.log.positionChange = options.position;
   }
 
   resetBuild({
@@ -82,6 +84,7 @@ BuildActions.fetchStartOfLog = function(moduleId, options={}) {
 
 BuildActions.fetchEndOfLog = function(moduleId, options={}) {
   const build = builds[moduleId];
+  build.log.hasScrolled = false;
   const logSizePromise = getLogSize();
   const buildInProgress = build.data.build.state === BuildStates.IN_PROGRESS;
   
@@ -273,9 +276,9 @@ function processBuild() {
 function processInactiveBuild(build) {
   const log = build.log;
   const logPromise = log.fetch();
-  logPromise.always((data, textStatus, jqxhr) => {
+  logPromise.always((data) => {
     build.log.nextOffset = data.nextOffset;
-    updateStore(build, log, data, textStatus, jqxhr);
+    updateStore(build);
   });  
 }
 
@@ -352,17 +355,19 @@ function createLogModel(build, size) {
 }
 
 // fetch previous/next offsets when scrolling up/down log
-function handlePageLogRequest(build, direction, isActive) {
+function handlePageLogRequest(build, hasScrolled, isActive) {
+  build.log.hasScrolled = hasScrolled;
   build.log.hasNavigatedWithButtons = false;
   build.log.positionChange = false
-  build.log.direction = direction;
+  build.log.hasScrolled = hasScrolled;
 
   // Log size is smaller than one offsetLength so nothing more to fetch
   if (build.log.options.logSize < config.offsetLength) {
+    console.log('no more to fetch');
     return;
   }
 
-  if (direction === 'down') {
+  if (hasScrolled === 'down') {
     // if we are at the end of the log, started at the end and since scrolled up,
     // or our log is less than one offset length
     if (build.log.endOfLogLoaded || build.log.options.logSize < config.offsetLength + 1) {
@@ -370,15 +375,16 @@ function handlePageLogRequest(build, direction, isActive) {
     }
   }
 
-  else if (direction === 'up') {
+  else if (hasScrolled === 'up') {
     // If we made it to the top, dont fetch anything
     if (build.log.startOfLogLoaded) {
+      console.log('start has loaded, return');
       return;
     }
   }
 
-  build.log.pageLog(direction).fetch().always((data, textStatus, jqxhr) => {
-    updateStore(build, build.log, data, textStatus, jqxhr)
+  build.log.pageLog(hasScrolled).fetch().always(() => {
+    updateStore(build)
   });
 }
 
@@ -397,23 +403,23 @@ function resetBuild(options) {
 function resetBuildLog(moduleId, offset, position) {
   const build = builds[moduleId];
 
-  build.log
+  builds[moduleId].log
     .reset()
     .setOffset(offset)
     .fetch()
     .always((data, textStatus, jqxhr) => {
-      build.log.positionChange = position;
-      build.log.nextOffset = data.nextOffset;
-      build.log.previousOffset = offset;
+      builds[moduleId].log.positionChange = position;
+      builds[moduleId].log.nextOffset = data.nextOffset;
+      builds[moduleId].log.previousOffset = offset;
 
-      updateStore(build, build.log, data, textStatus, jqxhr)
+      updateStore(builds[moduleId], builds[moduleId].log, data, textStatus, jqxhr)
   });
 }
 
-function updateStore(build, log, data, textStatus, jqxhr) {
+function updateStore(build) {
   BuildActions.loadBuildSuccess({
     build: build.data,
-    log: log,
+    log: build.log,
     fetchingLog: false
   });
 }

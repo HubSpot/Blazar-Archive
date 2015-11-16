@@ -44,7 +44,7 @@ class BuildLog extends Component {
     }
 
     // fast build: waiting for build and it is complete on first render
-    else if (!buildInProgress && !nextLog.positionChange && !nextLog.direction && nextLog.fetchCount === 1) {
+    else if (!buildInProgress && !nextLog.positionChange && !nextLog.hasScrolled && nextLog.fetchCount === 1) {
       this.showPagingSpinnerUp = false;
       this.showPagingSpinnerDown = false;
       this.buildCompleteOnLoad = true;
