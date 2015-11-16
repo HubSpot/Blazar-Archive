@@ -55,7 +55,6 @@ BuildActions.setupBuildRequest = function(data) {
 };
 
 BuildActions.shouldPoll = function(moduleId, state) {
-  builds[moduleId].shouldPoll = state;
   builds[moduleId].log.isPolling = state;
 };
 
@@ -67,7 +66,6 @@ BuildActions.pageLog = function(moduleId, hasScrolled) {
 
 BuildActions.fetchStartOfLog = function(moduleId, options={}) {
   const build = builds[moduleId]
-  build.shouldPoll = false;
   build.log.isPolling = false;
   build.log.hasScrolled = false;
 
@@ -89,7 +87,7 @@ BuildActions.fetchEndOfLog = function(moduleId, options={}) {
   const buildInProgress = build.data.build.state === BuildStates.IN_PROGRESS;
   
   if (options.poll && buildInProgress) {
-    build.shouldPoll = true;
+    build.log.isPolling = true;
   }
   
   logSizePromise.done((size) => {
@@ -263,7 +261,6 @@ function processBuild() {
   }
   // State: In Progress
   if (buildToProcess.data.build.state === BuildStates.IN_PROGRESS) {
-    buildToProcess.shouldPoll = true;
     buildToProcess.log.isPolling = true;
     processInProgressBuild(buildToProcess);
   }
@@ -283,7 +280,7 @@ function processInactiveBuild(build) {
 }
 
 function processInProgressBuild(build) {
-  if (!build.isActive || !build.shouldPoll) {
+  if (!build.isActive || !build.log.isPolling) {
     return;
   }
   // user has paged up, stop polling
