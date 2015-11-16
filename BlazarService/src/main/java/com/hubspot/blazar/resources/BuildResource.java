@@ -181,7 +181,7 @@ public class BuildResource {
   private LogChunk readS3LogChunk(String url, long offset, long length) throws Exception {
     HttpRequest request = HttpRequest.newBuilder()
         .setUrl(url)
-        .addHeader("Range", String.format("bytes=%d-%d", offset, offset + length))
+        .addHeader("Range", String.format("bytes=%d-%d", offset, offset + length - 1))
         .build();
 
     HttpResponse response = asyncHttpClient.execute(request).get();
