@@ -180,30 +180,23 @@ class Log extends Model {
     if (hasScrolled === 'up') {
       // Builds In Progresse
       if (this.options.buildState === BuildStates.IN_PROGRESS) {
-        this.options.offset = Math.max(this.runningOffset - config.offsetLength - 1, 0);
+        this.options.offset = Math.max(this.runningOffset - config.offsetLength, 0);
         this.runningOffset -= config.offsetLength;
       }
       // Finished Builds
       else {
-        this.options.offset = Math.max(this.options.offset - config.offsetLength - 1, 0);
+        this.options.offset = Math.max(this.options.offset - config.offsetLength, 0);
       }
 
     }
   
     else if (hasScrolled === 'down') {
-      const offsetIncrement = config.offsetLength;
+      this.options.offset = this.data.nextOffset;
 
-      if (this.options.offset === 0) {
-        this.options.offset = config.offsetLength + 1;
+      if ((this.options.offset + config.offsetLength) > this.options.logSize) {
+        this.endOfLogLoaded = true;
       }
-      else {
-        this.options.offset = this.options.offset + config.offsetLength + 1;
 
-        if ((this.options.offset + config.offsetLength + 1) > this.options.logSize) {
-          this.endOfLogLoaded = true;
-        }
-
-      }
       // if we've loaded a partial offset
       if (this.options.offset < config.offsetLength  && this.options.offset > 0) {
         this.options.offset = config.offsetLength;
@@ -242,9 +235,8 @@ class Log extends Model {
 
     // If we've reached the top when scrolling up,
     // we need to omit any overlap from last fetch..
-    if (this.options.offset === 0 && this.hasScrolled === 'up') { ///////============== && this.hasScrolled === 'up'
-      console.log('log scrolling up and reached top of long.. SUBSTRING TIME');
-      logData = logData.substring(0, getByteLength(logData) - (config.offsetLength + 1 - this.previousOffset))
+    if (this.options.offset === 0 && this.hasScrolled === 'up') {
+      logData = logData.substring(0, getByteLength(logData) - (config.offsetLength - this.previousOffset))
     }
 
     if (logData.length === 0) {

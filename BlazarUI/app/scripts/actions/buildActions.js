@@ -363,7 +363,6 @@ function handlePageLogRequest(build, hasScrolled, isActive) {
 
   // Log size is smaller than one offsetLength so nothing more to fetch
   if (build.log.options.logSize < config.offsetLength) {
-    console.log('no more to fetch');
     return;
   }
 
