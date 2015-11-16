@@ -48,12 +48,10 @@ class Log extends Model {
       
       if (this.options.offset > 0) {
         this.firstLine = first(newLogLines);
-        newLogLines = rest(newLogLines)    
+        newLogLines = rest(newLogLines);
       }
-      
+
     }
-
-
 
     // Scrolling up, but not Navigating up
     if (this.isPaging && this.direction === 'up' && this.positionChange !== 'top') {
@@ -106,12 +104,14 @@ class Log extends Model {
             }
           }
           // if we have a full offset to load
-          else {            
+          else {
             if (!this.isPolling) {
               newLogLines = initial(newLogLines);
             }
-
-            newLogLines[0].text = this.lastLine.text + newLogLines[0].text;  
+            // only prepend lastLine if we are scrolling down, not navigating up
+            if (this.positionChange !== 'top') {
+              newLogLines[0].text = this.lastLine.text + newLogLines[0].text;                
+            }
           }
         }
 
@@ -140,15 +140,14 @@ class Log extends Model {
     }
   
     else if (direction === 'down') {
-      
+      const offsetIncrement = config.offsetLength;
+
       if (this.options.offset === 0) {
-        // this.options.offset = config.offsetLength + 1;
-        this.options.offset = config.offsetLength ;
+        this.options.offset = config.offsetLength + 1;
       }
       else {
-        // this.options.offset = this.options.offset + config.offsetLength + 1;
-        this.options.offset = this.options.offset + config.offsetLength;
-        
+        this.options.offset = this.options.offset + config.offsetLength + 1;
+
         if ((this.options.offset + config.offsetLength + 1) > this.options.logSize) {
           this.endOfLogLoaded = true;
         }
@@ -167,6 +166,8 @@ class Log extends Model {
   reset() {
     this.fetchCount = 0;
     this.hasFetched = false;
+    this.endOfLogLoaded = false;
+    this.startOfLogLoaded = false;
     this.logLines = [];
     return this;
   }
@@ -205,10 +206,9 @@ class Log extends Model {
     const NEW_LINE = '\n';
     let logData = this.jqXHR.responseJSON.data;
 
-    // If offset is less than our offsetLength when scrolling up,
-    // and we havent used the 'To Top' navigation button
-    // we need to omit any overlap from last fetch..    
-    if (this.options.offset < config.offsetLength && this.direction === 'up') {
+    // If we've reached the top when scrolling up,
+    // we need to omit any overlap from last fetch..
+    if (this.options.offset === 0 && this.direction === 'up') {
       logData = logData.substring(0, this.getByteLength(logData) - (config.offsetLength + 1 - this.previousOffset))
     }
 
