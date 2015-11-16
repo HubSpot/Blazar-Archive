@@ -56,6 +56,7 @@ BuildActions.setupBuildRequest = function(data) {
 
 BuildActions.shouldPoll = function(moduleId, state) {
   builds[moduleId].shouldPoll = state;
+  builds[moduleId].log.isPolling = state;
 };
 
 // Scrolling up or down log
@@ -66,6 +67,7 @@ BuildActions.pageLog = function(moduleId, direction) {
 
 BuildActions.fetchStartOfLog = function(moduleId, options={}) {
   builds[moduleId].shouldPoll = false;
+  builds[moduleId].log.isPolling = false;
 
   if (options.position) {
     builds[moduleId].log.positionChange = options.position;
@@ -89,6 +91,7 @@ BuildActions.fetchEndOfLog = function(moduleId, options={}) {
   
   logSizePromise.done((size) => {
     build.log.reset().setOffset(getLastOffset(size))
+    build.log.isPolling = true;
 
     if (options.position) {
       build.log.positionChange = options.position;
@@ -258,6 +261,7 @@ function processBuild() {
   // State: In Progress
   if (buildToProcess.data.build.state === BuildStates.IN_PROGRESS) {
     buildToProcess.shouldPoll = true;
+    buildToProcess.log.isPolling = true;
     processInProgressBuild(buildToProcess);
   }
   // State: Failed, Cancelled

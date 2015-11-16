@@ -32,25 +32,35 @@ class Log extends Model {
       this.startOfLogLoaded = true;
     }
 
-    // nothing new, nothing to do
+    // No new lines, nothing to do
     if (newLogLines.length === 0) {
       this.logLines = this.logLines;
       return;
     }
-    
-    // if build is In Progress and we are just starting
+
+    // If build is In Progress and we are not starting at the beginning
+    // we need to get rid of first line and keep track of it if user scrolls up
     if (this.fetchCount === 1 && buildInProgress) {
+      this.lastLine = last(newLogLines); // .........
       this.firstLine = first(newLogLines);
-      newLogLines = rest(newLogLines)
+      
+      // newLogLines = rest(newLogLines);
+      
+      if (this.options.offset > 0) {
+        this.firstLine = first(newLogLines);
+        newLogLines = rest(newLogLines)    
+      }
+      
     }
 
-    // scrolling up, but not navigating up
-    if (this.isPaging && this.direction === 'up' && this.positionChange !== 'top') {
-      // save first line so we can 
-      // append it during the next fetch
-      const tempFirst = first(newLogLines);
 
-      this.lastLine = last(newLogLines);
+
+    // Scrolling up, but not Navigating up
+    if (this.isPaging && this.direction === 'up' && this.positionChange !== 'top') {
+      // save incomplete first line so we can append it to the 
+      // incomplete last line of the next fetch  if we scroll up
+      const tempFirst = first(newLogLines);
+      // remove the first line which may be incomplete
       newLogLines = rest(newLogLines);
 
       // append any extra text to last log line
@@ -60,37 +70,49 @@ class Log extends Model {
       this.firstLine = tempFirst;
     }
 
-    // initial offset load, used nav buttons, or paging down
+
+    // Initial load with finished builds, used nav buttons, or scrolling down
     else {
-      // If we only have one page, nothing to do here
-      if (this.options.offset === 0 && this.options.logSize < config.offsetLength) {}
-      
-      // bottom of page
+      // If we started with a log size less than one offset we dont need to fix any lines.
+      // e.g. we have been tailing the log from the very start
+      if (this.options.logSize < config.offsetLength) {}
+
+      // Button Navigated to the end of the log
       else if (this.options.startingOffset === this.options.offset && (!buildInProgress || this.fetchCount !== 1) ) {
-        this.lastLine = last(newLogLines);
+        // save the first incomplete line so we can append it to 
+        // the last incomplete line on the next fetch if we scroll up        
         this.firstLine = first(newLogLines);
+        // remove the first incomplete line
         newLogLines = rest(newLogLines);
       }
-      // fetching for top of page 
-      else if (this.options.offset === 0) {
-        this.lastLine = last(newLogLines);
-        newLogLines = initial(newLogLines);
-      }
       
-      // in between top and bottom
+      // Button Navigated to the top of a finished build
+      // or scrolling down
       else {
-        const tempLast = last(newLogLines);
-        newLogLines = initial(newLogLines);
-        
+        // save incomplete last line so we can prepend it to 
+        // the incomplete first line of next fetch if we scroll down
+        const tempLast = last(newLogLines); 
+
+        if (!buildInProgress) {
+          newLogLines = initial(newLogLines);
+        }
+
         // append any extra text to first log line            
         if (newLogLines[0] && this.lastLine) {
+          // if we are loading less than 1 offset at a time
           if (buildInProgress && this.nextOffset !== config.offsetLength) {
-            newLogLines.unshift(this.lastLine)
+            if (!this.isPolling) {
+              newLogLines = initial(newLogLines)
+            }
           }
-          else {
+          // if we have a full offset to load
+          else {            
+            if (!this.isPolling) {
+              newLogLines = initial(newLogLines);
+            }
+
             newLogLines[0].text = this.lastLine.text + newLogLines[0].text;  
           }
-
         }
 
         this.lastLine = tempLast;
