@@ -62,7 +62,7 @@ BuildActions.shouldPoll = function(moduleId, state) {
 // Scrolling up or down log
 BuildActions.pageLog = function(moduleId, direction) {  
   const isActive = builds[moduleId].data.build.state === BuildStates.IN_PROGRESS;
-  handleScroll(builds[moduleId], direction, isActive);
+  handlePageLogRequest(builds[moduleId], direction, isActive);
 };
 
 BuildActions.fetchStartOfLog = function(moduleId, options={}) {
@@ -74,7 +74,7 @@ BuildActions.fetchStartOfLog = function(moduleId, options={}) {
   }
 
   resetBuild({
-    build: builds[moduleId],
+    moduleId: moduleId,
     offset: 0,
     position: 'top'
   });
@@ -103,7 +103,7 @@ BuildActions.fetchEndOfLog = function(moduleId, options={}) {
     }
     else {
       resetBuild({
-        build: build,
+        moduleId: moduleId,
         offset: getLastOffset(size),
         position: 'bottom'
       });
@@ -352,7 +352,7 @@ function createLogModel(build, size) {
 }
 
 // fetch previous/next offsets when scrolling up/down log
-function handleScroll(build, direction, isActive) {
+function handlePageLogRequest(build, direction, isActive) {
   build.log.hasNavigatedWithButtons = false;
   build.log.positionChange = false
   build.log.direction = direction;
@@ -382,17 +382,20 @@ function handleScroll(build, direction, isActive) {
   });
 }
 
-// Pass a build and offset to set
 function resetBuild(options) {
+  const {moduleId, offset, position} = options;
+  // save log since we are refetching our build
+  const existingLog = builds[moduleId].log;
 
-  const {
-    build, 
-    offset, 
-    position
-  } = options;
+  getBuild().then((updateBuildData) => {
+    builds[moduleId].data = updateBuildData;
+    builds[moduleId].log = existingLog;
+    resetBuildLog(moduleId, offset, position);
+  });
+}
 
-  build.log.endOfLogLoaded = false;
-  build.log.startOfLogLoaded = false;
+function resetBuildLog(moduleId, offset, position) {
+  const build = builds[moduleId];
 
   build.log
     .reset()
@@ -402,6 +405,7 @@ function resetBuild(options) {
       build.log.positionChange = position;
       build.log.nextOffset = data.nextOffset;
       build.log.previousOffset = offset;
+
       updateStore(build, build.log, data, textStatus, jqxhr)
   });
 }
