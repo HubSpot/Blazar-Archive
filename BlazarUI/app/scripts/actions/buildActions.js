@@ -282,6 +282,7 @@ function processInactiveBuild(build) {
 
 function processInProgressBuild(build) {  
   if (!build.isActive || !build.log.isPolling || build.stopPolling) {
+    build.log.isPolling = false;
     return;
   }
   // user has paged up, stop polling
