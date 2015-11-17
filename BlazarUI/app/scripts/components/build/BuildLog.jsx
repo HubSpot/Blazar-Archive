@@ -37,7 +37,7 @@ class BuildLog extends Component {
     const buildCancelled = nextProps.buildState === BuildStates.CANCELLED;
     const nextLog = nextProps.log;
     const onDeck = buildIsOnDeck(nextProps.buildState);
-    
+
     // still waiting to build or cancelled
     if ((!buildInProgress && onDeck) || buildCancelled) {
       return;
@@ -56,9 +56,9 @@ class BuildLog extends Component {
     if (buildInProgress && nextProps.log.fetchCount === 1 && nextProps.log.positionChange === 'bottom') {
       this.isTailing = true;
     }
-  
+
     // if we are at the top - remove the paging spinner
-    if (nextProps.log.options.offset < nextProps.log.options.offsetLength) {
+    if (nextProps.log.options.offset < nextProps.log.options.offsetLength || nextProps.log.startOfLogLoaded) {
       this.showPagingSpinnerUp = false;
       this.showPagingSpinnerDown = true;
     }
