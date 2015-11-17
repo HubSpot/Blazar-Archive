@@ -12,11 +12,12 @@ class Log extends Model {
     this.fetchCount = 0;
     this.hasFetched = false;
     this.runningOffset = options.startingOffset;
+    this.manualLength = false;
     super(options);
   }
 
   url() {
-    return `${config.apiRoot}/build/${this.options.buildNumber}/log?offset=${this.options.offset}&length=${config.offsetLength}`;
+    return `${config.apiRoot}/build/${this.options.buildNumber}/log?offset=${this.options.offset}&length=${this.manualLength || config.offsetLength}`;
   }
 
   // Helper for parse, used to manage incomplete lines
@@ -52,16 +53,18 @@ class Log extends Model {
   }
 
 
-  parse() {    
+  parse() {
     this.fetchCount++;
-    let newLogLines = this.formatLog();
-
+    this.manualLength = false;
     const buildInProgress = this.options.buildState === BuildStates.IN_PROGRESS;
+    // keep track of the lowest offset so if we reach the top we can specify the length parameter
+    this.lowestOffset = this.fetchCount === 1 ? this.data.offset : Math.min(this.lowestOffset, this.data.offset);
+    let newLogLines = this.formatLog();
 
     if (this.options.offset === this.options.lastOffset) {
       this.endOfLogLoaded = true;
     }
-    
+
     if (this.options.offset === 0) {
       this.startOfLogLoaded = true;
     }
@@ -71,7 +74,6 @@ class Log extends Model {
       this.logLines = this.logLines;
       return;
     }
-    
     
     if (buildInProgress) {
       // Initial Log Request
@@ -175,10 +177,15 @@ class Log extends Model {
   // Update our fetch offset
   pageLog(hasScrolled) {
     this.isPaging = true;
-    this.previousOffset = this.options.offset;
+    this.previousOffset = this.options.offset; // do we need this????
 
     if (hasScrolled === 'up') {
-      // Builds In Progresse
+      // if our last offset is less than our offsetLength, 
+      // we need to reduce our request length
+      if (this.lowestOffset < config.offsetLength) {
+        this.manualLength = this.lowestOffset;
+      }
+      // Builds In Progress
       if (this.options.buildState === BuildStates.IN_PROGRESS) {
         this.options.offset = Math.max(this.runningOffset - config.offsetLength, 0);
         this.runningOffset -= config.offsetLength;
@@ -212,6 +219,7 @@ class Log extends Model {
     this.hasFetched = false;
     this.endOfLogLoaded = false;
     this.startOfLogLoaded = false;
+    this.isPolling = true;
     this.logLines = [];
     return this;
   }
@@ -232,12 +240,6 @@ class Log extends Model {
 
     const NEW_LINE = '\n';
     let logData = this.jqXHR.responseJSON.data;
-
-    // If we've reached the top when scrolling up,
-    // we need to omit any overlap from last fetch..
-    if (this.options.offset === 0 && this.hasScrolled === 'up') {
-      logData = logData.substring(0, getByteLength(logData) - (config.offsetLength - this.previousOffset))
-    }
 
     if (logData.length === 0) {
       return [];
