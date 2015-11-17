@@ -59,7 +59,7 @@ class Log extends Model {
     const buildInProgress = this.options.buildState === BuildStates.IN_PROGRESS;
     // keep track of the lowest offset so if we reach the top we can specify the length parameter
     this.lowestOffset = this.fetchCount === 1 ? this.data.offset : Math.min(this.lowestOffset, this.data.offset);
-    let newLogLines = this.formatLog();
+    
 
     if (this.options.offset === this.options.lastOffset) {
       this.endOfLogLoaded = true;
@@ -70,10 +70,11 @@ class Log extends Model {
     }
 
     // No new lines, nothing to do
-    if (newLogLines.length === 0) {
-      this.logLines = this.logLines;
+    if (this.data.data.length === 0) {
       return;
     }
+    
+    let newLogLines = this.formatLog();
     
     if (buildInProgress) {
       // Initial Log Request
@@ -214,13 +215,17 @@ class Log extends Model {
     return this;
   }
   
-  reset() {
+  reset(options = {}) {
+    this.logLines = [];
     this.fetchCount = 0;
     this.hasFetched = false;
     this.endOfLogLoaded = false;
     this.startOfLogLoaded = false;
-    this.isPolling = true;
-    this.logLines = [];
+
+    if (options.isPolling) {
+      this.isPolling = true;
+    }
+
     return this;
   }
 
@@ -245,8 +250,8 @@ class Log extends Model {
       return [];
     }
 
-    const splitLines = compact(logData.split(NEW_LINE));
-    return splitLines.map((line, i) => {
+    const splitLines = logData.split(NEW_LINE);
+    return compact(splitLines.map((line, i) => {
       // store second line because we may chop off the first
       if (i === 1) {
         this.currentOffsetLine = offsetRunningTotal + getByteLength(line);
@@ -260,7 +265,7 @@ class Log extends Model {
         text:  utf8.decode(line),
         offset: offsetRunningTotal += getByteLength(line)
       }
-    });
+    }));
 
   }
 

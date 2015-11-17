@@ -84,16 +84,13 @@ BuildActions.fetchStartOfLog = function(moduleId, options={}) {
 
 BuildActions.fetchEndOfLog = function(moduleId, options={}) {
   const build = builds[moduleId];
+  build.stopPolling = false;
   build.log.hasScrolled = false;
   const logSizePromise = getLogSize();
   const buildInProgress = build.data.build.state === BuildStates.IN_PROGRESS;
   
-  if (options.poll && buildInProgress) {
-    build.log.isPolling = true;
-  }
-  
   logSizePromise.done((size) => {
-    build.log.reset().setOffset(getLastOffset(size));
+    build.log.reset({isPolling: true}).setOffset(getLastOffset(size));
 
     if (options.position) {
       build.log.positionChange = options.position;
