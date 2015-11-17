@@ -91,8 +91,7 @@ BuildActions.fetchEndOfLog = function(moduleId, options={}) {
   }
   
   logSizePromise.done((size) => {
-    build.log.reset().setOffset(getLastOffset(size))
-    build.log.isPolling = true;
+    build.log.reset().setOffset(getLastOffset(size));
 
     if (options.position) {
       build.log.positionChange = options.position;
@@ -334,7 +333,6 @@ function getLastOffset(size) {
 
 function createLogModel(build, size) {
   const inProgress = build.data.build.state === BuildStates.IN_PROGRESS;
-  // const backupOffset = inProgress ? 1000 : config.offsetLength;
   const maxOffset = getLastOffset(size);
   
   const settings = {
@@ -374,7 +372,6 @@ function handlePageLogRequest(build, hasScrolled, isActive) {
   else if (hasScrolled === 'up') {
     // If we made it to the top, dont fetch anything
     if (build.log.startOfLogLoaded) {
-      console.log('start has loaded, return');
       return;
     }
   }
