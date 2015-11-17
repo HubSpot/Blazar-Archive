@@ -9,7 +9,9 @@ import com.hubspot.blazar.data.dao.BuildDao;
 import com.hubspot.blazar.data.dao.BuildDefinitionDao;
 import com.hubspot.blazar.data.dao.BuildStateDao;
 import com.hubspot.blazar.data.dao.DependenciesDao;
+import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
+import com.hubspot.blazar.data.dao.RepositoryBuildDao;
 import com.hubspot.guice.transactional.DataSourceLocator;
 import com.hubspot.guice.transactional.TransactionalDataSource;
 import com.hubspot.guice.transactional.TransactionalModule;
@@ -35,6 +37,8 @@ public class BlazarDaoModule extends AbstractModule {
     bindDao(binder(), BranchDao.class);
     bindDao(binder(), ModuleDao.class);
     bindDao(binder(), BuildDao.class);
+    bindDao(binder(), RepositoryBuildDao.class);
+    bindDao(binder(), ModuleBuildDao.class);
     bindDao(binder(), DependenciesDao.class);
   }
 

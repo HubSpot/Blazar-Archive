@@ -9,6 +9,9 @@ CREATE TABLE `branches_v2` (
   `repositoryId` int(11) unsigned NOT NULL,
   `branch` varchar(250) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
+  `pendingBuildId` bigint(20) unsigned,
+  `inProgressBuildId` bigint(20) unsigned,
+  `lastBuildId` bigint(20) unsigned,
   `createdTimestamp` bigint(20) unsigned NOT NULL,
   `updatedTimestamp` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
@@ -24,9 +27,8 @@ CREATE TABLE `modules_v2` (
   `path` varchar(250) NOT NULL,
   `glob` varchar(250) NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT 1,
-  `lastBuildId` bigint(20) unsigned,
   `inProgressBuildId` bigint(20) unsigned,
-  `pendingBuildId` bigint(20) unsigned,
+  `lastBuildId` bigint(20) unsigned,
   `createdTimestamp` bigint(20) unsigned NOT NULL,
   `updatedTimestamp` bigint(20) unsigned NOT NULL,
   `buildpack` mediumtext,
@@ -75,5 +77,6 @@ CREATE TABLE `module_builds_v2` (
   `runId` varchar(500),
   `taskId` varchar(500),
   PRIMARY KEY (`id`),
-  UNIQUE INDEX (`moduleId`, `buildNumber`)
+  UNIQUE INDEX (`moduleId`, `buildNumber`),
+  INDEX (`repoBuildId`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;

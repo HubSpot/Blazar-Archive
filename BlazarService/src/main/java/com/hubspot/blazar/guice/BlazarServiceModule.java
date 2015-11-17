@@ -2,10 +2,15 @@ package com.hubspot.blazar.guice;
 
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
+import com.google.inject.Provides;
 import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
+import com.hubspot.blazar.util.GitHubHelper;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -13,9 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Binder;
-import com.google.inject.Provides;
 import com.google.inject.Scopes;
-import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.GitHubNamingFilter;
@@ -80,6 +83,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(GitHubStatusHandler.class);
     binder.bind(DependencyBuilder.class);
     binder.bind(SingularityTaskKiller.class);
+    binder.bind(GitHubHelper.class);
 
     Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
     multibinder.addBinding().to(MavenModuleDiscovery.class);
@@ -114,6 +118,13 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
   @Singleton
   public ObjectMapper providesObjectMapper(Environment environment) {
     return environment.getObjectMapper();
+  }
+
+  @Provides
+  @Singleton
+  @Named("whitelist")
+  public Set<String> providesWhitelist(BlazarConfiguration configuration) {
+    return configuration.getWhitelist();
   }
 
   @Provides

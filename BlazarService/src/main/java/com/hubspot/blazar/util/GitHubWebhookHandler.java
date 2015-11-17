@@ -9,19 +9,20 @@ import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.data.service.BuildService;
-import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
+import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,21 +41,24 @@ public class GitHubWebhookHandler {
   private final BranchService branchService;
   private final ModuleService moduleService;
   private final ModuleDiscovery moduleDiscovery;
-  private final BuildService buildService;
-  private final DependenciesService dependenciesService;
+  private final RepositoryBuildService repositoryBuildService;
+  private final GitHubHelper gitHubHelper;
+  private final Set<String> whitelist;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
                               ModuleService moduleService,
                               ModuleDiscovery moduleDiscovery,
-                              BuildService buildService,
-                              DependenciesService dependenciesService,
+                              RepositoryBuildService repositoryBuildService,
+                              GitHubHelper gitHubHelper,
+                              @Named("whitelist") Set<String> whitelist,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.moduleDiscovery = moduleDiscovery;
-    this.buildService = buildService;
-    this.dependenciesService = dependenciesService;
+    this.repositoryBuildService = repositoryBuildService;
+    this.gitHubHelper = gitHubHelper;
+    this.whitelist = whitelist;
 
     eventBus.register(this);
   }
@@ -62,7 +66,10 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handleCreateEvent(CreateEvent createEvent) throws IOException {
     if ("branch".equalsIgnoreCase(createEvent.getRefType())) {
-      processBranch(gitInfo(createEvent));
+      GitInfo gitInfo = gitInfo(createEvent);
+      if (isOptedIn(gitInfo)) {
+        branchService.upsert(gitInfo);
+      }
     }
   }
 
@@ -76,10 +83,29 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handlePushEvent(PushEvent pushEvent) throws IOException {
     if (!pushEvent.getRef().startsWith("refs/tags/") && !pushEvent.getDeleted()) {
-      GitInfo gitInfo = branchService.upsert(gitInfo(pushEvent));
+      GitInfo gitInfo = gitInfo(pushEvent);
+      if (isOptedIn(gitInfo)) {
+        gitInfo = branchService.upsert(gitInfo(pushEvent));
+        repositoryBuildService.enqueue(gitInfo);
+      }
+    }
+  }
 
-      Set<Module> modules = updateModules(gitInfo, pushEvent);
-      triggerBuilds(pushEvent, gitInfo, modules);
+  private boolean isOptedIn(GitInfo gitInfo) throws IOException {
+    return whitelist.contains(gitInfo.getRepository()) || branchExists(gitInfo) || blazarConfigExists(gitInfo);
+  }
+
+  private boolean branchExists(GitInfo gitInfo) {
+    return branchService.lookup(gitInfo).isPresent();
+  }
+
+  private boolean blazarConfigExists(GitInfo gitInfo) throws IOException  {
+    try {
+      GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
+      String config = gitHubHelper.contentsFor(".blazar.yaml", repository, gitInfo);
+      return config.contains("enabled: true");
+    } catch (FileNotFoundException e) {
+      return false;
     }
   }
 

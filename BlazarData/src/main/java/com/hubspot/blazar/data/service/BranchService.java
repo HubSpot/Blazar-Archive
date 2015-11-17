@@ -21,8 +21,12 @@ public class BranchService {
     return branchDao.lookup(host, organization, repository, branch);
   }
 
+  public Optional<GitInfo> lookup(GitInfo gitInfo) {
+    return branchDao.get(gitInfo);
+  }
+
   public GitInfo upsert(GitInfo gitInfo) {
-    Optional<GitInfo> existing = branchDao.get(gitInfo);
+    Optional<GitInfo> existing = lookup(gitInfo);
     if (existing.isPresent()) {
       gitInfo = gitInfo.withId(existing.get().getId().get());
 

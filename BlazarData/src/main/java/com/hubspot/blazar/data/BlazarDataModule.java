@@ -6,7 +6,9 @@ import com.hubspot.blazar.data.service.BuildDefinitionService;
 import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.BuildStateService;
 import com.hubspot.blazar.data.service.DependenciesService;
+import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
 
 public class BlazarDataModule extends AbstractModule {
 
@@ -19,6 +21,8 @@ public class BlazarDataModule extends AbstractModule {
     bind(BranchService.class);
     bind(ModuleService.class);
     bind(BuildService.class);
+    bind(RepositoryBuildService.class);
+    bind(ModuleBuildService.class);
     bind(DependenciesService.class);
   }
 }

@@ -1,6 +1,8 @@
 package com.hubspot.blazar.config;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -40,6 +42,8 @@ public class BlazarConfiguration extends Configuration {
   @Valid
   @JsonProperty("slack_blazar")
   private Optional<SlackConfiguration> slackConfiguration = Optional.absent();
+
+  private Set<String> whitelist = Collections.emptySet();
 
   private boolean webhookOnly = false;
 
@@ -94,6 +98,15 @@ public class BlazarConfiguration extends Configuration {
 
   public void setSlackConfiguration(Optional<SlackConfiguration> slackConfiguration) {
     this.slackConfiguration = slackConfiguration;
+  }
+
+  public Set<String> getWhitelist() {
+    return whitelist;
+  }
+
+  public BlazarConfiguration setWhitelist(Set<String> whitelist) {
+    this.whitelist = whitelist;
+    return this;
   }
 
   public boolean isWebhookOnly() {
