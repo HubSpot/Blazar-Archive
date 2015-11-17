@@ -16,7 +16,6 @@ class SearchFilter extends Component {
     this.handleSearchDebounced = debounce(function () {
       this.props.onChange(this.refs.searchFilterInput.getDOMNode().value);
     }, 250);
-    
   }
     
   componentDidMount() {

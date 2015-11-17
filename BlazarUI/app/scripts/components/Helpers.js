@@ -1,6 +1,6 @@
 // Using in favor of Deprecated ComponentHelpers.js
 import React from 'react';
-import {some, uniq, flatten, filter} from 'underscore';
+import {some, uniq, flatten, filter, contains} from 'underscore';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
 import {LABELS, iconStatus} from './constants';
@@ -147,6 +147,14 @@ export const getFilteredModules = function(filters, modules) {
   return filteredModules.sort( (a, b) => {
     return cmp(a.gitInfo.branch, b.gitInfo.branch) || cmp(a.module.name, b.module.name);
   });  
+}
+
+export const buildIsOnDeck = function(buildState) {
+  return contains([BuildStates.LAUNCHING, BuildStates.QUEUED], buildState);
+}
+
+export const buildIsInactive = function(buildState) {
+  contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState)
 }
 
 // DOM Helpers

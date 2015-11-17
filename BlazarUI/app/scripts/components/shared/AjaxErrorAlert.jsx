@@ -2,7 +2,7 @@
 import React, {Component, PropTypes} from 'react';
 import Alert from 'react-bootstrap/lib/Alert';
 
-class ErrorAlert extends Component {
+class AjaxErrorAlert extends Component {
 
   render() {    
     if (!this.props.error) {
@@ -18,8 +18,8 @@ class ErrorAlert extends Component {
   }
 }
 
-ErrorAlert.propTypes = {
+AjaxErrorAlert.propTypes = {
   error: PropTypes.node
 };
 
-export default ErrorAlert;
+export default AjaxErrorAlert;

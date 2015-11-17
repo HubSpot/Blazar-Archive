@@ -6,16 +6,14 @@ import Loader from '../shared/Loader.jsx';
 
 import BuildHeadline from './BuildHeadline.jsx';
 import BuildDetail from './BuildDetail.jsx';
-import BuildCommits from './BuildCommits.jsx';
-import BuildLog from './BuildLog.jsx';
-import CancelBuildButton from './CancelBuildButton.jsx';
 
+import BuildLogNavigation from './BuildLogNavigation.jsx';
+import BuildLog from './BuildLog.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 class Build extends Component {
 
   render() {
-
     if (this.props.loading) {
       return (
         <Loader align='top-center' />
@@ -30,49 +28,53 @@ class Build extends Component {
 
     return (
       <div>
-        <UIGrid>
-          <UIGridItem size={10}>
-            <BuildHeadline 
-              moduleName={this.props.params.module}
-              moduleId={this.props.params.moduleId}
-              modulePath={this.props.pathname}
-              buildNumber={parseInt(this.props.params.buildNumber)}
-              isStarred={this.props.isStarred}
-              toggleStar={this.props.toggleStar}
-            />
-          </UIGridItem>
-          <UIGridItem size={2}>
-            <CancelBuildButton 
-              triggerCancelBuild={this.props.triggerCancelBuild}
-              build={this.props.build}
-            />
-          </UIGridItem>
-        </UIGrid>
-        <UIGrid>
-          <UIGridItem size={12}>
-            <GenericErrorMessage
-              message={this.props.error}
-            />
-            <BuildDetail
-              build={this.props.build}
-              loading={this.props.loading}
-            />
-          </UIGridItem>
-        </UIGrid>  
-        <UIGrid>  
-          <UIGridItem size={12}>
-            <BuildCommits 
-              build={this.props.build}
-              loading={this.props.loading}
-            />
+        <div className='build-header'>
+          <UIGrid>
+            <UIGridItem size={8}>
+              <BuildHeadline 
+                moduleName={this.props.params.module}
+                moduleId={this.props.params.moduleId}
+                modulePath={this.props.pathname}
+                buildNumber={parseInt(this.props.params.buildNumber)}
+                isStarred={this.props.isStarred}
+                toggleStar={this.props.toggleStar}
+              />
+            </UIGridItem>
+            <UIGridItem size={4}>
+              <BuildLogNavigation 
+                changeOffsetWithNavigation={this.props.changeOffsetWithNavigation}
+                buildState={build.state}
+                loading={this.props.loading}
+              />
+            </UIGridItem>
+          </UIGrid>
+          <UIGrid>
+            <UIGridItem size={12}>
+              <GenericErrorMessage 
+                message={this.props.error}
+              />
+              <BuildDetail
+                build={this.props.build}
+                loading={this.props.loading}
+                triggerCancelBuild={this.props.triggerCancelBuild}
+              />
+            </UIGridItem>
+          </UIGrid>  
+        </div>
+        <div className='build-body'>
+          <div>  
             <BuildLog
-              log={this.props.log}
               fetchingLog={this.props.fetchingLog}
+              shouldPoll={this.props.shouldPoll}
+              fetchStartOfLog={this.props.fetchStartOfLog}
+              fetchEndOfLog={this.props.fetchEndOfLog}
+              pageLog={this.props.pageLog}
               buildState={build.state}
               loading={this.props.loading}
+              log={this.props.log}
             />
-          </UIGridItem>
-        </UIGrid>
+          </div>
+        </div>
       </div>
     );
   }
@@ -86,15 +88,18 @@ Build.propTypes = {
     module: PropTypes.object
   }),
   error: PropTypes.node,
-  log: PropTypes.string,
+  fetchStartOfLog: PropTypes.func.isRequired,
+  fetchEndOfLog: PropTypes.func.isRequired,
+  shouldPoll: PropTypes.func.isRequired,
+  changeOffsetWithNavigation: PropTypes.func.isRequired,
+  log: PropTypes.object,
   fetchingLog: PropTypes.bool,
-  originalParams: PropTypes.object,
   params: PropTypes.object,
   loading: PropTypes.bool,
+  triggerCancelBuild: PropTypes.func.isRequired,
   toggleStar: PropTypes.func.isRequired,
   isStarred: PropTypes.bool.isRequired,
-  pathname: PropTypes.string.isRequired,
-  triggerCancelBuild: PropTypes.func.isRequired
+  pathname: PropTypes.string.isRequired
 };
 
 export default Build;

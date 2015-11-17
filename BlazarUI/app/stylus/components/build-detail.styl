@@ -3,11 +3,14 @@
 build-status(color)
   .build-detail-header
     border-bottom 1px solid color
-
+    .headline-icon
+      margin 0 5px
+    
   .build-detail-footer
     border-top 1px solid color
 
 .build-detail
+  position relative
   padding 0
   margin 0
   
@@ -20,6 +23,12 @@ build-status(color)
   &.alert-info
     build-status($info-dark)
       
+.build-detail-header
+  .cancel-build-button 
+    position absolute
+    top 4px
+    right 4px
+
 .build-detail-header__build-state
   font-weight $font-medium
   margin 0
@@ -31,10 +40,11 @@ build-status(color)
   margin-left 5px
     
 .build-detail-body
+  position relative
   p
     margin: 0
     font-size 13px
-
+      
 .build-detail-body__commit-desc
   height 30px
   overflow hidden
@@ -42,7 +52,7 @@ build-status(color)
   word-wrap break-word
   background inherit
   border none
-  padding 0 5px
+  padding 0 10px
   margin 0
   color $gray-darker
   font-size 12px
@@ -50,7 +60,7 @@ build-status(color)
 
 .build-detail-footer
   background #fff
-  padding 5px
+  padding 5px 10px
   font-size 13px
   color $gray-darker
 

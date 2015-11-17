@@ -1,15 +1,23 @@
+/*global config*/
 import Reflux from 'reflux';
+import {find, has} from 'underscore';
+import {buildIsOnDeck} from '../components/Helpers';
 
 import Build from '../models/Build';
 import Log from '../models/Log';
+import LogSize from '../models/LogSize';
 import BuildTrigger from '../models/BuildTrigger';
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
-import {find, has} from 'underscore';
+
 import BuildStates from '../constants/BuildStates';
 import BuildHistoryActions from '../actions/buildHistoryActions';
 
+// map to keep track of builds being viewed
+// in the event that we navigate to other builds
 let builds = {};
+// temporary storage for a build
+// we are loading details for
 let requestedBuild = {};
 
 const BuildActions = Reflux.createActions([
@@ -21,7 +29,11 @@ const BuildActions = Reflux.createActions([
   'triggerBuildError',
   'triggerBuildStart',
   'loadBuildCancelError',
-  'loadBuildCancelled'
+  'loadBuildCancelled',
+  'pageLog',
+  'fetchEndOfLog',
+  'fetchStartOfLog',
+  'shouldPoll'
 ]);
 
 BuildActions.loadBuild.preEmit = function(data) {
@@ -34,17 +46,76 @@ BuildActions.reloadBuild = function(data) {
 
 BuildActions.setupBuildRequest = function(data) {
   requestedBuild.gitInfo = data;
-
+  
   getBranchId()
     .then(getModule)
     .then(getBuild)
+    .then(getLogSize)
     .then(processBuild.bind(this));
 };
+
+BuildActions.shouldPoll = function(moduleId, state) {
+  builds[moduleId].log.isPolling = state;
+};
+
+// Scrolling up or down log
+BuildActions.pageLog = function(moduleId, hasScrolled) {  
+  const isActive = builds[moduleId].data.build.state === BuildStates.IN_PROGRESS;
+  handlePageLogRequest(builds[moduleId], hasScrolled, isActive);
+};
+
+BuildActions.fetchStartOfLog = function(moduleId, options={}) {
+  const build = builds[moduleId];
+  builds[moduleId].log.hasScrolled = false;
+  builds[moduleId].log.isPolling = false;
+  // to access our recursive log polling
+  builds[moduleId].stopPolling = true;
+  
+  if (options.position) {
+    build.log.positionChange = options.position;
+  }
+
+  resetBuild({
+    moduleId: moduleId,
+    offset: 0,
+    position: 'top'
+  });
+}
+
+BuildActions.fetchEndOfLog = function(moduleId, options={}) {
+  const build = builds[moduleId];
+  build.stopPolling = false;
+  build.log.hasScrolled = false;
+  const logSizePromise = getLogSize();
+  const buildInProgress = build.data.build.state === BuildStates.IN_PROGRESS;
+  
+  logSizePromise.done((size) => {
+    build.log.reset({isPolling: true}).setOffset(getLastOffset(size));
+
+    if (options.position) {
+      build.log.positionChange = options.position;
+      build.log.hasNavigatedWithButtons = true;
+    }
+
+    if (buildInProgress) {
+      processInProgressBuild(build);  
+    }
+    else {
+      resetBuild({
+        moduleId: moduleId,
+        offset: getLastOffset(size),
+        position: 'bottom'
+      });
+    }
+    
+  });
+}
 
 BuildActions.stopWatchingBuild = function(buildId, moduleId) {
   if (builds[moduleId]) {
     builds[moduleId].isActive = false;
   }
+
   else {
     // Hack - if user tries to navigate too quickly from one
     // build to the next, we dont have time to load the moduleId
@@ -68,7 +139,7 @@ BuildActions.cancelBuild = function(buildId, moduleId) {
       BuildActions.loadBuildCancelled()
     }
   })
-  
+
   cancel.error((err) => {
     BuildActions.loadBuildCancelError({
       status: err.status,
@@ -81,12 +152,12 @@ BuildActions.cancelBuild = function(buildId, moduleId) {
 BuildActions.triggerBuild = function(moduleId) {
   BuildActions.triggerBuildStart();
   
-  
   const trigger = new BuildTrigger({
     moduleId: moduleId
   });
   
   const promise = trigger.fetch();
+
   promise.then(() => {
     BuildActions.triggerBuildSuccess();
     BuildHistoryActions.fetchLatestHistory();
@@ -135,143 +206,216 @@ function getBuild() {
   const buildPromise = builds[requestedBuild.gitInfo.moduleId].fetch();
 
   buildPromise.error(() => {
-    BuildActions.loadBuildError("Error retrieving build. Build does not exist or no longer exists.");
+    BuildActions.loadBuildError('Error retrieving build. Build does not exist or no longer exists.');
   });
 
   return buildPromise;
 }
 
+function getLogSize() {
+  const build = builds[requestedBuild.gitInfo.moduleId]
+  
+  if (build.data.build.state === BuildStates.LAUNCHING || build.data.build.state === BuildStates.QUEUED) {
+    return;
+  }
+  
+  const logSize = new LogSize({
+    buildNumber: build.data.build.id
+  });
+
+  const sizePromise = logSize.fetch();
+  
+  sizePromise.done((size) => {
+    requestedBuild.logSize = size;
+    build.log = createLogModel(build, requestedBuild.logSize);
+  });
+  
+  sizePromise.error((err) => {
+    console.warn(err);
+    BuildActions.loadBuildSuccess({
+      error: {responseText: `Error loading log, we don't have the log size. View your console for more detail.` },
+      build: build.data
+    });
+    
+  });
+
+  return sizePromise;
+}
+
 function processBuild() {
   const buildToProcess = builds[requestedBuild.gitInfo.moduleId];
 
-  // to do: find out why we dont have state at this point
-  if (!has(buildToProcess.data.build, 'state')) {
+  // To do: find out why we dont have state at this point
+  if (!has(buildToProcess.data.build, 'state') || !buildToProcess.isActive) {
     return;
   }
 
-  if (!buildToProcess.isActive) {
-    return;
-  }
-
-  if (buildToProcess.data.build.state === BuildStates.LAUNCHING) {
+  // States: Launching, Queued
+  if (buildIsOnDeck(buildToProcess.data.build.state)) {
     BuildActions.loadBuildSuccess({
       build: buildToProcess.data
     });
     return;
   }
-
+  // State: In Progress
   if (buildToProcess.data.build.state === BuildStates.IN_PROGRESS) {
+    buildToProcess.log.isPolling = true;
     processInProgressBuild(buildToProcess);
   }
-
+  // State: Failed, Cancelled
   else {
     processInactiveBuild(buildToProcess);
   }
 }
 
-function processInProgressBuild(build) {
-  let inProgressBuild = {
-    logLines: '',
-    offset: 0
-  };
-
-  (function fetchLog() {
-    if (!builds[build.data.module.id].isActive) {
-      return;
-    }
-    
-    const log = new Log({
-      dataType: 'json',
-      buildNumber: build.data.build.id,
-      offset: inProgressBuild.offset
-    });
-    
-    const logPromise = log.fetch();
-    logPromise.always( (data, textStatus, jqxhr) => {
-      inProgressBuild.logLines += log.formatLog(jqxhr);
-      inProgressBuild.offset = data.nextOffset;
-    
-      if (data.nextOffset === -1) {
-        // get latest build detail when log fetching is complete
-        // so we can update status section at top of build page
-        const lastBuild = new Build(requestedBuild.gitInfo);
-        const buildPromise = lastBuild.fetch();
-    
-        buildPromise.done(() => {
-          BuildActions.loadBuildSuccess({
-            build: lastBuild.data,
-            log: inProgressBuild.logLines,
-            fetchingLog: false
-          });
-        });
-      }
-    
-      // still building
-      else {
-        BuildActions.loadBuildSuccess({
-          build: build.data,
-          log: inProgressBuild.logLines,
-          fetchingLog: true
-        });
-    
-        setTimeout(() => {
-          fetchLog();
-        }, 5000);
-      }
-    
-    });
-
-  })();
+function processInactiveBuild(build) {
+  const log = build.log;
+  const logPromise = log.fetch();
+  logPromise.always((data) => {
+    build.log.nextOffset = data.nextOffset;
+    updateStore(build);
+  });  
 }
 
-function processInactiveBuild(build) {
-  let logLines = '';
-  let offset = 0;
+function processInProgressBuild(build) {  
+  if (!build.isActive || !build.log.isPolling || build.stopPolling) {
+    build.log.isPolling = false;
+    return;
+  }
+  // user has paged up, stop polling
+  if (build.log.navigationPosition === 'up') {
+    return;
+  }
 
-  (function fetchLog() {
-    const log = new Log({
-      buildNumber: build.data.build.id,
-      offset: offset
-    });
+  const logPromise = build.log.fetch();
 
-    const logPromise = log.fetch();
-    logPromise.always( (data, textStatus, jqxhr) => {
+  logPromise.always( (data, textStatus, jqxhr) => {
+    build.log.nextOffset = data.nextOffset;
+    build.log.setOffset(data.nextOffset);
 
-      logLines += log.formatLog(jqxhr);
-
-      if (jqxhr.responseJSON === undefined || textStatus !== 'success') {
+    // reached end of log
+    if (data.nextOffset === -1) {
+      // get latest build detail when log fetching is complete
+      // so we can update status section at top of build page
+      const lastBuild = new Build(requestedBuild.gitInfo);
+      const buildPromise = lastBuild.fetch();
+  
+      buildPromise.done(() => {
         BuildActions.loadBuildSuccess({
-          build: build.data,
-          log: `<p class='roomy-xy'>${data.responseText}</p>`,
+          build: lastBuild.data,
+          log: build.log,
           fetchingLog: false
         });
-        return;
-      }
+      });
+    }
 
+    // still building
+    else {
       BuildActions.loadBuildSuccess({
         build: build.data,
-        log: logLines,
+        log: build.log,
         fetchingLog: true
       });
-
-      // more log lines exist
-      if (jqxhr.responseJSON.nextOffset !== -1) {
-        offset = jqxhr.responseJSON.nextOffset;
-        fetchLog();
-      }
-
-      // got all log lines
-      else {
-        BuildActions.loadBuildSuccess({
-          build: build.data,
-          log: logLines,
-          fetchingLog: false
-        });
-      }
-
-    });
-
-  })();
+      
+      setTimeout(() => {
+        processInProgressBuild(build)
+      }, config.activeBuildRefresh);
+    }
+  });  
 }
+
+//
+// Shared Methods Across Build States
+//
+function getLastOffset(size) {
+  return Math.max(size - config.offsetLength, 0);
+}
+
+function createLogModel(build, size) {
+  const inProgress = build.data.build.state === BuildStates.IN_PROGRESS;
+  const maxOffset = getLastOffset(size);
+  
+  const settings = {
+    buildState: build.data.build.state,
+    buildNumber: build.data.build.id,
+    logSize: size,
+    logPages: Math.ceil(maxOffset / config.offsetLength),
+    startingOffset: maxOffset,
+    lastOffset: maxOffset,
+    offset: maxOffset,
+    offsetLength: config.offsetLength
+  }
+  
+  return new Log(settings);
+}
+
+// fetch previous/next offsets when scrolling up/down log
+function handlePageLogRequest(build, hasScrolled, isActive) {
+  build.log.hasScrolled = hasScrolled;
+  build.log.hasNavigatedWithButtons = false;
+  build.log.positionChange = false
+  build.log.hasScrolled = hasScrolled;
+
+  // Log size is smaller than one offsetLength so nothing more to fetch
+  if (build.log.options.logSize < config.offsetLength) {
+    return;
+  }
+
+  if (hasScrolled === 'down') {
+    // if we are at the end of the log, started at the end and since scrolled up,
+    // or our log is less than one offset length
+    if (build.log.endOfLogLoaded || build.log.options.logSize < config.offsetLength + 1) {
+      return;
+    }
+  }
+
+  else if (hasScrolled === 'up') {
+    // If we made it to the top, dont fetch anything
+    if (build.log.startOfLogLoaded) {
+      return;
+    }
+  }
+
+  build.log.pageLog(hasScrolled).fetch().always(() => {
+    updateStore(build)
+  });
+}
+
+function resetBuild(options) {
+  const {moduleId, offset, position} = options;
+  // save log since we are refetching our build
+  const existingLog = builds[moduleId].log;
+
+  getBuild().then((updateBuildData) => {
+    builds[moduleId].data = updateBuildData;
+    builds[moduleId].log = existingLog;
+    resetBuildLog(moduleId, offset, position);
+  });
+}
+
+function resetBuildLog(moduleId, offset, position) {
+  const build = builds[moduleId];
+
+  builds[moduleId].log
+    .reset()
+    .setOffset(offset)
+    .fetch()
+    .always((data, textStatus, jqxhr) => {
+      builds[moduleId].log.positionChange = position;
+      builds[moduleId].log.nextOffset = data.nextOffset;
+      builds[moduleId].log.previousOffset = offset;
+
+      updateStore(builds[moduleId], builds[moduleId].log, data, textStatus, jqxhr)
+  });
+}
+
+function updateStore(build) {
+  BuildActions.loadBuildSuccess({
+    build: build.data,
+    log: build.log,
+    fetchingLog: false
+  });
+}
+
 
 export default BuildActions;

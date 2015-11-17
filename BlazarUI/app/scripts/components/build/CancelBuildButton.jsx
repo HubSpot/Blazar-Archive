@@ -34,7 +34,11 @@ class CancelBuildButton extends Component {
     return (
       <Modal show={this.state.showModal} onHide={this.closeCancelModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Are you sure you want to cancel build #{this.props.build.build.id}</Modal.Title>
+          <Modal.Title>
+            Are you sure you want to cancel 
+            <strong> build #{this.props.build.build.buildNumber}</strong> {' '}
+            for module <strong>{this.props.build.module.name}</strong>.
+          </Modal.Title>
         </Modal.Header>
         <Modal.Footer>
           <Button onClick={this.closeCancelModal}>No, nevermind</Button>
@@ -67,8 +71,8 @@ class CancelBuildButton extends Component {
       );
     } else {
       return (
-        <div className='text-right'>
-          <Button bsStyle="danger" onClick={this.handleCancelBuild}>
+        <div className='cancel-build-button text-right'>
+          <Button bsSize='xsmall' bsStyle='danger' onClick={this.handleCancelBuild}>
             Cancel Build
           </Button>
           {this.cancelModal()}

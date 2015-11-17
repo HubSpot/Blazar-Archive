@@ -1,10 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll, contains, some, clone} from 'underscore';
+import {bindAll, some, clone} from 'underscore';
 import BuildStates from '../../constants/BuildStates.js';
 import {getIsStarredState} from '../Helpers.js';
 import Build from './Build.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
-import {getPathname} from '../Helpers';
+import {getPathname, buildIsOnDeck} from '../Helpers';
 
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
@@ -19,8 +19,13 @@ const initialState = {
     gitInfo: {},
     module: { name: ''}
   },
-  log: '',
-  fetchingLog: true,
+  log: {
+    logLines: [],
+    fetchingLog: false,
+    currentOffsetLine: 0,
+    positionChange: null
+  },
+  fetchingLog: false,
   stars: [],
   error: false
 };
@@ -29,7 +34,15 @@ class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
-    bindAll(this, 'toggleStar', 'triggerCancelBuild');
+    bindAll(this, 
+      'toggleStar', 
+      'triggerCancelBuild', 
+      'pageLog', 
+      'changeOffsetWithNavigation',
+      'fetchStartOfLog',
+      'fetchEndOfLog',
+      'shouldPoll'
+    );
     this.state = initialState;
   }
 
@@ -60,13 +73,39 @@ class BuildContainer extends Component {
   componentWillUnmount() {
     this.tearDown()
   }
+
+  shouldPoll(state) {
+    BuildActions.shouldPoll(this.props.params.moduleId, state);
+  }
+  
+  pageLog(direction) {
+    BuildActions.pageLog(this.props.params.moduleId, direction);
+  }
+  
+  // maybe dont need...
+  fetchStartOfLog() {
+    BuildActions.fetchStartOfLog(this.props.params.moduleId);
+  }
+  
+  fetchEndOfLog(options) {    
+    BuildActions.fetchEndOfLog(this.props.params.moduleId, options);
+  }
+
+  changeOffsetWithNavigation(position) {    
+    if (position === 'top') {
+      BuildActions.fetchStartOfLog(this.props.params.moduleId, {position: position})
+    }
+    
+    else if (position === 'bottom') {
+      BuildActions.fetchEndOfLog(this.props.params.moduleId, {position: position, poll: true})
+    }
+  }
   
   triggerCancelBuild(buildId, moduleId) {
     BuildActions.cancelBuild(buildId, moduleId);
   }
 
   onStatusChange(state) {
-    
     if (state.error) {
       this.setState({
         loading: false,
@@ -76,7 +115,8 @@ class BuildContainer extends Component {
 
     if (state.loadBuildCancelError) {
       this.setState({
-        error: state.loadBuildCancelError
+        loading: false,
+        error: state.error
       })
     }
 
@@ -84,6 +124,7 @@ class BuildContainer extends Component {
       this.setState({
         loading: true
       });
+
       return;
     }
 
@@ -97,11 +138,11 @@ class BuildContainer extends Component {
       this.setState({
         loading: false,
         build: state.build.build,
-        log: state.build.log,
-        fetchingLog: state.build.fetchingLog
+        log: state.build.log || initialState.log,
+        fetchingLog: state.build.fetchingLog,
       });
 
-      if (contains([BuildStates.QUEUED, BuildStates.LAUNCHING], state.build.build.build.state)){
+      if (buildIsOnDeck(state.build.build.build.state)) {
         setTimeout( () => {
           BuildActions.reloadBuild(this.props.params);
         }, 2000);
@@ -119,8 +160,13 @@ class BuildContainer extends Component {
         <Build
           error={this.state.error}
           build={this.state.build}
+          fetchStartOfLog={this.fetchStartOfLog}
+          fetchEndOfLog={this.fetchEndOfLog}
           log={this.state.log}
           fetchingLog={this.state.fetchingLog}
+          pageLog={this.pageLog}
+          shouldPoll={this.shouldPoll}
+          changeOffsetWithNavigation={this.changeOffsetWithNavigation}
           originalParams={this.originalParams}
           params={this.props.params}
           loading={this.state.loading}

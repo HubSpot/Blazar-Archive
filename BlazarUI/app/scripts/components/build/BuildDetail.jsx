@@ -1,8 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import {has, contains} from 'underscore';
+import {has, contains, bindAll} from 'underscore';
 import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
+import BuildCommits from './BuildCommits.jsx';
 
+import CancelBuildButton from './CancelBuildButton.jsx';
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
 import Icon from '../shared/Icon.jsx';
@@ -15,16 +17,11 @@ import {LABELS} from '../constants';
 class BuildDetail extends Component {
 
   constructor() {
-    this.handleResize = this.handleResize.bind(this);
+    bindAll(this, 'handleResize')
     this.state = {
-      windowWidth: window.innerWidth
+      windowWidth: window.innerWidth,
+      showCommits: false
     }
-  }
-
-  handleResize(e) {
-    this.setState({
-      windowWidth: window.innerWidth
-    });
   }
 
   componentDidMount() {
@@ -39,6 +36,12 @@ class BuildDetail extends Component {
     return classNames([
       `build-detail alert alert-${LABELS[this.props.build.build.state]}`
     ]);
+  }
+  
+  handleResize(e) {
+    this.setState({
+      windowWidth: window.innerWidth
+    });
   }
 
   render() {
@@ -88,6 +91,7 @@ class BuildDetail extends Component {
 
     const shaLink = `https://${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/commit/${build.sha}`;
 
+    
     return (
       <div className={this.getWrapperClassNames()}>
         
@@ -97,10 +101,14 @@ class BuildDetail extends Component {
             Build {buildDetail.buildResult} 
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
           </p>
+          <CancelBuildButton 
+            triggerCancelBuild={this.props.triggerCancelBuild}
+            build={this.props.build}
+          />
         </div>  
         
         <div className='build-detail-body'>
-          <pre title={currentCommit.message} className='build-detail-body__commit-desc'>{truncate(currentCommit.message, this.state.windowWidth * .08, true)}</pre>
+          <pre className='build-detail-body__commit-desc' title={currentCommit.message}>{truncate(currentCommit.message, this.state.windowWidth * .08, true)}</pre>
         </div>
         
         <div className='build-detail-footer'> 

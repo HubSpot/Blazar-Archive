@@ -31,7 +31,10 @@
       window.config = {
         staticRoot: "{{{staticRoot}}}",
         {{#buildsRefresh}}buildsRefresh: {{{buildsRefresh}}},{{/buildsRefresh}}
+        {{#activeBuildRefresh}}activeBuildRefresh: {{{activeBuildRefresh}}},{{/activeBuildRefresh}}
+        
         appRoot: "{{{appRoot}}}",
+        offsetLength: {{{offsetLength}}},
         {{#apiRoot}}apiRoot: "{{{apiRoot}}}",{{/apiRoot}}
         {{^apiRoot}}apiRoot: localStorage.getItem("apiRootOverride"),{{/apiRoot}}
       }
