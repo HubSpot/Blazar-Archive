@@ -65,10 +65,12 @@ BuildActions.pageLog = function(moduleId, hasScrolled) {
 };
 
 BuildActions.fetchStartOfLog = function(moduleId, options={}) {
-  const build = builds[moduleId]
-  build.log.isPolling = false;
-  build.log.hasScrolled = false;
-
+  const build = builds[moduleId];
+  builds[moduleId].log.hasScrolled = false;
+  builds[moduleId].log.isPolling = false;
+  // to access our recursive log polling
+  builds[moduleId].stopPolling = true;
+  
   if (options.position) {
     build.log.positionChange = options.position;
   }
@@ -278,8 +280,8 @@ function processInactiveBuild(build) {
   });  
 }
 
-function processInProgressBuild(build) {
-  if (!build.isActive || !build.log.isPolling) {
+function processInProgressBuild(build) {  
+  if (!build.isActive || !build.log.isPolling || build.stopPolling) {
     return;
   }
   // user has paged up, stop polling
