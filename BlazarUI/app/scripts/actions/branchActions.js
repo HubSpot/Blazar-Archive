@@ -5,6 +5,7 @@ import BranchSearch from '../collections/BranchSearch';
 
 const BranchActions = Reflux.createActions([
   'loadModulesSuccess',
+  'loadModulesError',
   'stopPolling'
 ]);
 
@@ -21,9 +22,19 @@ BranchActions.loadModules = function(params) {
     ]
   });
 
-  branchIds.fetch().done((branchIds) => {
-    _createPoller(branchIds);
-  });
+  branchIds.fetch()
+    .done((branchIds) => {
+      if (branchIds.length === 0) {
+        BranchActions.loadModulesSuccess([]);
+      }
+
+      else {
+        _createPoller(branchIds);  
+      }      
+    })
+    .fail((jqXHR, textStatus, errorThrown) => {
+      BranchActions.loadModulesError(`${jqXHR.status}: ${jqXHR.statusText}`);
+    });
 };
 
 function _createPoller(branchIds) {
@@ -38,21 +49,22 @@ function _createPoller(branchIds) {
     collection: collection
   });
 
-  poller.startPolling((resp) => {
-    if (resp.textStatus === 'success') {
+  poller.startPolling((jqXHR) => {
+    if (jqXHR.textStatus === 'success') {
       BranchActions.loadModulesSuccess(collection.sortByModuleName());
     }
 
     else {
-      console.warn('Error loading repositories');
-      // To do: global error reporting
+      BranchActions.loadModulesError(`${jqXHR.status}: ${jqXHR.statusText}`);
     }
   });
 
 }
     
 BranchActions.stopPolling = function() {
-  poller.stopPolling();
+  if (poller) {
+    poller.stopPolling();
+  }
 };
 
 export default BranchActions;

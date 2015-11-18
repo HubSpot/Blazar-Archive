@@ -43,12 +43,15 @@ BuildHistoryActions.loadModulesBuildHistory = (options) => {
     return new BuildHistory({
       moduleId: module.moduleId
     })
-      .fetch().then((data) => {
-        data = data.splice(0, options.limit);
+      .fetch()
+      .then((data) => {
         return {
           module: module,
           builds: data
         };
+      })
+      .fail((jqXHR) => {
+        BuildHistoryActions.loadBuildHistoryError(`Sorry but we can't find any module named ${gitInfo.module}`);
       });
   });
 
@@ -65,6 +68,7 @@ BuildHistoryActions.updatePollingStatus = (status) => {
 function buildHistoryPoller() {
 
   (function pollBuildHistory() {
+    
     fetchHistory(() => {
       if (buildHistoryActionSettings.polling) {
         setTimeout(pollBuildHistory, config.buildsRefresh);
@@ -88,9 +92,17 @@ function getBranchId() {
   const branchDefinition = new BranchDefinition(gitInfo);
   const branchPromise =  branchDefinition.fetch();
 
-  branchPromise.done( () => {
-    gitInfo.branchId = branchDefinition.data.id;
-  });
+  branchPromise
+    .done( () => {
+      gitInfo.branchId = branchDefinition.data.id;
+    })
+    
+    .fail(() => {
+      BuildHistoryActions.loadBuildHistoryError(`Sorry but we can't find any module named ${gitInfo.module}.`);
+      return;
+    });
+    
+  
 
   return branchPromise;
 }
@@ -102,16 +114,34 @@ function getModule() {
 
   const modulesPromise = branchModules.fetch();
 
-  modulesPromise.done( () => {
-    gitInfo.moduleId = find(branchModules.data, (m) => {
+  modulesPromise.done( (data, textStatus, jqXHR) => {
+    const module = find(branchModules.data, (m) => {
       return m.name === gitInfo.module;
-    }).id;
+    });
+
+    if (!module) {
+      BuildHistoryActions.loadBuildHistoryError(`Sorry but we can't find any module named ${gitInfo.module}.`);
+      buildHistoryActionSettings.polling = false;
+    }
+    
+    else {
+      gitInfo.moduleId = module.id;
+    }
+  });
+  
+  modulesPromise.error(() => {
+    BuildHistoryActions.loadBuildHistoryError("An error occured loading this module's id");
   });
 
   return modulesPromise;
 }
 
 function getBuildHistory() {
+  
+  if (!gitInfo.moduleId) {
+    return;
+  }
+  
   const buildHistory = new BuildHistory({
     moduleId: gitInfo.moduleId
   });

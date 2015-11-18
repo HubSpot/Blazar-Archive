@@ -7,6 +7,7 @@ import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import ModulesTable from './ModulesTable.jsx';
 import Loader from '../shared/Loader.jsx';
 import Icon from '../shared/Icon.jsx';
+import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
@@ -49,6 +50,26 @@ class BranchContainer extends Component {
     BranchActions.stopPolling();
     this.unsubscribeFromBranch();
   }
+  
+  getRenderedContent() {
+    if (this.state.error) {
+      return (
+        <GenericErrorMessage
+          message={this.state.error}
+        />
+      );
+    }
+    
+    else {
+      return (
+        <ModulesTable
+          modules={this.state.modules}
+          loading={this.state.loading}
+        />
+      );
+    }
+    
+  }
 
   render() {
     return (
@@ -59,10 +80,7 @@ class BranchContainer extends Component {
               <Icon type="octicon" name="git-branch" classNames="headline-icon" />
               Branch Modules
             </Headline>
-            <ModulesTable
-              modules={this.state.modules}
-              loading={this.state.loading}
-            />
+            {this.getRenderedContent()}
           </UIGridItem>
         </UIGrid>
       </PageContainer>

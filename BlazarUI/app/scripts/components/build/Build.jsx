@@ -13,13 +13,23 @@ import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 class Build extends Component {
 
-  render() {
+  getRenderContent() {
     if (this.props.loading) {
       return (
         <Loader align='top-center' />
       );
     }
+    
+    if (this.props.error) {
+      return this.renderError();
+    }
+    
+    else {
+      return this.renderModuleAndLog();
+    }
+  }
 
+  renderModuleAndLog() {
     const {
       build,
       gitInfo,
@@ -76,7 +86,25 @@ class Build extends Component {
           </div>
         </div>
       </div>
-    );
+    )
+  }
+
+  renderError() {
+    return (
+      <div className='build-header'>
+        <UIGrid>
+          <UIGridItem size={12}>
+            <GenericErrorMessage
+              message={this.props.error}
+            />
+          </UIGridItem>
+        </UIGrid>
+      </div>
+    )
+  }
+
+  render() {
+    return this.getRenderContent();
   }
 
 }

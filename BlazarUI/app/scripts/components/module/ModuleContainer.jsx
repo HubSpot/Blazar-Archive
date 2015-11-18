@@ -6,6 +6,7 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import BuildHistoryTable from './BuildHistoryTable.jsx';
 import BuildButton from './BuildButton.jsx';
+import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import BuildHistoryStore from '../../stores/buildHistoryStore';
 import BuildStore from '../../stores/buildStore';
@@ -68,32 +69,62 @@ class ModuleContainer extends Component {
   triggerBuild() {
     BuildActions.triggerBuild(this.props.params.moduleId);
   }
+  
+  renderSectionContent() {
+    if (this.state.error) {
+      return this.renderError();
+    }
+
+    else {
+      return this.renderHistory();
+    }
+  }
+  
+  renderError() {
+    return (
+      <UIGrid>
+        <UIGridItem size={10}>
+          <GenericErrorMessage 
+            message={this.state.error}
+          />
+        </UIGridItem>
+      </UIGrid>
+    );
+  }
+  
+  renderHistory() {
+    return (
+      <UIGrid>
+        <UIGridItem size={10}>
+          <ModuleHeadline
+            params={this.props.params}
+            stars={this.state.stars}
+            loading={this.state.loadingStars || this.state.loadingHistory}
+          />            
+        </UIGridItem>           
+        <UIGridItem size={2} align='RIGHT'>
+          <BuildButton 
+            triggerBuild={this.triggerBuild} 
+            loading={this.state.loadingHistory}
+            error={this.state.error}
+          />
+        </UIGridItem>
+        <UIGridItem size={12}>
+          <BuildHistoryTable
+            params={this.props.params}
+            buildHistory={this.state.buildHistory}
+            loading={this.state.loadingStars || this.state.loadingHistory}
+            shouldRender={this.state.error}
+          />
+        </UIGridItem>
+      </UIGrid>
+    );
+  }
 
   render() {
     return (
       <PageContainer>
-        <UIGrid>
-          <UIGridItem size={10}>
-            <ModuleHeadline
-              params={this.props.params}
-              stars={this.state.stars}
-              loading={this.state.loadingStars || this.state.loadingHistory}
-            />
-          </UIGridItem>           
-          <UIGridItem size={2} align='RIGHT'>
-            <BuildButton 
-              triggerBuild={this.triggerBuild} 
-              loading={this.state.loadingHistory}
-            />
-          </UIGridItem>
-          <UIGridItem size={12}>
-            <BuildHistoryTable
-              params={this.props.params}
-              buildHistory={this.state.buildHistory}
-              loading={this.state.loadingStars || this.state.loadingHistory}
-            />
-          </UIGridItem>
-        </UIGrid>
+        {this.renderSectionContent()}
       </PageContainer>
     );
   }

@@ -175,7 +175,7 @@ function getBranchId() {
     requestedBuild.gitInfo.branchId = branchDefinition.data.id;
   });
   branchPromise.error(() => {
-    BuildHistoryActions.loadBuildHistoryError('an error occured');
+    BuildActions.loadBuildError(`Sorry but we can't find this build. Check that this branch or module still exists.`);
   });
 
   return branchPromise;
@@ -188,25 +188,41 @@ function getModule() {
 
   const modulesPromise = branchModules.fetch();
 
-  modulesPromise.done(() => {
-    requestedBuild.gitInfo.moduleId = find(branchModules.data, (m) => {
+
+  modulesPromise.done((data, textStatus, jqXHR) => {
+    const module = requestedBuild.gitInfo.moduleId = find(branchModules.data, (m) => {
       return m.name === requestedBuild.gitInfo.module;
-    }).id;
+    });
+
+    if (!module) {
+      BuildActions.loadBuildError(`Sorry but we can't find any module named ${requestedBuild.gitInfo.module}.`);
+    }
+    
+    else {
+      requestedBuild.gitInfo.moduleId = module.id;
+    }
   });
-  modulesPromise.error(() => {
-    BuildHistoryActions.loadBuildHistoryError('an error occured');
+
+  modulesPromise.error((jqXHR) => {
+    BuildActions.loadBuildError('Error requesting module ${requestedBuild.gitInfo.module}. See your console for more detail.');
+    console.warn(jqXHR);
   });
 
   return modulesPromise;
 }
 
 function getBuild() {
+  if (!requestedBuild.gitInfo.moduleId) {
+    return;
+  }
+
   builds[requestedBuild.gitInfo.moduleId] = new Build(requestedBuild.gitInfo);
   builds[requestedBuild.gitInfo.moduleId].isActive = true;
   const buildPromise = builds[requestedBuild.gitInfo.moduleId].fetch();
 
-  buildPromise.error(() => {
-    BuildActions.loadBuildError('Error retrieving build. Build does not exist or no longer exists.');
+  buildPromise.error((jqXHR) => {
+    BuildActions.loadBuildError(`Error retrieving build #${requestedBuild.gitInfo.buildNumber}. See your console for more detail.`);
+    console.warn(jqXHR);
   });
 
   return buildPromise;
@@ -214,6 +230,10 @@ function getBuild() {
 
 function getLogSize() {
   const build = builds[requestedBuild.gitInfo.moduleId];
+  
+  if (!build) {
+    return;
+  }
   
   if (build.data.build.state === BuildStates.LAUNCHING || build.data.build.state === BuildStates.QUEUED) {
     return;
@@ -244,6 +264,10 @@ function getLogSize() {
 
 function processBuild() {
   const buildToProcess = builds[requestedBuild.gitInfo.moduleId];
+
+  if (!buildToProcess) {
+    return;
+  }
 
   // To do: find out why we dont have state at this point
   if (!has(buildToProcess.data.build, 'state') || !buildToProcess.isActive) {

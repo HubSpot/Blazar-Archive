@@ -17,6 +17,13 @@ const BranchStore = Reflux.createStore({
       modules: this.modules,
       loading: false
     });
+  },
+  
+  loadModulesError(error) {
+    this.trigger({
+      error: error,
+      loading: false
+    });
   }
 
 });

@@ -61,8 +61,7 @@ class DashboardContainer extends Component {
 
     if (this.starsHistoryChanged) {
       BuildHistoryActions.loadModulesBuildHistory({
-        modules: this.state.stars,
-        limit: 3
+        modules: this.state.stars
       });
     }
   }
@@ -76,8 +75,7 @@ class DashboardContainer extends Component {
 
     if (state.stars){
       BuildHistoryActions.loadModulesBuildHistory({
-        modules: state.stars,
-        limit: 3
+        modules: state.stars
       });
     }
 

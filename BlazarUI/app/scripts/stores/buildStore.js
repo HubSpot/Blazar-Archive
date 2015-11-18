@@ -20,13 +20,10 @@ const BuildStore = Reflux.createStore({
     });
   },
 
-  loadBuildError(detail) {
-    this.build = detail.build;
-    
+  loadBuildError(error) {
     this.trigger({
-      error: detail.responseText,
-      loading: false,
-      build: this.build
+      error: error,
+      loading: false
     });
   },
 

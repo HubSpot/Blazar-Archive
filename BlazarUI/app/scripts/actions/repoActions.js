@@ -21,7 +21,13 @@ RepoActions.loadBranches = function(params) {
   });
 
   branchIds.fetch().done((branchIds) => {
-    _createPoller(branchIds);
+    if (branchIds.length === 0) {
+      RepoActions.loadBranchesSuccess([]);
+    }
+
+    else {
+      _createPoller(branchIds);  
+    }
   });
 };
 

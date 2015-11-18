@@ -15,10 +15,9 @@ class BuildButton extends Component {
   }
 
   render() {
+    
     if (this.props.loading) {
-      return (
-        <div />
-      );
+      return null;
     }
 
     if (this.props.buildTriggering) {
