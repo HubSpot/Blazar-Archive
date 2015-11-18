@@ -38,7 +38,7 @@ public class BlazarConfiguration extends Configuration {
   private UiConfiguration uiConfiguration = new UiConfiguration();
 
   @Valid
-  @JsonProperty("slack")
+  @JsonProperty("slack_blazar")
   private Optional<SlackConfiguration> slackConfiguration = Optional.absent();
 
   private boolean webhookOnly = false;
