@@ -1,52 +1,53 @@
+@import '../variables'
 
 .feedback-container
   position fixed
-  bottom 0
-  right 0
-  overflow hidden
-  max-height 40px
-  transition all 0.75s
-
-  &.visable
-    max-height 999px
-
-.feedback-title
-  float right
-  margin-right 10px
-  height 40px
+  height 330px
+  width 530px
+  bottom -330px
+  right 25px
   padding 10px
+  background-color $gray-lightest
   border 1px solid $gray-light
   border-bottom none
-  background-color white
+  transition all 0.75s
+
+  &.visible
+    bottom 0
+
+.feedback-title
+  position absolute
+  right -1px
+  top -28px
+  padding 5px 8px
+  border 1px solid $gray-light
+  border-bottom none
+  background-color $gray-lightest
+  font-size 13px
   cursor pointer
   color $gray-dark
 
   &:hover
     color $gray-darker
 
-.feedback-form
-  margin-top 40px
-  padding 10px
-  background-color $gray-lightest
-  border 1px solid $gray-light
-  border-bottom none
-  height 300px
-  width 530px
-
+.feedback__form
+  color $color-text-standard
   & .message-area
     height 100px
-
-  & .thanks
-    text-align center
+    margin-bottom 10px
 
   & .big-icon
-    font-size 138px
+    font-size 100px
     color green
 
-  & .thanks-text
-    color #333
-    font-size 18px
-
   & .channel-name
-    background-color white
-    font-family monospace
+    font-family $monospace
+
+.feedback__sent
+  text-align center
+  
+  .submit-more-btn
+    margin-top 10px
+
+.feedback__sent--error
+  background $danger-light
