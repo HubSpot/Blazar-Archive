@@ -12,7 +12,6 @@ import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
@@ -27,10 +26,8 @@ import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileSystems;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -135,23 +132,6 @@ public class GitHubWebhookHandler {
     }
   }
 
-  private void triggerBuilds(PushEvent pushEvent, GitInfo gitInfo, Set<Module> modules) throws IOException {
-    Set<Module> toBuild = new HashSet<>();
-    if (pushEvent.getForced()) {
-      toBuild = modules;
-    } else {
-      for (String path : affectedPaths(pushEvent)) {
-        for (Module module : modules) {
-          if (module.contains(FileSystems.getDefault().getPath(path))) {
-            toBuild.add(module);
-          }
-        }
-      }
-    }
-
-    triggerBuilds(gitInfo, toBuild);
-  }
-
   private void triggerBuilds(GitInfo gitInfo, Set<Module> modules) throws IOException {
     DependencyGraph graph = dependenciesService.buildDependencyGraph(gitInfo);
 
@@ -194,16 +174,5 @@ public class GitHubWebhookHandler {
     String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
 
     return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, branch, active, System.currentTimeMillis(), System.currentTimeMillis());
-  }
-
-  private static Set<String> affectedPaths(PushEvent pushEvent) {
-    Set<String> affectedPaths = new HashSet<>();
-    for (Commit commit : pushEvent.getCommitsList()) {
-      affectedPaths.addAll(commit.getAddedList());
-      affectedPaths.addAll(commit.getModifiedList());
-      affectedPaths.addAll(commit.getRemovedList());
-    }
-
-    return affectedPaths;
   }
 }

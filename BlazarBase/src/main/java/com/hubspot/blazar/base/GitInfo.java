@@ -86,6 +86,10 @@ public class GitInfo {
     return new GitInfo(Optional.of(id), host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp);
   }
 
+  public GitInfo withBranch(String branch) {
+    return new GitInfo(id, host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
