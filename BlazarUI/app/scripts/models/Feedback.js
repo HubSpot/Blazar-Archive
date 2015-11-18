@@ -2,7 +2,14 @@ import $ from 'jquery';
 
 class Feedback {
 
-  constructor(username, message, page, other) {
+  constructor(payload) {
+    const {
+      username,
+      message,
+      page,
+      other
+    } = payload;
+
     this.username = username;
     this.message = message;
     this.page = page;
@@ -16,15 +23,14 @@ class Feedback {
       page: this.page || 'No Page',
       other: this.other
     };
-    const promise = $.ajax({
+    
+    return $.ajax({
       type: 'POST',
       contentType: 'application/json',
       url: `${config.apiRoot}/feedback`,
       dataType: 'json',
       data: JSON.stringify(data)
     });
-
-    return promise;
   }
 }
 
