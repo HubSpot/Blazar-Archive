@@ -37,4 +37,10 @@ public interface BranchDao {
 
   @SqlUpdate("UPDATE branches_v2 SET pendingBuildId = :id, updatedTimestamp = " + NOW + " WHERE id = :branchId AND pendingBuildId IS NULL")
   int updatePendingBuild(@BindWithRosetta RepositoryBuild build);
+
+  @SqlUpdate("UPDATE branches_v2 SET inProgressBuildId = :id, pendingBuildId = NULL, updatedTimestamp = " + NOW + " WHERE id = :branchId AND pendingBuildId = :id AND inProgressBuildId IS NULL")
+  int updateInProgressBuild(@BindWithRosetta RepositoryBuild build);
+
+  @SqlUpdate("UPDATE branches_v2 SET lastBuildId = :id, inProgressBuildId = NULL, updatedTimestamp = " + NOW + " WHERE id = :branchId AND inProgressBuildId = :id")
+  int updateLastBuild(@BindWithRosetta RepositoryBuild build);
 }

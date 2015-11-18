@@ -33,4 +33,13 @@ public interface RepositoryBuildDao {
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO repo_builds_v2 (branchId, buildNumber, state) VALUES (:branchId, :buildNumber, :state)")
   long enqueue(@BindWithRosetta RepositoryBuild build);
+
+  @SqlUpdate("UPDATE repo_builds_v2 SET startTimestamp = :startTimestamp, sha = :sha, state = :state, commitInfo = :commitInfo WHERE id = :id AND state = 'QUEUED'")
+  int begin(@BindWithRosetta RepositoryBuild build);
+
+  @SqlUpdate("UPDATE repo_builds_v2 SET state = :state WHERE id = :id AND state = 'LAUNCHING'")
+  int update(@BindWithRosetta RepositoryBuild build);
+
+  @SqlUpdate("UPDATE repo_builds_v2 SET endTimestamp = :endTimestamp, state = :state WHERE id = :id AND state IN ('QUEUED', 'LAUNCHING', 'IN_PROGRESS')")
+  int complete(@BindWithRosetta RepositoryBuild build);
 }

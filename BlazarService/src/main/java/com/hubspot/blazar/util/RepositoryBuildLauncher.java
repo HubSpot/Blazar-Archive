@@ -6,11 +6,9 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
@@ -23,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Set;
 
 @Singleton
 public class RepositoryBuildLauncher {
@@ -31,18 +28,15 @@ public class RepositoryBuildLauncher {
 
   private final RepositoryBuildService repositoryBuildService;
   private final BranchService branchService;
-  private final ModuleService moduleService;
   private final GitHubHelper gitHubHelper;
 
   @Inject
   public RepositoryBuildLauncher(RepositoryBuildService repositoryBuildService,
                                  BranchService branchService,
-                                 ModuleService moduleService,
                                  GitHubHelper gitHubHelper,
                                  EventBus eventBus) {
     this.repositoryBuildService = repositoryBuildService;
     this.branchService = branchService;
-    this.moduleService = moduleService;
     this.gitHubHelper = gitHubHelper;
 
     eventBus.register(this);
@@ -74,10 +68,6 @@ public class RepositoryBuildLauncher {
           previousBuild = Optional.absent();
         }
       }
-    } else if (build.getState() == State.LAUNCHING) {
-      Set<Module> modules = moduleService.getByBranch(build.getBranchId());
-      // figure out modified modules, launch build
-      return;
     } else if (build.getState().isComplete()) {
       BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(build.getBranchId());
 

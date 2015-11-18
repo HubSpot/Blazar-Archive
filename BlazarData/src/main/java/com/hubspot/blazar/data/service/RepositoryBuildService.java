@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.dao.BranchDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
 import com.hubspot.blazar.data.util.BuildNumbers;
@@ -71,6 +72,43 @@ public class RepositoryBuildService {
     eventBus.post(build);
 
     return build;
+  }
+
+  @Transactional
+  public void begin(RepositoryBuild build) {
+    Preconditions.checkArgument(build.getStartTimestamp().isPresent());
+
+    checkAffectedRowCount(repositoryBuildDao.begin(build));
+    checkAffectedRowCount(branchDao.updateInProgressBuild(build));
+
+    eventBus.post(build);
+  }
+
+  @Transactional
+  public void update(RepositoryBuild build) {
+    if (build.getState().isComplete()) {
+      Preconditions.checkArgument(build.getEndTimestamp().isPresent());
+
+      checkAffectedRowCount(repositoryBuildDao.complete(build));
+      checkAffectedRowCount(branchDao.updateLastBuild(build));
+    } else {
+      checkAffectedRowCount(repositoryBuildDao.update(build));
+    }
+
+    eventBus.post(build);
+  }
+
+  @Transactional
+  public void fail(RepositoryBuild build) {
+    if (build.getState().isComplete()) {
+      throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
+    }
+
+    if (build.getState() == State.QUEUED) {
+      begin(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
+    }
+
+    update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
   }
 
   private static void checkAffectedRowCount(int affectedRows) {
