@@ -17,6 +17,10 @@ public class BranchService {
     this.branchDao = branchDao;
   }
 
+  public Optional<GitInfo> get(int id) {
+    return branchDao.get(id);
+  }
+
   public Optional<GitInfo> lookup(String host, String organization, String repository, String branch) {
     return branchDao.lookup(host, organization, repository, branch);
   }

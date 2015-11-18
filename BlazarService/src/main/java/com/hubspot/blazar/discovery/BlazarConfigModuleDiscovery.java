@@ -1,10 +1,11 @@
 package com.hubspot.blazar.discovery;
 
 import com.hubspot.blazar.base.BuildConfig;
+import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.github.GitHubProtos.PushEvent;
+import com.hubspot.blazar.util.GitHubHelper;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
@@ -16,14 +17,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Singleton
-public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
+public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
+  private final GitHubHelper gitHubHelper;
 
   @Inject
-  public BlazarConfigModuleDiscovery() {}
+  public BlazarConfigModuleDiscovery(GitHubHelper gitHubHelper) {
+    this.gitHubHelper = gitHubHelper;
+  }
 
   @Override
-  public boolean shouldRediscover(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
-    for (String path : affectedPaths(pushEvent)) {
+  public boolean shouldRediscover(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
+    for (String path : gitHubHelper.affectedPaths(commitInfo)) {
       if (isBlazarConfig(path)) {
         return true;
       }
@@ -34,8 +38,8 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
 
   @Override
   public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
-    GHRepository repository = repositoryFor(gitInfo);
-    GHTree tree = treeFor(repository, gitInfo);
+    GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
+    GHTree tree = gitHubHelper.treeFor(repository, gitInfo);
 
     Set<String> blazarConfigs = new HashSet<>();
     for (GHTreeEntry entry : tree.getTree()) {
@@ -46,7 +50,7 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
 
     Set<DiscoveredModule> modules = new HashSet<>();
     for (String blazarConfig : blazarConfigs) {
-      BuildConfig buildConfig = configFor(blazarConfig, repository, gitInfo).get();
+      BuildConfig buildConfig = gitHubHelper.configFor(blazarConfig, repository, gitInfo).get();
       if (canBuild(buildConfig)) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";

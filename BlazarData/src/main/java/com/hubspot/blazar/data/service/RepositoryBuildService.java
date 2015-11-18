@@ -1,7 +1,11 @@
 package com.hubspot.blazar.data.service;
 
-import com.hubspot.blazar.base.Build;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.eventbus.EventBus;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.data.dao.BranchDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import org.slf4j.Logger;
@@ -9,24 +13,37 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.transaction.Transactional;
 
 @Singleton
 public class RepositoryBuildService {
   private static final Logger LOG = LoggerFactory.getLogger(RepositoryBuildService.class);
 
   private final RepositoryBuildDao repositoryBuildDao;
+  private final BranchDao branchDao;
+  private final EventBus eventBus;
 
   @Inject
-  public RepositoryBuildService(RepositoryBuildDao repositoryBuildDao) {
+  public RepositoryBuildService(RepositoryBuildDao repositoryBuildDao, BranchDao branchDao, EventBus eventBus) {
     this.repositoryBuildDao = repositoryBuildDao;
+    this.branchDao = branchDao;
+    this.eventBus = eventBus;
+  }
+
+  public Optional<RepositoryBuild> get(long id) {
+    return repositoryBuildDao.get(id);
+  }
+
+  public BuildNumbers getBuildNumbers(int branchId) {
+    return repositoryBuildDao.getBuildNumbers(branchId);
   }
 
   public void enqueue(GitInfo gitInfo) {
-    BuildNumbers buildNumbers = repositoryBuildDao.getBuildNumbers(gitInfo);
+    BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
 
-    if (buildNumbers.getPendingBuildNumber().isPresent()) {
-      int pendingBuildNumber = buildNumbers.getPendingBuildNumber().get();
-      LOG.info("Not enqueuing build for repository {}, pending build {} already exists", gitInfo.getId().get(), pendingBuildNumber);
+    if (buildNumbers.getPendingBuildId().isPresent()) {
+      int pendingBuildId = buildNumbers.getPendingBuildId().get();
+      LOG.info("Not enqueuing build for repository {}, pending build {} already exists", gitInfo.getId().get(), pendingBuildId);
     } else {
       final int nextBuildNumber;
       if (buildNumbers.getInProgressBuildNumber().isPresent()) {
@@ -38,9 +55,25 @@ public class RepositoryBuildService {
       }
 
       LOG.info("Enqueuing build for repository {} with build number {}", gitInfo.getId().get(), nextBuildNumber);
-      Build build = Build.queuedBuild(definition.getModule(), nextBuildNumber);
+      RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, nextBuildNumber);
       build = enqueue(build);
       LOG.info("Enqueued build for repository {} with id {}", gitInfo.getId().get(), build.getId().get());
     }
+  }
+
+  @Transactional
+  protected RepositoryBuild enqueue(RepositoryBuild build) {
+    long id = repositoryBuildDao.enqueue(build);
+    build = build.withId(id);
+
+    checkAffectedRowCount(branchDao.updatePendingBuild(build));
+
+    eventBus.post(build);
+
+    return build;
+  }
+
+  private static void checkAffectedRowCount(int affectedRows) {
+    Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
   }
 }

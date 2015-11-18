@@ -1,9 +1,9 @@
 package com.hubspot.blazar.discovery;
 
 import com.google.common.collect.ImmutableSet;
+import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,14 +25,14 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
   }
 
   @Override
-  public boolean shouldRediscover(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
+  public boolean shouldRediscover(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     for (ModuleDiscovery delegate : delegates) {
-      if (delegate.shouldRediscover(gitInfo, pushEvent)) {
+      if (delegate.shouldRediscover(gitInfo, commitInfo)) {
         return true;
       }
     }
 
-    return configDiscovery.shouldRediscover(gitInfo, pushEvent);
+    return configDiscovery.shouldRediscover(gitInfo, commitInfo);
   }
 
   @Override
