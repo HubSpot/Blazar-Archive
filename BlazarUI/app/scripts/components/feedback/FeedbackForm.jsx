@@ -80,8 +80,7 @@ class FeedbackForm extends Component {
     const payload = {
       username: this.state.nameValue,
       message: this.state.messageValue,
-      page: window.location.href,
-      other: navigator.userAgent
+      page: window.location.href
     }
 
     FeedbackActions.sendFeedback(payload);
@@ -128,7 +127,7 @@ class FeedbackForm extends Component {
     return (
       <div>
         <p>
-          Did you notice a bug? Hate something? Love something? Have a brilliant UX idea? We'd love to hear it.
+          Did you notice a bug? Hate something? Love something? Have a brilliant UX idea? We'd love to hear it. 
         </p>
         <hr/>
         <Input
@@ -144,7 +143,7 @@ class FeedbackForm extends Component {
           type="textarea"
           placeholder="Message"
           ref="message"
-          help="The URL of the page you are on (and other data) will be submitted with this form."
+          help="This page's url will be included in the response, but if submitting a bug, please also include other relevant information such as your OS and browser."
           value={this.state.messageValue}
           onChange={this.handleMessageChange} 
           autoFocus={this.state.autofocus === 'message'}
