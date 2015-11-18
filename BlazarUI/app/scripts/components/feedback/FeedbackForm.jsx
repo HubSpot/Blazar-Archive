@@ -1,33 +1,62 @@
 import React, {Component, PropTypes} from 'react';
+import {bindAll} from 'underscore';
 import Input from 'react-bootstrap/lib/Input';
 import Button from 'react-bootstrap/lib/Button';
-import {bindAll} from 'underscore';
-import Feedback from '../../models/Feedback'
 import Icon from '../shared/Icon.jsx';
+import Alert from 'react-bootstrap/lib/Alert';
+import Feedback from '../../models/Feedback';
+import FeedbackActions from '../../actions/feedbackActions';
+import FeedbackStore from '../../stores/feedbackStore';
 
 class FeedbackForm extends Component {
 
   constructor() {
-    bindAll(this, 'toggleShow', 'submitFeedback', 'handleNameChange', 'handleMessageChange');
+    bindAll(this, 'toggleShow', 'submitFeedback', 'handleNameChange', 'handleMessageChange', 'resetForm', 'onStatusChange');
     this.state = {
-      visable: false,
+      sendError: false,
+      submitted: false,
+      visible: false,
       nameValue: '',
       messageValue: '',
       submitDisabled: true,
-      submitted: false
+      submitted: false,
+      autofocus: 'name'
     }
+  }
+  
+  componentDidMount() {
+    this.unsubscribeFeedbackForm = FeedbackStore.listen(this.onStatusChange)
+  }
+  
+  componentWillUnmount() {
+    this.unsubscribeFeedbackForm()
+  }
+  
+  onStatusChange(status) {
+    this.setState(status);
   }
 
   toggleShow() {
     this.setState({
-      visable: !this.state.visable,
+      visible: !this.state.visible,
       submitted: false
+    });
+  }
+  
+  resetForm() {
+    this.setState({
+      sendError: false,
+      submitted: false,
+      visible: true,
+      messageValue: '',
+      submitDisabled: true,
+      autofocus: 'message'
     });
   }
 
   getContainerClassName() {
-    if (this.state.visable) {
-      return 'feedback-container visable';
+    if (this.state.visible) {
+      return 'feedback-container visible';
     } else {
       return 'feedback-container';
     }
@@ -48,40 +77,50 @@ class FeedbackForm extends Component {
   }
 
   submitFeedback() {
-    let name = this.state.nameValue;
-    let message = this.state.messageValue;
-    let url = window.location.href;
-    let userAgent = navigator.userAgent;
-    let feedback = new Feedback(name, message, url, userAgent);
-    feedback.submit().done(() =>
-      this.setState({
-        submitted: true,
-        nameValue: '',
-        messageValue: '',
-        submitDisabled: true
-      })
-    );
+    const payload = {
+      username: this.state.nameValue,
+      message: this.state.messageValue,
+      page: window.location.href,
+      other: navigator.userAgent
+    }
+
+    FeedbackActions.sendFeedback(payload);
   }
 
   renderContent() {
     if (this.state.submitted) {
-      return this.renderThanks();
+      return this.renderSubmitted();
     }
     else {
       return this.renderForm();
     }
   }
 
-  renderThanks() {
+  renderSubmitted() {
+    if (this.state.sendError) {
+      return (
+        <Alert bsStyle="danger" className="feedback__sent" >
+          <h4>Sorry, we received an error submitting feedback</h4>
+          <pre>{this.state.sendError}</pre>
+          <p>Please visit Slack room  { ' ' }
+          <span className="channel-name">
+            <a href="https://hubspot.slack.com/messages/blazar/" target="blank">#blazar</a>
+          </span> in Slack.
+          for support.</p>
+        </Alert>
+      )
+    }
+
     return (
-      <div className="thanks">
-        <p className="thanks-text">Thanks for helping us improve Blazar!</p>
+      <div className="feedback__sent">
+        <h4>Thanks for helping us improve Blazar!</h4>
         <p className="big-icon"><Icon for="circle-check"/></p>
-        <p className="thanks-text">To join the conversation, hit up&nbsp;
+        <p>To join the conversation, hit up { ' ' }
           <span className="channel-name">
             <a href="https://hubspot.slack.com/messages/blazar/" target="blank">#blazar</a>
           </span> in Slack.
         </p>
+        <button onClick={this.resetForm} className='btn submit-more-btn'>Submit more feedback</button>
       </div>
     );
   }
@@ -89,20 +128,28 @@ class FeedbackForm extends Component {
   renderForm() {
     return (
       <div>
+        <p>
+          Did you notice a bug? Hate something? Love something? Have a brilliant UX idea? We'd love to hear it.
+        </p>
+        <hr/>
         <Input
           type="text"
-          label="Name"
+          placeholder="Name"
           ref="name"
           value={this.state.nameValue}
-          onChange={this.handleNameChange} />
+          onChange={this.handleNameChange} 
+          autoFocus={this.state.autofocus === 'name'}
+        />
         <Input
           className="message-area"
           type="textarea"
-          label="Message"
+          placeholder="Message"
           ref="message"
           help="The URL of the page you are on (and other data) will be submitted with this form."
           value={this.state.messageValue}
-          onChange={this.handleMessageChange} />
+          onChange={this.handleMessageChange} 
+          autoFocus={this.state.autofocus === 'message'}
+        />
         <Button bsStyle="info" block disabled={this.state.submitDisabled} onClick={this.submitFeedback}>Submit</Button>
       </div>
     );
@@ -114,7 +161,7 @@ class FeedbackForm extends Component {
         <div className="feedback-title" onClick={this.toggleShow}>
           Give Feedback
         </div>
-        <div className="feedback-form">
+        <div className="feedback__form">
           {this.renderContent()}
         </div>
       </div>
