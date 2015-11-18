@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {RouteHandler} from 'react-router';
 import BuildsSidebarContainer from '../components/sidebar/BuildsSidebarContainer.jsx';
+import FeedbackForm from '../components/feedback/FeedbackForm.jsx';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Input from 'react-bootstrap/lib/Input';
@@ -60,6 +61,7 @@ class App extends Component {
           <BuildsSidebarContainer/>
           <RouteHandler/>
         </div>
+        <FeedbackForm/>
         {modal}
       </div>
     );

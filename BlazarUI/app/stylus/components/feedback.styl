@@ -1,0 +1,53 @@
+@import '../variables'
+
+.feedback-container
+  position fixed
+  height 360px
+  width 530px
+  bottom -360px
+  right 25px
+  padding 10px
+  background-color $gray-lightest
+  border 1px solid $gray-light
+  border-bottom none
+  transition all 0.75s
+
+  &.visible
+    bottom 0
+
+.feedback-title
+  position absolute
+  right -1px
+  top -32px
+  padding 5px 10px
+  border 1px solid $gray-light
+  border-bottom none
+  background-color $gray-lightest
+  font-size 14px
+  cursor pointer
+  color $gray-dark
+
+  &:hover
+    color $gray-darker
+
+.feedback__form
+  color $color-text-standard
+  & .message-area
+    height 100px
+    margin-bottom 10px
+
+  & .big-icon
+    font-size 100px
+    color green
+
+  & .channel-name
+    font-family $monospace
+
+.feedback__sent
+  text-align center
+  
+  .submit-more-btn
+    margin-top 10px
+
+.feedback__sent--error
+  background $danger-light

@@ -30,7 +30,8 @@ export const ICON_LIST = {
   'spinner': 'fa fa-circle-o-notch fa-spin',
   'dashboard': 'fa fa-tachometer',
   'scroll-down': 'fa fa-arrow-circle-down',
-  'scroll-up': 'fa fa-arrow-circle-up'
+  'scroll-up': 'fa fa-arrow-circle-up',
+  'circle-check': 'fa fa-check-circle'
 };
 
 export const BUILD_ICONS = {
