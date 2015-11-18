@@ -102,11 +102,10 @@ class FeedbackForm extends Component {
         <Alert bsStyle="danger" className="feedback__sent" >
           <h4>Sorry, we received an error submitting feedback</h4>
           <pre>{this.state.sendError}</pre>
-          <p>Please visit Slack room  { ' ' }
-          <span className="channel-name">
-            <a href="https://hubspot.slack.com/messages/blazar/" target="blank">#blazar</a>
-          </span> in Slack.
-          for support.</p>
+          <p>Please visit channel  { ' ' }
+            <span className="channel-name">
+              <a href="https://hubspot.slack.com/messages/blazar/" target="blank">#blazar</a>
+            </span> in Slack for support.</p>
         </Alert>
       )
     }
