@@ -7,7 +7,7 @@ class Model {
   constructor(options) {    
     const defaultOptions = {
       parse: true
-    }
+    };
 
     this.options = extend(defaultOptions, options);
     this.fetch = this.fetch.bind(this);

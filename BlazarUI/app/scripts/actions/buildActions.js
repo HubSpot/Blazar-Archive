@@ -80,7 +80,7 @@ BuildActions.fetchStartOfLog = function(moduleId, options={}) {
     offset: 0,
     position: 'top'
   });
-}
+};
 
 BuildActions.fetchEndOfLog = function(moduleId, options={}) {
   const build = builds[moduleId];
@@ -109,7 +109,7 @@ BuildActions.fetchEndOfLog = function(moduleId, options={}) {
     }
     
   });
-}
+};
 
 BuildActions.stopWatchingBuild = function(buildId, moduleId) {
   if (builds[moduleId]) {
@@ -136,9 +136,9 @@ BuildActions.cancelBuild = function(buildId, moduleId) {
   
   cancel.done((d, t, j) => {
     if (j.status === 204) {
-      BuildActions.loadBuildCancelled()
+      BuildActions.loadBuildCancelled();
     }
-  })
+  });
 
   cancel.error((err) => {
     BuildActions.loadBuildCancelError({
@@ -213,7 +213,7 @@ function getBuild() {
 }
 
 function getLogSize() {
-  const build = builds[requestedBuild.gitInfo.moduleId]
+  const build = builds[requestedBuild.gitInfo.moduleId];
   
   if (build.data.build.state === BuildStates.LAUNCHING || build.data.build.state === BuildStates.QUEUED) {
     return;
@@ -318,7 +318,7 @@ function processInProgressBuild(build) {
       });
       
       setTimeout(() => {
-        processInProgressBuild(build)
+        processInProgressBuild(build);
       }, config.activeBuildRefresh);
     }
   });  
@@ -344,7 +344,7 @@ function createLogModel(build, size) {
     lastOffset: maxOffset,
     offset: maxOffset,
     offsetLength: config.offsetLength
-  }
+  };
   
   return new Log(settings);
 }
@@ -353,7 +353,7 @@ function createLogModel(build, size) {
 function handlePageLogRequest(build, hasScrolled, isActive) {
   build.log.hasScrolled = hasScrolled;
   build.log.hasNavigatedWithButtons = false;
-  build.log.positionChange = false
+  build.log.positionChange = false;
   build.log.hasScrolled = hasScrolled;
 
   // Log size is smaller than one offsetLength so nothing more to fetch
@@ -377,7 +377,7 @@ function handlePageLogRequest(build, hasScrolled, isActive) {
   }
 
   build.log.pageLog(hasScrolled).fetch().always(() => {
-    updateStore(build)
+    updateStore(build);
   });
 }
 
@@ -405,7 +405,7 @@ function resetBuildLog(moduleId, offset, position) {
       builds[moduleId].log.nextOffset = data.nextOffset;
       builds[moduleId].log.previousOffset = offset;
 
-      updateStore(builds[moduleId], builds[moduleId].log, data, textStatus, jqxhr)
+      updateStore(builds[moduleId], builds[moduleId].log, data, textStatus, jqxhr);
   });
 }
 

@@ -64,11 +64,11 @@ BuildsActions.loadBuildOfType = function(newFilterType) {
 
 BuildsActions.stopListening = function() {
   shouldPoll = false;
-}
+};
 
 BuildsActions.setFilterType = function(newFilterType) {
   filterType = newFilterType;
-}
+};
 
 // When user toggles a star update the sidebar
 // Also run on initial page load as starred is default

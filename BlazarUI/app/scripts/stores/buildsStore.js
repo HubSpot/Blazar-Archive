@@ -18,7 +18,7 @@ const BuildsStore = Reflux.createStore({
       building: { 
         builds: [] 
       }
-    }
+    };
   },
 
   getBuilds() {
@@ -39,7 +39,7 @@ const BuildsStore = Reflux.createStore({
     const triggerPayload = {
       builds: sortedBuilds,
       loadingBuilds: false
-    }
+    };
     
     if (filterHasChanged) {
       triggerPayload.filterHasChanged = true;

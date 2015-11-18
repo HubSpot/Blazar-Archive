@@ -44,7 +44,7 @@ class Builds extends BaseCollection {
     switch (this.options.request) {
       case 'starred':
         this.options.stars.forEach((star) => {
-          url += `&moduleId=${star.moduleId}`
+          url += `&moduleId=${star.moduleId}`;
         });
         url+= '&since=0';
         break;
@@ -60,14 +60,14 @@ class Builds extends BaseCollection {
         url += `&property=id&since=${this.updatedTimestamp}`;
 
       case 'building':
-        url += '&since=0&buildState=LAUNCHING&buildState=IN_PROGRESS'
+        url += '&since=0&buildState=LAUNCHING&buildState=IN_PROGRESS';
         break;
         
       case 'branchIds':
         this.options.branchIds.forEach((m) => {
-          url += `&branchId=${m.id}`
+          url += `&branchId=${m.id}`;
         });
-        url += `&since=${this.updatedTimestamp}`
+        url += `&since=${this.updatedTimestamp}`;
         break;
     }
 
@@ -147,7 +147,7 @@ class Builds extends BaseCollection {
       // dont include for now as we dont have
       // a timestamp to sort by
       else if (has(build, 'pendingBuild')) {
-        latestBuild = pendingBuild
+        latestBuild = pendingBuild;
       }
 
       else if (has(build, 'lastBuild')) {
@@ -156,7 +156,7 @@ class Builds extends BaseCollection {
       }
 
       else {
-        return false
+        return false;
       }
 
       if (startTime === 'undefined') {
@@ -205,7 +205,7 @@ class Builds extends BaseCollection {
   sortByBranchName() {
     return sortBy(this.data, (m) => {
       return m.gitInfo.branch.toLowerCase();
-    })
+    });
   }
 
 

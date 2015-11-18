@@ -16,7 +16,7 @@ export const binarySearch = (haystack, needle) => {
   return bs(haystack, needle, (a, b) => {
     return a.module.id - b.module.id;
   });
-}
+};
 
 // to do - make this more reusable by property type
 export const sortBuilds = (builds, type) => {

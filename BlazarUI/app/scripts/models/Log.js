@@ -145,7 +145,7 @@ class Log extends Model {
           // the first incomplete line on the next fetch if we keep scrolling down
           this.lastLine = last(newLogLines);
           // chop off incomplete last line
-          this.logLines = initial(newLogLines)
+          this.logLines = initial(newLogLines);
         }
         // we have more than one offset
         else {
@@ -264,7 +264,7 @@ class Log extends Model {
       return {
         text:  utf8.decode(line),
         offset: offsetRunningTotal += getByteLength(line)
-      }
+      };
     }));
 
   }

@@ -65,9 +65,9 @@ export const uniqueBranches = function(branches) {
     return {
       value: b.gitInfo.branch,
       label: b.gitInfo.branch
-    }
+    };
   });
-}
+};
 
 export const uniqueModules = function(modules) {
   const uniqueModules = uniq(modules, false, (m) => {
@@ -78,9 +78,9 @@ export const uniqueModules = function(modules) {
     return {
       value: m.module.name,
       label: m.module.name
-    }
+    };
   });
-}
+};
 
 export const tableRowBuildState = function(state) {
   if (state === BuildStates.FAILED) {
@@ -120,7 +120,7 @@ export const getFilteredModules = function(filters, modules) {
         }
       });
       
-      return branchMatch && moduleMatch
+      return branchMatch && moduleMatch;
 
     }
 
@@ -147,15 +147,15 @@ export const getFilteredModules = function(filters, modules) {
   return filteredModules.sort( (a, b) => {
     return cmp(a.gitInfo.branch, b.gitInfo.branch) || cmp(a.module.name, b.module.name);
   });  
-}
+};
 
 export const buildIsOnDeck = function(buildState) {
   return contains([BuildStates.LAUNCHING, BuildStates.QUEUED], buildState);
-}
+};
 
 export const buildIsInactive = function(buildState) {
-  contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState)
-}
+  contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState);
+};
 
 // DOM Helpers
 export const events = {

@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import Builds from '../collections/Builds';
-import Poller from '../utils/poller'
+import Poller from '../utils/poller';
 import StarStore from '../stores/starStore';
 
 const GlobalBuildsActions = Reflux.createActions([
@@ -28,7 +28,7 @@ GlobalBuildsActions.loadBuilds = function() {
       GlobalBuildsActions.loadBuildsSuccess(globalBuildsCollection.data);
     }
     else {
-      console.warn('Error loading global builds')
+      console.warn('Error loading global builds');
       // GlobalBuildsActions.loadError();
     }
   });
@@ -39,14 +39,13 @@ GlobalBuildsActions.stopPolling = function() {
   if (poller) {
     poller.stopPolling();    
   }
-
-}
+};
 
 GlobalBuildsActions.loadBuildsOnce = function() {
   const promise = globalBuildsCollection.fetch();
   promise.done((data) => {
     GlobalBuildsActions.loadBuildsOnceSuccess(globalBuildsCollection.data);
-  })
-}
+  });
+};
 
 export default GlobalBuildsActions;

@@ -12,7 +12,7 @@ class Build extends Model {
       type: 'POST',
       url: `${config.apiRoot}/build/${this.options.buildId}/cancel`,
       parse: false
-    }
+    };
     return this.fetch({
       parse: false
     });

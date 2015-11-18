@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import Builds from '../collections/Builds';
-import Poller from '../utils/poller'
+import Poller from '../utils/poller';
 import BranchSearch from '../collections/BranchSearch';
 
 const BranchActions = Reflux.createActions([
@@ -24,7 +24,7 @@ BranchActions.loadModules = function(params) {
   branchIds.fetch().done((branchIds) => {
     _createPoller(branchIds);
   });
-}
+};
 
 function _createPoller(branchIds) {
 
@@ -44,7 +44,7 @@ function _createPoller(branchIds) {
     }
 
     else {
-      console.warn('Error loading repositories')
+      console.warn('Error loading repositories');
       // To do: global error reporting
     }
   });
@@ -53,6 +53,6 @@ function _createPoller(branchIds) {
     
 BranchActions.stopPolling = function() {
   poller.stopPolling();
-}
+};
 
 export default BranchActions;

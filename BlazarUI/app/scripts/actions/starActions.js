@@ -9,7 +9,7 @@ const StarActions = Reflux.createActions([
 ]);
 
 StarActions.loadStars.preEmit = function(source) {
-  StarActions.setSource(source)
+  StarActions.setSource(source);
   StarActions.loadStarsSuccess(StarProvider.getStars());
 };
 

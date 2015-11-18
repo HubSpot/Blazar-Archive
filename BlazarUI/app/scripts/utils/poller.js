@@ -17,7 +17,7 @@ class Poller {
       that._fetchBuilds((resp) => {
         setTimeout(_doPoll, config.buildsRefresh);
         if (cb) {
-          cb(resp)
+          cb(resp);
         }
       });
     })();

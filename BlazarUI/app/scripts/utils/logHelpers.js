@@ -14,4 +14,4 @@ export const getByteLength = function(normal_val) {
   }
   return byteLen;
   
-}
+};

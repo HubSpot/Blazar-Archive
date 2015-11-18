@@ -34,7 +34,7 @@ const BuildStore = Reflux.createStore({
     this.build.build.build.state = 'CANCELLED';
     this.trigger({
       build: this.build
-    })
+    });
   },
 
   triggerBuildStart() {
