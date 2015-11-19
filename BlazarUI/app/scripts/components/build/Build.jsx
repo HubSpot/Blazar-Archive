@@ -39,7 +39,7 @@ class Build extends Component {
       <div>
         <div className='build-header'>
           <UIGrid>
-            <UIGridItem size={8}>
+            <UIGridItem size={7}>
               <BuildHeadline 
                 moduleName={this.props.params.module}
                 moduleId={this.props.params.moduleId}
@@ -49,7 +49,7 @@ class Build extends Component {
                 toggleStar={this.props.toggleStar}
               />
             </UIGridItem>
-            <UIGridItem size={4}>
+            <UIGridItem size={5} >
               <BuildLogNavigation 
                 build={build}
                 changeOffsetWithNavigation={this.props.changeOffsetWithNavigation}

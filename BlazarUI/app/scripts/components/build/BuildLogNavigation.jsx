@@ -40,7 +40,7 @@ class BuildLogNavigation extends Component {
     return (
       <nav className='text-right'>
         <JSONModal
-          classname='log-nav-btn log-nav-btn--json'
+          classname='log-nav-btn log-nav-btn--json hidden-sm hidden-xs'
           json={this.props.build}
         />
         <button data-position='top' disabled={this.state.topDisabled} onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Top</button>
