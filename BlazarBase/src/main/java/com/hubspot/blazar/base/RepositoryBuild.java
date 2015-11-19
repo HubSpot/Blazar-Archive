@@ -31,6 +31,8 @@ public class RepositoryBuild {
   private final Optional<String> sha;
   @StoredAsJson
   private final Optional<CommitInfo> commitInfo;
+  @StoredAsJson
+  private final Optional<DependencyGraph> dependencyGraph;
 
   @JsonCreator
   public RepositoryBuild(@JsonProperty("id") Optional<Long> id,
@@ -40,7 +42,8 @@ public class RepositoryBuild {
                          @JsonProperty("startTimestamp") Optional<Long> startTimestamp,
                          @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
                          @JsonProperty("sha") Optional<String> sha,
-                         @JsonProperty("commitInfo") Optional<CommitInfo> commitInfo) {
+                         @JsonProperty("commitInfo") Optional<CommitInfo> commitInfo,
+                         @JsonProperty("dependencyGraph") Optional<DependencyGraph> dependencyGraph) {
     this.id = id;
     this.branchId = branchId;
     this.buildNumber = buildNumber;
@@ -48,15 +51,17 @@ public class RepositoryBuild {
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.sha = sha;
-    this.commitInfo = com.google.common.base.Objects.firstNonNull(commitInfo, Optional.<CommitInfo>absent());
+    this.commitInfo = commitInfo;
+    this.dependencyGraph = dependencyGraph;
   }
 
   public static RepositoryBuild queuedBuild(GitInfo gitInfo, int buildNumber) {
     Optional<Long> absentLong = Optional.absent();
     Optional<String> absentString = Optional.absent();
     Optional<CommitInfo> commitInfo = Optional.absent();
+    Optional<DependencyGraph> dependencyGraph = Optional.absent();
 
-    return new RepositoryBuild(absentLong, gitInfo.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, commitInfo);
+    return new RepositoryBuild(absentLong, gitInfo.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, commitInfo, dependencyGraph);
   }
 
   public Optional<Long> getId() {
@@ -91,25 +96,33 @@ public class RepositoryBuild {
     return commitInfo;
   }
 
+  public Optional<DependencyGraph> getDependencyGraph() {
+    return dependencyGraph;
+  }
+
   public RepositoryBuild withId(long id) {
-    return new RepositoryBuild(Optional.of(id), branchId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo);
+    return new RepositoryBuild(Optional.of(id), branchId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph);
+  }
+
+  public RepositoryBuild withState(State state) {
+    return new RepositoryBuild(id, branchId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph);
+  }
+
+  public RepositoryBuild withStartTimestamp(long startTimestamp) {
+    return new RepositoryBuild(id, branchId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, commitInfo, dependencyGraph);
+  }
+
+  public RepositoryBuild withEndTimestamp(long endTimestamp) {
+    return new RepositoryBuild(id, branchId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), sha, commitInfo, dependencyGraph);
   }
 
   public RepositoryBuild withCommitInfo(CommitInfo commitInfo) {
     Optional<String> sha = Optional.of(commitInfo.getCurrent().getId());
-    return new RepositoryBuild(id, branchId, buildNumber, state, startTimestamp, endTimestamp, sha, Optional.of(commitInfo));
+    return new RepositoryBuild(id, branchId, buildNumber, state, startTimestamp, endTimestamp, sha, Optional.of(commitInfo), dependencyGraph);
   }
 
-  public RepositoryBuild withState(State state) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo);
-  }
-
-  public RepositoryBuild withStartTimestamp(long startTimestamp) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, sha, commitInfo);
-  }
-
-  public RepositoryBuild withEndTimestamp(long endTimestamp) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), sha, commitInfo);
+  public RepositoryBuild withDependencyGraph(DependencyGraph dependencyGraph) {
+    return new RepositoryBuild(id, branchId, buildNumber, state, startTimestamp, endTimestamp, sha, commitInfo, Optional.of(dependencyGraph));
   }
 
   @Override

@@ -9,8 +9,11 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.DependenciesService;
+import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.data.util.BuildNumbers;
+import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import org.kohsuke.github.GHRepository;
@@ -28,15 +31,24 @@ public class RepositoryBuildLauncher {
 
   private final RepositoryBuildService repositoryBuildService;
   private final BranchService branchService;
+  private final ModuleService moduleService;
+  private final DependenciesService dependenciesService;
+  private final ModuleDiscovery moduleDiscovery;
   private final GitHubHelper gitHubHelper;
 
   @Inject
   public RepositoryBuildLauncher(RepositoryBuildService repositoryBuildService,
                                  BranchService branchService,
+                                 ModuleService moduleService,
+                                 DependenciesService dependenciesService,
+                                 ModuleDiscovery moduleDiscovery,
                                  GitHubHelper gitHubHelper,
                                  EventBus eventBus) {
     this.repositoryBuildService = repositoryBuildService;
     this.branchService = branchService;
+    this.moduleService = moduleService;
+    this.dependenciesService = dependenciesService;
+    this.moduleDiscovery = moduleDiscovery;
     this.gitHubHelper = gitHubHelper;
 
     eventBus.register(this);
@@ -94,13 +106,21 @@ public class RepositoryBuildLauncher {
 
   private synchronized void startBuild(GitInfo gitInfo, RepositoryBuild queued, Optional<RepositoryBuild> previous) throws Exception {
     CommitInfo commitInfo = commitInfo(gitInfo, commit(previous));
+    updateModules(gitInfo, commitInfo);
 
     RepositoryBuild launching = queued.withStartTimestamp(System.currentTimeMillis())
         .withState(State.LAUNCHING)
-        .withCommitInfo(commitInfo);
+        .withCommitInfo(commitInfo)
+        .withDependencyGraph(dependenciesService.buildDependencyGraph(gitInfo));
 
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     repositoryBuildService.begin(launching);
+  }
+
+  private void updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
+    if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
+      moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
+    }
   }
 
   private CommitInfo commitInfo(GitInfo gitInfo, Optional<Commit> previousCommit) throws IOException, NonRetryableBuildException {

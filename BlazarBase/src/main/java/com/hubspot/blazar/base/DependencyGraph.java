@@ -18,11 +18,11 @@ public class DependencyGraph {
     return transitiveReduction.get(moduleId);
   }
 
-  public Set<Integer> reduceVertices(Set<Integer> modules) {
-    Set<Integer> reduced = new HashSet<>(modules);
-    for (int source : modules) {
-      for (int target : modules) {
-        if (paths.get(source).contains(target)) {
+  public Set<Module> reduceModules(Set<Module> modules) {
+    Set<Module> reduced = new HashSet<>(modules);
+    for (Module source : modules) {
+      for (Module target : modules) {
+        if (paths.get(source.getId().get()).contains(target.getId().get())) {
           reduced.remove(target);
         }
       }

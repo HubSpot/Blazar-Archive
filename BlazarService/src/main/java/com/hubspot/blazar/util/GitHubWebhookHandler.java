@@ -3,15 +3,9 @@ package com.hubspot.blazar.util;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.hubspot.blazar.base.BuildDefinition;
-import com.hubspot.blazar.base.DependencyGraph;
-import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
@@ -26,9 +20,6 @@ import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @Singleton
@@ -36,23 +27,17 @@ public class GitHubWebhookHandler {
   private static final Logger LOG = LoggerFactory.getLogger(GitHubWebhookHandler.class);
 
   private final BranchService branchService;
-  private final ModuleService moduleService;
-  private final ModuleDiscovery moduleDiscovery;
   private final RepositoryBuildService repositoryBuildService;
   private final GitHubHelper gitHubHelper;
   private final Set<String> whitelist;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
-                              ModuleService moduleService,
-                              ModuleDiscovery moduleDiscovery,
                               RepositoryBuildService repositoryBuildService,
                               GitHubHelper gitHubHelper,
                               @Named("whitelist") Set<String> whitelist,
                               EventBus eventBus) {
     this.branchService = branchService;
-    this.moduleService = moduleService;
-    this.moduleDiscovery = moduleDiscovery;
     this.repositoryBuildService = repositoryBuildService;
     this.gitHubHelper = gitHubHelper;
     this.whitelist = whitelist;
@@ -103,50 +88,6 @@ public class GitHubWebhookHandler {
       return config.contains("enabled: true");
     } catch (FileNotFoundException e) {
       return false;
-    }
-  }
-
-  public Set<Module> processBranch(GitInfo gitInfo) throws IOException {
-    gitInfo = branchService.upsert(gitInfo);
-
-    try {
-      Set<DiscoveredModule> discovered = moduleDiscovery.discover(gitInfo);
-      Set<Module> modules = moduleService.setModules(gitInfo, discovered);
-      triggerBuilds(gitInfo, modules);
-      return modules;
-    } catch (FileNotFoundException e) {
-      branchService.delete(gitInfo);
-      return Collections.emptySet();
-    }
-  }
-
-  private Set<Module> updateModules(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
-    try {
-      if (pushEvent.getForced() || moduleDiscovery.shouldRediscover(gitInfo, pushEvent)) {
-        return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
-      }
-
-      return moduleService.getByBranch(gitInfo.getId().get());
-    } catch (FileNotFoundException e) {
-      return Collections.emptySet();
-    }
-  }
-
-  private void triggerBuilds(GitInfo gitInfo, Set<Module> modules) throws IOException {
-    DependencyGraph graph = dependenciesService.buildDependencyGraph(gitInfo);
-
-    Map<Integer, Module> moduleMap = new HashMap<>();
-    for (Module module : modules) {
-      moduleMap.put(module.getId().get(), module);
-    }
-
-    moduleMap.keySet().retainAll(graph.reduceVertices(moduleMap.keySet()));
-
-    for (Module module : moduleMap.values()) {
-      LOG.info("Going to build module {}", module.getId().get());
-      if ("true".equals(System.getenv("TRIGGER_BUILDS"))) {
-        buildService.enqueue(new BuildDefinition(gitInfo, module));
-      }
     }
   }
 

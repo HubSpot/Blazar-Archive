@@ -59,6 +59,7 @@ CREATE TABLE `repo_builds_v2` (
   `startTimestamp` bigint(20) unsigned,
   `endTimestamp` bigint(20) unsigned,
   `commitInfo` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `dependencyGraph` mediumtext,
   `sha` char(40),
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`branchId`, `buildNumber`)
