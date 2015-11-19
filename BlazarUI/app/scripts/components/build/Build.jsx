@@ -38,7 +38,7 @@ class Build extends Component {
     return (
       <div>
         <div className='build-header'>
-          <UIGrid>
+          <UIGrid containerClassName='build-header__name-and-buttons'>
             <UIGridItem size={7}>
               <BuildHeadline 
                 moduleName={this.props.params.module}
