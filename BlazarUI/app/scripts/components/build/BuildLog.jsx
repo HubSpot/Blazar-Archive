@@ -1,6 +1,5 @@
 import React, {Component, PropTypes, findDOMNode} from 'react';
 import $ from 'jquery';
-import {debounce} from 'underscore';
 import {events, humanizeText, buildIsOnDeck, buildIsInactive, timestampFormatted} from '../Helpers';
 import BuildLogLine from './BuildLogLine.jsx';
 import Collapsable from '../shared/Collapsable.jsx';
