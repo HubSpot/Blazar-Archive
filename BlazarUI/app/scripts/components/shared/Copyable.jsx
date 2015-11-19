@@ -1,18 +1,17 @@
 import React, {Component, PropTypes} from 'react';
 import ReactZeroClipboard from 'react-zeroclipboard';
-import { bindAll } from 'underscore';
 import Tooltip from 'react-bootstrap/lib/Tooltip';
 import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
 
-const tooltipTextDefault = 'Copy SHA';
 const tooltipTextClicked = 'Copied!';
 
 class Copyable extends Component {
 
-  constructor() {
-    bindAll(this, 'handleClick');
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
     this.state = {
-      tooltipText: tooltipTextDefault
+      tooltipText: this.props.tooltip
     };
   }
 
@@ -20,7 +19,7 @@ class Copyable extends Component {
     if (this.state.tooltipText === tooltipTextClicked) {
       setTimeout( () => {
         this.setState({
-          tooltipText: tooltipTextDefault
+          tooltipText: this.props.tooltip
         });
       }, 2000);
     }
@@ -31,18 +30,20 @@ class Copyable extends Component {
       tooltipText: tooltipTextClicked
     });
   }
-
-  render() {
-    let tooltip = (
+  
+  renderTooltip() {
+    return (
       <Tooltip id="copy-tooltip">
         <span id="copy-tooltip-text">{this.state.tooltipText}</span>
       </Tooltip>
     );
+  }
 
+  render() {
     return (
       <span>
           <ReactZeroClipboard text={this.props.text}>
-            <OverlayTrigger placement='bottom' overlay={tooltip}>
+            <OverlayTrigger placement='bottom' overlay={this.renderTooltip()}>
               <span onClick={this.handleClick}>{this.props.children}</span>
             </OverlayTrigger>
           </ReactZeroClipboard>
