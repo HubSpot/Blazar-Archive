@@ -43,7 +43,6 @@ class JSONModal extends Component {
   }
 
   closeModal() {
-    console.log('close');
     this.setState({
       showModal: false
     });

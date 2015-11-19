@@ -1,10 +1,11 @@
-import React, {Component, PropTypes, findDOMNode} from 'react';
+import React, {Component, PropTypes} from 'react';
 import $ from 'jquery';
-import {events, humanizeText, buildIsOnDeck, buildIsInactive, timestampFormatted} from '../Helpers';
+import {humanizeText, buildIsOnDeck, buildIsInactive, timestampFormatted} from '../Helpers';
+import {bindAll} from 'underscore';
+import ClassNames from 'classnames';
 import BuildLogLine from './BuildLogLine.jsx';
-import Collapsable from '../shared/Collapsable.jsx';
+import Icon from '../shared/Icon.jsx';
 import Loader from '../shared/Loader.jsx';
-import MutedMessage from '../shared/MutedMessage.jsx'
 import BuildStates from '../../constants/BuildStates';
 
 window.$ = $;
@@ -12,12 +13,16 @@ window.$ = $;
 class BuildLog extends Component {
 
   constructor(props, context) {
-    super(props, context);    
-    this.handleScroll = this.handleScroll.bind(this);
-    this.initialState = this.props.buildState;
+    super(props, context);
+    bindAll(this, 'handleScroll', 'toggleLogSize')
+    
     this.isTailing = true;
     this.showPagingSpinnerUp = false;
     this.showPagingSpinnerDown = false;
+
+    this.state = {
+      logExpanded: false
+    }
   }
 
   componentDidMount() {
@@ -264,19 +269,55 @@ class BuildLog extends Component {
       );
     });
   }
+  
+  getContainerClassNames() {
+    return ClassNames([
+      'build-log',
+      {'expanded': this.state.logExpanded}
+    ]);
+  }
+  
+  toggleLogSize() {
+    this.setState({
+      logExpanded: !this.state.logExpanded
+    });
+  }
+  
+  getRenderedSizeToggleIcon() {
+    const iconName = this.state.logExpanded ? 'compress' : 'expand';
+    
+    const renderedClassnames = ClassNames([
+      'log-expand-toggle',
+      {'log-expand-toggle--expanded' : this.state.logExpanded}
+    ]);
+
+    return (
+      <span onClick={this.toggleLogSize}>
+        <Icon name={iconName} classNames={renderedClassnames} />
+      </span>
+    );
+  }
 
   render() {
     let pagingSpinnerUp;
     let pagingSpinnerDown;
     let tailingSpinner;
     let endOfLogMessage;
+    let expandToggleicon;
     
     const buildInProgress = this.props.buildState === BuildStates.IN_PROGRESS;
 
     if (this.props.loading) {
       <Loader align='top-center' />
     }
-    
+    // Finished build message
+    if (this.props.log.endOfLogLoaded && !buildInProgress) {
+      const build = this.props.build.build;
+      endOfLogMessage = (
+        <p className='log-line log-line-end'>End of log for build ID {build.id}</p>
+      )
+    }
+    // Paging up spinner
     if (this.showPagingSpinnerUp) {
       pagingSpinnerUp = (
         <div>
@@ -284,14 +325,7 @@ class BuildLog extends Component {
         </div>
       )
     }
-
-    if (this.props.log.endOfLogLoaded && !buildInProgress) {
-      const build = this.props.build.build;
-      endOfLogMessage = (
-        <p className='log-line log-line-end'>End of log for build ID {build.id}</p>
-      )
-    }
-
+    // Paging down spinner
     if (this.showPagingSpinnerDown && !this.props.log.endOfLogLoaded) {
       pagingSpinnerDown = (
         <div>
@@ -299,8 +333,7 @@ class BuildLog extends Component {
         </div>
       )
     }
-    
-
+    // Tailing spinner
     if (this.isTailing && buildInProgress) {
       tailingSpinner = (
         <Loader align='left' roomy={true} />
@@ -310,8 +343,9 @@ class BuildLog extends Component {
     return (
       <pre id='log' 
         ref='log'
-        className='build-log' 
+        className={this.getContainerClassNames()}
       >
+        {this.getRenderedSizeToggleIcon()}
         {pagingSpinnerUp}
         {this.generateLines()}
         {pagingSpinnerDown}
