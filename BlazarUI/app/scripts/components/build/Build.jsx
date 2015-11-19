@@ -6,7 +6,6 @@ import Loader from '../shared/Loader.jsx';
 
 import BuildHeadline from './BuildHeadline.jsx';
 import BuildDetail from './BuildDetail.jsx';
-
 import BuildLogNavigation from './BuildLogNavigation.jsx';
 import BuildLog from './BuildLog.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
@@ -52,8 +51,8 @@ class Build extends Component {
             </UIGridItem>
             <UIGridItem size={4}>
               <BuildLogNavigation 
+                build={build}
                 changeOffsetWithNavigation={this.props.changeOffsetWithNavigation}
-                buildState={build.state}
                 loading={this.props.loading}
               />
             </UIGridItem>
@@ -74,6 +73,7 @@ class Build extends Component {
         <div className='build-body'>
           <div>  
             <BuildLog
+              build={this.props.build}
               fetchingLog={this.props.fetchingLog}
               shouldPoll={this.props.shouldPoll}
               fetchStartOfLog={this.props.fetchStartOfLog}

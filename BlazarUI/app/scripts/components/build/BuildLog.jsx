@@ -1,7 +1,7 @@
 import React, {Component, PropTypes, findDOMNode} from 'react';
 import $ from 'jquery';
 import {debounce} from 'underscore';
-import {events, humanizeText, buildIsOnDeck, buildIsInactive} from '../Helpers';
+import {events, humanizeText, buildIsOnDeck, buildIsInactive, timestampFormatted} from '../Helpers';
 import BuildLogLine from './BuildLogLine.jsx';
 import Collapsable from '../shared/Collapsable.jsx';
 import Loader from '../shared/Loader.jsx';
@@ -287,8 +287,9 @@ class BuildLog extends Component {
     }
 
     if (this.props.log.endOfLogLoaded && !buildInProgress) {
+      const build = this.props.build.build;
       endOfLogMessage = (
-        <p className='log-line log-line-end'>End of log</p>
+        <p className='log-line log-line-end'>End of log for build ID {build.id}</p>
       )
     }
 

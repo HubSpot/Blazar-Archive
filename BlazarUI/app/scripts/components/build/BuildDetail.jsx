@@ -112,7 +112,7 @@ class BuildDetail extends Component {
         </div>
         
         <div className='build-detail-footer'> 
-          Authored by <strong>{currentCommit.author.name}</strong> on { ' ' }
+          Triggered by <strong>{currentCommit.author.name}</strong> on { ' ' }
           {timestampFormatted(currentCommit.timestamp, 'dddd')}, { ' ' }
           {timestampFormatted(currentCommit.timestamp, 'llll')} 
           <span className='build-detail__sha'> 
