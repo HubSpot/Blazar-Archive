@@ -2,7 +2,7 @@ import $ from 'jquery';
 import React, {Component} from 'react';
 import SidebarFilter from './SidebarFilter.jsx';
 import BuildsSidebarMessage from './BuildsSidebarMessage.jsx';
-import {bindAll, has} from 'underscore';
+import {bindAll, has, debounce} from 'underscore';
 import {getFilterMatches} from '../../utils/buildsHelpers';
 import {FILTER_MESSAGES, NO_MATCH_MESSAGES} from '../constants';
 import Loader from '../shared/Loader.jsx';
@@ -26,7 +26,13 @@ class BuildsSidebarContainer extends Component {
   constructor(props) {
     super(props);
     
-    bindAll(this, 'persistStarChange', 'onBuildsStatusChange', 'getBuildsOfType', 'updateResults', 'setToggleState');
+    bindAll(this, 
+      'persistStarChange', 
+      'onBuildsStatusChange', 
+      'getBuildsOfType', 
+      'updateResults', 
+      'setToggleState'
+    );
 
     this.state = {
       builds: [],
@@ -36,8 +42,16 @@ class BuildsSidebarContainer extends Component {
       changingBuildsType: false,
       filterText: '',
       toggleFilterState: 'starred',
-      sidebarHeight: $(window).height() - $('#primary-nav').height() + $('.sidebar__filter').height()
+      sidebarHeight: this.getSidebarHeight()
     };
+  }
+
+  componentWillMount() {
+    this.handleResizeDebounced = debounce(() => {
+      this.setState({
+        sidebarHeight: this.getSidebarHeight()
+      });
+    }, 500);
   }
 
   componentDidMount() {
@@ -54,14 +68,20 @@ class BuildsSidebarContainer extends Component {
     // initially load global builds so we have quick access
     // we will remove this when we have a searchable endpoint
     GlobalBuildsActions.loadBuildsOnce();
-    //
+    
+    window.addEventListener('resize', this.handleResizeDebounced);
   }
 
   componentWillUnmount() {
     BuildsActions.stopListening();
     this.unsubscribeFromStarredBuilds();
+    window.removeEventListener('resize', this.handleResizeDebounced);
   }
   
+  getSidebarHeight() {
+    return $(window).height() - $('#primary-nav').height() + $('.sidebar__filter').height();
+  }
+
   // fetch builds based on toggle selection
   getBuildsOfType(type) {
     this.setState({
