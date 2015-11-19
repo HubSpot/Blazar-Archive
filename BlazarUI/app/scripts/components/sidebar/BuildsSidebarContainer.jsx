@@ -175,7 +175,7 @@ class BuildsSidebarContainer extends Component {
           {moduleComponentsList}
           <BuildsSidebarMessage
             loading={this.state.loading}
-            dontDisplay={this.state.source !== 'sidebar' || this.state.changingBuilds}
+            dontDisplay={this.state.changingBuildsType}
             searchType={searchType}
             numModules={matches.length}
             filterText={this.state.filterText}
