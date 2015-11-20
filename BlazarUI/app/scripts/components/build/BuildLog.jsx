@@ -80,7 +80,6 @@ class BuildLog extends Component {
     // Used 'To Top' or 'To Bottom' buttons with Inactive build
     // Or used 'To Bottom' in an In Progress Build
     if (log.positionChange) {
-
       // prevent our navigationi change from
       // triggering a scroll event
       this.ignoreScrollEvent = true;
@@ -304,18 +303,35 @@ class BuildLog extends Component {
     let tailingSpinner;
     let endOfLogMessage;
     let expandToggleicon;
+    let cancelledButStillProcessing = false;
     
+    const build = this.props.build.build;
     const buildInProgress = this.props.buildState === BuildStates.IN_PROGRESS;
+    const buildCancelled = this.props.buildState === BuildStates.CANCELLED;
+    const {endOfLogLoaded, fetchCount, fullLogFetched} = this.props.log;
+    
+    if (this.props.log && fetchCount > 0) {
+      cancelledButStillProcessing = buildCancelled && this.props.log.data.nextOffset !== -1 && !this.props.log.fullLogFetched; 
+    }
 
     if (this.props.loading) {
       <Loader align='top-center' />
     }
-    // Finished build message
-    if (this.props.log.endOfLogLoaded && !buildInProgress) {
-      const build = this.props.build.build;
+
+    // build cancelled but log is still processing
+    if (endOfLogLoaded && cancelledButStillProcessing ) {
+      endOfLogMessage = (
+        <p className='log-line log-line-end'>
+          Build ID {build.id} has been cancelled but the log is still processing. Refresh to see latest log.
+        </p>
+      );
+    }
+    // build is complete
+    else if (endOfLogLoaded && !buildInProgress) {      
       endOfLogMessage = (
         <p className='log-line log-line-end'>End of log for build ID {build.id}</p>
       )
+      
     }
     // Paging up spinner
     if (this.showPagingSpinnerUp) {
@@ -326,7 +342,7 @@ class BuildLog extends Component {
       )
     }
     // Paging down spinner
-    if (this.showPagingSpinnerDown && !this.props.log.endOfLogLoaded) {
+    if (this.showPagingSpinnerDown && !endOfLogLoaded) {
       pagingSpinnerDown = (
         <div>
           <Loader align='left' roomy={true} />

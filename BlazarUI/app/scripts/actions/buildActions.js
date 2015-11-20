@@ -264,55 +264,88 @@ function getLogSize() {
 
 function processBuild() {
   const buildToProcess = builds[requestedBuild.gitInfo.moduleId];
+  const buildState = buildToProcess.data.build.state;
 
   if (!buildToProcess) {
     return;
   }
 
   // To do: find out why we dont have state at this point
-  if (!has(buildToProcess.data.build, 'state') || !buildToProcess.isActive) {
+  else if (!has(buildToProcess.data.build, 'state') || !buildToProcess.isActive) {
     return;
   }
 
   // States: Launching, Queued
-  if (buildIsOnDeck(buildToProcess.data.build.state)) {
+  else if (buildIsOnDeck(buildState)) {
     BuildActions.loadBuildSuccess({
       build: buildToProcess.data
     });
     return;
   }
+  
   // State: In Progress
-  if (buildToProcess.data.build.state === BuildStates.IN_PROGRESS) {
+  else if (buildState === BuildStates.IN_PROGRESS) {
     buildToProcess.log.isPolling = true;
     processInProgressBuild(buildToProcess);
   }
-  // State: Failed, Cancelled
+  
+  // State: Cancelled
+  // If build is cancelled, we need to check if the log
+  // is still processing so we can provide the proper message
+  else if (buildState === BuildStates.CANCELLED) {
+    processCancelledBuild(buildToProcess);
+  }
+
+  // State: Failed or Success
   else {
     processInactiveBuild(buildToProcess);
   }
 }
 
+function processCancelledBuild(build) {
+  // fetch logSize as offset so we can check
+  // if the log is still processing
+  build.log.setOffset(build.log.options.logSize);
+
+  const logPromise = build.log.fetch();
+  logPromise.always((data) => {
+    if (data.nextOffset === -1) {
+      // make note if we've fetched the entire log
+      // so we can add a message at the end of the log
+      build.log.fullLogFetched = true;
+    }
+    const newOffset = getLastOffset(build.log.options.logSize);
+    // now fetch the last offset
+    resetBuildLog(build.data.module.id, newOffset, 'bottom');
+  });
+}
+
+// Builds with state SUCCESS or FAILED
 function processInactiveBuild(build) {
   const log = build.log;
   const logPromise = log.fetch();
   logPromise.always((data) => {
     build.log.nextOffset = data.nextOffset;
     updateStore(build);
-  });  
+  });
 }
 
 function processInProgressBuild(build) {  
-  if (!build.isActive || !build.log.isPolling || build.stopPolling) {
-    build.log.isPolling = false;
+  // if we stop tailing and our build was cancelled, stop all polling
+  if ((!build.isActive || !build.log.isPolling || build.stopPolling) && build.data.build.state === BuildStates.CANCELLED) {
     return;
   }
 
+  else if (!build.isActive || !build.log.isPolling || build.stopPolling) {
+    build.log.isPolling = false;
+  }
+
+  // if we havent stopped tailing, fetch our log
   const logPromise = build.log.fetch();
 
   logPromise.always( (data, textStatus, jqxhr) => {
     build.log.nextOffset = data.nextOffset;
     build.log.setOffset(data.nextOffset);
-
     // reached end of log
     if (data.nextOffset === -1) {
       // get latest build detail when log fetching is complete
