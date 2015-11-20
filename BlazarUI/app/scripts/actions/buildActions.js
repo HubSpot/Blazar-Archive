@@ -321,12 +321,11 @@ function processInProgressBuild(build) {
     if (data.nextOffset === -1) {
       // get latest build detail when log fetching is complete
       // so we can update status section at top of build page
-      const lastBuild = new Build(requestedBuild.gitInfo);
-      const buildPromise = lastBuild.fetch();
+      const buildPromise = build.fetch();
   
       buildPromise.done(() => {
         BuildActions.loadBuildSuccess({
-          build: lastBuild.data,
+          build: build.data,
           log: build.log,
           fetchingLog: false
         });
@@ -345,7 +344,7 @@ function processInProgressBuild(build) {
         processInProgressBuild(build);
       }, config.activeBuildRefresh);
     }
-  });  
+  });
 }
 
 //
