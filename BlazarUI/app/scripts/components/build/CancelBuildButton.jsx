@@ -62,8 +62,8 @@ class CancelBuildButton extends Component {
     
     if (this.props.buildCancelTriggered || this.state.cancelling) {
       return (
-        <div className='text-right'>
-          <Button bsStyle="danger" disabled>
+        <div className='cancel-build-button text-right'>
+          <Button bsSize='xsmall' bsStyle="danger" disabled>
             <Icon for="spinner" /> Cancelling
           </Button>
           {this.cancelModal()}
