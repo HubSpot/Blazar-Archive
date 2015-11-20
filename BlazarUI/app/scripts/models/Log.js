@@ -29,7 +29,9 @@ class Log extends Model {
     // chop off last incomplete line
     newLogLines = initial(newLogLines);
     // prepend the rest of the first line that was cutoff last fetch
-    newLogLines[0].text = this.lastLine.text + newLogLines[0].text;
+    if (this.lastLine) {
+      newLogLines[0].text = this.lastLine.text + newLogLines[0].text;  
+    }
     this.lastLine = tempLast;
     this.logLines = [...this.logLines, ...newLogLines];
   }
