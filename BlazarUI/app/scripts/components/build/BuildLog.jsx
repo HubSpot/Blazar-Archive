@@ -42,6 +42,10 @@ class BuildLog extends Component {
     const nextLog = nextProps.log;
     const onDeck = buildIsOnDeck(nextProps.buildState);
 
+    // reset spinners states
+    this.showPagingSpinnerUp = false;
+    this.showPagingSpinnerDown = false;
+
     // still waiting to build or cancelled
     if ((!buildInProgress && onDeck) || buildCancelled) {
       return;
