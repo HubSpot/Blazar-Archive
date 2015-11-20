@@ -55,33 +55,42 @@ class CancelBuildButton extends Component {
   }
 
   render() {
+    let cancelButtonContent;
     
     if (this.props.build.build.state === undefined || contains(FINAL_BUILD_STATES, this.props.build.build.state)) {
       return null;
     }
     
     if (this.props.buildCancelTriggered || this.state.cancelling) {
-      return (
-        <div className='cancel-build-button text-right'>
-          <Button bsSize='xsmall' bsStyle="danger" disabled>
-            <Icon for="spinner" /> Cancelling
-          </Button>
-          {this.cancelModal()}
-        </div>
-      );
-    } else {
-      return (
-        <div className='cancel-build-button text-right'>
-          <Button bsSize='xsmall' bsStyle='danger' onClick={this.handleCancelBuild}>
-            Cancel Build
-          </Button>
-          {this.cancelModal()}
-        </div>
+      cancelButtonContent = (
+        <span>
+          <Icon for="spinner" /> Cancelling
+        </span>
       );
     }
+
+    else {
+      cancelButtonContent = 'Cancel Build'
+    }
+    
+    return (
+      <div className='cancel-build-button text-right'>
+        <Button 
+          bsSize='xsmall' 
+          bsStyle="danger" 
+          disabled={this.props.buildCancelTriggered || this.state.cancelling}
+          onClick={this.handleCancelBuild}
+        >
+          {cancelButtonContent}
+        </Button>
+        {this.cancelModal()}
+      </div>
+    ); 
+
   }
+
 }
-// 
+
 CancelBuildButton.propTypes = {
   triggerCancelBuild: PropTypes.func.isRequired,
   build: PropTypes.object.isRequired
