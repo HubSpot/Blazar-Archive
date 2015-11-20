@@ -306,10 +306,6 @@ function processInProgressBuild(build) {
     build.log.isPolling = false;
     return;
   }
-  // user has paged up, stop polling
-  if (build.log.navigationPosition === 'up') {
-    return;
-  }
 
   const logPromise = build.log.fetch();
 
