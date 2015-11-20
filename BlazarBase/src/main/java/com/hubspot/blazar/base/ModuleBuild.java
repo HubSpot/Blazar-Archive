@@ -77,7 +77,7 @@ public class ModuleBuild {
     return repoBuildId;
   }
 
-  public long getModuleId() {
+  public int getModuleId() {
     return moduleId;
   }
 

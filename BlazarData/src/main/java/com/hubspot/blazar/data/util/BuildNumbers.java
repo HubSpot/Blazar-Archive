@@ -27,6 +27,16 @@ public class BuildNumbers {
     this.lastBuildNumber = lastBuildNumber;
   }
 
+  public int getNextBuildNumber() {
+    if (getInProgressBuildNumber().isPresent()) {
+      return getInProgressBuildNumber().get() + 1;
+    } else if (getLastBuildNumber().isPresent()) {
+      return getLastBuildNumber().get() + 1;
+    } else {
+      return 1;
+    }
+  }
+
   public Optional<Integer> getPendingBuildId() {
     return pendingBuildId;
   }

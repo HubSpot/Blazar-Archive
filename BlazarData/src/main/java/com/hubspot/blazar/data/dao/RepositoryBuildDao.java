@@ -34,7 +34,7 @@ public interface RepositoryBuildDao {
   @SqlUpdate("INSERT INTO repo_builds_v2 (branchId, buildNumber, state) VALUES (:branchId, :buildNumber, :state)")
   long enqueue(@BindWithRosetta RepositoryBuild build);
 
-  @SqlUpdate("UPDATE repo_builds_v2 SET startTimestamp = :startTimestamp, sha = :sha, state = :state, commitInfo = :commitInfo WHERE id = :id AND state = 'QUEUED'")
+  @SqlUpdate("UPDATE repo_builds_v2 SET startTimestamp = :startTimestamp, sha = :sha, state = :state, commitInfo = :commitInfo, dependencyGraph = :dependencyGraph WHERE id = :id AND state = 'QUEUED'")
   int begin(@BindWithRosetta RepositoryBuild build);
 
   @SqlUpdate("UPDATE repo_builds_v2 SET state = :state WHERE id = :id AND state = 'LAUNCHING'")

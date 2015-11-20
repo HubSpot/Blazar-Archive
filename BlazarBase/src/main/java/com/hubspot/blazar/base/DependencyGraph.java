@@ -3,6 +3,7 @@ package com.hubspot.blazar.base;
 import com.google.common.collect.SetMultimap;
 
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class DependencyGraph {
@@ -16,6 +17,17 @@ public class DependencyGraph {
 
   public Set<Integer> reachableVertices(int moduleId) {
     return transitiveReduction.get(moduleId);
+  }
+
+  public Set<Integer> upstreamVertices(int moduleId) {
+    Set<Integer> upstreamVertices = new HashSet<>();
+    for (Entry<Integer, Integer> path : paths.entries()) {
+      if (path.getValue() == moduleId) {
+        upstreamVertices.add(path.getKey());
+      }
+    }
+
+    return upstreamVertices;
   }
 
   public Set<Module> reduceModules(Set<Module> modules) {

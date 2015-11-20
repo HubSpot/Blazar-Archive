@@ -132,13 +132,11 @@ public class BuildLauncher {
   }
 
   private synchronized void startBuild(BuildDefinition definition, Build queued, Optional<Build> previous) throws Exception {
-    CommitInfo commitInfo = commitInfo(definition.getGitInfo(), commit(previous));
     BuildConfig buildConfig = configAtSha(definition, commitInfo.getCurrent().getId());
     BuildConfig resolvedConfig = resolveConfig(buildConfig, definition);
 
     Build launching = queued.withStartTimestamp(System.currentTimeMillis())
         .withState(State.LAUNCHING)
-        .withCommitInfo(commitInfo)
         .withBuildConfig(buildConfig)
         .withResolvedConfig(resolvedConfig);
 
@@ -246,113 +244,10 @@ public class BuildLauncher {
     }
   }
 
-  private CommitInfo commitInfo(GitInfo gitInfo, Optional<Commit> previousCommit) throws IOException, NonRetryableBuildException {
-    LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
-    GitHub gitHub = gitHubFor(gitInfo);
-
-    final GHRepository repository;
-    try {
-      repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
-    } catch (FileNotFoundException e) {
-      throw new NonRetryableBuildException("Couldn't find repository " + gitInfo.getFullRepositoryName(), e);
-    }
-
-    GHBranch branch = repository.getBranches().get(gitInfo.getBranch());
-    if (branch == null) {
-      String message = String.format("Couldn't find branch %s for repository %s", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
-      throw new NonRetryableBuildException(message);
-    } else {
-      LOG.info("Found sha {} for branch {}/{}", branch.getSHA1(), gitInfo.getRepository(), gitInfo.getBranch());
-
-      Commit commit = toCommit(repository.getCommit(branch.getSHA1()));
-      final List<Commit> newCommits;
-      boolean truncated = false;
-      if (previousCommit.isPresent()) {
-        newCommits = new ArrayList<>();
-
-        List<GHCompare.Commit> commits = Collections.emptyList();
-        try {
-          GHCompare compare = repository.getCompare(previousCommit.get().getId(), commit.getId());
-          commits = Arrays.asList(compare.getCommits());
-        } catch (FileNotFoundException e) {
-          LOG.warn("Error generating compare from sha {} to sha {}", previousCommit.get().getId(), commit.getId(), e);
-        }
-
-        if (commits.size() > 10) {
-          commits = commits.subList(commits.size() - 10, commits.size());
-          truncated = true;
-        }
-
-        for (GHCompare.Commit newCommit : commits) {
-          newCommits.add(toCommit(repository.getCommit(newCommit.getSHA1())));
-        }
-      } else {
-        newCommits = Collections.emptyList();
-      }
-
-      return new CommitInfo(commit, previousCommit, newCommits, truncated);
-    }
-  }
-
   private GitHub gitHubFor(GitInfo gitInfo) {
     String host = gitInfo.getHost();
 
     return Preconditions.checkNotNull(gitHubByHost.get(host), "No GitHub found for host " + host);
-  }
-
-  private static Commit toCommit(GHCommit commit) throws IOException {
-    Commit.Builder builder = Commit.newBuilder()
-        .setId(commit.getSHA1())
-        .setMessage(commit.getCommitShortInfo().getMessage())
-        .setTimestamp(String.valueOf(commit.getCommitShortInfo().getCommitter().getDate().getTime()))
-        .setUrl(commit.getOwner().getHtmlUrl() + "/commit/" + commit.getSHA1())
-        .setAuthor(toAuthor(commit))
-        .setCommitter(toCommitter(commit));
-
-    for (GHCommit.File file : commit.getFiles()) {
-      switch (file.getStatus()) {
-        case "added":
-          builder.addAdded(file.getFileName());
-          break;
-        case "modified":
-        case "changed":
-        case "renamed":
-          builder.addModified(file.getFileName());
-          break;
-        case "removed":
-          builder.addRemoved(file.getFileName());
-          break;
-        default:
-          throw new IllegalArgumentException("Unrecognized file status: " + file.getStatus());
-      }
-    }
-
-    return builder.build();
-  }
-
-  private static User toAuthor(GHCommit commit) throws IOException {
-    User.Builder builder = toUser(commit.getCommitShortInfo().getAuthor());
-
-    if (commit.getAuthor() != null && commit.getAuthor().getLogin() != null) {
-      builder.setUsername(commit.getAuthor().getLogin());
-    }
-
-    return builder.build();
-  }
-
-  private static User toCommitter(GHCommit commit) throws IOException {
-    User.Builder builder = toUser(commit.getCommitShortInfo().getCommitter());
-
-    if (commit.getCommitter() != null && commit.getCommitter().getLogin() != null) {
-      builder.setUsername(commit.getCommitter().getLogin());
-    }
-
-    return builder.build();
-  }
-
-  private static User.Builder toUser(GitUser user) {
-    return User.newBuilder().setName(user.getName()).setEmail(user.getEmail());
-
   }
 
   private static Optional<Commit> commit(Optional<Build> build) {
