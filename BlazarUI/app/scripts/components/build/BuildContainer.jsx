@@ -92,8 +92,8 @@ class BuildContainer extends Component {
     BuildActions.fetchPrevious();
   }
 
-  triggerCancelBuild(buildId, moduleId) {
-    BuildActions.cancelBuild(buildId, moduleId);
+  triggerCancelBuild() {
+    BuildActions.cancelBuild();
   }
 
   toggleStar(isStarred, starInfo) {
@@ -106,6 +106,14 @@ class BuildContainer extends Component {
 
   onStatusChange(state) {
     this.setState(state);
+    
+    if (state.build) {
+      if (buildIsOnDeck(state.build.build.state)) {
+        setTimeout( () => {
+          BuildActions.loadBuild(this.props.params);
+        }, 2000);
+      }      
+    }
   }
 
   render() {
@@ -143,7 +151,7 @@ class BuildContainer extends Component {
                 build={this.state.build}
                 loading={this.state.loading}
                 error={this.state.error}
-                triggerCancelBuild={this.state.triggerCancelBuild}
+                triggerCancelBuild={this.triggerCancelBuild}
               />
             </UIGridItem>
           </UIGrid>  

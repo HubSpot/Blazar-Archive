@@ -2,9 +2,10 @@
 import Reflux from 'reflux';
 
 const BuildActions = Reflux.createActions([
-  'triggerBuild', // to do
   'loadBuild',
   'resetBuild',
+  'triggerBuild',
+  'cancelBuild',
   'fetchNext',
   'fetchPrevious',
   'navigationChange'

@@ -33,11 +33,14 @@ class BuildLog extends Component {
     $('#log').on('scroll', this.handleScroll);
   }
 
-  componentWillReceiveProps(nextProps) {    
+  componentWillReceiveProps(nextProps) {  
     const nextLog = nextProps.log;
     let stateUpdates = {};
+    
+    if (nextLog) {
+      stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && nextLog.maxOffsetLoaded !== nextLog.options.size;  
+    }
 
-    stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && nextLog.maxOffsetLoaded !== nextLog.options.size;
     this.setState(extend(refreshStates, stateUpdates));
   }
 
@@ -203,14 +206,15 @@ class BuildLog extends Component {
   }
 
   generateLines() {
-  
+    const {build, log} = this.props;
+
     if (this.props.loading) {
       return (
         <Loader />
       )
     }
     
-    if (this.props.buildState === BuildStates.LAUNCHING || this.props.buildState === BuildStates.QUEUED) {
+    if (build.build.state === BuildStates.LAUNCHING ||build.build.state === BuildStates.QUEUED) {
       return (
         <div>
           <BuildLogLine text='Polling for updates...' />
@@ -219,7 +223,7 @@ class BuildLog extends Component {
       );
     }
     
-    else if (this.props.log.logLines.length === 0) {
+    else if (log.logLines.length === 0) {
       return (
         <div>
           <BuildLogLine text='No log available' />
@@ -227,7 +231,7 @@ class BuildLog extends Component {
       );
     }
 
-    return this.props.log.logLines.map((line, i) => {
+    return log.logLines.map((line, i) => {
       return (
         <BuildLogLine offset={line.offset} text={line.text} key={i} />
       );

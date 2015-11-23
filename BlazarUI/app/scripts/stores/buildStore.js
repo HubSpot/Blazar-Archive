@@ -34,6 +34,27 @@ const BuildStore = Reflux.createStore({
     });
   },
   
+  onCancelBuild() {
+    const build = new Build({
+      buildId: this.build.model.data.build.id
+    });
+    
+    const cancel = build.cancel();
+    
+    cancel.done((data, textStatus, jqXHR) => {
+      if (jqXHR.status === 204) {
+        this.build.model.data.build.state = BuildStates.CANCELLED
+        this.trigger({
+          build: this.build.model.data
+        });
+      }
+    });
+    
+    cancel.error((err) => {
+      this.loadBuildError(`Error cancelling build #${this.params.buildNumber}. See your console for more detail.`);
+    });
+  },
+  
   onResetBuild() {
     this.init();
   },
@@ -143,7 +164,7 @@ const BuildStore = Reflux.createStore({
   _triggerUpdate(additional = {}) {
     const buildInfo = {
       build: this.build.model.data,
-      log: this.build.logCollection,
+      log: this.build.logCollection || {},
       loading: false,
       positionChange: false
     };
@@ -175,9 +196,8 @@ const BuildStore = Reflux.createStore({
     return logPromise;
   },
 
-  // TO DO:
   _processBuildOnDeck() {
-    // this._pollBuild();
+    this._triggerUpdate();  
   },
   
   // TO DO:
@@ -264,12 +284,15 @@ const BuildStore = Reflux.createStore({
 
     this.build.model = new Build(this.params);
     this.build.model.moduleId = this.build.module.id;
-
     return this._fetchBuild();
   },
   
   _getLog() {    
     const logSizePromise = this._getLogSize();
+    
+    if (!logSizePromise) {
+      return;
+    }
     
     logSizePromise.done((size) => {
       this.build.logCollection = new Log({
@@ -286,7 +309,7 @@ const BuildStore = Reflux.createStore({
     if (!this.build.model) {
       return;
     }
-  
+
     if (buildIsOnDeck(this.build.model.data.build.state)) {
       return;
     }

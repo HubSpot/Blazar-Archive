@@ -22,14 +22,14 @@ class CancelBuildButton extends Component {
   }
   
   cancelBuild() {
-    this.props.triggerCancelBuild(this.props.build.build.id, this.props.build.module.id);
+    this.props.triggerCancelBuild();
 
     this.setState({
       cancelling: true,
       showModal: false
     });    
   }
-  
+
   cancelModal() {
     return (
       <Modal show={this.state.showModal} onHide={this.closeCancelModal}>
