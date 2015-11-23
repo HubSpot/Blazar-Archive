@@ -155,7 +155,7 @@ const BuildStore = Reflux.createStore({
     const buildPromise = this.build.model.fetch();
     
     buildPromise
-      .error((jqXHR) => {
+      .fail((jqXHR) => {
         this.loadBuildError(`Error retrieving build #${this.params.buildNumber}. See your console for more detail.`);
         console.warn(jqXHR);
       });
@@ -167,7 +167,7 @@ const BuildStore = Reflux.createStore({
     const logPromise = this.build.logCollection.fetch();
     
     logPromise
-      .error(() => {
+      .fail(() => {
         this.loadBuildError(`Error retrieving log for build #${this.params.buildNumber}. See your console for more detail.`);
         console.warn(jqXHR);
       });
@@ -225,7 +225,7 @@ const BuildStore = Reflux.createStore({
       .done(() => {
         this.build.branchId = branchDefinition.data.id;
       })
-      .error(() => {
+      .fail(() => {
         this.loadBuildError(`Sorry but we can't find this build. Check that this branch or module still exists.`);
       });
 
@@ -249,7 +249,7 @@ const BuildStore = Reflux.createStore({
           this.loadBuildError(`Sorry but we can't find any module named ${this.params.module}.`);
         }
       })
-      .error((jqXHR) => {
+      .fail((jqXHR) => {
         this.loadBuildError('Error requesting module ${this.build.module}. See your console for more detail.');
         console.warn(jqXHR);
       });
@@ -297,7 +297,7 @@ const BuildStore = Reflux.createStore({
 
     const sizePromise = logSize.fetch();
     
-    sizePromise.error((err) => {
+    sizePromise.fail((err) => {
       console.warn(err);
       this.loadBuildError('Error requesting log size. View your console for more detail.');
     });
