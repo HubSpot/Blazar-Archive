@@ -1,23 +1,21 @@
 /*global config*/
 import Reflux from 'reflux';
-import BuildActions from '../actions/buildActions';
 
 import $ from 'jquery';
+import {find, has, extend} from 'underscore';
+import BuildStates from '../constants/BuildStates';
+import {buildIsOnDeck, buildIsInactive} from '../components/Helpers';
+
+import BuildActions from '../actions/buildActions';
+import BuildHistoryActions from '../actions/buildHistoryActions';
+
 import BranchDefinition from '../models/BranchDefinition';
 import BranchModules from '../collections/BranchModules';
 import Build from '../models/Build';
 import Log from '../models/Log';
 import LogSize from '../models/LogSize';
+import BuildTrigger from '../models/BuildTrigger';
 
-import {find, has, extend} from 'underscore';
-import BuildStates from '../constants/BuildStates';
-
-
-import {buildIsOnDeck, buildIsInactive} from '../components/Helpers';
-
-// TO DO
-// import BuildTrigger from '../models/BuildTrigger';
-// import BuildHistoryActions from '../actions/buildHistoryActions';
 
 
 const BuildStore = Reflux.createStore({
@@ -38,6 +36,31 @@ const BuildStore = Reflux.createStore({
   
   onResetBuild() {
     this.init();
+  },
+
+  onTriggerBuild(moduleId) {
+    this.trigger({
+      buildTriggeringDone: false
+    });
+    
+    const trigger = new BuildTrigger({
+      moduleId: moduleId
+    });
+
+    trigger.fetch()
+      .done(() => {
+        this.trigger({
+          buildTriggeringDone: true
+        });
+        BuildHistoryActions.fetchLatestHistory();
+      })
+
+      .fail((data, textStatus, jqXHR) => {
+        this.trigger({
+          buildTriggeringDone: true,
+          buildTriggeringError: jqXHR
+        });
+      });
   },
 
   onLoadBuild(params) {
