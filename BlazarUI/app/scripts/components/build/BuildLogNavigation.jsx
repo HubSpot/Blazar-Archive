@@ -29,11 +29,11 @@ class BuildLogNavigation extends Component {
       [position + 'Disabled']: true
     })
 
-    this.props.changeOffsetWithNavigation(position);
+    this.props.requestNavigationChange(position);
   }
 
   render() {
-    if (this.props.build.buildState === BuildStates.LAUNCHING || this.props.build.buildState === BuildStates.QUEUED) {
+    if (this.props.loading || this.props.build.buildState === BuildStates.LAUNCHING || this.props.build.buildState === BuildStates.QUEUED) {
       return null;
     }
 
@@ -51,8 +51,9 @@ class BuildLogNavigation extends Component {
 }
 // 
 BuildLogNavigation.propTypes = {
-  changeOffsetWithNavigation: PropTypes.func.isRequired,
-  build: PropTypes.object.isRequired
+  requestNavigationChange: PropTypes.func.isRequired,
+  build: PropTypes.object.isRequired,
+  loading: PropTypes.bool.isRequired
 };
 
 export default BuildLogNavigation;

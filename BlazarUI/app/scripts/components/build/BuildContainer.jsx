@@ -1,10 +1,18 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll, some, clone} from 'underscore';
+import {getPathname, buildIsOnDeck, getIsStarredState} from '../Helpers';
 import BuildStates from '../../constants/BuildStates.js';
-import {getIsStarredState} from '../Helpers.js';
-import Build from './Build.jsx';
+
 import PageContainer from '../shared/PageContainer.jsx';
-import {getPathname, buildIsOnDeck} from '../Helpers';
+import UIGrid from '../shared/grid/UIGrid.jsx';
+import UIGridItem from '../shared/grid/UIGridItem.jsx';
+import Loader from '../shared/Loader.jsx';
+import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
+
+import BuildHeadline from './BuildHeadline.jsx';
+import BuildDetail from './BuildDetail.jsx';
+import BuildLogNavigation from './BuildLogNavigation.jsx';
+import BuildLog from './BuildLog.jsx';
 
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
@@ -13,22 +21,22 @@ import StarActions from '../../actions/starActions';
 import LocationStore from '../../stores/locationStore';
 
 const initialState = {
-  loading: true,
   build: {
     build: {},
     gitInfo: {},
-    module: { name: ''}
+    // we need to fetch moduleID
+    module: {
+      id: -1
+    }
   },
   log: {
-    logLines: [],
-    fetchingLog: false,
-    currentOffsetLine: 0,
-    positionChange: null
+    logLines: []
   },
-  fetchingLog: false,
   stars: [],
-  error: false
-};
+  loading: true,
+  loadingStars: true,
+  isStarred: false
+}
 
 class BuildContainer extends Component {
 
@@ -36,32 +44,17 @@ class BuildContainer extends Component {
     super(props);
     bindAll(this, 
       'toggleStar', 
-      'triggerCancelBuild', 
-      'pageLog', 
-      'changeOffsetWithNavigation',
-      'fetchStartOfLog',
-      'fetchEndOfLog',
-      'shouldPoll'
+      'triggerCancelBuild',
+      'onStatusChange',
+      'requestNavigationChange'
     );
+    this.haveMounted = false;
     this.state = initialState;
   }
 
   componentDidMount() {
+    this.haveMounted = true;
     this.setup(this.props);
-  }
-
-  setup(props) {
-    this.originalParams = clone(props.params);
-    this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange.bind(this));
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
-    BuildActions.loadBuild(props.params);
-    StarActions.loadStars('buildContainer');
-  }
-
-  tearDown() {
-    this.unsubscribeFromBuild();
-    this.unsubscribeFromStars();
-    BuildActions.stopWatchingBuild(this.props.params.buildId, this.props.params.moduleId)
   }
 
   componentWillReceiveProps(nextProps) {
@@ -73,108 +66,101 @@ class BuildContainer extends Component {
   componentWillUnmount() {
     this.tearDown()
   }
-
-  shouldPoll(state) {
-    BuildActions.shouldPoll(this.props.params.moduleId, state);
-  }
   
-  pageLog(direction) {
-    BuildActions.pageLog(this.props.params.moduleId, direction);
-  }
-  
-  // maybe dont need...
-  fetchStartOfLog() {
-    BuildActions.fetchStartOfLog(this.props.params.moduleId);
-  }
-  
-  fetchEndOfLog(options) {    
-    BuildActions.fetchEndOfLog(this.props.params.moduleId, options);
-  }
-
-  changeOffsetWithNavigation(position) {    
-    if (position === 'top') {
-      BuildActions.fetchStartOfLog(this.props.params.moduleId, {position: position})
-    }
-    
-    else if (position === 'bottom') {
-      BuildActions.fetchEndOfLog(this.props.params.moduleId, {position: position, poll: true})
+  setup(props) {
+    this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
+    BuildActions.loadBuild(props.params);
+    // we get this detail from the sidebar on mount but need
+    // to refresh it when we change to another build
+    if (this.haveMounted) {
+      StarActions.loadStars('buildContainer'); 
     }
   }
+
+  tearDown() {
+    this.unsubscribeFromBuild();
+    this.unsubscribeFromStars();
+    BuildActions.resetBuild();
+  }
+
+  fetchNext() {
+    BuildActions.fetchNext();
+  }
   
+  fetchPrevious() {
+    BuildActions.fetchPrevious();
+  }
+
   triggerCancelBuild(buildId, moduleId) {
     BuildActions.cancelBuild(buildId, moduleId);
-  }
-
-  onStatusChange(state) {
-    if (state.error) {
-      this.setState({
-        loading: false,
-        error: state.error
-      })
-    }
-
-    if (state.loadBuildCancelError) {
-      this.setState({
-        loading: false,
-        error: state.error
-      })
-    }
-
-    if (state.loading) {
-      this.setState({
-        loading: true
-      });
-
-      return;
-    }
-
-    if (state.stars) {
-      this.setState({
-        stars: state.stars
-      });
-    }
-
-    if (state.build) {
-      this.setState({
-        loading: false,
-        build: state.build.build,
-        log: state.build.log || initialState.log,
-        fetchingLog: state.build.fetchingLog,
-      });
-
-      if (buildIsOnDeck(state.build.build.build.state)) {
-        setTimeout( () => {
-          BuildActions.reloadBuild(this.props.params);
-        }, 2000);
-      }
-    }
   }
 
   toggleStar(isStarred, starInfo) {
     StarActions.toggleStar(isStarred, starInfo);
   }
+  
+  requestNavigationChange(position) {
+    BuildActions.navigationChange(position);
+  }
+
+  onStatusChange(state) {
+    this.setState(state);
+  }
 
   render() {
     return (
       <PageContainer>
-        <Build
-          error={this.state.error}
-          build={this.state.build}
-          fetchStartOfLog={this.fetchStartOfLog}
-          fetchEndOfLog={this.fetchEndOfLog}
-          log={this.state.log}
-          fetchingLog={this.state.fetchingLog}
-          pageLog={this.pageLog}
-          shouldPoll={this.shouldPoll}
-          changeOffsetWithNavigation={this.changeOffsetWithNavigation}
-          originalParams={this.originalParams}
-          params={this.props.params}
-          loading={this.state.loading}
-          pathname={getPathname()}
-          triggerCancelBuild={this.triggerCancelBuild}
-          toggleStar={this.toggleStar}
-          isStarred={getIsStarredState(this.state.stars, this.props.params.moduleId)}
-        />
+        <div className='build-header'>
+          <UIGrid containerClassName='build-header__name-and-buttons'>
+            <UIGridItem size={7}>
+              <BuildHeadline 
+                moduleName={this.props.params.module}
+                moduleId={this.state.build.module.id}
+                modulePath={getPathname()}
+                buildNumber={parseInt(this.props.params.buildNumber)}
+                isStarred={this.state.isStarred}
+                toggleStar={this.toggleStar}
+                loadingStars={this.state.loadingStars}
+                isStarred={getIsStarredState(this.state.stars, this.state.build.module.id)}
+              />
+            </UIGridItem>
+            <UIGridItem size={5} >
+              <BuildLogNavigation 
+                loading={this.state.loading}
+                build={this.state.build}
+                loading={this.state.loading}
+                requestNavigationChange={this.requestNavigationChange}
+              />
+            </UIGridItem>
+          </UIGrid>
+          <UIGrid>
+            <UIGridItem size={12}>
+              <GenericErrorMessage 
+                message={this.state.error}
+              />
+              <BuildDetail
+                build={this.state.build}
+                loading={this.state.loading}
+                error={this.state.error}
+                triggerCancelBuild={this.state.triggerCancelBuild}
+              />
+            </UIGridItem>
+          </UIGrid>  
+        </div>
+        <div className='build-body'>
+          <div>  
+            <BuildLog
+              build={this.state.build}
+              log={this.state.log}
+              loading={this.state.loading}
+              fetchNext={this.fetchNext}
+              fetchPrevious={this.fetchPrevious}
+              positionChange={this.state.positionChange}
+            />
+          </div>
+        </div>
+      
       </PageContainer>
     );
   }

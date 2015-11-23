@@ -49,6 +49,10 @@ class BuildDetail extends Component {
       build, 
       gitInfo
     } = this.props.build;
+      
+    if (this.props.loading || this.props.error) {
+      return null;
+    }
 
     if (build.state === BuildStates.CANCELLED) {
       return (

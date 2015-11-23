@@ -19,7 +19,7 @@ class Build extends Model {
   }
 
   url() {
-    return `${config.apiRoot}/build/history/module/${this.options.moduleId}/build/${this.options.buildNumber}/`;
+    return `${config.apiRoot}/build/history/module/${this.moduleId}/build/${this.options.buildNumber}/`;
   }
 }
 

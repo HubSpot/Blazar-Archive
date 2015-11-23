@@ -6,6 +6,10 @@ import Star from '../shared/Star.jsx';
 class BuildHeadline extends Component {
   
   render() {
+    if (this.props.loadingStars) {
+      return null;
+    }
+
     return (
       <Headline>
         <Star
@@ -27,6 +31,7 @@ class BuildHeadline extends Component {
 }
 
 BuildHeadline.propTypes = {
+  loadingStars: PropTypes.bool.isRequired,
   moduleName: PropTypes.string.isRequired,
   moduleId: PropTypes.number.isRequired,
   modulePath: PropTypes.string.isRequired,
