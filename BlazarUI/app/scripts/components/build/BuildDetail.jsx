@@ -4,6 +4,7 @@ import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
 import BuildCommits from './BuildCommits.jsx';
 
+import Loader from '../shared/Loader.jsx';
 import CancelBuildButton from './CancelBuildButton.jsx';
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
@@ -49,9 +50,15 @@ class BuildDetail extends Component {
       build, 
       gitInfo
     } = this.props.build;
-      
-    if (this.props.loading || this.props.error) {
+
+    if (this.props.error) {
       return null;
+    }
+
+    else if (this.props.loading || !build.id) {
+      return (
+        <Loader align='left' roomy={true} />
+      );
     }
 
     if (build.state === BuildStates.CANCELLED) {
