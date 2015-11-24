@@ -86,11 +86,14 @@ public class GitHubHelper {
     return new CommitInfo(current, previous, newCommits, truncated);
   }
 
+  public Optional<BuildConfig> configFor(String path, GitInfo gitInfo) throws IOException {
+    return configFor(path, repositoryFor(gitInfo), gitInfo);
+  }
+
   public Optional<BuildConfig> configFor(String path, GHRepository repository, GitInfo gitInfo) throws IOException {
-    String configPath = (path.contains("/") ? path.substring(0, path.lastIndexOf('/') + 1) : "") + ".blazar.yaml";
     final String config;
     try {
-      config = contentsFor(configPath, repository, gitInfo);
+      config = contentsFor(path, repository, gitInfo);
     } catch (FileNotFoundException e) {
       return Optional.absent();
     }

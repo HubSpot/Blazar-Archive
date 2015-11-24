@@ -61,6 +61,16 @@ public class ModuleBuildService {
     return build;
   }
 
+  @Transactional
+  public void begin(ModuleBuild build) {
+    Preconditions.checkArgument(build.getStartTimestamp().isPresent());
+
+    checkAffectedRowCount(moduleBuildDao.begin(build));
+    checkAffectedRowCount(moduleDao.updateInProgressBuild(build));
+
+    eventBus.post(build);
+  }
+
   private static void checkAffectedRowCount(int affectedRows) {
     Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
   }

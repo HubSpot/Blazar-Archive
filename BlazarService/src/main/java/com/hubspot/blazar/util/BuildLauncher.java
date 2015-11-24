@@ -1,58 +1,21 @@
 package com.hubspot.blazar.util;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.hubspot.blazar.base.CommitInfo;
-import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
-import com.hubspot.blazar.github.GitHubProtos.User;
-import com.hubspot.singularity.SingularityClientCredentials;
-import org.kohsuke.github.GHBranch;
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHCompare;
-import org.kohsuke.github.GHContent;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GitUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.Build;
 import com.hubspot.blazar.base.Build.State;
-import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
-import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.BuildStateService;
-import com.hubspot.horizon.AsyncHttpClient;
-import com.hubspot.horizon.HttpRequest;
-import com.hubspot.horizon.HttpRequest.Method;
-import com.hubspot.horizon.HttpResponse;
 
 @Singleton
 public class BuildLauncher {
@@ -60,28 +23,13 @@ public class BuildLauncher {
 
   private final BuildStateService buildStateService;
   private final BuildService buildService;
-  private final AsyncHttpClient asyncHttpClient;
-  private final SingularityConfiguration singularityConfiguration;
-  private final Map<String, GitHub> gitHubByHost;
-  private final ObjectMapper objectMapper;
-  private final YAMLFactory yamlFactory;
 
   @Inject
   public BuildLauncher(BuildStateService buildStateService,
                        BuildService buildService,
-                       AsyncHttpClient asyncHttpClient,
-                       BlazarConfiguration configuration,
-                       Map<String, GitHub> gitHubByHost,
-                       EventBus eventBus,
-                       ObjectMapper objectMapper,
-                       YAMLFactory yamlFactory) {
+                       EventBus eventBus) {
     this.buildStateService = buildStateService;
     this.buildService = buildService;
-    this.asyncHttpClient = asyncHttpClient;
-    this.singularityConfiguration = configuration.getSingularityConfiguration();
-    this.gitHubByHost = gitHubByHost;
-    this.objectMapper = objectMapper;
-    this.yamlFactory = yamlFactory;
 
     eventBus.register(this);
   }
@@ -128,133 +76,6 @@ public class BuildLauncher {
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", buildToLaunch.getId().get(), e);
       buildService.fail(buildToLaunch);
-    }
-  }
-
-  private synchronized void startBuild(BuildDefinition definition, Build queued, Optional<Build> previous) throws Exception {
-    BuildConfig buildConfig = configAtSha(definition, commitInfo.getCurrent().getId());
-    BuildConfig resolvedConfig = resolveConfig(buildConfig, definition);
-
-    Build launching = queued.withStartTimestamp(System.currentTimeMillis())
-        .withState(State.LAUNCHING)
-        .withBuildConfig(buildConfig)
-        .withResolvedConfig(resolvedConfig);
-
-    LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
-    buildService.begin(launching);
-    LOG.info("About to launch build {}", launching.getId().get());
-    HttpResponse response = asyncHttpClient.execute(buildRequest(definition, launching)).get();
-    LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
-  }
-
-  private BuildConfig resolveConfig(BuildConfig buildConfig, BuildDefinition definition) throws IOException, NonRetryableBuildException {
-    if (buildConfig.getBuildpack().isPresent()) {
-      BuildConfig buildpackConfig = fetchBuildpack(buildConfig.getBuildpack().get());
-      return mergeConfig(buildConfig, buildpackConfig);
-    } else if (definition.getModule().getBuildpack().isPresent()) {
-      BuildConfig buildpackConfig = fetchBuildpack(definition.getModule().getBuildpack().get());
-      return mergeConfig(buildConfig, buildpackConfig);
-    } else {
-      return buildConfig;
-    }
-  }
-
-  private BuildConfig fetchBuildpack(GitInfo gitInfo) throws IOException, NonRetryableBuildException {
-    return configAtSha(gitInfo, ".blazar-buildpack.yaml", gitInfo.getBranch());
-  }
-
-  private static BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
-    List<String> cmds = primary.getCmds().isEmpty() ? secondary.getCmds() : primary.getCmds();
-    Map<String, String> env = new LinkedHashMap<>();
-    env.putAll(secondary.getEnv());
-    env.putAll(primary.getEnv());
-    List<String> buildDeps = Lists.newArrayList(Iterables.concat(secondary.getBuildDeps(), primary.getBuildDeps()));
-    List<String> webhooks = Lists.newArrayList(Iterables.concat(secondary.getWebhooks(), primary.getWebhooks()));
-    List<String> cache = Lists.newArrayList(Iterables.concat(secondary.getCache(), primary.getCache()));
-
-    return new BuildConfig(cmds, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent());
-  }
-
-  private HttpRequest buildRequest(BuildDefinition definition, Build build) {
-    String buildId = String.valueOf(build.getId().get());
-    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_api_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(definition, build));
-
-    return buildRequest(body);
-  }
-
-  private HttpRequest buildRequest(Object body) {
-    Optional<SingularityClientCredentials> credentials = singularityConfiguration.getCredentials();
-
-    HttpRequest.Builder builder = HttpRequest.newBuilder()
-        .setMethod(Method.POST)
-        .setUrl(buildUrl())
-        .setBody(body);
-
-    if (credentials.isPresent()) {
-      builder.addHeader(credentials.get().getHeaderName(), credentials.get().getToken());
-    }
-
-    return builder.build();
-  }
-
-  private String buildUrl() {
-    String host = singularityConfiguration.getHost();
-    String path = singularityConfiguration.getPath().or("singularity/api");
-    return String.format("http://%s/%s/requests/request/blazar-executor/run", host, path);
-  }
-
-  private String buildCommand(BuildDefinition definition, Build build) {
-    BuildConfig buildConfig = build.getBuildConfig().get();
-    if (!buildConfig.getCmds().isEmpty() || buildConfig.getBuildpack().isPresent()) {
-      return "--safe_mode";
-    }
-
-    String whitelist = Objects.firstNonNull(System.getenv("BUILD_WHITELIST"), "");
-
-    List<String> reposToBuild = Splitter.on(',').omitEmptyStrings().splitToList(whitelist);
-    return reposToBuild.contains(definition.getGitInfo().getRepository()) ? "--safe_mode" : "--dry_run";
-  }
-
-  private BuildConfig configAtSha(BuildDefinition definition, String sha) throws IOException, NonRetryableBuildException {
-    String modulePath = definition.getModule().getPath();
-    String moduleFolder = modulePath.contains("/") ? modulePath.substring(0, modulePath.lastIndexOf('/') + 1) : "";
-    String configPath = moduleFolder + ".blazar.yaml";
-
-    return configAtSha(definition.getGitInfo(), configPath, sha);
-  }
-
-  private BuildConfig configAtSha(GitInfo gitInfo, String configPath, String sha) throws IOException, NonRetryableBuildException {
-    GitHub gitHub = gitHubFor(gitInfo);
-    GHRepository repository = gitHub.getRepository(gitInfo.getFullRepositoryName());
-
-    String repositoryName = gitInfo.getFullRepositoryName();
-    LOG.info("Going to fetch config for path {} in repo {}@{}", configPath, repositoryName, sha);
-
-    try {
-      GHContent configContent = repository.getFileContent(configPath, sha);
-      LOG.info("Found config for path {} in repo {}@{}", configPath, repositoryName, sha);
-      JsonParser parser = yamlFactory.createParser(configContent.getContent());
-      return objectMapper.readValue(parser, BuildConfig.class);
-    } catch (FileNotFoundException e) {
-      LOG.info("No config found for path {} in repo {}@{}, using default values", configPath, repositoryName, sha);
-      return BuildConfig.makeDefaultBuildConfig();
-    } catch (JsonProcessingException e) {
-      String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", configPath, repositoryName, sha);
-      throw new NonRetryableBuildException(message, e);
-    }
-  }
-
-  private GitHub gitHubFor(GitInfo gitInfo) {
-    String host = gitInfo.getHost();
-
-    return Preconditions.checkNotNull(gitHubByHost.get(host), "No GitHub found for host " + host);
-  }
-
-  private static Optional<Commit> commit(Optional<Build> build) {
-    if (build.isPresent() && build.get().getCommitInfo().isPresent()) {
-      return Optional.of(build.get().getCommitInfo().get().getCurrent());
-    } else {
-      return Optional.absent();
     }
   }
 }

@@ -41,7 +41,7 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
 
     for (ModuleDiscovery delegate : delegates) {
       for (DiscoveredModule module : delegate.discover(gitInfo)) {
-        String folder = folderFor(module.getPath());
+        String folder = module.getFolder();
 
         Set<DiscoveredModule> modules = modulesByPath.get(folder);
         if (modules == null) {
@@ -54,7 +54,7 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
     }
 
     for (DiscoveredModule module : configDiscovery.discover(gitInfo)) {
-      String folder = folderFor(module.getPath());
+      String folder = module.getFolder();
 
       if (!modulesByPath.containsKey(folder)) {
         modulesByPath.put(folder, ImmutableSet.of(module));
@@ -67,9 +67,5 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
     }
 
     return modules;
-  }
-
-  private static String folderFor(String path) {
-    return path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "/";
   }
 }

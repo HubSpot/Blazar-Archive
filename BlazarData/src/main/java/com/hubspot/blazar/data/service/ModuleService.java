@@ -1,5 +1,6 @@
 package com.hubspot.blazar.data.service;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -23,6 +24,10 @@ public class ModuleService {
   public ModuleService(ModuleDao moduleDao, DependenciesService dependenciesService) {
     this.moduleDao = moduleDao;
     this.dependenciesService = dependenciesService;
+  }
+
+  public Optional<Module> get(int moduleId) {
+    return moduleDao.get(moduleId);
   }
 
   public Set<Module> getByBranch(int branchId) {

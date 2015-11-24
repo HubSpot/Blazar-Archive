@@ -1,6 +1,7 @@
 package com.hubspot.blazar.base;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 import com.hubspot.rosetta.annotations.StoredAsJson;
@@ -29,7 +30,6 @@ public class ModuleBuild {
   private final State state;
   private final Optional<Long> startTimestamp;
   private final Optional<Long> endTimestamp;
-  private final Optional<String> runId;
   private final Optional<String> taskId;
   @StoredAsJson
   private final Optional<BuildConfig> buildConfig;
@@ -39,12 +39,11 @@ public class ModuleBuild {
   @JsonCreator
   public ModuleBuild(@JsonProperty("id") Optional<Long> id,
                      @JsonProperty("repoBuildId") long repoBuildId,
-                     @JsonProperty("repoBuildId") int moduleId,
+                     @JsonProperty("moduleId") int moduleId,
                      @JsonProperty("buildNumber") int buildNumber,
                      @JsonProperty("state") State state,
                      @JsonProperty("startTimestamp") Optional<Long> startTimestamp,
                      @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
-                     @JsonProperty("runId") Optional<String> runId,
                      @JsonProperty("taskId") Optional<String> taskId,
                      @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig,
                      @JsonProperty("resolvedConfig") Optional<BuildConfig> resolvedConfig) {
@@ -55,7 +54,6 @@ public class ModuleBuild {
     this.state = state;
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
-    this.runId = runId;
     this.taskId = taskId;
     this.buildConfig = buildConfig;
     this.resolvedConfig = resolvedConfig;
@@ -66,7 +64,7 @@ public class ModuleBuild {
     Optional<String> absentString = Optional.absent();
     Optional<BuildConfig> absentConfig = Optional.absent();
 
-    return new ModuleBuild(absentLong, repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, absentString, absentConfig, absentConfig);
+    return new ModuleBuild(absentLong, repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, absentConfig, absentConfig);
   }
 
   public Optional<Long> getId() {
@@ -97,8 +95,9 @@ public class ModuleBuild {
     return endTimestamp;
   }
 
+  @JsonIgnore
   public Optional<String> getRunId() {
-    return runId;
+    return id.isPresent() ? Optional.of(String.valueOf(id.get())) : Optional.<String>absent();
   }
 
   public Optional<String> getTaskId() {
@@ -114,27 +113,27 @@ public class ModuleBuild {
   }
 
   public ModuleBuild withId(long id) {
-    return new ModuleBuild(Optional.of(id), repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, runId, taskId, buildConfig, resolvedConfig);
+    return new ModuleBuild(Optional.of(id), repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, resolvedConfig);
   }
 
   public ModuleBuild withState(State state) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, runId, taskId, buildConfig, resolvedConfig);
+    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, resolvedConfig);
   }
 
   public ModuleBuild withStartTimestamp(long startTimestamp) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, runId, taskId, buildConfig, resolvedConfig);
+    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, taskId, buildConfig, resolvedConfig);
   }
 
   public ModuleBuild withEndTimestamp(long endTimestamp) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), runId, taskId, buildConfig, resolvedConfig);
+    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), taskId, buildConfig, resolvedConfig);
   }
 
   public ModuleBuild withBuildConfig(BuildConfig buildConfig) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, runId, taskId, Optional.of(buildConfig), resolvedConfig);
+    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, Optional.of(buildConfig), resolvedConfig);
   }
 
   public ModuleBuild withResolvedConfig(BuildConfig resolvedConfig) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, runId, taskId, buildConfig, Optional.of(resolvedConfig));
+    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, Optional.of(resolvedConfig));
   }
 
   @Override

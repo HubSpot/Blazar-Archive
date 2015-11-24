@@ -1,6 +1,7 @@
 package com.hubspot.blazar.base;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 import com.hubspot.rosetta.annotations.StoredAsJson;
@@ -59,6 +60,11 @@ public class Module {
 
   public String getPath() {
     return path;
+  }
+
+  @JsonIgnore
+  public String getFolder() {
+    return path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "";
   }
 
   public String getGlob() {

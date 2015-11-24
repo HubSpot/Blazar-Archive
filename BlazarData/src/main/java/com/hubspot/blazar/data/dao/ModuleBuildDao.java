@@ -27,4 +27,7 @@ public interface ModuleBuildDao {
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO module_builds_v2 (repoBuildId, moduleId, buildNumber, state) VALUES (:repoBuildId, :moduleId, :buildNumber, :state)")
   long enqueue(@BindWithRosetta ModuleBuild build);
+
+  @SqlUpdate("UPDATE module_builds_v2 SET startTimestamp = :startTimestamp, state = :state, buildConfig = :buildConfig, resolvedConfig = :resolvedConfig WHERE id = :id AND state = 'QUEUED'")
+  int begin(@BindWithRosetta ModuleBuild build);
 }
