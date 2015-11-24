@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.util.Set;
 
 @Singleton
 public class ModuleBuildService {
@@ -32,6 +33,10 @@ public class ModuleBuildService {
 
   public BuildNumbers getBuildNumbers(int moduleId) {
     return moduleBuildDao.getBuildNumbers(moduleId);
+  }
+
+  public Set<ModuleBuild> getByRepositoryBuild(long repoBuildId) {
+    return moduleBuildDao.getByRepositoryBuild(repoBuildId);
   }
 
   public void enqueue(RepositoryBuild repositoryBuild, Module module) {

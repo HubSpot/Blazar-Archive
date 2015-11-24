@@ -33,10 +33,7 @@ public class DependenciesService {
       }
     }
 
-    SetMultimap<Integer, Integer> paths = GraphUtils.INSTANCE.findAllPaths(edges);
-    SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(paths);
-
-    return new DependencyGraph(transitiveReduction, paths);
+    return new DependencyGraph(GraphUtils.INSTANCE.transitiveReduction(edges));
   }
 
   @Transactional

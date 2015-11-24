@@ -8,6 +8,8 @@ import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 
+import java.util.Set;
+
 public interface ModuleBuildDao {
 
   @SqlQuery("" +
@@ -23,6 +25,9 @@ public interface ModuleBuildDao {
       "LEFT OUTER JOIN module_builds_v2 AS lastBuild ON (m.lastBuildId = lastBuild.id) " +
       "WHERE m.id = :moduleId")
   BuildNumbers getBuildNumbers(@Bind("moduleId") int moduleId);
+
+  @SqlQuery("SELECT * FROM module_builds_v2 WHERE repoBuildId = :repoBuildId")
+  Set<ModuleBuild> getByRepositoryBuild(@Bind("repoBuildId") long repoBuildId);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO module_builds_v2 (repoBuildId, moduleId, buildNumber, state) VALUES (:repoBuildId, :moduleId, :buildNumber, :state)")

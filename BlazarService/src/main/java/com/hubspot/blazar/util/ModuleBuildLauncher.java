@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -83,25 +84,51 @@ public class ModuleBuildLauncher {
 
     switch (build.getState()) {
       case QUEUED:
-        if (dependencyGraph.upstreamVertices(build.getModuleId()).isEmpty()) {
+        if (dependencyGraph.incomingVertices(build.getModuleId()).isEmpty()) {
           launchBuild(repositoryBuild, build);
         }
         break;
       case SUCCEEDED:
-        Set<Integer> downstreamModules = dependencyGraph.reachableVertices(build.getModuleId());
+        Set<Integer> downstreamModules = dependencyGraph.outgoingVertices(build.getModuleId());
         if (downstreamModules.isEmpty()) {
-          // check if we're the last module, complete repository build if so (maybe move to RepositoryBuildLauncher?)
+          boolean done = true;
+          for (ModuleBuild otherBuild : moduleBuildService.getByRepositoryBuild(build.getRepoBuildId())) {
+            if (otherBuild.getState().isComplete()) {
+              done = false;
+            }
+          }
+
+          if (done) {
+            // complete the repository build
+          }
         } else {
-          for (int downstreamModule : dependencyGraph.reachableVertices(build.getModuleId())) {
-            // launch build if all upstreams are done and still queued
+          Set<ModuleBuild> builds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
+          Map<Integer, ModuleBuild> buildMap = mapByModuleId(builds);
+          for (int downstreamModule : dependencyGraph.outgoingVertices(build.getModuleId())) {
+            Set<Integer> upstreamModules = dependencyGraph.incomingVertices(downstreamModule);
+
+            boolean ready = buildMap.get(downstreamModule).getState() == State.QUEUED;
+            for (int upstreamModule : upstreamModules) {
+              if (buildMap.containsKey(upstreamModule) && buildMap.get(upstreamModule).getState() != State.SUCCEEDED) {
+                ready = false;
+              }
+            }
+
+            if (ready) {
+              launchBuild(repositoryBuild, buildMap.get(downstreamModule));
+            }
           }
         }
         break;
       case CANCELLED:
       case FAILED:
-        // cancel all downstream modules
-        for (int downstreamModule : dependencyGraph.reachableVertices(build.getModuleId())) {
-          // cancel build if queued
+        Set<ModuleBuild> builds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
+        for (int downstreamModule : dependencyGraph.outgoingVertices(build.getModuleId())) {
+          for (ModuleBuild otherBuild : builds) {
+            if (otherBuild.getModuleId() == downstreamModule && !otherBuild.getState().isComplete()) {
+              cancelBuild(otherBuild);
+            }
+          }
         }
         break;
     }
@@ -124,6 +151,10 @@ public class ModuleBuildLauncher {
     LOG.info("About to launch build {}", launching.getId().get());
     HttpResponse response = singularityBuildLauncher.launchBuild(launching);
     LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
+  }
+
+  private void cancelBuild(ModuleBuild build) {
+    // cancel
   }
 
   private BuildConfig resolveConfig(BuildConfig buildConfig, Module module) throws IOException, NonRetryableBuildException {
@@ -189,5 +220,14 @@ public class ModuleBuildLauncher {
     }
 
     return toBuild;
+  }
+
+  private static Map<Integer, ModuleBuild> mapByModuleId(Set<ModuleBuild> builds) {
+    Map<Integer, ModuleBuild> buildMap = new HashMap<>();
+    for (ModuleBuild build : builds) {
+      buildMap.put(build.getModuleId(), build);
+    }
+
+    return buildMap;
   }
 }
