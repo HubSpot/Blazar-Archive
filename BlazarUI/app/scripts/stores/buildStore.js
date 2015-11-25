@@ -1,8 +1,7 @@
 /*global config*/
 import Reflux from 'reflux';
 
-import $ from 'jquery';
-import {find, has, extend} from 'underscore';
+import {find, has, extend} from 'underscore'; 
 import BuildStates from '../constants/BuildStates';
 import {buildIsOnDeck, buildIsInactive} from '../components/Helpers';
 
@@ -15,7 +14,6 @@ import Build from '../models/Build';
 import Log from '../models/Log';
 import LogSize from '../models/LogSize';
 import BuildTrigger from '../models/BuildTrigger';
-
 
 
 const BuildStore = Reflux.createStore({
@@ -33,7 +31,17 @@ const BuildStore = Reflux.createStore({
       loading: false
     });
   },
-  
+
+  onLoadBuild(params) {
+    this.params = params;
+    
+    this._getBranchId()
+      .then(this._getModule)
+      .then(this._getBuild)
+      .then(this._getLog)
+      .then(this._assignBuildProcessing);
+  },
+
   onCancelBuild() {
     const build = new Build({
       buildId: this.build.model.data.build.id
@@ -43,13 +51,13 @@ const BuildStore = Reflux.createStore({
     
     cancel.done((data, textStatus, jqXHR) => {
       if (jqXHR.status === 204) {
-        this.build.model.data.build.state = BuildStates.CANCELLED
+        this.build.model.data.build.state = BuildStates.CANCELLED;
         this.trigger({
           build: this.build.model.data
         });
       }
     });
-    
+
     cancel.error((err) => {
       this.loadBuildError(`Error cancelling build #${this.params.buildNumber}. See your console for more detail.`);
     });
@@ -84,40 +92,48 @@ const BuildStore = Reflux.createStore({
       });
   },
 
-  onLoadBuild(params) {
-    this.params = params;
-    
-    this._getBranchId()
-      .then(this._getModule)
-      .then(this._getBuild)
-      .then(this._getLog)
-      .then(this._assignBuildProcessing);
-  },
-
   onNavigationChange(position) {
     const startOfLogLoaded = this.build.logCollection.minOffsetLoaded === 0;
     const endOfLogLoaded = this.build.logCollection.maxOffsetLoaded === this.build.logCollection.options.size;
+    const buildInProgress = this.build.model.data.build.state === BuildStates.IN_PROGRESS;
 
-    if (startOfLogLoaded && position === 'top') {
-      this.trigger({
-        positionChange: position
-      });
-    }
+    // navigated to the top
+    if (position === 'top') {
+      
+      if (buildInProgress) {
+        this.onSetLogPollingState(false);
+      }
 
-    else if (endOfLogLoaded && position === 'bottom') {
-      this.trigger({
-        positionChange: position
-      });
+      if (startOfLogLoaded) {
+        this._triggerUpdate({positionChange: position});  
+      }
+      
+      else {
+        this._resetLogViaNavigation(position);
+      }
     }
-
-    else {
-      this._resetLogViaNavigation(position);
-    }
-  },
   
+    // navigated to the bottom
+    else if (position === 'bottom') {
+
+      if (buildInProgress) {
+        this.onSetLogPollingState(true);
+      }
+
+      if (endOfLogLoaded) {
+        this._triggerUpdate({positionChange: position});
+      }
+
+      else {
+        this._resetLogViaNavigation(position);
+      }      
+    }
+
+  },
+
   onFetchPrevious() {
     const log = this.build.logCollection;
-
+  
     if (log.minOffsetLoaded === 0) {
       this._triggerUpdate();
     }
@@ -128,28 +144,26 @@ const BuildStore = Reflux.createStore({
   },
   
   onFetchNext() {
-    const log = this.build.logCollection;
+    this.build.logCollection
+      .fetchNext()
+      .done(this._triggerUpdate);
+  },
 
-    // have already loaded the end of the log
-    if (log.options.size === log.maxOffsetLoaded) {
-      this._triggerUpdate();
-    }
-    
-    else {
-      log.fetchNext().done(this._triggerUpdate);
+  onSetLogPollingState(state) {
+
+    if (this.build.logCollection) {
+      this.build.logCollection.shouldPoll = state;
+      // if we stopped polling and are starting up again,
+      // fetch the latest log size, last offset, 
+      // and start polling again
+      if (state) {
+        this._getLog().done(this._pollLog);
+      }
     }
   },
 
   _resetLogViaNavigation(position) {
     const logSize = this.build.logCollection.options.size;
-
-    // To Do:
-    // if navigating to the bottom, we need to update our 
-    // size calculation if build is still in progress
-    // 
-    if (this.build.state === BuildStates.IN_PROGRESS) {
-      // TO DO
-    }
 
     const logPromise = this.build.logCollection.updateLogForNavigationChange({
       size: logSize,
@@ -168,8 +182,9 @@ const BuildStore = Reflux.createStore({
       loading: false,
       positionChange: false
     };
-
-    this.trigger(extend(buildInfo, additional));
+    
+    const buildUpdate = extend(buildInfo, additional);
+    this.trigger(buildUpdate);
   },
   
   _fetchBuild() {
@@ -188,7 +203,7 @@ const BuildStore = Reflux.createStore({
     const logPromise = this.build.logCollection.fetch();
     
     logPromise
-      .fail(() => {
+      .fail((jqXHR) => {
         this.loadBuildError(`Error retrieving log for build #${this.params.buildNumber}. See your console for more detail.`);
         console.warn(jqXHR);
       });
@@ -199,9 +214,33 @@ const BuildStore = Reflux.createStore({
   _processBuildOnDeck() {
     this._triggerUpdate();  
   },
+
+  _processActiveBuild() { 
+    this._pollLog();
+    this._pollBuild();
+  },
   
-  // TO DO:
-  _processActiveBuild() {
+  // TO DO
+  // Stop polling when navigating away...
+  _pollLog() {
+    if (!this.build.logCollection) {
+      return;
+    }
+    if (this.build.logCollection.shouldPoll && this.build.model.data.build.state === BuildStates.IN_PROGRESS) {
+      this._fetchLog().done((data, textStatus, jqxhr) => {
+        this._triggerUpdate();
+        
+        this.build.logCollection.requestOffset = data.nextOffset;
+        
+        setTimeout(() => {
+          this._pollLog();
+        }, config.activeBuildRefresh);
+      });
+    }
+  },
+  
+  // To do
+  _pollBuild() {
 
   },
 
@@ -278,7 +317,7 @@ const BuildStore = Reflux.createStore({
   },
   
   _getBuild() {
-    if (!this.build.module.id) {
+    if (!this.build.module.id) { // test this
       return;
     }
 
@@ -287,7 +326,7 @@ const BuildStore = Reflux.createStore({
     return this._fetchBuild();
   },
   
-  _getLog() {    
+  _getLog() {
     const logSizePromise = this._getLogSize();
     
     if (!logSizePromise) {
@@ -319,7 +358,7 @@ const BuildStore = Reflux.createStore({
     });
 
     const sizePromise = logSize.fetch();
-    
+
     sizePromise.fail((err) => {
       console.warn(err);
       this.loadBuildError('Error requesting log size. View your console for more detail.');

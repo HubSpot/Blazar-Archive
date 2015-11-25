@@ -22,7 +22,8 @@ import LocationStore from '../../stores/locationStore';
 
 const initialState = {
   build: {
-    build: {},
+    build: {
+    },
     gitInfo: {},
     // we need to fetch moduleID
     module: {
@@ -103,16 +104,18 @@ class BuildContainer extends Component {
   requestNavigationChange(position) {
     BuildActions.navigationChange(position);
   }
+  
+  requestPollingStateChange(change) {
+    BuildActions.setLogPollingState(change);
+  }
 
   onStatusChange(state) {
     this.setState(state);
-    
-    if (state.build) {
-      if (buildIsOnDeck(state.build.build.state)) {
-        setTimeout( () => {
-          BuildActions.loadBuild(this.props.params);
-        }, 2000);
-      }      
+
+    if (state.build && buildIsOnDeck(state.build.build.state)) {
+      setTimeout( () => {
+        BuildActions.loadBuild(this.props.params);
+      }, 2000);
     }
   }
 
@@ -165,6 +168,8 @@ class BuildContainer extends Component {
               fetchNext={this.fetchNext}
               fetchPrevious={this.fetchPrevious}
               positionChange={this.state.positionChange}
+              error={this.state.error}
+              requestPollingStateChange={this.requestPollingStateChange}
             />
           </div>
         </div>

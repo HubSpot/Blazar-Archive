@@ -8,7 +8,8 @@ const BuildActions = Reflux.createActions([
   'cancelBuild',
   'fetchNext',
   'fetchPrevious',
-  'navigationChange'
+  'navigationChange',
+  'setLogPollingState'
 ]);
 
 export default BuildActions;

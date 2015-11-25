@@ -33,36 +33,66 @@ class BuildLog extends Component {
     $('#log').on('scroll', this.handleScroll);
   }
 
-  componentWillReceiveProps(nextProps) {  
+  componentWillReceiveProps(nextProps) {
     const nextLog = nextProps.log;
+    const buildInProgress = nextProps.build.build.state === BuildStates.IN_PROGRESS;
     let stateUpdates = {};
-    
+
+    if (nextProps.log.shouldPoll && !this.state.isTailing && buildInProgress) {
+      stateUpdates.isTailing = true
+    }
+
+    if (nextProps.positionChange === 'top' && buildInProgress) {
+      stateUpdates.isTailing = false;
+    }
+
     if (nextLog) {
       stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && nextLog.maxOffsetLoaded !== nextLog.options.size;  
     }
 
-    this.setState(extend(refreshStates, stateUpdates));
+    this.setState(extend({}, refreshStates, stateUpdates));
   }
 
   componentDidUpdate() {
-    // initial fetch
-    if (this.props.log.fetchCount === 1 && !this.props.positionChange && !this.state.haveFetchedOnce) {
-      this.scrollToBottom();
+    const {log, build, positionChange} = this.props;
+
+    if (positionChange) {
+      this.hasChangedPosition = true;
     }
 
+    // ignore any fetched data if we already processed
+    if (log.fetchCount > 1 && log.fetchTimestamp === this.state.lastFetchTimestamp) {    
+      return;
+    }
+
+    if (log.fetchCount === 1) {
+      this.scrollId = `offset-${log.currentOffsetLine}`;
+    }
+
+    // Store nextScrollId so we can set scroll
+    // to the correct position with our requestAnimationFrame
+    this.nextScrollId = `offset-${log.currentOffsetLine}`;
+
     // used navigation buttons
-    else if (this.props.positionChange) {
-      if (this.props.positionChange === 'top') {
+    if (positionChange) {
+      if (positionChange === 'top') {
         this.scrollToTop();
       }
-      else if (this.props.positionChange === 'bottom') {
+
+      // dont scroll to bottom if we just did and then DidUpdate
+      else if (positionChange === 'bottom') {
         this.scrollToBottom();
       }
     }
 
+    // initial fetch or tailing
+    else if ((log.fetchCount === 1 && !positionChange && !this.state.haveFetchedOnce) || this.state.isTailing) {
+      this.scrollToBottom();
+    }
+
     // updates based on scroll change
-    else if (this.props.log.fetchCount > 1) {
-      if (this.props.log.fetchAction === 'previous') {
+    else if (log.fetchCount > 1) {
+      if (log.fetchAction === 'previous') {
         this.scrollToOffsetLine();  
       }
     }
@@ -73,7 +103,7 @@ class BuildLog extends Component {
   }
 
   scrollToTop() {
-    this.preventFetch = true;
+    this.ignoreScrollEvents = true;
 
     window.requestAnimationFrame(() => {
       $('#log').scrollTop(0);
@@ -81,32 +111,28 @@ class BuildLog extends Component {
   }
   
   scrollToBottom() {
-    this.preventFetch = true;
+    this.ignoreScrollEvents = true;
 
     window.requestAnimationFrame(() => {
       $('#log').scrollTop($('#log')[0].scrollHeight);
     });  
   }
 
-  
   scrollToOffsetLine() {
-    const scrollId = `offset-${this.props.log.pastOffsetLine}`;
+    const buildInProgress = this.props.build.build.state === BuildStates.IN_PROGRESS;
     
-    if (this.previousScrollId === scrollId) {
-      return;
-    }
-
-    this.previousScrollId = scrollId;
-    const scrollToEl = document.getElementById(scrollId);
+    const scrollToEl = document.getElementById(this.scrollId);
     scrollToEl.scrollIntoView();
+
+    this.scrollId = this.nextScrollId;
   }
 
   handleScroll() {
     const $log = $('#log');
     const log = this.props.log;
 
-    if (this.preventFetch) {
-      this.preventFetch = false;
+    if (this.ignoreScrollEvents) {
+      this.ignoreScrollEvents = false;
       return;
     }
 
@@ -117,40 +143,54 @@ class BuildLog extends Component {
     }
 
     this.frameRequest = window.requestAnimationFrame(() => {
-
       const scrollTop = $log.scrollTop();
       const scrollDirection = this.pastScrollTop < scrollTop ? 'down' : 'up';
       this.pastScrollTop = scrollTop;
       
       const scrollHeight = $log[0].scrollHeight;
       const contentsHeight = $log.outerHeight();
-      const buildInProgress = this.props.buildState === BuildStates.IN_PROGRESS;
+      const buildInProgress = this.props.build.build.state === BuildStates.IN_PROGRESS;
       
       const bottomScrollBuffer = 1;
       const atBottom = scrollTop >= scrollHeight - contentsHeight - bottomScrollBuffer;
       const atTop = scrollTop === 0;
-      
+
+      const shouldFetchNext = this.props.log.maxOffsetLoaded < this.props.log.options.size;
+
       // at top of page
       if (atTop && !atBottom && this.props.log.minOffsetLoaded > 0) {
+        
         this.setState({
           fetchingPrevious: true,
-          haveFetchedOnce: true
+          haveFetchedOnce: true,
+          lastFetchTimestamp: this.props.log.fetchTimestamp
         });
 
         this.props.fetchPrevious();  
       }
 
-      // at bottom of page... dont trigger if we are scrolling up
-      else if (atBottom && !atTop && scrollDirection !== 'up') {
-        this.props.fetchNext(); 
+      // at bottom of page.
+      else if (atBottom && !atTop && scrollDirection !== 'up') {        
+        // check if we should fetchNext or start polling again
+        if (buildInProgress && !this.state.isTailing && !shouldFetchNext) {
+          this.props.requestPollingStateChange(true);
+        }
+        // Inactive build or haven't reached the log up to the point
+        // where we need to start polling again
+        else {
+          this.props.fetchNext();
+        }
+        
       }
 
       else {
-        // stop tailing + polling
+        // stop tailing & polling
         if (buildInProgress && this.state.isTailing) {
           this.setState({
             isTailing: false
           });
+
+          this.props.requestPollingStateChange(false);
         }
       }
 
@@ -186,13 +226,11 @@ class BuildLog extends Component {
   }
   
   getFetchNextSpinner(){
-    if (!this.state.fetchingNext) {
-      return null;
+    if (this.state.fetchingNext || this.state.isTailing) {
+      return (
+        <Loader align='left' roomy={true} />
+      );
     }
-
-    return (
-      <Loader align='left' roomy={true} />
-    );
   }
   
   getFetchPreviousSpinner() {
@@ -206,11 +244,11 @@ class BuildLog extends Component {
   }
 
   generateLines() {
-    const {build, log} = this.props;
+    const {build, log, error} = this.props;
 
-    if (this.props.loading) {
+    if ((this.props.loading || !log.fetchCount) && !error) {
       return (
-        <Loader />
+        <Loader align='left' roomy={true} />
       )
     }
     
@@ -225,9 +263,7 @@ class BuildLog extends Component {
     
     else if (log.logLines.length === 0) {
       return (
-        <div>
-          <BuildLogLine text='No log available' />
-        </div>
+        <BuildLogLine text='No log available' />
       );
     }
 
@@ -257,7 +293,9 @@ BuildLog.propTypes = {
   loading: PropTypes.bool.isRequired,
   fetchNext: PropTypes.func.isRequired,
   fetchPrevious: PropTypes.func.isRequired,
-  navigationChangeRequested: PropTypes.string
+  requestPollingStateChange: PropTypes.func.isRequired,
+  navigationChangeRequested: PropTypes.string,
+  error: PropTypes.node
 };
 
 export default BuildLog;
