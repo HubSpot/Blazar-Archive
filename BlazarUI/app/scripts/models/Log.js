@@ -96,6 +96,7 @@ class Log extends Model {
     this.minOffsetLoaded = Math.min(this.requestOffset, this.minOffsetLoaded);
     this.buildInProgress = this.options.buildState === BuildStates.IN_PROGRESS;
     this.cancelledBuild = this.options.buildState === BuildStates.CANCELLED;
+    this.endOfLogLoaded = this.maxOffsetLoaded === this.options.size;
     this.newLogLines = this.formatLog();
 
     if (this.buildInProgress) {

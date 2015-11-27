@@ -52,7 +52,7 @@ class BuildLog extends Component {
     }
 
     if (nextLog) {
-      stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && nextLog.maxOffsetLoaded !== nextLog.options.size;  
+      stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && !nextLog.endOfLogLoaded;
     }
     
     if (buildCancelled) {
@@ -283,6 +283,10 @@ class BuildLog extends Component {
     
     else if (buildCancelled) {
       message = 'Build Cancelled';
+    }
+  
+    else if (log.endOfLogLoaded) {
+      message = 'End of Log';
     }
 
     else {
