@@ -232,9 +232,11 @@ const BuildStore = Reflux.createStore({
 
     if (this.build.model.data.build.state === BuildStates.IN_PROGRESS) {
       this._fetchBuild().done((data) => {
-        // build has finished
+        // build has finished, get most up to date info
         if (this.build.model.data.build.state !== BuildStates.IN_PROGRESS) {
-          this._fetchLog().done(this._triggerUpdate);
+          this._updateLogSize()
+            .then(this._fetchLog)
+            .then(this._triggerUpdate);
         }
         setTimeout(() => {
           this._pollBuild();
@@ -332,6 +334,20 @@ const BuildStore = Reflux.createStore({
         size: size,
         buildState: this.build.model.data.build.state
       });    
+    });
+      
+    return logSizePromise;
+  },
+  
+  _updateLogSize() {
+    const logSizePromise = this._getLogSize();
+    
+    if (!logSizePromise) {
+      return;
+    }
+
+    logSizePromise.done((size) => {
+      this.build.logCollection.options.size = size;
     });
       
     return logSizePromise;
