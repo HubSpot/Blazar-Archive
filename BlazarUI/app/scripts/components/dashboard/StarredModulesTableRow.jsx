@@ -25,7 +25,6 @@ class StarredModulesTableRow extends Component {
           <td />
           <td />
           <td />
-          <td />
         </tr>
       );
     }
