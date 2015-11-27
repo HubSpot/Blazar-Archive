@@ -19,7 +19,8 @@ const initialState = {
 
 const refreshedState = {
   fetchingPrevious: false,
-  fetchingNext: false  
+  fetchingNext: false,
+  haveFetchedOnce: false
 }
 
 class BuildLog extends Component {
@@ -65,17 +66,18 @@ class BuildLog extends Component {
 
   componentDidUpdate() {
     const {log, build, positionChange} = this.props;
-    const buildCancelled = build.build.state === BuildStates.CANCELLED;
+    const buildCancelled = build.build.state === BuildStates.CANCELLED;    
     const initialFetch = log.fetchCount === 1 && !positionChange && !this.state.haveFetchedOnce;
+    
     // we fetch twice for cancelled builds to see if it is still processing
-    const initialCancelledFetch =  buildCancelled && log.fetchCount < 3;
+    const initialCancelledFetch = buildCancelled && log.fetchCount < 3;
 
     if (positionChange) {
       this.hasChangedPosition = true;
     }
 
     // ignore any fetched data if we already processed
-    if (log.fetchCount > 1 && log.fetchTimestamp === this.state.lastFetchTimestamp) {    
+    if (log.fetchCount > 1 && log.fetchTimestamp === this.state.lastFetchTimestamp) { 
       return;
     }
 
