@@ -10,9 +10,16 @@ import BuildStates from '../../constants/BuildStates';
 
 window.$ = $;
 
-const refreshStates = {
-  fetchingNext: false,
-  fetchingPrevious: false
+const initialState = {
+  logExpanded: false,
+  isTailing: false,
+  fetchingPrevious: false,
+  fetchingNext: false
+}
+
+const refreshedState = {
+  fetchingPrevious: false,
+  fetchingNext: false  
 }
 
 class BuildLog extends Component {
@@ -21,12 +28,7 @@ class BuildLog extends Component {
     super(props, context);
     bindAll(this, 'handleScroll', 'toggleLogSize')
 
-    this.state = {
-      logExpanded: false,
-      isTailing: false,
-      fetchingPrevious: false,
-      fetchingNext: false
-    }
+    this.state = initialState;
   }
 
   componentDidMount() {
@@ -50,7 +52,7 @@ class BuildLog extends Component {
       stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && nextLog.maxOffsetLoaded !== nextLog.options.size;  
     }
 
-    this.setState(extend({}, refreshStates, stateUpdates));
+    this.setState(extend({}, refreshedState, stateUpdates));
   }
 
   componentDidUpdate() {
@@ -130,6 +132,10 @@ class BuildLog extends Component {
   handleScroll() {
     const $log = $('#log');
     const log = this.props.log;
+
+    if (this.props.loading) {
+      return;
+    }
 
     if (this.ignoreScrollEvents) {
       this.ignoreScrollEvents = false;
