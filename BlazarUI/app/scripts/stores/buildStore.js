@@ -1,6 +1,6 @@
 /*global config*/
 import Reflux from 'reflux';
-
+import $ from 'jquery';
 import {find, has, extend} from 'underscore'; 
 import BuildStates from '../constants/BuildStates';
 import {buildIsOnDeck, buildIsInactive} from '../components/Helpers';
@@ -52,8 +52,9 @@ const BuildStore = Reflux.createStore({
     cancel.done((data, textStatus, jqXHR) => {
       if (jqXHR.status === 204) {
         this.build.model.data.build.state = BuildStates.CANCELLED;
-        this.trigger({
-          build: this.build.model.data
+        // get most recent info
+        $.when(this._fetchBuild(), this._fetchLog()).done(() => {
+          this._triggerUpdate();
         });
       }
     });
@@ -143,7 +144,11 @@ const BuildStore = Reflux.createStore({
     }
   },
   
-  onFetchNext() {
+  onFetchNext() {    
+    if (this.build.logCollection.requestOffset === -1) {
+      return;
+    }
+    
     this.build.logCollection
       .fetchNext()
       .done(this._triggerUpdate);
@@ -187,8 +192,12 @@ const BuildStore = Reflux.createStore({
   },
 
   _fetchLog() {
+    if (!this.build.logCollection) {
+      return;
+    }
+
     const logPromise = this.build.logCollection.fetch();
-    
+
     logPromise
       .fail((jqXHR) => {
         this.loadBuildError(`Error retrieving log for build #${this.params.buildNumber}. See your console for more detail.`);
@@ -223,21 +232,31 @@ const BuildStore = Reflux.createStore({
 
     if (this.build.model.data.build.state === BuildStates.IN_PROGRESS) {
       this._fetchBuild().done((data) => {
-        this._triggerUpdate();
+        // build has finished
+        if (this.build.model.data.build.state !== BuildStates.IN_PROGRESS) {
+          this._fetchLog().done(this._triggerUpdate);
+        }
         setTimeout(() => {
           this._pollBuild();
         }, config.activeBuildRefresh);
       });
     }
   },
+  
+  // If cancelled build, fetch twice to see if the build
+  // is still processing or if it is actually complete.
+  _processCancelledBuild() {
+    this._processFinishedBuild(() => {
+      this.onFetchNext();
+    });
+  },
 
-  _processFinishedBuild() {
+  _processFinishedBuild(cb) {
     this._getLog().then(this._fetchLog).done((data) => {
-      this.trigger({
-        build: this.build.model.data,
-        log: this.build.logCollection,
-        loading: false
-      });
+      this._triggerUpdate();
+      if (cb) {
+        cb();
+      }
     });
   },
 
@@ -247,7 +266,7 @@ const BuildStore = Reflux.createStore({
 
   _processActiveBuild() { 
     this._pollLog();
-    this._pollBuild();    
+    this._pollBuild();
   },
 
   _getBranchId() {
@@ -356,8 +375,11 @@ const BuildStore = Reflux.createStore({
     
       case BuildStates.SUCCEEDED:
       case BuildStates.FAILED: 
-      case BuildStates.CANCELLED:
         this._processFinishedBuild();
+        break;
+      
+      case BuildStates.CANCELLED:
+        this._processCancelledBuild();
         break;
     }
 

@@ -35,6 +35,10 @@ class Log extends Model {
   }
 
   url() {
+    if (this.requestOffset === -1) {
+      console.warn('requestOffset not properly set');
+      return;
+    }
     return `${config.apiRoot}/build/${this.options.buildNumber}/log?offset=${this.requestOffset}&length=${this.lengthOverride || this.baseRequestLength}`;
   }
 
@@ -91,6 +95,7 @@ class Log extends Model {
     this.maxOffsetLoaded = Math.max(this.data.nextOffset, this.maxOffsetLoaded);
     this.minOffsetLoaded = Math.min(this.requestOffset, this.minOffsetLoaded);
     this.buildInProgress = this.options.buildState === BuildStates.IN_PROGRESS;
+    this.cancelledBuild = this.options.buildState === BuildStates.CANCELLED;
     this.newLogLines = this.formatLog();
 
     if (this.buildInProgress) {
@@ -224,7 +229,7 @@ class Log extends Model {
   
   fetchNext() {
     this.fetchAction = 'next';
-    this.requestOffset = this.data.nextOffset;    
+    this.requestOffset = this.data.nextOffset;
     return this.fetch();
   }
 

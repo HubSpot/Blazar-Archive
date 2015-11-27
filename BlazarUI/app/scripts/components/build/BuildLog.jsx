@@ -38,6 +38,7 @@ class BuildLog extends Component {
   componentWillReceiveProps(nextProps) {    
     const nextLog = nextProps.log;
     const buildInProgress = nextProps.build.build.state === BuildStates.IN_PROGRESS;
+    const buildCancelled = nextProps.build.build.state === BuildStates.CANCELLED;
     // check if we navigated to another build 
     const hasNavigatedAway = (this.props.build.module.id !== nextProps.build.module.id) && this.props.build.module.id !== -1;
     let stateUpdates = clone(hasNavigatedAway ? initialState : refreshedState);
@@ -53,12 +54,21 @@ class BuildLog extends Component {
     if (nextLog) {
       stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && nextLog.maxOffsetLoaded !== nextLog.options.size;  
     }
-
+    
+    if (buildCancelled) {
+      stateUpdates.isTailing = false;
+      stateUpdates.fetchingNext = false;
+    }
+  
     this.setState(stateUpdates);
   }
 
   componentDidUpdate() {
     const {log, build, positionChange} = this.props;
+    const buildCancelled = build.build.state === BuildStates.CANCELLED;
+    const initialFetch = log.fetchCount === 1 && !positionChange && !this.state.haveFetchedOnce;
+    // we fetch twice for cancelled builds to see if it is still processing
+    const initialCancelledFetch =  buildCancelled && log.fetchCount < 3;
 
     if (positionChange) {
       this.hasChangedPosition = true;
@@ -90,7 +100,7 @@ class BuildLog extends Component {
     }
 
     // initial fetch or tailing
-    else if ((log.fetchCount === 1 && !positionChange && !this.state.haveFetchedOnce) || this.state.isTailing) {
+    else if (initialFetch || initialCancelledFetch || this.state.isTailing) {  
       this.scrollToBottom();
     }
 
@@ -162,7 +172,6 @@ class BuildLog extends Component {
       const bottomScrollBuffer = 1;
       const atBottom = scrollTop >= scrollHeight - contentsHeight - bottomScrollBuffer;
       const atTop = scrollTop === 0;
-
       const shouldFetchNext = this.props.log.maxOffsetLoaded < this.props.log.options.size;
 
       // at top of page
@@ -180,8 +189,13 @@ class BuildLog extends Component {
       // at bottom of page.
       else if (atBottom && !atTop && scrollDirection !== 'up') {        
         // check if we should fetchNext or start polling again
+
         if (buildInProgress && !this.state.isTailing && !shouldFetchNext) {
           this.props.requestPollingStateChange(true);
+        }
+        // nothing more to fetch
+        else if (!shouldFetchNext) {
+          return;
         }
         // Inactive build or haven't reached the log up to the point
         // where we need to start polling again
@@ -250,6 +264,36 @@ class BuildLog extends Component {
       <Loader align='left' roomy={true} />
     );
   }
+  
+  getEndOfLogMessage() {
+    const {build, log} = this.props;
+    const buildInProgress = build.build.state === BuildStates.IN_PROGRESS;
+    const buildCancelled = build.build.state === BuildStates.CANCELLED;
+    let message;
+
+    if (buildInProgress || this.props.loading || !log.fetchCount) {
+      return null;
+    }
+
+    else if (buildCancelled && log.data.nextOffset !== -1 && log.fetchCount > 1) {
+      message = 'Build cancelled. The build log may still be processing. Refresh for the latest updates.';
+    }
+    
+    else if (buildCancelled) {
+      message = 'Build Cancelled';
+    }
+    
+    else {
+      message = 'End of Log';
+    }
+
+    return (
+      <div>
+        <BuildLogLine emphasis={true} text={message} />
+      </div>
+    );
+    
+  }
 
   generateLines() {
     const {build, log, error} = this.props;
@@ -260,7 +304,7 @@ class BuildLog extends Component {
       )
     }
     
-    if (build.build.state === BuildStates.LAUNCHING ||build.build.state === BuildStates.QUEUED) {
+    else if (build.build.state === BuildStates.LAUNCHING ||build.build.state === BuildStates.QUEUED) {
       return (
         <div>
           <BuildLogLine text='Polling for updates...' />
@@ -292,6 +336,7 @@ class BuildLog extends Component {
         {this.getRenderedSizeToggleIcon()}
         {this.generateLines()}
         {this.getFetchNextSpinner()}
+        {this.getEndOfLogMessage()}
       </pre>
     );
   }
