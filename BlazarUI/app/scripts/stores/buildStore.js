@@ -150,7 +150,6 @@ const BuildStore = Reflux.createStore({
   },
 
   onSetLogPollingState(state) {
-
     if (this.build.logCollection) {
       this.build.logCollection.shouldPoll = state;
       // if we stopped polling and are starting up again,
@@ -175,18 +174,6 @@ const BuildStore = Reflux.createStore({
     });
   },
 
-  _triggerUpdate(additional = {}) {
-    const buildInfo = {
-      build: this.build.model.data,
-      log: this.build.logCollection || {},
-      loading: false,
-      positionChange: false
-    };
-    
-    const buildUpdate = extend(buildInfo, additional);
-    this.trigger(buildUpdate);
-  },
-  
   _fetchBuild() {
     const buildPromise = this.build.model.fetch();
     
@@ -198,7 +185,7 @@ const BuildStore = Reflux.createStore({
       
       return buildPromise;
   },
-  
+
   _fetchLog() {
     const logPromise = this.build.logCollection.fetch();
     
@@ -210,26 +197,15 @@ const BuildStore = Reflux.createStore({
 
     return logPromise;
   },
-
-  _processBuildOnDeck() {
-    this._triggerUpdate();  
-  },
-
-  _processActiveBuild() { 
-    this._pollLog();
-    this._pollBuild();
-  },
   
-  // TO DO
-  // Stop polling when navigating away...
   _pollLog() {
     if (!this.build.logCollection) {
       return;
     }
+  
     if (this.build.logCollection.shouldPoll && this.build.model.data.build.state === BuildStates.IN_PROGRESS) {
       this._fetchLog().done((data, textStatus, jqxhr) => {
         this._triggerUpdate();
-        
         this.build.logCollection.requestOffset = data.nextOffset;
         
         setTimeout(() => {
@@ -237,11 +213,18 @@ const BuildStore = Reflux.createStore({
         }, config.activeBuildRefresh);
       });
     }
-  },
-  
-  // To do
-  _pollBuild() {
 
+  },
+
+  _pollBuild() {    
+    if (this.build.model.data.build.state === BuildStates.IN_PROGRESS) {
+      this._fetchBuild().done((data) => {
+        this._triggerUpdate();
+        setTimeout(() => {
+          this._pollBuild();
+        }, config.activeBuildRefresh);
+      });
+    }
   },
 
   _processFinishedBuild() {
@@ -253,27 +236,14 @@ const BuildStore = Reflux.createStore({
       });
     });
   },
-  
-  _assignBuildProcessing() {
-    const buildState = this.build.model.data.build.state;
-    
-    switch (buildState) {
-      case BuildStates.QUEUED:
-      case BuildStates.LAUNCHING:
-        this._processBuildOnDeck();
-        break;
-    
-      case BuildStates.IN_PROGRESS:
-        this._processActiveBuild();
-        break;
-    
-      case BuildStates.SUCCEEDED:
-      case BuildStates.FAILED: 
-      case BuildStates.CANCELLED:
-        this._processFinishedBuild();
-        break;
-    }
 
+  _processBuildOnDeck() {
+    this._triggerUpdate();  
+  },
+
+  _processActiveBuild() { 
+    this._pollLog();
+    this._pollBuild();    
   },
 
   _getBranchId() {
@@ -317,7 +287,7 @@ const BuildStore = Reflux.createStore({
   },
   
   _getBuild() {
-    if (!this.build.module.id) { // test this
+    if (!this.build.module.id) {
       return;
     }
 
@@ -365,7 +335,42 @@ const BuildStore = Reflux.createStore({
     });
 
     return sizePromise;
-  }
+  },
+
+  _assignBuildProcessing() {
+    const buildState = this.build.model.data.build.state;
+    
+    switch (buildState) {
+      case BuildStates.QUEUED:
+      case BuildStates.LAUNCHING:
+        this._processBuildOnDeck();
+        break;
+    
+      case BuildStates.IN_PROGRESS:
+        this._processActiveBuild();
+        break;
+    
+      case BuildStates.SUCCEEDED:
+      case BuildStates.FAILED: 
+      case BuildStates.CANCELLED:
+        this._processFinishedBuild();
+        break;
+    }
+
+  },
+
+  _triggerUpdate(additional = {}) {
+    const buildInfo = {
+      build: this.build.model.data,
+      log: this.build.logCollection || {},
+      loading: false,
+      positionChange: false
+    };
+
+    const buildUpdate = extend(buildInfo, additional);
+
+    this.trigger(buildUpdate);
+  },
 
 });
 
