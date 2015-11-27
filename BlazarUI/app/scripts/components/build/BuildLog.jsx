@@ -248,7 +248,7 @@ class BuildLog extends Component {
   }
   
   getFetchNextSpinner(){
-    if (this.state.fetchingNext || this.state.isTailing) {
+    if (this.state.fetchingNext || (this.state.isTailing && this.props.build.build.state === BuildStates.IN_PROGRESS)) {
       return (
         <Loader align='left' roomy={true} />
       );
