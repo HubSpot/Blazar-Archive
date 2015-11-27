@@ -35,7 +35,7 @@ class BuildLog extends Component {
     $('#log').on('scroll', this.handleScroll);
   }
 
-  componentWillReceiveProps(nextProps) {    
+  componentWillReceiveProps(nextProps) {
     const nextLog = nextProps.log;
     const buildInProgress = nextProps.build.build.state === BuildStates.IN_PROGRESS;
     const buildCancelled = nextProps.build.build.state === BuildStates.CANCELLED;
@@ -313,7 +313,7 @@ class BuildLog extends Component {
       );
     }
     
-    else if (log.logLines.length === 0) {
+    else if (log.logLines && log.logLines.length === 0) {
       return (
         <BuildLogLine text='No log available' />
       );
