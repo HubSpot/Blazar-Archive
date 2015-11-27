@@ -216,7 +216,11 @@ const BuildStore = Reflux.createStore({
 
   },
 
-  _pollBuild() {    
+  _pollBuild() {
+    if (!this.build.model) {
+      return;
+    }
+
     if (this.build.model.data.build.state === BuildStates.IN_PROGRESS) {
       this._fetchBuild().done((data) => {
         this._triggerUpdate();
