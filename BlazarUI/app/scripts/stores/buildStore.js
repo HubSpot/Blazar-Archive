@@ -324,7 +324,7 @@ const BuildStore = Reflux.createStore({
   _getLog() {
     const logSizePromise = this._getLogSize();
     
-    if (!logSizePromise) {
+    if (!logSizePromise || !this.build.model) {
       return;
     }
     
