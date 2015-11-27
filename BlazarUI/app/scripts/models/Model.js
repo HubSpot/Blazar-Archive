@@ -15,8 +15,7 @@ class Model {
 
   parse() {}
 
-  fetch() {
-    this.data = {};
+  fetch() {    
     const promise = $.ajax({
       url: this.options.url || this.url(),
       type: this.options.type || 'GET',
