@@ -275,6 +275,8 @@ class BuildLog extends Component {
       return null;
     }
 
+    // To do: when a build is cancelled, we always get a nextOffset of -1 even though
+    // the build is still processing, that same requestOffset will later return something > -1
     else if (buildCancelled && log.data.nextOffset !== -1 && log.fetchCount > 1) {
       message = 'Build cancelled. The build log may still be processing. Refresh for the latest updates.';
     }
