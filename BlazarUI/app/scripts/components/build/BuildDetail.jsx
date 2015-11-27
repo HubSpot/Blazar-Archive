@@ -68,7 +68,15 @@ class BuildDetail extends Component {
         </Alert>
       )
     }
-
+    
+    else if (build.state === BuildStates.QUEUED) {
+      return (
+        <Alert>
+          <strong>Build Queued</strong> 
+        </Alert>
+      )
+    }
+    
     if (!has(build, 'commitInfo')) {
       return (
         <Alert>No detail available for this build</Alert>

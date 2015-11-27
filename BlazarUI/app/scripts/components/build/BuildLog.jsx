@@ -306,19 +306,19 @@ class BuildLog extends Component {
   generateLines() {
     const {build, log, error} = this.props;
 
-    if ((this.props.loading || !log.fetchCount) && !error) {
-      return (
-        <Loader align='left' roomy={true} />
-      )
-    }
-    
-    else if (build.build.state === BuildStates.LAUNCHING ||build.build.state === BuildStates.QUEUED) {
+    if (build.build.state === BuildStates.LAUNCHING || build.build.state === BuildStates.QUEUED) {
       return (
         <div>
           <BuildLogLine text='Polling for updates...' />
           <Loader align='left' roomy={true} />
         </div>
       );
+    }
+    
+    else if ((this.props.loading || !log.fetchCount) && !error) {
+      return (
+        <Loader align='left' roomy={true} />
+      )
     }
     
     else if (log.logLines && log.logLines.length === 0) {
