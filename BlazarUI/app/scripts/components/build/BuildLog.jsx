@@ -284,9 +284,9 @@ class BuildLog extends Component {
     else if (buildCancelled) {
       message = 'Build Cancelled';
     }
-    
+
     else {
-      message = 'End of Log';
+      return null;
     }
 
     return (
