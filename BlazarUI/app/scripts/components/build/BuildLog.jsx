@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import $ from 'jquery';
 import {humanizeText, buildIsOnDeck, buildIsInactive, timestampFormatted} from '../Helpers';
-import {bindAll, extend} from 'underscore';
+import {bindAll, extend, clone} from 'underscore';
 import ClassNames from 'classnames';
 import BuildLogLine from './BuildLogLine.jsx';
 import Icon from '../shared/Icon.jsx';
@@ -35,10 +35,12 @@ class BuildLog extends Component {
     $('#log').on('scroll', this.handleScroll);
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {    
     const nextLog = nextProps.log;
     const buildInProgress = nextProps.build.build.state === BuildStates.IN_PROGRESS;
-    let stateUpdates = {};
+    // check if we navigated to another build 
+    const hasNavigatedAway = (this.props.build.module.id !== nextProps.build.module.id) && this.props.build.module.id !== -1;
+    let stateUpdates = clone(hasNavigatedAway ? initialState : refreshedState);
 
     if (nextProps.log.shouldPoll && !this.state.isTailing && buildInProgress) {
       stateUpdates.isTailing = true
@@ -52,7 +54,7 @@ class BuildLog extends Component {
       stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && nextLog.maxOffsetLoaded !== nextLog.options.size;  
     }
 
-    this.setState(extend({}, refreshedState, stateUpdates));
+    this.setState(stateUpdates);
   }
 
   componentDidUpdate() {
