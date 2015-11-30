@@ -82,7 +82,11 @@ public class GitHubStatusHandler {
     }
 
     LOG.info("Setting status of commit {} to {} for build {}", sha, state, build.getId().get());
-    repository.createCommitStatus(sha, state, url, description, context);
+    try {
+      repository.createCommitStatus(sha, state, url, description, context);
+    } catch (IOException e) {
+      LOG.error("Error setting status of commit {} to {} for build {}", sha, state, build.getId().get(), e);
+    }
   }
 
   private boolean shouldUpdateStatus(BuildDefinition definition, Build build) {
