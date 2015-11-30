@@ -5,6 +5,7 @@ import BranchSearch from '../collections/BranchSearch';
 
 const RepoActions = Reflux.createActions([
   'loadBranchesSuccess',
+  'loadBranchesError',
   'stopPolling'
 ]);
 
@@ -20,15 +21,22 @@ RepoActions.loadBranches = function(params) {
     ]
   });
 
-  branchIds.fetch().done((branchIds) => {
-    if (branchIds.length === 0) {
-      RepoActions.loadBranchesSuccess([]);
-    }
+  branchIds.fetch()
+    .done((branchIds) => {
+      if (branchIds.length === 0) {
+        RepoActions.loadBranchesSuccess([]);
+      }
+      
+      else {
+        _createPoller(branchIds);  
+      }
+    })
+    .error((err) => {
+      console.warn(err);
+      RepoActions.loadBranchesError(`${err.status}: ${err.statusText}`);
+    });
 
-    else {
-      _createPoller(branchIds);  
-    }
-  });
+  
 };
 
 function _createPoller(branchIds) {
@@ -49,8 +57,7 @@ function _createPoller(branchIds) {
     }
 
     else {
-      console.warn('Error loading repositories');
-      // OrgActions.loadReposError();
+      RepoActions.loadBranchesError('Error loading repositories');
     }
     
   });

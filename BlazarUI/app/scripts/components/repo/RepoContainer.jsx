@@ -12,6 +12,7 @@ import BranchFilter from './BranchFilter.jsx';
 import BranchesTable from './BranchesTable.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
 import {getFilteredModules} from '../Helpers.js'
+import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
@@ -22,7 +23,8 @@ let initialState = {
   filters: {
     branch: [],
     module: []
-  }
+  },
+  error: null
 };
 
 class RepoContainer extends Component {
@@ -47,6 +49,9 @@ class RepoContainer extends Component {
   }
 
   onStatusChange(state) {
+    if (state.error) {
+      state.loading = false;
+    }
     this.setState(state);
   }
 
@@ -78,16 +83,21 @@ class RepoContainer extends Component {
                 All branches and modules
               </HeadlineDetail>
             </Headline>
-            <BranchFilter 
+            <GenericErrorMessage
+              message={this.state.error}
+            />
+            <BranchFilter
               branches={this.state.branches}
               branchFilter={this.state.branchFilter}
               filters={this.state.filters}
               updateFilters={this.updateFilters}
               loading={this.state.loading}
+              hide={this.state.error}
             />
             <BranchesTable 
               modules={getFilteredModules(this.state.filters, this.state.branches)}
               loading={this.state.loading}
+              hide={this.state.error}
             />
           </UIGridItem>
         </UIGrid>

@@ -6,6 +6,10 @@ import EmptyMessage from '../shared/EmptyMessage.jsx';
 class BranchesTable extends Component {
 
   render() {
+    if (this.props.hide) {
+      return null;
+    }
+
     if (this.props.modules.length === 0) {
       return (
         <EmptyMessage> No build history </EmptyMessage>

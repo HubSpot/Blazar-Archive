@@ -48,7 +48,7 @@ class BranchFilter extends Component {
   }
 
   render() {
-    if (this.props.loading) {
+    if (this.props.loading || this.props.hide) {
       return null;
     }
 

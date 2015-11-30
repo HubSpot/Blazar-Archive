@@ -17,6 +17,12 @@ const RepoStore = Reflux.createStore({
       branches: this.branches,
       loading: false
     });
+  },
+  
+  loadBranchesError(error) {
+    this.trigger({
+      error: error
+    });
   }
 
 });
