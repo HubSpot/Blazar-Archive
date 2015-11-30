@@ -60,7 +60,7 @@ Star.defaultProps = {
 };
 
 Star.propTypes = {
-  loading: PropTypes.bool.isRequired,
+  loading: PropTypes.bool,
   className: PropTypes.string,
   isStarred: PropTypes.bool.isRequired,
   toggleStar: PropTypes.func.isRequired,
