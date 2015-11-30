@@ -8,7 +8,6 @@ import Icon from '../shared/Icon.jsx';
 import Loader from '../shared/Loader.jsx';
 import BuildStates from '../../constants/BuildStates';
 
-window.$ = $;
 
 const initialState = {
   logExpanded: false,

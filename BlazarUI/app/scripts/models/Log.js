@@ -188,8 +188,10 @@ class Log extends Model {
     // save incomplete last line so we can prepend it to the
     // incomplete first line of the next fetch if we continue to scroll down
     const tempLast = last(this.newLogLines);
-    // chop off last incomplete line
-    this.newLogLines = initial(this.newLogLines);
+    // chop off last incomplete line, as long as we have more to fetch
+    if (!this.endOfLogLoaded) {
+      this.newLogLines = initial(this.newLogLines);  
+    }
     // prepend the rest of the first line that was cutoff last fetch
     if (this.lastLine) {
       this.newLogLines[0].text = this.lastLine.text + this.newLogLines[0].text;  
