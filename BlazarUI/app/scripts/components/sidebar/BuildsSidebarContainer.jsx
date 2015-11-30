@@ -28,7 +28,7 @@ class BuildsSidebarContainer extends Component {
     
     bindAll(this, 
       'persistStarChange', 
-      'onBuildsStatusChange', 
+      'onStoreChange', 
       'getBuildsOfType', 
       'updateResults', 
       'setToggleState'
@@ -57,13 +57,13 @@ class BuildsSidebarContainer extends Component {
   componentDidMount() {
     StarActions.loadStars('sidebar');
 
-    this.unsubscribeFromStars = StarStore.listen(this.onBuildsStatusChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStoreChange);
     //
     // temporarily load global builds until we have a searchable endpoint
-    this.unsubscribeFromGlobalBuilds = GlobalBuildsStore.listen(this.onBuildsStatusChange);
+    this.unsubscribeFromGlobalBuilds = GlobalBuildsStore.listen(this.onStoreChange);
     //
     
-    this.unsubscribeFromStarredBuilds = BuildsStore.listen(this.onBuildsStatusChange);
+    this.unsubscribeFromStarredBuilds = BuildsStore.listen(this.onStoreChange);
     BuildsActions.loadBuilds(this.state.toggleFilterState);
     // initially load global builds so we have quick access
     // we will remove this when we have a searchable endpoint
@@ -102,11 +102,11 @@ class BuildsSidebarContainer extends Component {
     
   }
 
-  onBuildsStatusChange(state) {
+  onStoreChange(state) {
     if (state.filterHasChanged) {
       state.changingBuildsType = false;
     }
-    if (!this.state.loadingStars) {
+    if (!state.loadingStars) {
       state.loading = false;
     }
 
