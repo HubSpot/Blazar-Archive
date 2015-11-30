@@ -28,7 +28,8 @@ const BuildStore = Reflux.createStore({
   loadBuildError(error) {
     this.trigger({
       error: error,
-      loading: false
+      loading: false,
+      build: this.build.model.data
     });
   },
 
@@ -43,6 +44,10 @@ const BuildStore = Reflux.createStore({
   },
 
   onCancelBuild() {
+    if (!this.build.model) {
+      this.loadBuildError(`Error cancelling build #${this.params.buildNumber}. See your console for more detail.`);
+    }
+    
     const build = new Build({
       buildId: this.build.model.data.build.id
     });
@@ -369,8 +374,9 @@ const BuildStore = Reflux.createStore({
     const sizePromise = logSize.fetch();
 
     sizePromise.fail((err) => {
+      console.warn('Error requesting log size.');
       console.warn(err);
-      this.loadBuildError('Error requesting log size. View your console for more detail.');
+      this.loadBuildError('Error accessing build log, or log does not exist. View console for more detail');
     });
 
     return sizePromise;
@@ -378,7 +384,7 @@ const BuildStore = Reflux.createStore({
 
   _assignBuildProcessing() {
     const buildState = this.build.model.data.build.state;
-    
+
     switch (buildState) {
       case BuildStates.QUEUED:
       case BuildStates.LAUNCHING:
