@@ -32,6 +32,7 @@ const initialState = {
   log: {
     logLines: []
   },
+  error: false,
   stars: [],
   loading: true,
   loadingStars: true,
