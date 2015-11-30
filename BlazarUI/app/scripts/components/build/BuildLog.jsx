@@ -321,7 +321,7 @@ class BuildLog extends Component {
       )
     }
     
-    else if (log.logLines && log.logLines.length === 0) {
+    else if (log.logLines && log.logLines.length === 0 || !log.logLines) {
       return (
         <BuildLogLine text='No log available' />
       );
