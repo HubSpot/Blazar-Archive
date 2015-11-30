@@ -6,7 +6,6 @@ import BuildStates from '../../constants/BuildStates.js';
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-import Loader from '../shared/Loader.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import BuildHeadline from './BuildHeadline.jsx';
@@ -130,9 +129,9 @@ class BuildContainer extends Component {
                 moduleId={this.state.build.module.id}
                 modulePath={getPathname()}
                 buildNumber={parseInt(this.props.params.buildNumber)}
-                isStarred={this.state.isStarred}
                 toggleStar={this.toggleStar}
-                loadingStars={this.state.loadingStars}
+                loading={this.state.loading}
+                loadingStars={this.state.loadingStars || this.state.build.module.id === -1}
                 isStarred={getIsStarredState(this.state.stars, this.state.build.module.id)}
               />
             </UIGridItem>

@@ -32,7 +32,8 @@ class Star extends Component {
        this.props.className,
        {disabled: this.props.disabled},
        {selected: this.props.isStarred},
-       {unselected: !this.props.isStarred}
+       {unselected: !this.props.isStarred},
+       {loading: this.props.loading}
     ]);
   }
 
@@ -59,6 +60,7 @@ Star.defaultProps = {
 };
 
 Star.propTypes = {
+  loading: PropTypes.bool.isRequired,
   className: PropTypes.string,
   isStarred: PropTypes.bool.isRequired,
   toggleStar: PropTypes.func.isRequired,

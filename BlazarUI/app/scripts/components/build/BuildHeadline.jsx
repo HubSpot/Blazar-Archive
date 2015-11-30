@@ -2,11 +2,12 @@ import React, {Component, PropTypes} from 'react';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Star from '../shared/Star.jsx';
+import Loader from '../shared/Loader.jsx';
 
 class BuildHeadline extends Component {
   
   render() {
-    if (this.props.loadingStars) {
+    if (this.props.loading) {
       return null;
     }
 
@@ -20,6 +21,7 @@ class BuildHeadline extends Component {
           moduleName={this.props.moduleName}
           moduleId={this.props.moduleId}
           updateWithState={true}
+          loading={this.props.loadingStars}
         />
         {this.props.moduleName}
         <HeadlineDetail>
@@ -31,6 +33,7 @@ class BuildHeadline extends Component {
 }
 
 BuildHeadline.propTypes = {
+  loading: PropTypes.bool.isRequired,
   loadingStars: PropTypes.bool.isRequired,
   moduleName: PropTypes.string.isRequired,
   moduleId: PropTypes.number.isRequired,
