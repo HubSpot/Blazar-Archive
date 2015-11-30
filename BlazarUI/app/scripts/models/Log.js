@@ -251,7 +251,7 @@ class Log extends Model {
 
     const splitLines = logData.split(NEW_LINE);
     
-    return compact(splitLines.map((line, i) => {
+    const formattedLogLines = splitLines.map((line, i) => {
       // store second line because we may chop off the first
       if (i === 1) {
         this.pastOffsetLine = this.currentOffsetLine;
@@ -262,11 +262,17 @@ class Log extends Model {
         this.lastOffsetLine = offsetRunningTotal + getByteLength(length);
       }
 
+      if (line.length === 0) {
+        return false;
+      }
+
       return {
         text:  utf8.decode(line),
         offset: offsetRunningTotal += getByteLength(line)
       };
-    }));
+    });
+
+    return compact(formattedLogLines);
 
   }
 
