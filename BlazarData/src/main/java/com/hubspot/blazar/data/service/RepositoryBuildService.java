@@ -43,7 +43,7 @@ public class RepositoryBuildService {
     BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
 
     if (buildNumbers.getPendingBuildId().isPresent()) {
-      int pendingBuildId = buildNumbers.getPendingBuildId().get();
+      long pendingBuildId = buildNumbers.getPendingBuildId().get();
       LOG.info("Not enqueuing build for repository {}, pending build {} already exists", gitInfo.getId().get(), pendingBuildId);
     } else {
       int nextBuildNumber = buildNumbers.getNextBuildNumber();

@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 
 import com.google.inject.Provides;
 import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
+import com.hubspot.blazar.listener.BuildListenerModule;
 import com.hubspot.blazar.util.GitHubHelper;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
@@ -36,7 +37,6 @@ import com.hubspot.blazar.resources.BuildStateResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.FeedbackResource;
 import com.hubspot.blazar.util.BlazarServiceLoader;
-import com.hubspot.blazar.util.BuildLauncher;
 import com.hubspot.blazar.util.DependencyBuilder;
 import com.hubspot.blazar.util.GitHubStatusHandler;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
@@ -67,6 +67,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
     binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule());
+    binder.install(new BuildListenerModule());
 
     binder.bind(BranchResource.class);
     binder.bind(BuildResource.class);
@@ -79,7 +80,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
-    binder.bind(BuildLauncher.class);
     binder.bind(GitHubStatusHandler.class);
     binder.bind(DependencyBuilder.class);
     binder.bind(SingularityTaskKiller.class);

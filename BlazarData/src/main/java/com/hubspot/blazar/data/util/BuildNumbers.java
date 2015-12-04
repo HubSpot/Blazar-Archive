@@ -5,19 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 
 public class BuildNumbers {
-  private final Optional<Integer> pendingBuildId;
+  private final Optional<Long> pendingBuildId;
   private final Optional<Integer> pendingBuildNumber;
-  private final Optional<Integer> inProgressBuildId;
+  private final Optional<Long> inProgressBuildId;
   private final Optional<Integer> inProgressBuildNumber;
-  private final Optional<Integer> lastBuildId;
+  private final Optional<Long> lastBuildId;
   private final Optional<Integer> lastBuildNumber;
 
   @JsonCreator
-  public BuildNumbers(@JsonProperty("pendingBuildId") Optional<Integer> pendingBuildId,
+  public BuildNumbers(@JsonProperty("pendingBuildId") Optional<Long> pendingBuildId,
                       @JsonProperty("pendingBuildNumber") Optional<Integer> pendingBuildNumber,
-                      @JsonProperty("inProgressBuildId") Optional<Integer> inProgressBuildId,
+                      @JsonProperty("inProgressBuildId") Optional<Long> inProgressBuildId,
                       @JsonProperty("inProgressBuildNumber") Optional<Integer> inProgressBuildNumber,
-                      @JsonProperty("lastBuildId") Optional<Integer> lastBuildId,
+                      @JsonProperty("lastBuildId") Optional<Long> lastBuildId,
                       @JsonProperty("lastBuildNumber") Optional<Integer> lastBuildNumber) {
     this.pendingBuildId = pendingBuildId;
     this.pendingBuildNumber = pendingBuildNumber;
@@ -37,7 +37,7 @@ public class BuildNumbers {
     }
   }
 
-  public Optional<Integer> getPendingBuildId() {
+  public Optional<Long> getPendingBuildId() {
     return pendingBuildId;
   }
 
@@ -45,7 +45,7 @@ public class BuildNumbers {
     return pendingBuildNumber;
   }
 
-  public Optional<Integer> getInProgressBuildId() {
+  public Optional<Long> getInProgressBuildId() {
     return inProgressBuildId;
   }
 
@@ -53,7 +53,7 @@ public class BuildNumbers {
     return inProgressBuildNumber;
   }
 
-  public Optional<Integer> getLastBuildId() {
+  public Optional<Long> getLastBuildId() {
     return lastBuildId;
   }
 

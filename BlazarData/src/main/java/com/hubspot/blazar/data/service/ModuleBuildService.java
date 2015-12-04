@@ -43,7 +43,7 @@ public class ModuleBuildService {
     BuildNumbers buildNumbers = getBuildNumbers(module.getId().get());
 
     if (buildNumbers.getPendingBuildId().isPresent()) {
-      int pendingBuildId = buildNumbers.getPendingBuildId().get();
+      long pendingBuildId = buildNumbers.getPendingBuildId().get();
       LOG.info("Not enqueuing build for module {}, pending build {} already exists", module.getId().get(), pendingBuildId);
     } else {
       int nextBuildNumber = buildNumbers.getNextBuildNumber();
