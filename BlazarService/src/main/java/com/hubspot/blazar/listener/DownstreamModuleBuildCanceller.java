@@ -32,13 +32,9 @@ public class DownstreamModuleBuildCanceller implements ModuleBuildListener {
     for (int downstreamModule : dependencyGraph.outgoingVertices(build.getModuleId())) {
       for (ModuleBuild otherBuild : builds) {
         if (otherBuild.getModuleId() == downstreamModule && !otherBuild.getState().isComplete()) {
-          cancelBuild(otherBuild);
+          moduleBuildService.cancel(otherBuild);
         }
       }
     }
-  }
-
-  private void cancelBuild(ModuleBuild build) {
-    // TODO cancel
   }
 }

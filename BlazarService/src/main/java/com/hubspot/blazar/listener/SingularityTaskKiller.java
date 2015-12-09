@@ -1,9 +1,8 @@
-package com.hubspot.blazar.util;
+package com.hubspot.blazar.listener;
 
 import com.google.common.base.Optional;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import com.hubspot.blazar.base.Build;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.listener.ModuleBuildListener;
 import com.hubspot.singularity.SingularityTaskCleanupResult;
 import com.hubspot.singularity.client.SingularityClient;
 import org.slf4j.Logger;
@@ -13,21 +12,19 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class SingularityTaskKiller {
+public class SingularityTaskKiller implements ModuleBuildListener {
   private static final Logger LOG = LoggerFactory.getLogger(SingularityTaskKiller.class);
 
   private final SingularityClient singularityClient;
 
   @Inject
-  public SingularityTaskKiller(SingularityClient singularityClient, EventBus eventBus) {
+  public SingularityTaskKiller(SingularityClient singularityClient) {
     this.singularityClient = singularityClient;
-
-    eventBus.register(this);
   }
 
-  @Subscribe
-  public void killSingularityTask(Build build) throws Exception {
-    if (build.getState() == Build.State.CANCELLED && build.getTaskId().isPresent()) {
+  @Override
+  public void buildChanged(ModuleBuild build) throws Exception {
+    if (build.getTaskId().isPresent()) {
       String taskId = build.getTaskId().get();
       LOG.info("Killing singularity task {} for cancelled build {}", taskId, build.getId().get());
       Optional<SingularityTaskCleanupResult> result = singularityClient.killTask(taskId, Optional.<String>absent());

@@ -13,7 +13,7 @@ import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 public interface RepositoryBuildDao {
 
   @SingleValueResult
-  @SqlQuery("SELECT * FROM repo_builds_v2 WHERE build.id = :id")
+  @SqlQuery("SELECT * FROM repo_builds WHERE id = :id")
   Optional<RepositoryBuild> get(@Bind("id") long id);
 
   @SqlQuery("" +
@@ -23,23 +23,23 @@ public interface RepositoryBuildDao {
       "inProgressBuild.buildNumber AS inProgressBuildNumber, " +
       "lastBuild.id AS lastBuildId, " +
       "lastBuild.buildNumber AS lastBuildNumber " +
-      "FROM branches_v2 b " +
-      "LEFT OUTER JOIN repo_builds_v2 AS pendingBuild ON (b.pendingBuildId = pendingBuild.id) " +
-      "LEFT OUTER JOIN repo_builds_v2 AS inProgressBuild ON (b.inProgressBuildId = inProgressBuild.id) " +
-      "LEFT OUTER JOIN repo_builds_v2 AS lastBuild ON (b.lastBuildId = lastBuild.id) " +
+      "FROM branches b " +
+      "LEFT OUTER JOIN repo_builds AS pendingBuild ON (b.pendingBuildId = pendingBuild.id) " +
+      "LEFT OUTER JOIN repo_builds AS inProgressBuild ON (b.inProgressBuildId = inProgressBuild.id) " +
+      "LEFT OUTER JOIN repo_builds AS lastBuild ON (b.lastBuildId = lastBuild.id) " +
       "WHERE b.id = :branchId")
   BuildNumbers getBuildNumbers(@Bind("branchId") int branchId);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO repo_builds_v2 (branchId, buildNumber, state) VALUES (:branchId, :buildNumber, :state)")
+  @SqlUpdate("INSERT INTO repo_builds (branchId, buildNumber, state) VALUES (:branchId, :buildNumber, :state)")
   long enqueue(@BindWithRosetta RepositoryBuild build);
 
-  @SqlUpdate("UPDATE repo_builds_v2 SET startTimestamp = :startTimestamp, sha = :sha, state = :state, commitInfo = :commitInfo, dependencyGraph = :dependencyGraph WHERE id = :id AND state = 'QUEUED'")
+  @SqlUpdate("UPDATE repo_builds SET startTimestamp = :startTimestamp, sha = :sha, state = :state, commitInfo = :commitInfo, dependencyGraph = :dependencyGraph WHERE id = :id AND state = 'QUEUED'")
   int begin(@BindWithRosetta RepositoryBuild build);
 
-  @SqlUpdate("UPDATE repo_builds_v2 SET state = :state WHERE id = :id AND state = 'LAUNCHING'")
+  @SqlUpdate("UPDATE repo_builds SET state = :state WHERE id = :id AND state IN ('LAUNCHING', 'IN_PROGRESS')")
   int update(@BindWithRosetta RepositoryBuild build);
 
-  @SqlUpdate("UPDATE repo_builds_v2 SET endTimestamp = :endTimestamp, state = :state WHERE id = :id AND state IN ('QUEUED', 'LAUNCHING', 'IN_PROGRESS')")
+  @SqlUpdate("UPDATE repo_builds SET endTimestamp = :endTimestamp, state = :state WHERE id = :id AND state IN ('QUEUED', 'LAUNCHING', 'IN_PROGRESS')")
   int complete(@BindWithRosetta RepositoryBuild build);
 }

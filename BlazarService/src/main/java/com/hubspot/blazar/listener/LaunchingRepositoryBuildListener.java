@@ -3,9 +3,11 @@ package com.hubspot.blazar.listener;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.base.listener.RepositoryBuildListener;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.util.GitHubHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,14 +22,17 @@ import java.util.Set;
 public class LaunchingRepositoryBuildListener implements RepositoryBuildListener {
   private static final Logger LOG = LoggerFactory.getLogger(LaunchingRepositoryBuildListener.class);
 
+  private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
   private final ModuleService moduleService;
   private final GitHubHelper gitHubHelper;
 
   @Inject
-  public LaunchingRepositoryBuildListener(ModuleBuildService moduleBuildService,
+  public LaunchingRepositoryBuildListener(RepositoryBuildService repositoryBuildService,
+                                          ModuleBuildService moduleBuildService,
                                           ModuleService moduleService,
                                           GitHubHelper gitHubHelper) {
+    this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
     this.moduleService = moduleService;
     this.gitHubHelper = gitHubHelper;
@@ -43,6 +48,8 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
     for (Module module : toBuild) {
       moduleBuildService.enqueue(build, module);
     }
+
+    repositoryBuildService.update(build.withState(State.IN_PROGRESS));
   }
 
   private Set<Module> findModulesToBuild(CommitInfo commitInfo, Set<Module> modules) {

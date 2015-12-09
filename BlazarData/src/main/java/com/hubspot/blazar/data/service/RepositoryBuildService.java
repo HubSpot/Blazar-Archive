@@ -68,12 +68,17 @@ public class RepositoryBuildService {
 
   @Transactional
   public void begin(RepositoryBuild build) {
+    beginNoPublish(build);
+
+    eventBus.post(build);
+  }
+
+  @Transactional
+  void beginNoPublish(RepositoryBuild build) {
     Preconditions.checkArgument(build.getStartTimestamp().isPresent());
 
     checkAffectedRowCount(repositoryBuildDao.begin(build));
     checkAffectedRowCount(branchDao.updateInProgressBuild(build));
-
-    eventBus.post(build);
   }
 
   @Transactional
@@ -97,7 +102,7 @@ public class RepositoryBuildService {
     }
 
     if (build.getState() == State.QUEUED) {
-      begin(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
+      beginNoPublish(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
     }
 
     update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));

@@ -37,11 +37,10 @@ import com.hubspot.blazar.resources.BuildStateResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.FeedbackResource;
 import com.hubspot.blazar.util.BlazarServiceLoader;
-import com.hubspot.blazar.util.DependencyBuilder;
 import com.hubspot.blazar.util.GitHubStatusHandler;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
-import com.hubspot.blazar.util.SingularityTaskKiller;
+import com.hubspot.blazar.listener.SingularityTaskKiller;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
@@ -81,7 +80,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
     binder.bind(GitHubStatusHandler.class);
-    binder.bind(DependencyBuilder.class);
     binder.bind(SingularityTaskKiller.class);
     binder.bind(GitHubHelper.class);
 

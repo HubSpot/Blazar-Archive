@@ -1,7 +1,7 @@
 --liquibase formatted sql
 
 --changeset tpetr:1 dbms:mysql
-CREATE TABLE `branches_v2` (
+CREATE TABLE `branches` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `host` varchar(250) NOT NULL,
   `organization` varchar(250) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE `branches_v2` (
   INDEX (`updatedTimestamp`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `modules_v2` (
+CREATE TABLE `modules` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `branchId` int(11) unsigned NOT NULL,
   `name` varchar(250) NOT NULL,
@@ -38,21 +38,21 @@ CREATE TABLE `modules_v2` (
   INDEX (`updatedTimestamp`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `module_provides_v2` (
+CREATE TABLE `module_provides` (
   `moduleId` int(11) unsigned NOT NULL,
   `name` varchar(250) NOT NULL,
   UNIQUE INDEX (`moduleId`, `name`),
   INDEX (`name`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `module_depends_v2` (
+CREATE TABLE `module_depends` (
   `moduleId` int(11) unsigned NOT NULL,
   `name` varchar(250) NOT NULL,
   UNIQUE INDEX (`moduleId`, `name`),
   INDEX (`name`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `repo_builds_v2` (
+CREATE TABLE `repo_builds` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `branchId` int(11) unsigned NOT NULL,
   `buildNumber` int(11) unsigned NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE `repo_builds_v2` (
   UNIQUE INDEX (`branchId`, `buildNumber`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `module_builds_v2` (
+CREATE TABLE `module_builds` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `moduleId` int(11) unsigned NOT NULL,
   `repoBuildId` bigint(20) unsigned NOT NULL,
@@ -76,7 +76,6 @@ CREATE TABLE `module_builds_v2` (
   `endTimestamp` bigint(20) unsigned,
   `buildConfig` mediumtext,
   `resolvedConfig` mediumtext,
-  `runId` varchar(500),
   `taskId` varchar(500),
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`moduleId`, `buildNumber`),

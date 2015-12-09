@@ -1,9 +1,11 @@
 package com.hubspot.blazar.data.service;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
@@ -31,12 +33,16 @@ public class ModuleBuildService {
     this.eventBus = eventBus;
   }
 
-  public BuildNumbers getBuildNumbers(int moduleId) {
-    return moduleBuildDao.getBuildNumbers(moduleId);
+  public Optional<ModuleBuild> get(long id) {
+    return moduleBuildDao.get(id);
   }
 
   public Set<ModuleBuild> getByRepositoryBuild(long repoBuildId) {
     return moduleBuildDao.getByRepositoryBuild(repoBuildId);
+  }
+
+  public BuildNumbers getBuildNumbers(int moduleId) {
+    return moduleBuildDao.getBuildNumbers(moduleId);
   }
 
   public void enqueue(RepositoryBuild repositoryBuild, Module module) {
@@ -68,12 +74,57 @@ public class ModuleBuildService {
 
   @Transactional
   public void begin(ModuleBuild build) {
+    beginNoPublish(build);
+
+    eventBus.post(build);
+  }
+
+  @Transactional
+  void beginNoPublish(ModuleBuild build) {
     Preconditions.checkArgument(build.getStartTimestamp().isPresent());
 
     checkAffectedRowCount(moduleBuildDao.begin(build));
     checkAffectedRowCount(moduleDao.updateInProgressBuild(build));
+  }
+
+  @Transactional
+  public void update(ModuleBuild build) {
+    if (build.getState().isComplete()) {
+      Preconditions.checkArgument(build.getEndTimestamp().isPresent());
+
+      checkAffectedRowCount(moduleBuildDao.complete(build));
+      checkAffectedRowCount(moduleDao.updateLastBuild(build));
+    } else {
+      checkAffectedRowCount(moduleBuildDao.update(build));
+    }
 
     eventBus.post(build);
+  }
+
+  @Transactional
+  public void cancel(ModuleBuild build) {
+    if (build.getState().isComplete()) {
+      throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
+    }
+
+    if (build.getState() == State.QUEUED) {
+      beginNoPublish(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
+    }
+
+    update(build.withState(State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
+  }
+
+  @Transactional
+  public void fail(ModuleBuild build) {
+    if (build.getState().isComplete()) {
+      throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
+    }
+
+    if (build.getState() == State.QUEUED) {
+      beginNoPublish(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
+    }
+
+    update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
   }
 
   private static void checkAffectedRowCount(int affectedRows) {

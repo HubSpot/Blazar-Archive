@@ -38,6 +38,9 @@ public class BuildListenerModule implements Module {
     // launch downstream builds if all upstreams succeeded
     moduleBuildListeners.addBinding(ModuleBuild.State.SUCCEEDED).to(DownstreamModuleBuildLauncher.class);
 
+    // kill the singularity task
+    moduleBuildListeners.addBinding(ModuleBuild.State.CANCELLED).to(SingularityTaskKiller.class);
+
     // cancel all downstream builds
     moduleBuildListeners.addBinding(ModuleBuild.State.CANCELLED).to(DownstreamModuleBuildCanceller.class);
     moduleBuildListeners.addBinding(ModuleBuild.State.FAILED).to(DownstreamModuleBuildCanceller.class);
