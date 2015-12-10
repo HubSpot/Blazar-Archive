@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Singleton
 public class RepositoryBuildService {
@@ -33,6 +34,16 @@ public class RepositoryBuildService {
 
   public Optional<RepositoryBuild> get(long id) {
     return repositoryBuildDao.get(id);
+  }
+
+  public List<RepositoryBuild> getByBranch(int branchId) {
+    // TODO
+    return null;
+  }
+
+  public Optional<RepositoryBuild> getByBranchAndNumber(int branchId, int buildNumber) {
+    // TODO
+    return null;
   }
 
   public BuildNumbers getBuildNumbers(int branchId) {

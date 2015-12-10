@@ -21,10 +21,6 @@ public class BranchService {
     return branchDao.get(id);
   }
 
-  public Optional<GitInfo> lookup(String host, String organization, String repository, String branch) {
-    return branchDao.lookup(host, organization, repository, branch);
-  }
-
   public Optional<GitInfo> lookup(GitInfo gitInfo) {
     return branchDao.get(gitInfo);
   }

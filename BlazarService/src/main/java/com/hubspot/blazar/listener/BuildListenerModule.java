@@ -13,6 +13,8 @@ public class BuildListenerModule implements Module {
 
   @Override
   public void configure(Binder binder) {
+    binder.bind(BuildEventDispatcher.class);
+
     MapBinder<State, RepositoryBuildListener> repositoryBuildListeners = MapBinder.newMapBinder(binder, RepositoryBuild.State.class, RepositoryBuildListener.class).permitDuplicates();
 
     // launch the queued build if nothing in progress
@@ -29,6 +31,14 @@ public class BuildListenerModule implements Module {
     repositoryBuildListeners.addBinding(RepositoryBuild.State.CANCELLED).to(CompletedRepositoryBuildListener.class);
     repositoryBuildListeners.addBinding(RepositoryBuild.State.FAILED).to(CompletedRepositoryBuildListener.class);
     repositoryBuildListeners.addBinding(RepositoryBuild.State.UNSTABLE).to(CompletedRepositoryBuildListener.class);
+
+    // update GitHub status
+    repositoryBuildListeners.addBinding(RepositoryBuild.State.LAUNCHING).to(GitHubStatusListener.class);
+    repositoryBuildListeners.addBinding(RepositoryBuild.State.IN_PROGRESS).to(GitHubStatusListener.class);
+    repositoryBuildListeners.addBinding(RepositoryBuild.State.SUCCEEDED).to(GitHubStatusListener.class);
+    repositoryBuildListeners.addBinding(RepositoryBuild.State.CANCELLED).to(GitHubStatusListener.class);
+    repositoryBuildListeners.addBinding(RepositoryBuild.State.FAILED).to(GitHubStatusListener.class);
+    repositoryBuildListeners.addBinding(RepositoryBuild.State.UNSTABLE).to(GitHubStatusListener.class);
 
     MapBinder<ModuleBuild.State, ModuleBuildListener> moduleBuildListeners = MapBinder.newMapBinder(binder, ModuleBuild.State.class, ModuleBuildListener.class).permitDuplicates();
 

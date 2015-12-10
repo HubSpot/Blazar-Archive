@@ -11,6 +11,8 @@ import javax.inject.Singleton;
 import com.google.inject.Provides;
 import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
 import com.hubspot.blazar.listener.BuildListenerModule;
+import com.hubspot.blazar.resources.ModuleBuildResource;
+import com.hubspot.blazar.resources.RepositoryBuildResource;
 import com.hubspot.blazar.util.GitHubHelper;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
@@ -32,15 +34,11 @@ import com.hubspot.blazar.discovery.docker.DockerModuleDiscovery;
 import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
-import com.hubspot.blazar.resources.BuildResource;
-import com.hubspot.blazar.resources.BuildStateResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.FeedbackResource;
 import com.hubspot.blazar.util.BlazarServiceLoader;
-import com.hubspot.blazar.util.GitHubStatusHandler;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
-import com.hubspot.blazar.listener.SingularityTaskKiller;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
@@ -69,8 +67,8 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.install(new BuildListenerModule());
 
     binder.bind(BranchResource.class);
-    binder.bind(BuildResource.class);
-    binder.bind(BuildStateResource.class);
+    binder.bind(ModuleBuildResource.class);
+    binder.bind(RepositoryBuildResource.class);
     binder.bind(BuildHistoryResource.class);
     binder.bind(FeedbackResource.class);
 
@@ -79,8 +77,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
-    binder.bind(GitHubStatusHandler.class);
-    binder.bind(SingularityTaskKiller.class);
     binder.bind(GitHubHelper.class);
 
     Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
