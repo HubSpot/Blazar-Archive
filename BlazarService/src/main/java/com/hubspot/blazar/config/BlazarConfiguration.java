@@ -36,10 +36,6 @@ public class BlazarConfiguration extends Configuration {
   private DataSourceFactory databaseConfiguration;
 
   @Valid
-  @JsonProperty("ui")
-  private UiConfiguration uiConfiguration = new UiConfiguration();
-
-  @Valid
   @JsonProperty("slack_blazar")
   private Optional<SlackConfiguration> slackConfiguration = Optional.absent();
 
@@ -80,15 +76,6 @@ public class BlazarConfiguration extends Configuration {
 
   public BlazarConfiguration setDatabaseConfiguration(DataSourceFactory databaseConfiguration) {
     this.databaseConfiguration = databaseConfiguration;
-    return this;
-  }
-
-  public UiConfiguration getUiConfiguration() {
-    return uiConfiguration;
-  }
-
-  public BlazarConfiguration setUiConfiguration(UiConfiguration uiConfiguration) {
-    this.uiConfiguration = uiConfiguration;
     return this;
   }
 

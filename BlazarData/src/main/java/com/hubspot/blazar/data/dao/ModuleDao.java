@@ -35,9 +35,6 @@ public interface ModuleDao {
   @SqlUpdate("UPDATE modules SET pendingBuildId = :id, updatedTimestamp = " + NOW + " WHERE id = :moduleId AND pendingBuildId IS NULL")
   int updatePendingBuild(@BindWithRosetta ModuleBuild build);
 
-  @SqlUpdate("UPDATE modules SET pendingBuildId = NULL, updatedTimestamp = " + NOW + " WHERE id = :moduleId AND pendingBuildId = :id")
-  int deletePendingBuild(@BindWithRosetta ModuleBuild build);
-
   @SqlUpdate("UPDATE modules SET inProgressBuildId = :id, pendingBuildId = NULL, updatedTimestamp = " + NOW + " WHERE id = :moduleId AND pendingBuildId = :id AND inProgressBuildId IS NULL")
   int updateInProgressBuild(@BindWithRosetta ModuleBuild build);
 

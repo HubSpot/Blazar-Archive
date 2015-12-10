@@ -9,11 +9,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.google.inject.Provides;
-import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
+import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.listener.BuildListenerModule;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
 import com.hubspot.blazar.util.GitHubHelper;
+import com.hubspot.blazar.util.ModuleBuildLauncher;
+import com.hubspot.blazar.util.RepositoryBuildLauncher;
+import com.hubspot.blazar.util.SingularityBuildLauncher;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -28,15 +31,10 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
-import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
-import com.hubspot.blazar.discovery.ModuleDiscovery;
-import com.hubspot.blazar.discovery.docker.DockerModuleDiscovery;
-import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.FeedbackResource;
-import com.hubspot.blazar.util.BlazarServiceLoader;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
 import com.hubspot.horizon.AsyncHttpClient;
@@ -65,6 +63,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule());
     binder.install(new BuildListenerModule());
+    binder.install(new DiscoveryModule());
 
     binder.bind(BranchResource.class);
     binder.bind(ModuleBuildResource.class);
@@ -78,16 +77,9 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
     binder.bind(GitHubHelper.class);
-
-    Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
-    multibinder.addBinding().to(MavenModuleDiscovery.class);
-    multibinder.addBinding().to(DockerModuleDiscovery.class);
-    for (Class<? extends ModuleDiscovery> moduleDiscovery : BlazarServiceLoader.load(ModuleDiscovery.class)) {
-      multibinder.addBinding().to(moduleDiscovery);
-    }
-
-    binder.bind(BlazarConfigModuleDiscovery.class);
-    binder.bind(ModuleDiscovery.class).to(CompositeModuleDiscovery.class);
+    binder.bind(RepositoryBuildLauncher.class);
+    binder.bind(ModuleBuildLauncher.class);
+    binder.bind(SingularityBuildLauncher.class);
 
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
     for (Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {
