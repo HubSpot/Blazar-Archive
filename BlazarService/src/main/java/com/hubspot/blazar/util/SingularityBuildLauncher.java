@@ -2,6 +2,7 @@ package com.hubspot.blazar.util;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpRequest;
@@ -20,10 +21,9 @@ public class SingularityBuildLauncher {
   private final SingularityConfiguration singularityConfiguration;
 
   @Inject
-  public SingularityBuildLauncher(AsyncHttpClient asyncHttpClient,
-                                  SingularityConfiguration singularityConfiguration) {
+  public SingularityBuildLauncher(AsyncHttpClient asyncHttpClient, BlazarConfiguration blazarConfiguration) {
     this.asyncHttpClient = asyncHttpClient;
-    this.singularityConfiguration = singularityConfiguration;
+    this.singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
   }
 
   public synchronized HttpResponse launchBuild(ModuleBuild build) throws Exception {
