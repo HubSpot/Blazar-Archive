@@ -11,6 +11,7 @@ import javax.inject.Singleton;
 import com.google.inject.Provides;
 import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.listener.BuildListenerModule;
+import com.hubspot.blazar.resources.BranchStateResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
 import com.hubspot.blazar.util.GitHubHelper;
@@ -66,6 +67,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.install(new DiscoveryModule());
 
     binder.bind(BranchResource.class);
+    binder.bind(BranchStateResource.class);
     binder.bind(ModuleBuildResource.class);
     binder.bind(RepositoryBuildResource.class);
     binder.bind(BuildHistoryResource.class);

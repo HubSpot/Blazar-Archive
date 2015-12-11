@@ -8,6 +8,7 @@ import com.hubspot.blazar.data.dao.BranchDao;
 import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Set;
 
 public class BranchService {
   private final BranchDao branchDao;
@@ -15,6 +16,10 @@ public class BranchService {
   @Inject
   public BranchService(BranchDao branchDao) {
     this.branchDao = branchDao;
+  }
+
+  public Set<GitInfo> getAll() {
+    return branchDao.getAll();
   }
 
   public Optional<GitInfo> get(int id) {

@@ -10,8 +10,13 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
+import java.util.Set;
+
 public interface BranchDao {
   String NOW = "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)";
+
+  @SqlQuery("SELECT * FROM branches")
+  Set<GitInfo> getAll();
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM branches WHERE id = :id")

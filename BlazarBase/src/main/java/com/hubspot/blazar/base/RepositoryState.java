@@ -18,9 +18,24 @@ public class RepositoryState {
                          @JsonProperty("inProgressBuild") Optional<RepositoryBuild> inProgressBuild,
                          @JsonProperty("pendingBuild") Optional<RepositoryBuild> pendingBuild) {
     this.gitInfo = gitInfo;
-    this.lastBuild = lastBuild;
-    this.inProgressBuild = inProgressBuild;
-    this.pendingBuild = pendingBuild;
+
+    if (lastBuild.isPresent() && !lastBuild.get().getId().isPresent()) {
+      this.lastBuild = Optional.absent();
+    } else {
+      this.lastBuild = lastBuild;
+    }
+
+    if (inProgressBuild.isPresent() && !inProgressBuild.get().getId().isPresent()) {
+      this.inProgressBuild = Optional.absent();
+    } else {
+      this.inProgressBuild = inProgressBuild;
+    }
+
+    if (pendingBuild.isPresent() && !pendingBuild.get().getId().isPresent()) {
+      this.pendingBuild = Optional.absent();
+    } else {
+      this.pendingBuild = pendingBuild;
+    }
   }
 
   public GitInfo getGitInfo() {

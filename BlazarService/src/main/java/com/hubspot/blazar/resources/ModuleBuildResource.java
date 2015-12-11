@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.List;
 
 @Path("/modules/builds")
-@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ModuleBuildResource {
   private static final Logger LOG = LoggerFactory.getLogger(ModuleBuildResource.class);
