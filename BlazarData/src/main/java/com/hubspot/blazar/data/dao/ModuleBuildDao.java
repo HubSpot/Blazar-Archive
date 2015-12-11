@@ -10,6 +10,7 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
+import java.util.List;
 import java.util.Set;
 
 public interface ModuleBuildDao {
@@ -20,6 +21,13 @@ public interface ModuleBuildDao {
 
   @SqlQuery("SELECT * FROM module_builds WHERE repoBuildId = :repoBuildId")
   Set<ModuleBuild> getByRepositoryBuild(@Bind("repoBuildId") long repoBuildId);
+
+  @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :moduleId ORDER BY id DESC")
+  List<ModuleBuild> getByModule(@Bind("moduleId") int moduleId);
+
+  @SingleValueResult
+  @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :moduleId AND buildNumber = :buildNumber")
+  Optional<ModuleBuild> getByModuleAndNumber(@Bind("moduleId") int moduleId, @Bind("buildNumber") int buildNumber);
 
   @SqlQuery("" +
       "SELECT pendingBuild.id AS pendingBuildId, " +

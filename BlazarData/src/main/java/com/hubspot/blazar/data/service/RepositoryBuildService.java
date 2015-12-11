@@ -37,13 +37,11 @@ public class RepositoryBuildService {
   }
 
   public List<RepositoryBuild> getByBranch(int branchId) {
-    // TODO
-    return null;
+    return repositoryBuildDao.getByBranch(branchId);
   }
 
   public Optional<RepositoryBuild> getByBranchAndNumber(int branchId, int buildNumber) {
-    // TODO
-    return null;
+    return repositoryBuildDao.getByBranchAndNumber(branchId, buildNumber);
   }
 
   public BuildNumbers getBuildNumbers(int branchId) {

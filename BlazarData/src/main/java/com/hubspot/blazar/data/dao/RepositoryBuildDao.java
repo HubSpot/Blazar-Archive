@@ -10,11 +10,20 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
+import java.util.List;
+
 public interface RepositoryBuildDao {
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM repo_builds WHERE id = :id")
   Optional<RepositoryBuild> get(@Bind("id") long id);
+
+  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId ORDER BY id DESC")
+  List<RepositoryBuild> getByBranch(@Bind("branchId") int branchId);
+
+  @SingleValueResult
+  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND buildNumber = :buildNumber")
+  Optional<RepositoryBuild> getByBranchAndNumber(@Bind("branchId") int branchId, @Bind("buildNumber") int buildNumber);
 
   @SqlQuery("" +
       "SELECT pendingBuild.id AS pendingBuildId, " +

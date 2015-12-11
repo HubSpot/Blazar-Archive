@@ -43,13 +43,11 @@ public class ModuleBuildService {
   }
 
   public List<ModuleBuild> getByModule(int moduleId) {
-    // TODO
-    return null;
+    return moduleBuildDao.getByModule(moduleId);
   }
 
   public Optional<ModuleBuild> getByModuleAndNumber(int moduleId, int buildNumber) {
-    // TODO
-    return null;
+    return moduleBuildDao.getByModuleAndNumber(moduleId, buildNumber);
   }
 
   public BuildNumbers getBuildNumbers(int moduleId) {
