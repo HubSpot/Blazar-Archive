@@ -48,18 +48,20 @@ public class RepositoryBuildService {
     return repositoryBuildDao.getBuildNumbers(branchId);
   }
 
-  public void enqueue(GitInfo gitInfo) {
+  public long enqueue(GitInfo gitInfo) {
     BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
 
     if (buildNumbers.getPendingBuildId().isPresent()) {
       long pendingBuildId = buildNumbers.getPendingBuildId().get();
       LOG.info("Not enqueuing build for repository {}, pending build {} already exists", gitInfo.getId().get(), pendingBuildId);
+      return pendingBuildId;
     } else {
       int nextBuildNumber = buildNumbers.getNextBuildNumber();
       LOG.info("Enqueuing build for repository {} with build number {}", gitInfo.getId().get(), nextBuildNumber);
       RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, nextBuildNumber);
       build = enqueue(build);
       LOG.info("Enqueued build for repository {} with id {}", gitInfo.getId().get(), build.getId().get());
+      return build.getId().get();
     }
   }
 
@@ -115,6 +117,19 @@ public class RepositoryBuildService {
     }
 
     update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+  }
+
+  @Transactional
+  public void cancel(RepositoryBuild build) {
+    if (build.getState().isComplete()) {
+      throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
+    }
+
+    if (build.getState() == State.QUEUED) {
+      // TODO
+    } else {
+      update(build.withState(State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
+    }
   }
 
   private static void checkAffectedRowCount(int affectedRows) {

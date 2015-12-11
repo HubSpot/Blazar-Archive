@@ -3,6 +3,8 @@ package com.hubspot.blazar.resources;
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryState;
+import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
 import javax.inject.Inject;
@@ -18,7 +20,9 @@ import java.util.Set;
 public class BranchResource {
 
   @Inject
-  public BranchResource() {}
+  public BranchResource(BranchService branchService, ModuleService moduleService) {
+
+  }
 
   @GET
   @PropertyFiltering

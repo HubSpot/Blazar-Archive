@@ -128,6 +128,10 @@ public class ModuleBuild {
     return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), taskId, buildConfig, resolvedConfig);
   }
 
+  public ModuleBuild withTaskId(String taskId) {
+    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, Optional.of(taskId), buildConfig, resolvedConfig);
+  }
+
   public ModuleBuild withBuildConfig(BuildConfig buildConfig) {
     return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, Optional.of(buildConfig), resolvedConfig);
   }

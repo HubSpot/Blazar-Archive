@@ -30,6 +30,10 @@ public class RepositoryBuildCompleter implements ModuleBuildListener {
   @Override
   public void buildChanged(ModuleBuild build) throws Exception {
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
+    if (repositoryBuild.getState().isComplete()) {
+      // already done, this must be a stale ModuleBuild event
+      return;
+    }
 
     // if no downstream builds, we could be done building
     if (noDownstreamBuilds(build, repositoryBuild.getDependencyGraph().get())) {
