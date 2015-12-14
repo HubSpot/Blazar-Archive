@@ -1,5 +1,6 @@
 package com.hubspot.blazar.discovery;
 
+import com.google.common.base.Optional;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.DependencyInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
@@ -46,11 +47,11 @@ public class BlazarConfigModuleDiscovery extends AbstractModuleDiscovery {
 
     Set<DiscoveredModule> modules = new HashSet<>();
     for (String blazarConfig : blazarConfigs) {
-      BuildConfig buildConfig = configFor(blazarConfig, repository, gitInfo).get();
-      if (canBuild(buildConfig)) {
+      Optional<BuildConfig> buildConfig = configFor(blazarConfig, repository, gitInfo);
+      if (buildConfig.isPresent() && canBuild(buildConfig.get())) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
-        modules.add(new DiscoveredModule(moduleName, blazarConfig, glob, buildConfig.getBuildpack(), DependencyInfo.unknown()));
+        modules.add(new DiscoveredModule(moduleName, blazarConfig, glob, buildConfig.get().getBuildpack(), DependencyInfo.unknown()));
       }
     }
     return modules;
