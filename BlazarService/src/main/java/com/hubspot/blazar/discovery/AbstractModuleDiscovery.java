@@ -41,7 +41,11 @@ public abstract class AbstractModuleDiscovery implements ModuleDiscovery {
       return Optional.absent();
     }
 
-    return Optional.of(mapper.readValue(yamlFactory.createParser(config), BuildConfig.class));
+    try {
+      return Optional.of(mapper.readValue(yamlFactory.createParser(config), BuildConfig.class));
+    } catch (IOException e) {
+      return Optional.absent();
+    }
   }
 
   protected String contentsFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
