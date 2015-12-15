@@ -1,7 +1,6 @@
 package com.hubspot.blazar.discovery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Optional;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyInfo;
