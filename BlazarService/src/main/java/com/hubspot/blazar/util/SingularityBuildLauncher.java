@@ -32,7 +32,7 @@ public class SingularityBuildLauncher {
 
   private HttpRequest buildRequest(ModuleBuild build) {
     String buildId = String.valueOf(build.getId().get());
-    List<String> body = Arrays.asList("BlazarExecutorV2", "--moduleBuildId", buildId, "--blazarApiUrl", "http://bootstrap.hubteam.com/blazar/v2");
+    List<String> body = Arrays.asList("BlazarExecutorV2", "--moduleBuildId", buildId);
 
     return buildRequest(buildId, body);
   }
