@@ -32,7 +32,7 @@ public class SingularityBuildLauncher {
 
   private HttpRequest buildRequest(ModuleBuild build) {
     String buildId = String.valueOf(build.getId().get());
-    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_api_url", "http://bootstrap.hubteam.com/blazar/v1", "--safe_mode");
+    List<String> body = Arrays.asList("BlazarExecutorV2", "--moduleBuildId", buildId, "--blazarApiUrl", "http://bootstrap.hubteam.com/blazar/v2");
 
     return buildRequest(buildId, body);
   }
@@ -56,6 +56,6 @@ public class SingularityBuildLauncher {
   private String buildUrl() {
     String host = singularityConfiguration.getHost();
     String path = singularityConfiguration.getPath().or("singularity/api");
-    return String.format("http://%s/%s/requests/request/blazar-executor/run", host, path);
+    return String.format("http://%s/%s/requests/request/BlazarExecutorV2/run", host, path);
   }
 }
