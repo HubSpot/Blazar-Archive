@@ -52,6 +52,7 @@
     <module>BlazarService</module>
     <module>BlazarData</module>
     <module>BlazarServiceIntegrationTests</module>
+    <module>BlazarClient</module>
   </modules>
 
   <dependencyManagement>
