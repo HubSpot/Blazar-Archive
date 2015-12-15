@@ -1,5 +1,7 @@
 package com.hubspot.blazar.discovery;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Optional;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyInfo;
@@ -9,6 +11,8 @@ import com.hubspot.blazar.util.GitHubHelper;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,6 +22,8 @@ import java.util.Set;
 
 @Singleton
 public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
+  private static final Logger LOG = LoggerFactory.getLogger(BlazarConfigModuleDiscovery.class);
+
   private final GitHubHelper gitHubHelper;
 
   @Inject
@@ -50,7 +56,13 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
 
     Set<DiscoveredModule> modules = new HashSet<>();
     for (String blazarConfig : blazarConfigs) {
-      BuildConfig buildConfig = gitHubHelper.configFor(blazarConfig, repository, gitInfo).get();
+      final BuildConfig buildConfig;
+      try {
+        buildConfig = gitHubHelper.configFor(blazarConfig, repository, gitInfo).get();
+      } catch (JsonProcessingException e) {
+        LOG.warn("Error parsing config at path {} for repository {}@{}", blazarConfig, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+        continue;
+      }
       if (canBuild(buildConfig)) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
