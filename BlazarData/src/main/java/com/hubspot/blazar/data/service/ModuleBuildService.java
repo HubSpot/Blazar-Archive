@@ -42,6 +42,10 @@ public class ModuleBuildService {
     return moduleBuildDao.getByRepositoryBuild(repoBuildId);
   }
 
+  public Set<ModuleBuild> getByState(State state) {
+    return moduleBuildDao.getByState(state);
+  }
+
   public List<ModuleBuild> getByModule(int moduleId) {
     return moduleBuildDao.getByModule(moduleId);
   }

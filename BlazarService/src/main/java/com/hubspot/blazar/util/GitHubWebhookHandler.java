@@ -11,8 +11,6 @@ import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
 import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,8 +22,6 @@ import java.util.Set;
 
 @Singleton
 public class GitHubWebhookHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(GitHubWebhookHandler.class);
-
   private final BranchService branchService;
   private final RepositoryBuildService repositoryBuildService;
   private final GitHubHelper gitHubHelper;

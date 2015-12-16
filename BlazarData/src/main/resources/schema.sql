@@ -79,5 +79,6 @@ CREATE TABLE `module_builds` (
   `taskId` varchar(500),
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`moduleId`, `buildNumber`),
-  INDEX (`repoBuildId`)
+  INDEX (`repoBuildId`),
+  INDEX (`state`)
 ) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;

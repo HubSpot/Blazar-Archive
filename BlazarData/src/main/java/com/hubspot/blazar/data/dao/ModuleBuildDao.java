@@ -2,6 +2,7 @@ package com.hubspot.blazar.data.dao;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 import org.skife.jdbi.v2.sqlobject.Bind;
@@ -21,6 +22,9 @@ public interface ModuleBuildDao {
 
   @SqlQuery("SELECT * FROM module_builds WHERE repoBuildId = :repoBuildId")
   Set<ModuleBuild> getByRepositoryBuild(@Bind("repoBuildId") long repoBuildId);
+
+  @SqlQuery("SELECT * FROM module_builds WHERE state = :state")
+  Set<ModuleBuild> getByState(@Bind("state") State state);
 
   @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :moduleId ORDER BY id DESC")
   List<ModuleBuild> getByModule(@Bind("moduleId") int moduleId);
