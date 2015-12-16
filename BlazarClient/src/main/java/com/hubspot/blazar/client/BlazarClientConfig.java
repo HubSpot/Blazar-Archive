@@ -45,7 +45,7 @@ public class BlazarClientConfig {
     return new BlazarClientConfig(httpClient, objectMapper, domain, Optional.of(contextPath));
   }
 
-  public BlazarClient newClient() {
+  public BlazarClient build() {
     Preconditions.checkState(domain.isPresent(), "Domain is required");
 
     return new BlazarClient(getOrCreateHttpClient(), constructBaseUrl());

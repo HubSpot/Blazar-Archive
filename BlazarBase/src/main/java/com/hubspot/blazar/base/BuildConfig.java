@@ -10,7 +10,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
 public class BuildConfig {
-  private final List<String> cmds;
+  private final Map<String, List<String>> cmds;
   private final Map<String, String> env;
   private final List<String> buildDeps;
   private final List<String> webhooks;
@@ -18,13 +18,13 @@ public class BuildConfig {
   private final Optional<GitInfo> buildpack;
 
   @JsonCreator
-  public BuildConfig(@JsonProperty("cmds") List<String> cmds,
+  public BuildConfig(@JsonProperty("cmds") Map<String, List<String>> cmds,
                      @JsonProperty("env") Map<String, String> env,
                      @JsonProperty("buildDeps") List<String> buildDeps,
                      @JsonProperty("webhooks") List<String> webhooks,
                      @JsonProperty("cache") List<String> cache,
                      @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
-    this.cmds = Objects.firstNonNull(cmds, Collections.<String>emptyList());
+    this.cmds = Objects.firstNonNull(cmds, Collections.<String, List<String>>emptyMap());
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
@@ -36,7 +36,7 @@ public class BuildConfig {
     return new BuildConfig(null, null, null, null, null, null);
   }
 
-  public List<String> getCmds() {
+  public Map<String, List<String>> getCmds() {
     return cmds;
   }
 

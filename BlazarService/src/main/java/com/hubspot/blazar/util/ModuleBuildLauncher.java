@@ -1,6 +1,8 @@
 package com.hubspot.blazar.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 @Singleton
 public class ModuleBuildLauncher {
@@ -84,7 +87,7 @@ public class ModuleBuildLauncher {
   }
 
   private static BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
-    List<String> cmds = primary.getCmds().isEmpty() ? secondary.getCmds() : primary.getCmds();
+    Map<String, List<String>> cmds = primary.getCmds().isEmpty() ? secondary.getCmds() : primary.getCmds();
     Map<String, String> env = new LinkedHashMap<>();
     env.putAll(secondary.getEnv());
     env.putAll(primary.getEnv());
