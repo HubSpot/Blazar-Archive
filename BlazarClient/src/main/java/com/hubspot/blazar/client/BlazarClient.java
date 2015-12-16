@@ -1,13 +1,19 @@
 package com.hubspot.blazar.client;
 
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.horizon.HttpClient;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpRequest.Method;
 import com.hubspot.horizon.HttpResponse;
 
 public class BlazarClient {
+  private static final String GET_GIT_INFO_PATH = "/branches/%s";
+
+  private static final String GET_REPOSITORY_BUILD_PATH = "/branches/builds/%s";
+
   private static final String MODULE_BUILD_PATH = "/modules/builds";
   private static final String GET_MODULE_BUILD_PATH = MODULE_BUILD_PATH + "/%s";
   private static final String START_MODULE_BUILD_PATH = MODULE_BUILD_PATH + "/%s/start";
@@ -21,6 +27,34 @@ public class BlazarClient {
   BlazarClient(HttpClient httpClient, String baseUrl) {
     this.httpClient = httpClient;
     this.baseUrl = baseUrl;
+  }
+
+  public Optional<GitInfo> getGitInfo(long branchId) {
+    String url = String.format(baseUrl + GET_GIT_INFO_PATH, branchId);
+    HttpRequest request = HttpRequest.newBuilder().setMethod(Method.GET).setUrl(url).build();
+
+    HttpResponse response = httpClient.execute(request);
+    if (response.getStatusCode() == 404) {
+      return Optional.absent();
+    } else if (response.getStatusCode() == 200) {
+      return Optional.of(response.getAs(GitInfo.class));
+    } else {
+      throw toException(response);
+    }
+  }
+
+  public Optional<RepositoryBuild> getRepositoryBuild(long repositoryBuildId) {
+    String url = String.format(baseUrl + GET_REPOSITORY_BUILD_PATH, repositoryBuildId);
+    HttpRequest request = HttpRequest.newBuilder().setMethod(Method.GET).setUrl(url).build();
+
+    HttpResponse response = httpClient.execute(request);
+    if (response.getStatusCode() == 404) {
+      return Optional.absent();
+    } else if (response.getStatusCode() == 200) {
+      return Optional.of(response.getAs(RepositoryBuild.class));
+    } else {
+      throw toException(response);
+    }
   }
 
   public Optional<ModuleBuild> getModuleBuild(long moduleBuildId) {
