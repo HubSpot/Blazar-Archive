@@ -51,4 +51,7 @@ public interface RepositoryBuildDao {
 
   @SqlUpdate("UPDATE repo_builds SET endTimestamp = :endTimestamp, state = :state WHERE id = :id AND state IN ('QUEUED', 'LAUNCHING', 'IN_PROGRESS')")
   int complete(@BindWithRosetta RepositoryBuild build);
+
+  @SqlUpdate("DELETE FROM repo_builds WHERE id = :id AND state = 'QUEUED'")
+  int delete(@BindWithRosetta RepositoryBuild build);
 }

@@ -126,7 +126,8 @@ public class RepositoryBuildService {
     }
 
     if (build.getState() == State.QUEUED) {
-      // TODO
+      checkAffectedRowCount(repositoryBuildDao.delete(build));
+      checkAffectedRowCount(branchDao.deletePendingBuild(build));
     } else {
       update(build.withState(State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
     }
