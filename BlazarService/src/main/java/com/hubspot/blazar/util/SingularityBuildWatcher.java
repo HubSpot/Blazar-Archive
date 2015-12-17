@@ -68,6 +68,8 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
     public void run() {
       try {
         if (running.get() && leader.get()) {
+          // TODO LAUNCHING
+
           for (ModuleBuild build : moduleBuildService.getByState(State.IN_PROGRESS)) {
             String taskId = build.getTaskId().get();
             Optional<Long> completedTimestamp = completedTimestamp(taskId);
