@@ -46,6 +46,7 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
     Set<Module> toBuild = findModulesToBuild(build.getCommitInfo().get(), modules);
 
     if (toBuild.isEmpty()) {
+      LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
       repositoryBuildService.update(build.withState(State.SUCCEEDED).withEndTimestamp(System.currentTimeMillis()));
     } else {
       for (Module module : toBuild) {
