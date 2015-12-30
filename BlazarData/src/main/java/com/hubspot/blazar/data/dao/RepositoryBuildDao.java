@@ -40,7 +40,7 @@ public interface RepositoryBuildDao {
   BuildNumbers getBuildNumbers(@Bind("branchId") int branchId);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO repo_builds (branchId, buildNumber, state, trigger) VALUES (:branchId, :buildNumber, :state, :trigger)")
+  @SqlUpdate("INSERT INTO repo_builds (branchId, buildNumber, state, buildTrigger) VALUES (:branchId, :buildNumber, :state, :buildTrigger)")
   long enqueue(@BindWithRosetta RepositoryBuild build);
 
   @SqlUpdate("UPDATE repo_builds SET startTimestamp = :startTimestamp, sha = :sha, state = :state, commitInfo = :commitInfo, dependencyGraph = :dependencyGraph WHERE id = :id AND state = 'QUEUED'")
