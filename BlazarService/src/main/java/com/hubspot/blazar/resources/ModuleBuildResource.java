@@ -139,11 +139,19 @@ public class ModuleBuildResource {
     Optional<String> grep = Optional.absent();
 
     Optional<MesosFileChunkObject> chunk = singularityClient.readSandBoxFile(taskId.get(), path, grep, absent, absent);
+    final long size;
     if (chunk.isPresent()) {
-      return chunk.get().getOffset();
+      size = chunk.get().getOffset();
     } else {
-      return findS3ServiceLog(taskId.get()).getSize();
+      size = findS3ServiceLog(taskId.get()).getSize();
     }
+
+    return new Object() {
+
+      public long getSize() {
+        return size;
+      }
+    };
   }
 
   private SingularityS3Log findS3ServiceLog(String taskId) {
