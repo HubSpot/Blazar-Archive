@@ -5,8 +5,10 @@ import com.google.inject.name.Named;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.singularity.ExtendedTaskState;
 import com.hubspot.singularity.SingularityTaskHistory;
 import com.hubspot.singularity.SingularityTaskHistoryUpdate;
+import com.hubspot.singularity.SingularityTaskIdHistory;
 import com.hubspot.singularity.client.SingularityClient;
 import io.dropwizard.lifecycle.Managed;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
@@ -68,7 +70,22 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
     public void run() {
       try {
         if (running.get() && leader.get()) {
-          // TODO LAUNCHING
+          for (ModuleBuild build : moduleBuildService.getByState(State.LAUNCHING)) {
+            long age = System.currentTimeMillis() - build.getStartTimestamp().get();
+            if (age < TimeUnit.MINUTES.toMillis(1)) {
+              continue;
+            }
+            
+            String runId =  String.valueOf(build.getId().get());
+            Optional<SingularityTaskIdHistory> task = singularityClient.getHistoryForTask("blazar-executor", runId);
+            if (task.isPresent()) {
+              Optional<ExtendedTaskState> taskState = task.get().getLastTaskState();
+              if (taskState.isPresent() && taskState.get().isDone()) {
+                LOG.info("Updating build {} to FAILED because runId {} is done", build.getId().get(), runId);
+                moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(task.get().getUpdatedAt()));
+              }
+            }
+          }
 
           for (ModuleBuild build : moduleBuildService.getByState(State.IN_PROGRESS)) {
             String taskId = build.getTaskId().get();
