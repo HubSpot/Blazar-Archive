@@ -3,6 +3,7 @@ package com.hubspot.blazar.base;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
+import com.hubspot.rosetta.annotations.RosettaProperty;
 import com.hubspot.rosetta.annotations.StoredAsJson;
 
 import java.util.Objects;
@@ -27,6 +28,7 @@ public class RepositoryBuild {
   private final int buildNumber;
   private final State state;
   @StoredAsJson
+  @RosettaProperty("buildTrigger")
   private final BuildTrigger trigger;
   private final Optional<Long> startTimestamp;
   private final Optional<Long> endTimestamp;
