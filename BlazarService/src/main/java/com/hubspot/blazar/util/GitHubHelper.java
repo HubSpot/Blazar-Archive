@@ -81,6 +81,7 @@ public class GitHubHelper {
       }
     } else {
       newCommits = Collections.emptyList();
+      truncated = true;
     }
 
     return new CommitInfo(current, previous, newCommits, truncated);
