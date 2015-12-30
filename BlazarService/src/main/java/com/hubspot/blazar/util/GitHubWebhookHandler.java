@@ -43,6 +43,10 @@ public class GitHubWebhookHandler {
 
   @Subscribe
   public void handleCreateEvent(CreateEvent createEvent) throws IOException {
+    if (!createEvent.hasRepository()) {
+      return;
+    }
+
     if ("branch".equalsIgnoreCase(createEvent.getRefType())) {
       GitInfo gitInfo = gitInfo(createEvent);
       if (isOptedIn(gitInfo)) {
@@ -53,6 +57,10 @@ public class GitHubWebhookHandler {
 
   @Subscribe
   public void handleDeleteEvent(DeleteEvent deleteEvent) {
+    if (!deleteEvent.hasRepository()) {
+      return;
+    }
+
     if ("branch".equalsIgnoreCase(deleteEvent.getRefType())) {
       branchService.delete(gitInfo(deleteEvent));
     }
@@ -60,6 +68,10 @@ public class GitHubWebhookHandler {
 
   @Subscribe
   public void handlePushEvent(PushEvent pushEvent) throws IOException {
+    if (!pushEvent.hasRepository()) {
+      return;
+    }
+
     if (!pushEvent.getRef().startsWith("refs/tags/") && !pushEvent.getDeleted()) {
       GitInfo gitInfo = gitInfo(pushEvent);
       if (isOptedIn(gitInfo)) {
