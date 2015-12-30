@@ -75,7 +75,7 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
             if (age < TimeUnit.MINUTES.toMillis(1)) {
               continue;
             }
-            
+
             String runId =  String.valueOf(build.getId().get());
             Optional<SingularityTaskIdHistory> task = singularityClient.getHistoryForTask("blazar-executor", runId);
             if (task.isPresent()) {
@@ -88,6 +88,11 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
           }
 
           for (ModuleBuild build : moduleBuildService.getByState(State.IN_PROGRESS)) {
+            long age = System.currentTimeMillis() - build.getStartTimestamp().get();
+            if (age < TimeUnit.MINUTES.toMillis(2)) {
+              continue;
+            }
+
             String taskId = build.getTaskId().get();
             Optional<Long> completedTimestamp = completedTimestamp(taskId);
 
