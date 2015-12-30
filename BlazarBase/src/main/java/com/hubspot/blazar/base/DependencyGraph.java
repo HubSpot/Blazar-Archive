@@ -1,5 +1,7 @@
 package com.hubspot.blazar.base;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.SetMultimap;
 
 import java.util.HashSet;
@@ -9,8 +11,13 @@ import java.util.Set;
 public class DependencyGraph {
   private final SetMultimap<Integer, Integer> transitiveReduction;
 
-  public DependencyGraph(SetMultimap<Integer, Integer> transitiveReduction) {
+  @JsonCreator
+  public DependencyGraph(@JsonProperty("transitiveReduction") SetMultimap<Integer, Integer> transitiveReduction) {
     this.transitiveReduction = transitiveReduction;
+  }
+
+  public SetMultimap<Integer, Integer> getTransitiveReduction() {
+    return transitiveReduction;
   }
 
   public Set<Integer> incomingVertices(int moduleId) {
