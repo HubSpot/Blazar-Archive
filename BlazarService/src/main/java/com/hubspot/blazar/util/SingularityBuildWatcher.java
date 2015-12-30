@@ -4,6 +4,8 @@ import com.google.common.base.Optional;
 import com.google.inject.name.Named;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.singularity.ExtendedTaskState;
 import com.hubspot.singularity.SingularityTaskHistory;
@@ -28,16 +30,19 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
   private final ScheduledExecutorService executorService;
   private final ModuleBuildService moduleBuildService;
   private final SingularityClient singularityClient;
+  private final SingularityConfiguration singularityConfiguration;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
 
   @Inject
   public SingularityBuildWatcher(@Named("QueueProcessor") ScheduledExecutorService executorService,
                                  ModuleBuildService moduleBuildService,
-                                 SingularityClient singularityClient) {
+                                 SingularityClient singularityClient,
+                                 BlazarConfiguration blazarConfiguration) {
     this.executorService = executorService;
     this.moduleBuildService = moduleBuildService;
     this.singularityClient = singularityClient;
+    this.singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
 
     this.running = new AtomicBoolean();
     this.leader = new AtomicBoolean();
@@ -76,8 +81,9 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
               continue;
             }
 
+            String requestId = singularityConfiguration.getRequest();
             String runId =  String.valueOf(build.getId().get());
-            Optional<SingularityTaskIdHistory> task = singularityClient.getHistoryForTask("blazar-executor", runId);
+            Optional<SingularityTaskIdHistory> task = singularityClient.getHistoryForTask(requestId, runId);
             if (task.isPresent()) {
               Optional<ExtendedTaskState> taskState = task.get().getLastTaskState();
               if (taskState.isPresent() && taskState.get().isDone()) {

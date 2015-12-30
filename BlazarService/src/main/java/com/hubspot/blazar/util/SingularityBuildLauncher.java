@@ -57,6 +57,7 @@ public class SingularityBuildLauncher {
   private String buildUrl() {
     String host = singularityConfiguration.getHost();
     String path = singularityConfiguration.getPath().or("singularity/api");
-    return String.format("http://%s/%s/requests/request/blazar-executor/run", host, path);
+    String request = singularityConfiguration.getRequest();
+    return String.format("http://%s/%s/requests/request/%s/run", host, path, request);
   }
 }
