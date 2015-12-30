@@ -3,7 +3,6 @@ package com.hubspot.blazar.base;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
-import com.hubspot.rosetta.annotations.RosettaProperty;
 import com.hubspot.rosetta.annotations.StoredAsJson;
 
 import java.util.Objects;
@@ -28,8 +27,7 @@ public class RepositoryBuild {
   private final int buildNumber;
   private final State state;
   @StoredAsJson
-  @RosettaProperty("buildTrigger")
-  private final BuildTrigger trigger;
+  private final BuildTrigger buildTrigger;
   private final Optional<Long> startTimestamp;
   private final Optional<Long> endTimestamp;
   private final Optional<String> sha;
@@ -43,7 +41,7 @@ public class RepositoryBuild {
                          @JsonProperty("branchId") int branchId,
                          @JsonProperty("buildNumber") int buildNumber,
                          @JsonProperty("state") State state,
-                         @JsonProperty("trigger") BuildTrigger trigger,
+                         @JsonProperty("trigger") BuildTrigger buildTrigger,
                          @JsonProperty("startTimestamp") Optional<Long> startTimestamp,
                          @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
                          @JsonProperty("sha") Optional<String> sha,
@@ -53,7 +51,7 @@ public class RepositoryBuild {
     this.branchId = branchId;
     this.buildNumber = buildNumber;
     this.state = state;
-    this.trigger = trigger;
+    this.buildTrigger = buildTrigger;
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.sha = sha;
@@ -86,8 +84,8 @@ public class RepositoryBuild {
     return state;
   }
 
-  public BuildTrigger getTrigger() {
-    return trigger;
+  public BuildTrigger getBuildTrigger() {
+    return buildTrigger;
   }
 
   public Optional<Long> getStartTimestamp() {
@@ -111,28 +109,28 @@ public class RepositoryBuild {
   }
 
   public RepositoryBuild withId(long id) {
-    return new RepositoryBuild(Optional.of(id), branchId, buildNumber, state, trigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph);
+    return new RepositoryBuild(Optional.of(id), branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph);
   }
 
   public RepositoryBuild withState(State state) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, trigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph);
+    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph);
   }
 
   public RepositoryBuild withStartTimestamp(long startTimestamp) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, trigger, Optional.of(startTimestamp), endTimestamp, sha, commitInfo, dependencyGraph);
+    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, Optional.of(startTimestamp), endTimestamp, sha, commitInfo, dependencyGraph);
   }
 
   public RepositoryBuild withEndTimestamp(long endTimestamp) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, trigger, startTimestamp, Optional.of(endTimestamp), sha, commitInfo, dependencyGraph);
+    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, Optional.of(endTimestamp), sha, commitInfo, dependencyGraph);
   }
 
   public RepositoryBuild withCommitInfo(CommitInfo commitInfo) {
     Optional<String> sha = Optional.of(commitInfo.getCurrent().getId());
-    return new RepositoryBuild(id, branchId, buildNumber, state, trigger, startTimestamp, endTimestamp, sha, Optional.of(commitInfo), dependencyGraph);
+    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, Optional.of(commitInfo), dependencyGraph);
   }
 
   public RepositoryBuild withDependencyGraph(DependencyGraph dependencyGraph) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, trigger, startTimestamp, endTimestamp, sha, commitInfo, Optional.of(dependencyGraph));
+    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, Optional.of(dependencyGraph));
   }
 
   @Override

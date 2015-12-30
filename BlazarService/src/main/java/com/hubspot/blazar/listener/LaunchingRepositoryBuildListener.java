@@ -62,7 +62,7 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
     CommitInfo commitInfo = build.getCommitInfo().get();
 
     final Set<Module> toBuild = new HashSet<>();
-    if (build.getTrigger().getType() == Type.MANUAL) {
+    if (build.getBuildTrigger().getType() == Type.MANUAL) {
       toBuild.addAll(modules);
     } else if (commitInfo.isTruncated()) {
       toBuild.addAll(modules);
