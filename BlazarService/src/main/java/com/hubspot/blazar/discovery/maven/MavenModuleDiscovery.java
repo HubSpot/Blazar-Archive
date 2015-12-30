@@ -26,9 +26,9 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
   private static final Logger LOG = LoggerFactory.getLogger(MavenModuleDiscovery.class);
 
   private static final Optional<GitInfo> STANDARD_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#publish"));
+      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#v2"));
   private static final Optional<GitInfo> DEPLOYABLE_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#deployable"));
+      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#v2-deployable"));
   private static final String EXECUTABLE_MARKER = ".build-executable";
 
   private final GitHubHelper gitHubHelper;
