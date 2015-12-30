@@ -16,10 +16,10 @@ public interface ModuleDao {
   String NOW = "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)";
 
   @SingleValueResult
-  @SqlQuery("SELECT * modules WHERE id = :moduleId")
+  @SqlQuery("SELECT * FROM modules WHERE id = :moduleId")
   Optional<Module> get(@Bind("moduleId") int moduleId);
 
-  @SqlQuery("SELECT * modules WHERE branchId = :branchId")
+  @SqlQuery("SELECT * FROM modules WHERE branchId = :branchId")
   Set<Module> getByBranch(@Bind("branchId") int branchId);
 
   @GetGeneratedKeys
