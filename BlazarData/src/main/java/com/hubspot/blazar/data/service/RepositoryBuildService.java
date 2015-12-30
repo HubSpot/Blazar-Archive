@@ -3,6 +3,7 @@ package com.hubspot.blazar.data.service;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
+import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
@@ -48,7 +49,7 @@ public class RepositoryBuildService {
     return repositoryBuildDao.getBuildNumbers(branchId);
   }
 
-  public long enqueue(GitInfo gitInfo) {
+  public long enqueue(GitInfo gitInfo, BuildTrigger trigger) {
     BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
 
     if (buildNumbers.getPendingBuildId().isPresent()) {
@@ -58,7 +59,7 @@ public class RepositoryBuildService {
     } else {
       int nextBuildNumber = buildNumbers.getNextBuildNumber();
       LOG.info("Enqueuing build for repository {} with build number {}", gitInfo.getId().get(), nextBuildNumber);
-      RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, nextBuildNumber);
+      RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber);
       build = enqueue(build);
       LOG.info("Enqueued build for repository {} with id {}", gitInfo.getId().get(), build.getId().get());
       return build.getId().get();

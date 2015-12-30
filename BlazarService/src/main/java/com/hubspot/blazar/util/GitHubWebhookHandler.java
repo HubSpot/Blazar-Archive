@@ -3,6 +3,7 @@ package com.hubspot.blazar.util;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
@@ -76,7 +77,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = gitInfo(pushEvent);
       if (isOptedIn(gitInfo)) {
         gitInfo = branchService.upsert(gitInfo(pushEvent));
-        repositoryBuildService.enqueue(gitInfo);
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()));
       }
     }
   }

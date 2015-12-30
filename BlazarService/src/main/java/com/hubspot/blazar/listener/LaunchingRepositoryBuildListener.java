@@ -1,5 +1,6 @@
 package com.hubspot.blazar.listener;
 
+import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -43,7 +44,7 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
     LOG.info("Going to enqueue module builds for repository build {}", build.getId().get());
 
     Set<Module> modules = moduleService.getByBranch(build.getBranchId());
-    Set<Module> toBuild = findModulesToBuild(build.getCommitInfo().get(), modules);
+    Set<Module> toBuild = findModulesToBuild(build, modules);
 
     if (toBuild.isEmpty()) {
       LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
@@ -57,9 +58,13 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
     }
   }
 
-  private Set<Module> findModulesToBuild(CommitInfo commitInfo, Set<Module> modules) {
+  private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> modules) {
+    CommitInfo commitInfo = build.getCommitInfo().get();
+
     final Set<Module> toBuild = new HashSet<>();
-    if (commitInfo.isTruncated()) {
+    if (build.getTrigger().getType() == Type.MANUAL) {
+      toBuild.addAll(modules);
+    } else if (commitInfo.isTruncated()) {
       toBuild.addAll(modules);
     } else {
       for (String path : gitHubHelper.affectedPaths(commitInfo)) {

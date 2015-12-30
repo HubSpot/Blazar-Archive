@@ -1,6 +1,7 @@
 package com.hubspot.blazar.resources;
 
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -42,7 +43,8 @@ public class RepositoryBuildResource {
       throw new NotFoundException("No branch found with id: " + branchId);
     }
 
-    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get());
+    // TODO capture user
+    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), BuildTrigger.forUser("unknown"));
     return repositoryBuildService.get(repositoryBuildId).get();
   }
 

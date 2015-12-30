@@ -57,6 +57,7 @@ CREATE TABLE `repo_builds` (
   `branchId` int(11) unsigned NOT NULL,
   `buildNumber` int(11) unsigned NOT NULL,
   `state` varchar(40) NOT NULL,
+  `trigger` mediumtext NOT NULL,
   `startTimestamp` bigint(20) unsigned,
   `endTimestamp` bigint(20) unsigned,
   `commitInfo` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
