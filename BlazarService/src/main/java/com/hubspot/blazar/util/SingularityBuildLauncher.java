@@ -13,6 +13,7 @@ import com.hubspot.singularity.SingularityClientCredentials;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Singleton
@@ -32,9 +33,9 @@ public class SingularityBuildLauncher {
 
   private HttpRequest buildRequest(ModuleBuild build) {
     String buildId = String.valueOf(build.getId().get());
-    List<String> body = Arrays.asList("BlazarExecutorV2", "--moduleBuildId", buildId);
+    //List<String> body = Arrays.asList("BlazarExecutorV2", "--moduleBuildId", buildId);
 
-    return buildRequest(buildId, body);
+    return buildRequest(buildId, Collections.singletonList("--help"));
   }
 
   private HttpRequest buildRequest(String buildId, Object body) {
@@ -56,6 +57,6 @@ public class SingularityBuildLauncher {
   private String buildUrl() {
     String host = singularityConfiguration.getHost();
     String path = singularityConfiguration.getPath().or("singularity/api");
-    return String.format("http://%s/%s/requests/request/BlazarExecutorV2/run", host, path);
+    return String.format("http://%s/%s/requests/request/blazar-executor/run", host, path);
   }
 }
