@@ -45,11 +45,15 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
     Set<Module> modules = moduleService.getByBranch(build.getBranchId());
     Set<Module> toBuild = findModulesToBuild(build.getCommitInfo().get(), modules);
 
-    for (Module module : toBuild) {
-      moduleBuildService.enqueue(build, module);
-    }
+    if (toBuild.isEmpty()) {
+      repositoryBuildService.update(build.withState(State.SUCCEEDED).withEndTimestamp(System.currentTimeMillis()));
+    } else {
+      for (Module module : toBuild) {
+        moduleBuildService.enqueue(build, module);
+      }
 
-    repositoryBuildService.update(build.withState(State.IN_PROGRESS));
+      repositoryBuildService.update(build.withState(State.IN_PROGRESS));
+    }
   }
 
   private Set<Module> findModulesToBuild(CommitInfo commitInfo, Set<Module> modules) {
