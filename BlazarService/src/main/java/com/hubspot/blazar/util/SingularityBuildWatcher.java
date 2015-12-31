@@ -87,8 +87,9 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
             if (task.isPresent()) {
               Optional<ExtendedTaskState> taskState = task.get().getLastTaskState();
               if (taskState.isPresent() && taskState.get().isDone()) {
-                LOG.info("Updating build {} to FAILED because runId {} is done", build.getId().get(), runId);
-                moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(task.get().getUpdatedAt()));
+                String taskId = task.get().getTaskId().getId();
+                LOG.info("Updating build {} to FAILED because taskId {} is done", build.getId().get(), taskId);
+                moduleBuildService.update(build.withState(State.FAILED).withTaskId(taskId).withEndTimestamp(task.get().getUpdatedAt()));
               }
             }
           }
