@@ -12,7 +12,7 @@ import com.hubspot.singularity.SingularityClientCredentials;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
+import java.util.Arrays;
 
 @Singleton
 public class SingularityBuildLauncher {
@@ -32,7 +32,7 @@ public class SingularityBuildLauncher {
   private HttpRequest buildRequest(ModuleBuild build) {
     String buildId = String.valueOf(build.getId().get());
 
-    return buildRequest(buildId, Collections.singletonList("hello"));
+    return buildRequest(buildId, Arrays.asList("/bin/echo", buildId));
   }
 
   private HttpRequest buildRequest(String buildId, Object body) {
