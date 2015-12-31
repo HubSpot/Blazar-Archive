@@ -28,6 +28,8 @@ public class QueuedRepositoryBuildListener implements RepositoryBuildListener {
 
   @Override
   public void buildChanged(RepositoryBuild build) throws Exception {
+    LOG.info("L31: {}", build.getBuildTrigger());
+
     BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(build.getBranchId());
 
     if (build.getBuildNumber() != buildNumbers.getPendingBuildNumber().or(-1)) {
