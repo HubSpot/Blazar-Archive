@@ -41,7 +41,7 @@ public class RepositoryBuild {
                          @JsonProperty("branchId") int branchId,
                          @JsonProperty("buildNumber") int buildNumber,
                          @JsonProperty("state") State state,
-                         @JsonProperty("trigger") BuildTrigger buildTrigger,
+                         @JsonProperty("buildTrigger") BuildTrigger buildTrigger,
                          @JsonProperty("startTimestamp") Optional<Long> startTimestamp,
                          @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
                          @JsonProperty("sha") Optional<String> sha,
