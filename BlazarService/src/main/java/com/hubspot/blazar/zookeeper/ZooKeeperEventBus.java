@@ -6,6 +6,7 @@ import com.google.common.base.Throwables;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
+import com.hubspot.blazar.base.RepositoryBuild;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 @Singleton
@@ -63,6 +65,10 @@ public class ZooKeeperEventBus extends EventBus {
   }
 
   private byte[] serialize(Object event) throws JsonProcessingException {
-    return mapper.writeValueAsBytes(new QueueItem(event));
+    byte[] bytes = mapper.writeValueAsBytes(new QueueItem(event));
+    if (event instanceof RepositoryBuild) {
+      LOG.info(new String(bytes, StandardCharsets.UTF_8));
+    }
+    return bytes;
   }
 }

@@ -42,7 +42,9 @@ public class BuildEventDispatcher {
 
   @Subscribe
   public void dispatch(RepositoryBuild build) throws Exception {
+    LOG.info("L45: {}", build.getBuildTrigger());
     RepositoryBuild current = repositoryBuildService.get(build.getId().get()).get();
+    LOG.info("L47: {}", build.getBuildTrigger());
     if (current.getState() != build.getState()) {
       LOG.warn("Ignoring stale event with state {} for repository build {}, current state is {}", build.getState(), build.getId().get(), current.getState());
       return;
