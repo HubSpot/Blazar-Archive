@@ -2,7 +2,6 @@ package com.hubspot.blazar.base;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
 
 public class BuildTrigger {
   public enum Type {
@@ -32,13 +31,5 @@ public class BuildTrigger {
 
   public String getId() {
     return id;
-  }
-
-  @Override
-  public String toString() {
-    return Objects.toStringHelper(this)
-        .add("type", type)
-        .add("id", id)
-        .toString();
   }
 }

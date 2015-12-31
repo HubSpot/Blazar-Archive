@@ -56,8 +56,6 @@ public class RepositoryBuildLauncher {
         .withState(State.LAUNCHING)
         .withCommitInfo(commitInfo)
         .withDependencyGraph(dependenciesService.buildDependencyGraph(gitInfo));
-    LOG.info("L58: {}", queued.getBuildTrigger());
-    LOG.info("L59: {}", launching.getBuildTrigger());
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     repositoryBuildService.begin(launching);
   }

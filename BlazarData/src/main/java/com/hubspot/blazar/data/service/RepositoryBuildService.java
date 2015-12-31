@@ -60,9 +60,7 @@ public class RepositoryBuildService {
       int nextBuildNumber = buildNumbers.getNextBuildNumber();
       LOG.info("Enqueuing build for repository {} with build number {}", gitInfo.getId().get(), nextBuildNumber);
       RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber);
-      LOG.info("L63: {}", build.getBuildTrigger());
       build = enqueue(build);
-      LOG.info("L65: {}", build.getBuildTrigger());
       LOG.info("Enqueued build for repository {} with id {}", gitInfo.getId().get(), build.getId().get());
       return build.getId().get();
     }
