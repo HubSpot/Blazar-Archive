@@ -67,6 +67,7 @@ public class ZooKeeperEventBus extends EventBus {
   private byte[] serialize(Object event) throws JsonProcessingException {
     byte[] bytes = mapper.writeValueAsBytes(new QueueItem(event));
     if (event instanceof RepositoryBuild) {
+      LOG.info("L70: {}", ((RepositoryBuild) event).getBuildTrigger());
       LOG.info(new String(bytes, StandardCharsets.UTF_8));
     }
     return bytes;
