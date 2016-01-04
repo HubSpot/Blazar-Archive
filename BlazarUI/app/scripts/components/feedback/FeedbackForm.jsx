@@ -127,12 +127,14 @@ class FeedbackForm extends Component {
     return (
       <div>
         <p>
-          Did you notice a bug? Hate something? Love something? Have a brilliant UX idea? We'd love to hear it. 
+          Running into an issue? Fill out the form below and we'll be alerted in Slack channel <a href="https://hubspot.slack.com/messages/blazar/" target="blank">#blazar</a>.
+          <span className='text-muted'> (No need to include the url, we will receive it with your message)</span>
         </p>
+        
         <hr/>
         <Input
           type="text"
-          placeholder="Name"
+          placeholder="Your Name"
           ref="name"
           value={this.state.nameValue}
           onChange={this.handleNameChange} 
@@ -143,7 +145,7 @@ class FeedbackForm extends Component {
           type="textarea"
           placeholder="Message"
           ref="message"
-          help="This page's url will be included in the response, but if submitting a bug, please also include other relevant information such as your OS and browser."
+          help=""
           value={this.state.messageValue}
           onChange={this.handleMessageChange} 
           autoFocus={this.state.autofocus === 'message'}
@@ -157,7 +159,7 @@ class FeedbackForm extends Component {
     return (
       <div className={this.getContainerClassName()}>
         <div className="feedback-title" onClick={this.toggleShow}>
-          Give Feedback
+          Get Help/Give Feedback
         </div>
         <div className="feedback__form">
           {this.renderContent()}
