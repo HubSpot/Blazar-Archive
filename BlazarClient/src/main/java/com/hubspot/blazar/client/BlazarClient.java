@@ -61,7 +61,7 @@ public class BlazarClient {
     }
   }
 
-  public Optional<Module> getModule(long branchId, long moduleId) {
+  public Optional<Module> getModule(long branchId, int moduleId) {
     Optional<List<Module>> modules = getModules(branchId);
     if (modules.isPresent()) {
       for (Module each : modules.get()) {
