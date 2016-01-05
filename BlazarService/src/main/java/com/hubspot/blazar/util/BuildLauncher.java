@@ -12,18 +12,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Optional;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.hubspot.blazar.base.CommitInfo;
-import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.SingularityConfiguration;
-import com.hubspot.blazar.exception.NonRetryableBuildException;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
-import com.hubspot.blazar.github.GitHubProtos.User;
-import com.hubspot.singularity.SingularityClientCredentials;
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCompare;
@@ -34,11 +22,16 @@ import org.kohsuke.github.GitUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.Build;
@@ -46,13 +39,19 @@ import com.hubspot.blazar.base.Build.State;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildDefinition;
 import com.hubspot.blazar.base.BuildState;
+import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.data.service.BuildService;
 import com.hubspot.blazar.data.service.BuildStateService;
+import com.hubspot.blazar.exception.NonRetryableBuildException;
+import com.hubspot.blazar.github.GitHubProtos.Commit;
+import com.hubspot.blazar.github.GitHubProtos.User;
 import com.hubspot.horizon.AsyncHttpClient;
-import com.hubspot.horizon.HttpRequest;
-import com.hubspot.horizon.HttpRequest.Method;
-import com.hubspot.horizon.HttpResponse;
+import com.hubspot.singularity.api.SingularityRunNowRequest;
+import com.hubspot.singularity.client.SingularityClient;
+import com.hubspot.singularity.client.SingularityClientException;
 
 @Singleton
 public class BuildLauncher {
@@ -61,6 +60,7 @@ public class BuildLauncher {
   private final BuildStateService buildStateService;
   private final BuildService buildService;
   private final AsyncHttpClient asyncHttpClient;
+  private final SingularityClient singularityClient;
   private final SingularityConfiguration singularityConfiguration;
   private final Map<String, GitHub> gitHubByHost;
   private final ObjectMapper objectMapper;
@@ -70,6 +70,7 @@ public class BuildLauncher {
   public BuildLauncher(BuildStateService buildStateService,
                        BuildService buildService,
                        AsyncHttpClient asyncHttpClient,
+                       SingularityClient singularityClient,
                        BlazarConfiguration configuration,
                        Map<String, GitHub> gitHubByHost,
                        EventBus eventBus,
@@ -78,6 +79,7 @@ public class BuildLauncher {
     this.buildStateService = buildStateService;
     this.buildService = buildService;
     this.asyncHttpClient = asyncHttpClient;
+    this.singularityClient = singularityClient;
     this.singularityConfiguration = configuration.getSingularityConfiguration();
     this.gitHubByHost = gitHubByHost;
     this.objectMapper = objectMapper;
@@ -145,8 +147,19 @@ public class BuildLauncher {
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     buildService.begin(launching);
     LOG.info("About to launch build {}", launching.getId().get());
-    HttpResponse response = asyncHttpClient.execute(buildRequest(definition, launching)).get();
-    LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
+    SingularityRunNowRequest runNowRequest = new SingularityRunNowRequest(
+        Optional.of(String.format("Build %d", launching.getId().get())),
+        Optional.of(false),
+        Optional.of("blazar-executor"),
+        Optional.of(buildRunArgs(definition, launching)));
+    try {
+      singularityClient.runSingularityRequest("blazar-executor", Optional.of(runNowRequest));
+    } catch (SingularityClientException e) {
+      LOG.warn(String.format("Launch of %d resulted in SingularityClientException", launching.getId().get()), e);
+      return;
+    }
+    LOG.info("Launch of {} was successful", launching.getId().get());
+
   }
 
   private BuildConfig resolveConfig(BuildConfig buildConfig, BuildDefinition definition) throws IOException, NonRetryableBuildException {
@@ -177,32 +190,10 @@ public class BuildLauncher {
     return new BuildConfig(cmds, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent());
   }
 
-  private HttpRequest buildRequest(BuildDefinition definition, Build build) {
+  private List<String> buildRunArgs(BuildDefinition definition, Build build) {
     String buildId = String.valueOf(build.getId().get());
-    List<String> body = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_api_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(definition, build));
-
-    return buildRequest(body);
-  }
-
-  private HttpRequest buildRequest(Object body) {
-    Optional<SingularityClientCredentials> credentials = singularityConfiguration.getCredentials();
-
-    HttpRequest.Builder builder = HttpRequest.newBuilder()
-        .setMethod(Method.POST)
-        .setUrl(buildUrl())
-        .setBody(body);
-
-    if (credentials.isPresent()) {
-      builder.addHeader(credentials.get().getHeaderName(), credentials.get().getToken());
-    }
-
-    return builder.build();
-  }
-
-  private String buildUrl() {
-    String host = singularityConfiguration.getHost();
-    String path = singularityConfiguration.getPath().or("singularity/api");
-    return String.format("http://%s/%s/requests/request/blazar-executor/run", host, path);
+    List<String> args = Arrays.asList("blazar-executor", "--build_id", buildId, "--blazar_api_url", "http://bootstrap.hubteam.com/blazar/v1", buildCommand(definition, build));
+    return args;
   }
 
   private String buildCommand(BuildDefinition definition, Build build) {
