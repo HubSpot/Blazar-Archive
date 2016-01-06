@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import StarProvider from '../utils/starProvider';
+import StarProvider from '../services/starProvider';
 
 const StarActions = Reflux.createActions([
   'loadStars',
@@ -8,15 +8,15 @@ const StarActions = Reflux.createActions([
   'setSource'
 ]);
 
-StarActions.loadStars.preEmit = function(source) {
+StarActions.loadStars.preEmit = function(source = '') {
   StarActions.setSource(source);
   StarActions.loadStarsSuccess(StarProvider.getStars());
 };
 
-StarActions.toggleStar = function(isStarred, starInfo) {
-  const stars = StarProvider.starChange(isStarred, starInfo);
-  StarActions.loadStarsSuccess(stars);
+StarActions.toggleStar = function(repoId) {
+  StarProvider.toggleStar(repoId, (stars) => {
+    StarActions.loadStarsSuccess(stars);  
+  });
 };
-
 
 export default StarActions;

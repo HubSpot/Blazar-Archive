@@ -2,7 +2,8 @@ import React, {Component, PropTypes} from 'react';
 import Icon from '../shared/Icon.jsx';
 import { bindAll } from 'underscore';
 import classnames from 'classnames';
-
+import StarActions from '../../actions/starActions';
+  
 class Star extends Component {
 
   constructor(props) {
@@ -17,13 +18,7 @@ class Star extends Component {
       return;
     }
 
-    const starInfo = {
-      moduleId: this.props.moduleId,
-      moduleName: this.props.moduleName,
-      modulePath: this.props.modulePath
-    };
-
-    this.props.toggleStar(this.props.isStarred, starInfo);
+    StarActions.toggleStar(this.props.repositoryId);
   }
 
   getContainerClassNames() {
@@ -63,10 +58,7 @@ Star.propTypes = {
   loading: PropTypes.bool,
   className: PropTypes.string,
   isStarred: PropTypes.bool.isRequired,
-  toggleStar: PropTypes.func.isRequired,
-  moduleId: PropTypes.number,
-  modulePath: PropTypes.string.isRequired,
-  moduleName: PropTypes.string.isRequired,
+  repositoryId: PropTypes.string,
   disabled: PropTypes.bool
 };
 
