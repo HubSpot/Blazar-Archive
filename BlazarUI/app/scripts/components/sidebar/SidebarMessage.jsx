@@ -2,8 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import {NO_MATCH_MESSAGES} from '../constants';
 
-class BuildsSidebarMessage extends Component {
-
+class SidebarMessage extends Component {
 
   render() {
     let message = null;
@@ -12,21 +11,21 @@ class BuildsSidebarMessage extends Component {
       return null;
     }
 
-    if (this.props.numModules === 0 && this.props.filterText.length > 0) {
+    if (this.props.numberOfBuilds === 0 && this.props.filterText.length > 0) {
         message = (
           <span>
-            No {NO_MATCH_MESSAGES[this.props.toggleFilterState]} modules matching <strong>{this.props.filterText}</strong>.
+            No {NO_MATCH_MESSAGES[this.props.toggleFilterState]} repositories matching <strong>{this.props.filterText}</strong>.
           </span>
         ) 
     }
 
-    else if (this.props.numModules === 0 && this.props.filterText.length === 0) {
+    else if (this.props.numberOfBuilds === 0 && this.props.filterText.length === 0) {
       if (this.props.toggleFilterState === 'starred') {
-        message = 'No modules have been starred';
+        message = 'No repositories have been starred';
       } 
 
       else if (this.props.toggleFilterState === 'building') {
-        message = 'No modules actively building';
+        message = 'No repositories actively building';
       }
     }
 
@@ -41,10 +40,10 @@ class BuildsSidebarMessage extends Component {
 }
 
 
-BuildsSidebarMessage.propTypes = {
-  numModules: PropTypes.number,
+SidebarMessage.propTypes = {
+  numberOfBuilds: PropTypes.number,
   filterText: PropTypes.string,
   toggleFilterState: PropTypes.string
 };
 
-export default BuildsSidebarMessage;
+export default SidebarMessage;

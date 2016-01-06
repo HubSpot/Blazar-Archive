@@ -100,7 +100,7 @@ function stopPolling() {
 }
 
 function fetchBuild(id) {
-  console.log('fetch build with id: ', id);
+
 }
 
 export default {
