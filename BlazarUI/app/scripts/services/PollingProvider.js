@@ -29,7 +29,8 @@ class PollingProvider {
     });
 
     promise.fail((err) => {
-      cb(err, []);
+      console.warn(err);
+      cb(err, null);
     });
     
     promise.always(() => {

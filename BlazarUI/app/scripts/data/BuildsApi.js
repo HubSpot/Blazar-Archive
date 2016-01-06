@@ -67,13 +67,17 @@ function fetchBuilds(options, cb) {
   }
 
   this.buildsPoller = new PollingProvider({
-    // url: `${config.apiRoot}/branches/state`,
-    url: 'http://local.hubteam.com:5000/js/fixtures/builds.json',
+    url: `${config.apiRoot}/branches/state`,
     type: 'GET',
     dataType: 'json'
   });
 
   this.buildsPoller.poll((err, resp) => {
+    if (err) {
+      cb(err);
+      return;
+    }
+
     const filteredBuilds = _filterBuilds(resp, filter);
     cb(err, _parse(filteredBuilds));
   });

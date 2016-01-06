@@ -5,6 +5,7 @@ import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
 import {sortBuilds} from '../utils/buildsHelpers';
 import BuildsApi from '../data/BuildsApi';
+import Immutable from 'immutable';
 // import StarStore from '../stores/starStore';
 
 const BuildsStore = Reflux.createStore({
@@ -31,7 +32,15 @@ const BuildsStore = Reflux.createStore({
 
     BuildsApi.fetchBuilds({filter: filter}, (err, resp) => {
       if (err) {
-        // to do
+        this.trigger({
+          loading: false,
+          changingBuildsType: false,
+          error: {
+            status: err.status,
+            statusText: err.statusText
+          }
+        });
+        return;
       }
       this.builds[filter] = resp;
 

@@ -18,8 +18,9 @@ const StarProvider = {
     const index = this.starStore.indexOf(repoId);
     
     if (index !== -1) {
-      this.starStore.splice(index, 1)
-    } else {
+      this.starStore.splice(index, 1);
+    }
+    else {
       this.starStore.push(parseInt(repoId));
     }
 

@@ -8,6 +8,7 @@ import SidebarFilter from './SidebarFilter.jsx';
 import SidebarRepoList from './SidebarRepoList.jsx';
 import SidebarMessage from './SidebarMessage.jsx';
 import Loader from '../shared/Loader.jsx';
+import AjaxErrorAlert from '../shared/AjaxErrorAlert.jsx';
 
 import StarStore from '../../stores/starStore';
 import BuildsStore from '../../stores/buildsStore';
@@ -99,12 +100,20 @@ class SidebarContainer extends Component {
   }
 
   render() {
-    const {loading, toggleFilterState, filterText, builds} = this.state;
+    const {loading, toggleFilterState, filterText, builds, error} = this.state;
 
     if (loading) {
       return (
         <Sidebar>
-          <Loader align='top-center' />
+          <Loader align='top-center'/>
+        </Sidebar>
+      );
+    }
+    
+    if (error) {
+      return (
+        <Sidebar>
+          <AjaxErrorAlert error={error} fixed={true} />
         </Sidebar>
       );
     }
