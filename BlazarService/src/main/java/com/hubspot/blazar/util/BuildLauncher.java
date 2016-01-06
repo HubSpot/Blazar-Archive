@@ -149,7 +149,7 @@ public class BuildLauncher {
     LOG.info("About to launch build {}", launching.getId().get());
     SingularityRunNowRequest runNowRequest = new SingularityRunNowRequest(
         Optional.of(String.format("Build %d", launching.getId().get())),
-        Optional.of(false),
+        Optional.<Boolean>absent(),
         Optional.of("blazar-executor"),
         Optional.of(buildRunArgs(definition, launching)));
     try {
