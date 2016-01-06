@@ -9,6 +9,7 @@ import Repo from './pages/repo.jsx';
 import Branch from './pages/branch.jsx';
 import Build from './pages/build.jsx';
 import Module from './pages/module.jsx';
+import Modules from './pages/modules.jsx';
 import NotFound from './pages/notFound.jsx';
 
 function pagePath(path) {
@@ -21,8 +22,10 @@ const routes = (
     <Route name='dashboard' path={pagePath('/?')} handler={ Dashboard } />
     <Route name='repo' path={pagePath('/builds/:host/:org/:repo/?')} handler={Repo}/>
     <Route name='branch' path={pagePath('/builds/:host/:org/:repo/:branch/?')} handler={Branch}/>
-    <Route name='module' path={pagePath('/builds/:host/:org/:repo/:branch/:module/?')} handler={Module}/>
-    <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/:module/:buildNumber/?')} handler={Build}/>
+    <Route name='module' path={pagePath('/builds/:host/:org/:repo/:branch/module/:module/?')} handler={Module}/>
+    <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/build/:buildNumber/?')} handler={Build}/>
+    <Route name='modules' path={pagePath('/builds/:host/:org/:repo/:branch/build/:buildNumber/modules')} handler={Modules}/>
+    
     <NotFoundRoute handler={ NotFound } />
   </Route>
 );
