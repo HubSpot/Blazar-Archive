@@ -68,7 +68,7 @@ function fetchBuilds(options, cb) {
 
   this.buildsPoller = new PollingProvider({
     // url: `${config.apiRoot}/branches/state`,
-    url: 'http://local.hubteam.com:5000/js/fixtures/builds.js',
+    url: 'http://local.hubteam.com:5000/js/fixtures/builds.json',
     type: 'GET',
     dataType: 'json'
   });
