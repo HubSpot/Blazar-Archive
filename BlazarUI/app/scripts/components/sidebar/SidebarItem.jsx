@@ -48,7 +48,7 @@ class SidebarItem extends Component {
   
   renderBuildLink() {
     const {buildType, build, hasBuild} = this.props;
-    let icon, buildNumberLink;
+    let icon, buildIdLink;
     
     if (hasBuild) {
       icon = (
@@ -57,9 +57,9 @@ class SidebarItem extends Component {
         </Link>
       );
 
-      buildNumberLink =(
+      buildIdLink =(
         <Link to={build.blazarPath} className='sidebar-item__build-number'>
-          #{build.buildNumber}
+          #{build.id}
         </Link>
       );  
     }
@@ -76,7 +76,7 @@ class SidebarItem extends Component {
     return (
       <div>
         {icon}
-        {buildNumberLink}
+        {buildIdLink}
       </div>
     );
   }

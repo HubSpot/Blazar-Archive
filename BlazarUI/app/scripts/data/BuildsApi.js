@@ -4,14 +4,14 @@ import {has, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import $ from 'jquery';
 import PollingProvider from '../services/PollingProvider';
+import StarProvider from '../services/starProvider';
 
-function _filterBuilds(builds, filter, options) {
+function _filterBuilds(builds, filter) {
+  
   if (filter === 'all') {
     return builds;
   }
-  
-  // Temoprarily filter all builds
-  // until we can query API by `inProgressBuild`
+
   if (filter === 'building') {
     return builds.filter((build) => {
       return has(build, 'inProgressBuild');
@@ -19,9 +19,10 @@ function _filterBuilds(builds, filter, options) {
   }
   
   if (filter === 'starred') {
+    const ids = StarProvider.starStore;    
     return builds.filter((build) => {
-      return contains(options.ids, build.gitInfo.repositoryId);
-    });
+      return contains(ids, build.gitInfo.repositoryId);
+    }) || [];
   }
 }
 
@@ -35,13 +36,13 @@ function _parse(data) {
     } = item;
 
     if (has(item, 'inProgressBuild')) {
-      item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/build/${inProgressBuild.buildNumber}/modules`;
+      item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${gitInfo.repositoryId}/${inProgressBuild.id}`;
       item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true});
     }
 
     if (has(item, 'lastBuild')) {
       item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true});
-      item.lastBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/build/${lastBuild.buildNumber}/modules`;
+      item.lastBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${gitInfo.repositoryId}/${lastBuild.id}`;
     }
 
     item.gitInfo.blazarRepositoryPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
@@ -53,7 +54,13 @@ function _parse(data) {
   return fromJS(parsed);
 }
 
+
+
+
 function fetchBuilds(options, cb) {    
+  
+  const {filter} = options;
+  
   if (this.buildsPoller) {
     this.buildsPoller.disconnect();
     this.buildsPoller = undefined;
@@ -67,29 +74,11 @@ function fetchBuilds(options, cb) {
   });
 
   this.buildsPoller.poll((err, resp) => {
-    const filteredBuilds = _filterBuilds(resp, options.filter);
+    const filteredBuilds = _filterBuilds(resp, filter);
     cb(err, _parse(filteredBuilds));
   });
 }
 
-// Temoprarily filter all builds
-// until we can query API by repositoryId
-function fetchStarredBuilds(ids, cb) {  
-  const promise = $.ajax({
-    url: 'http://local.hubteam.com:5000/js/fixtures/builds.js',
-    type: 'GET',
-    dataType: 'json'
-  });
-  
-  promise.done((resp) => {
-    const filteredBuilds = _filterBuilds(resp, 'starred', {ids: ids});
-    cb(false, _parse(filteredBuilds));
-  });
-  
-  promise.fail((err) => {
-    cb(err, []);
-  });
-}
 
 function stopPolling() {
   if (!this.buildsPoller) {
@@ -105,6 +94,5 @@ function fetchBuild(id) {
 
 export default {
   fetchBuilds: fetchBuilds,
-  fetchBuild: fetchBuild,
-  fetchStarredBuilds: fetchStarredBuilds
+  fetchBuild: fetchBuild
 };

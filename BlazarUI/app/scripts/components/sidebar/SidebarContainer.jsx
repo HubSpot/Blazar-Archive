@@ -9,6 +9,7 @@ import SidebarRepoList from './SidebarRepoList.jsx';
 import SidebarMessage from './SidebarMessage.jsx';
 import Loader from '../shared/Loader.jsx';
 
+import StarStore from '../../stores/starStore';
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
 
@@ -21,7 +22,8 @@ class SidebarContainer extends Component {
     super(props);
     
     bindAll(this, 
-      'onStoreChange', 
+      'onStoreChange',
+      'onStarChange',
       'getBuildsOfType', 
       'updateResults', 
       'setToggleState'
@@ -47,6 +49,7 @@ class SidebarContainer extends Component {
 
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStoreChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStarChange);
     BuildsActions.loadBuilds(this.state.toggleFilterState);
     window.addEventListener('resize', this.handleResizeDebounced);
   }
@@ -73,6 +76,12 @@ class SidebarContainer extends Component {
   onStoreChange(state) {
     this.setState(state);
   }
+  
+  onStarChange(state) {
+    if (this.state.toggleFilterState === 'starred') {
+      BuildsActions.loadBuilds('starred');
+    }
+  }
 
   updateResults(input) {
     this.setState({
@@ -90,7 +99,9 @@ class SidebarContainer extends Component {
   }
 
   render() {
-    if (this.state.loading) {
+    const {loading, toggleFilterState, filterText, builds} = this.state;
+
+    if (loading) {
       return (
         <Sidebar>
           <Loader align='top-center' />
@@ -98,8 +109,8 @@ class SidebarContainer extends Component {
       );
     }
 
-    const searchType = NO_MATCH_MESSAGES[this.state.toggleFilterState];
-    const matches = getFilterMatches(this.state.builds.toJS(), this.state.filterText);
+    const searchType = NO_MATCH_MESSAGES[toggleFilterState];
+    const matches = getFilterMatches(builds.toJS(), filterText);
 
     return (
       <Sidebar>

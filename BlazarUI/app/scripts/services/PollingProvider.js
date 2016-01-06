@@ -2,7 +2,6 @@
 import { fromJS } from 'immutable';
 import {has} from 'underscore';
 import humanizeDuration from 'humanize-duration';
-import Q from 'q';
 import $ from 'jquery';
 
 class PollingProvider {
@@ -36,12 +35,12 @@ class PollingProvider {
     promise.always(() => {
       setTimeout(() => {
         this.poll.call(this, cb);
-      }, config.buildsRefresh)
-    })
+      }, config.buildsRefresh);
+    });
   }
   
   disconnect() {
-    this.shouldPoll = false
+    this.shouldPoll = false;
   }  
   
 }

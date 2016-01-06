@@ -22,10 +22,10 @@ const routes = (
     <Route name='dashboard' path={pagePath('/?')} handler={ Dashboard } />
     <Route name='repo' path={pagePath('/builds/:host/:org/:repo/?')} handler={Repo}/>
     <Route name='branch' path={pagePath('/builds/:host/:org/:repo/:branch/?')} handler={Branch}/>
-    <Route name='module' path={pagePath('/builds/:host/:org/:repo/:branch/module/:module/?')} handler={Module}/>
-    <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/build/:buildNumber/?')} handler={Build}/>
-    <Route name='modules' path={pagePath('/builds/:host/:org/:repo/:branch/build/:buildNumber/modules')} handler={Modules}/>
+    <Route name='modules' path={pagePath('/builds/:host/:org/:repo/:branch/:repositoryId/:repoBuildId')} handler={Modules}/>
     
+    <Route name='module' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId/module/:moduleId')} handler={Module}/>
+    <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId/module/:moduleId/build/:buildId')} handler={Build}/>
     <NotFoundRoute handler={ NotFound } />
   </Route>
 );
