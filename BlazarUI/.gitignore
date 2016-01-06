@@ -3,5 +3,5 @@ bower_components
 *.log
 dist
 app/mock.json
-
+app/scripts/fixtures
 node
