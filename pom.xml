@@ -42,7 +42,7 @@
 
     <dep.horizon.version>0.0.13</dep.horizon.version>
     <dep.rosetta.version>3.10.1</dep.rosetta.version>
-    <singularity.version>0.4.4-STAGING-SNAPSHOT</singularity.version>
+    <singularity.version>0.4.8-QA-SNAPSHOT</singularity.version>
     <mesos.version>0.23.0</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
   </properties>
