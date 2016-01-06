@@ -28,36 +28,19 @@ const BuildsStore = Reflux.createStore({
   },
 
   onLoadBuilds(filter) {
-    
-    const ids = [22614011, 39576074];
-    
-    if (filter === 'starred') {
-      BuildsApi.fetchStarredBuilds(ids, (err, resp) => {
-        if (err) {
-          console.warn(err);
-        }
-        this.trigger({
-          builds: resp,
-          loading: false,
-          changingBuildsType: false
-        });
-      });
-    }
-    
-    else {
-      BuildsApi.fetchBuilds({filter: filter}, (err, resp) => {
-        if (err) {
-          // to do
-        }
-        this.builds[filter] = resp;
 
-        this.trigger({
-          builds: resp,
-          loading: false,
-          changingBuildsType: false
-        });
-      });  
-    }
+    BuildsApi.fetchBuilds({filter: filter}, (err, resp) => {
+      if (err) {
+        // to do
+      }
+      this.builds[filter] = resp;
+
+      this.trigger({
+        builds: resp,
+        loading: false,
+        changingBuildsType: false
+      });
+    });  
   
   },
   
