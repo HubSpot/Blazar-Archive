@@ -9,7 +9,7 @@ export default class Search {
   getOptions() {
     return {
       extract: function(el) {
-        return `${el.module.name} ${el.gitInfo.branch}`;
+        return `${el.gitInfo.repository} ${el.gitInfo.branch}`;
       }
     };
   }

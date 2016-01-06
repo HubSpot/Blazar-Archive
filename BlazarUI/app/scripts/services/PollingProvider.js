@@ -2,7 +2,6 @@
 import { fromJS } from 'immutable';
 import {has} from 'underscore';
 import humanizeDuration from 'humanize-duration';
-import Q from 'q';
 import $ from 'jquery';
 
 class PollingProvider {

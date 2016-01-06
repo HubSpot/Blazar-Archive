@@ -24,9 +24,8 @@ class SidebarFilter extends Component {
   }
 
   render() {
-
     if (this.props.loading) {
-      return <div />;
+      return null;
     }
 
     return (
@@ -34,7 +33,7 @@ class SidebarFilter extends Component {
         <div className='sidebar__filter-search'>
           <SearchFilter
             ref="buildFilterSearch"
-            placeholder='Filter modules...'
+            placeholder='Filter repositories...'
             onChange={this.setInputValue} />
         </div>
         <SidebarToggle
@@ -54,7 +53,6 @@ SidebarFilter.propTypes = {
   updateResults: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   filterText: PropTypes.string.isRequired,
-  builds: PropTypes.array.isRequired,
   setToggleState: PropTypes.func.isRequired
 };
 

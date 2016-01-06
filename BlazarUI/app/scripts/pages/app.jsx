@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {RouteHandler} from 'react-router';
-import BuildsSidebarContainer from '../components/sidebar/BuildsSidebarContainer.jsx';
+import SidebarContainer from '../components/sidebar/SidebarContainer.jsx';
 import FeedbackForm from '../components/feedback/FeedbackForm.jsx';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
@@ -58,7 +58,7 @@ class App extends Component {
     return (
       <div>
         <div className="page-wrapper">
-          <BuildsSidebarContainer/>
+          <SidebarContainer/>
           <RouteHandler/>
         </div>
         <FeedbackForm/>
