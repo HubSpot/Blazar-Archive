@@ -2,7 +2,8 @@
 import Reflux from 'reflux';
 
 const RepoBuildActions = Reflux.createActions([
-  'loadModuleBuilds'
+  'loadModuleBuilds',
+  'stopPolling'
 ]);
 
 export default RepoBuildActions;

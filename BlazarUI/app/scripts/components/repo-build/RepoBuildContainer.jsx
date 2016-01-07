@@ -52,6 +52,7 @@ class RepoBuildContainer extends Component {
   }
   
   tearDown() {
+    RepoBuildActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromRepoBuild();
   }

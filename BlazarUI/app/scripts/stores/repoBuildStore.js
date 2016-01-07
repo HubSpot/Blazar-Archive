@@ -18,7 +18,7 @@ const RepoBuildStore = Reflux.createStore({
   },
   
   onStopPolling() {
-    BuildsApi.stopPolling;
+    RepoBuildApi.stopPolling();
   },
 
   onLoadModuleBuilds(repoBuildId) {

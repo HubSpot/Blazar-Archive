@@ -41,11 +41,8 @@ function stopPolling() {
   this.buildsPoller.disconnect();
 }
 
-function fetchModule(id) {
-
-}
 
 export default {
   fetchModuleBuilds: fetchModuleBuilds,
-  fetchModule: fetchModule
+  stopPolling: stopPolling
 };
