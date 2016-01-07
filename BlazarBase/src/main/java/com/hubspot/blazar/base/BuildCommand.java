@@ -28,7 +28,11 @@ public class BuildCommand {
                       @JsonProperty("returnCodes") Set<Integer> returnCodes,
                       @JsonProperty("env") Map<String, String> commandSpecificEnvironment) {
     this.executable = Objects.firstNonNull(executable, DEFAULT_CMD);
-    this.args = Objects.firstNonNull(args, Lists.newArrayList(DEFAULT_ARG));
+    if (executable == null) {
+      this.args = Lists.asList(DEFAULT_ARG, args.toArray(new String[args.size()]));
+    } else {
+      this.args = Objects.firstNonNull(args, Lists.newArrayList(DEFAULT_ARG));
+    }
     this.returnCodes = Objects.firstNonNull(returnCodes, DEFAULT_RETURN_CODES);
     this.commandSpecificEnvironment = Objects.firstNonNull(commandSpecificEnvironment, new HashMap<String, String>());
   }
