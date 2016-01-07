@@ -1,6 +1,7 @@
 // Using in favor of Deprecated ComponentHelpers.js
 import React from 'react';
 import {some, uniq, flatten, filter, contains} from 'underscore';
+import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
 import {LABELS, iconStatus} from './constants';
@@ -14,6 +15,10 @@ export const timestampFormatted = function(timestamp, format='lll') {
   }
   const timeObject = moment(timestamp);
   return timeObject.format(format);
+};
+
+export const timestampDuration = function(startTimestamp, endTimestamp, round='true') {
+  return humanizeDuration(endTimestamp - startTimestamp, {round: round});
 };
 
 // 'BUILD_SUCCEEEDED' => 'Build Succeeded'

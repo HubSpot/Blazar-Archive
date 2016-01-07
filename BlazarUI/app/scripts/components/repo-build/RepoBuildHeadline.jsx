@@ -22,10 +22,8 @@ class RepoBuildHeadline extends Component {
         isStarred={contains(stars, parseInt(params.repositoryId))}
         repositoryId={this.props.params.repositoryId}
       />
-        {this.props.params.repo}
-        <HeadlineDetail>
-          modules for build id #{params.repoBuildId}
-        </HeadlineDetail>
+        {this.props.params.repo} - build id {params.repoBuildId}
+        <HeadlineDetail></HeadlineDetail>
       </Headline>
     )
   }

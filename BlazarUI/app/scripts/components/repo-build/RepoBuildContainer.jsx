@@ -1,21 +1,24 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll, clone, some} from 'underscore';
+
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import StarStore from '../../stores/starStore';
+import RepoBuildStore from '../../stores/repoBuildStore';
 import StarActions from '../../actions/starActions';
-import RepoBuildHeadline from './RepoBuildHeadline.jsx';
+import RepoBuildActions from '../../actions/repoBuildActions';
 
+import RepoBuildHeadline from './RepoBuildHeadline.jsx';
+import RepoBuildModulesTable from './RepoBuildModulesTable.jsx'
 
 let initialState = {
-  moduleBuilds: [],
+  moduleBuilds: false,
   stars: [],
-  loadingModules: true,
-  loadingStars: true,
-  buildTriggeringError: ''
+  loadingModuleBuilds: true,
+  loadingStars: true
 };
 
 class RepoBuildContainer extends Component {
@@ -43,11 +46,14 @@ class RepoBuildContainer extends Component {
   
   setup(params) { 
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
-    StarActions.loadStars('moduleContainer');
+    this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
+    StarActions.loadStars('repoBuildContainer');
+    RepoBuildActions.loadModuleBuilds(params.repoBuildId);
   }
   
   tearDown() {
     this.unsubscribeFromStars();
+    this.unsubscribeFromRepoBuild();
   }
   
   onStatusChange(state) {
@@ -78,15 +84,26 @@ class RepoBuildContainer extends Component {
   
   renderPage() {
     return (
-      <UIGrid>
-        <UIGridItem size={10}>
-          <RepoBuildHeadline
+      <div>
+        <UIGrid>
+          <UIGridItem size={12}>
+            <RepoBuildHeadline
+              params={this.props.params}
+              stars={this.state.stars}
+              loading={false}
+            />
+          </UIGridItem>
+        </UIGrid>
+        <UIGridItem size={12}>
+          <RepoBuildModulesTable
             params={this.props.params}
-            stars={this.state.stars}
-            loading={false}
+            data={this.state.moduleBuilds ? this.state.moduleBuilds.toJS() : []}
+            loading={this.state.loadingStars || this.state.loadingModuleBuilds}
+            shouldRender={this.state.error}
           />
         </UIGridItem>
-      </UIGrid>
+      </div>
+      
     );
   }
 

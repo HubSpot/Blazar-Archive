@@ -34,49 +34,40 @@ function TableMaker(RenderedComponent, options) {
       })
     }
 
-    buildTable(tableOptions) {
-      return (
-        <div className='table-wrapper'>
-          <table className="fixed-table table table-hover table-striped">
-            <TableHead
-              columnNames={tableOptions.columnNames}
-            />
-            <tbody>
-              {this.getRows(tableOptions.data, tableOptions.rowComponent)}
-            </tbody>
-          </table>
-          {options.paginate ? Pagination(tableOptions.data, this.state, this.changePage) : null}
-        </div>
-      );
-    }
 
-    getRows(data, TableRow) {
+    getRows(data, TableRow, params) {
       const pageStart = this.state.page * this.state.rowsPerPage;
       const pageEnd = pageStart + this.state.rowsPerPage;      
       const currentRows = options.paginate ? data.slice(pageStart, pageEnd) : data;
 
       return currentRows.map((item, i) => {
-        if (has(item, 'build')) {
-          if (item.build.state === BuildStates.IN_PROGRESS && options.showProgress) {
-            const progress = data.length > 1 ? Progress(item.build.startTimestamp, data) : false;
-            return (
-              <TableRow
-                data={item}
-                key={i}
-                progress={progress}
-              />
-            );
-          }
-        }
-
         return (
           <TableRow
             data={item}
+            params={params}
             key={i}
           />
         );
 
       });
+    }
+
+    buildTable(tableOptions) {
+      const {columnNames, data, rowComponent, params} = tableOptions;
+
+      return (
+        <div className='table-wrapper'>
+          <table className="fixed-table table table-hover table-striped">
+            <TableHead
+              columnNames={columnNames}
+            />
+            <tbody>
+              {this.getRows(data, rowComponent, params)}
+            </tbody>
+          </table>
+          {options.paginate ? Pagination(data, this.state, this.changePage) : null}
+        </div>
+      );
     }
 
     render() {

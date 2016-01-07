@@ -49,18 +49,9 @@ const BuildsStore = Reflux.createStore({
         loading: false,
         changingBuildsType: false
       });
-    });  
-  
+    });
   },
   
-  onLoadBuildsCompleted: function() {
-    console.log('complete!');
-  },
-  
-  onLoadBuildsFailed: function() {
-    console.log('failed :/');
-  },
-   
   onSetFilterType() {
     console.log('set filter!');
   }
