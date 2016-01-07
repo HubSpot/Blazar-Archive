@@ -7,18 +7,18 @@ import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
-import ModulesHeadline from './ModulesHeadline.jsx';
+import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 
 
 let initialState = {
-  modules: [],
+  moduleBuilds: [],
   stars: [],
   loadingModules: true,
   loadingStars: true,
   buildTriggeringError: ''
 };
 
-class ModulesContainer extends Component {
+class RepoBuildContainer extends Component {
 
   constructor(props) {
     super(props);
@@ -80,7 +80,7 @@ class ModulesContainer extends Component {
     return (
       <UIGrid>
         <UIGridItem size={10}>
-          <ModulesHeadline
+          <RepoBuildHeadline
             params={this.props.params}
             stars={this.state.stars}
             loading={false}
@@ -99,8 +99,8 @@ class ModulesContainer extends Component {
   }
 }
 
-ModulesContainer.propTypes = {
+RepoBuildContainer.propTypes = {
   params: PropTypes.object.isRequired
 };
 
-export default ModulesContainer;
+export default RepoBuildContainer;

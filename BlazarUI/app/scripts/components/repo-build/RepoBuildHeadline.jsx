@@ -6,7 +6,7 @@ import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Star from '../shared/Star.jsx';
 
-class ModulesHeadline extends Component {
+class RepoBuildHeadline extends Component {
     
   render() {
     if (this.props.loading) {
@@ -31,9 +31,9 @@ class ModulesHeadline extends Component {
   }
 }
 
-ModulesHeadline.propTypes = {
+RepoBuildHeadline.propTypes = {
   params: PropTypes.object.isRequired,
   loading: PropTypes.bool.isRequired
 };
 
-export default ModulesHeadline;
+export default RepoBuildHeadline;

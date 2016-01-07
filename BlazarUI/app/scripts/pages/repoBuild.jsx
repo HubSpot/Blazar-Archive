@@ -1,9 +1,9 @@
 import React, {Component, PropTypes} from 'react';
 import {clone} from 'underscore';
-import ModulesContainer from '../components/modules/ModulesContainer.jsx';
+import RepoBuildContainer from '../components/repo-build/RepoBuildContainer.jsx';
 import HeaderContainer from '../components/header/HeaderContainer.jsx';
 
-class Module extends Component {
+class RepoBuild extends Component {
 
   render() {
     return (
@@ -11,7 +11,7 @@ class Module extends Component {
         <HeaderContainer 
           params={this.props.params}
         />
-        <ModulesContainer
+        <RepoBuildContainer
           params={this.props.params}
         />
       </div>
@@ -19,8 +19,8 @@ class Module extends Component {
   }
 }
 
-Module.propTypes = {
+RepoBuild.propTypes = {
   params: PropTypes.object.isRequired
 };
 
-export default Module;
+export default RepoBuild;
