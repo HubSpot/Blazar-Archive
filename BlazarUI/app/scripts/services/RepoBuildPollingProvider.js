@@ -1,10 +1,11 @@
 /*global config*/
 import { fromJS } from 'immutable';
-import {has, findWhere} from 'underscore';
+import {has, findWhere, some, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import $ from 'jquery';
 import Q from 'q';
 import Resource from './ResourceProvider';
+import ActiveBuildStates from '../constants/ActiveBuildStates';
 
 class RepoBuildPollingProvider {
 
@@ -52,6 +53,17 @@ class RepoBuildPollingProvider {
         repositoryId: this.repositoryId  
       });
     
+      // check if we need to keep polling
+      const moduleBuildStates = moduleBuilds.map((build) => build.state)
+      
+      const shouldPoll = some(moduleBuildStates, (state) => {
+        return contains(ActiveBuildStates, state);
+      });
+      
+      if (!shouldPoll) {
+        return;
+      }
+      
       setTimeout(() => {
         this.poll.call(this, cb);
       }, config.buildsRefresh);
