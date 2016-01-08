@@ -22,7 +22,7 @@ const routes = (
     <Route name='dashboard' path={pagePath('/?')} handler={ Dashboard } />
     <Route name='repo' path={pagePath('/builds/:host/:org/:repo/?')} handler={Repo}/>
     <Route name='branch' path={pagePath('/builds/:host/:org/:repo/:branch/?')} handler={Branch}/>
-    <Route name='repoBuild' path={pagePath('/builds/:host/:org/:repo/:branch/:repositoryId/:repoBuildId')} handler={RepoBuild}/>
+    <Route name='repoBuild' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId')} handler={RepoBuild}/>
     
     <Route name='module' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId/module/:moduleId')} handler={Module}/>
     <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId/module/:moduleId/build/:buildId')} handler={Build}/>

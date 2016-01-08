@@ -22,8 +22,8 @@ class Model {
       dataType: this.options.dataType || 'json'
     });
 
-    promise.done((data, textStatus, jqXHR) => {
-      this.data = data;
+    promise.done((raw, textStatus, jqXHR) => {
+      this.raw = raw;
       this.textStatus = textStatus;
       this.jqXHR = jqXHR;
 

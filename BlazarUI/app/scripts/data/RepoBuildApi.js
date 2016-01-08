@@ -1,48 +1,34 @@
 /*global config*/
-import { fromJS } from 'immutable';
 import $ from 'jquery';
-import PollingProvider from '../services/PollingProvider';
+import RepoBuildPollingProvider from '../services/RepoBuildPollingProvider';
 
-function _parse(data) {
-  return fromJS(data);
-}
+class RepoBuildApi {
 
-function fetchModuleBuilds(options, cb) {
-
-  const {repoBuildId} = options;
-  
-  if (this.buildsPoller) {
-    this.buildsPoller.disconnect();
-    this.buildsPoller = undefined;
+  constructor(params) {
+    this.buildsPoller = new RepoBuildPollingProvider(params);
   }
 
-  this.buildsPoller = new PollingProvider({
-    url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
-    type: 'GET',
-    dataType: 'json'
-  });
+  startPolling(cb) {
+    this.cb = cb;
 
-  this.buildsPoller.poll((err, resp) => {
-    if (err) {
-      cb(err);
+    this.buildsPoller.poll((err, resp) => {
+      if (err) {
+        cb(err);
+        return;
+      }
+
+      cb(err, resp);
+    });
+  }
+
+  stopPolling() {
+    if (!this.buildsPoller) {
       return;
     }
 
-    cb(err, _parse(resp));
-  });
-}
-
-
-function stopPolling() {
-  if (!this.buildsPoller) {
-    return;
+    this.buildsPoller.disconnect();
   }
 
-  this.buildsPoller.disconnect();
 }
 
-
-export default {
-  fetchModuleBuilds: fetchModuleBuilds,
-  stopPolling: stopPolling
-};
+export default RepoBuildApi;

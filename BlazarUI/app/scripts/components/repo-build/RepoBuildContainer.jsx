@@ -17,6 +17,7 @@ import RepoBuildModulesTable from './RepoBuildModulesTable.jsx'
 let initialState = {
   moduleBuilds: false,
   stars: [],
+  repositoryId: undefined,
   loadingModuleBuilds: true,
   loadingStars: true
 };
@@ -48,9 +49,9 @@ class RepoBuildContainer extends Component {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
-    RepoBuildActions.loadModuleBuilds(params.repoBuildId);
+    RepoBuildActions.loadModuleBuilds(params);
   }
-  
+
   tearDown() {
     RepoBuildActions.stopPolling();
     this.unsubscribeFromStars();
@@ -89,9 +90,9 @@ class RepoBuildContainer extends Component {
         <UIGrid>
           <UIGridItem size={12}>
             <RepoBuildHeadline
-              params={this.props.params}
-              stars={this.state.stars}
-              loading={false}
+              {...this.props}
+              {...this.state}
+              loading={this.state.loadingStars || this.state.loadingModuleBuilds}
             />
           </UIGridItem>
         </UIGrid>
@@ -99,7 +100,7 @@ class RepoBuildContainer extends Component {
           <RepoBuildModulesTable
             params={this.props.params}
             data={this.state.moduleBuilds ? this.state.moduleBuilds.toJS() : []}
-            loading={this.state.loadingStars || this.state.loadingModuleBuilds}
+            loading={this.state.loadingModuleBuilds}
             shouldRender={this.state.error}
           />
         </UIGridItem>

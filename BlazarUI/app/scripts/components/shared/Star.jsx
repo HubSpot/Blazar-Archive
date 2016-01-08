@@ -17,7 +17,6 @@ class Star extends Component {
     if (this.props.disabled) {
       return;
     }
-
     StarActions.toggleStar(this.props.repositoryId);
   }
 
@@ -58,7 +57,7 @@ Star.propTypes = {
   loading: PropTypes.bool,
   className: PropTypes.string,
   isStarred: PropTypes.bool.isRequired,
-  repositoryId: PropTypes.string,
+  repositoryId: PropTypes.number,
   disabled: PropTypes.bool
 };
 

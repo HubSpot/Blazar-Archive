@@ -3,7 +3,7 @@ import store from 'store';
 const StarProvider = {
 
   haveSynced: false,
-  starStore: [],
+  stars: [],
 
   checkStorage: function() {
     if (!this.haveSynced) {
@@ -15,23 +15,27 @@ const StarProvider = {
   toggleStar: function(repoId, cb) {
     const repoId = parseInt(repoId);
     this.checkStorage();
-    const index = this.starStore.indexOf(repoId);
+    const index = this.stars.indexOf(repoId);
     
     if (index !== -1) {
-      this.starStore.splice(index, 1);
+      this.stars.splice(index, 1);
     }
     else {
-      this.starStore.push(parseInt(repoId));
+      this.stars.push(parseInt(repoId));
     }
 
-    cb(this.starStore);
-    store.set('starredRepos', this.starStore);    
+    cb(this.stars);
+    store.set('starredRepos', this.stars);    
   },
 
 
   getStars: function() {
+    if (this.haveSynced) {
+      return this.stars;
+    }
+
     this.haveSynced = true;
-    return this.starStore = store.get('starredRepos') || [];
+    return this.stars = store.get('starredRepos') || [];
   }
 
 };

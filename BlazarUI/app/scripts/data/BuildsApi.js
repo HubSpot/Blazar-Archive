@@ -19,7 +19,7 @@ function _filterBuilds(builds, filter) {
   }
   
   if (filter === 'starred') {
-    const ids = StarProvider.starStore;    
+    const ids = StarProvider.getStars();
     return builds.filter((build) => {
       return contains(ids, build.gitInfo.repositoryId);
     }) || [];
@@ -36,13 +36,13 @@ function _parse(data) {
     } = item;
 
     if (has(item, 'inProgressBuild')) {
-      item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${gitInfo.repositoryId}/${inProgressBuild.id}`;
+      item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${inProgressBuild.id}`;
       item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true});
     }
 
     if (has(item, 'lastBuild')) {
       item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true});
-      item.lastBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${gitInfo.repositoryId}/${lastBuild.id}`;
+      item.lastBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${lastBuild.id}`;
     }
 
     item.gitInfo.blazarRepositoryPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
@@ -53,9 +53,6 @@ function _parse(data) {
 
   return fromJS(parsed);
 }
-
-
-
 
 function fetchBuilds(options, cb) {    
   
