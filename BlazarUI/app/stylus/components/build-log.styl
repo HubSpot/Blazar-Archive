@@ -3,7 +3,7 @@
 .build-log
   position absolute
   z-index 2
-  top 220px
+  top 108px
   left 0
   bottom 0
   right 0
@@ -23,6 +23,9 @@
   
   &.expanded
     top 107px
+    
+  .alert
+    margin: 10px
 
 .log-line
   font-size 11px
@@ -35,17 +38,3 @@
 .log-line-emphasis
   margin-top 10px
   font-weight $font-heavy
-
-.log-expand-toggle
-  position fixed
-  top 230px
-  right 5px
-  padding 10px
-  transition top .6s
-  background-color rgba($blue-gray, .8)
-  color $link-color
-  font-size 14px
-  cursor pointer
-  
-.log-expand-toggle--expanded
-  top 118px

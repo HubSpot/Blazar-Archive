@@ -28,7 +28,7 @@ class RepoBuildModulesTableRow extends Component {
     const {data, params} = this.props;
     
     // To do: dont pull in global appRoot
-    const buildLink = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${params.repositoryId}/module/${data.moduleId}/build/${data.id}`;
+    const buildLink = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${params.repoBuildId}/module/${data.moduleId}/build/${data.id}`;
     
     return (
       <Link to={buildLink}>View Module Build</Link>   

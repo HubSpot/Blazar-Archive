@@ -33,7 +33,7 @@ class BuildLogNavigation extends Component {
   }
 
   render() {
-    if (this.props.loading || this.props.build.buildState === BuildStates.LAUNCHING || this.props.build.buildState === BuildStates.QUEUED) {
+    if (this.props.loading || this.props.build.state === BuildStates.LAUNCHING || this.props.build.state === BuildStates.QUEUED) {
       return null;
     }
 

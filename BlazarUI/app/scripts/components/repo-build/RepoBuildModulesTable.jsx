@@ -7,6 +7,10 @@ import Loader from '../shared/Loader.jsx';
 class RepoBuildModulesTable extends Component {
 
   render() {
+    if (this.props.loading) {
+      return null;
+    }
+
     if (this.props.data.length === 0) {
       return (
         <EmptyMessage> No build history </EmptyMessage>

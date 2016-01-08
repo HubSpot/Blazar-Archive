@@ -54,7 +54,7 @@ class RepoBuildPollingProvider {
       });
     
       // check if we need to keep polling
-      const moduleBuildStates = moduleBuilds.map((build) => build.state)
+      const moduleBuildStates = moduleBuilds.map((build) => build.state);
       
       const shouldPoll = some(moduleBuildStates, (state) => {
         return contains(ActiveBuildStates, state);

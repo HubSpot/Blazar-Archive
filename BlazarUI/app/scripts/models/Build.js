@@ -1,25 +1,16 @@
 /*global config*/
 import Model from './Model';
+import {findWhere} from 'underscore'; 
 
 class Build extends Model {
   
   parse() {
-    this.addTimeHelpers();
+    this.data = findWhere(this.raw, {id: parseInt(this.options.buildId)});
   }
-
-  cancel() {
-    this.options = {
-      type: 'POST',
-      url: `${config.apiRoot}/build/${this.options.buildId}/cancel`,
-      parse: false
-    };
-    return this.fetch({
-      parse: false
-    });
-  }
-
+  
   url() {
-    return `${config.apiRoot}/build/history/module/${this.moduleId}/build/${this.options.buildNumber}/`;
+    const {repoBuildId} = this.options;
+    return `${config.apiRoot}/branches/builds/${repoBuildId}/modules`;
   }
 }
 

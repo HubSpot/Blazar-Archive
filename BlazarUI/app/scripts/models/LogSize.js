@@ -3,9 +3,8 @@ import Model from './Model';
 
 class LogSize extends Model {
 
-  // to do: rename this buildId - buildNumber is something else
   url() {
-    return `${config.apiRoot}/build/${this.options.buildNumber}/log/size`;
+    return `${config.apiRoot}/modules/builds/${this.options.buildId}/log/size`;
   }
 
 }

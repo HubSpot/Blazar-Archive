@@ -14,6 +14,10 @@ import RepoBuildActions from '../../actions/repoBuildActions';
 import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx'
 
+// To do:
+// import RepoBuildDetail from './RepoBuildDetail.jsx'
+
+
 let initialState = {
   moduleBuilds: false,
   stars: [],
@@ -97,11 +101,14 @@ class RepoBuildContainer extends Component {
           </UIGridItem>
         </UIGrid>
         <UIGridItem size={12}>
+          <hr />
+          To do: Show build detail...
+          <hr />
           <RepoBuildModulesTable
             params={this.props.params}
             data={this.state.moduleBuilds ? this.state.moduleBuilds.toJS() : []}
             loading={this.state.loadingModuleBuilds}
-            shouldRender={this.state.error}
+            {...this.state}
           />
         </UIGridItem>
       </div>
