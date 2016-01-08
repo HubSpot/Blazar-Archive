@@ -3,6 +3,7 @@ import { fromJS } from 'immutable';
 import {has} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import $ from 'jquery';
+import Resource from './ResourceProvider';
 
 class PollingProvider {
   
@@ -11,26 +12,32 @@ class PollingProvider {
     this.type = type;
     this.dataType = dataType;
     this.shouldPoll = true;
+    
+    this.resource = new Resource({
+      url: this.url,
+      type: this.type,
+      dataType: this.dataType
+    });
   }
 
   poll(cb) {
     if (!this.shouldPoll) {
       return;
     }
-
-    const promise = $.ajax({
-      url: this.url,
-      type: this.type,
-      dataType: this.dataType
-    });
-
+    
+    const promise = this.resource.get();
+    
     promise.done((resp) => {
-      cb(false, resp);
+      if (cb) {
+        cb(false, resp);  
+      }  
     });
 
     promise.fail((err) => {
       console.warn(err);
-      cb(err, null);
+      if (cb) {
+        cb(err, null);  
+      }
     });
     
     promise.always(() => {
