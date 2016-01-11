@@ -19,8 +19,7 @@ class RepoBuildModulesTable extends Component {
 
     const columnNames = [
       {label: '', key: 'state'},
-      {label: 'Module', key: 'module'},
-      {label: 'Build', key: 'buildNumber'},
+      {label: 'Module Build', key: 'module'},
       {label: 'Start Time', key: 'startTime'},
       {label: 'Duration', key: 'duration'},
       {label: 'Singularity Task', key: 'taskid'},

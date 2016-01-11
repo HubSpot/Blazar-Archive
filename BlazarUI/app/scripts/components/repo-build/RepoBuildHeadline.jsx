@@ -22,7 +22,7 @@ class RepoBuildHeadline extends Component {
           isStarred={contains(stars, this.props.branchId)}
           id={this.props.branchId}
         />
-        {this.props.params.repo} - build id {params.repoBuildId}
+        {this.props.params.repo} - Build ID {params.repoBuildId}
         <HeadlineDetail></HeadlineDetail>
       </Headline>
     )

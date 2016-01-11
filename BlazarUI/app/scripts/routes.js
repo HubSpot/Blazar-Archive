@@ -25,7 +25,7 @@ const routes = (
     <Route name='repoBuild' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId')} handler={RepoBuild}/>
     
     <Route name='module' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId/module/:moduleId')} handler={Module}/>
-    <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId/module/:moduleId/build/:buildId')} handler={Build}/>
+    <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/:repoBuildId/:moduleName')} handler={Build}/>
     <NotFoundRoute handler={ NotFound } />
   </Route>
 );

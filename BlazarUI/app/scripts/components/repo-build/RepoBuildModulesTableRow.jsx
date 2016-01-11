@@ -26,14 +26,13 @@ class RepoBuildModulesTableRow extends Component {
   
   renderBuildLink() {
     const {data, params} = this.props;
-    
+
     // To do: dont pull in global appRoot
-    const buildLink = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${params.repoBuildId}/module/${data.moduleId}/build/${data.id}`;
-    
+    const buildLink = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${params.repoBuildId}/${data.name}`;    
+
     return (
-      <Link to={buildLink}>View Module Build</Link>   
-    );
-    
+      <Link to={buildLink}>{data.name}</Link>   
+    );    
   }
 
   renderSingularityLink() {
@@ -58,9 +57,6 @@ class RepoBuildModulesTableRow extends Component {
       <tr className={tableRowBuildState(data.state)}>
         <td className='build-status'>
           {this.renderBuildStatus()}
-        </td>
-        <td>
-          id {data.id}
         </td>
         <td className='table-cell-link'>
           {this.renderBuildLink()}
