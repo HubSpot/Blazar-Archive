@@ -19,8 +19,8 @@ class RepoBuildHeadline extends Component {
       <Headline>
         <Star
           className='icon-roomy'
-          isStarred={contains(stars, this.props.repositoryId)}
-          repositoryId={this.props.repositoryId}
+          isStarred={contains(stars, this.props.branchId)}
+          id={this.props.branchId}
         />
         {this.props.params.repo} - build id {params.repoBuildId}
         <HeadlineDetail></HeadlineDetail>
@@ -31,7 +31,7 @@ class RepoBuildHeadline extends Component {
 
 RepoBuildHeadline.propTypes = {
   params: PropTypes.object.isRequired,
-  repositoryId: PropTypes.number,
+  branchId: PropTypes.number,
   loading: PropTypes.bool.isRequired
 };
 

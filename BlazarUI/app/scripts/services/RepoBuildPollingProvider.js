@@ -12,13 +12,13 @@ class RepoBuildPollingProvider {
   constructor(params) {
     this.shouldPoll = true;
     this.params = params;
-    this.repositoryId = undefined;
+    this.branchId = undefined;
     
     this.repoBuildPromise = new Resource({url: `${config.apiRoot}/branches/builds/${params.repoBuildId}/modules`});
-    this.repoIdPromise = new Resource({ url: `${config.apiRoot}/branches/state`}).get();
+    this.branchIdPromise = new Resource({ url: `${config.apiRoot}/branches/state`}).get();
   }
   
-  _findRepositoryId(builds) {
+  _getBranchId(builds) {
     const repoBuild = findWhere(builds.map((build) => build.gitInfo), {
       host: this.params.host,
       organization: this.params.org,
@@ -26,7 +26,7 @@ class RepoBuildPollingProvider {
       branch: this.params.branch
     });
   
-    this.repositoryId = repoBuild ? repoBuild.repositoryId : null;
+    this.branchId = repoBuild ? repoBuild.id : null;
   }
 
   poll(cb) {
@@ -37,20 +37,20 @@ class RepoBuildPollingProvider {
     // load module builds from repoBuildId
     let promises = [this.repoBuildPromise.get()];
 
-    // On first fetch, find repositoryId based on params so we can load the starred state
-    if (!this.repositoryId) {
-      promises.push(this.repoIdPromise);
+    // On first fetch, find branchId based on params so we can load the starred state
+    if (!this.branchId) {
+      promises.push(this.branchIdPromise);
     }
 
     Q.spread(promises, (moduleBuilds, allBuilds) => {      
       
       if (allBuilds) {
-        this._findRepositoryId(allBuilds);
+        this._getBranchId(allBuilds);
       }
       
       cb(false, {
         moduleBuilds: fromJS(moduleBuilds),
-        repositoryId: this.repositoryId  
+        branchId: this.branchId  
       });
     
       // check if we need to keep polling

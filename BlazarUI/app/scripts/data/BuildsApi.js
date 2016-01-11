@@ -21,7 +21,7 @@ function _filterBuilds(builds, filter) {
   if (filter === 'starred') {
     const ids = StarProvider.getStars();
     return builds.filter((build) => {
-      return contains(ids, build.gitInfo.repositoryId);
+      return contains(ids, build.gitInfo.id);
     }) || [];
   }
 }
