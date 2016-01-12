@@ -1,13 +1,14 @@
 /*global config*/
 import Reflux from 'reflux';
 import $ from 'jquery';
-import {extend} from 'underscore'; 
+import {extend, findWhere} from 'underscore'; 
 import BuildStates from '../constants/BuildStates';
 import {buildIsOnDeck} from '../components/Helpers';
 
 import Build from '../models/Build';
 import Log from '../models/Log';
 import LogSize from '../models/LogSize';
+import Resource from '../services/ResourceProvider';
 
 class BuildApi {
   
@@ -17,18 +18,17 @@ class BuildApi {
   }
   
   _buildError(error) {
-    this.cb(error)
-  }  
+    this.cb(error);
+  }
 
   loadBuild(cb) {
     this.cb = cb;
-
     this._getBuild()
       .then(this._getLog.bind(this))
       .then(this._assignBuildProcessing.bind(this));
   }
 
-  navigationChange(position, cb) {    
+  navigationChange(position, cb) {
     this.cb = cb;
     const startOfLogLoaded = this.build.logCollection.minOffsetLoaded === 0;
     const endOfLogLoaded = this.build.logCollection.maxOffsetLoaded === this.build.logCollection.options.size;
@@ -218,10 +218,43 @@ class BuildApi {
     this._pollLog();
     this._pollBuild();
   }
-    
+  
   _getBuild() {
-    this.build.model = new Build(this.params);
-    return this._fetchBuild();
+    // first get all builds so we can find the build id
+    const buildStates = new Resource({url: `${config.apiRoot}/branches/state`}).get();
+
+    return buildStates.then((builds) => {
+      const repoBuild = findWhere(builds.map((build) => build.gitInfo), {
+        host: this.params.host,
+        organization: this.params.org,
+        repository: this.params.repo,
+        branch: this.params.branch
+      });
+
+      // now get modules so we can get the moduleId by the module name
+      const repoBuildModules = new Resource({url: `${config.apiRoot}/branches/${repoBuild.id}/modules`}).get();
+
+      return repoBuildModules.then((modules) => {
+        const repoBuildModule = findWhere(modules, {name: this.params.moduleName});
+
+        // last get module build based on module id
+        const buildModules = new Resource({url: `${config.apiRoot}/branches/builds/${this.params.repoBuildId}/modules`}).get();
+
+        return buildModules.then((modules) => {  
+          const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});
+
+          this.build.model = new Build({
+            id: moduleBuild.id,
+            repoBuildId: this.params.repoBuildId
+          });
+
+          return this._fetchBuild();
+        });
+
+      });
+
+    });  
+
   }
 
   _getLog() {
@@ -233,7 +266,7 @@ class BuildApi {
 
     logSizePromise.done((resp) => {
       this.build.logCollection = new Log({
-        buildNumber: this.build.model.data.id,
+        buildNumber: this.build.model.data.buildNumber,
         size: resp.size,
         buildState: this.build.model.data.state
       });    
@@ -246,7 +279,7 @@ class BuildApi {
     if (!this.build.model) {
       return;
     }
-
+  
     if (buildIsOnDeck(this.build.model.data.state)) {
       return;
     }
@@ -258,8 +291,7 @@ class BuildApi {
     const sizePromise = logSize.fetch();
 
     sizePromise.fail((err) => {
-      console.warn('Error requesting log size.');
-      console.warn(err);
+      console.warn('Error requesting log size. ', err);
       this._buildError('Error accessing build log, or log does not exist. View console for more detail');
     });
 

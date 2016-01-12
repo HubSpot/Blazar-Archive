@@ -5,12 +5,11 @@ import {findWhere} from 'underscore';
 class Build extends Model {
   
   parse() {
-    this.data = findWhere(this.raw, {id: parseInt(this.options.buildId)});
+    this.data = findWhere(this.raw, {id: parseInt(this.options.id)});
   }
   
   url() {
-    const {repoBuildId} = this.options;
-    return `${config.apiRoot}/branches/builds/${repoBuildId}/modules`;
+    return `${config.apiRoot}/branches/builds/${this.options.repoBuildId}/modules`;
   }
 }
 
