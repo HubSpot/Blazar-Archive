@@ -17,10 +17,10 @@ class RepoBuildPollingProvider {
     this.promises = {
       repoBuildPromise: new Resource({url: `${config.apiRoot}/branches/builds/${params.repoBuildId}/modules`}),
       branchIdPromise: new Resource({ url: `${config.apiRoot}/branches/state`}).get(),
-      modulesPromise: function(){
+      modulesPromise: function() {
         return new Resource({url: `${config.apiRoot}/branches/${this.branchId}/modules`}).get();
       }
-    }
+    };
   }
   
   _getBranchId(builds) {
@@ -60,7 +60,7 @@ class RepoBuildPollingProvider {
 
       modulesPromise.then((modules) => {
         const moduleNamesOnly = modules.map((module) => {
-          return { id: module.id, name: module.name }
+          return { id: module.id, name: module.name };
         });
         
         // add module name to module builds

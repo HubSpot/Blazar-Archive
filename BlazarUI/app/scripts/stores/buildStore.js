@@ -18,7 +18,8 @@ const BuildStore = Reflux.createStore({
 
     if (err) {
       this.triggerError();
-    } else {
+    } 
+    else {
       this.triggerSuccess();  
     }
   },
@@ -29,12 +30,12 @@ const BuildStore = Reflux.createStore({
       loading: false
     });
   },
-  
+
   triggerError() {
     let error;
 
     // custom error message
-    if(typeof(this.error) === 'string') {
+    if (typeof(this.error) === 'string') {
       error = this.error;
     } 
     // send the xhr message
@@ -42,7 +43,7 @@ const BuildStore = Reflux.createStore({
       error = {
         status: this.error.status,
         statusText: this.error.statusText
-      }
+      };
     }
 
     this.trigger({
@@ -50,7 +51,7 @@ const BuildStore = Reflux.createStore({
       error: error
     });
   },
-  
+
   onLoadBuild(params) {
     this.api = new BuildApi(params);
     
