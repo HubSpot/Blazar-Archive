@@ -1,6 +1,7 @@
 /*global config*/
 import { fromJS } from 'immutable';
-import {has, findWhere, some, contains, extend} from 'underscore';
+import {has, findWhere, some, contains, extend, flatten} from 'underscore';
+import {timestampDuration} from '../components/Helpers';
 import humanizeDuration from 'humanize-duration';
 import $ from 'jquery';
 import Q from 'q';
@@ -24,14 +25,43 @@ class RepoBuildPollingProvider {
   }
   
   _getBranchId(builds) {
-    const repoBuild = findWhere(builds.map((build) => build.gitInfo), {
+    
+    const repoBuildGitInfo = findWhere(builds.map((build) => build.gitInfo), {
       host: this.params.host,
       organization: this.params.org,
       repository: this.params.repo,
       branch: this.params.branch
     });
-  
-    this.branchId = repoBuild ? repoBuild.id : null;
+      
+    if (repoBuildGitInfo) {
+      this.branchId = repoBuildGitInfo.id;
+    }
+    
+    else {
+      // to do
+    }
+
+    const flatBuilds = flatten(builds.map((build) => {
+      let newBuild = [];
+
+      if (build.lastBuild) { 
+        newBuild.push(build.lastBuild); 
+      }
+
+      if (build.inProgressBuild) { 
+        newBuild.push(build.inProgressBuild); 
+      }
+
+      if (build.pendingBuild) { 
+        newBuild.push(build.pendingBuild); 
+      }
+      
+      return newBuild;
+    }));
+    
+    
+    this.currentRepoBuild = findWhere(flatBuilds, {id: parseInt(this.params.repoBuildId)});
+    this.currentRepoBuild.duration = timestampDuration(this.currentRepoBuild.startTimestamp, this.currentRepoBuild.endTimestamp);
   }
   
   _shouldPoll(moduleBuildStates) {
@@ -67,16 +97,17 @@ class RepoBuildPollingProvider {
         const ModuleBuildsWithName = moduleBuilds.map((build) => {
           return extend(build, findWhere(moduleNamesOnly, { id: build.moduleId }));
         });
-        
+
         // send module builds to store
         cb(false, {
           moduleBuilds: fromJS(ModuleBuildsWithName),
+          currentRepoBuild: fromJS(this.currentRepoBuild),
           branchId: this.branchId
         });
         
         // check if we need to keep polling
         const moduleBuildStates = moduleBuilds.map((build) => build.state);
-        
+
         if (!this._shouldPoll(moduleBuildStates)) {
           return;
         }

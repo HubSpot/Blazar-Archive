@@ -36,8 +36,7 @@ class CancelBuildButton extends Component {
         <Modal.Header closeButton>
           <Modal.Title>
             Are you sure you want to cancel 
-            <strong> build #{this.props.build.build.buildNumber}</strong> {' '}
-            for module <strong>{this.props.build.module.name}</strong>.
+            <strong> build #{this.props.build.buildNumber}</strong> {' '}.
           </Modal.Title>
         </Modal.Header>
         <Modal.Footer>
@@ -57,7 +56,7 @@ class CancelBuildButton extends Component {
   render() {
     let cancelButtonContent;
     
-    if (this.props.build.build.state === undefined || contains(FINAL_BUILD_STATES, this.props.build.build.state)) {
+    if (this.props.build.state === undefined || contains(FINAL_BUILD_STATES, this.props.build.state)) {
       return null;
     }
     

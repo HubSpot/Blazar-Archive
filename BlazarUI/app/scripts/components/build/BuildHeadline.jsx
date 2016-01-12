@@ -11,8 +11,6 @@ class BuildHeadline extends Component {
       return null;
     }
     
-    console.log(this.props);
-    
     const {moduleName} = this.props.params;
     const {build} = this.props.data;
   

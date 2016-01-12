@@ -13,9 +13,7 @@ import RepoBuildActions from '../../actions/repoBuildActions';
 
 import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx'
-
-// To do:
-// import RepoBuildDetail from './RepoBuildDetail.jsx'
+import RepoBuildDetail from './RepoBuildDetail.jsx'
 
 
 let initialState = {
@@ -31,7 +29,7 @@ class RepoBuildContainer extends Component {
   constructor(props) {
     super(props);
     this.state = initialState;
-    
+
     bindAll(this, 'onStatusChange')
   }
   
@@ -64,6 +62,11 @@ class RepoBuildContainer extends Component {
   
   onStatusChange(state) {
     this.setState(state);
+  }
+  
+  // to do
+  triggerCancelBuild() {
+    alert('not ready')
   }
 
   renderSectionContent() {
@@ -101,9 +104,12 @@ class RepoBuildContainer extends Component {
           </UIGridItem>
         </UIGrid>
         <UIGridItem size={12}>
-          <hr />
-          To do: Show build detail...
-          <hr />
+          <RepoBuildDetail 
+            {...this.props}
+            {...this.state}
+            loading={this.state.loadingModuleBuilds}
+            triggerCancelBuild={this.triggerCancelBuild}
+          />
           <RepoBuildModulesTable
             params={this.props.params}
             data={this.state.moduleBuilds ? this.state.moduleBuilds.toJS() : []}
@@ -112,7 +118,6 @@ class RepoBuildContainer extends Component {
           />
         </UIGridItem>
       </div>
-      
     );
   }
 

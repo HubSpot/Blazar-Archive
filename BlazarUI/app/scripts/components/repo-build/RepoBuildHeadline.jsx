@@ -13,7 +13,8 @@ class RepoBuildHeadline extends Component {
       return null;
     }
     
-    const {stars, params} = this.props;
+    const {stars, params, currentRepoBuild} = this.props;
+    const build = currentRepoBuild.toJS()
 
     return (
       <Headline>
@@ -22,8 +23,10 @@ class RepoBuildHeadline extends Component {
           isStarred={contains(stars, this.props.branchId)}
           id={this.props.branchId}
         />
-        {this.props.params.repo} - Build ID {params.repoBuildId}
-        <HeadlineDetail></HeadlineDetail>
+        {params.repo}
+        <HeadlineDetail>
+          - {params.branch} build #{build.buildNumber}
+        </HeadlineDetail>
       </Headline>
     )
   }
