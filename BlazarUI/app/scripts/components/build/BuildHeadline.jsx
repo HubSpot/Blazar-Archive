@@ -2,50 +2,36 @@ import React, {Component, PropTypes} from 'react';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Loader from '../shared/Loader.jsx';
+import {renderBuildStatusIcon, humanizeText} from '../Helpers';
 
 class BuildHeadline extends Component {
-  
+
   render() {
     if (this.props.loading) {
       return null;
     }
     
-      return (
-          <Headline>
-            Module Name here
-            <HeadlineDetail>
-              Build number here
-            </HeadlineDetail>
-          </Headline>
-      )
-
-    // return (
-    //   <Headline>
-    //     <Star
-    //       className='icon-roomy'
-    //       isStarred={this.props.isStarred}
-    //       toggleStar={this.props.toggleStar} 
-    //       modulePath={this.props.modulePath}
-    //       moduleName={this.props.moduleName}
-    //       moduleId={this.props.moduleId}
-    //       updateWithState={true}
-    //       loading={this.props.loadingStars}
-    //     />
-    //     {this.props.moduleName}
-    //     <HeadlineDetail>
-    //       Build #{this.props.buildNumber}
-    //     </HeadlineDetail>
-    //   </Headline>
-    // );
+    console.log(this.props);
+    
+    const {moduleName} = this.props.params;
+    const {build} = this.props.data;
+  
+    return (
+        <Headline>
+          {renderBuildStatusIcon(this.props.data.build)}
+          {moduleName}
+          <HeadlineDetail>
+            Status: {humanizeText(build.state)}
+          </HeadlineDetail>
+        </Headline>
+    );
   }
 }
 
-// BuildHeadline.propTypes = {
-//   loading: PropTypes.bool.isRequired,
-//   moduleName: PropTypes.string.isRequired,
-//   moduleId: PropTypes.number.isRequired,
-//   modulePath: PropTypes.string.isRequired,
-//   buildNumber: PropTypes.number.isRequired
-// };
+BuildHeadline.propTypes = {
+  loading: PropTypes.bool.isRequired,
+  data: PropTypes.object.isRequired,
+  params: PropTypes.object.isRequired
+};
 
 export default BuildHeadline;

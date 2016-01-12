@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import {buildIsOnDeck} from '../Helpers';
+import classNames from 'classnames';
 
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -67,7 +68,7 @@ class BuildContainer extends Component {
   requestNavigationChange(position) {
     BuildActions.navigationChange(position);
   }
-  
+
   requestPollingStateChange(change) {
     BuildActions.setLogPollingState(change);
   }
@@ -81,15 +82,28 @@ class BuildContainer extends Component {
       }, 2000);
     }
   }
+  
+  getHeaderClasses() {
+    const buildState = this.state.data.build.state;
+    
+    if (buildState) {
+      return classNames([
+        'build-header',
+        `alert-state-${buildState}`
+      ]);
+    }
+    return null;
+  }
 
   render() {
     return (
       <PageContainer>
-        <div className='build-header'>
+        <div className={this.getHeaderClasses()}>
           <UIGrid containerClassName='build-header__name-and-buttons'>
             <UIGridItem size={7}>
               <BuildHeadline 
-
+                {...this.props}
+                {...this.state}
               />
             </UIGridItem>
             <UIGridItem size={5} >
