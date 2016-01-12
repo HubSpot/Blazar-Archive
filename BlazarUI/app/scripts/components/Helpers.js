@@ -202,3 +202,14 @@ export const buildResultIcon = function(result) {
     />
   );
 };
+
+
+export const renderBuildStatusIcon = function(data) {
+  return (
+    <Icon
+      name={iconStatus[data.state]}
+      classNames={`icon-roomy ${LABELS[data.state]}`}
+      title={humanizeText(data.state)}
+    />
+  );
+};

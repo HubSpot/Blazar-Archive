@@ -4,25 +4,9 @@ import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import {contains, has} from 'underscore';
-import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate} from '../Helpers';
-import {LABELS, iconStatus} from '../constants';
-import Icon from '../shared/Icon.jsx';
+import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, renderBuildStatusIcon} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
-
-
-  renderBuildStatus() {
-    
-    const {data} = this.props;
-
-    return (
-      <Icon
-        name={iconStatus[data.state]}
-        classNames={`icon-roomy ${LABELS[data.state]}`}
-        title={humanizeText(data.state)}
-      />
-    );
-  }
   
   renderBuildLink() {
     const {data, params} = this.props;
@@ -56,7 +40,7 @@ class RepoBuildModulesTableRow extends Component {
     return (
       <tr className={tableRowBuildState(data.state)}>
         <td className='build-status'>
-          {this.renderBuildStatus()}
+          {renderBuildStatusIcon(this.props.data)}
         </td>
         <td className='table-cell-link'>
           {this.renderBuildLink()}
