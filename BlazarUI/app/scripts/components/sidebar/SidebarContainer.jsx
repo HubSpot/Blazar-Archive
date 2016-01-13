@@ -2,6 +2,7 @@ import $ from 'jquery';
 import React, {Component} from 'react';
 import {Link} from 'react-router';
 import {bindAll, has, debounce} from 'underscore';
+import Immutable from 'immutable';
 
 import Sidebar from './Sidebar.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
@@ -24,14 +25,13 @@ class SidebarContainer extends Component {
     
     bindAll(this, 
       'onStoreChange',
-      'onStarChange',
-      'getBuildsOfType', 
+      'onStarChange', 
       'updateResults', 
       'setToggleState'
     );
 
     this.state = {
-      builds: [],
+      builds: undefined,
       loading: true,
       changingBuildsType: false,
       filterText: '',
@@ -51,7 +51,7 @@ class SidebarContainer extends Component {
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStoreChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStarChange);
-    BuildsActions.loadBuilds(this.state.toggleFilterState);
+    BuildsActions.loadBuilds();
     window.addEventListener('resize', this.handleResizeDebounced);
   }
   
@@ -65,22 +65,13 @@ class SidebarContainer extends Component {
     return $(window).height() - $('#primary-nav').height() + $('.sidebar__filter').height();
   }
 
-  // fetch builds based on toggle selection
-  getBuildsOfType(type) {
-    this.setState({
-      changingBuildsType: true
-    });
-    
-    BuildsActions.loadBuilds(type);
-  }
-
   onStoreChange(state) {
     this.setState(state);
   }
   
   onStarChange(state) {
     if (this.state.toggleFilterState === 'starred') {
-      BuildsActions.loadBuilds('starred');
+      BuildsActions.loadBuilds();
     }
   }
 
@@ -91,11 +82,12 @@ class SidebarContainer extends Component {
   }
 
   setToggleState(toggleState) {
-    this.getBuildsOfType(toggleState);
+    BuildsActions.loadBuilds();
 
     this.setState({
       filterText: this.state.filterText,
-      toggleFilterState: toggleState
+      toggleFilterState: toggleState,
+      changingBuildsType: true
     });
   }
 
@@ -119,7 +111,8 @@ class SidebarContainer extends Component {
     }
 
     const searchType = NO_MATCH_MESSAGES[toggleFilterState];
-    const matches = getFilterMatches(builds.toJS(), filterText);
+    const filteredBuilds = builds[this.state.toggleFilterState];
+    const matches = getFilterMatches(filteredBuilds.toJS(), filterText);
 
     return (
       <Sidebar>

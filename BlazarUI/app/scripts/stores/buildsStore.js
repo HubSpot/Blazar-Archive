@@ -20,7 +20,7 @@ const BuildsStore = Reflux.createStore({
     };
   },
 
-  getBuilds() {
+  getBuilds() {    
     return this.builds;
   },
   
@@ -28,8 +28,7 @@ const BuildsStore = Reflux.createStore({
     BuildsApi.stopPolling;
   },
 
-  onLoadBuilds(filter) {
-    
+  onLoadBuilds() {
     BuildsApi.fetchBuilds((err, resp) => {
       if (err) {
         this.trigger({
@@ -45,15 +44,11 @@ const BuildsStore = Reflux.createStore({
       this.builds = resp;
 
       this.trigger({
-        builds: this.builds[filter],
+        builds: this.builds,
         loading: false,
         changingBuildsType: false
       });
     });
-  },
-  
-  onSetFilterType() {
-    console.log('set filter!');
   }
 
 });
