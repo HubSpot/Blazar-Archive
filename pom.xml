@@ -164,6 +164,11 @@
         <artifactId>slack-java-webhook</artifactId>
         <version>0.0.4</version>
       </dependency>
+      <dependency>
+        <groupId>com.codahale.metrics</groupId>
+        <artifactId>metrics-jdbi</artifactId>
+        <version>${dep.metrics.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

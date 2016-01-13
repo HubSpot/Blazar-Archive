@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Provides;
 import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.listener.BuildListenerModule;
@@ -100,6 +101,12 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
   @Singleton
   public XmlFactory providesXmlFactory() {
     return new XmlFactory();
+  }
+
+  @Provides
+  @Singleton
+  public MetricRegistry providesMetricRegistry(Environment environment) {
+    return environment.metrics();
   }
 
   @Provides

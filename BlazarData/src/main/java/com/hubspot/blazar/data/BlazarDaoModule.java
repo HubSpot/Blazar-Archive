@@ -1,5 +1,6 @@
 package com.hubspot.blazar.data;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
@@ -16,7 +17,6 @@ import com.hubspot.guice.transactional.TransactionalModule;
 import com.hubspot.guice.transactional.impl.DefaultDataSourceLocator;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
-import io.dropwizard.setup.Environment;
 import org.skife.jdbi.v2.DBI;
 
 import javax.inject.Singleton;
@@ -45,8 +45,8 @@ public class BlazarDaoModule extends AbstractModule {
   @Provides
   @Singleton
   public ManagedDataSource providesManagedDataSource(DataSourceFactory dataSourceFactory,
-                                                     Environment environment) throws ClassNotFoundException {
-    return dataSourceFactory.build(environment.metrics(), "db");
+                                                     MetricRegistry metricRegistry) throws ClassNotFoundException {
+    return dataSourceFactory.build(metricRegistry, "db");
   }
 
   @Provides

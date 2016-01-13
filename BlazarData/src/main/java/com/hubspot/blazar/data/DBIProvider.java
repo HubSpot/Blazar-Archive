@@ -1,102 +1,95 @@
 package com.hubspot.blazar.data;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.jdbi.InstrumentedTimingCollector;
+import com.codahale.metrics.jdbi.strategies.DelegatingStatementNameStrategy;
+import com.codahale.metrics.jdbi.strategies.NameStrategies;
+import com.codahale.metrics.jdbi.strategies.StatementNameStrategy;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.guice.transactional.TransactionalDataSource;
 import com.hubspot.rosetta.jdbi.RosettaMapperFactory;
+import com.hubspot.rosetta.jdbi.RosettaObjectMapperOverride;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
-import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.jdbi.DBIHealthCheck;
+import io.dropwizard.jdbi.ImmutableListContainerFactory;
+import io.dropwizard.jdbi.ImmutableSetContainerFactory;
+import io.dropwizard.jdbi.OptionalContainerFactory;
+import io.dropwizard.jdbi.args.JodaDateTimeArgumentFactory;
+import io.dropwizard.jdbi.args.JodaDateTimeMapper;
+import io.dropwizard.jdbi.args.OptionalArgumentFactory;
+import io.dropwizard.jdbi.logging.LogbackLog;
 import io.dropwizard.setup.Environment;
 import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.StatementContext;
 
 import javax.inject.Provider;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
-import java.util.logging.Logger;
 
 public class DBIProvider implements Provider<DBI> {
   private final TransactionalDataSource transactionalDataSource;
   private final ManagedDataSource managedDataSource;
   private final DataSourceFactory dataSourceFactory;
-  private final Environment environment;
+  private final ObjectMapper objectMapper;
+  private Optional<Environment> environment;
 
   @Inject
   public DBIProvider(TransactionalDataSource transactionalDataSource,
                      ManagedDataSource managedDataSource,
                      DataSourceFactory dataSourceFactory,
-                     Environment environment) {
+                     ObjectMapper objectMapper) {
     this.transactionalDataSource = transactionalDataSource;
     this.managedDataSource = managedDataSource;
     this.dataSourceFactory = dataSourceFactory;
-    this.environment = environment;
+    this.objectMapper = objectMapper;
+    this.environment = Optional.absent();
+  }
+
+  @Inject(optional = true)
+  public void setEnvironment(Environment environment) {
+    this.environment = Optional.of(environment);
   }
 
   @Override
   public DBI get() {
-    DBI dbi = new DBIFactory().build(environment, dataSourceFactory, frankenDataSource(), "db");
+    final DBI dbi = new DBI(transactionalDataSource);
+    dbi.setSQLLog(new LogbackLog());
+
+    if (environment.isPresent()) {
+      environment.get().lifecycle().manage(managedDataSource);
+      environment.get().healthChecks().register("db", new DBIHealthCheck(dbi, dataSourceFactory.getValidationQuery()));
+      dbi.setTimingCollector(new InstrumentedTimingCollector(environment.get().metrics(), new SanerNamingStrategy()));
+    }
+
+    dbi.registerArgumentFactory(new OptionalArgumentFactory(dataSourceFactory.getDriverClass()));
+    dbi.registerContainerFactory(new ImmutableListContainerFactory());
+    dbi.registerContainerFactory(new ImmutableSetContainerFactory());
+    dbi.registerContainerFactory(new OptionalContainerFactory());
+    dbi.registerArgumentFactory(new JodaDateTimeArgumentFactory());
+    dbi.registerMapper(new JodaDateTimeMapper());
     dbi.registerMapper(new RosettaMapperFactory());
+
+    new RosettaObjectMapperOverride(objectMapper).override(dbi);
+
     return dbi;
   }
 
-  private ManagedDataSource frankenDataSource() {
-    return new ManagedDataSource() {
+  private static class SanerNamingStrategy extends DelegatingStatementNameStrategy {
+    private static final String RAW_SQL = MetricRegistry.name(DBI.class, "raw-sql");
 
-      @Override
-      public Connection getConnection() throws SQLException {
-        return transactionalDataSource.getConnection();
-      }
+    private SanerNamingStrategy() {
+      super(NameStrategies.CHECK_EMPTY,
+          NameStrategies.CONTEXT_CLASS,
+          NameStrategies.CONTEXT_NAME,
+          NameStrategies.SQL_OBJECT,
+          new StatementNameStrategy() {
 
-      @Override
-      public Connection getConnection(String username, String password) throws SQLException {
-        return transactionalDataSource.getConnection(username, password);
-      }
-
-      @Override
-      public PrintWriter getLogWriter() throws SQLException {
-        return transactionalDataSource.getLogWriter();
-      }
-
-      @Override
-      public void setLogWriter(PrintWriter out) throws SQLException {
-        transactionalDataSource.setLogWriter(out);
-      }
-
-      @Override
-      public void setLoginTimeout(int seconds) throws SQLException {
-        transactionalDataSource.setLoginTimeout(seconds);
-      }
-
-      @Override
-      public int getLoginTimeout() throws SQLException {
-        return transactionalDataSource.getLoginTimeout();
-      }
-
-      @Override
-      public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        throw new SQLFeatureNotSupportedException();
-      }
-
-      @Override
-      public void start() throws Exception {
-        managedDataSource.start();
-      }
-
-      @Override
-      public void stop() throws Exception {
-        managedDataSource.stop();
-      }
-
-      @Override
-      public <T> T unwrap(Class<T> iface) throws SQLException {
-        return transactionalDataSource.unwrap(iface);
-      }
-
-      @Override
-      public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return transactionalDataSource.isWrapperFor(iface);
-      }
-    };
+            @Override
+            public String getStatementName(StatementContext statementContext) {
+              return RAW_SQL;
+            }
+          });
+    }
   }
 }

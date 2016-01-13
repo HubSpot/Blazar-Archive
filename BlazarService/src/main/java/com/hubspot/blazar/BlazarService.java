@@ -7,7 +7,6 @@ import com.hubspot.blazar.guice.BlazarServiceModule;
 import com.hubspot.blazar.guice.GuiceBundle;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 
-import com.hubspot.rosetta.Rosetta;
 import io.dropwizard.Application;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.db.DataSourceFactory;
@@ -27,7 +26,6 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
         return configuration.getDatabaseConfiguration();
       }
     });
-    Rosetta.addModule(new ProtobufModule());
     bootstrap.getObjectMapper().registerModule(new ProtobufModule());
     bootstrap.getObjectMapper().setSerializationInclusion(Include.NON_NULL);
     bootstrap.getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
