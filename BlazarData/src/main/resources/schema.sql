@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset tpetr:1 dbms:mysql
+--changeset tpetr:1
 CREATE TABLE `branches` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `host` varchar(250) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE `branches` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`repositoryId`, `branch`),
   INDEX (`updatedTimestamp`)
-) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `modules` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -36,21 +36,21 @@ CREATE TABLE `modules` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`branchId`, `name`, `type`),
   INDEX (`updatedTimestamp`)
-) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `module_provides` (
   `moduleId` int(11) unsigned NOT NULL,
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`moduleId`, `name`),
   INDEX (`name`)
-) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `module_depends` (
   `moduleId` int(11) unsigned NOT NULL,
   `name` varchar(250) NOT NULL,
   PRIMARY KEY (`moduleId`, `name`),
   INDEX (`name`)
-) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `repo_builds` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -60,12 +60,12 @@ CREATE TABLE `repo_builds` (
   `buildTrigger` mediumtext NOT NULL,
   `startTimestamp` bigint(20) unsigned,
   `endTimestamp` bigint(20) unsigned,
-  `commitInfo` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `commitInfo` mediumtext,
   `dependencyGraph` mediumtext,
   `sha` char(40),
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`branchId`, `buildNumber`)
-) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `module_builds` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -82,4 +82,19 @@ CREATE TABLE `module_builds` (
   UNIQUE INDEX (`moduleId`, `buildNumber`),
   INDEX (`repoBuildId`),
   INDEX (`state`)
-) ENGINE=InnoDB ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--changeset jhaber:2 dbms:mysql
+ALTER TABLE `branches` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+ALTER TABLE `modules` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+ALTER TABLE `module_provides` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+ALTER TABLE `module_depends` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+ALTER TABLE `repo_builds` MODIFY `commitInfo` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE `repo_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+ALTER TABLE `module_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
