@@ -6,24 +6,20 @@ import $ from 'jquery';
 import PollingProvider from '../services/PollingProvider';
 import StarProvider from '../services/starProvider';
 
-function _filterBuilds(builds, filter) {
+function _groupBuilds(builds) {
+  const stars = StarProvider.getStars();
   
-  if (filter === 'all') {
-    return builds;
-  }
+  let groupedBuilds = { all: fromJS(builds) };
+  
+  groupedBuilds.building = fromJS(builds.filter((build) => {
+    return has(build, 'inProgressBuild');
+  }));
+  
+  groupedBuilds.starred = fromJS(builds.filter((build) => {
+    return contains(stars, build.gitInfo.id);
+  })) || Immutable.List.of();
 
-  if (filter === 'building') {
-    return builds.filter((build) => {
-      return has(build, 'inProgressBuild');
-    });
-  }
-  
-  if (filter === 'starred') {
-    const ids = StarProvider.getStars();
-    return builds.filter((build) => {
-      return contains(ids, build.gitInfo.id);
-    }) || [];
-  }
+  return groupedBuilds;
 }
 
 function _parse(data) {
@@ -51,12 +47,10 @@ function _parse(data) {
     return item;
   });
 
-  return fromJS(parsed);
+  return parsed;
 }
 
-function fetchBuilds(options, cb) {    
-  
-  const {filter} = options;
+function fetchBuilds(cb) {
   
   if (this.buildsPoller) {
     this.buildsPoller.disconnect();
@@ -75,8 +69,7 @@ function fetchBuilds(options, cb) {
       return;
     }
 
-    const filteredBuilds = _filterBuilds(resp, filter);
-    cb(err, _parse(filteredBuilds));
+    cb(err, _groupBuilds(_parse(resp)));
   });
 }
 

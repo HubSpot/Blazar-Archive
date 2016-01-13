@@ -1,5 +1,5 @@
 //
-// Used to build sidebar
+// Used for sidebar
 //
 import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
@@ -14,9 +14,9 @@ const BuildsStore = Reflux.createStore({
 
   init() {  
     this.builds = {
-      starred: {},
-      all: { },
-      building: {}
+      all: {},
+      building: {},
+      starred: {}
     };
   },
 
@@ -29,8 +29,8 @@ const BuildsStore = Reflux.createStore({
   },
 
   onLoadBuilds(filter) {
-
-    BuildsApi.fetchBuilds({filter: filter}, (err, resp) => {
+    
+    BuildsApi.fetchBuilds((err, resp) => {
       if (err) {
         this.trigger({
           loading: false,
@@ -42,10 +42,10 @@ const BuildsStore = Reflux.createStore({
         });
         return;
       }
-      this.builds[filter] = resp;
+      this.builds = resp;
 
       this.trigger({
-        builds: resp,
+        builds: this.builds[filter],
         loading: false,
         changingBuildsType: false
       });
