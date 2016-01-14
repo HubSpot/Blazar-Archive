@@ -10,6 +10,7 @@ class BranchBuildsApi extends StoredBuilds {
   
   _parse(resp) {
     const {params} = this.options;
+
     const builds = resp.map((build) => {
       build.blazarPath = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${build.buildNumber}`;
       if (build.endTimestamp && build.startTimestamp) {
@@ -20,9 +21,8 @@ class BranchBuildsApi extends StoredBuilds {
     
     return fromJS(resp);
   }
-
-  _onStoreChange(resp) {
-    this.builds = resp.builds.all;
+  
+  _afterInitialFetch() {
     // need branchId for history endpoint
     this._getBranchId();
     // fetch all builds for branchId and keep polling for changes

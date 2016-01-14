@@ -11,7 +11,9 @@ const BranchStore = Reflux.createStore({
   },
 
   onLoadBranchBuilds(params) {
-    this.branchBuildsApi = new BranchBuildsApi({params: params});
+    this.branchBuildsApi = new BranchBuildsApi({
+      params: params
+    });
 
     this.branchBuildsApi.fetchBuilds((err, resp) => {
       if (err) {

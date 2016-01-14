@@ -18,7 +18,13 @@ class StoredBuilds {
     if (!this.builds.size) {
       return;
     }
-    this._parse();
+    
+    this._afterInitialFetch();
+    
+  }
+  
+  _afterInitialFetch() {
+    this._parse();  
   }
 
   // used by subclasses
@@ -28,20 +34,22 @@ class StoredBuilds {
 
   _onStoreChange(resp) {
     this.builds = resp.builds.all;
-    this._parse();
+    this._afterInitialFetch();
   }
 
   //
   // Public
   //
   fetchBuilds(cb) {
-    this.cb = cb;
-    this.getInitialBuilds();
     this._unsubscribeFromBuilds = BuildsStore.listen(this._onStoreChange.bind(this));
+    this.cb = cb;
+    this.getInitialBuilds();  
   }
   
   stopPollingBuilds() {
     this._unsubscribeFromBuilds();
+    // if polling other endpoints
+    this.shouldPoll = false;
   }
   
 }

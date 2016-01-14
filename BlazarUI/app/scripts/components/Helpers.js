@@ -100,7 +100,6 @@ export const getFilteredBranches = function(filters, branches) {
   
       branchFilters.some((branch) => {
         if (branch.value === b.gitInfo.branch) {
-          console.log('gots a match');
           branchMatch = true;
         }
       });
