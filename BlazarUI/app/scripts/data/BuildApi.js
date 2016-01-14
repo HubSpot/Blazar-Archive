@@ -1,6 +1,5 @@
 /*global config*/
 import Reflux from 'reflux';
-import $ from 'jquery';
 import {extend, findWhere} from 'underscore'; 
 import BuildStates from '../constants/BuildStates';
 import {buildIsOnDeck} from '../components/Helpers';
@@ -36,7 +35,7 @@ class BuildApi {
 
     // navigated to the top
     if (position === 'top') {
-      
+
       if (buildInProgress) {
         this.setLogPollingState(false);
       }
@@ -154,7 +153,6 @@ class BuildApi {
     return logPromise;
   }
   
-  
   _pollLog() {
     if (!this.build.logCollection) {
       return;
@@ -218,7 +216,7 @@ class BuildApi {
     this._pollLog();
     this._pollBuild();
   }
-  
+
   _getBuild() {
     // first get all builds so we can find the build id
     const buildStates = new Resource({url: `${config.apiRoot}/branches/state`}).get();
@@ -230,27 +228,54 @@ class BuildApi {
         repository: this.params.repo,
         branch: this.params.branch
       });
+      
+      // get branch id
+      const branchIdPromise = new Resource({ url: `${config.apiRoot}/branches/state`}).get();
+      
+      return branchIdPromise.then((resp) => {
+        
+        const branchId = findWhere(resp.map((build) => build.gitInfo), {
+          host: this.params.host,
+          organization: this.params.org,
+          repository: this.params.repo,
+          branch: this.params.branch
+        }).id
 
-      // now get modules so we can get the moduleId by the module name
-      const repoBuildModules = new Resource({url: `${config.apiRoot}/branches/${repoBuild.id}/modules`}).get();
+        const branchHistoryPromise = new Resource({ url: `${config.apiRoot}/builds/history/branch/${branchId}`}).get();
+        
+        return branchHistoryPromise.then((resp) => {
+          
+          const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
+          
+          // now get modules so we can get the moduleId by the module name
+          const repoBuildModules = new Resource({url: `${config.apiRoot}/branches/${branchId}/modules`}).get();
 
-      return repoBuildModules.then((modules) => {
-        const repoBuildModule = findWhere(modules, {name: this.params.moduleName});
+          return repoBuildModules.then((modules) => {
 
-        // last get module build based on module id
-        const buildModules = new Resource({url: `${config.apiRoot}/branches/builds/${this.params.repoBuildId}/modules`}).get();
+            const repoBuildModule = findWhere(modules, {name: this.params.moduleName});
 
-        return buildModules.then((modules) => {  
-          const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});
+            // last get module build based on module id
+            const buildModules = new Resource({url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`}).get();
 
-          this.build.model = new Build({
-            id: moduleBuild.id,
-            repoBuildId: this.params.repoBuildId
+            return buildModules.then((modules) => {
+              const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});
+
+              this.build.model = new Build({
+                id: moduleBuild.id,
+                repoBuildId: moduleBuild.repoBuildId
+              });
+
+              return this._fetchBuild();
+            });
+
           });
 
-          return this._fetchBuild();
-        });
-
+        }, (error) => {
+          this.cb(error);
+        })
+        
+      }, (error) => {
+        this.cb(error)
       });
 
     });  
@@ -264,10 +289,10 @@ class BuildApi {
       return;
     }
 
-    logSizePromise.done((resp) => {
+    logSizePromise.done((size) => {
       this.build.logCollection = new Log({
         buildNumber: this.build.model.data.buildNumber,
-        size: resp.size,
+        size: size,
         buildState: this.build.model.data.state
       });    
     });
@@ -346,6 +371,7 @@ class BuildApi {
     };
 
     const buildUpdate = extend(buildInfo, additional);
+
     this.cb(false, buildUpdate);
   }
 

@@ -1,4 +1,3 @@
-/*global config*/
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
@@ -11,11 +10,8 @@ class RepoBuildModulesTableRow extends Component {
   renderBuildLink() {
     const {data, params} = this.props;
 
-    // To do: dont pull in global appRoot
-    const buildLink = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${params.repoBuildId}/${data.name}`;    
-
     return (
-      <Link to={buildLink}>{data.name}</Link>   
+      <Link to={data.blazarPath}>{data.name}</Link>   
     );    
   }
 

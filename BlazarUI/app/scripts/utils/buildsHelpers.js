@@ -4,7 +4,6 @@ import {sortBy} from 'underscore';
 import bs from 'binary-search';
 
 export const getFilterMatches = (builds, filterText) => {
-  console.log('builds: ', builds);
   if (builds.length === 0) {
     return [];
   }

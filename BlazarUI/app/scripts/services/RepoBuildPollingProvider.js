@@ -16,52 +16,31 @@ class RepoBuildPollingProvider {
     this.branchId = undefined;
     
     this.promises = {
-      repoBuildPromise: new Resource({url: `${config.apiRoot}/branches/builds/${params.repoBuildId}/modules`}),
-      branchIdPromise: new Resource({ url: `${config.apiRoot}/branches/state`}).get(),
-      modulesPromise: function() {
+      branchId: new Resource({ url: `${config.apiRoot}/branches/state`}).get(),
+      moduleBuilds: function() {
+        return new Resource({url: `${config.apiRoot}/branches/builds/${this.repoBuildId}/modules`}).get();
+      },      
+      repoBuild: function() {
+        return new Resource({ url: `${config.apiRoot}/builds/history/branch/${this.branchId}/build/${this.params.buildNumber}`}).get()
+      },
+      branchHistory: function() {
+        return new Resource({ url: `${config.apiRoot}/builds/history/branch/${this.branchId}`}).get()
+      },
+      moduleNames: function() {
         return new Resource({url: `${config.apiRoot}/branches/${this.branchId}/modules`}).get();
       }
     };
   }
   
-  _getBranchId(builds) {
-    
-    const repoBuildGitInfo = findWhere(builds.map((build) => build.gitInfo), {
-      host: this.params.host,
-      organization: this.params.org,
-      repository: this.params.repo,
-      branch: this.params.branch
+  _parseModules(modules) {
+    const {params} = this;
+
+    const modules = modules.map((module) => {
+      module.blazarPath = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${params.buildNumber}/${module.name}`;    
+      return module;
     });
-      
-    if (repoBuildGitInfo) {
-      this.branchId = repoBuildGitInfo.id;
-    }
-    
-    else {
-      // to do
-    }
 
-    const flatBuilds = flatten(builds.map((build) => {
-      let newBuild = [];
-
-      if (build.lastBuild) { 
-        newBuild.push(build.lastBuild); 
-      }
-
-      if (build.inProgressBuild) { 
-        newBuild.push(build.inProgressBuild); 
-      }
-
-      if (build.pendingBuild) { 
-        newBuild.push(build.pendingBuild); 
-      }
-      
-      return newBuild;
-    }));
-    
-    
-    this.currentRepoBuild = findWhere(flatBuilds, {id: parseInt(this.params.repoBuildId)});
-    this.currentRepoBuild.duration = timestampDuration(this.currentRepoBuild.startTimestamp, this.currentRepoBuild.endTimestamp);
+    return fromJS(modules);
   }
   
   _shouldPoll(moduleBuildStates) {
@@ -72,58 +51,62 @@ class RepoBuildPollingProvider {
   
   _fetchBuilds(cb) {
     // load module builds from repoBuildId
-    let promises = [this.promises.repoBuildPromise.get()];
+    let promises = [];
 
-    // On first fetch, find branchId based on params so we can load the starred state
+    // On first fetch, find the branchId
     if (!this.branchId) {
-      promises.push(this.promises.branchIdPromise);
-    }
-    
-    Q.spread(promises, (moduleBuilds, allBuilds) => {
-      
-      if (allBuilds) {
-        this._getBranchId(allBuilds);
-      }
 
-      // get module names
-      const modulesPromise = this.promises.modulesPromise.call(this);
-
-      modulesPromise.then((modules) => {
-        const moduleNamesOnly = modules.map((module) => {
-          return { id: module.id, name: module.name };
-        });
+      this.promises.branchId.then((builds) => {
         
-        // add module name to module builds
-        const ModuleBuildsWithName = moduleBuilds.map((build) => {
-          return extend(build, findWhere(moduleNamesOnly, { id: build.moduleId }));
-        });
-
-        // send module builds to store
-        cb(false, {
-          moduleBuilds: fromJS(ModuleBuildsWithName),
-          currentRepoBuild: fromJS(this.currentRepoBuild),
-          branchId: this.branchId
-        });
+        // get the branch id:
+        this.branchId = findWhere(builds.map((build) => build.gitInfo), {
+          host: this.params.host,
+          organization: this.params.org,
+          repository: this.params.repo,
+          branch: this.params.branch
+        }).id
         
-        // check if we need to keep polling
-        const moduleBuildStates = moduleBuilds.map((build) => build.state);
+        // get repositoryId
+        this.promises.branchHistory.call(this).then((resp) => {
+          this.repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
 
-        if (!this._shouldPoll(moduleBuildStates)) {
-          return;
-        }
+          // get repo build and module build info
+          Q.spread([this.promises.moduleNames.call(this), this.promises.moduleBuilds.call(this), this.promises.repoBuild.call(this)], 
+            (moduleNames, moduleBuilds, repoBuild) => {
 
-        setTimeout(() => {
-          this.poll.call(this, cb);
-        }, config.buildsRefresh);
+              repoBuild.duration = timestampDuration(repoBuild.startTimestamp, repoBuild.endTimestamp);
+              
+              // merge module names with module builds
+              const moduleNamesOnly = moduleNames.map((module) => {
+                return { id: module.id, name: module.name };
+              });
+              
+              const ModuleBuildsWithName = moduleBuilds.map((build) => {
+                return extend(build, findWhere(moduleNamesOnly, { id: build.moduleId }));
+              });
+              
+              cb(false, {
+                moduleBuilds: this._parseModules(ModuleBuildsWithName),
+                currentRepoBuild: fromJS(repoBuild),
+                branchId: this.branchId
+              });
             
+          }).fail((error) => {
+            cb(error, null);
+          }); 
+          
+          
+        }, (error) => {
+          console.warn(error);
+          cb(err, null);
+        });
+        
       }, (error) => {
-        cb(xhr, null); 
+        cb(error, null);
       });
       
-    })
-    .fail((xhr) => {
-      cb(xhr, null);
-    });  
+    }
+
   }
 
   poll(cb) {

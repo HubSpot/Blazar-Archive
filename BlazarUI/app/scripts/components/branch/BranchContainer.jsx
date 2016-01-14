@@ -4,7 +4,7 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
-import ModulesTable from './ModulesTable.jsx';
+import BranchBuildHistoryTable from './BranchBuildHistoryTable.jsx';
 import Loader from '../shared/Loader.jsx';
 import Icon from '../shared/Icon.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
@@ -13,7 +13,7 @@ import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
 let initialState = {
-  modules: [],
+  builds: null,
   loading: true
 };
 
@@ -43,7 +43,7 @@ class BranchContainer extends Component {
     
   setup(params) {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
-    BranchActions.loadModules(params);
+    BranchActions.loadBranchBuilds(params);
   }
   
   tearDown() {
@@ -62,9 +62,11 @@ class BranchContainer extends Component {
     
     else {
       return (
-        <ModulesTable
-          modules={this.state.modules}
+        <BranchBuildHistoryTable
+          data={this.state.builds}
           loading={this.state.loading}
+          {...this.state}
+          {...this.props}
         />
       );
     }
@@ -78,7 +80,10 @@ class BranchContainer extends Component {
           <UIGridItem size={12}>
             <Headline>
               <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-              Branch Modules
+              {this.props.params.repo} - {this.props.params.branch}
+              <HeadlineDetail>
+                Branch Builds
+              </HeadlineDetail>
             </Headline>
             {this.getRenderedContent()}
           </UIGridItem>
