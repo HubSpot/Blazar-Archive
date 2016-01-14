@@ -22,7 +22,9 @@ class RepoBuildModulesTableRow extends Component {
       return null;
     }
 
+    //
     // to do: surface singularity env
+    //
     const singularityPath = `https://tools.hubteamqa.com/singularity/task/${taskId}`;
 
     return (
@@ -58,7 +60,8 @@ class RepoBuildModulesTableRow extends Component {
 
 }
 
-// RepoBuildModulesTableRow.propTypes = {
-// };
+RepoBuildModulesTableRow.propTypes = {
+  data: PropTypes.object.isRequired
+};
 
 export default RepoBuildModulesTableRow;

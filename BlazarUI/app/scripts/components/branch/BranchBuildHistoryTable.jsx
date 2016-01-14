@@ -30,7 +30,8 @@ class BranchBuildHistoryTable extends Component {
     return this.props.buildTable({
       data: this.props.data.toJS(),
       columnNames: columnNames,
-      rowComponent: BranchBuildHistoryTableRow
+      rowComponent: BranchBuildHistoryTableRow,
+      params: this.props.params
     });
   }
 }

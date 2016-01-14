@@ -2,13 +2,13 @@ import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
-import {has} from 'underscore';
 
 import Helpers from '../ComponentHelpers';
 import {tableRowBuildState} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
+
 
 class BranchBuildHistoryTableRow extends Component {
 
@@ -24,23 +24,41 @@ class BranchBuildHistoryTableRow extends Component {
       />
     );
   }
-
-  render() {
-    const {data} = this.props;
-    
+  
+  renderSha() {
+    const {data, params} = this.props;
     let sha;
-    // const buildLink = `${window.config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${build.buildNumber}`;
-    const startTime = Helpers.timestampFormatted(data.startTimestamp);
 
     if (data.sha !== undefined) {
-      // sha = <Sha gitInfo={gitInfo} build={build} />;
-      sha = data.sha;
-    }
+      const gitInfo = {
+        host: params.host,
+        organization: params.org,
+        repository: params.repo,
+      }
+
+      return (
+        <Sha gitInfo={gitInfo} build={data} />  
+      );
+    }  
+  }
+  
+  renderDuration() {
+    const {data} = this.props;
 
     let duration = data.duration;
     if (data.state === BuildStates.IN_PROGRESS) {
       duration = 'In Progress...';
     }
+
+    return duration;
+  }
+  
+  renderStartTime() {
+    return Helpers.timestampFormatted(this.props.data.startTimestamp);
+  }
+
+  render() {
+    const {data} = this.props;
 
     return (
       <tr className={tableRowBuildState(data.state)}>
@@ -51,13 +69,13 @@ class BranchBuildHistoryTableRow extends Component {
           <Link to={data.blazarPath}>{data.buildNumber}</Link>
         </td>
         <td>
-          {startTime}
+          {this.renderStartTime()}
         </td>
         <td>
-          {duration}
+          {this.renderDuration()}
         </td>
         <td>
-          {sha}
+          {this.renderSha()}
         </td>
       </tr>
     );

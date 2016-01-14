@@ -6,7 +6,6 @@ import {githubShaLink, truncate} from '../Helpers';
 class Sha extends Component {
 
   render() {
-
     const commitLink = githubShaLink({gitInfo: this.props.gitInfo, build: this.props.build});
 
     return (
