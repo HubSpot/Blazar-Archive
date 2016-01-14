@@ -4,16 +4,12 @@ import { findWhere } from 'underscore';
 import BuildsStore from '../stores/buildsStore';
 import Resource from '../services/ResourceProvider';
 import humanizeDuration from 'humanize-duration';
+import StoredBuilds from '../data/StoredBuilds';
 
-class BranchBuildsApi {
-  
-  constructor({params}) {
-    this.params = params;
-    this.shouldPoll = true;
-  }
+class BranchBuildsApi extends StoredBuilds {
   
   _parse(resp) {
-    const {params} = this;
+    const {params} = this.options;
     const builds = resp.map((build) => {
       build.blazarPath = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${build.buildNumber}`;
       if (build.endTimestamp && build.startTimestamp) {
@@ -32,16 +28,18 @@ class BranchBuildsApi {
     // fetch all builds for branchId and keep polling for changes
     this._fetchBuildHistory();
     // we only needed the branchId, dont need to listen anymore
-    this._unsubscribeFromBuilds();
+    this.stopPollingBuilds();
   }
   
   _getBranchId() {
     const builds = this.builds.toJS();
+    const {params} = this.options;
+    
     const repoBuildGitInfo = findWhere(builds.map((build) => build.gitInfo), {
-      host: this.params.host,
-      organization: this.params.org,
-      repository: this.params.repo,
-      branch: this.params.branch
+      host: params.host,
+      organization: params.org,
+      repository: params.repo,
+      branch: params.branch
     });
     
     if (repoBuildGitInfo) {
@@ -70,18 +68,6 @@ class BranchBuildsApi {
     });
   }
 
-  //
-  // Public
-  //
-
-  fetchBuilds(cb) {
-    this.cb = cb;
-    this._unsubscribeFromBuilds = BuildsStore.listen(this._onStoreChange.bind(this));
-  }
-  
-  stopPolling() {
-    this.shouldPoll = false;
-  }
   
 }
 

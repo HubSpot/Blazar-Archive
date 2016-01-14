@@ -3,9 +3,7 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
-
-import Helpers from '../ComponentHelpers';
-import {tableRowBuildState} from '../Helpers';
+import {tableRowBuildState, humanizeText, timestampFormatted} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -20,7 +18,7 @@ class BranchesTableRow extends Component {
       <Icon
         name={iconStatus[result]}
         classNames={classNames}
-        title={Helpers.humanizeText(result)}
+        title={humanizeText(result)}
       />
     );
   }
@@ -30,21 +28,17 @@ class BranchesTableRow extends Component {
       lastBuild,
       inProgressBuild,
       pendingBuild,
-      module,
       gitInfo
     } = this.props.data;
+    
 
     if (!has(this.props.data, 'lastBuild') ) {
       return (
         <tr> 
           <td>
             <Icon for='branch' classNames="icon-roomy icon-muted" />
-            <Link to={module.blazarPath.branch}>{gitInfo.branch}</Link>
+            <Link to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
           </td>
-          <td>
-            <Icon for='module' classNames="icon-roomy icon-muted" />
-            <Link to={module.blazarPath.module}>{module.name}</Link>
-          </td>  
           <td>No History</td>
           <td></td>
           <td></td>
@@ -70,11 +64,7 @@ class BranchesTableRow extends Component {
       <tr className={tableRowBuildState(build.state)}>
         <td>
           <Icon for='branch' classNames="icon-roomy icon-muted" />
-          <Link to={module.blazarPath.branch}>{gitInfo.branch}</Link>
-        </td>
-        <td>
-          <Icon for='module' classNames="icon-roomy icon-muted" />
-          <Link to={module.blazarPath.module}>{module.name}</Link>
+          <Link to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
         </td>
         <td className='build-result-link'>
           <Link to={build.blazarPath}>
@@ -83,7 +73,7 @@ class BranchesTableRow extends Component {
           </Link>
         </td>
         <td>
-          {Helpers.timestampFormatted(build.startTimestamp)}
+          {timestampFormatted(build.startTimestamp)}
         </td>
         <td>
           {duration}

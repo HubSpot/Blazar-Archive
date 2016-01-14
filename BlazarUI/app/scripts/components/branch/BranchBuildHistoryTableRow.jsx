@@ -3,8 +3,7 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 
-import Helpers from '../ComponentHelpers';
-import {tableRowBuildState} from '../Helpers';
+import {tableRowBuildState, timestampFormatted, humanizeText} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -20,7 +19,7 @@ class BranchBuildHistoryTableRow extends Component {
       <Icon
         name={iconStatus[result]}
         classNames={classNames}
-        title={Helpers.humanizeText(result)}
+          title={humanizeText(result)}
       />
     );
   }
@@ -54,7 +53,7 @@ class BranchBuildHistoryTableRow extends Component {
   }
   
   renderStartTime() {
-    return Helpers.timestampFormatted(this.props.data.startTimestamp);
+    return timestampFormatted(this.props.data.startTimestamp);
   }
 
   render() {

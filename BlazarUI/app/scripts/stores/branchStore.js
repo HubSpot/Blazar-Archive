@@ -7,7 +7,7 @@ const BranchStore = Reflux.createStore({
   listenables: BranchActions,
 
   onStopPolling() {
-    this.branchBuildsApi.stopPolling();
+    this.branchBuildsApi.stopPollingBuilds();
   },
 
   onLoadBranchBuilds(params) {

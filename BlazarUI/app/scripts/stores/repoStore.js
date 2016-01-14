@@ -1,28 +1,31 @@
 import Reflux from 'reflux';
 import RepoActions from '../actions/repoActions';
-
+import BranchesApi from '../data/BranchesApi';
+import { fromJS } from 'immutable';
 
 const RepoStore = Reflux.createStore({
 
   listenables: RepoActions,
-  
+
   init() {
     this.branches = [];
   },
+  
+  onLoadBranches(params) {
 
-  loadBranchesSuccess(incomingData) {
-    this.branches = incomingData;
-    
-    this.trigger({
-      branches: this.branches,
-      loading: false
+    this.branchesApi = new BranchesApi({params});
+
+    this.branchesApi.fetchBuilds((branches) => {      
+      this.trigger({
+        branches: branches,
+        loading: false
+      });
     });
+
   },
   
-  loadBranchesError(error) {
-    this.trigger({
-      error: error
-    });
+  onStopPolling() {
+    this.branchesApi.stopPollingBuilds();
   }
 
 });
