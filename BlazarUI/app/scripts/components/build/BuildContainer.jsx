@@ -108,10 +108,9 @@ class BuildContainer extends Component {
             </UIGridItem>
             <UIGridItem size={5} >
               <BuildLogNavigation 
-                loading={this.state.loading}
                 build={this.state.data.build}
-                loading={this.state.loading}
                 requestNavigationChange={this.requestNavigationChange}
+                {...this.state}
               />
             </UIGridItem>
           </UIGrid>
@@ -120,12 +119,11 @@ class BuildContainer extends Component {
           <BuildLog
             build={this.state.data.build}
             log={this.state.data.log}
-            loading={this.state.loading}
             fetchNext={this.fetchNext}
             fetchPrevious={this.fetchPrevious}
-            positionChange={this.state.positionChange}
-            error={this.state.error}
+            positionChange={this.state.data.positionChange}
             requestPollingStateChange={this.requestPollingStateChange}
+            {...this.state}
           />
         </div>
       </PageContainer>
