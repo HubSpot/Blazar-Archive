@@ -21,10 +21,10 @@ class RepoBuildPollingProvider {
         return new Resource({url: `${config.apiRoot}/branches/builds/${this.repoBuildId}/modules`}).get();
       },      
       repoBuild: function() {
-        return new Resource({ url: `${config.apiRoot}/builds/history/branch/${this.branchId}/build/${this.params.buildNumber}`}).get()
+        return new Resource({ url: `${config.apiRoot}/builds/history/branch/${this.branchId}/build/${this.params.buildNumber}`}).get();
       },
       branchHistory: function() {
-        return new Resource({ url: `${config.apiRoot}/builds/history/branch/${this.branchId}`}).get()
+        return new Resource({ url: `${config.apiRoot}/builds/history/branch/${this.branchId}`}).get();
       },
       moduleNames: function() {
         return new Resource({url: `${config.apiRoot}/branches/${this.branchId}/modules`}).get();
@@ -64,7 +64,7 @@ class RepoBuildPollingProvider {
           organization: this.params.org,
           repository: this.params.repo,
           branch: this.params.branch
-        }).id
+        }).id;
         
         // get repositoryId
         this.promises.branchHistory.call(this).then((resp) => {
@@ -94,8 +94,7 @@ class RepoBuildPollingProvider {
           }).fail((error) => {
             cb(error, null);
           }); 
-          
-          
+
         }, (error) => {
           console.warn(error);
           cb(err, null);

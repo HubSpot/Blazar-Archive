@@ -239,7 +239,7 @@ class BuildApi {
           organization: this.params.org,
           repository: this.params.repo,
           branch: this.params.branch
-        }).id
+        }).id;
 
         const branchHistoryPromise = new Resource({ url: `${config.apiRoot}/builds/history/branch/${branchId}`}).get();
         
@@ -272,10 +272,10 @@ class BuildApi {
 
         }, (error) => {
           this.cb(error);
-        })
+        });
         
       }, (error) => {
-        this.cb(error)
+        this.cb(error);
       });
 
     });  

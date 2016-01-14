@@ -20,9 +20,9 @@ class BranchBuildsApi {
         build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp, {round: true});   
       }
       return build;
-    })
+    });
     
-    return fromJS(resp)
+    return fromJS(resp);
   }
 
   _onStoreChange(resp) {
@@ -36,7 +36,7 @@ class BranchBuildsApi {
   }
   
   _getBranchId() {
-    const builds = this.builds.toJS()
+    const builds = this.builds.toJS();
     const repoBuildGitInfo = findWhere(builds.map((build) => build.gitInfo), {
       host: this.params.host,
       organization: this.params.org,
@@ -57,7 +57,7 @@ class BranchBuildsApi {
     const branchBuildsPromise = new Resource({url: `${config.apiRoot}/builds/history/branch/${this.branchId}`}).get();
 
     branchBuildsPromise.then((resp) => {
-      this.cb(false, this._parse(resp))
+      this.cb(false, this._parse(resp));
 
       if (this.shouldPoll) {
         setTimeout(() => {
@@ -65,7 +65,7 @@ class BranchBuildsApi {
         }, config.buildsRefresh);
       }
     }, (error) => {
-      this.cb('Error fetching branch builds. Check your console for more details.')
+      this.cb('Error fetching branch builds. Check your console for more details.');
       console.warn(error);
     });
   }
