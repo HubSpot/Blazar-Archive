@@ -12,8 +12,8 @@ CREATE TABLE `branches` (
   `pendingBuildId` bigint(20) unsigned,
   `inProgressBuildId` bigint(20) unsigned,
   `lastBuildId` bigint(20) unsigned,
-  `createdTimestamp` bigint(20) unsigned NOT NULL,
-  `updatedTimestamp` bigint(20) unsigned NOT NULL,
+  `createdTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`repositoryId`, `branch`),
   INDEX (`updatedTimestamp`)
@@ -30,8 +30,8 @@ CREATE TABLE `modules` (
   `pendingBuildId` bigint(20) unsigned,
   `inProgressBuildId` bigint(20) unsigned,
   `lastBuildId` bigint(20) unsigned,
-  `createdTimestamp` bigint(20) unsigned NOT NULL,
-  `updatedTimestamp` bigint(20) unsigned NOT NULL,
+  `createdTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `buildpack` mediumtext,
   PRIMARY KEY (`id`),
   UNIQUE INDEX (`branchId`, `name`, `type`),
@@ -87,14 +87,36 @@ CREATE TABLE `module_builds` (
 --changeset jhaber:2 dbms:mysql
 ALTER TABLE `branches` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
+ALTER TABLE `branches` MODIFY `updatedTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
 ALTER TABLE `modules` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+ALTER TABLE `modules` MODIFY `updatedTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE `module_provides` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
 ALTER TABLE `module_depends` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
-ALTER TABLE `repo_builds` MODIFY `commitInfo` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 ALTER TABLE `repo_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
+ALTER TABLE `repo_builds` MODIFY `commitInfo` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 ALTER TABLE `module_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+--changeset jhaber:3 dbms:h2
+CREATE TRIGGER `upd_branch_timestamp` AFTER UPDATE ON `branches` FOR EACH ROW CALL "com.hubspot.blazar.data.UpdateTimestampTrigger";
+
+CREATE TRIGGER `upd_module_timestamp` AFTER UPDATE ON `modules` FOR EACH ROW CALL "com.hubspot.blazar.data.UpdateTimestampTrigger";
+
+--changeset jhaber:4 dbms:h2 runAlways:true
+TRUNCATE TABLE `branches`;
+
+TRUNCATE TABLE `modules`;
+
+TRUNCATE TABLE `module_provides`;
+
+TRUNCATE TABLE `module_depends`;
+
+TRUNCATE TABLE `repo_builds`;
+
+TRUNCATE TABLE `module_builds`;

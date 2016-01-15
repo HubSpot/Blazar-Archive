@@ -1,22 +1,27 @@
 package com.hubspot.blazar.data.service;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.common.base.Optional;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.data.BlazarDataModule;
-import com.hubspot.blazar.data.BlazarDataTestModule;
-import org.junit.BeforeClass;
+import com.hubspot.blazar.data.BlazarDataTestBase;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Set;
 
-public class BranchServiceTest {
-  private static BranchService branchService;
+public class BranchServiceTest extends BlazarDataTestBase {
+  private BranchService branchService;
 
-  @BeforeClass
-  public static void setup() {
-    Injector injector = Guice.createInjector(new BlazarDataTestModule(), new BlazarDataModule());
-    branchService = injector.getInstance(BranchService.class);
+  @Before
+  public void before() {
+    this.branchService = getFromGuice(BranchService.class);
+  }
+
+  @Test
+  public void itCreatesABranch() {
+    GitInfo gitInfo = branchService.upsert(new GitInfo(Optional.<Integer>absent(), "git.hubteam.com", "HubSpot", "Overwatch", 123, "master", true, System.currentTimeMillis(), System.currentTimeMillis()));
+    Set<GitInfo> results = branchService.getAll();
+
+    int i = 1;
   }
 
   @Test

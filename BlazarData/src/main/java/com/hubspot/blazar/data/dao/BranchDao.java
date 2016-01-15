@@ -13,7 +13,6 @@ import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 import java.util.Set;
 
 public interface BranchDao {
-  String NOW = "ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 1000)";
 
   @SqlQuery("SELECT * FROM branches")
   Set<GitInfo> getAll();
@@ -27,24 +26,24 @@ public interface BranchDao {
   Optional<GitInfo> get(@BindWithRosetta GitInfo gitInfo);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO branches (host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp) VALUES (:host, :organization, :repository, :repositoryId, :branch, :active, " + NOW + ", " + NOW + ")")
+  @SqlUpdate("INSERT INTO branches (host, organization, repository, repositoryId, branch, active) VALUES (:host, :organization, :repository, :repositoryId, :branch, :active)")
   int insert(@BindWithRosetta GitInfo gitInfo);
 
-  @SqlUpdate("UPDATE branches SET organization = :organization, repository = :repository, active = :active, updatedTimestamp = " + NOW + " WHERE id = :id")
+  @SqlUpdate("UPDATE branches SET organization = :organization, repository = :repository, active = :active WHERE id = :id")
   int update(@BindWithRosetta GitInfo gitInfo);
 
-  @SqlUpdate("UPDATE branches SET active = 0, updatedTimestamp = " + NOW + " WHERE repositoryId = :repositoryId AND branch = :branch")
+  @SqlUpdate("UPDATE branches SET active = 0 WHERE repositoryId = :repositoryId AND branch = :branch")
   int delete(@BindWithRosetta GitInfo gitInfo);
 
-  @SqlUpdate("UPDATE branches SET pendingBuildId = :id, updatedTimestamp = " + NOW + " WHERE id = :branchId AND pendingBuildId IS NULL")
+  @SqlUpdate("UPDATE branches SET pendingBuildId = :id WHERE id = :branchId AND pendingBuildId IS NULL")
   int updatePendingBuild(@BindWithRosetta RepositoryBuild build);
 
-  @SqlUpdate("UPDATE branches SET pendingBuildId = NULL, updatedTimestamp = " + NOW + " WHERE id = :branchId AND pendingBuildId = :id")
+  @SqlUpdate("UPDATE branches SET pendingBuildId = NULL WHERE id = :branchId AND pendingBuildId = :id")
   int deletePendingBuild(@BindWithRosetta RepositoryBuild build);
 
-  @SqlUpdate("UPDATE branches SET inProgressBuildId = :id, pendingBuildId = NULL, updatedTimestamp = " + NOW + " WHERE id = :branchId AND pendingBuildId = :id AND inProgressBuildId IS NULL")
+  @SqlUpdate("UPDATE branches SET inProgressBuildId = :id, pendingBuildId = NULL WHERE id = :branchId AND pendingBuildId = :id AND inProgressBuildId IS NULL")
   int updateInProgressBuild(@BindWithRosetta RepositoryBuild build);
 
-  @SqlUpdate("UPDATE branches SET lastBuildId = :id, inProgressBuildId = NULL, updatedTimestamp = " + NOW + " WHERE id = :branchId AND inProgressBuildId = :id")
+  @SqlUpdate("UPDATE branches SET lastBuildId = :id, inProgressBuildId = NULL WHERE id = :branchId AND inProgressBuildId = :id")
   int updateLastBuild(@BindWithRosetta RepositoryBuild build);
 }
