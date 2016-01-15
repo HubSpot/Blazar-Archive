@@ -1,5 +1,3 @@
-/*global config*/
-import $ from 'jquery';
 import RepoBuildPollingProvider from '../services/RepoBuildPollingProvider';
 
 class RepoBuildApi {
