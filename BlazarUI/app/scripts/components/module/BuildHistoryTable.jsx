@@ -13,19 +13,9 @@ class BuildHistoryTable extends Component {
       );
     }
 
-    const columnNames = [
-      {label: '', key: 'result'},
-      {label: 'Build', key: 'buildNumber'},
-      {label: 'Start Time', key: 'startTime'},
-      {label: 'Duration', key: 'duration'},
-      {label: 'Commit', key: 'commit'},
-      {label: 'Commit Message', key: 'commitMessage'},
-      {label: '', key: 'progress'}
-    ];
-
     return this.props.buildTable({
       data: this.props.buildHistory,
-      columnNames: columnNames,
+      columnNames: ['Builds', 'Start Time', 'Duration', 'Commit', 'CommitMessage'],
       rowComponent: BuildHistoryTableRow,
       showProgress: true
     });

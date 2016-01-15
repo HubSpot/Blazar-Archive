@@ -19,17 +19,9 @@ class BranchBuildHistoryTable extends Component {
       );
     }
 
-    const columnNames = [
-      {label: '', key: 'state'},
-      {label: 'Build', key: 'build'},
-      {label: 'Start Time', key: 'startTime'},
-      {label: 'Duration', key: 'duration'},
-      {label: 'Commit', key: 'commit'}
-    ];
-
     return this.props.buildTable({
       data: this.props.data.toJS(),
-      columnNames: columnNames,
+      columnNames: ['Build', 'Start Time', 'Duration', 'Commit'],
       rowComponent: BranchBuildHistoryTableRow,
       params: this.props.params
     });

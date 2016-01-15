@@ -16,17 +16,9 @@ class BranchesTable extends Component {
       );
     }
 
-    const columnNames = [
-      {label: 'Branch', key: 'branch'},
-      {label: 'Latest Build', key: 'latestBuild'},
-      {label: 'Start Time', key: 'startTime'},
-      {label: 'Duration', key: 'duration'},
-      {label: 'Commit', key: 'commit'}
-    ];
-
     return this.props.buildTable({
       data: this.props.branches,
-      columnNames: columnNames,
+      columnNames: ['', 'Branch', 'Latest Build', 'Start Time', 'Duration', 'Commit'],
       rowComponent: BranchesTableRow
     });
   }

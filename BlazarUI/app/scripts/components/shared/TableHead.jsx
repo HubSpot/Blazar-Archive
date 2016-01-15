@@ -3,6 +3,7 @@ import {map} from 'underscore';
 import TableHeadRow from './TableHeadRow.jsx';
 import classNames from 'classnames';
 
+
 class TableHead extends Component {
 
   getClassNames() {
@@ -10,8 +11,8 @@ class TableHead extends Component {
   }
 
   getColumns() {
-    return map(this.props.columnNames, (column) =>
-      <TableHeadRow key={column.key} label={column.label} />
+    return map(this.props.columnNames, (name, i) =>
+      <TableHeadRow key={name.length > 0 ? (name).replace(/ /g, '') : i} label={name} />
     );
   }
 

@@ -17,18 +17,9 @@ class RepoBuildModulesTable extends Component {
       );
     }
 
-    const columnNames = [
-      {label: '', key: 'state'},
-      {label: 'Module Build', key: 'module'},
-      {label: 'Start Time', key: 'startTime'},
-      {label: 'Duration', key: 'duration'},
-      {label: 'Singularity Task', key: 'taskid'},
-      {label: '', key: 'progress'}
-    ];
-
     return this.props.buildTable({
       data: this.props.data,
-      columnNames: columnNames,
+      columnNames: ['', 'Module Build', 'Start Time', 'Duration', 'Singularity Task', ''],
       rowComponent: RepoBuildModulesTableRow,
       showProgress: true,
       params: this.props.params
