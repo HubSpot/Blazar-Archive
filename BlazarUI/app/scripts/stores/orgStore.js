@@ -19,7 +19,10 @@ const RepoStore = Reflux.createStore({
   },
   
   onStopPolling() {
-    this.branchesApi.stopPollingBuilds();
+    if (this.branchesApi) {
+      this.branchesApi.stopPollingBuilds();  
+    }
+    
   }
 
 });
