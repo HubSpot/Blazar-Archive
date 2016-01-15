@@ -167,12 +167,12 @@ export const buildResultIcon = function(result) {
 };
 
 
-export const renderBuildStatusIcon = function(data) {
+export const renderBuildStatusIcon = function(state) {
   return (
     <Icon
-      name={iconStatus[data.state]}
-      classNames={`icon-roomy ${LABELS[data.state]}`}
-      title={humanizeText(data.state)}
+      name={iconStatus[state]}
+      classNames={`icon-roomy ${LABELS[state]}`}
+      title={humanizeText(state)}
     />
   );
 };

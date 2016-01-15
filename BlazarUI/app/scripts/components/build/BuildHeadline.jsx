@@ -16,7 +16,7 @@ class BuildHeadline extends Component {
   
     return (
         <Headline>
-          {renderBuildStatusIcon(this.props.data.build)}
+          {renderBuildStatusIcon(this.props.data.build.state)}
           {moduleName}
           <HeadlineDetail>
             Status: {humanizeText(build.state)}

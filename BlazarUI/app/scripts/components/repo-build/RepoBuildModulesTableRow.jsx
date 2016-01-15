@@ -34,11 +34,10 @@ class RepoBuildModulesTableRow extends Component {
 
   render() {
     const {data, params} = this.props;
-    
     return (
       <tr className={tableRowBuildState(data.state)}>
         <td className='build-status'>
-          {renderBuildStatusIcon(this.props.data)}
+          {renderBuildStatusIcon(data.state)}
         </td>
         <td className='table-cell-link'>
           {this.renderBuildLink()}

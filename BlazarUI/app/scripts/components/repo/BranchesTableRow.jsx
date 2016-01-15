@@ -3,27 +3,40 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
-import {tableRowBuildState, humanizeText, timestampFormatted} from '../Helpers';
+import {tableRowBuildState, humanizeText, timestampFormatted, renderBuildStatusIcon} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
 class BranchesTableRow extends Component {
 
-  getBuildResult(build) {
-    const result = build.state;
-    const classNames = `icon-roomy ${LABELS[result]}`;
+  renderBranchLink(gitInfo) {
+    const {gitInfo} = this.props.data;
 
     return (
-      <Icon
-        name={iconStatus[result]}
-        classNames={classNames}
-        title={humanizeText(result)}
-      />
+      <span>
+        <Icon for='branch' classNames="icon-roomy icon-muted" />
+        <Link to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
+      </span>
     );
   }
-
-  render() {
+  
+  renderNoHistoryTable() {
+    return (
+      <tr> 
+        <td></td>
+        <td>
+          {this.renderBranchLink()}
+        </td>
+        <td>No History</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr> 
+    )
+  } 
+  
+  renderFullTable() {
     const {
       lastBuild,
       inProgressBuild,
@@ -31,23 +44,6 @@ class BranchesTableRow extends Component {
       gitInfo
     } = this.props.data;
     
-
-    if (!has(this.props.data, 'lastBuild') ) {
-      return (
-        <tr> 
-          <td>
-            <Icon for='branch' classNames="icon-roomy icon-muted" />
-            <Link to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
-          </td>
-          <td>No History</td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr> 
-      )
-      
-    }
-
     let sha;
     const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
     
@@ -62,13 +58,14 @@ class BranchesTableRow extends Component {
 
     return (
       <tr className={tableRowBuildState(build.state)}>
+        <td className='build-status'>
+          {renderBuildStatusIcon(build.state)}
+        </td>
         <td>
-          <Icon for='branch' classNames="icon-roomy icon-muted" />
-          <Link to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
+          {this.renderBranchLink(gitInfo)}
         </td>
         <td className='build-result-link'>
           <Link to={build.blazarPath}>
-            {this.getBuildResult(build)}
             {build.buildNumber}
           </Link>
         </td>
@@ -83,7 +80,18 @@ class BranchesTableRow extends Component {
         </td>
       </tr>
     );
+  
   }
+
+  render() {
+    if (!has(this.props.data, 'lastBuild') ) {
+      return this.renderNoHistoryTable();
+    }
+    else {
+      return this.renderFullTable();
+    }
+  }
+
 }
 
 BranchesTableRow.propTypes = {
