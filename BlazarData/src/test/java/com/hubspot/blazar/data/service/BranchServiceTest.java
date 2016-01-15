@@ -27,6 +27,9 @@ public class BranchServiceTest extends BlazarDataTestBase {
 
     assertThat(retrieved.isPresent()).isTrue();
     assertThat(retrieved.get()).isEqualTo(inserted);
+    assertThat(retrieved.get().getCreatedTimestamp()).isBetween(System.currentTimeMillis() - 1000, System.currentTimeMillis());
+    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(System.currentTimeMillis() - 1000, System.currentTimeMillis());
+    assertThat(retrieved.get().getUpdatedTimestamp()).isEqualTo(retrieved.get().getCreatedTimestamp());
   }
 
   @Test
@@ -43,6 +46,8 @@ public class BranchServiceTest extends BlazarDataTestBase {
 
     assertThat(retrieved.isPresent()).isTrue();
     assertThat(retrieved.get()).isEqualTo(renamed);
+    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(System.currentTimeMillis() - 1000, System.currentTimeMillis());
+    assertThat(retrieved.get().getUpdatedTimestamp()).isGreaterThan(retrieved.get().getCreatedTimestamp());
   }
 
   @Test
