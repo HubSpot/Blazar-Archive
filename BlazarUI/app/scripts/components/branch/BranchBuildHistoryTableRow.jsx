@@ -3,7 +3,7 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 
-import {tableRowBuildState, timestampFormatted, humanizeText} from '../Helpers';
+import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -11,18 +11,6 @@ import Sha from '../shared/Sha.jsx';
 
 class BranchBuildHistoryTableRow extends Component {
 
-  getBuildResult(build) {
-    const result = build.state;
-    const classNames = `icon-roomy ${LABELS[result]}`;
-
-    return (
-      <Icon
-        name={iconStatus[result]}
-        classNames={classNames}
-          title={humanizeText(result)}
-      />
-    );
-  }
   
   renderSha() {
     const {data, params} = this.props;
@@ -61,8 +49,8 @@ class BranchBuildHistoryTableRow extends Component {
 
     return (
       <tr className={tableRowBuildState(data.state)}>
-        <td>
-          
+        <td className='build-status'>
+          {buildResultIcon(data.state)}
         </td>
         <td className='build-result-link'>
           <Link to={data.blazarPath}>{data.buildNumber}</Link>
