@@ -14,7 +14,7 @@ public class GitInfo {
   private final String host;
   private final String organization;
   private final String repository;
-  private final long repositoryId;
+  private final int repositoryId;
   private final String branch;
   private final boolean active;
   private final long createdTimestamp;
@@ -25,7 +25,7 @@ public class GitInfo {
                  @JsonProperty("host") String host,
                  @JsonProperty("organization") String organization,
                  @JsonProperty("repository") String repository,
-                 @JsonProperty("repositoryId") long repositoryId,
+                 @JsonProperty("repositoryId") int repositoryId,
                  @JsonProperty("branch") String branch,
                  @JsonProperty("active") boolean active,
                  @JsonProperty("createdTimestamp") long createdTimestamp,
@@ -57,7 +57,7 @@ public class GitInfo {
     return repository;
   }
 
-  public long getRepositoryId() {
+  public int getRepositoryId() {
     return repositoryId;
   }
 

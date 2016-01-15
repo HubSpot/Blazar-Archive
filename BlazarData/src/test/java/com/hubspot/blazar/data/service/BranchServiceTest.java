@@ -17,8 +17,8 @@ public class BranchServiceTest extends BlazarDataTestBase {
   }
 
   @Test
-  public void itCreatesBranch() {
-    GitInfo original = newGitInfo("Overwatch");
+  public void testUpsertBasic() {
+    GitInfo original = newGitInfo(123, "Overwatch", "master");
     GitInfo inserted = branchService.upsert(original);
 
     assertThat(inserted.getId().isPresent()).isTrue();
@@ -30,22 +30,43 @@ public class BranchServiceTest extends BlazarDataTestBase {
   }
 
   @Test
-  public void itUpdatesRepositoryName() {
-    GitInfo original = newGitInfo("Overwatch");
-    GitInfo inserted = branchService.upsert(original);
+  public void testUpsertRepositoryRename() {
+    GitInfo original = newGitInfo(123, "Overwatch", "master");
+    original = branchService.upsert(original);
 
-    GitInfo renamed = newGitInfo("Underwatch");
-    GitInfo updated = branchService.upsert(renamed);
+    GitInfo renamed = newGitInfo(123, "Underwatch", "master");
+    renamed = branchService.upsert(renamed);
 
-    assertThat(updated.getId().get()).isEqualTo(inserted.getId().get());
+    assertThat(renamed.getId().get()).isEqualTo(original.getId().get());
 
-    Optional<GitInfo> retrieved = branchService.get(inserted.getId().get());
+    Optional<GitInfo> retrieved = branchService.get(original.getId().get());
 
     assertThat(retrieved.isPresent()).isTrue();
-    assertThat(retrieved.get()).isEqualTo(updated);
+    assertThat(retrieved.get()).isEqualTo(renamed);
   }
 
-  private static GitInfo newGitInfo(String repositoryName) {
-    return new GitInfo(Optional.<Integer>absent(), "github", "HubSpot", repositoryName, 123, "master", true, System.currentTimeMillis(), System.currentTimeMillis());
+  @Test
+  public void testUpsertMultipleBranches() {
+    GitInfo master = newGitInfo(123, "Overwatch", "master");
+    master = branchService.upsert(master);
+
+    GitInfo branch = newGitInfo(123, "Overwatch", "branch");
+    branch = branchService.upsert(branch);
+
+    assertThat(branch.getId().get()).isNotEqualTo(master.getId().get());
+
+    Optional<GitInfo> masterRetrieved = branchService.get(master.getId().get());
+
+    assertThat(masterRetrieved.isPresent()).isTrue();
+    assertThat(masterRetrieved.get()).isEqualTo(master);
+
+    Optional<GitInfo> branchRetrieved = branchService.get(branch.getId().get());
+
+    assertThat(branchRetrieved.isPresent()).isTrue();
+    assertThat(branchRetrieved.get()).isEqualTo(branch);
+  }
+
+  private static GitInfo newGitInfo(int repositoryId, String repositoryName, String branch) {
+    return new GitInfo(Optional.<Integer>absent(), "github", "HubSpot", repositoryName, repositoryId, branch, true, System.currentTimeMillis(), System.currentTimeMillis());
   }
 }

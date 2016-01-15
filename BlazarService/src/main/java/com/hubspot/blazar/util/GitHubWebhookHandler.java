@@ -120,7 +120,7 @@ public class GitHubWebhookHandler {
     String fullName = repository.getFullName();
     String organization = fullName.substring(0, fullName.indexOf('/'));
     String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
-    long repositoryId = repository.getId();
+    int repositoryId = repository.getId();
     String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
 
     return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, branch, active, System.currentTimeMillis(), System.currentTimeMillis());
