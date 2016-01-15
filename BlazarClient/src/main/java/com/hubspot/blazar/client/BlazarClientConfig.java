@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import com.hubspot.horizon.HttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.ning.NingHttpClient;
+import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 
 public class BlazarClientConfig {
   private final Optional<HttpClient> httpClient;
@@ -59,7 +60,7 @@ public class BlazarClientConfig {
       if (this.objectMapper.isPresent()) {
         objectMapper = this.objectMapper.get();
       } else {
-        objectMapper = new ObjectMapper().registerModule(new GuavaModule());
+        objectMapper = new ObjectMapper().registerModule(new GuavaModule()).registerModule(new ProtobufModule());
       }
 
       return new NingHttpClient(HttpConfig.newBuilder().setObjectMapper(objectMapper).build());
