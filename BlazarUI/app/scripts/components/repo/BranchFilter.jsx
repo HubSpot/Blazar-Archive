@@ -54,7 +54,7 @@ class BranchFilter extends Component {
     }
 
     return (
-      <div className='branch-filter'>
+      <div className='filter-container branch-filter'>
         <Select
           onFocus={this.handleFilterFocus}
           onBlur={this.handleFilterBlur}

@@ -21,7 +21,7 @@ const routes = (
   <Route name='app' path='/' handler={ App }>
     <DefaultRoute handler={ Dashboard } />
     <Route name='dashboard' path={pagePath('/?')} handler={ Dashboard } />
-    <Route name='org' path={pagePath('/builds/:host/:org?')} handler={Org}/>
+    <Route name='org' path={pagePath('/builds/:host/:org/?')} handler={Org}/>
     <Route name='repo' path={pagePath('/builds/:host/:org/:repo/?')} handler={Repo}/>
     <Route name='branch' path={pagePath('/builds/:host/:org/:repo/:branch/?')} handler={Branch}/>
     <Route name='repoBuild' path={pagePath('/builds/:host/:org/:repo/:branch/:buildNumber/?')} handler={RepoBuild}/>

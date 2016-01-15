@@ -113,8 +113,7 @@ export const getFilteredBranches = function(filters, branches) {
   //finally sort by branch and bodule name
   return filteredBranches.sort((a, b) => {
     return cmp(a.gitInfo.branch, b.gitInfo.branch);
-  });
-  
+  });  
 };
 
 export const buildIsOnDeck = function(buildState) {
