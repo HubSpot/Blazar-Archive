@@ -6,7 +6,7 @@ import com.hubspot.blazar.data.BlazarDataTestBase;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Set;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class BranchServiceTest extends BlazarDataTestBase {
   private BranchService branchService;
@@ -17,16 +17,35 @@ public class BranchServiceTest extends BlazarDataTestBase {
   }
 
   @Test
-  public void itCreatesABranch() {
-    GitInfo gitInfo = branchService.upsert(new GitInfo(Optional.<Integer>absent(), "git.hubteam.com", "HubSpot", "Overwatch", 123, "master", true, System.currentTimeMillis(), System.currentTimeMillis()));
-    Set<GitInfo> results = branchService.getAll();
+  public void itCreatesBranch() {
+    GitInfo original = newGitInfo("Overwatch");
+    GitInfo inserted = branchService.upsert(original);
 
-    int i = 1;
+    assertThat(inserted.getId().isPresent()).isTrue();
+
+    Optional<GitInfo> retrieved = branchService.get(inserted.getId().get());
+
+    assertThat(retrieved.isPresent()).isTrue();
+    assertThat(retrieved.get()).isEqualTo(inserted);
   }
 
   @Test
-  public void itReturnsAllBranches() {
-    Set<GitInfo> results = branchService.getAll();
-    System.out.println(results.size());
+  public void itUpdatesRepositoryName() {
+    GitInfo original = newGitInfo("Overwatch");
+    GitInfo inserted = branchService.upsert(original);
+
+    GitInfo renamed = newGitInfo("Underwatch");
+    GitInfo updated = branchService.upsert(renamed);
+
+    assertThat(updated.getId().get()).isEqualTo(inserted.getId().get());
+
+    Optional<GitInfo> retrieved = branchService.get(inserted.getId().get());
+
+    assertThat(retrieved.isPresent()).isTrue();
+    assertThat(retrieved.get()).isEqualTo(updated);
+  }
+
+  private static GitInfo newGitInfo(String repositoryName) {
+    return new GitInfo(Optional.<Integer>absent(), "github", "HubSpot", repositoryName, 123, "master", true, System.currentTimeMillis(), System.currentTimeMillis());
   }
 }
