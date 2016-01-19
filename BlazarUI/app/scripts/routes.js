@@ -9,7 +9,6 @@ import Org from './pages/org.jsx';
 import Repo from './pages/repo.jsx';
 import Branch from './pages/branch.jsx';
 import Build from './pages/build.jsx';
-import Module from './pages/module.jsx';
 import RepoBuild from './pages/repoBuild.jsx';
 import NotFound from './pages/notFound.jsx';
 

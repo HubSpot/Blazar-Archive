@@ -33,7 +33,7 @@ class StarredModules extends Component {
             Star modules by clicking on the module name in the sidebar, then clicking the star next to the modules name.
           </p>
         </Alert>
-      )
+      );
     }
 
     const columnNames = [
