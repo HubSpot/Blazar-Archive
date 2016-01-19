@@ -23,7 +23,7 @@ class HostsApi extends StoredBuilds {
         return {
           name: org.gitInfo.organization,
           blazarPath: `${config.appRoot}/builds/${host}/${organization}`
-        }
+        };
       });
       
       hosts.push({
