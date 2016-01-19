@@ -26,7 +26,6 @@ import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
-import com.hubspot.horizon.HttpResponse;
 
 @Singleton
 public class ModuleBuildLauncher {
@@ -66,8 +65,7 @@ public class ModuleBuildLauncher {
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     moduleBuildService.begin(launching);
     LOG.info("About to launch build {}", launching.getId().get());
-    HttpResponse response = singularityBuildLauncher.launchBuild(launching);
-    LOG.info("Launch returned {}: {}", response.getStatusCode(), response.getAsString());
+    singularityBuildLauncher.launchBuild(launching);
   }
 
   private BuildConfig resolveConfig(BuildConfig buildConfig, Module module) throws IOException, NonRetryableBuildException {
