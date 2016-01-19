@@ -1,5 +1,6 @@
 package com.hubspot.blazar.client;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -48,29 +49,28 @@ public class BlazarClient {
     }
   }
 
-  public Optional<List<Module>> getModules(long branchId) {
+  public List<Module> getModules(long branchId) {
     String url = String.format(baseUrl, BRANCHES_MODULES_PATH, branchId);
     HttpRequest request = HttpRequest.newBuilder().setMethod(Method.GET).setUrl(url).build();
     HttpResponse response = httpClient.execute(request);
     if (response.getStatusCode() == 404) {
-      return Optional.absent();
+      return Collections.emptyList();
     } else if (response.getStatusCode() == 200) {
-      return Optional.of(response.getAs(new TypeReference<List<Module>>() {}));
+      return response.getAs(new TypeReference<List<Module>>() {
+      });
     } else {
       throw toException(response);
     }
   }
 
   public Optional<Module> getModule(long branchId, int moduleId) {
-    Optional<List<Module>> modules = getModules(branchId);
-    if (modules.isPresent()) {
-      for (Module each : modules.get()) {
-        if (each.getId().get() == moduleId) {
-          return Optional.of(each);
-        }
+    List<Module> modules = getModules(branchId);
+    for (Module each : modules) {
+      if (each.getId().get() == moduleId) {
+        return Optional.of(each);
       }
     }
-    return Optional.absent();
+    throw new RuntimeException(String.format("Module id not found %d", moduleId));  // todo better exception type
   }
 
   public Optional<RepositoryBuild> getRepositoryBuild(long repositoryBuildId) {
