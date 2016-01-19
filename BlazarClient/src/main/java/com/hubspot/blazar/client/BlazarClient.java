@@ -50,7 +50,7 @@ public class BlazarClient {
   }
 
   public List<Module> getModules(long branchId) {
-    String url = String.format(baseUrl, BRANCHES_MODULES_PATH, branchId);
+    String url = String.format(baseUrl + BRANCHES_MODULES_PATH, branchId);
     HttpRequest request = HttpRequest.newBuilder().setMethod(Method.GET).setUrl(url).build();
     HttpResponse response = httpClient.execute(request);
     if (response.getStatusCode() == 404) {
