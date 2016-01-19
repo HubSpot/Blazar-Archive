@@ -10,6 +10,7 @@ class StoredBuilds {
   constructor(options) {
     this.options = options;
     this.shouldPoll = true;
+    return this;
   }
 
   getInitialBuilds() {

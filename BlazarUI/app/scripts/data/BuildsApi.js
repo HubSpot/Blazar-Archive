@@ -2,7 +2,6 @@
 import { fromJS } from 'immutable';
 import {has, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
-import $ from 'jquery';
 import PollingProvider from '../services/PollingProvider';
 import StarProvider from '../services/starProvider';
 
@@ -43,6 +42,7 @@ function _parse(data) {
 
     item.gitInfo.blazarRepositoryPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
     item.gitInfo.blazarBranchPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}`;
+    item.gitInfo.blazarHostPath = `${config.appRoot}/builds/${gitInfo.host}`;
 
     return item;
   });
