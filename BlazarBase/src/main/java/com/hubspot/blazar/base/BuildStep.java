@@ -28,6 +28,6 @@ public class BuildStep {
 
   @JsonCreator
   public static BuildStep fromString(String command) {
-    return new BuildStep(Optional.<String>absent(), Collections.<BuildCommand>singletonList(BuildCommand.buildCommandFromString(command)));
+    return new BuildStep(Optional.<String>absent(), Collections.singletonList(BuildCommand.fromString(command)));
   }
 }
