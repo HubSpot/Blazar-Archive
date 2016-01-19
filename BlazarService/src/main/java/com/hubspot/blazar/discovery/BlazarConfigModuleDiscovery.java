@@ -72,7 +72,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
   }
 
   private boolean canBuild(BuildConfig buildConfig) {
-    return (buildConfig.getCmds().size() > 0 || buildConfig.getBuildpack().isPresent());
+    return (buildConfig.getSteps().size() > 0 || buildConfig.getBuildpack().isPresent());
   }
 
   private static String moduleName(GitInfo gitInfo, String path) {

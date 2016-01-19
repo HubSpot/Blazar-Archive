@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.hubspot.blazar.base.BuildConfig;
+import com.hubspot.blazar.base.BuildStep;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -84,7 +85,7 @@ public class ModuleBuildLauncher {
   }
 
   private static BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
-    Map<String, List<String>> cmds = primary.getCmds().isEmpty() ? secondary.getCmds() : primary.getCmds();
+    List<BuildStep> steps = primary.getSteps().isEmpty() ? secondary.getSteps() : primary.getSteps();
     Map<String, String> env = new LinkedHashMap<>();
     env.putAll(secondary.getEnv());
     env.putAll(primary.getEnv());
@@ -92,7 +93,7 @@ public class ModuleBuildLauncher {
     List<String> webhooks = Lists.newArrayList(Iterables.concat(secondary.getWebhooks(), primary.getWebhooks()));
     List<String> cache = Lists.newArrayList(Iterables.concat(secondary.getCache(), primary.getCache()));
 
-    return new BuildConfig(cmds, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent());
+    return new BuildConfig(steps, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent());
   }
 
   private BuildConfig configAtSha(GitInfo gitInfo, Module module) throws IOException, NonRetryableBuildException {
