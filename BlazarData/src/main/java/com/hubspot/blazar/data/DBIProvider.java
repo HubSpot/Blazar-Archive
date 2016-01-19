@@ -5,6 +5,7 @@ import com.codahale.metrics.jdbi.InstrumentedTimingCollector;
 import com.codahale.metrics.jdbi.strategies.DelegatingStatementNameStrategy;
 import com.codahale.metrics.jdbi.strategies.NameStrategies;
 import com.codahale.metrics.jdbi.strategies.StatementNameStrategy;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
@@ -42,7 +43,7 @@ public class DBIProvider implements Provider<DBI> {
     this.transactionalDataSource = transactionalDataSource;
     this.managedDataSource = managedDataSource;
     this.dataSourceFactory = dataSourceFactory;
-    this.objectMapper = objectMapper;
+    this.objectMapper = objectMapper.copy().setSerializationInclusion(Include.ALWAYS);
     this.environment = Optional.absent();
   }
 
