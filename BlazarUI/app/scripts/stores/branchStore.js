@@ -19,15 +19,16 @@ const BranchStore = Reflux.createStore({
       if (err) {
         return this.trigger({
           error: err,
-          loading: false
+          loadingBranches: false
         });
       }
 
       this.trigger({
-        builds: resp,
-        loading: false
+        builds: resp.builds,
+        branchId: resp.branchId,
+        loadingBranches: false
       });
-      
+
     });
   },
 

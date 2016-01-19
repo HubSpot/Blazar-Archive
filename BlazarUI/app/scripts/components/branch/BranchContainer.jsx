@@ -5,16 +5,21 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import BranchBuildHistoryTable from './BranchBuildHistoryTable.jsx';
+import BranchHeadline from './BranchHeadline.jsx';
 import Loader from '../shared/Loader.jsx';
-import Icon from '../shared/Icon.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
+
+import StarStore from '../../stores/starStore';
+import StarActions from '../../actions/starActions';
 
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
 let initialState = {
   builds: null,
-  loading: true
+  stars: [],
+  loadingBranches: true,
+  loadingStars: true
 };
 
 class BranchContainer extends Component {
@@ -43,11 +48,14 @@ class BranchContainer extends Component {
     
   setup(params) {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
+    StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuilds(params);
   }
   
   tearDown() {
     BranchActions.stopPolling();
+    this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
   }
   
@@ -64,7 +72,7 @@ class BranchContainer extends Component {
       return (
         <BranchBuildHistoryTable
           data={this.state.builds}
-          loading={this.state.loading}
+          loading={this.state.loadingBranches}
           {...this.state}
           {...this.props}
         />
@@ -78,13 +86,11 @@ class BranchContainer extends Component {
       <PageContainer>
         <UIGrid>
           <UIGridItem size={12}>
-            <Headline>
-              <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-              {this.props.params.repo} - {this.props.params.branch}
-              <HeadlineDetail>
-                Branch Builds
-              </HeadlineDetail>
-            </Headline>
+            <BranchHeadline
+              loading={this.state.loadingStars || this.state.loadingBranches}
+              {...this.state}
+              {...this.props}
+            />
             {this.getRenderedContent()}
           </UIGridItem>
         </UIGrid>

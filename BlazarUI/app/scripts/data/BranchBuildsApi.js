@@ -55,7 +55,10 @@ class BranchBuildsApi extends StoredBuilds {
     const branchBuildsPromise = new Resource({url: `${config.apiRoot}/builds/history/branch/${this.branchId}`}).get();
 
     branchBuildsPromise.then((resp) => {
-      this.cb(false, this._parse(resp));
+      this.cb(false, {
+        builds: this._parse(resp),
+        branchId: this.branchId
+      });
 
       if (this.shouldPoll) {
         setTimeout(() => {
