@@ -5,7 +5,7 @@ import {bindAll} from 'underscore';
 import Loader from '../shared/Loader.jsx';
 import ClassNames from 'classnames';
 
-class BreadcrumbHost extends Component {
+class BreadcrumbOrg extends Component {
 
   constructor() {
     bindAll(this, 'handleOrgClick', 'handleLinkClick');
@@ -94,10 +94,10 @@ class BreadcrumbHost extends Component {
   }
 }
 
-BreadcrumbHost.propTypes = {
+BreadcrumbOrg.propTypes = {
   hosts: PropTypes.object,
   page: PropTypes.string
 };
 
 
-export default BreadcrumbHost;
+export default BreadcrumbOrg;

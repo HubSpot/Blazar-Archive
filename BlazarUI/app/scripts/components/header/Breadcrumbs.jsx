@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import Logo from '../shared/Logo.jsx';
 import Breadcrumb from './Breadcrumb.jsx';
-import BreadcrumbHost from './BreadcrumbHost.jsx';
+import BreadcrumbOrg from './BreadcrumbOrg.jsx';
 
 class Breadcrumbs extends Component {
 
@@ -14,7 +14,7 @@ class Breadcrumbs extends Component {
       links.push(<Breadcrumb param='host' key='host' text={host} dontLink={true} {...this.props} />);
     }
     if (org) {
-      links.push(<BreadcrumbHost key='org' {...this.props} {...this.state} isActive={!repo} />);
+      links.push(<BreadcrumbOrg key='org' {...this.props} {...this.state} isActive={!repo} />);
     }
     if (repo) {
       links.push(<Breadcrumb param='repo' key='repo' text={repo} isActive={!branch} {...this.props} />);
