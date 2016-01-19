@@ -1,7 +1,12 @@
 package com.hubspot.blazar.client;
 
+import java.util.Collections;
+import java.util.List;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.horizon.HttpClient;
@@ -15,6 +20,7 @@ public class BlazarClient {
   private static final String GET_REPOSITORY_BUILD_PATH = "/branches/builds/%s";
 
   private static final String MODULE_BUILD_PATH = "/modules/builds";
+  private static final String BRANCHES_MODULES_PATH = "/branches/%s/modules";
   private static final String GET_MODULE_BUILD_PATH = MODULE_BUILD_PATH + "/%s";
   private static final String START_MODULE_BUILD_PATH = MODULE_BUILD_PATH + "/%s/start";
   private static final String COMPLETE_MODULE_BUILD_SUCCESS_PATH = MODULE_BUILD_PATH + "/%s/success";
@@ -41,6 +47,30 @@ public class BlazarClient {
     } else {
       throw toException(response);
     }
+  }
+
+  public List<Module> getModules(long branchId) {
+    String url = String.format(baseUrl + BRANCHES_MODULES_PATH, branchId);
+    HttpRequest request = HttpRequest.newBuilder().setMethod(Method.GET).setUrl(url).build();
+    HttpResponse response = httpClient.execute(request);
+    if (response.getStatusCode() == 404) {
+      return Collections.emptyList();
+    } else if (response.getStatusCode() == 200) {
+      return response.getAs(new TypeReference<List<Module>>() {
+      });
+    } else {
+      throw toException(response);
+    }
+  }
+
+  public Optional<Module> getModule(long branchId, int moduleId) {
+    List<Module> modules = getModules(branchId);
+    for (Module each : modules) {
+      if (each.getId().get() == moduleId) {
+        return Optional.of(each);
+      }
+    }
+    throw new RuntimeException(String.format("Module id not found %d", moduleId));  // todo better exception type
   }
 
   public Optional<RepositoryBuild> getRepositoryBuild(long repositoryBuildId) {
