@@ -1,4 +1,3 @@
-// Using in favor of Deprecated ComponentHelpers.js
 import React from 'react';
 import {some, uniq, flatten, filter, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
