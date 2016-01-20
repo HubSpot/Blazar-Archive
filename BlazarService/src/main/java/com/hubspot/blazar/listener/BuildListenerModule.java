@@ -45,6 +45,9 @@ public class BuildListenerModule implements Module {
     // launch the queued build if nothing upstream
     moduleBuildListeners.addBinding(ModuleBuild.State.QUEUED).to(QueuedModuleBuildListener.class);
 
+    // kick off the singularity task if the build is launching
+    moduleBuildListeners.addBinding(ModuleBuild.State.LAUNCHING).to(LaunchingModuleBuildListener.class);
+
     // launch downstream builds if all upstreams succeeded
     moduleBuildListeners.addBinding(ModuleBuild.State.SUCCEEDED).to(DownstreamModuleBuildLauncher.class);
 

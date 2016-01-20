@@ -31,19 +31,16 @@ import com.hubspot.blazar.exception.NonRetryableBuildException;
 public class ModuleBuildLauncher {
   private static final Logger LOG = LoggerFactory.getLogger(ModuleBuildLauncher.class);
 
-  private final SingularityBuildLauncher singularityBuildLauncher;
   private final ModuleBuildService moduleBuildService;
   private final BranchService branchService;
   private final ModuleService moduleService;
   private final GitHubHelper gitHubHelper;
 
   @Inject
-  public ModuleBuildLauncher(SingularityBuildLauncher singularityBuildLauncher,
-                             ModuleBuildService moduleBuildService,
+  public ModuleBuildLauncher(ModuleBuildService moduleBuildService,
                              BranchService branchService,
                              ModuleService moduleService,
                              GitHubHelper gitHubHelper) {
-    this.singularityBuildLauncher = singularityBuildLauncher;
     this.moduleBuildService = moduleBuildService;
     this.branchService = branchService;
     this.moduleService = moduleService;
@@ -64,8 +61,6 @@ public class ModuleBuildLauncher {
 
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     moduleBuildService.begin(launching);
-    LOG.info("About to launch build {}", launching.getId().get());
-    singularityBuildLauncher.launchBuild(launching);
   }
 
   private BuildConfig resolveConfig(BuildConfig buildConfig, Module module) throws IOException, NonRetryableBuildException {
