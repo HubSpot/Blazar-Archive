@@ -8,6 +8,7 @@ import BranchBuildHistoryTable from './BranchBuildHistoryTable.jsx';
 import BranchHeadline from './BranchHeadline.jsx';
 import Loader from '../shared/Loader.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
+import BuildButton from './BuildButton.jsx';
 
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
@@ -59,7 +60,11 @@ class BranchContainer extends Component {
     this.unsubscribeFromBranch();
   }
   
-  getRenderedContent() {
+  triggerBuild() {
+    BranchActions.triggerBuild();
+  }
+  
+  renderTable() {
     if (this.state.error) {
       return (
         <GenericErrorMessage
@@ -85,14 +90,25 @@ class BranchContainer extends Component {
     return (
       <PageContainer>
         <UIGrid>
-          <UIGridItem size={12}>
+          <UIGridItem size={10}>
             <BranchHeadline
               loading={this.state.loadingStars || this.state.loadingBranches}
               {...this.state}
               {...this.props}
             />
-            {this.getRenderedContent()}
-          </UIGridItem>
+            </UIGridItem>
+            <UIGridItem size={2} align='RIGHT'>
+              <BuildButton 
+                triggerBuild={this.triggerBuild} 
+                loading={this.state.loadingBranches}
+                error={this.state.error}
+              />
+            </UIGridItem>
+            <UIGrid>
+              <UIGridItem size={12} align='RIGHT'>
+                {this.renderTable()}
+              </UIGridItem>
+            </UIGrid>
         </UIGrid>
       </PageContainer>
     );

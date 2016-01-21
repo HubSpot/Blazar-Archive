@@ -11,10 +11,10 @@ class RepoBuildApi {
 
     this.buildsPoller.poll((err, resp) => {
       if (err) {
-        cb(err);
-        return;
+        return cb(err);
       }
 
+      this.branchId = resp.branchId;
       cb(err, resp);
     });
   }
@@ -25,6 +25,10 @@ class RepoBuildApi {
     }
 
     this.buildsPoller.disconnect();
+  }
+  
+  cancelBuild() {
+    // console.log('cancel: ', this.branchId);
   }
 
 }

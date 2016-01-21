@@ -12,8 +12,8 @@ import StarActions from '../../actions/starActions';
 import RepoBuildActions from '../../actions/repoBuildActions';
 
 import RepoBuildHeadline from './RepoBuildHeadline.jsx';
-import RepoBuildModulesTable from './RepoBuildModulesTable.jsx'
-import RepoBuildDetail from './RepoBuildDetail.jsx'
+import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
+import RepoBuildDetail from './RepoBuildDetail.jsx';
 
 
 let initialState = {
@@ -67,6 +67,11 @@ class RepoBuildContainer extends Component {
   // to do
   triggerCancelBuild() {
     alert('not ready')
+    RepoBuildActions.cancelBuild();
+  }
+  
+  triggerBuild() {
+    RepoBuildActions.triggerBuild();
   }
 
   renderSectionContent() {
@@ -83,7 +88,7 @@ class RepoBuildContainer extends Component {
     return (
       <UIGrid>
         <UIGridItem size={10}>
-          <GenericErrorMessage 
+          <GenericErrorMessage
             message={this.state.error}
           />
         </UIGridItem>

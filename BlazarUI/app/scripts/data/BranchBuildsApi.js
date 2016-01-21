@@ -23,12 +23,16 @@ class BranchBuildsApi extends StoredBuilds {
   }
   
   _afterInitialFetch() {
+    if (this.pollingHistory) {
+      return;
+    }
+    
+    this.pollingHistory = true;
+
     // need branchId for history endpoint
     this._getBranchId();
     // fetch all builds for branchId and keep polling for changes
     this._fetchBuildHistory();
-    // we only needed the branchId, dont need to listen anymore
-    this.stopPollingBuilds();
   }
   
   _getBranchId() {
@@ -68,6 +72,17 @@ class BranchBuildsApi extends StoredBuilds {
     }, (error) => {
       this.cb('Error fetching branch builds. Check your console for more details.');
       console.warn(error);
+    });
+  }
+  
+  triggerBuild(cb) {
+    const buildPromise = new Resource({url: `${config.apiRoot}/branches/builds/branch/${this.branchId}`}).post();
+
+    buildPromise.then((resp) => {
+      cb(false, resp);
+    }, (error) => {
+      console.warn(error);
+      cb('Error triggering build. Check your console for more detail.');
     });
   }
 

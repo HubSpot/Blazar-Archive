@@ -15,22 +15,42 @@ const BranchStore = Reflux.createStore({
       params: params
     });
 
-    this.branchBuildsApi.fetchBuilds((err, resp) => {
-      if (err) {
-        return this.trigger({
-          error: err,
-          loadingBranches: false
-        });
+    this.branchBuildsApi.fetchBuilds((error, resp) => {
+      if (error) {
+        this.error = error;
+        return this.triggerErrorUpdate();
       }
 
-      this.trigger({
-        builds: resp.builds,
-        branchId: resp.branchId,
-        loadingBranches: false
-      });
-
+      this.data = resp;
+      this.triggerUpdate();
     });
   },
+  
+  onTriggerBuild() {
+    this.branchBuildsApi.triggerBuild((error, resp) => {
+      if (error) {
+        this.error = error;
+        return this.triggerErrorUpdate();
+      }
+    });
+  },
+  
+  triggerUpdate() {
+    this.trigger({
+      builds: this.data.builds,
+      branchId: this.data.branchId,
+      loadingBranches: false  
+    });  
+  },
+  
+  triggerErrorUpdate() {
+    this.trigger({
+      error: this.error,
+      loadingBranches: false
+    });
+
+    this.error = undefined;
+  }
 
 });
   
