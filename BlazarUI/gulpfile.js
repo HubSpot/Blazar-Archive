@@ -142,6 +142,8 @@ gulp.task('watch', function() {
   gulp.watch(app + 'index.mustache', ['html']);
   gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
   gulp.watch(app + 'scripts/**/*.js', ['scripts', 'lint']);
+  // gulp.watch(app + 'scripts/**/*.jsx', ['scripts']);
+  // gulp.watch(app + 'scripts/**/*.js', ['scripts']);
 });
 
 // remove bundles
@@ -154,5 +156,5 @@ gulp.task('default', ['build', 'serve', 'watch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
-  gulp.start(['images', 'html', 'fonts', 'lint', 'fixtures', 'scripts', 'vendorStyles', 'styles']);
+  gulp.start(['images', 'html', 'fonts', 'fixtures', 'scripts', 'vendorStyles', 'styles']);
 });

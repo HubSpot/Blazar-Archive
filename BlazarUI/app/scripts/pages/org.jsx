@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import OrgContainer from '../components/org/OrgContainer.jsx';
+import OrgContainer from '../components/org/orgContainer.jsx';
 import HeaderContainer from '../components/header/HeaderContainer.jsx';
 
 class Org extends Component {

@@ -24,15 +24,15 @@ class ResourceProvider {
   }
 
   put() {
-    
+    return $.ajax(Object.assign(this.defaultAjaxProps(), {type: 'PUT', data: this.data}));
   }
   
   post() {
-    
+    return $.ajax(Object.assign(this.defaultAjaxProps(), {type: 'POST', data: this.data}));
   }
   
   delete() {
-    
+    return $.ajax(Object.assign(this.defaultAjaxProps(), {type: 'DELETE', data: this.data}));
   }
   
 }
