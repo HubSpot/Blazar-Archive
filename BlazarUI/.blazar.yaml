@@ -7,9 +7,9 @@ cmds:
   - npm install bender-deps
   - ./node_modules/.bin/gulp lint
   - >
-      BLAZAR_API_URL=https://bootstrap.hubteam.com/blazar/v1
-      BLAZAR_APP_URI=/blazar
-      BLAZAR_STATIC_ROOT=https://static.hsappstatic.net/BlazarUI/static-1.$BUILD_NUMBER
+      BLAZAR_API_URL=https://bootstrap.hubteam.com/blazar/v2
+      BLAZAR_APP_URI=/blazarv2
+      BLAZAR_STATIC_ROOT=https://static.hsappstatic.net/BlazarUIv2/static-1.$BUILD_NUMBER
       ./node_modules/.bin/gulp build
-  - ./node_modules/.bin/bender-deps cdn-publish BlazarUI@1.$BUILD_NUMBER dist
-  - CI_ENVIRONMENT=PROD publish-build-success --project BlazarUI --version static-1.$BUILD_NUMBER
+  - ./node_modules/.bin/bender-deps cdn-publish BlazarUIv2@1.$BUILD_NUMBER dist
+  - CI_ENVIRONMENT=PROD publish-build-success --project BlazarUIv2 --version static-1.$BUILD_NUMBER
