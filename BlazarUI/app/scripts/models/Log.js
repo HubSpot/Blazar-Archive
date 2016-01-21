@@ -39,8 +39,7 @@ class Log extends Model {
       console.warn('requestOffset not properly set');
       return;
     }
-
-    return `${config.apiRoot}/modules/builds/${this.options.buildNumber}/log?offset=${this.requestOffset}&length=${this.lengthOverride || this.baseRequestLength}`;
+    return `${config.apiRoot}/modules/builds/${this.options.buildId}/log?offset=${this.requestOffset}&length=${this.lengthOverride || this.baseRequestLength}`;
   }
 
   getMaxOffset(size) {

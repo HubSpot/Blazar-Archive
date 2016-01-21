@@ -289,10 +289,10 @@ class BuildApi {
       return;
     }
 
-    logSizePromise.done((size) => {
+    logSizePromise.done((resp) => {
       this.build.logCollection = new Log({
-        buildNumber: this.build.model.data.buildNumber,
-        size: size,
+        buildId: this.build.model.data.id,
+        size: resp.size,
         buildState: this.build.model.data.state
       });    
     });
