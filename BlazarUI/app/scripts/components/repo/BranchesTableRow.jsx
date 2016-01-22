@@ -44,16 +44,24 @@ class BranchesTableRow extends Component {
       gitInfo
     } = this.props.data;
     
-    let sha;
+    let sha, buildLink;
     const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
-    
+    let duration = build.duration;
+
+    if (build.state === BuildStates.IN_PROGRESS) {
+      duration = 'In Progress...';
+    }
+
     if (build.sha !== undefined) {
       sha = <Sha gitInfo={gitInfo} build={build} />;
     }
 
-    let duration = build.duration;
-    if (build.state === BuildStates.IN_PROGRESS) {
-      duration = 'In Progress...';
+    if (build.blazarPath) {
+      buildLink = (
+        <Link to={build.blazarPath}>
+          {build.buildNumber}
+        </Link>
+      );
     }
 
     return (
@@ -65,9 +73,7 @@ class BranchesTableRow extends Component {
           {this.renderBranchLink(gitInfo)}
         </td>
         <td className='build-result-link'>
-          <Link to={build.blazarPath}>
-            {build.buildNumber}
-          </Link>
+          {buildLink}
         </td>
         <td>
           {timestampFormatted(build.startTimestamp)}
