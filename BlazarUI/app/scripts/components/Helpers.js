@@ -151,7 +151,7 @@ export const getPathname = function() {
   return window.location.pathname;
 };
 
-// Components
+// To do: move these out as components in components/shared
 export const buildResultIcon = function(result) {
   const classNames = LABELS[result];
 
