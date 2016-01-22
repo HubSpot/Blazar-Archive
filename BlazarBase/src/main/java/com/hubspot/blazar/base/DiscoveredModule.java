@@ -33,7 +33,6 @@ public class DiscoveredModule extends Module {
     this.dependencyInfo = dependencyInfo;
   }
 
-  @JsonIgnore
   public DependencyInfo getDependencyInfo() {
     return dependencyInfo;
   }
