@@ -19,12 +19,11 @@ class SidebarItem extends Component {
   
   renderRepoLink() {
     const {gitInfo} = this.props;
-    const linkPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
     
     return (
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='icon-muted'/>{ ' ' }
-        <Link to={linkPath} className='sidebar-item__module-branch-name'>
+        <Link to={gitInfo.blazarRepositoryPath} className='sidebar-item__module-branch-name'>
           {truncate(gitInfo.repository, 30, true)}
         </Link>
       </div>
