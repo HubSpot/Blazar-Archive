@@ -62,16 +62,20 @@ class BranchBuildsApi extends StoredBuilds {
     }).send();
 
     branchBuildsPromise.then((resp) => {
+
+      if (!this.shouldPoll) {
+        return;
+      }
+      
       this.cb(false, {
         builds: this._parse(resp),
         branchId: this.branchId
       });
 
-      if (this.shouldPoll) {
-        setTimeout(() => {
-          this._fetchBuildHistory();
-        }, config.buildsRefresh);
-      }
+      setTimeout(() => {
+        this._fetchBuildHistory();
+      }, config.buildsRefresh);
+
     }, (error) => {
       this.cb('Error fetching branch builds. Check your console for more details.');
       console.warn(error);
