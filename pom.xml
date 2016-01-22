@@ -41,7 +41,7 @@
     <basepom.check.skip-findbugs>true</basepom.check.skip-findbugs>
 
     <dep.jackson.version>2.6.4</dep.jackson.version>
-    <dep.horizon.version>0.0.13</dep.horizon.version>
+    <dep.horizon.version>0.0.20</dep.horizon.version>
     <dep.rosetta.version>3.10.7</dep.rosetta.version>
     <singularity.version>0.4.9-hs_stable-SNAPSHOT</singularity.version>
     <mesos.version>0.23.0</mesos.version>
