@@ -16,8 +16,7 @@ class PollingProvider {
     this.resource = new Resource({
       url: this.url,
       type: this.type,
-      dataType: this.dataType,
-      type: 'GET'
+      dataType: this.dataType
     });
   }
 
