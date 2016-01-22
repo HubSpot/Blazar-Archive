@@ -89,6 +89,7 @@ class BranchBuildsApi extends StoredBuilds {
     }).send();
 
     buildPromise.then((resp) => {
+      this._fetchBuildHistory();
       cb(false, resp);
     }, (error) => {
       console.warn(error);
