@@ -35,18 +35,15 @@ public class RepositoryBuildCompleter implements ModuleBuildListener {
       return;
     }
 
-    // if no downstream builds, we could be done building
-    if (noDownstreamBuilds(build, repositoryBuild.getDependencyGraph().get())) {
-      Set<ModuleBuild> builds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
-      if (allComplete(builds)) {
-        LOG.info("All module builds complete, going to complete repository build {}", build.getRepoBuildId());
-        RepositoryBuild.State finalState = determineRepositoryBuildState(repositoryBuild, builds);
-        LOG.info("Final state for repository build {} is {}", build.getRepoBuildId(), finalState);
-        RepositoryBuild completed = repositoryBuild
-            .withState(finalState)
-            .withEndTimestamp(System.currentTimeMillis());
-        repositoryBuildService.update(completed);
-      }
+    Set<ModuleBuild> builds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
+    if (allComplete(builds)) {
+      LOG.info("All module builds complete, going to complete repository build {}", build.getRepoBuildId());
+      RepositoryBuild.State finalState = determineRepositoryBuildState(repositoryBuild, builds);
+      LOG.info("Final state for repository build {} is {}", build.getRepoBuildId(), finalState);
+      RepositoryBuild completed = repositoryBuild
+          .withState(finalState)
+          .withEndTimestamp(System.currentTimeMillis());
+      repositoryBuildService.update(completed);
     }
   }
 
