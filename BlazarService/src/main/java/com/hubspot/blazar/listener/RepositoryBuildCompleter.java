@@ -73,8 +73,4 @@ public class RepositoryBuildCompleter implements ModuleBuildListener {
 
     return true;
   }
-
-  private static boolean noDownstreamBuilds(ModuleBuild build, DependencyGraph dependencyGraph) {
-    return dependencyGraph.outgoingVertices(build.getModuleId()).isEmpty();
-  }
 }
