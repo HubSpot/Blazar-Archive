@@ -16,7 +16,8 @@ class PollingProvider {
     this.resource = new Resource({
       url: this.url,
       type: this.type,
-      dataType: this.dataType
+      dataType: this.dataType,
+      type: 'GET'
     });
   }
 
@@ -24,9 +25,9 @@ class PollingProvider {
     if (!this.shouldPoll) {
       return;
     }
-    
-    const promise = this.resource.get();
-    
+
+    const promise = this.resource.send();
+
     promise.done((resp) => {
       if (cb) {
         cb(false, resp);  

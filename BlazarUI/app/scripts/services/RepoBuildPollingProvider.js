@@ -16,18 +16,35 @@ class RepoBuildPollingProvider {
     this.branchId = undefined;
     
     this.promises = {
-      branchId: new Resource({ url: `${config.apiRoot}/branches/state`}).get(),
+      branchId: new Resource({
+        url: `${config.apiRoot}/branches/state`,
+        type: 'GET'
+      }).send(),
+      
+      
       moduleBuilds: function() {
-        return new Resource({url: `${config.apiRoot}/branches/builds/${this.repoBuildId}/modules`}).get();
+        return new Resource({
+          url: `${config.apiRoot}/branches/builds/${this.repoBuildId}/modules`,
+          type: 'GET'
+        }).send();
       },      
       repoBuild: function() {
-        return new Resource({ url: `${config.apiRoot}/builds/history/branch/${this.branchId}/build/${this.params.buildNumber}`}).get();
+        return new Resource({
+          url: `${config.apiRoot}/builds/history/branch/${this.branchId}/build/${this.params.buildNumber}`,
+          type: 'GET'
+        }).send();
       },
       branchHistory: function() {
-        return new Resource({ url: `${config.apiRoot}/builds/history/branch/${this.branchId}`}).get();
+        return new Resource({
+          url: `${config.apiRoot}/builds/history/branch/${this.branchId}`,
+          tpe: 'GET'
+        }).send();
       },
       moduleNames: function() {
-        return new Resource({url: `${config.apiRoot}/branches/${this.branchId}/modules`}).get();
+        return new Resource({
+          url: `${config.apiRoot}/branches/${this.branchId}/modules`,
+          type: 'GET'
+        }).send();
       }
     };
   }

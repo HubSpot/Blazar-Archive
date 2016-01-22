@@ -219,7 +219,10 @@ class BuildApi {
 
   _getBuild() {
     // first get all builds so we can find the build id
-    const buildStates = new Resource({url: `${config.apiRoot}/branches/state`}).get();
+    const buildStates = new Resource({
+      url: `${config.apiRoot}/branches/state`,
+      type: 'GET'
+    }).send();
 
     return buildStates.then((builds) => {
       const repoBuild = findWhere(builds.map((build) => build.gitInfo), {
@@ -230,7 +233,10 @@ class BuildApi {
       });
       
       // get branch id
-      const branchIdPromise = new Resource({ url: `${config.apiRoot}/branches/state`}).get();
+      const branchIdPromise = new Resource({ 
+        url: `${config.apiRoot}/branches/state`,
+        type: 'GET'
+      }).send();
       
       return branchIdPromise.then((resp) => {
         
@@ -241,21 +247,30 @@ class BuildApi {
           branch: this.params.branch
         }).id;
 
-        const branchHistoryPromise = new Resource({ url: `${config.apiRoot}/builds/history/branch/${branchId}`}).get();
+        const branchHistoryPromise = new Resource({ 
+          url: `${config.apiRoot}/builds/history/branch/${branchId}`,
+          type: 'GET'
+        }).send();
         
         return branchHistoryPromise.then((resp) => {
           
           const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
           
           // now get modules so we can get the moduleId by the module name
-          const repoBuildModules = new Resource({url: `${config.apiRoot}/branches/${branchId}/modules`}).get();
+          const repoBuildModules = new Resource({
+            url: `${config.apiRoot}/branches/${branchId}/modules`,
+            type: 'GET'
+          }).send();
 
           return repoBuildModules.then((modules) => {
 
             const repoBuildModule = findWhere(modules, {name: this.params.moduleName});
 
             // last get module build based on module id
-            const buildModules = new Resource({url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`}).get();
+            const buildModules = new Resource({
+              url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
+              type: 'GET'
+            }).send();
 
             return buildModules.then((modules) => {
               const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});

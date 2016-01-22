@@ -56,7 +56,10 @@ class BranchBuildsApi extends StoredBuilds {
   }
 
   _fetchBuildHistory() {
-    const branchBuildsPromise = new Resource({url: `${config.apiRoot}/builds/history/branch/${this.branchId}`}).get();
+    const branchBuildsPromise = new Resource({
+      url: `${config.apiRoot}/builds/history/branch/${this.branchId}`,
+      type: 'GET'
+    }).send();
 
     branchBuildsPromise.then((resp) => {
       this.cb(false, {
@@ -76,7 +79,10 @@ class BranchBuildsApi extends StoredBuilds {
   }
   
   triggerBuild(cb) {
-    const buildPromise = new Resource({url: `${config.apiRoot}/branches/builds/branch/${this.branchId}`}).post();
+    const buildPromise = new Resource({
+      url: `${config.apiRoot}/branches/builds/branch/${this.branchId}`,
+      type: 'POST'
+    }).send();
 
     buildPromise.then((resp) => {
       cb(false, resp);

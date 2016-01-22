@@ -6,31 +6,21 @@ import $ from 'jquery';
 
 class ResourceProvider {
   
-  constructor({url, dataType = 'json', data={}}) {
-    this.url = url;
-    this.data = data;
-    this.dataType = dataType;
+  constructor(settings) {
+    this.settings = settings;
+    return this;
   }
 
-  defaultAjaxProps() {
+  defaultSettings() {
     return {
-      url: this.url,
-      dataType: this.dataType
+      dataType: 'json'
     };
   }
 
-  get() {
-    return $.ajax(Object.assign(this.defaultAjaxProps(), {type: 'GET'}));
+  send() {
+    return $.ajax(Object.assign(this.defaultSettings(), this.settings));
   }
 
-  post() {
-    return $.ajax(Object.assign(this.defaultAjaxProps(), {type: 'POST'}));
-  }
-  
-  delete() {
-    
-  }
-  
 }
 
 export default ResourceProvider;
