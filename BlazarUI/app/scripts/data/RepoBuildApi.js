@@ -1,4 +1,6 @@
+/*global config*/
 import RepoBuildPollingProvider from '../services/RepoBuildPollingProvider';
+import Resource from '../services/ResourceProvider';
 
 class RepoBuildApi {
 
@@ -27,8 +29,17 @@ class RepoBuildApi {
     this.buildsPoller.disconnect();
   }
   
-  cancelBuild() {
-    // console.log('cancel: ', this.branchId);
+  cancelBuild(cb) {
+    const cancelPromise = new Resource({
+      url: `${config.apiRoot}/branches/builds/${this.buildsPoller.repoBuildId}/cancel`,
+      type: 'POST'
+    }).send();
+
+    cancelPromise.error((error) => {
+      console.warn(error);
+      cb(`Error cancelling build. See your console for more detail.`);
+    });
+       
   }
 
 }

@@ -120,7 +120,7 @@ export const buildIsOnDeck = function(buildState) {
 };
 
 export const buildIsInactive = function(buildState) {
-  contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState);
+  return contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState);
 };
 
 // DOM Helpers

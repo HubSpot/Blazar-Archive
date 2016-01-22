@@ -7,7 +7,10 @@ const BranchStore = Reflux.createStore({
   listenables: BranchActions,
 
   onStopPolling() {
-    this.branchBuildsApi.stopPollingBuilds();
+    if (this.branchBuildsApi) {
+      this.branchBuildsApi.stopPollingBuilds();
+      this.branchBuildsApi = undefined;  
+    }
   },
 
   onLoadBranchBuilds(params) {
@@ -34,15 +37,15 @@ const BranchStore = Reflux.createStore({
       }
     });
   },
-  
+
   triggerUpdate() {
     this.trigger({
       builds: this.data.builds,
       branchId: this.data.branchId,
       loadingBranches: false  
-    });  
+    });
   },
-  
+
   triggerErrorUpdate() {
     this.trigger({
       error: this.error,

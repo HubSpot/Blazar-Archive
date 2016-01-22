@@ -48,9 +48,8 @@ class StoredBuilds {
   }
   
   stopPollingBuilds() {
-    this._unsubscribeFromBuilds();
-    // if polling other endpoints
     this.shouldPoll = false;
+    this._unsubscribeFromBuilds();
   }
   
 }

@@ -21,7 +21,6 @@ class RepoBuildPollingProvider {
         type: 'GET'
       }).send(),
       
-      
       moduleBuilds: function() {
         return new Resource({
           url: `${config.apiRoot}/branches/builds/${this.repoBuildId}/modules`,
@@ -61,67 +60,79 @@ class RepoBuildPollingProvider {
   }
   
   _shouldPoll(moduleBuildStates) {
+    if (moduleBuildStates.length === 0) {
+      return true;
+    }
+  
     return some(moduleBuildStates, (state) => {
       return contains(ActiveBuildStates, state);
     });
   }
-  
+
   _fetchBuilds(cb) {
-    // load module builds from repoBuildId
-    let promises = [];
 
-    // On first fetch, find the branchId
-    if (!this.branchId) {
+    this.promises.branchId.then((builds) => {
+      
+      // get the branch id:
+      this.branchId = findWhere(builds.map((build) => build.gitInfo), {
+        host: this.params.host,
+        organization: this.params.org,
+        repository: this.params.repo,
+        branch: this.params.branch
+      }).id;
+      
+      // get repositoryId
+      this.promises.branchHistory.call(this).then((resp) => {
+        this.repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
 
-      this.promises.branchId.then((builds) => {
-        
-        // get the branch id:
-        this.branchId = findWhere(builds.map((build) => build.gitInfo), {
-          host: this.params.host,
-          organization: this.params.org,
-          repository: this.params.repo,
-          branch: this.params.branch
-        }).id;
-        
-        // get repositoryId
-        this.promises.branchHistory.call(this).then((resp) => {
-          this.repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
+        // get repo build and module build info
+        Q.spread([this.promises.moduleNames.call(this), this.promises.moduleBuilds.call(this), this.promises.repoBuild.call(this)], 
+          (moduleNames, moduleBuilds, repoBuild) => {
 
-          // get repo build and module build info
-          Q.spread([this.promises.moduleNames.call(this), this.promises.moduleBuilds.call(this), this.promises.repoBuild.call(this)], 
-            (moduleNames, moduleBuilds, repoBuild) => {
+            const moduleBuildStates = flatten(moduleBuilds.map((build) => {
+              return build.state;
+            }));
 
-              repoBuild.duration = timestampDuration(repoBuild.startTimestamp, repoBuild.endTimestamp);
-              
-              // merge module names with module builds
-              const moduleNamesOnly = moduleNames.map((module) => {
-                return { id: module.id, name: module.name };
-              });
-              
-              const ModuleBuildsWithName = moduleBuilds.map((build) => {
-                return extend(build, findWhere(moduleNamesOnly, { id: build.moduleId }));
-              });
-              
-              cb(false, {
-                moduleBuilds: this._parseModules(ModuleBuildsWithName),
-                currentRepoBuild: fromJS(repoBuild),
-                branchId: this.branchId
-              });
+            // stop polling if build is in a terminal state
+            if (!this._shouldPoll(moduleBuildStates)) {
+              this.disconnect();
+            }
             
-          }).fail((error) => {
-            cb(error, null);
-          }); 
+            repoBuild.duration = timestampDuration(repoBuild.startTimestamp, repoBuild.endTimestamp);
+            
+            // merge module names with module builds
+            const moduleNamesOnly = moduleNames.map((module) => {
+              return { id: module.id, name: module.name };
+            });
+            
+            const ModuleBuildsWithName = moduleBuilds.map((build) => {
+              return extend(build, findWhere(moduleNamesOnly, { id: build.moduleId }));
+            });
+            
+            cb(false, {
+              moduleBuilds: this._parseModules(ModuleBuildsWithName),
+              currentRepoBuild: fromJS(repoBuild),
+              branchId: this.branchId
+            });
 
-        }, (error) => {
-          console.warn(error);
-          cb(err, null);
-        });
-        
+            setTimeout(() => {
+              this.poll(cb);
+            }, config.buildsRefresh);
+          
+        }).fail((error) => {
+          cb(error, null);
+        }); 
+
       }, (error) => {
-        cb(error, null);
+        console.warn(error);
+        cb(err, null);
       });
       
-    }
+    }, (error) => {
+      cb(error, null);
+    });
+      
+    
 
   }
 
@@ -132,11 +143,11 @@ class RepoBuildPollingProvider {
 
     this._fetchBuilds(cb);    
   }
-  
+
   disconnect() {
     this.shouldPoll = false;
   }  
-  
+
 }
 
 export default RepoBuildPollingProvider;

@@ -19,7 +19,6 @@ import RepoBuildDetail from './RepoBuildDetail.jsx';
 let initialState = {
   moduleBuilds: false,
   stars: [],
-  repositoryId: undefined,
   loadingModuleBuilds: true,
   loadingStars: true
 };
@@ -66,7 +65,6 @@ class RepoBuildContainer extends Component {
   
   // to do
   triggerCancelBuild() {
-    alert('not ready')
     RepoBuildActions.cancelBuild();
   }
   
