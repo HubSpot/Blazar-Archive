@@ -33,7 +33,7 @@ public class SingularityBuildLauncher {
         Optional.of("Running Blazar module build " + buildId),
         Optional.of(false),
         Optional.of(buildId),
-        Optional.of(Arrays.asList("--dryRun", "true", "--buildId", buildId))
+        Optional.of(Arrays.asList("--buildId", buildId))
     );
   }
 }
