@@ -103,7 +103,11 @@ public class BlazarClient {
 
   public void startModuleBuild(long moduleBuildId, String taskId) {
     String url = String.format(baseUrl + START_MODULE_BUILD_PATH, moduleBuildId);
-    HttpRequest request = HttpRequest.newBuilder().setMethod(Method.PUT).setUrl(url).build();
+    HttpRequest request = HttpRequest.newBuilder()
+        .setMethod(Method.PUT)
+        .setUrl(url)
+        .setQueryParam("taskId").to(taskId)
+        .build();
 
     HttpResponse response = httpClient.execute(request);
     if (response.getStatusCode() != 200) {
