@@ -26,9 +26,8 @@ class SidebarRepoList extends Component {
       return (
         <SidebarItem
           key={build[buildType].id}
-          hasBuild={buildType !== 'neverBuilt'}
           build={build[buildType]}
-          prevBuildState={buildType !== 'neverBuilt' ? build['lastBuild'].state : ''}
+          prevBuildState={buildType !== 'neverBuilt' ? build['lastBuild'].state : false}
           buildType={buildType}
           gitInfo={build.gitInfo}
           isStarred={true}

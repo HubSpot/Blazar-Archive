@@ -46,10 +46,10 @@ class SidebarItem extends Component {
   }
   
   renderBuildLink() {
-    const {buildType, build, hasBuild, prevBuildState} = this.props;
+    const {buildType, build, prevBuildState} = this.props;
     let icon, buildIdLink;
     
-    if (hasBuild) {
+    if (prevBuildState) {
       icon = (
         <Link to={build.blazarPath} className='sidebar-item__building-icon-link'>
           <BuildingIcon result={build.state} prevBuildState={prevBuildState} size='small' />

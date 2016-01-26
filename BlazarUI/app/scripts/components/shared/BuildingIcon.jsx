@@ -3,11 +3,13 @@ import React, {Component, PropTypes} from 'react';
 class BuildingIcon extends Component {
 
   getClassNames() {
-    if (this.props.result === "IN_PROGRESS" && this.props.prevBuildState != '') {
-      return `building-icon sidebar__active-building-icon building-icon--${this.props.result}-laststatus-${this.props.prevBuildState} ${this.props.classNames} building-icon--${this.props.size}`;
+    let prevBuildStateModifier = ``;
+
+    if (this.props.result === "IN_PROGRESS" && this.props.prevBuildState) {
+      prevBuildStateModifier = `-laststatus-${this.props.prevBuildState}`;
     }
 
-    return `building-icon sidebar__active-building-icon building-icon--${this.props.result} ${this.props.classNames} building-icon--${this.props.size}`;
+    return `building-icon sidebar__active-building-icon building-icon--${this.props.result}${prevBuildStateModifier} ${this.props.classNames} building-icon--${this.props.size}`;
   }
 
   getInnerClassNames() {
