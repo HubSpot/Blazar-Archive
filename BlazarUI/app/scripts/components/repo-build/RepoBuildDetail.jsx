@@ -79,22 +79,6 @@ class RepoBuildBuildDetail extends Component {
       durationPrefix: '',
       buildResult: humanizeText(build.state)
     }
-  
-    if (build.state === BuildStates.CANCELLED) {
-      return (
-        <Alert bsStyle="warning">
-          <strong>Build Cancelled</strong> 
-        </Alert>
-      )
-    }
-    
-    else if (build.state === BuildStates.QUEUED) {
-      return (
-        <Alert>
-          <strong>Build Queued</strong> 
-        </Alert>
-      )
-    }
     
     if (!has(build, 'commitInfo')) {
       return (
@@ -104,14 +88,16 @@ class RepoBuildBuildDetail extends Component {
   
     if (contains(FINAL_BUILD_STATES, build.state)) {
       buildDetail.endtime = timestampFormatted(build.endTimestamp)
+      const conjunction = build.state === BuildStates.CANCELLED ? 'after' : 'in';
+
       buildDetail.duration = (
-        <span>in {build.duration}</span>
+        <span>{conjunction} {build.duration}</span>
       );
-    }
-  
-    if (build.state === BuildStates.IN_PROGRESS) {
+    } 
+
+    else if (build.state === BuildStates.IN_PROGRESS) {
       buildDetail.duration = (
-        <span> started {timestampFormatted(build.startTimestamp)}</span>
+        <span>started {timestampFormatted(build.startTimestamp)}</span>
       );
     }
 
