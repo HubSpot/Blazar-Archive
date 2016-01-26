@@ -114,8 +114,6 @@ class SidebarContainer extends Component {
     const filteredBuilds = builds[this.state.toggleFilterState];
     const matches = getFilterMatches(filteredBuilds.toJS(), filterText);
 
-    //console.log(builds);
-
     return (
       <Sidebar>
         <div className="sidebar__filter">
