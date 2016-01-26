@@ -88,18 +88,11 @@ class RepoBuildBuildDetail extends Component {
   
     if (contains(FINAL_BUILD_STATES, build.state)) {
       buildDetail.endtime = timestampFormatted(build.endTimestamp)
+      const conjunction = build.state === BuildStates.CANCELLED ? 'after' : 'in';
 
-      if (build.state === BuildStates.CANCELLED) {
-        buildDetail.duration = (
-          <span>after {build.duration}</span>
-        );
-      }
-
-      else {
-        buildDetail.duration = (
-          <span>in {build.duration}</span>
-        );
-      }
+      buildDetail.duration = (
+        <span>{conjunction} {build.duration}</span>
+      );
     } 
 
     else if (build.state === BuildStates.IN_PROGRESS) {
