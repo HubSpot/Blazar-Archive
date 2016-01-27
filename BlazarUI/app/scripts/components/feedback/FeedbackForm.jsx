@@ -159,7 +159,7 @@ class FeedbackForm extends Component {
     return (
       <div className={this.getContainerClassName()}>
         <div className="feedback-title" onClick={this.toggleShow}>
-          Give Feedback
+          Get Help/Give Feedback
         </div>
         <div className="feedback__form">
           {this.renderContent()}
