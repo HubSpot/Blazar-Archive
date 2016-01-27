@@ -16,7 +16,7 @@ class BuildingIcon extends Component {
         'sidebar__active-building-icon',
         `building-icon--${this.props.size}`,
         `building-icon--${this.props.result}${prevBuildStateModifier}`,
-        `${this.props.classNames}`
+        this.props.classNames
       ]);
   }
 
