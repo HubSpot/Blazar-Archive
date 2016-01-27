@@ -47,7 +47,7 @@ class Log extends Model {
   }
   
   parseInactiveBuild() {
-    // first fetch or navigated 'To Bottom'
+    // First fetch or navigated 'To Bottom'
     if (!this.fetchAction || this.fetchAction === 'bottom') {
       this.handleEndOfLogFetch();
     }
