@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.ExecutorConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,16 +37,19 @@ public class ModuleBuildLauncher {
   private final BranchService branchService;
   private final ModuleService moduleService;
   private final GitHubHelper gitHubHelper;
+  private final ExecutorConfiguration executorConfiguration;
 
   @Inject
   public ModuleBuildLauncher(ModuleBuildService moduleBuildService,
                              BranchService branchService,
                              ModuleService moduleService,
-                             GitHubHelper gitHubHelper) {
+                             GitHubHelper gitHubHelper,
+                             BlazarConfiguration blazarConfiguration) {
     this.moduleBuildService = moduleBuildService;
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.gitHubHelper = gitHubHelper;
+    this.executorConfiguration = blazarConfiguration.getExecutorConfiguration();
   }
 
   public void launch(RepositoryBuild repositoryBuild, ModuleBuild build) throws Exception {
@@ -79,7 +84,7 @@ public class ModuleBuildLauncher {
     return configAtSha(gitInfo, ".blazar-buildpack.yaml");
   }
 
-  private static BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
+  private BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
     List<BuildStep> steps = primary.getSteps().isEmpty() ? secondary.getSteps() : primary.getSteps();
     Map<String, String> env = new LinkedHashMap<>();
     env.putAll(secondary.getEnv());
@@ -87,8 +92,16 @@ public class ModuleBuildLauncher {
     List<String> buildDeps = Lists.newArrayList(Iterables.concat(secondary.getBuildDeps(), primary.getBuildDeps()));
     List<String> webhooks = Lists.newArrayList(Iterables.concat(secondary.getWebhooks(), primary.getWebhooks()));
     List<String> cache = Lists.newArrayList(Iterables.concat(secondary.getCache(), primary.getCache()));
+    final String user;
+    if (primary.getUser().isPresent()) {
+      user = primary.getUser().get();
+    } else if (secondary.getUser().isPresent()) {
+      user = secondary.getUser().get();
+    } else {
+      user = executorConfiguration.getDefaultBuildUser();
+    }
 
-    return new BuildConfig(steps, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent());
+    return new BuildConfig(steps, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user));
   }
 
   private BuildConfig configAtSha(GitInfo gitInfo, Module module) throws IOException, NonRetryableBuildException {

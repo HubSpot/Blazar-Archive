@@ -16,6 +16,7 @@ public class BuildConfig {
   private final List<String> webhooks;
   private final List<String> cache;
   private final Optional<GitInfo> buildpack;
+  private final Optional<String> user;
 
   @JsonCreator
   public BuildConfig(@JsonProperty("steps") List<BuildStep> steps,
@@ -23,17 +24,19 @@ public class BuildConfig {
                      @JsonProperty("buildDeps") List<String> buildDeps,
                      @JsonProperty("webhooks") List<String> webhooks,
                      @JsonProperty("cache") List<String> cache,
-                     @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
+                     @JsonProperty("buildpack") Optional<GitInfo> buildpack,
+                     @JsonProperty("user") Optional<String> user) {
     this.steps = Objects.firstNonNull(steps, Collections.<BuildStep>emptyList());
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
     this.buildpack = Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
     this.cache = Objects.firstNonNull(cache, Collections.<String>emptyList());
+    this.user = Objects.firstNonNull(user, Optional.<String>absent());
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null, null, null);
+    return new BuildConfig(null, null, null, null, null, null, null);
   }
 
   public List<BuildStep> getSteps() {
@@ -58,5 +61,9 @@ public class BuildConfig {
 
   public Optional<GitInfo> getBuildpack() {
     return buildpack;
+  }
+
+  public Optional<String> getUser() {
+    return user;
   }
 }

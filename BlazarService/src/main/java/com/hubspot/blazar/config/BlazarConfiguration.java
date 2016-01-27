@@ -27,6 +27,11 @@ public class BlazarConfiguration extends Configuration {
 
   @Valid
   @NotNull
+  @JsonProperty("executor")
+  private ExecutorConfiguration executorConfiguration = new ExecutorConfiguration("root");
+
+  @Valid
+  @NotNull
   @JsonProperty("zookeeper")
   private ZooKeeperConfiguration zooKeeperConfiguration;
 
@@ -58,6 +63,15 @@ public class BlazarConfiguration extends Configuration {
 
   public BlazarConfiguration setSingularityConfiguration(SingularityConfiguration singularityConfiguration) {
     this.singularityConfiguration = singularityConfiguration;
+    return this;
+  }
+
+  public ExecutorConfiguration getExecutorConfiguration() {
+    return executorConfiguration;
+  }
+
+  public BlazarConfiguration setExecutorConfiguration(ExecutorConfiguration executorConfiguration) {
+    this.executorConfiguration = executorConfiguration;
     return this;
   }
 
