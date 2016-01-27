@@ -66,4 +66,9 @@ public class BuildConfig {
   public Optional<String> getUser() {
     return user;
   }
+
+  public BuildConfig withUser(String user) {
+    return new BuildConfig(steps, env,buildDeps, webhooks, cache, buildpack, Optional.of(user));
+  }
+
 }

@@ -8,8 +8,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.ExecutorConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +22,8 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
@@ -76,7 +76,11 @@ public class ModuleBuildLauncher {
       BuildConfig buildpackConfig = fetchBuildpack(module.getBuildpack().get());
       return mergeConfig(buildConfig, buildpackConfig);
     } else {
-      return buildConfig;
+      if (buildConfig.getUser().isPresent()) {
+        return buildConfig;
+      } else {
+        return buildConfig.withUser(executorConfiguration.getDefaultBuildUser());
+      }
     }
   }
 
