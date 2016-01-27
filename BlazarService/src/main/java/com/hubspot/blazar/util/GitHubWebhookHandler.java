@@ -42,6 +42,7 @@ public class GitHubWebhookHandler {
   private final ModuleDiscovery moduleDiscovery;
   private final BuildService buildService;
   private final DependenciesService dependenciesService;
+  private final BlazarV2Checker blazarV2Checker;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
@@ -49,12 +50,14 @@ public class GitHubWebhookHandler {
                               ModuleDiscovery moduleDiscovery,
                               BuildService buildService,
                               DependenciesService dependenciesService,
+                              BlazarV2Checker blazarV2Checker,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.moduleDiscovery = moduleDiscovery;
     this.buildService = buildService;
     this.dependenciesService = dependenciesService;
+    this.blazarV2Checker = blazarV2Checker;
 
     eventBus.register(this);
   }
@@ -62,7 +65,10 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handleCreateEvent(CreateEvent createEvent) throws IOException {
     if ("branch".equalsIgnoreCase(createEvent.getRefType())) {
-      processBranch(gitInfo(createEvent));
+      GitInfo gitInfo = gitInfo(createEvent);
+      if (!blazarV2Checker.isBlazarV2(gitInfo)) {
+        processBranch(gitInfo);
+      }
     }
   }
 
@@ -76,10 +82,13 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handlePushEvent(PushEvent pushEvent) throws IOException {
     if (!pushEvent.getRef().startsWith("refs/tags/") && !pushEvent.getDeleted()) {
-      GitInfo gitInfo = branchService.upsert(gitInfo(pushEvent));
+      GitInfo gitInfo = gitInfo(pushEvent);
 
-      Set<Module> modules = updateModules(gitInfo, pushEvent);
-      triggerBuilds(pushEvent, gitInfo, modules);
+      if (!blazarV2Checker.isBlazarV2(gitInfo)) {
+        gitInfo = branchService.upsert(gitInfo);
+        Set<Module> modules = updateModules(gitInfo, pushEvent);
+        triggerBuilds(pushEvent, gitInfo, modules);
+      }
     }
   }
 

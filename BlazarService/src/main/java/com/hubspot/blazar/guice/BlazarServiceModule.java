@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 
 import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
+import com.hubspot.blazar.util.BlazarV2Checker;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -74,6 +75,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
     binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 
+    binder.bind(BlazarV2Checker.class);
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
     binder.bind(BuildLauncher.class);
