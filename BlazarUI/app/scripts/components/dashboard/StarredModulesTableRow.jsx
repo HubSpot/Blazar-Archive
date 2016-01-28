@@ -37,11 +37,12 @@ class StarredModulesTableRow extends Component {
     let commitMessage;
     let sha;
 
-    if (has(latestBuild, 'commitInfo')){
-      commitMessage = (
-        <CommitMessage message={latestBuild.get('commitInfo').get('message')} />
-      );
-    }
+    console.log(latestBuild.get('commitInfo'));
+    console.log(latestBuild.get('commitInfo').get('message'));
+
+    commitMessage = (
+      <CommitMessage message={latestBuild.get('commitInfo').get('current').get('message')} />
+    );
     
     if (latestBuild.sha !== undefined) {
       const gitInfo = {
@@ -68,7 +69,7 @@ class StarredModulesTableRow extends Component {
           <Link to={latestBuild.get('blazarPath')}>{latestBuild.get('buildNumber')}</Link>
         </td>
         <td>
-          {timestampFormatted(latestBuild.startTimestamp)}
+          {timestampFormatted(latestBuild.get('startTimestamp'))}
         </td>
         <td>
           {sha}
