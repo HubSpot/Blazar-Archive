@@ -5,6 +5,7 @@ buildDeps:
 steps:
   - description: "Installing dependencies"
     commands:
+      - env | sort
       - npm install
       - npm install bender-deps
   - description: "Linting"
