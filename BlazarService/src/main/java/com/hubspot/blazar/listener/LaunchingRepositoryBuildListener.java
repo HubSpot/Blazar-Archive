@@ -2,6 +2,7 @@ package com.hubspot.blazar.listener;
 
 import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
+import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
@@ -16,7 +17,9 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.nio.file.FileSystems;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Singleton
@@ -74,8 +77,25 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
           }
         }
       }
+
+      Map<Integer, Module> moduleMap = mapByModuleId(modules);
+      DependencyGraph dependencyGraph = build.getDependencyGraph().get();
+      for (Module module : toBuild) {
+        for (int downstreamModule : dependencyGraph.reachableVertices(module.getId().get())) {
+          toBuild.add(moduleMap.get(downstreamModule));
+        }
+      }
     }
 
     return toBuild;
+  }
+
+  private static Map<Integer, Module> mapByModuleId(Set<Module> modules) {
+    Map<Integer, Module> moduleMap = new HashMap<>();
+    for (Module module : modules) {
+      moduleMap.put(module.getId().get(), module);
+    }
+
+    return moduleMap;
   }
 }
