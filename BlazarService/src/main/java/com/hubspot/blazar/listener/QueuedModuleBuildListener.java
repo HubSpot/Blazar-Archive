@@ -3,6 +3,7 @@ package com.hubspot.blazar.listener;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.listener.ModuleBuildListener;
 import com.hubspot.blazar.data.service.ModuleBuildService;
@@ -38,13 +39,25 @@ public class QueuedModuleBuildListener implements ModuleBuildListener {
     if (dependencyGraph.incomingVertices(build.getModuleId()).isEmpty()) {
       moduleBuildLauncher.launch(repositoryBuild, build);
     } else {
-      Set<Integer> buildingModules = extractModuleIds(moduleBuildService.getByRepositoryBuild(build.getRepoBuildId()));
+      Set<ModuleBuild> moduleBuilds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
+      Set<Integer> buildingModules = extractModuleIds(filterSkipped(moduleBuilds));
       Set<Integer> upstreamModules = dependencyGraph.incomingVertices(build.getModuleId());
 
       if (Sets.intersection(buildingModules, upstreamModules).isEmpty()) {
         moduleBuildLauncher.launch(repositoryBuild, build);
       }
     }
+  }
+
+  private static Set<ModuleBuild> filterSkipped(Set<ModuleBuild> builds) {
+    Set<ModuleBuild> filtered = new HashSet<>();
+    for (ModuleBuild build : builds) {
+      if (build.getState() != State.SKIPPED) {
+        filtered.add(build);
+      }
+    }
+
+    return filtered;
   }
 
   private static Set<Integer> extractModuleIds(Set<ModuleBuild> builds) {

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -57,8 +58,9 @@ public class DownstreamModuleBuildLauncher implements ModuleBuildListener {
         boolean ready = true;
         for (int upstreamModule : upstreamModules) {
           ModuleBuild upstreamBuild = buildMap.get(upstreamModule);
-          if (upstreamBuild != null && upstreamBuild.getState() != State.SUCCEEDED) {
-            LOG.info("Not launching downstream build {} because upstream build {} is in state {} (Needs to be SUCCEEDED)", downstreamBuild.getId().get(), upstreamBuild.getId().get(), upstreamBuild.getState());
+          Set<State> allowedUpstreamStates = EnumSet.of(State.SUCCEEDED, State.SKIPPED);
+          if (upstreamBuild != null && !allowedUpstreamStates.contains(upstreamBuild.getState())) {
+            LOG.info("Not launching downstream build {} because upstream build {} is in state {} (Needs to be one of {})", downstreamBuild.getId().get(), upstreamBuild.getId().get(), upstreamBuild.getState(), allowedUpstreamStates);
             ready = false;
             break;
           }
