@@ -65,7 +65,7 @@ public class ModuleBuildService {
       long pendingBuildId = buildNumbers.getPendingBuildId().get();
       LOG.info("Not enqueuing build for module {}, pending build {} already exists", module.getId().get(), pendingBuildId);
     } else {
-      int nextBuildNumber = buildNumbers.getNextBuildNumber();
+      int nextBuildNumber = repositoryBuild.getBuildNumber();
       LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
       ModuleBuild build = ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber);
       build = enqueue(build);
