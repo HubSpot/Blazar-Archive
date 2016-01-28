@@ -26,10 +26,8 @@ import com.hubspot.blazar.util.GitHubHelper;
 public class DockerModuleDiscovery implements ModuleDiscovery {
   private static final Logger LOG = LoggerFactory.getLogger(DockerModuleDiscovery.class);
 
-  private static final Optional<GitInfo> BRANCH_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#v2-stable"));
   private static final Optional<GitInfo> MASTER_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#v2-publish"));
+      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#master"));
 
   private final GitHubHelper gitHubHelper;
 
@@ -65,7 +63,7 @@ public class DockerModuleDiscovery implements ModuleDiscovery {
     for (String dockerFile: dockerFiles) {
       String moduleName = moduleName(gitInfo, dockerFile);
       String glob = (dockerFile.contains("/") ? dockerFile.substring(0, dockerFile.lastIndexOf('/') + 1) : "") + "**";
-      modules.add(new DiscoveredModule(moduleName, "docker", dockerFile, glob, buildpackFor(dockerFile, gitInfo), getDockerfileDeps()));
+      modules.add(new DiscoveredModule(moduleName, "docker", dockerFile, glob,  MASTER_BUILDPACK, getDockerfileDeps()));
     }
     return modules;
   }
@@ -74,16 +72,6 @@ public class DockerModuleDiscovery implements ModuleDiscovery {
     // todo Currently not supporting deps because most builds are not in the same repository and deps builds are limited to repo committed to
     Set<String> emtpySet = Collections.emptySet();
     return new DependencyInfo(emtpySet, emtpySet);
-  }
-
-  private Optional<GitInfo> buildpackFor(String file, GitInfo gitInfo) throws IOException {
-    if ("master".equals(gitInfo.getBranch())) {
-      LOG.info("Picked master buildpack {} for {}", MASTER_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
-      return MASTER_BUILDPACK;
-    } else {
-      LOG.info("Picked branch buildpack {} for {}", BRANCH_BUILDPACK, String.format("%s-%s", gitInfo.getFullRepositoryName(), file));
-      return BRANCH_BUILDPACK;
-    }
   }
 
   private static String moduleName(GitInfo gitInfo, String path) {
