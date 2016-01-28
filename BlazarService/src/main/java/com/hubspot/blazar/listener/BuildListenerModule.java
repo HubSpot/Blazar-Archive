@@ -62,5 +62,6 @@ public class BuildListenerModule implements Module {
     moduleBuildListeners.addBinding(ModuleBuild.State.SUCCEEDED).to(RepositoryBuildCompleter.class);
     moduleBuildListeners.addBinding(ModuleBuild.State.CANCELLED).to(RepositoryBuildCompleter.class);
     moduleBuildListeners.addBinding(ModuleBuild.State.FAILED).to(RepositoryBuildCompleter.class);
+    moduleBuildListeners.addBinding(ModuleBuild.State.SKIPPED).to(RepositoryBuildCompleter.class);
   }
 }

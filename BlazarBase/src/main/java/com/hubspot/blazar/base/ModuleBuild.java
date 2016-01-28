@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class ModuleBuild {
   public enum State {
-    QUEUED(false), LAUNCHING(false), IN_PROGRESS(false), SUCCEEDED(true), CANCELLED(true), FAILED(true);
+    QUEUED(false), LAUNCHING(false), IN_PROGRESS(false), SUCCEEDED(true), CANCELLED(true), FAILED(true), SKIPPED(true);
 
     private final boolean completed;
 
@@ -65,6 +65,14 @@ public class ModuleBuild {
     Optional<BuildConfig> absentConfig = Optional.absent();
 
     return new ModuleBuild(absentLong, repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, absentConfig, absentConfig);
+  }
+
+  public static ModuleBuild skippedBuild(RepositoryBuild repositoryBuild, Module module, int buildNumber) {
+    Optional<Long> absentLong = Optional.absent();
+    Optional<String> absentString = Optional.absent();
+    Optional<BuildConfig> absentConfig = Optional.absent();
+
+    return new ModuleBuild(absentLong, repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.SKIPPED, absentLong, absentLong, absentString, absentConfig, absentConfig);
   }
 
   public Optional<Long> getId() {

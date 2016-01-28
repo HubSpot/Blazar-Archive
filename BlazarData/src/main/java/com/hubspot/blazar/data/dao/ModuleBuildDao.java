@@ -3,7 +3,6 @@ package com.hubspot.blazar.data.dao;
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
-import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
@@ -33,19 +32,9 @@ public interface ModuleBuildDao {
   @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :moduleId AND buildNumber = :buildNumber")
   Optional<ModuleBuild> getByModuleAndNumber(@Bind("moduleId") int moduleId, @Bind("buildNumber") int buildNumber);
 
-  @SqlQuery("" +
-      "SELECT pendingBuild.id AS pendingBuildId, " +
-      "pendingBuild.buildNumber AS pendingBuildNumber, " +
-      "inProgressBuild.id AS inProgressBuildId, " +
-      "inProgressBuild.buildNumber AS inProgressBuildNumber, " +
-      "lastBuild.id AS lastBuildId, " +
-      "lastBuild.buildNumber AS lastBuildNumber " +
-      "FROM modules m " +
-      "LEFT OUTER JOIN module_builds AS pendingBuild ON (m.pendingBuildId = pendingBuild.id) " +
-      "LEFT OUTER JOIN module_builds AS inProgressBuild ON (m.inProgressBuildId = inProgressBuild.id) " +
-      "LEFT OUTER JOIN module_builds AS lastBuild ON (m.lastBuildId = lastBuild.id) " +
-      "WHERE m.id = :moduleId")
-  BuildNumbers getBuildNumbers(@Bind("moduleId") int moduleId);
+  @GetGeneratedKeys
+  @SqlUpdate("INSERT INTO module_builds (repoBuildId, moduleId, buildNumber, state) VALUES (:repoBuildId, :moduleId, :buildNumber, :state)")
+  long skip(@BindWithRosetta ModuleBuild build);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO module_builds (repoBuildId, moduleId, buildNumber, state) VALUES (:repoBuildId, :moduleId, :buildNumber, :state)")

@@ -54,23 +54,30 @@ public class ModuleBuildService {
     return moduleBuildDao.getByModuleAndNumber(moduleId, buildNumber);
   }
 
-  public BuildNumbers getBuildNumbers(int moduleId) {
-    return moduleBuildDao.getBuildNumbers(moduleId);
+  public void skip(RepositoryBuild repositoryBuild, Module module) {
+    int nextBuildNumber = repositoryBuild.getBuildNumber();
+    LOG.info("Skipping build for module {} with build number {}", module.getId().get(), nextBuildNumber);
+    ModuleBuild build = ModuleBuild.skippedBuild(repositoryBuild, module, nextBuildNumber);
+    build = skip(build);
+    LOG.info("Skipped build for module {} with id {}", module.getId().get(), build.getId().get());
   }
 
   public void enqueue(RepositoryBuild repositoryBuild, Module module) {
-    BuildNumbers buildNumbers = getBuildNumbers(module.getId().get());
+    int nextBuildNumber = repositoryBuild.getBuildNumber();
+    LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
+    ModuleBuild build = ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber);
+    build = enqueue(build);
+    LOG.info("Enqueued build for module {} with id {}", module.getId().get(), build.getId().get());
+  }
 
-    if (buildNumbers.getPendingBuildId().isPresent()) {
-      long pendingBuildId = buildNumbers.getPendingBuildId().get();
-      LOG.info("Not enqueuing build for module {}, pending build {} already exists", module.getId().get(), pendingBuildId);
-    } else {
-      int nextBuildNumber = repositoryBuild.getBuildNumber();
-      LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
-      ModuleBuild build = ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber);
-      build = enqueue(build);
-      LOG.info("Enqueued build for module {} with id {}", module.getId().get(), build.getId().get());
-    }
+  @Transactional
+  protected ModuleBuild skip(ModuleBuild build) {
+    long id = moduleBuildDao.skip(build);
+    build = build.withId(id);
+
+    eventBus.post(build);
+
+    return build;
   }
 
   @Transactional

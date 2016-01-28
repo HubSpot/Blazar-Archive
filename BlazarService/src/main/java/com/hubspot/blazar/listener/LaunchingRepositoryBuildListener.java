@@ -1,6 +1,7 @@
 package com.hubspot.blazar.listener;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
@@ -49,13 +50,18 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
 
     Set<Module> modules = moduleService.getByBranch(build.getBranchId());
     Set<Module> toBuild = findModulesToBuild(build, modules);
+    Set<Module> skipped = Sets.difference(modules, toBuild);
 
-    if (toBuild.isEmpty()) {
+    if (modules.isEmpty()) {
       LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
       repositoryBuildService.update(build.withState(State.SUCCEEDED).withEndTimestamp(System.currentTimeMillis()));
     } else {
       for (Module module : toBuild) {
         moduleBuildService.enqueue(build, module);
+      }
+
+      for (Module module : skipped) {
+        moduleBuildService.skip(build, module);
       }
 
       repositoryBuildService.update(build.withState(State.IN_PROGRESS));

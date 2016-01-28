@@ -1,6 +1,5 @@
 package com.hubspot.blazar.listener;
 
-import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.listener.ModuleBuildListener;
