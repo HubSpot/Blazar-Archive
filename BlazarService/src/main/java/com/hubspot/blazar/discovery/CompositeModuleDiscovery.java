@@ -56,7 +56,9 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
     for (DiscoveredModule module : configDiscovery.discover(gitInfo)) {
       String folder = module.getFolder();
 
-      if (!modulesByPath.containsKey(folder)) {
+      if (!module.isActive()) {
+        modulesByPath.remove(folder);
+      } else if (!modulesByPath.containsKey(folder)) {
         modulesByPath.put(folder, ImmutableSet.of(module));
       }
     }

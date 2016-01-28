@@ -1,6 +1,7 @@
 package com.hubspot.blazar.discovery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Optional;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyInfo;
@@ -55,6 +56,22 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
 
     Set<DiscoveredModule> modules = new HashSet<>();
     for (String blazarConfig : blazarConfigs) {
+      if (disabled(blazarConfig, repository, gitInfo)) {
+        modules.add(new DiscoveredModule(
+            Optional.<Integer>absent(),
+            "disabled",
+            "config",
+            blazarConfig,
+            "",
+            false,
+            System.currentTimeMillis(),
+            System.currentTimeMillis(),
+            Optional.<GitInfo>absent(),
+            DependencyInfo.unknown()
+        ));
+        continue;
+      }
+
       final BuildConfig buildConfig;
       try {
         buildConfig = gitHubHelper.configFor(blazarConfig, repository, gitInfo).get();
@@ -69,6 +86,10 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
       }
     }
     return modules;
+  }
+
+  private boolean disabled(String blazarConfig, GHRepository repository, GitInfo gitInfo) throws IOException {
+    return gitHubHelper.contentsFor(blazarConfig, repository, gitInfo).contains("enabled: false");
   }
 
   private boolean canBuild(BuildConfig buildConfig) {
