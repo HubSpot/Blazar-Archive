@@ -75,12 +75,10 @@ public class ModuleBuildLauncher {
     } else if (module.getBuildpack().isPresent()) {
       BuildConfig buildpackConfig = fetchBuildpack(module.getBuildpack().get());
       return mergeConfig(buildConfig, buildpackConfig);
+    } else if (buildConfig.getUser().isPresent()) {
+      return buildConfig;
     } else {
-      if (buildConfig.getUser().isPresent()) {
-        return buildConfig;
-      } else {
-        return buildConfig.withUser(executorConfiguration.getDefaultBuildUser());
-      }
+      return buildConfig.withUser(executorConfiguration.getDefaultBuildUser());
     }
   }
 
