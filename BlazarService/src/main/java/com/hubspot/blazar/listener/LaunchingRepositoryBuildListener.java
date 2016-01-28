@@ -1,5 +1,6 @@
 package com.hubspot.blazar.listener;
 
+import com.google.common.collect.ImmutableSet;
 import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
@@ -83,7 +84,7 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
       LOG.info("All modules: {}", moduleMap.keySet());
       LOG.info("Changed modules: {}", mapByModuleId(toBuild).keySet());
       LOG.info("Transitive reduction: {}", dependencyGraph.getTransitiveReduction());
-      for (Module module : toBuild) {
+      for (Module module : ImmutableSet.copyOf(toBuild)) {
         for (int downstreamModule : dependencyGraph.reachableVertices(module.getId().get())) {
           toBuild.add(moduleMap.get(downstreamModule));
         }
