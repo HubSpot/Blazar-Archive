@@ -80,11 +80,15 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
 
       Map<Integer, Module> moduleMap = mapByModuleId(modules);
       DependencyGraph dependencyGraph = build.getDependencyGraph().get();
+      LOG.info("All modules: {}", moduleMap.keySet());
+      LOG.info("Changed modules: {}", mapByModuleId(toBuild).keySet());
+      LOG.info("Transitive reduction: {}", dependencyGraph.getTransitiveReduction());
       for (Module module : toBuild) {
         for (int downstreamModule : dependencyGraph.reachableVertices(module.getId().get())) {
           toBuild.add(moduleMap.get(downstreamModule));
         }
       }
+      LOG.info("Modules to build: {}", mapByModuleId(toBuild).keySet());
     }
 
     return toBuild;
