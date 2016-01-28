@@ -230,7 +230,7 @@
                 <image>
                   <name>hubspot/blazarservice:${project.version}</name>
                   <build>
-                    <from>java:8u45-jre</from>
+                    <from>java:8u65-jre</from>
                     <maintainer>platform-infrastructure-groups@hubspot.com</maintainer>
                     <ports>
                       <port>8099</port>
