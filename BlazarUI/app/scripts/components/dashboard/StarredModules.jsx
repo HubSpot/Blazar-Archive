@@ -8,7 +8,9 @@ import StarredModulesTableRow from './StarredModulesTableRow.jsx';
 class StarredModules extends Component {
 
   getRows() {
-    return this.props.modulesBuildHistory.map((item, i) => {
+    return this.props.starredBuilds.map((item, i) => {
+      //console.log('item: ', item);
+      //console.log('i: ', i);
       return (
         <StarredModulesTableRow 
           key={i}
@@ -19,13 +21,15 @@ class StarredModules extends Component {
   }
 
   render() {  
-    if (this.props.loadingModulesBuildHistory || this.props.loadingStars) {
+    //console.log(this.props.starredBuilds.toString());
+
+    /*if (this.props.loadingModulesBuildHistory || this.props.loadingStars) {
       return (
         <Loader align='top-center' />
       );
-    }
+    }*/
     
-    if (this.props.modulesBuildHistory.length === 0) {
+    if (!this.props.starredBuilds || this.props.starredBuilds.size === 0) {
       return(
         <Alert bsStyle='info'>
           <p>You have no starred modules.</p>
@@ -37,12 +41,13 @@ class StarredModules extends Component {
     }
 
     const columnNames = [
-      {label: '', key: 'buildNumber'},
-      {label: 'Module', key: 'module'},
-      {label: 'Latest Build', key: 'latestBuild'},
-      {label: 'Start Time', key: 'startTime'},
-      {label: 'Commit', key: 'commit'},
-      {label: 'Commit Message', key: 'commitMessage'},
+      {label: 'Build State', key: ''},
+      {label: 'Repo', key: ''},
+      {label: 'Branch', key: ''},
+      {label: 'Build Number', key: ''},
+      {label: 'Start Time', key: ''},
+      {label: 'Commit', key: ''},
+      {label: 'Commit Message', key: ''}
     ];
 
     return (
@@ -60,9 +65,10 @@ class StarredModules extends Component {
 }
 
 StarredModules.propTypes = {
-  loadingModulesBuildHistory: PropTypes.bool,
+  starredBuilds: PropTypes.array
+  /*loadingModulesBuildHistory: PropTypes.bool,
   loadingStars: PropTypes.bool,
-  modulesBuildHistory: PropTypes.array,
+  modulesBuildHistory: PropTypes.array,*/
 };
 
 export default StarredModules;

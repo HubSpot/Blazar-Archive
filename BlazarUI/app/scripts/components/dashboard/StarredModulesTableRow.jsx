@@ -14,12 +14,14 @@ class StarredModulesTableRow extends Component {
 
     const item = this.props.item;
 
-    if (item.builds.length === 0) {
+    console.log(this.props.item.toString());
+
+    if (false) {
       return (
         <tr>
           <td />
           <td>
-            <Link to={item.module.modulePath}>{item.module.moduleName}</Link>
+            <Link to={item.get('gitInfo').get('blazarRepositoryPath')}>{item.get('gitInfo').get('repository')}</Link>
           </td>
           <td> No build history </td>
           <td />
@@ -29,23 +31,23 @@ class StarredModulesTableRow extends Component {
       );
     }
 
-    const latestBuild = item.builds[0].build;
-    const latestBuildGitInfo = item.builds[0].gitInfo;
+    const latestBuild = item.get('lastBuild');
+    const latestBuildGitInfo = item.get('gitInfo');
 
     let commitMessage;
     let sha;
 
     if (has(latestBuild, 'commitInfo')){
       commitMessage = (
-        <CommitMessage message={latestBuild.commitInfo.current.message} />
+        <CommitMessage message={latestBuild.get('commitInfo').get('message')} />
       );
     }
     
     if (latestBuild.sha !== undefined) {
       const gitInfo = {
-        host: latestBuildGitInfo.host,
-        organization: latestBuildGitInfo.organization,
-        repository: latestBuildGitInfo.repository
+        host: latestBuildGitInfo.get('host'),
+        organization: latestBuildGitInfo.get('organization'),
+        repository: latestBuildGitInfo.get('repository')
       }
 
       sha = <Sha gitInfo={gitInfo} build={latestBuild} />;
@@ -54,13 +56,16 @@ class StarredModulesTableRow extends Component {
     return (
       <tr className={tableRowBuildState(latestBuild.state)}>
         <td className='build-status'>
-          {buildResultIcon(latestBuild.state)}
+          {buildResultIcon(latestBuild.get('state'))}
         </td>
         <td>
-          <Link to={item.module.modulePath}>{item.module.moduleName}</Link>
+          <Link to={latestBuildGitInfo.get('blazarRepositoryPath')}>{latestBuildGitInfo.get('repository')}</Link>
         </td>
         <td> 
-          <Link to={latestBuild.blazarPath}>{latestBuild.buildNumber}</Link>
+          <Link to={latestBuildGitInfo.get('blazarBranchPath')}>{latestBuildGitInfo.get('branch')}</Link>
+        </td>
+        <td>
+          <Link to={latestBuild.get('blazarPath')}>{latestBuild.get('buildNumber')}</Link>
         </td>
         <td>
           {timestampFormatted(latestBuild.startTimestamp)}

@@ -16,7 +16,9 @@ class Dashboard extends Component {
           <Headline>
             Starred Modules
           </Headline>
-           to do...
+           <StarredModules
+            starredBuilds={this.props.starredBuilds}
+           />
         </UIGridItem>
       </UIGrid>
     );
@@ -24,6 +26,7 @@ class Dashboard extends Component {
 }
 
 Dashboard.propTypes = {
+  starredBuilds: PropTypes.array,
   params: PropTypes.object
 };
 
