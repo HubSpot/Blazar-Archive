@@ -46,7 +46,7 @@ class SidebarItem extends Component {
   }
   
   renderBuildLink() {
-    const {buildType, build, prevBuildState} = this.props;
+    const {build, prevBuildState} = this.props;
     let icon, buildIdLink;
     
     if (prevBuildState) {
