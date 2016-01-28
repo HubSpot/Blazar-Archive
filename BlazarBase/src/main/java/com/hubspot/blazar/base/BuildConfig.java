@@ -11,6 +11,7 @@ import com.google.common.base.Optional;
 
 public class BuildConfig {
   private final List<BuildStep> steps;
+  private final List<BuildStep> before;
   private final Map<String, String> env;
   private final List<String> buildDeps;
   private final List<String> webhooks;
@@ -20,6 +21,7 @@ public class BuildConfig {
 
   @JsonCreator
   public BuildConfig(@JsonProperty("steps") List<BuildStep> steps,
+                     @JsonProperty("before") List<BuildStep> before,
                      @JsonProperty("env") Map<String, String> env,
                      @JsonProperty("buildDeps") List<String> buildDeps,
                      @JsonProperty("webhooks") List<String> webhooks,
@@ -27,6 +29,7 @@ public class BuildConfig {
                      @JsonProperty("buildpack") Optional<GitInfo> buildpack,
                      @JsonProperty("user") Optional<String> user) {
     this.steps = Objects.firstNonNull(steps, Collections.<BuildStep>emptyList());
+    this.before = Objects.firstNonNull(before, Collections.<BuildStep>emptyList());
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
@@ -36,11 +39,15 @@ public class BuildConfig {
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null, null, null, null);
+    return new BuildConfig(null, null, null, null, null, null, null, null);
   }
 
   public List<BuildStep> getSteps() {
     return steps;
+  }
+
+  public List<BuildStep> getBefore() {
+    return before;
   }
 
   public Map<String, String> getEnv() {
@@ -68,7 +75,7 @@ public class BuildConfig {
   }
 
   public BuildConfig withUser(String user) {
-    return new BuildConfig(steps, env, buildDeps, webhooks, cache, buildpack, Optional.of(user));
+    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, buildpack, Optional.of(user));
   }
 
 }
