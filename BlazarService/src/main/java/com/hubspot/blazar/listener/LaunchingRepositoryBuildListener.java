@@ -48,7 +48,7 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
   public void buildChanged(RepositoryBuild build) {
     LOG.info("Going to enqueue module builds for repository build {}", build.getId().get());
 
-    Set<Module> modules = moduleService.getByBranch(build.getBranchId());
+    Set<Module> modules = filterActive(moduleService.getByBranch(build.getBranchId()));
     Set<Module> toBuild = findModulesToBuild(build, modules);
     Set<Module> skipped = Sets.difference(modules, toBuild);
 
@@ -99,6 +99,17 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
     }
 
     return toBuild;
+  }
+
+  private static Set<Module> filterActive(Set<Module> modules) {
+    Set<Module> filtered = new HashSet<>();
+    for (Module module : modules) {
+      if (module.isActive()) {
+        filtered.add(module);
+      }
+    }
+
+    return filtered;
   }
 
   private static Map<Integer, Module> mapByModuleId(Set<Module> modules) {
