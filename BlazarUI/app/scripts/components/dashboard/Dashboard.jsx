@@ -1,5 +1,6 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
+import Immutable from 'immutable'
 import StarredModules from './StarredModules.jsx';
 
 import Headline from '../shared/headline/Headline.jsx';
@@ -26,7 +27,7 @@ class Dashboard extends Component {
 }
 
 Dashboard.propTypes = {
-  starredBuilds: PropTypes.array,
+  starredBuilds: PropTypes.instanceOf(Immutable.List),
   params: PropTypes.object
 };
 

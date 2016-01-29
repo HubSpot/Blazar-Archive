@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import Immutable from 'immutable'
 const Link = require('react-router').Link;
 import Alert from 'react-bootstrap/lib/Alert';
 import Loader from '../shared/Loader.jsx';
@@ -11,6 +12,7 @@ class StarredModules extends Component {
     return this.props.starredBuilds.map((item, i) => {
       return (
         <StarredModulesTableRow
+          key={i}
           item={item}
         />
       );
@@ -55,7 +57,7 @@ class StarredModules extends Component {
 }
 
 StarredModules.propTypes = {
-  starredBuilds: PropTypes.array
+  starredBuilds: PropTypes.instanceOf(Immutable.List)
 };
 
 export default StarredModules;
