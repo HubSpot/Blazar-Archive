@@ -10,8 +10,7 @@ class StarredModules extends Component {
   getRows() {
     return this.props.starredBuilds.map((item, i) => {
       return (
-        <StarredModulesTableRow 
-          key={i}
+        <StarredModulesTableRow
           item={item}
         />
       );

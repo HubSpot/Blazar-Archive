@@ -13,13 +13,23 @@ class StarredModulesTableRow extends Component {
   render() {
 
     const item = this.props.item;
+    const latestBuild = item.get('lastBuild');
+    const latestBuildGitInfo = item.get('gitInfo');
 
-    if (item.get('lastBuild') === undefined) {
+    const blazarRepositoryPath = latestBuildGitInfo.get('blazarRepositoryPath');
+    const repository = latestBuildGitInfo.get('repository');
+    const blazarBranchPath = latestBuildGitInfo.get('blazarBranchPath');
+    const branch = latestBuildGitInfo.get('branch');
+
+    if (latestBuild === undefined) {
       return (
         <tr>
           <td />
           <td>
-            <Link to={item.get('gitInfo').get('blazarRepositoryPath')}>{item.get('gitInfo').get('repository')}</Link>
+            <Link to={blazarRepositoryPath}>{repository}</Link>
+          </td>
+          <td>
+            <Link to={blazarBranchPath}>{branch}</Link>
           </td>
           <td> No build history </td>
           <td />
@@ -29,23 +39,24 @@ class StarredModulesTableRow extends Component {
       );
     }
 
-    const latestBuild = item.get('lastBuild');
-    const latestBuildGitInfo = item.get('gitInfo');
-
+    const commitInfo = latestBuild.get('commitInfo');
     let commitMessage;
     let sha;
 
-    commitMessage = (
-      <CommitMessage message={latestBuild.get('commitInfo').get('current').get('message')} />
-    );
+    if (commitInfo !== undefined) {
+      commitMessage = (
+        <CommitMessage message={commitInfo.get('current').get('message')} />
+      );
+    }
     
     if (latestBuild.get('sha')) {
       const gitInfo = {
         host: latestBuildGitInfo.get('host'),
         organization: latestBuildGitInfo.get('organization'),
-        repository: latestBuildGitInfo.get('repository')
+        repository: repository
       }
 
+      latestBuild.sha = latestBuild.get('sha');
       sha = <Sha gitInfo={gitInfo} build={latestBuild} />;
     }
 
@@ -55,10 +66,10 @@ class StarredModulesTableRow extends Component {
           {buildResultIcon(latestBuild.get('state'))}
         </td>
         <td>
-          <Link to={latestBuildGitInfo.get('blazarRepositoryPath')}>{latestBuildGitInfo.get('repository')}</Link>
+          <Link to={blazarRepositoryPath}>{repository}</Link>
         </td>
         <td> 
-          <Link to={latestBuildGitInfo.get('blazarBranchPath')}>{latestBuildGitInfo.get('branch')}</Link>
+          <Link to={blazarBranchPath}>{branch}</Link>
         </td>
         <td>
           <Link to={latestBuild.get('blazarPath')}>{latestBuild.get('buildNumber')}</Link>
@@ -81,7 +92,6 @@ class StarredModulesTableRow extends Component {
 
 StarredModulesTableRow.propTypes = {
   item: PropTypes.object,
-  index: PropTypes.number,
 };
 
 export default StarredModulesTableRow;

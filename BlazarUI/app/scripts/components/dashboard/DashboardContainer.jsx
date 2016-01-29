@@ -39,7 +39,7 @@ class DashboardContainer extends Component {
       return;
     }
 
-    if (this.state.builds.size !== 0) {
+    if (this.state.builds.all) {
       const starredBuilds = this.state.builds.all.filter((build) => {
         return contains(this.state.stars, build.get('gitInfo').get('id'));
       });
