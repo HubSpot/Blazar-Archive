@@ -14,9 +14,7 @@ class StarredModulesTableRow extends Component {
 
     const item = this.props.item;
 
-    console.log(this.props.item.toString());
-
-    if (false) {
+    if (item.get('lastBuild') === undefined) {
       return (
         <tr>
           <td />
@@ -37,14 +35,11 @@ class StarredModulesTableRow extends Component {
     let commitMessage;
     let sha;
 
-    console.log(latestBuild.get('commitInfo'));
-    console.log(latestBuild.get('commitInfo').get('message'));
-
     commitMessage = (
       <CommitMessage message={latestBuild.get('commitInfo').get('current').get('message')} />
     );
     
-    if (latestBuild.sha !== undefined) {
+    if (latestBuild.get('sha')) {
       const gitInfo = {
         host: latestBuildGitInfo.get('host'),
         organization: latestBuildGitInfo.get('organization'),

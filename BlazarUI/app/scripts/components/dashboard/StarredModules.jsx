@@ -9,8 +9,6 @@ class StarredModules extends Component {
 
   getRows() {
     return this.props.starredBuilds.map((item, i) => {
-      //console.log('item: ', item);
-      //console.log('i: ', i);
       return (
         <StarredModulesTableRow 
           key={i}
@@ -20,14 +18,7 @@ class StarredModules extends Component {
     });
   }
 
-  render() {  
-    //console.log(this.props.starredBuilds.toString());
-
-    /*if (this.props.loadingModulesBuildHistory || this.props.loadingStars) {
-      return (
-        <Loader align='top-center' />
-      );
-    }*/
+  render() {
     
     if (!this.props.starredBuilds || this.props.starredBuilds.size === 0) {
       return(
@@ -41,13 +32,13 @@ class StarredModules extends Component {
     }
 
     const columnNames = [
-      {label: 'Build State', key: ''},
-      {label: 'Repo', key: ''},
-      {label: 'Branch', key: ''},
-      {label: 'Build Number', key: ''},
-      {label: 'Start Time', key: ''},
-      {label: 'Commit', key: ''},
-      {label: 'Commit Message', key: ''}
+      {label: ''}, // build state
+      {label: 'Repo'},
+      {label: 'Branch'},
+      {label: 'Build Number'},
+      {label: 'Start Time'},
+      {label: 'Commit'},
+      {label: 'Commit Message'}
     ];
 
     return (
@@ -66,9 +57,6 @@ class StarredModules extends Component {
 
 StarredModules.propTypes = {
   starredBuilds: PropTypes.array
-  /*loadingModulesBuildHistory: PropTypes.bool,
-  loadingStars: PropTypes.bool,
-  modulesBuildHistory: PropTypes.array,*/
 };
 
 export default StarredModules;

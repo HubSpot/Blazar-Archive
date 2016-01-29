@@ -18,8 +18,7 @@ class DashboardContainer extends Component {
     this.state = {
       stars: [],
       builds: [],
-      starredBuilds: [],
-      loadingStars: true
+      starredBuilds: []
     }
   }
 
@@ -40,24 +39,18 @@ class DashboardContainer extends Component {
       return;
     }
 
-    //console.log("this.state.builds.all: ", this.state.builds.all);
-
     if (this.state.builds.size !== 0) {
-      const newStarredBuilds = this.state.builds.all.filter((build) => {
+      const starredBuilds = this.state.builds.all.filter((build) => {
         return contains(this.state.stars, build.get('gitInfo').get('id'));
       });
 
-      //console.log("newStarredBuilds: ", newStarredBuilds.toString());
-
-      this.setState({ starredBuilds: newStarredBuilds });
+      this.setState({ starredBuilds: starredBuilds });
     }
   }
 
   onStatusChange(state) {
     this.setState(state);
     this.checkStarHistory();
-
-    //console.log("STATE UPDATED: ", this.state);
   }
 
   render() {
@@ -65,7 +58,6 @@ class DashboardContainer extends Component {
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
           starredBuilds={this.state.starredBuilds}
-          loadingStars={this.stateloadingStars}
           params={this.props.params}
         />
       </PageContainer>
