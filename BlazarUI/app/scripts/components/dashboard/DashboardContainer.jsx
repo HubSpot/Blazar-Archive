@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {contains, pluck, isEqual, filter} from 'underscore';
+import Immutable from 'immutable'
 import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
@@ -16,9 +17,9 @@ class DashboardContainer extends Component {
     this.onStatusChange = this.onStatusChange.bind(this);
 
     this.state = {
-      stars: [],
-      builds: [],
-      starredBuilds: []
+      stars: Immutable.List.of(),
+      builds: Immutable.List.of(),
+      starredBuilds: Immutable.List.of()
     }
   }
 
