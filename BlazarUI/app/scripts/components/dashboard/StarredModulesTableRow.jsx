@@ -13,13 +13,23 @@ class StarredModulesTableRow extends Component {
   render() {
 
     const item = this.props.item;
+    const latestBuild = item.get('lastBuild');
+    const latestBuildGitInfo = item.get('gitInfo');
 
-    if (item.builds.length === 0) {
+    const blazarRepositoryPath = latestBuildGitInfo.get('blazarRepositoryPath');
+    const repository = latestBuildGitInfo.get('repository');
+    const blazarBranchPath = latestBuildGitInfo.get('blazarBranchPath');
+    const branch = latestBuildGitInfo.get('branch');
+
+    if (latestBuild === undefined) {
       return (
         <tr>
           <td />
           <td>
-            <Link to={item.module.modulePath}>{item.module.moduleName}</Link>
+            <Link to={blazarRepositoryPath}>{repository}</Link>
+          </td>
+          <td>
+            <Link to={blazarBranchPath}>{branch}</Link>
           </td>
           <td> No build history </td>
           <td />
@@ -29,41 +39,43 @@ class StarredModulesTableRow extends Component {
       );
     }
 
-    const latestBuild = item.builds[0].build;
-    const latestBuildGitInfo = item.builds[0].gitInfo;
-
+    const commitInfo = latestBuild.get('commitInfo');
     let commitMessage;
     let sha;
 
-    if (has(latestBuild, 'commitInfo')){
+    if (commitInfo !== undefined) {
       commitMessage = (
-        <CommitMessage message={latestBuild.commitInfo.current.message} />
+        <CommitMessage message={commitInfo.get('current').get('message')} />
       );
     }
     
-    if (latestBuild.sha !== undefined) {
+    if (latestBuild.get('sha')) {
       const gitInfo = {
-        host: latestBuildGitInfo.host,
-        organization: latestBuildGitInfo.organization,
-        repository: latestBuildGitInfo.repository
+        host: latestBuildGitInfo.get('host'),
+        organization: latestBuildGitInfo.get('organization'),
+        repository: repository
       }
 
+      latestBuild.sha = latestBuild.get('sha');
       sha = <Sha gitInfo={gitInfo} build={latestBuild} />;
     }
 
     return (
       <tr className={tableRowBuildState(latestBuild.state)}>
         <td className='build-status'>
-          {buildResultIcon(latestBuild.state)}
+          {buildResultIcon(latestBuild.get('state'))}
         </td>
         <td>
-          <Link to={item.module.modulePath}>{item.module.moduleName}</Link>
+          <Link to={blazarRepositoryPath}>{repository}</Link>
         </td>
         <td> 
-          <Link to={latestBuild.blazarPath}>{latestBuild.buildNumber}</Link>
+          <Link to={blazarBranchPath}>{branch}</Link>
         </td>
         <td>
-          {timestampFormatted(latestBuild.startTimestamp)}
+          <Link to={latestBuild.get('blazarPath')}>{latestBuild.get('buildNumber')}</Link>
+        </td>
+        <td>
+          {timestampFormatted(latestBuild.get('startTimestamp'))}
         </td>
         <td>
           {sha}
@@ -80,7 +92,6 @@ class StarredModulesTableRow extends Component {
 
 StarredModulesTableRow.propTypes = {
   item: PropTypes.object,
-  index: PropTypes.number,
 };
 
 export default StarredModulesTableRow;
