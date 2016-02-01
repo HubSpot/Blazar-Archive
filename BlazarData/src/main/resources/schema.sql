@@ -84,6 +84,14 @@ CREATE TABLE `module_builds` (
   INDEX (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `malformed_files` (
+  `branchId` int(11) unsigned NOT NULL,
+  `type` varchar(250) NOT NULL,
+  `path` varchar(250) NOT NULL,
+  `details` mediumtext,
+  PRIMARY KEY (`branchId`, `type`, `path`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --changeset jhaber:2 dbms:mysql
 ALTER TABLE `branches` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
@@ -103,6 +111,8 @@ ALTER TABLE `repo_builds` MODIFY `commitInfo` mediumtext CHARACTER SET utf8mb4 C
 
 ALTER TABLE `module_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
+ALTER TABLE `malformed_files` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
 --changeset jhaber:3 dbms:h2
 CREATE TRIGGER `upd_branch_timestamp` AFTER UPDATE ON `branches` FOR EACH ROW CALL "com.hubspot.blazar.data.UpdateTimestampTrigger";
 
@@ -120,3 +130,5 @@ TRUNCATE TABLE `module_depends`;
 TRUNCATE TABLE `repo_builds`;
 
 TRUNCATE TABLE `module_builds`;
+
+TRUNCATE TABLE `malformed_files`;

@@ -7,6 +7,7 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.hubspot.blazar.data.dao.BranchDao;
 import com.hubspot.blazar.data.dao.DependenciesDao;
+import com.hubspot.blazar.data.dao.MalformedFileDao;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
@@ -36,6 +37,7 @@ public class BlazarDaoModule extends AbstractModule {
     bindDao(binder(), RepositoryBuildDao.class);
     bindDao(binder(), ModuleBuildDao.class);
     bindDao(binder(), DependenciesDao.class);
+    bindDao(binder(), MalformedFileDao.class);
   }
 
   private static <T> void bindDao(Binder binder, Class<T> type) {

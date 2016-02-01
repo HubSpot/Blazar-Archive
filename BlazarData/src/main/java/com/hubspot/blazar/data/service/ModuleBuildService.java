@@ -9,7 +9,6 @@ import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
-import com.hubspot.blazar.data.util.BuildNumbers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

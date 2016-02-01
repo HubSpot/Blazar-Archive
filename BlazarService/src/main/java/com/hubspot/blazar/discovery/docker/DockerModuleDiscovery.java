@@ -8,11 +8,11 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.hubspot.blazar.base.DiscoveryResult;
+import com.hubspot.blazar.base.MalformedFile;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.CommitInfo;
@@ -24,8 +24,6 @@ import com.hubspot.blazar.util.GitHubHelper;
 
 @Singleton
 public class DockerModuleDiscovery implements ModuleDiscovery {
-  private static final Logger LOG = LoggerFactory.getLogger(DockerModuleDiscovery.class);
-
   private static final Optional<GitInfo> MASTER_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#master"));
 
@@ -48,7 +46,7 @@ public class DockerModuleDiscovery implements ModuleDiscovery {
   }
 
   @Override
-  public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
+  public DiscoveryResult discover(GitInfo gitInfo) throws IOException {
     GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
     GHTree tree = gitHubHelper.treeFor(repository, gitInfo);
 
@@ -65,7 +63,7 @@ public class DockerModuleDiscovery implements ModuleDiscovery {
       String glob = (dockerFile.contains("/") ? dockerFile.substring(0, dockerFile.lastIndexOf('/') + 1) : "") + "**";
       modules.add(new DiscoveredModule(moduleName, "docker", dockerFile, glob,  MASTER_BUILDPACK, getDockerfileDeps()));
     }
-    return modules;
+    return new DiscoveryResult(modules, Collections.<MalformedFile>emptySet());
   }
 
   private DependencyInfo getDockerfileDeps() throws IOException {

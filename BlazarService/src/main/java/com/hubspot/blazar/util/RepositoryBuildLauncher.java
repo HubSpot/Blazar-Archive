@@ -2,12 +2,13 @@ package com.hubspot.blazar.util;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.CommitInfo;
+import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
-import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
@@ -27,22 +28,22 @@ public class RepositoryBuildLauncher {
 
   private final RepositoryBuildService repositoryBuildService;
   private final BranchService branchService;
-  private final ModuleService moduleService;
   private final DependenciesService dependenciesService;
+  private final ModuleDiscoveryService moduleDiscoveryService;
   private final ModuleDiscovery moduleDiscovery;
   private final GitHubHelper gitHubHelper;
 
   @Inject
   public RepositoryBuildLauncher(RepositoryBuildService repositoryBuildService,
                                  BranchService branchService,
-                                 ModuleService moduleService,
                                  DependenciesService dependenciesService,
+                                 ModuleDiscoveryService moduleDiscoveryService,
                                  ModuleDiscovery moduleDiscovery,
                                  GitHubHelper gitHubHelper) {
     this.repositoryBuildService = repositoryBuildService;
     this.branchService = branchService;
-    this.moduleService = moduleService;
     this.dependenciesService = dependenciesService;
+    this.moduleDiscoveryService = moduleDiscoveryService;
     this.moduleDiscovery = moduleDiscovery;
     this.gitHubHelper = gitHubHelper;
   }
@@ -60,9 +61,10 @@ public class RepositoryBuildLauncher {
     repositoryBuildService.begin(launching);
   }
 
-  private void updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
+  void updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
-      moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
+      DiscoveryResult result = moduleDiscovery.discover(gitInfo);
+      moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
     }
   }
 
