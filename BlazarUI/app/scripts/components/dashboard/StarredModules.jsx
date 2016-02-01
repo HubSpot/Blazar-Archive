@@ -33,13 +33,13 @@ class StarredModules extends Component {
     }
 
     const columnNames = [
-      {label: ''}, // build state
-      {label: 'Repo'},
-      {label: 'Branch'},
-      {label: 'Build Number'},
-      {label: 'Start Time'},
-      {label: 'Commit'},
-      {label: 'Commit Message'}
+      '', // build state
+      'Repo',
+      'Branch',
+      'Build Number',
+      'Start Time',
+      'Commit',
+      'Commit Message'
     ];
 
     return (

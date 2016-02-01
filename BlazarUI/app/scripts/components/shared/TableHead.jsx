@@ -12,7 +12,7 @@ class TableHead extends Component {
 
   getColumns() {
     return map(this.props.columnNames, (name, i) =>
-      <TableHeadRow key={name.label.length > 0 ? (name.label).replace(/ /g, '') : i} label={name.label} />
+      <TableHeadRow key={name.length > 0 ? (name).replace(/ /g, '') : i} label={name} />
     );
   }
 
