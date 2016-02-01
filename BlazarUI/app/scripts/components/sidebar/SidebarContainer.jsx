@@ -18,6 +18,10 @@ import BuildsActions from '../../actions/buildsActions';
 import {NO_MATCH_MESSAGES} from '../constants';
 import {getFilterMatches} from '../../utils/buildsHelpers';
 
+// $('.sidebar__filter') is inaccessible at render time,
+// so use this default until the window is resized
+const defaultSidebarFilterHeight = 79;
+
 class SidebarContainer extends Component {
 
   constructor(props) {
@@ -62,7 +66,8 @@ class SidebarContainer extends Component {
   }
   
   getSidebarHeight() {
-    return $(window).height() - $('#primary-nav').height() + $('.sidebar__filter').height();
+    let filterHeight = $('.sidebar__filter').height() || defaultSidebarFilterHeight;
+    return $(window).height() - filterHeight;
   }
 
   onStoreChange(state) {
