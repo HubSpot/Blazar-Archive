@@ -11,7 +11,7 @@ let LazyRender = React.createClass({
 
   getDefaultProps: function() {
     return {
-      itemPadding: 3
+      itemPadding: 7
     };
   },
 
