@@ -6,6 +6,8 @@ import java.io.IOException;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.listener.RepositoryBuildListener;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.util.GitHubHelper;
 import org.kohsuke.github.GHCommitState;
@@ -24,11 +26,15 @@ public class GitHubStatusListener implements RepositoryBuildListener {
 
   private final BranchService branchService;
   private final GitHubHelper gitHubHelper;
+  private final UiConfiguration uiConfiguration;
 
   @Inject
-  public GitHubStatusListener(BranchService branchService, GitHubHelper gitHubHelper) {
+  public GitHubStatusListener(BranchService branchService,
+                              GitHubHelper gitHubHelper,
+                              BlazarConfiguration configuration) {
     this.branchService = branchService;
     this.gitHubHelper = gitHubHelper;
+    this.uiConfiguration = configuration.getUiConfiguration();
   }
 
   @Override
@@ -40,7 +46,8 @@ public class GitHubStatusListener implements RepositoryBuildListener {
 
     GitInfo gitInfo = branchService.get(build.getBranchId()).get();
 
-    String url = UriBuilder.fromUri("https://tools.hubteam.com/blazar/builds")
+    String url = UriBuilder.fromUri(uiConfiguration.getBaseUrl())
+        .segment("builds")
         .segment(gitInfo.getHost())
         .segment(gitInfo.getOrganization())
         .segment(gitInfo.getRepository())
