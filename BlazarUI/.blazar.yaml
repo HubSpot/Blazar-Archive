@@ -22,4 +22,6 @@ steps:
       - ./node_modules/.bin/bender-deps cdn-publish BlazarUIv2@1.$BUILD_NUMBER dist
   - description: "Notifying deploy service"
     commands:
-      - CI_ENVIRONMENT=PROD publish-build-success --project BlazarUIv2 --version static-1.$BUILD_NUMBER
+      - command: CI_ENVIRONMENT=PROD publish-build-success --project BlazarUIv2 --version static-1.$BUILD_NUMBER
+        env:
+          BOOTSTRAP_PROPERTIES_PATH: /usr/share/hubspot/internal/hubspot.bootstrap.properties        
