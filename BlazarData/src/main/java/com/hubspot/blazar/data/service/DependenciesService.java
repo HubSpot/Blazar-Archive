@@ -10,11 +10,13 @@ import com.hubspot.blazar.data.dao.DependenciesDao;
 import com.hubspot.blazar.data.util.GraphUtils;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@Singleton
 public class DependenciesService {
   private final DependenciesDao dependenciesDao;
 

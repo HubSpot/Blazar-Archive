@@ -1,9 +1,13 @@
 package com.hubspot.blazar.resources;
 
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.MalformedFileService;
+import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
@@ -23,12 +27,20 @@ import java.util.Set;
 public class BranchResource {
   private final BranchService branchService;
   private final ModuleService moduleService;
+  private final MalformedFileService malformedFileService;
+  private final ModuleDiscoveryService moduleDiscoveryService;
   private final ModuleDiscovery moduleDiscovery;
 
   @Inject
-  public BranchResource(BranchService branchService, ModuleService moduleService, ModuleDiscovery moduleDiscovery) {
+  public BranchResource(BranchService branchService,
+                        ModuleService moduleService,
+                        MalformedFileService malformedFileService,
+                        ModuleDiscoveryService moduleDiscoveryService,
+                        ModuleDiscovery moduleDiscovery) {
     this.branchService = branchService;
     this.moduleService = moduleService;
+    this.malformedFileService = malformedFileService;
+    this.moduleDiscoveryService = moduleDiscoveryService;
     this.moduleDiscovery = moduleDiscovery;
   }
 
@@ -52,11 +64,20 @@ public class BranchResource {
     return moduleService.getByBranch(branchId);
   }
 
+  @GET
+  @Path("/{id}/malformedFiles")
+  @PropertyFiltering
+  public Set<MalformedFile> getMalformedFiles(@PathParam("id") int branchId) {
+    return malformedFileService.getMalformedFiles(branchId);
+  }
+
   @POST
   @Path("/{id}/discover")
   @PropertyFiltering
-  public Set<Module> discoverModules(@PathParam("id") int branchId) throws IOException {
+  public DiscoveryResult discoverModules(@PathParam("id") int branchId) throws IOException {
     GitInfo gitInfo = get(branchId).get();
-    return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
+    DiscoveryResult result = moduleDiscovery.discover(gitInfo);
+    moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
+    return result;
   }
 }

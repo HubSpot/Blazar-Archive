@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.util.GitHubHelper;
 import org.kohsuke.github.GHRepository;
@@ -54,7 +57,7 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
   }
 
   @Override
-  public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
+  public DiscoveryResult discover(GitInfo gitInfo) throws IOException {
     GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
     GHTree tree = gitHubHelper.treeFor(repository, gitInfo);
 
@@ -69,6 +72,7 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
     }
 
     Set<DiscoveredModule> modules = new HashSet<>();
+    Set<MalformedFile> malformedFiles = new HashSet<>();
     for (String path : poms) {
       final ProjectObjectModel pom;
 
@@ -77,6 +81,7 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
         pom = objectMapper.readValue(parser, ProjectObjectModel.class);
       } catch (IOException e) {
         LOG.error("Error parsing POM at path {} for repo {}@{}", path, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+        malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "maven", path, Throwables.getStackTraceAsString(e)));
         continue;
       }
 
@@ -91,7 +96,7 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
       modules.add(new DiscoveredModule(pom.getArtifactId(), "maven", path, glob, buildpack, pom.getDependencyInfo()));
     }
 
-    return modules;
+    return new DiscoveryResult(modules, malformedFiles);
   }
 
   private Optional<GitInfo> buildpackFor(String file, Set<String> allFiles) throws IOException {

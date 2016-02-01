@@ -2,11 +2,14 @@ package com.hubspot.blazar.discovery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.util.GitHubHelper;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
@@ -43,7 +46,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
   }
 
   @Override
-  public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
+  public DiscoveryResult discover(GitInfo gitInfo) throws IOException {
     GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
     GHTree tree = gitHubHelper.treeFor(repository, gitInfo);
 
@@ -55,6 +58,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
     }
 
     Set<DiscoveredModule> modules = new HashSet<>();
+    Set<MalformedFile> malformedFiles = new HashSet<>();
     for (String blazarConfig : blazarConfigs) {
       if (disabled(blazarConfig, repository, gitInfo)) {
         modules.add(new DiscoveredModule(
@@ -77,15 +81,18 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
         buildConfig = gitHubHelper.configFor(blazarConfig, repository, gitInfo).get();
       } catch (JsonProcessingException e) {
         LOG.warn("Error parsing config at path {} for repository {}@{}", blazarConfig, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+        malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "config", blazarConfig, Throwables.getStackTraceAsString(e)));
         continue;
       }
+
       if (canBuild(buildConfig)) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
         modules.add(new DiscoveredModule(moduleName, "config", blazarConfig, glob, buildConfig.getBuildpack(), DependencyInfo.unknown()));
       }
     }
-    return modules;
+
+    return new DiscoveryResult(modules, malformedFiles);
   }
 
   private boolean disabled(String blazarConfig, GHRepository repository, GitInfo gitInfo) throws IOException {

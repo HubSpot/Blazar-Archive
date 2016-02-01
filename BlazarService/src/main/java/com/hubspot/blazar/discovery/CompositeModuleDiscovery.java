@@ -3,7 +3,9 @@ package com.hubspot.blazar.discovery;
 import com.google.common.collect.ImmutableSet;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.MalformedFile;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,11 +38,14 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
   }
 
   @Override
-  public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
+  public DiscoveryResult discover(GitInfo gitInfo) throws IOException {
     Map<String, Set<DiscoveredModule>> modulesByPath = new HashMap<>();
+    Set<MalformedFile> malformedFiles = new HashSet<>();
 
     for (ModuleDiscovery delegate : delegates) {
-      for (DiscoveredModule module : delegate.discover(gitInfo)) {
+      DiscoveryResult result  =delegate.discover(gitInfo);
+      malformedFiles.addAll(result.getMalformedFiles());
+      for (DiscoveredModule module : result.getModules()) {
         String folder = module.getFolder();
 
         Set<DiscoveredModule> modules = modulesByPath.get(folder);
@@ -53,7 +58,9 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
       }
     }
 
-    for (DiscoveredModule module : configDiscovery.discover(gitInfo)) {
+    DiscoveryResult result = configDiscovery.discover(gitInfo);
+    malformedFiles.addAll(result.getMalformedFiles());
+    for (DiscoveredModule module : result.getModules()) {
       String folder = module.getFolder();
 
       if (!module.isActive()) {
@@ -68,6 +75,6 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
       modules.addAll(folderModules);
     }
 
-    return modules;
+    return new DiscoveryResult(modules, malformedFiles);
   }
 }
