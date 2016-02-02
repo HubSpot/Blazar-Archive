@@ -181,8 +181,8 @@ class BuildApi {
         // build has finished, get most up to date info
         if (this.build.model.data.state !== BuildStates.IN_PROGRESS) {
           this._updateLogSize()
-            .then(this._fetchLog)
-            .then(this._triggerUpdate);
+            .then(this._fetchLog.bind(this))
+            .then(this._triggerUpdate.bind(this));
         }
         setTimeout(() => {
           this._pollBuild();
