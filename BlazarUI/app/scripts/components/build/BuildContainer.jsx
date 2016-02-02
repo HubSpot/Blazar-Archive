@@ -76,7 +76,7 @@ class BuildContainer extends Component {
   onStatusChange(state) {
     this.setState(state);
 
-    if (state.build && buildIsOnDeck(state.data.build.state)) {
+    if (state.data.build && buildIsOnDeck(state.data.build.state)) {
       setTimeout( () => {
         BuildActions.loadBuild(this.props.params);
       }, 2000);
