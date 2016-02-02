@@ -44,6 +44,14 @@ public class BuildCommand {
     this.env = Objects.firstNonNull(env, Collections.<String, String>emptyMap());
   }
 
+  public BuildCommand(String executable, List<String> args) {
+    this(executable, args, DEFAULT_SUCCESSFUL_RETURN_CODES, Collections.<String, String>emptyMap());
+  }
+
+  public BuildCommand(String executable, List<String> args, Map<String, String> env) {
+    this(executable, args, DEFAULT_SUCCESSFUL_RETURN_CODES, env);
+  }
+
   public BuildCommand(String executable, List<String> args, Set<Integer> successfulReturnCodes, Map<String, String> env) {
     this.executable = Preconditions.checkNotNull(executable);
     this.args = Preconditions.checkNotNull(args);
