@@ -10,7 +10,7 @@ steps:
   - description: "Installing dependencies"
     commands:
       - npm install
-      - [ -d ./node_modules/bender-deps] || npm install bender-deps
+      - [ -d ./node_modules/bender-deps ] || npm install bender-deps
   - description: "Linting"
     commands:
       - ./node_modules/.bin/gulp lint
