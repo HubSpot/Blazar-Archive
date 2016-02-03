@@ -8,6 +8,7 @@ import com.hubspot.blazar.data.dao.BranchDao;
 import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Set;
 
 public class BranchService {
   private final BranchDao branchDao;
@@ -17,12 +18,20 @@ public class BranchService {
     this.branchDao = branchDao;
   }
 
-  public Optional<GitInfo> lookup(String host, String organization, String repository, String branch) {
-    return branchDao.lookup(host, organization, repository, branch);
+  public Set<GitInfo> getAll() {
+    return branchDao.getAll();
+  }
+
+  public Optional<GitInfo> get(int id) {
+    return branchDao.get(id);
+  }
+
+  public Optional<GitInfo> lookup(GitInfo gitInfo) {
+    return branchDao.get(gitInfo);
   }
 
   public GitInfo upsert(GitInfo gitInfo) {
-    Optional<GitInfo> existing = branchDao.get(gitInfo);
+    Optional<GitInfo> existing = lookup(gitInfo);
     if (existing.isPresent()) {
       gitInfo = gitInfo.withId(existing.get().getId().get());
 

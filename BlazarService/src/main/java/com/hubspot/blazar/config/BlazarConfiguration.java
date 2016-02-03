@@ -1,6 +1,8 @@
 package com.hubspot.blazar.config;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -25,6 +27,11 @@ public class BlazarConfiguration extends Configuration {
 
   @Valid
   @NotNull
+  @JsonProperty("executor")
+  private ExecutorConfiguration executorConfiguration = new ExecutorConfiguration("root");
+
+  @Valid
+  @NotNull
   @JsonProperty("zookeeper")
   private ZooKeeperConfiguration zooKeeperConfiguration;
 
@@ -34,12 +41,15 @@ public class BlazarConfiguration extends Configuration {
   private DataSourceFactory databaseConfiguration;
 
   @Valid
+  @NotNull
   @JsonProperty("ui")
-  private UiConfiguration uiConfiguration = new UiConfiguration();
+  private UiConfiguration uiConfiguration;
 
   @Valid
   @JsonProperty("slack_blazar")
   private Optional<SlackConfiguration> slackConfiguration = Optional.absent();
+
+  private Set<String> whitelist = Collections.emptySet();
 
   private boolean webhookOnly = false;
 
@@ -58,6 +68,15 @@ public class BlazarConfiguration extends Configuration {
 
   public BlazarConfiguration setSingularityConfiguration(SingularityConfiguration singularityConfiguration) {
     this.singularityConfiguration = singularityConfiguration;
+    return this;
+  }
+
+  public ExecutorConfiguration getExecutorConfiguration() {
+    return executorConfiguration;
+  }
+
+  public BlazarConfiguration setExecutorConfiguration(ExecutorConfiguration executorConfiguration) {
+    this.executorConfiguration = executorConfiguration;
     return this;
   }
 
@@ -94,6 +113,15 @@ public class BlazarConfiguration extends Configuration {
 
   public void setSlackConfiguration(Optional<SlackConfiguration> slackConfiguration) {
     this.slackConfiguration = slackConfiguration;
+  }
+
+  public Set<String> getWhitelist() {
+    return whitelist;
+  }
+
+  public BlazarConfiguration setWhitelist(Set<String> whitelist) {
+    this.whitelist = whitelist;
+    return this;
   }
 
   public boolean isWebhookOnly() {

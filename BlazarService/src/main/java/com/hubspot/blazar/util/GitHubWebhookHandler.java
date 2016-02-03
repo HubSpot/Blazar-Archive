@@ -3,77 +3,65 @@ package com.hubspot.blazar.util;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.hubspot.blazar.base.BuildDefinition;
-import com.hubspot.blazar.base.DependencyGraph;
-import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.data.service.BuildService;
-import com.hubspot.blazar.data.service.DependenciesService;
-import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.discovery.ModuleDiscovery;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.kohsuke.github.GHRepository;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileSystems;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @Singleton
 public class GitHubWebhookHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(GitHubWebhookHandler.class);
-
   private final BranchService branchService;
-  private final ModuleService moduleService;
-  private final ModuleDiscovery moduleDiscovery;
-  private final BuildService buildService;
-  private final DependenciesService dependenciesService;
-  private final BlazarV2Checker blazarV2Checker;
+  private final RepositoryBuildService repositoryBuildService;
+  private final GitHubHelper gitHubHelper;
+  private final Set<String> whitelist;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
-                              ModuleService moduleService,
-                              ModuleDiscovery moduleDiscovery,
-                              BuildService buildService,
-                              DependenciesService dependenciesService,
-                              BlazarV2Checker blazarV2Checker,
+                              RepositoryBuildService repositoryBuildService,
+                              GitHubHelper gitHubHelper,
+                              @Named("whitelist") Set<String> whitelist,
                               EventBus eventBus) {
     this.branchService = branchService;
-    this.moduleService = moduleService;
-    this.moduleDiscovery = moduleDiscovery;
-    this.buildService = buildService;
-    this.dependenciesService = dependenciesService;
-    this.blazarV2Checker = blazarV2Checker;
+    this.repositoryBuildService = repositoryBuildService;
+    this.gitHubHelper = gitHubHelper;
+    this.whitelist = whitelist;
 
     eventBus.register(this);
   }
 
   @Subscribe
   public void handleCreateEvent(CreateEvent createEvent) throws IOException {
+    if (!createEvent.hasRepository()) {
+      return;
+    }
+
     if ("branch".equalsIgnoreCase(createEvent.getRefType())) {
       GitInfo gitInfo = gitInfo(createEvent);
-      if (!blazarV2Checker.isBlazarV2(gitInfo)) {
-        processBranch(gitInfo);
+      if (isOptedIn(gitInfo)) {
+        branchService.upsert(gitInfo);
       }
     }
   }
 
   @Subscribe
   public void handleDeleteEvent(DeleteEvent deleteEvent) {
+    if (!deleteEvent.hasRepository()) {
+      return;
+    }
+
     if ("branch".equalsIgnoreCase(deleteEvent.getRefType())) {
       branchService.delete(gitInfo(deleteEvent));
     }
@@ -81,75 +69,34 @@ public class GitHubWebhookHandler {
 
   @Subscribe
   public void handlePushEvent(PushEvent pushEvent) throws IOException {
+    if (!pushEvent.hasRepository()) {
+      return;
+    }
+
     if (!pushEvent.getRef().startsWith("refs/tags/") && !pushEvent.getDeleted()) {
       GitInfo gitInfo = gitInfo(pushEvent);
-
-      if (!blazarV2Checker.isBlazarV2(gitInfo)) {
-        gitInfo = branchService.upsert(gitInfo);
-        Set<Module> modules = updateModules(gitInfo, pushEvent);
-        triggerBuilds(pushEvent, gitInfo, modules);
+      if (isOptedIn(gitInfo)) {
+        gitInfo = branchService.upsert(gitInfo(pushEvent));
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()));
       }
     }
   }
 
-  public Set<Module> processBranch(GitInfo gitInfo) throws IOException {
-    gitInfo = branchService.upsert(gitInfo);
+  private boolean isOptedIn(GitInfo gitInfo) throws IOException {
+    return whitelist.contains(gitInfo.getRepository()) || branchExists(gitInfo) || blazarConfigExists(gitInfo);
+  }
 
+  private boolean branchExists(GitInfo gitInfo) {
+    return branchService.lookup(gitInfo).isPresent();
+  }
+
+  private boolean blazarConfigExists(GitInfo gitInfo) throws IOException  {
     try {
-      Set<DiscoveredModule> discovered = moduleDiscovery.discover(gitInfo);
-      Set<Module> modules = moduleService.setModules(gitInfo, discovered);
-      triggerBuilds(gitInfo, modules);
-      return modules;
+      GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
+      String config = gitHubHelper.contentsFor(".blazar.yaml", repository, gitInfo);
+      return config.contains("enabled: true");
     } catch (FileNotFoundException e) {
-      branchService.delete(gitInfo);
-      return Collections.emptySet();
-    }
-  }
-
-  private Set<Module> updateModules(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
-    try {
-      if (pushEvent.getForced() || moduleDiscovery.shouldRediscover(gitInfo, pushEvent)) {
-        return moduleService.setModules(gitInfo, moduleDiscovery.discover(gitInfo));
-      }
-
-      return moduleService.getByBranch(gitInfo.getId().get());
-    } catch (FileNotFoundException e) {
-      return Collections.emptySet();
-    }
-  }
-
-  private void triggerBuilds(PushEvent pushEvent, GitInfo gitInfo, Set<Module> modules) throws IOException {
-    Set<Module> toBuild = new HashSet<>();
-    if (pushEvent.getForced()) {
-      toBuild = modules;
-    } else {
-      for (String path : affectedPaths(pushEvent)) {
-        for (Module module : modules) {
-          if (module.contains(FileSystems.getDefault().getPath(path))) {
-            toBuild.add(module);
-          }
-        }
-      }
-    }
-
-    triggerBuilds(gitInfo, toBuild);
-  }
-
-  private void triggerBuilds(GitInfo gitInfo, Set<Module> modules) throws IOException {
-    DependencyGraph graph = dependenciesService.buildDependencyGraph(gitInfo);
-
-    Map<Integer, Module> moduleMap = new HashMap<>();
-    for (Module module : modules) {
-      moduleMap.put(module.getId().get(), module);
-    }
-
-    moduleMap.keySet().retainAll(graph.reduceVertices(moduleMap.keySet()));
-
-    for (Module module : moduleMap.values()) {
-      LOG.info("Going to build module {}", module.getId().get());
-      if ("true".equals(System.getenv("TRIGGER_BUILDS"))) {
-        buildService.enqueue(new BuildDefinition(gitInfo, module));
-      }
+      return false;
     }
   }
 
@@ -173,20 +120,9 @@ public class GitHubWebhookHandler {
     String fullName = repository.getFullName();
     String organization = fullName.substring(0, fullName.indexOf('/'));
     String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
-    long repositoryId = repository.getId();
+    int repositoryId = repository.getId();
     String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
 
-    return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, branch, active);
-  }
-
-  private static Set<String> affectedPaths(PushEvent pushEvent) {
-    Set<String> affectedPaths = new HashSet<>();
-    for (Commit commit : pushEvent.getCommitsList()) {
-      affectedPaths.addAll(commit.getAddedList());
-      affectedPaths.addAll(commit.getModifiedList());
-      affectedPaths.addAll(commit.getRemovedList());
-    }
-
-    return affectedPaths;
+    return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, branch, active, System.currentTimeMillis(), System.currentTimeMillis());
   }
 }

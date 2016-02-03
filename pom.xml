@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>12.5</version>
+    <version>15.1</version>
   </parent>
 
   <artifactId>Blazar</artifactId>
@@ -40,9 +40,10 @@
   <properties>
     <basepom.check.skip-findbugs>true</basepom.check.skip-findbugs>
 
-    <dep.horizon.version>0.0.13</dep.horizon.version>
-    <dep.rosetta.version>3.10.1</dep.rosetta.version>
-    <singularity.version>0.4.8-QA-SNAPSHOT</singularity.version>
+    <dep.jackson.version>2.6.4</dep.jackson.version>
+    <dep.horizon.version>0.0.24</dep.horizon.version>
+    <dep.rosetta.version>3.10.7</dep.rosetta.version>
+    <singularity.version>0.4.9-hs_stable-SNAPSHOT</singularity.version>
     <mesos.version>0.23.0</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
   </properties>
@@ -52,6 +53,7 @@
     <module>BlazarService</module>
     <module>BlazarData</module>
     <module>BlazarServiceIntegrationTests</module>
+    <module>BlazarClient</module>
   </modules>
 
   <dependencyManagement>
@@ -94,7 +96,7 @@
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
         <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
-        <version>0.7.1</version>
+        <version>0.7.2</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
@@ -142,14 +144,9 @@
         <version>3.9.2.Final</version>
       </dependency>
       <dependency>
-        <groupId>net.sourceforge.argparse4j</groupId>
-        <artifactId>argparse4j</artifactId>
-        <version>0.4.3</version>
-      </dependency>
-      <dependency>
         <groupId>org.kohsuke</groupId>
         <artifactId>github-api</artifactId>
-        <version>1.68</version>
+        <version>1.72</version>
         <exclusions>
           <exclusion>
             <groupId>org.jenkins-ci</groupId>
@@ -166,6 +163,21 @@
         <groupId>in.ashwanthkumar</groupId>
         <artifactId>slack-java-webhook</artifactId>
         <version>0.0.4</version>
+      </dependency>
+      <dependency>
+        <groupId>com.codahale.metrics</groupId>
+        <artifactId>metrics-jdbi</artifactId>
+        <version>${dep.metrics.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>1.4.190</version>
+      </dependency>
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>3.4.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
