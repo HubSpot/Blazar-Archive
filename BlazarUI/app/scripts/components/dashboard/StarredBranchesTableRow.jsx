@@ -7,7 +7,7 @@ import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 import CommitMessage from '../shared/CommitMessage.jsx';
 
-class StarredModulesTableRow extends Component {
+class StarredBranchesTableRow extends Component {
 
 
   render() {
@@ -90,8 +90,8 @@ class StarredModulesTableRow extends Component {
   
 }
 
-StarredModulesTableRow.propTypes = {
+StarredBranchesTableRow.propTypes = {
   item: PropTypes.object,
 };
 
-export default StarredModulesTableRow;
+export default StarredBranchesTableRow;
