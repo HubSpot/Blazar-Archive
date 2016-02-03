@@ -37,6 +37,7 @@
         offsetLength: {{{offsetLength}}},
         {{#apiRoot}}apiRoot: "{{{apiRoot}}}",{{/apiRoot}}
         {{^apiRoot}}apiRoot: localStorage.getItem("apiRootOverride"),{{/apiRoot}}
+        {{#usernameCookie}}usernameCookie: "{{{usernameCookie}}}",{{/usernameCookie}}
       }
     </script>
     <script src="{{{ staticRoot }}}/js/main.js"></script>
