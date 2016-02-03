@@ -8,7 +8,7 @@ import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
-import com.hubspot.blazar.base.listener.RepositoryBuildListener;
+import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 @Singleton
-public class LaunchingRepositoryBuildListener implements RepositoryBuildListener {
-  private static final Logger LOG = LoggerFactory.getLogger(LaunchingRepositoryBuildListener.class);
+public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor {
+  private static final Logger LOG = LoggerFactory.getLogger(LaunchingRepositoryBuildVisitor.class);
 
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
@@ -34,10 +34,10 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
   private final GitHubHelper gitHubHelper;
 
   @Inject
-  public LaunchingRepositoryBuildListener(RepositoryBuildService repositoryBuildService,
-                                          ModuleBuildService moduleBuildService,
-                                          ModuleService moduleService,
-                                          GitHubHelper gitHubHelper) {
+  public LaunchingRepositoryBuildVisitor(RepositoryBuildService repositoryBuildService,
+                                         ModuleBuildService moduleBuildService,
+                                         ModuleService moduleService,
+                                         GitHubHelper gitHubHelper) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
     this.moduleService = moduleService;
@@ -45,7 +45,7 @@ public class LaunchingRepositoryBuildListener implements RepositoryBuildListener
   }
 
   @Override
-  public void buildChanged(RepositoryBuild build) {
+  protected void visitLaunching(RepositoryBuild build) throws Exception {
     LOG.info("Going to enqueue module builds for repository build {}", build.getId().get());
 
     Set<Module> modules = filterActive(moduleService.getByBranch(build.getBranchId()));

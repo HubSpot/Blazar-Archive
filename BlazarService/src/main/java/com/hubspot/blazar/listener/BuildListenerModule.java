@@ -2,12 +2,9 @@ package com.hubspot.blazar.listener;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.google.inject.multibindings.MapBinder;
-import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.RepositoryBuild.State;
-import com.hubspot.blazar.base.listener.ModuleBuildListener;
-import com.hubspot.blazar.base.listener.RepositoryBuildListener;
+import com.google.inject.multibindings.Multibinder;
+import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
+import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 
 public class BuildListenerModule implements Module {
 
@@ -15,53 +12,32 @@ public class BuildListenerModule implements Module {
   public void configure(Binder binder) {
     binder.bind(BuildEventDispatcher.class);
 
-    MapBinder<State, RepositoryBuildListener> repositoryBuildListeners = MapBinder.newMapBinder(binder, RepositoryBuild.State.class, RepositoryBuildListener.class).permitDuplicates();
+    Multibinder<RepositoryBuildVisitor> repositoryBuildVisitors = Multibinder.newSetBinder(binder, RepositoryBuildVisitor.class);
 
     // launch the queued build if nothing in progress
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.QUEUED).to(QueuedRepositoryBuildListener.class);
-
+    repositoryBuildVisitors.addBinding().to(QueuedRepositoryBuildVisitor.class);
     // queue builds for the affected modules
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.LAUNCHING).to(LaunchingRepositoryBuildListener.class);
-
+    repositoryBuildVisitors.addBinding().to(LaunchingRepositoryBuildVisitor.class);
     // cancel module builds
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.CANCELLED).to(CancelledRepositoryBuildListener.class);
-
+    repositoryBuildVisitors.addBinding().to(CancelledRepositoryBuildVisitor.class);
     // launch any queued repository build if present
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.SUCCEEDED).to(CompletedRepositoryBuildListener.class);
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.CANCELLED).to(CompletedRepositoryBuildListener.class);
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.FAILED).to(CompletedRepositoryBuildListener.class);
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.UNSTABLE).to(CompletedRepositoryBuildListener.class);
-
+    repositoryBuildVisitors.addBinding().to(CompletedRepositoryBuildVisitor.class);
     // update GitHub status
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.LAUNCHING).to(GitHubStatusListener.class);
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.IN_PROGRESS).to(GitHubStatusListener.class);
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.SUCCEEDED).to(GitHubStatusListener.class);
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.CANCELLED).to(GitHubStatusListener.class);
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.FAILED).to(GitHubStatusListener.class);
-    repositoryBuildListeners.addBinding(RepositoryBuild.State.UNSTABLE).to(GitHubStatusListener.class);
+    repositoryBuildVisitors.addBinding().to(GitHubStatusVisitor.class);
 
-    MapBinder<ModuleBuild.State, ModuleBuildListener> moduleBuildListeners = MapBinder.newMapBinder(binder, ModuleBuild.State.class, ModuleBuildListener.class).permitDuplicates();
+    Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder, ModuleBuildVisitor.class);
 
     // launch the queued build if nothing upstream
-    moduleBuildListeners.addBinding(ModuleBuild.State.QUEUED).to(QueuedModuleBuildListener.class);
-
+    moduleBuildVisitors.addBinding().to(QueuedModuleBuildVisitor.class);
     // kick off the singularity task if the build is launching
-    moduleBuildListeners.addBinding(ModuleBuild.State.LAUNCHING).to(LaunchingModuleBuildListener.class);
-
+    moduleBuildVisitors.addBinding().to(LaunchingModuleBuildVisitor.class);
     // launch downstream builds if all upstreams succeeded
-    moduleBuildListeners.addBinding(ModuleBuild.State.SUCCEEDED).to(DownstreamModuleBuildLauncher.class);
-
+    moduleBuildVisitors.addBinding().to(DownstreamModuleBuildVisitor.class);
     // kill the singularity task
-    moduleBuildListeners.addBinding(ModuleBuild.State.CANCELLED).to(SingularityTaskKiller.class);
-
+    moduleBuildVisitors.addBinding().to(SingularityTaskKiller.class);
     // cancel all downstream builds
-    moduleBuildListeners.addBinding(ModuleBuild.State.CANCELLED).to(DownstreamModuleBuildCanceller.class);
-    moduleBuildListeners.addBinding(ModuleBuild.State.FAILED).to(DownstreamModuleBuildCanceller.class);
-
+    moduleBuildVisitors.addBinding().to(DownstreamModuleBuildCanceller.class);
     // complete the repository build once all of the module builds have finished
-    moduleBuildListeners.addBinding(ModuleBuild.State.SUCCEEDED).to(RepositoryBuildCompleter.class);
-    moduleBuildListeners.addBinding(ModuleBuild.State.CANCELLED).to(RepositoryBuildCompleter.class);
-    moduleBuildListeners.addBinding(ModuleBuild.State.FAILED).to(RepositoryBuildCompleter.class);
-    moduleBuildListeners.addBinding(ModuleBuild.State.SKIPPED).to(RepositoryBuildCompleter.class);
+    moduleBuildVisitors.addBinding().to(RepositoryBuildCompleter.class);
   }
 }

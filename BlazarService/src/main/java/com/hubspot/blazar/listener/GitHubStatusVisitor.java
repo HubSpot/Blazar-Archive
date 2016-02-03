@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.listener.RepositoryBuildListener;
+import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
@@ -21,24 +21,24 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.core.UriBuilder;
 
 @Singleton
-public class GitHubStatusListener implements RepositoryBuildListener {
-  private static final Logger LOG = LoggerFactory.getLogger(GitHubStatusListener.class);
+public class GitHubStatusVisitor implements RepositoryBuildVisitor {
+  private static final Logger LOG = LoggerFactory.getLogger(GitHubStatusVisitor.class);
 
   private final BranchService branchService;
   private final GitHubHelper gitHubHelper;
   private final UiConfiguration uiConfiguration;
 
   @Inject
-  public GitHubStatusListener(BranchService branchService,
-                              GitHubHelper gitHubHelper,
-                              BlazarConfiguration configuration) {
+  public GitHubStatusVisitor(BranchService branchService,
+                             GitHubHelper gitHubHelper,
+                             BlazarConfiguration configuration) {
     this.branchService = branchService;
     this.gitHubHelper = gitHubHelper;
     this.uiConfiguration = configuration.getUiConfiguration();
   }
 
   @Override
-  public void buildChanged(RepositoryBuild build) throws Exception {
+  public void visit(RepositoryBuild build) throws Exception {
     // Can't set GitHub status without a sha
     if (!build.getSha().isPresent()) {
       return;

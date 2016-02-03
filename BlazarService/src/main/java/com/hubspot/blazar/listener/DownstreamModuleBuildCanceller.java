@@ -3,7 +3,7 @@ package com.hubspot.blazar.listener;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.listener.ModuleBuildListener;
+import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 
@@ -12,7 +12,7 @@ import javax.inject.Singleton;
 import java.util.Set;
 
 @Singleton
-public class DownstreamModuleBuildCanceller implements ModuleBuildListener {
+public class DownstreamModuleBuildCanceller extends AbstractModuleBuildVisitor {
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
 
@@ -24,7 +24,16 @@ public class DownstreamModuleBuildCanceller implements ModuleBuildListener {
   }
 
   @Override
-  public void buildChanged(ModuleBuild build) {
+  protected void visitCancelled(ModuleBuild build) throws Exception {
+    cancelDownstreamModuleBuilds(build);
+  }
+
+  @Override
+  protected void visitFailed(ModuleBuild build) throws Exception {
+    cancelDownstreamModuleBuilds(build);
+  }
+
+  private void cancelDownstreamModuleBuilds(ModuleBuild build) {
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
     DependencyGraph dependencyGraph = repositoryBuild.getDependencyGraph().get();
 

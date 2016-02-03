@@ -2,7 +2,7 @@ package com.hubspot.blazar.listener;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.blazar.base.listener.ModuleBuildListener;
+import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
 import com.hubspot.singularity.SingularityTaskCleanupResult;
 import com.hubspot.singularity.api.SingularityKillTaskRequest;
 import com.hubspot.singularity.client.SingularityClient;
@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class SingularityTaskKiller implements ModuleBuildListener {
+public class SingularityTaskKiller extends AbstractModuleBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(SingularityTaskKiller.class);
 
   private final SingularityClient singularityClient;
@@ -31,7 +31,7 @@ public class SingularityTaskKiller implements ModuleBuildListener {
   }
 
   @Override
-  public void buildChanged(ModuleBuild build) throws Exception {
+  protected void visitCancelled(ModuleBuild build) throws Exception {
     if (build.getTaskId().isPresent()) {
       String taskId = build.getTaskId().get();
       LOG.info("Killing singularity task {} for cancelled build {}", taskId, build.getId().get());

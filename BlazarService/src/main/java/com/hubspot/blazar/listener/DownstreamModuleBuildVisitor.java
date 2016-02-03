@@ -4,7 +4,7 @@ import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.listener.ModuleBuildListener;
+import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.util.ModuleBuildLauncher;
@@ -19,24 +19,24 @@ import java.util.Map;
 import java.util.Set;
 
 @Singleton
-public class DownstreamModuleBuildLauncher implements ModuleBuildListener {
-  private static final Logger LOG = LoggerFactory.getLogger(DownstreamModuleBuildLauncher.class);
+public class DownstreamModuleBuildVisitor extends AbstractModuleBuildVisitor {
+  private static final Logger LOG = LoggerFactory.getLogger(DownstreamModuleBuildVisitor.class);
 
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
   private final ModuleBuildLauncher moduleBuildLauncher;
 
   @Inject
-  public DownstreamModuleBuildLauncher(RepositoryBuildService repositoryBuildService,
-                                       ModuleBuildService moduleBuildService,
-                                       ModuleBuildLauncher moduleBuildLauncher) {
+  public DownstreamModuleBuildVisitor(RepositoryBuildService repositoryBuildService,
+                                      ModuleBuildService moduleBuildService,
+                                      ModuleBuildLauncher moduleBuildLauncher) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
     this.moduleBuildLauncher = moduleBuildLauncher;
   }
 
   @Override
-  public void buildChanged(ModuleBuild build) throws Exception {
+  protected void visitSucceeded(ModuleBuild build) throws Exception {
     LOG.info("Checking for builds downstream of {}", build.getId().get());
 
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();

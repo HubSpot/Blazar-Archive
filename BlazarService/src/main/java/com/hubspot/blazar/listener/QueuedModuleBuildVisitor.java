@@ -5,7 +5,7 @@ import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.listener.ModuleBuildListener;
+import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.util.ModuleBuildLauncher;
@@ -16,22 +16,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Singleton
-public class QueuedModuleBuildListener implements ModuleBuildListener {
+public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
   private final ModuleBuildLauncher moduleBuildLauncher;
 
   @Inject
-  public QueuedModuleBuildListener(RepositoryBuildService repositoryBuildService,
-                                   ModuleBuildService moduleBuildService,
-                                   ModuleBuildLauncher moduleBuildLauncher) {
+  public QueuedModuleBuildVisitor(RepositoryBuildService repositoryBuildService,
+                                  ModuleBuildService moduleBuildService,
+                                  ModuleBuildLauncher moduleBuildLauncher) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
     this.moduleBuildLauncher = moduleBuildLauncher;
   }
 
   @Override
-  public void buildChanged(ModuleBuild build) throws Exception {
+  protected void visitQueued(ModuleBuild build) throws Exception {
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
     DependencyGraph dependencyGraph = repositoryBuild.getDependencyGraph().get();
 

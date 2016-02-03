@@ -1,6 +1,7 @@
 package com.hubspot.blazar.guice;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -75,7 +76,9 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(FeedbackResource.class);
 
     binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
-    binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
+    binder.bind(PropertyFilteringMessageBodyWriter.class)
+        .toConstructor(defaultConstructor(PropertyFilteringMessageBodyWriter.class))
+        .in(Scopes.SINGLETON);
 
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
@@ -160,6 +163,14 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     try {
       return builder.build();
     } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static <T> Constructor<T> defaultConstructor(Class<T> type) {
+    try {
+      return type.getConstructor();
+    } catch (NoSuchMethodException e) {
       throw new RuntimeException(e);
     }
   }

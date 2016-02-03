@@ -2,7 +2,7 @@ package com.hubspot.blazar.listener;
 
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.listener.ModuleBuildListener;
+import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ import javax.inject.Singleton;
 import java.util.Set;
 
 @Singleton
-public class RepositoryBuildCompleter implements ModuleBuildListener {
+public class RepositoryBuildCompleter implements ModuleBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(RepositoryBuildCompleter.class);
 
   private final RepositoryBuildService repositoryBuildService;
@@ -27,7 +27,12 @@ public class RepositoryBuildCompleter implements ModuleBuildListener {
   }
 
   @Override
-  public void buildChanged(ModuleBuild build) throws Exception {
+  public void visit(ModuleBuild build) throws Exception {
+    if (!build.getState().isComplete()) {
+      // repository build can't be done if this module isn't done
+      return;
+    }
+
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
     if (repositoryBuild.getState().isComplete()) {
       // already done, this must be a stale ModuleBuild event

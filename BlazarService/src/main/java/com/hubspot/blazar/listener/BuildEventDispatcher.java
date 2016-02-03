@@ -4,8 +4,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.listener.ModuleBuildListener;
-import com.hubspot.blazar.base.listener.RepositoryBuildListener;
+import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
+import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Map;
 import java.util.Set;
 
 @Singleton
@@ -23,19 +22,19 @@ public class BuildEventDispatcher {
 
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
-  private final Map<RepositoryBuild.State, Set<RepositoryBuildListener>> repositoryListeners;
-  private final Map<ModuleBuild.State, Set<ModuleBuildListener>> moduleListeners;
+  private final Set<RepositoryBuildVisitor> repositoryVisitors;
+  private final Set<ModuleBuildVisitor> moduleVisitors;
 
   @Inject
   public BuildEventDispatcher(RepositoryBuildService repositoryBuildService,
                               ModuleBuildService moduleBuildService,
-                              Map<RepositoryBuild.State, Set<RepositoryBuildListener>> repositoryListeners,
-                              Map<ModuleBuild.State, Set<ModuleBuildListener>> moduleListeners,
+                              Set<RepositoryBuildVisitor> repositoryVisitors,
+                              Set<ModuleBuildVisitor> moduleVisitors,
                               EventBus eventBus) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
-    this.repositoryListeners = repositoryListeners;
-    this.moduleListeners = moduleListeners;
+    this.repositoryVisitors = repositoryVisitors;
+    this.moduleVisitors = moduleVisitors;
 
     eventBus.register(this);
   }
@@ -51,10 +50,8 @@ public class BuildEventDispatcher {
     }
 
     try {
-      if (repositoryListeners.containsKey(build.getState())) {
-        for (RepositoryBuildListener listener : repositoryListeners.get(build.getState())) {
-          listener.buildChanged(build);
-        }
+      for (RepositoryBuildVisitor visitor : repositoryVisitors) {
+        visitor.visit(build);
       }
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", build.getId().get(), e);
@@ -73,10 +70,8 @@ public class BuildEventDispatcher {
     }
 
     try {
-      if (moduleListeners.containsKey(build.getState())) {
-        for (ModuleBuildListener listener : moduleListeners.get(build.getState())) {
-          listener.buildChanged(build);
-        }
+      for (ModuleBuildVisitor visitor : moduleVisitors) {
+        visitor.visit(build);
       }
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", build.getId().get(), e);

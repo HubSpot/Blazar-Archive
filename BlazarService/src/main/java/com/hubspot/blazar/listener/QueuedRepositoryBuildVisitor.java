@@ -2,7 +2,7 @@ package com.hubspot.blazar.listener;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.listener.RepositoryBuildListener;
+import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.blazar.util.RepositoryBuildLauncher;
@@ -13,21 +13,21 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class QueuedRepositoryBuildListener implements RepositoryBuildListener {
-  private static final Logger LOG = LoggerFactory.getLogger(QueuedRepositoryBuildListener.class);
+public class QueuedRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor {
+  private static final Logger LOG = LoggerFactory.getLogger(QueuedRepositoryBuildVisitor.class);
 
   private final RepositoryBuildService repositoryBuildService;
   private final RepositoryBuildLauncher buildLauncher;
 
   @Inject
-  public QueuedRepositoryBuildListener(RepositoryBuildService repositoryBuildService,
-                                       RepositoryBuildLauncher buildLauncher) {
+  public QueuedRepositoryBuildVisitor(RepositoryBuildService repositoryBuildService,
+                                      RepositoryBuildLauncher buildLauncher) {
     this.repositoryBuildService = repositoryBuildService;
     this.buildLauncher = buildLauncher;
   }
 
   @Override
-  public void buildChanged(RepositoryBuild build) throws Exception {
+  protected void visitQueued(RepositoryBuild build) throws Exception {
     BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(build.getBranchId());
 
     if (build.getBuildNumber() != buildNumbers.getPendingBuildNumber().or(-1)) {
