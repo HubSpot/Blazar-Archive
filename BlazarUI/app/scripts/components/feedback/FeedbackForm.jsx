@@ -14,8 +14,7 @@ class FeedbackForm extends Component {
   constructor() {
     bindAll(this, 'toggleShow', 'submitFeedback', 'handleNameChange', 'handleMessageChange', 'resetForm', 'onStatusChange');
 
-    name = Cookies.get(config['usernameCookie']);
-    name = (name == undefined) ? '' : name;
+    name = Cookies.get(config['usernameCookie']) || '';
 
     this.state = {
       sendError: false,
