@@ -13,14 +13,11 @@ class FeedbackForm extends Component {
 
   constructor() {
     bindAll(this, 'toggleShow', 'submitFeedback', 'handleNameChange', 'handleMessageChange', 'resetForm', 'onStatusChange');
-
-    name = Cookies.get(config['usernameCookie']) || '';
-
     this.state = {
       sendError: false,
       submitted: false,
       visible: false,
-      nameValue: name,
+      nameValue: Cookies.get(config['usernameCookie']) || '',
       messageValue: '',
       submitDisabled: true,
       submitted: false,
