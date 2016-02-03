@@ -9,6 +9,7 @@ steps:
   - description: "Installing dependencies"
     commands:
       - echo $PWD
+      - echo $HOME
       - npm install
       - npm install bender-deps
   - description: "Linting"
