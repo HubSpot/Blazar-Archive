@@ -19,7 +19,9 @@ class DashboardContainer extends Component {
     this.state = {
       stars: Immutable.List.of(),
       builds: Immutable.List.of(),
-      starredBuilds: Immutable.List.of()
+      starredBuilds: Immutable.List.of(),
+      loadingStars: true,
+      loading: true
     }
   }
 
@@ -59,6 +61,8 @@ class DashboardContainer extends Component {
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
           starredBuilds={this.state.starredBuilds}
+          loadingStars={this.state.loadingStars}
+          loadingBuilds={this.state.loading}
           params={this.props.params}
         />
       </PageContainer>

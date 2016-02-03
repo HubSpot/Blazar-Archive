@@ -19,6 +19,8 @@ class Dashboard extends Component {
           </Headline>
            <StarredBranches
             starredBuilds={this.props.starredBuilds}
+            loadingStars={this.props.loadingStars}
+            loadingBuilds={this.props.loadingBuilds}
            />
         </UIGridItem>
       </UIGrid>
@@ -28,6 +30,8 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
   starredBuilds: PropTypes.instanceOf(Immutable.List),
+  loadingStars: PropTypes.bool,
+  loadingBuilds: PropTypes.bool,
   params: PropTypes.object
 };
 

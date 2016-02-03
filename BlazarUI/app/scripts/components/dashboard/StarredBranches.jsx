@@ -20,6 +20,12 @@ class StarredBranches extends Component {
   }
 
   render() {
+
+    if (this.props.loadingStars || this.props.loadingBuilds) {
+      return (
+        <Loader align='top-center' />
+      );
+    }
     
     if (!this.props.starredBuilds || this.props.starredBuilds.size === 0) {
       return(
@@ -57,7 +63,9 @@ class StarredBranches extends Component {
 }
 
 StarredBranches.propTypes = {
-  starredBuilds: PropTypes.instanceOf(Immutable.List)
+  starredBuilds: PropTypes.instanceOf(Immutable.List),
+  loadingStars: PropTypes.bool,
+  loadingBuilds: PropTypes.bool
 };
 
 export default StarredBranches;
