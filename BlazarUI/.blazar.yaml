@@ -4,6 +4,7 @@ buildDeps:
 
 cache:
   - $PWD/node_modules
+  - $PWD/bower_components
 
 steps:
   - description: "Installing dependencies"
