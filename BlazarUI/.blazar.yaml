@@ -9,8 +9,11 @@ cache:
 steps:
   - description: "Installing dependencies"
     commands:
+      - date
       - npm install
+      - date
       - npm install bender-deps
+      - date
   - description: "Linting"
     commands:
       - ./node_modules/.bin/gulp lint
