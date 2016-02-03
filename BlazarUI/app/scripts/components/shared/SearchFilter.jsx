@@ -38,8 +38,7 @@ class SearchFilter extends Component {
     this.handleSearchDebounced();
   }
 
-  render() {
-
+  render() {    
     return (
       <div>
         <Icon name='search' classNames='search-filter__icon' />
@@ -47,7 +46,7 @@ class SearchFilter extends Component {
           type="text"
           ref="searchFilterInput"
           className="search-input form-control"
-          placeholder='Filter modules...'
+          placeholder='Filter repositories...'
           value={this.state.searchValue}
           onChange={this.handleChange}
         />

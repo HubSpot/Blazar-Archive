@@ -1,31 +1,60 @@
 import Reflux from 'reflux';
 import BranchActions from '../actions/branchActions';
-
+import BranchBuildsApi from '../data/BranchBuildsApi';
 
 const BranchStore = Reflux.createStore({
 
   listenables: BranchActions,
-  
-  init() {
-    this.modules = [];
+
+  onStopPolling() {
+    if (this.branchBuildsApi) {
+      this.branchBuildsApi.stopPollingBuilds();
+      this.branchBuildsApi = undefined;  
+    }
   },
 
-  loadModulesSuccess(incomingData) {
-    this.modules = incomingData;
+  onLoadBranchBuilds(params) {
+    this.branchBuildsApi = new BranchBuildsApi({
+      params: params
+    });
 
-    this.trigger({
-      modules: this.modules,
-      loading: false
+    this.branchBuildsApi.fetchBuilds((error, resp) => {
+      if (error) {
+        this.error = error;
+        return this.triggerErrorUpdate();
+      }
+
+      this.data = resp;
+      this.triggerUpdate();
     });
   },
   
-  loadModulesError(error) {
-    this.trigger({
-      error: error,
-      loading: false
+  onTriggerBuild() {
+    this.branchBuildsApi.triggerBuild((error, resp) => {
+      if (error) {
+        this.error = error;
+        return this.triggerErrorUpdate();
+      }
     });
+  },
+
+  triggerUpdate() {
+    this.trigger({
+      builds: this.data.builds,
+      branchId: this.data.branchId,
+      loadingBranches: false  
+    });
+  },
+
+  triggerErrorUpdate() {
+    this.trigger({
+      error: this.error,
+      loadingBranches: false
+    });
+
+    this.error = undefined;
   }
 
 });
-
+  
 export default BranchStore;

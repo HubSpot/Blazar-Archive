@@ -10,24 +10,15 @@ class BranchesTable extends Component {
       return null;
     }
 
-    if (this.props.modules.length === 0) {
+    if (this.props.branches.length === 0) {
       return (
         <EmptyMessage> No build history </EmptyMessage>
       );
     }
 
-    const columnNames = [
-      {label: 'Branch', key: 'branch'},
-      {label: 'Module', key: 'module'},
-      {label: 'Latest Build', key: 'latestBuild'},
-      {label: 'Start Time', key: 'startTime'},
-      {label: 'Duration', key: 'duration'},
-      {label: 'Commit', key: 'commit'}
-    ];
-
     return this.props.buildTable({
-      data: this.props.modules,
-      columnNames: columnNames,
+      data: this.props.branches,
+      columnNames: ['', 'Branch', 'Latest Build', 'Start Time', 'Duration', 'Commit'],
       rowComponent: BranchesTableRow
     });
   }
@@ -35,7 +26,7 @@ class BranchesTable extends Component {
 
 BranchesTable.propTypes = {
   loading: PropTypes.bool,
-  modules: PropTypes.array.isRequired
+  branches: PropTypes.array.isRequired
 };
 
 export default TableMaker(BranchesTable, {showProgress: false});

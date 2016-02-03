@@ -76,10 +76,9 @@ The Container component is the first component loaded by the page, conventionall
 `Layout.styl`
  - General structure of the pages
 
-To do..
+To do.. finish remaining files/directory descriptions
 
-#### Flux actions and stores
-To Do
+#### Reflux Stores
+repoBuildStore - hold a single repo build, which consists of individual module builds
 
-#### Collections and models
-To Do
+to do: add remaining store descriptions

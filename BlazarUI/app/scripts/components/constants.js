@@ -39,7 +39,7 @@ export const BUILD_ICONS = {
   'IN_PROGRESS': 'hourglass-half',
   'SUCCEEDED': 'check success',
   'FAILED': 'close danger',
-  'CANCELLED': 'circle warning'
+  'CANCELLED': 'stop opacity-semi warning'
 };
 
 export const NO_MATCH_MESSAGES = {

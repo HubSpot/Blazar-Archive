@@ -42,7 +42,7 @@ public class ProjectObjectModel {
     if (parent != null) {
       this.dependencies.add(parent);
     }
-    this.depends = toDepends(this.dependencies);
+    this.depends = toDepends(dependencies);
   }
 
   public String getGroupId() {

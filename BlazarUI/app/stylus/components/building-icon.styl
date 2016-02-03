@@ -3,6 +3,11 @@
 buildStatus(color)
   background-color color
   border 0 solid color
+  
+buildInProgressStatus(color)
+  buildStatus(color)
+  opacity 0
+  animation: blink 1.5s ease-in 0s infinite
 
 .building-icon
   display block
@@ -16,14 +21,19 @@ buildStatus(color)
   height 10px
 
 .building-icon--IN_PROGRESS
-  buildStatus($info)
-  opacity 0
-  animation: blink 1.5s ease-in 0s infinite
+  buildInProgressStatus($info)
+  
+.building-icon--IN_PROGRESS-laststatus-SUCCEEDED
+  buildInProgressStatus($success)
+  
+.building-icon--IN_PROGRESS-laststatus-CANCELLED
+  buildInProgressStatus($warning)
+  
+.building-icon--IN_PROGRESS-laststatus-FAILED
+  buildInProgressStatus($danger)
 
 .building-icon--LAUNCHING
-  buildStatus($default)
-  opacity 0
-  animation: blink 1.5s ease-in 0s infinite
+  buildInProgressStatus($default)
 
 .building-icon--CANCELLED
   buildStatus($warning)

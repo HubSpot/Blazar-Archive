@@ -1,58 +1,53 @@
+//
+// Used for sidebar
+//
 import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
 import {sortBuilds} from '../utils/buildsHelpers';
+import BuildsApi from '../data/BuildsApi';
+import Immutable from 'immutable';
+// import StarStore from '../stores/starStore';
 
 const BuildsStore = Reflux.createStore({
 
   listenables: BuildsActions,
 
-  init() {
+  init() {  
     this.builds = {
-      starred: { 
-        builds: [] 
-      },
-      all: { 
-        builds: [],
-        haveLoaded: false
-      },
-      building: { 
-        builds: [] 
-      }
+      all: {},
+      building: {},
+      starred: {}
     };
   },
 
-  getBuilds() {
+  getBuilds() {    
     return this.builds;
   },
-
-  loadBuildsSuccess(incomingBuilds, filterType, filterHasChanged) {
-    this.builds[filterType].builds = incomingBuilds;
-
-    let sortedBuilds;
-    if (filterType === 'building') {
-      sortedBuilds = sortBuilds(this.builds[filterType].builds, 'building');
-    }
-    else {
-      sortedBuilds = sortBuilds(this.builds[filterType].builds, 'abc');
-    }
-
-    const triggerPayload = {
-      builds: sortedBuilds,
-      loadingBuilds: false
-    };
-    
-    if (filterHasChanged) {
-      triggerPayload.filterHasChanged = true;
-    }
-
-    this.trigger(triggerPayload);
-
+  
+  onStopPollingBuilds() {
+    BuildsApi.stopPolling;
   },
 
-  loadBuildsError(error) {
-    this.trigger({
-      error: error,
-      loadingBuilds: false
+  onLoadBuilds() {
+    BuildsApi.fetchBuilds((err, resp) => {
+      if (err) {
+        this.trigger({
+          loading: false,
+          changingBuildsType: false,
+          error: {
+            status: err.status,
+            statusText: err.statusText
+          }
+        });
+        return;
+      }
+      this.builds = resp;
+
+      this.trigger({
+        builds: this.builds,
+        loading: false,
+        changingBuildsType: false
+      });
     });
   }
 

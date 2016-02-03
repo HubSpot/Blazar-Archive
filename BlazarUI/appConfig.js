@@ -15,7 +15,9 @@ const appConfig = {
   // Otherwise we'll get it from localStorage later.
   apiRoot: process.env.BLAZAR_API_URL || '',
 
-  staticRoot: process.env.BLAZAR_STATIC_ROOT || ''
+  staticRoot: process.env.BLAZAR_STATIC_ROOT || '',
+
+  usernameCookie: process.env.BLAZAR_USERNAME_COOKIE || ''
 }
 
 module.exports = appConfig;

@@ -8,12 +8,13 @@ build-status(color)
     
   .build-detail-footer
     border-top 1px solid color
-
+    
 .build-detail
   position relative
   padding 0
-  margin 0
-  
+  margin 0 0 25px 0
+  min-height 93px // so things dont jump around
+      
   &.alert-success
     build-status($success-dark)
       
@@ -22,6 +23,9 @@ build-status(color)
     
   &.alert-info
     build-status($info-dark)
+
+  &.alert-warning
+    build-status($warning-dark)
       
 .build-detail-header
   .cancel-build-button 

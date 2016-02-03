@@ -1,48 +1,34 @@
 package com.hubspot.blazar.base;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.SetMultimap;
 
 import java.util.HashSet;
-import java.util.Map.Entry;
 import java.util.Set;
 
 public class DependencyGraph {
   private final SetMultimap<Integer, Integer> transitiveReduction;
+  private final SetMultimap<Integer, Integer> paths;
 
-  @JsonCreator
-  public DependencyGraph(@JsonProperty("transitiveReduction") SetMultimap<Integer, Integer> transitiveReduction) {
+  public DependencyGraph(SetMultimap<Integer, Integer> transitiveReduction, SetMultimap<Integer, Integer> paths) {
     this.transitiveReduction = transitiveReduction;
-  }
-
-  public SetMultimap<Integer, Integer> getTransitiveReduction() {
-    return transitiveReduction;
-  }
-
-  public Set<Integer> incomingVertices(int moduleId) {
-    Set<Integer> incomingVertices = new HashSet<>();
-    for (Entry<Integer, Integer> path : transitiveReduction.entries()) {
-      if (path.getValue() == moduleId) {
-        incomingVertices.add(path.getKey());
-      }
-    }
-
-    return incomingVertices;
+    this.paths = paths;
   }
 
   public Set<Integer> reachableVertices(int moduleId) {
-    Set<Integer> reachableVertices = new HashSet<>();
-    for (int vertex : outgoingVertices(moduleId)) {
-      reachableVertices.add(vertex);
-      reachableVertices.addAll(reachableVertices(vertex));
-    }
-
-    return reachableVertices;
+    return transitiveReduction.get(moduleId);
   }
 
-  public Set<Integer> outgoingVertices(int moduleId) {
-    return transitiveReduction.get(moduleId);
+  public Set<Integer> reduceVertices(Set<Integer> modules) {
+    Set<Integer> reduced = new HashSet<>(modules);
+    for (int source : modules) {
+      for (int target : modules) {
+        if (paths.get(source).contains(target)) {
+          reduced.remove(target);
+        }
+      }
+    }
+
+    return reduced;
   }
 
   @Override

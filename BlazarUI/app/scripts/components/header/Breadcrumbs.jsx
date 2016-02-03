@@ -1,85 +1,32 @@
 import React, {Component, PropTypes} from 'react';
-import {values, pick} from 'underscore';
-const Link = require('react-router').Link;
-import Icon from '../shared/Icon.jsx';
 import Logo from '../shared/Logo.jsx';
-import ClassNames from 'classnames';
-
-
-const ICON_MAP = {
-  1: 'org',
-  2: 'repo',
-  3: 'branch',
-  4: 'module'
-};
+import Breadcrumb from './Breadcrumb.jsx';
+import BreadcrumbOrg from './BreadcrumbOrg.jsx';
 
 class Breadcrumbs extends Component {
 
   render() {
-
-    const appRoot = this.props.appRoot;  
-    //remove any unwanted params that may have been added
-    const cleanParams = pick(this.props.params, 'host','org','repo','branch','module','buildNumber')
-    const pages = values(cleanParams);
-
-    const links = pages.map((page, i) => {
-      let pageLinks = '';
-      let noLink = false;
-      let isActivePage = false;
-      let nextCrumb = true;
-      let linkToDashboard = false;
-      let isOrg;
-  
-      // active page
-      if (i === pages.length - 1) {
-        noLink = true;
-        isActivePage = true;
-      }
-
-      // repo and org pages
-      if (i === 0 || i === 1) {
-        noLink = true;
-      }
-
-      // generate route path for each link
-      for (let g = 0; g < pages.length; g++) {
-        pageLinks += `/${pages[g]}`;
-
-        if (i === g) {
-          break;
-        }
-      }
-
-      if (noLink) {
-        const classNames = ClassNames([
-          'crumb',
-          {'active': isActivePage}
-        ]);
-        
-        return (
-          <span key={page + i} className={classNames}>
-            { ICON_MAP[i] ? <Icon classNames='breadcrumb-icon' for={ICON_MAP[i]} />  : null}
-            {page}
-          </span>
-        );        
-      }
-      
-      
-      return (
-        <Link key={page + i} className='crumb' to={`${this.props.appRoot}/builds${pageLinks}`}>
-          { ICON_MAP[i] ? <Icon classNames='breadcrumb-icon' for={ICON_MAP[i]} />  : null}
-          {page}
-        </Link>
-      );
-
-    })
-
-    if (links.length === 0) {
-      return (
-        <div className='breadcrumbs'>
-        <Logo crumb={false} />
-        </div>
-      )
+    const {appRoot} = this.props;  
+    const {host, org, repo, branch, buildNumber, moduleName} = this.props.params;
+    let links = [];
+    
+    if (host) {
+      links.push(<Breadcrumb param='host' key='host' text={host} dontLink={true} {...this.props} />);
+    }
+    if (org) {
+      links.push(<BreadcrumbOrg key='org' {...this.props} {...this.state} isActive={!repo} />);
+    }
+    if (repo) {
+      links.push(<Breadcrumb param='repo' key='repo' text={repo} isActive={!branch} {...this.props} />);
+    }
+    if (branch) {
+      links.push(<Breadcrumb param='branch' key='branch' text={branch} isActive={!buildNumber} {...this.props} />);
+    }
+    if (buildNumber) {
+      links.push(<Breadcrumb param='buildNumber' key='buildNumber' text={buildNumber} isActive={!moduleName} {...this.props} />);
+    }
+    if (moduleName) {
+      links.push(<Breadcrumb param='moduleName' key='moduleName' text={moduleName} isActive={true} {...this.props} />);
     }
 
     return (
@@ -88,7 +35,6 @@ class Breadcrumbs extends Component {
         {links}
       </div>
     );
-
   }
 }
 
@@ -98,6 +44,5 @@ Breadcrumbs.propTypes = {
   appRoot: PropTypes.string.isRequired,
   navigationIsActive: PropTypes.bool
 };
-
 
 export default Breadcrumbs;

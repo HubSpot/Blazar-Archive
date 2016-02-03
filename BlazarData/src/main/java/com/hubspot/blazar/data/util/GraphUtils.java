@@ -9,28 +9,7 @@ import java.util.Set;
 public enum GraphUtils {
   INSTANCE;
 
-  public <V> SetMultimap<V, V> transitiveReduction(SetMultimap<V, V> edges) {
-    SetMultimap<V, V> paths = findAllPaths(edges);
-
-    SetMultimap<V, V> reduced = HashMultimap.create(paths);
-    Set<V> vertices = vertices(paths);
-
-    for (V vertexI : vertices) {
-      for (V vertexJ : vertices) {
-        if (reduced.get(vertexI).contains(vertexJ)) {
-          for (V vertexK : vertices) {
-            if (reduced.get(vertexJ).contains(vertexK)) {
-              reduced.get(vertexI).remove(vertexK);
-            }
-          }
-        }
-      }
-    }
-
-    return reduced;
-  }
-
-  private <V> SetMultimap<V, V> findAllPaths(SetMultimap<V, V> edges) {
+  public <V> SetMultimap<V, V> findAllPaths(SetMultimap<V, V> edges) {
     SetMultimap<V, V> paths = HashMultimap.create(edges);
     Set<V> vertices = vertices(paths);
 
@@ -47,6 +26,25 @@ public enum GraphUtils {
     }
 
     return paths;
+  }
+
+  public <V> SetMultimap<V, V> transitiveReduction(SetMultimap<V, V> paths) {
+    SetMultimap<V, V> reduced = HashMultimap.create(paths);
+    Set<V> vertices = vertices(paths);
+
+    for (V vertexI : vertices) {
+      for (V vertexJ : vertices) {
+        if (reduced.get(vertexI).contains(vertexJ)) {
+          for (V vertexK : vertices) {
+            if (reduced.get(vertexJ).contains(vertexK)) {
+              reduced.get(vertexI).remove(vertexK);
+            }
+          }
+        }
+      }
+    }
+
+    return reduced;
   }
 
   private <V> Set<V> vertices(SetMultimap<V, V> graph) {

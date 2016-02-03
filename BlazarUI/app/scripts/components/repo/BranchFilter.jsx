@@ -1,12 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import Select from 'react-select';
 import {bindAll, uniq, flatten} from 'underscore';
-import {uniqueBranches, uniqueModules} from '../Helpers';
+import {uniqueBranches} from '../Helpers';
 
 class BranchFilter extends Component {
 
   constructor() {
     bindAll(this, 'handleBranchFilterChange', 'handleModuleFilterChange', 'handleFilterFocus', 'handleFilterBlur');  
+    
     this.filters = {
       branch: [],
       module: []
@@ -53,7 +54,7 @@ class BranchFilter extends Component {
     }
 
     return (
-      <div className='branch-filter'>
+      <div className='filter-container branch-filter'>
         <Select
           onFocus={this.handleFilterFocus}
           onBlur={this.handleFilterBlur}
@@ -61,20 +62,10 @@ class BranchFilter extends Component {
           className='branch-filter-input'
           name="branchFilter"
           value={this.props.filters.branch}
-          options={uniqueBranches(this.props.branches)}
+          options={uniqueBranches(this.props.branches.toJS())}
           onChange={this.handleBranchFilterChange}
         />
-        <Select
-          onFocus={this.handleFilterFocus}
-          onBlur={this.handleFilterBlur}
-          multi={true}
-          placeholder='Filter by module'
-          className='branch-filter-input'
-          name="moduleFilter"
-          value={this.props.filters.module}
-          options={uniqueModules(this.props.branches)}
-          onChange={this.handleModuleFilterChange}
-        />
+
       </div>
     );
   }
@@ -82,7 +73,7 @@ class BranchFilter extends Component {
 
 BranchFilter.propTypes = {
   filters: PropTypes.object.isRequired,
-  branches: PropTypes.array,
+  branches: PropTypes.object,
   updateFilters: PropTypes.func.isRequired
 };
 

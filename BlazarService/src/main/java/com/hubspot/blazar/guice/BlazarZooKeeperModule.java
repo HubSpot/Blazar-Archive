@@ -3,6 +3,7 @@ package com.hubspot.blazar.guice;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.HostAndPort;
+import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;

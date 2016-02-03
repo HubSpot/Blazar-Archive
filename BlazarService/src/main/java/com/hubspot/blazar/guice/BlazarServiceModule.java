@@ -1,25 +1,11 @@
 package com.hubspot.blazar.guice;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.inject.Provides;
-import com.hubspot.blazar.discovery.DiscoveryModule;
-import com.hubspot.blazar.listener.BuildListenerModule;
-import com.hubspot.blazar.resources.BranchStateResource;
-import com.hubspot.blazar.resources.ModuleBuildResource;
-import com.hubspot.blazar.resources.RepositoryBuildResource;
-import com.hubspot.blazar.util.GitHubHelper;
-import com.hubspot.blazar.util.ModuleBuildLauncher;
-import com.hubspot.blazar.util.RepositoryBuildLauncher;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
+import com.hubspot.blazar.discovery.BlazarConfigModuleDiscovery;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -27,19 +13,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Binder;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
+import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
+import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
+import com.hubspot.blazar.discovery.ModuleDiscovery;
+import com.hubspot.blazar.discovery.docker.DockerModuleDiscovery;
+import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
+import com.hubspot.blazar.resources.BuildResource;
+import com.hubspot.blazar.resources.BuildStateResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.FeedbackResource;
+import com.hubspot.blazar.util.BlazarServiceLoader;
+import com.hubspot.blazar.util.BuildLauncher;
+import com.hubspot.blazar.util.DependencyBuilder;
+import com.hubspot.blazar.util.GitHubStatusHandler;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
+import com.hubspot.blazar.util.SingularityTaskKiller;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
@@ -65,27 +64,32 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
     binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule());
-    binder.install(new BuildListenerModule());
-    binder.install(new DiscoveryModule());
 
     binder.bind(BranchResource.class);
-    binder.bind(BranchStateResource.class);
-    binder.bind(ModuleBuildResource.class);
-    binder.bind(RepositoryBuildResource.class);
+    binder.bind(BuildResource.class);
+    binder.bind(BuildStateResource.class);
     binder.bind(BuildHistoryResource.class);
     binder.bind(FeedbackResource.class);
 
     binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
-    binder.bind(PropertyFilteringMessageBodyWriter.class)
-        .toConstructor(defaultConstructor(PropertyFilteringMessageBodyWriter.class))
-        .in(Scopes.SINGLETON);
+    binder.bind(PropertyFilteringMessageBodyWriter.class).in(Scopes.SINGLETON);
 
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
-    binder.bind(GitHubHelper.class);
-    binder.bind(RepositoryBuildLauncher.class);
-    binder.bind(ModuleBuildLauncher.class);
-    binder.bind(SingularityBuildLauncher.class);
+    binder.bind(BuildLauncher.class);
+    binder.bind(GitHubStatusHandler.class);
+    binder.bind(DependencyBuilder.class);
+    binder.bind(SingularityTaskKiller.class);
+
+    Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
+    multibinder.addBinding().to(MavenModuleDiscovery.class);
+    multibinder.addBinding().to(DockerModuleDiscovery.class);
+    for (Class<? extends ModuleDiscovery> moduleDiscovery : BlazarServiceLoader.load(ModuleDiscovery.class)) {
+      multibinder.addBinding().to(moduleDiscovery);
+    }
+
+    binder.bind(BlazarConfigModuleDiscovery.class);
+    binder.bind(ModuleDiscovery.class).to(CompositeModuleDiscovery.class);
 
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
     for (Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {
@@ -108,21 +112,8 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
   @Provides
   @Singleton
-  public MetricRegistry providesMetricRegistry(Environment environment) {
-    return environment.metrics();
-  }
-
-  @Provides
-  @Singleton
   public ObjectMapper providesObjectMapper(Environment environment) {
     return environment.getObjectMapper();
-  }
-
-  @Provides
-  @Singleton
-  @Named("whitelist")
-  public Set<String> providesWhitelist(BlazarConfiguration configuration) {
-    return configuration.getWhitelist();
   }
 
   @Provides
@@ -163,14 +154,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     try {
       return builder.build();
     } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static <T> Constructor<T> defaultConstructor(Class<T> type) {
-    try {
-      return type.getConstructor();
-    } catch (NoSuchMethodException e) {
       throw new RuntimeException(e);
     }
   }

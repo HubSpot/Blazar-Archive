@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import PageContainer from '../shared/PageContainer.jsx';
+import Immutable from 'immutable';
 
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
@@ -11,18 +12,18 @@ import Icon from '../shared/Icon.jsx';
 import BranchFilter from './BranchFilter.jsx';
 import BranchesTable from './BranchesTable.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
-import {getFilteredModules} from '../Helpers.js'
+import {getFilteredBranches} from '../Helpers.js'
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
 
 let initialState = {
-  branches: [],
+  branches: Immutable.List.of(),
   loading: true,
   filters: {
     branch: [],
-    module: []
+    repo: []
   },
   error: null
 };
@@ -80,24 +81,21 @@ class RepoContainer extends Component {
               <Icon type="octicon" name="repo" classNames="headline-icon" />
               <span>{this.props.params.repo}</span>
               <HeadlineDetail>
-                All branches and modules
+                Branches
               </HeadlineDetail>
             </Headline>
             <GenericErrorMessage
               message={this.state.error}
             />
             <BranchFilter
-              branches={this.state.branches}
-              branchFilter={this.state.branchFilter}
-              filters={this.state.filters}
-              updateFilters={this.updateFilters}
-              loading={this.state.loading}
               hide={this.state.error}
+              updateFilters={this.updateFilters}
+              {...this.state}
             />
             <BranchesTable 
-              modules={getFilteredModules(this.state.filters, this.state.branches)}
-              loading={this.state.loading}
               hide={this.state.error}
+              {...this.state}
+              branches={getFilteredBranches(this.state.filters, this.state.branches.toJS())}
             />
           </UIGridItem>
         </UIGrid>

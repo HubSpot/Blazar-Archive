@@ -4,17 +4,23 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
-import ModulesTable from './ModulesTable.jsx';
+import BranchBuildHistoryTable from './BranchBuildHistoryTable.jsx';
+import BranchHeadline from './BranchHeadline.jsx';
 import Loader from '../shared/Loader.jsx';
-import Icon from '../shared/Icon.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
+import BuildButton from './BuildButton.jsx';
+
+import StarStore from '../../stores/starStore';
+import StarActions from '../../actions/starActions';
 
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
 let initialState = {
-  modules: [],
-  loading: true
+  builds: null,
+  stars: [],
+  loadingBranches: true,
+  loadingStars: true
 };
 
 class BranchContainer extends Component {
@@ -43,15 +49,22 @@ class BranchContainer extends Component {
     
   setup(params) {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
-    BranchActions.loadModules(params);
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
+    StarActions.loadStars('repoBuildContainer');
+    BranchActions.loadBranchBuilds(params);
   }
   
   tearDown() {
     BranchActions.stopPolling();
+    this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
   }
   
-  getRenderedContent() {
+  triggerBuild() {
+    BranchActions.triggerBuild();
+  }
+  
+  renderTable() {
     if (this.state.error) {
       return (
         <GenericErrorMessage
@@ -62,9 +75,11 @@ class BranchContainer extends Component {
     
     else {
       return (
-        <ModulesTable
-          modules={this.state.modules}
-          loading={this.state.loading}
+        <BranchBuildHistoryTable
+          data={this.state.builds}
+          loading={this.state.loadingBranches}
+          {...this.state}
+          {...this.props}
         />
       );
     }
@@ -75,13 +90,25 @@ class BranchContainer extends Component {
     return (
       <PageContainer>
         <UIGrid>
-          <UIGridItem size={12}>
-            <Headline>
-              <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-              Branch Modules
-            </Headline>
-            {this.getRenderedContent()}
-          </UIGridItem>
+          <UIGridItem size={10}>
+            <BranchHeadline
+              loading={this.state.loadingStars || this.state.loadingBranches}
+              {...this.state}
+              {...this.props}
+            />
+            </UIGridItem>
+            <UIGridItem size={2} align='RIGHT'>
+              <BuildButton 
+                triggerBuild={this.triggerBuild} 
+                loading={this.state.loadingBranches}
+                error={this.state.error}
+              />
+            </UIGridItem>
+            <UIGrid>
+              <UIGridItem size={12} align='RIGHT'>
+                {this.renderTable()}
+              </UIGridItem>
+            </UIGrid>
         </UIGrid>
       </PageContainer>
     );

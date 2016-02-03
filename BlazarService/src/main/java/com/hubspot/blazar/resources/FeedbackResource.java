@@ -17,6 +17,7 @@ import in.ashwanthkumar.slack.webhook.SlackAttachment;
 
 @Path("/feedback")
 public class FeedbackResource {
+
   private final Optional<SlackConfiguration> slackConfiguration;
 
   @Inject
@@ -25,12 +26,16 @@ public class FeedbackResource {
   }
 
   @POST
-  public void handleFeedback(Feedback feedback) throws IOException {
+  public void doAll(Feedback feedback) throws IOException {
+    doSlack(feedback);
+  }
+
+  private void doSlack(Feedback feedback) throws IOException {
     if (!slackConfiguration.isPresent()) {
       throw new WebApplicationException(new Throwable("Slack is not configured"));
     }
 
-    Slack api = slackConfiguration.get().getSlack();
+    Slack api = new Slack(slackConfiguration.get().getUrl()).displayName("Blazar").icon(":fire:").sendToChannel(slackConfiguration.get().getRoom());
     SlackAttachment attachment = new SlackAttachment(feedback.getMessage());
     if (feedback.getOther().isPresent()) {
       attachment = attachment.addField(new SlackAttachment.Field("OtherData", feedback.getOther().get(), false));

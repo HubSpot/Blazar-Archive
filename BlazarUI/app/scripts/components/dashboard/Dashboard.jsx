@@ -1,15 +1,11 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
-import StarredModules from './StarredModules.jsx';
+import Immutable from 'immutable'
+import StarredBranches from './StarredBranches.jsx';
 
 import Headline from '../shared/headline/Headline.jsx';
-import PageHeader from '../shared/PageHeader.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-import MutedMessage from '../shared/MutedMessage.jsx';
-import Icon from '../shared/Icon.jsx';
-import EmptyMessage from '../shared/EmptyMessage.jsx';
-import Helpers from '../ComponentHelpers';
 
 
 class Dashboard extends Component {
@@ -19,14 +15,13 @@ class Dashboard extends Component {
       <UIGrid>                
         <UIGridItem size={12} className='dashboard-unit'>
           <Headline>
-            Starred Modules
+            Starred Branches
           </Headline>
-          <StarredModules 
-            modulesBuildHistory={this.props.modulesBuildHistory}
+           <StarredBranches
+            starredBuilds={this.props.starredBuilds}
             loadingStars={this.props.loadingStars}
-            loadingModulesBuildHistory={this.props.loadingModulesBuildHistory}
-            loadingStars={this.props.loadingStars}
-          />
+            loadingBuilds={this.props.loadingBuilds}
+           />
         </UIGridItem>
       </UIGrid>
     );
@@ -34,10 +29,9 @@ class Dashboard extends Component {
 }
 
 Dashboard.propTypes = {
-  loadingModulesBuildHistory: PropTypes.bool,
+  starredBuilds: PropTypes.instanceOf(Immutable.List),
   loadingStars: PropTypes.bool,
-  loadingHosts: PropTypes.bool,
-  modulesBuildHistory: PropTypes.array,
+  loadingBuilds: PropTypes.bool,
   params: PropTypes.object
 };
 

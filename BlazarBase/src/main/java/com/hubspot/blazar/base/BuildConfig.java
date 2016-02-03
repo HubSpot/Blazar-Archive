@@ -10,44 +10,34 @@ import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
 public class BuildConfig {
-  private final List<BuildStep> steps;
-  private final List<BuildStep> before;
+  private final List<String> cmds;
   private final Map<String, String> env;
   private final List<String> buildDeps;
   private final List<String> webhooks;
   private final List<String> cache;
   private final Optional<GitInfo> buildpack;
-  private final Optional<String> user;
 
   @JsonCreator
-  public BuildConfig(@JsonProperty("steps") List<BuildStep> steps,
-                     @JsonProperty("before") List<BuildStep> before,
+  public BuildConfig(@JsonProperty("cmds") List<String> cmds,
                      @JsonProperty("env") Map<String, String> env,
                      @JsonProperty("buildDeps") List<String> buildDeps,
                      @JsonProperty("webhooks") List<String> webhooks,
                      @JsonProperty("cache") List<String> cache,
-                     @JsonProperty("buildpack") Optional<GitInfo> buildpack,
-                     @JsonProperty("user") Optional<String> user) {
-    this.steps = Objects.firstNonNull(steps, Collections.<BuildStep>emptyList());
-    this.before = Objects.firstNonNull(before, Collections.<BuildStep>emptyList());
+                     @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
+    this.cmds = Objects.firstNonNull(cmds, Collections.<String>emptyList());
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
     this.buildpack = Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
     this.cache = Objects.firstNonNull(cache, Collections.<String>emptyList());
-    this.user = Objects.firstNonNull(user, Optional.<String>absent());
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null, null, null, null, null);
+    return new BuildConfig(null, null, null, null, null, null);
   }
 
-  public List<BuildStep> getSteps() {
-    return steps;
-  }
-
-  public List<BuildStep> getBefore() {
-    return before;
+  public List<String> getCmds() {
+    return cmds;
   }
 
   public Map<String, String> getEnv() {
@@ -69,13 +59,4 @@ public class BuildConfig {
   public Optional<GitInfo> getBuildpack() {
     return buildpack;
   }
-
-  public Optional<String> getUser() {
-    return user;
-  }
-
-  public BuildConfig withUser(String user) {
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, buildpack, Optional.of(user));
-  }
-
 }

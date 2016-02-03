@@ -1,15 +1,13 @@
 import React, {Component} from 'react';
-import {contains, pluck, isEqual} from 'underscore';
+import {contains, pluck, isEqual, filter} from 'underscore';
+import Immutable from 'immutable'
 import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
-import BuildsStore from '../../stores/buildsStore'; // use deprecated name...
+import BuildsStore from '../../stores/buildsStore';
 
 import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
-
-import BuildHistoryActions from '../../actions/buildHistoryActions';
-import BuildHistoryStore from '../../stores/buildHistoryStore';
 
 class DashboardContainer extends Component {
 
@@ -19,21 +17,17 @@ class DashboardContainer extends Component {
     this.onStatusChange = this.onStatusChange.bind(this);
 
     this.state = {
-      builds: [],
-      stars: [],
-      modulesBuildHistory: [],
-      loadingModulesBuildHistory: true,
-      loadingStars: true
-    };
-
-    this.starsHistory = [];
-    this.starsHistoryChanged = false;
+      stars: Immutable.List.of(),
+      builds: Immutable.List.of(),
+      starredBuilds: Immutable.List.of(),
+      loadingStars: true,
+      loading: true
+    }
   }
 
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
-    this.unsubscribeFromBuildHistory = BuildHistoryStore.listen(this.onStatusChange);
 
     StarActions.loadStars();
   }
@@ -41,53 +35,34 @@ class DashboardContainer extends Component {
   componentWillUnmount() {
     this.unsubscribeFromBuilds();
     this.unsubscribeFromStars();
-    this.unsubscribeFromBuildHistory();
   }
 
-  // check if star history has changed so we
-  // can fetch the updated history
   checkStarHistory() {
-    if (this.state.stars.length === 0) {
+    if (this.state.stars.size === 0) {
       return;
     }
 
-    const starIds = pluck(this.state.stars, 'moduleId');
-    const starredBuilds = this.state.builds.filter((build) => {
-      return contains(starIds, build.module.id);
-    });
-    
-    this.starsHistoryChanged = !isEqual(this.starsHistory, starredBuilds)
-    this.starsHistory = starredBuilds;
-
-    if (this.starsHistoryChanged) {
-      BuildHistoryActions.loadModulesBuildHistory({
-        modules: this.state.stars
+    if (this.state.builds.all) {
+      const starredBuilds = this.state.builds.all.filter((build) => {
+        return contains(this.state.stars, build.get('gitInfo').get('id'));
       });
+
+      this.setState({ starredBuilds: starredBuilds });
     }
   }
 
   onStatusChange(state) {
     this.setState(state);
     this.checkStarHistory();
-
-    const noHistoryToFetch = state.stars && state.stars.length === 0;
-    const haveHistory = !this.state.loadingModulesBuildHistory && !this.state.loadingStars;
-
-    if (state.stars){
-      BuildHistoryActions.loadModulesBuildHistory({
-        modules: state.stars
-      });
-    }
-
   }
 
   render() {
     return (
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
-          modulesBuildHistory={this.state.modulesBuildHistory} 
-          loadingModulesBuildHistory={this.state.loadingModulesBuildHistory}
+          starredBuilds={this.state.starredBuilds}
           loadingStars={this.state.loadingStars}
+          loadingBuilds={this.state.loading}
           params={this.props.params}
         />
       </PageContainer>

@@ -4,7 +4,6 @@ import ClassNames from 'classnames';
 import json2html from 'json-to-html';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
-import ReactZeroClipboard from 'react-zeroclipboard';
 
 class JSONModal extends Component {
 
@@ -24,9 +23,6 @@ class JSONModal extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.closeModal}>Close</Button>
-          <ReactZeroClipboard text={JSON.stringify(this.props.json)}>
-            <Button className='btn btn-primary'>Copy</Button>
-          </ReactZeroClipboard>
         </Modal.Footer>
       </Modal>
     );

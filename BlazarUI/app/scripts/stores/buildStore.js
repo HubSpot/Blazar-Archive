@@ -1,424 +1,93 @@
 /*global config*/
 import Reflux from 'reflux';
-import $ from 'jquery';
-import {find, has, extend} from 'underscore'; 
-import BuildStates from '../constants/BuildStates';
-import {buildIsOnDeck, buildIsInactive} from '../components/Helpers';
-
 import BuildActions from '../actions/buildActions';
-import BuildHistoryActions from '../actions/buildHistoryActions';
-
-import BranchDefinition from '../models/BranchDefinition';
-import BranchModules from '../collections/BranchModules';
-import Build from '../models/Build';
-import Log from '../models/Log';
-import LogSize from '../models/LogSize';
-import BuildTrigger from '../models/BuildTrigger';
-
+import BuildApi from '../data/BuildApi';
 
 const BuildStore = Reflux.createStore({
 
   listenables: BuildActions,
 
   init() {
-    this.build = {};
-    this.params = {};
+    this.data = null;
+    this.error = false;
   },
   
-  loadBuildError(error) {
+  updateData(err, resp) {
+    this.data = resp;
+    this.error = err;
+
+    if (err) {
+      this.triggerError();
+    } 
+    else {
+      this.triggerSuccess();  
+    }
+  },
+  
+  triggerSuccess() {
     this.trigger({
-      error: error,
+      data: this.data,
+      loading: false
+    });
+  },
+
+  triggerError() {
+    let error;
+
+    // custom error message
+    if (typeof(this.error) === 'string') {
+      error = this.error;
+    } 
+    // send the xhr message
+    else {
+      error = {
+        status: this.error.status,
+        statusText: this.error.statusText
+      };
+    }
+
+    this.trigger({
       loading: false,
-      build: this.build.model.data
+      error: error
     });
   },
 
   onLoadBuild(params) {
-    this.params = params;
+    this.api = new BuildApi(params);
     
-    this._getBranchId()
-      .then(this._getModule)
-      .then(this._getBuild)
-      .then(this._getLog)
-      .then(this._assignBuildProcessing);
-  },
-
-  onCancelBuild() {
-    if (!this.build.model) {
-      this.loadBuildError(`Error cancelling build #${this.params.buildNumber}. See your console for more detail.`);
-    }
-    
-    const build = new Build({
-      buildId: this.build.model.data.build.id
-    });
-    
-    const cancel = build.cancel();
-    
-    cancel.done((data, textStatus, jqXHR) => {
-      if (jqXHR.status === 204) {
-        this.build.model.data.build.state = BuildStates.CANCELLED;
-        // get most recent info
-        $.when(this._fetchBuild(), this._fetchLog()).done(() => {
-          this._triggerUpdate();
-        });
-      }
-    });
-
-    cancel.error((err) => {
-      this.loadBuildError(`Error cancelling build #${this.params.buildNumber}. See your console for more detail.`);
-    });
+    this.api.loadBuild((err, resp) => {
+      this.updateData(err, resp);
+    });  
   },
   
   onResetBuild() {
-    this.init();
+    this.api.setLogPollingState(false);
+    this.api = undefined;
   },
-
-  onTriggerBuild(moduleId) {
-    this.trigger({
-      buildTriggeringDone: false
-    });
-    
-    const trigger = new BuildTrigger({
-      moduleId: moduleId
-    });
-
-    trigger.fetch()
-      .done(() => {
-        this.trigger({
-          buildTriggeringDone: true
-        });
-        BuildHistoryActions.fetchLatestHistory();
-      })
-
-      .fail((data, textStatus, jqXHR) => {
-        this.trigger({
-          buildTriggeringDone: true,
-          buildTriggeringError: jqXHR
-        });
-      });
-  },
-
-  onNavigationChange(position) {
-    const startOfLogLoaded = this.build.logCollection.minOffsetLoaded === 0;
-    const endOfLogLoaded = this.build.logCollection.maxOffsetLoaded === this.build.logCollection.options.size;
-    const buildInProgress = this.build.model.data.build.state === BuildStates.IN_PROGRESS;
-
-    // navigated to the top
-    if (position === 'top') {
-      
-      if (buildInProgress) {
-        this.onSetLogPollingState(false);
-      }
-
-      if (startOfLogLoaded) {
-        this._triggerUpdate({positionChange: position});  
-      }
-      
-      else {
-        this._resetLogViaNavigation(position);
-      }
-    }
   
-    // navigated to the bottom
-    else if (position === 'bottom') {
-
-      if (buildInProgress) {
-        this.onSetLogPollingState(true);
-      }
-
-      if (endOfLogLoaded) {
-        this._triggerUpdate({positionChange: position});
-      }
-
-      else {
-        this._resetLogViaNavigation(position);
-      }      
-    }
-
+  onFetchNext() {
+    this.api.fetchNext((err, resp) => {
+      this.updateData(err, resp);
+    });
   },
 
   onFetchPrevious() {
-    const log = this.build.logCollection;
-  
-    if (log.minOffsetLoaded === 0) {
-      this._triggerUpdate();
-    }
-
-    else {
-      log.fetchPrevious().done(this._triggerUpdate);
-    }
+    this.api.fetchPrevious((err, resp) => {
+      this.updateData(err, resp);
+    });    
   },
   
-  onFetchNext() {    
-    if (this.build.logCollection.requestOffset === -1) {
-      return;
-    }
-    
-    this.build.logCollection
-      .fetchNext()
-      .done(this._triggerUpdate);
-  },
-
-  onSetLogPollingState(state) {
-    if (this.build.logCollection) {
-      this.build.logCollection.shouldPoll = state;
-      // if we stopped polling and are starting up again,
-      // fetch the latest log size, last offset, 
-      // and start polling again
-      if (state) {
-        this._getLog().done(this._pollLog);
-      }
-    }
-  },
-
-  _resetLogViaNavigation(position) {
-    const logSize = this.build.logCollection.options.size;
-
-    const logPromise = this.build.logCollection.updateLogForNavigationChange({
-      size: logSize,
-      position: position
-    }).fetch();
-    
-    logPromise.done(() => {
-      this._triggerUpdate({positionChange: position});
+  onNavigationChange(position) {
+    this.api.navigationChange(position, (err, resp) => {
+      this.updateData(err, resp);
     });
   },
-
-  _fetchBuild() {
-    const buildPromise = this.build.model.fetch();
-    
-    buildPromise
-      .fail((jqXHR) => {
-        this.loadBuildError(`Error retrieving build #${this.params.buildNumber}. See your console for more detail.`);
-        console.warn(jqXHR);
-      });
-      
-      return buildPromise;
-  },
-
-  _fetchLog() {
-    if (!this.build.logCollection) {
-      return;
-    }
-
-    const logPromise = this.build.logCollection.fetch();
-
-    logPromise
-      .fail((jqXHR) => {
-        this.loadBuildError(`Error retrieving log for build #${this.params.buildNumber}. See your console for more detail.`);
-        console.warn(jqXHR);
-      });
-
-    return logPromise;
-  },
   
-  _pollLog() {
-    if (!this.build.logCollection) {
-      return;
-    }
-  
-    if (this.build.logCollection.shouldPoll && this.build.model.data.build.state === BuildStates.IN_PROGRESS) {
-      this._fetchLog().done((data, textStatus, jqxhr) => {
-        this._triggerUpdate();
-        this.build.logCollection.requestOffset = data.nextOffset;
-        
-        setTimeout(() => {
-          this._pollLog();
-        }, config.activeBuildRefresh);
-      });
-    }
-
-  },
-
-  _pollBuild() {
-    if (!this.build.model) {
-      return;
-    }
-
-    if (this.build.model.data.build.state === BuildStates.IN_PROGRESS) {
-      this._fetchBuild().done((data) => {
-        // build has finished, get most up to date info
-        if (this.build.model.data.build.state !== BuildStates.IN_PROGRESS) {
-          this._updateLogSize()
-            .then(this._fetchLog)
-            .then(this._triggerUpdate);
-        }
-        setTimeout(() => {
-          this._pollBuild();
-        }, config.activeBuildRefresh);
-      });
-    }
-  },
-  
-  // If cancelled build, fetch twice to see if the build
-  // is still processing or if it is actually complete.
-  _processCancelledBuild() {
-    this._processFinishedBuild(() => {
-      this.onFetchNext();
-    });
-  },
-
-  _processFinishedBuild(cb) {
-    this._getLog().then(this._fetchLog).done((data) => {
-      this._triggerUpdate();
-      if (cb) {
-        cb();
-      }
-    });
-  },
-
-  _processBuildOnDeck() {
-    this._triggerUpdate();  
-  },
-
-  _processActiveBuild() { 
-    this._pollLog();
-    this._pollBuild();
-  },
-
-  _getBranchId() {
-    const branchDefinition = new BranchDefinition(this.params);
-    const branchPromise =  branchDefinition.fetch();
-
-    branchPromise
-      .done(() => {
-        this.build.branchId = branchDefinition.data.id;
-      })
-      .fail(() => {
-        this.loadBuildError(`Sorry but we can't find this build. Check that this branch or module still exists.`);
-      });
-
-    return branchPromise;
-  },
-  
-  _getModule() {
-    const branchModules = new BranchModules({
-      branchId: this.build.branchId
-    });
-
-    const modulesPromise = branchModules.fetch();
-
-    modulesPromise
-      .done((data, textStatus, jqXHR) => {
-        this.build.module = find(branchModules.data, (m) => {
-          return m.name === this.params.module;
-        });
-
-        if (!this.build.module) {
-          this.loadBuildError(`Sorry but we can't find any module named ${this.params.module}.`);
-        }
-      })
-      .fail((jqXHR) => {
-        this.loadBuildError('Error requesting module ${this.build.module}. See your console for more detail.');
-        console.warn(jqXHR);
-      });
-  
-    return modulesPromise;
-  },
-  
-  _getBuild() {
-    if (!this.build.module.id) {
-      return;
-    }
-
-    this.build.model = new Build(this.params);
-    this.build.model.moduleId = this.build.module.id;
-    return this._fetchBuild();
-  },
-  
-  _getLog() {
-    const logSizePromise = this._getLogSize();
-    
-    if (!logSizePromise || !this.build.model) {
-      return;
-    }
-    
-    logSizePromise.done((size) => {
-      this.build.logCollection = new Log({
-        buildNumber: this.build.model.data.build.id,
-        size: size,
-        buildState: this.build.model.data.build.state
-      });    
-    });
-      
-    return logSizePromise;
-  },
-  
-  _updateLogSize() {
-    const logSizePromise = this._getLogSize();
-    
-    if (!logSizePromise) {
-      return;
-    }
-
-    logSizePromise.done((size) => {
-      this.build.logCollection.options.size = size;
-    });
-      
-    return logSizePromise;
-  },
-  
-  _getLogSize() {
-    if (!this.build.model) {
-      return;
-    }
-
-    if (buildIsOnDeck(this.build.model.data.build.state)) {
-      return;
-    }
-
-    const logSize = new LogSize({
-      buildNumber: this.build.model.data.build.id
-    });
-
-    const sizePromise = logSize.fetch();
-
-    sizePromise.fail((err) => {
-      console.warn('Error requesting log size.');
-      console.warn(err);
-      this.loadBuildError('Error accessing build log, or log does not exist. View console for more detail');
-    });
-
-    return sizePromise;
-  },
-
-  _assignBuildProcessing() {
-    const buildState = this.build.model.data.build.state;
-
-    switch (buildState) {
-      case BuildStates.QUEUED:
-      case BuildStates.LAUNCHING:
-        this._processBuildOnDeck();
-        break;
-    
-      case BuildStates.IN_PROGRESS:
-        this._processActiveBuild();
-        break;
-    
-      case BuildStates.SUCCEEDED:
-      case BuildStates.FAILED: 
-        this._processFinishedBuild();
-        break;
-      
-      case BuildStates.CANCELLED:
-        this._processCancelledBuild();
-        break;
-    }
-
-  },
-
-  _triggerUpdate(additional = {}) {
-    const buildInfo = {
-      build: this.build.model.data,
-      log: this.build.logCollection || {},
-      loading: false,
-      positionChange: false
-    };
-
-    const buildUpdate = extend(buildInfo, additional);
-
-    this.trigger(buildUpdate);
-  },
+  setLogPollingState(state) {
+    this.api.navigationChange(state, (err, resp) => {
+      this.updateData(err, resp);
+    });    
+  }
 
 });
 

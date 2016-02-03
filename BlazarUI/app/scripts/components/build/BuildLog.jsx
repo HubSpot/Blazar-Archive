@@ -7,7 +7,7 @@ import BuildLogLine from './BuildLogLine.jsx';
 import Icon from '../shared/Icon.jsx';
 import Loader from '../shared/Loader.jsx';
 import BuildStates from '../../constants/BuildStates';
-
+import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 const initialState = {
   logExpanded: false,
@@ -37,10 +37,10 @@ class BuildLog extends Component {
 
   componentWillReceiveProps(nextProps) {
     const nextLog = nextProps.log;
-    const buildInProgress = nextProps.build.build.state === BuildStates.IN_PROGRESS;
-    const buildCancelled = nextProps.build.build.state === BuildStates.CANCELLED;
+    const buildInProgress = nextProps.build.state === BuildStates.IN_PROGRESS;
+    const buildCancelled = nextProps.build.state === BuildStates.CANCELLED;
     // check if we navigated to another build 
-    const hasNavigatedAway = (this.props.build.module.id !== nextProps.build.module.id) && this.props.build.module.id !== -1;
+    const hasNavigatedAway = (this.props.build.id !== nextProps.build.id) && this.props.build.id !== -1;
     let stateUpdates = clone(hasNavigatedAway ? initialState : refreshedState);
 
     if (nextProps.log.shouldPoll && !this.state.isTailing && buildInProgress) {
@@ -65,7 +65,7 @@ class BuildLog extends Component {
 
   componentDidUpdate() {
     const {log, build, positionChange} = this.props;
-    const buildCancelled = build.build.state === BuildStates.CANCELLED;    
+    const buildCancelled = build.state === BuildStates.CANCELLED;    
     const initialFetch = log.fetchCount === 1 && !positionChange && !this.state.haveFetchedOnce;
     
     // we fetch twice for cancelled builds to see if it is still processing
@@ -134,7 +134,7 @@ class BuildLog extends Component {
   }
 
   scrollToOffsetLine() {
-    const buildInProgress = this.props.build.build.state === BuildStates.IN_PROGRESS;
+    const buildInProgress = this.props.build.state === BuildStates.IN_PROGRESS;
     
     const scrollToEl = document.getElementById(this.scrollId);
     scrollToEl.scrollIntoView();
@@ -168,7 +168,7 @@ class BuildLog extends Component {
       
       const scrollHeight = $log[0].scrollHeight;
       const contentsHeight = $log.outerHeight();
-      const buildInProgress = this.props.build.build.state === BuildStates.IN_PROGRESS;
+      const buildInProgress = this.props.build.state === BuildStates.IN_PROGRESS;
       
       const bottomScrollBuffer = 1;
       const atBottom = scrollTop >= scrollHeight - contentsHeight - bottomScrollBuffer;
@@ -233,30 +233,15 @@ class BuildLog extends Component {
     });
   }
   
-  getRenderedSizeToggleIcon() {
-    const iconName = this.state.logExpanded ? 'compress' : 'expand';
-    
-    const renderedClassnames = ClassNames([
-      'log-expand-toggle',
-      {'log-expand-toggle--expanded' : this.state.logExpanded}
-    ]);
-
-    return (
-      <span onClick={this.toggleLogSize}>
-        <Icon name={iconName} classNames={renderedClassnames} />
-      </span>
-    );
-  }
-  
-  getFetchNextSpinner(){
-    if (this.state.fetchingNext || (this.state.isTailing && this.props.build.build.state === BuildStates.IN_PROGRESS)) {
+  renderFetchNextSpinner(){
+    if (this.state.fetchingNext || (this.state.isTailing && this.props.build.state === BuildStates.IN_PROGRESS)) {
       return (
         <Loader align='left' roomy={true} />
       );
     }
   }
   
-  getFetchPreviousSpinner() {
+  renderFetchPreviousSpinner() {
     if (!this.state.fetchingPrevious) {
       return null;
     }
@@ -266,10 +251,10 @@ class BuildLog extends Component {
     );
   }
   
-  getEndOfLogMessage() {
+  renderEndOfLogMessage() {
     const {build, log} = this.props;
-    const buildInProgress = build.build.state === BuildStates.IN_PROGRESS;
-    const buildCancelled = build.build.state === BuildStates.CANCELLED;
+    const buildInProgress = build.state === BuildStates.IN_PROGRESS;
+    const buildCancelled = build.state === BuildStates.CANCELLED;
     let message;
 
     if (buildInProgress || this.props.loading || !log.fetchCount) {
@@ -302,10 +287,10 @@ class BuildLog extends Component {
     
   }
 
-  generateLines() {
+  renderLogLines() {
     const {build, log, error} = this.props;
 
-    if (build.build.state === BuildStates.LAUNCHING || build.build.state === BuildStates.QUEUED) {
+    if (build.state === BuildStates.LAUNCHING || build.state === BuildStates.QUEUED) {
       return (
         <div>
           <BuildLogLine text='Polling for updates...' />
@@ -333,17 +318,25 @@ class BuildLog extends Component {
     });
   }
   
+  renderError() {
+    return (
+      <GenericErrorMessage 
+        message={this.props.error}
+      />
+    );
+  }
+  
   render() {
     return (
       <pre id='log' 
         ref='log'
         className={this.getContainerClassNames()}
       >
-        {this.getFetchPreviousSpinner()}
-        {this.getRenderedSizeToggleIcon()}
-        {this.generateLines()}
-        {this.getFetchNextSpinner()}
-        {this.getEndOfLogMessage()}
+        {this.renderError()}
+        {this.renderFetchPreviousSpinner()}
+        {this.renderLogLines()}
+        {this.renderFetchNextSpinner()}
+        {this.renderEndOfLogMessage()}
       </pre>
     );
   }

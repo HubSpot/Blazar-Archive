@@ -1,11 +1,8 @@
 jest.dontMock('../../components/shared/Sha.jsx');
-jest.dontMock('../../components/shared/Copyable.jsx');
 jest.dontMock('../../components/shared/Icon.jsx');
 
 import React from 'react/addons';
 import Sha from '../../components/shared/Sha.jsx';
-// import Copyable from '../../components/shared/Copyable.jsx';
-// import Icon from '../../components/shared/Icon.jsx';
 
 const TestUtils = React.addons.TestUtils;
 
@@ -47,19 +44,5 @@ describe('<Sha />', () => {
   it('should have the right tag', () => {
     expect(sha.type).toBe('span');
   });
-
-
-  // TO DO: Get <a /> link to render properly
-  // ========================================
-  // it('should render all the children', () => {
-  //
-  //   expect(sha.props.children).toEqual([
-  //     <Copyable text='fljdksfsdkfj3r3fwef'>
-  //       <Icon type='octicon' classNames='icon-roomy fa-link' name='clippy' />
-  //     </Copyable>,
-  //     <a href='https://github.com/HubSpot/Blazar/commit/fljdksfsdkfj3r3fwef/' target="_blank">fljdksfs</a>
-  //   ]);
-  //
-  // });
 
 });

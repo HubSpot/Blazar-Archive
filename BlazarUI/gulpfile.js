@@ -121,6 +121,13 @@ gulp.task('serve', function() {
   });
 });
 
+// copy fixtures
+gulp.task('fixtures', function(cb) {
+  return gulp.src(app + 'scripts/fixtures/**/*.json')
+    .pipe($.size({ title : 'fixtures' }))
+    .pipe(gulp.dest(dist + 'js/fixtures/'));
+});
+
 // copy images
 gulp.task('images', function(cb) {
   return gulp.src(app + 'images/**/*.{png,jpg,jpeg,gif,svg}')
@@ -135,6 +142,8 @@ gulp.task('watch', function() {
   gulp.watch(app + 'index.mustache', ['html']);
   gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
   gulp.watch(app + 'scripts/**/*.js', ['scripts', 'lint']);
+  // gulp.watch(app + 'scripts/**/*.jsx', ['scripts']);
+  // gulp.watch(app + 'scripts/**/*.js', ['scripts']);
 });
 
 // remove bundles

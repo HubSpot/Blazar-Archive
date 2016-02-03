@@ -19,7 +19,7 @@ class Log extends Model {
     this.requestOffset = this.getMaxOffset(options.size);
     this.lengthOverride = false;
     this.shouldPoll = options.buildState === BuildStates.IN_PROGRESS;
-    this.currentOffsetLine = 
+    this.currentOffsetLine = null;
     // keep track of if we have loaded the beginning or the end of the log
     this.maxOffsetLoaded = options.size;
     this.minOffsetLoaded = this.requestOffset;
@@ -39,7 +39,7 @@ class Log extends Model {
       console.warn('requestOffset not properly set');
       return;
     }
-    return `${config.apiRoot}/build/${this.options.buildNumber}/log?offset=${this.requestOffset}&length=${this.lengthOverride || this.baseRequestLength}`;
+    return `${config.apiRoot}/modules/builds/${this.options.buildId}/log?offset=${this.requestOffset}&length=${this.lengthOverride || this.baseRequestLength}`;
   }
 
   getMaxOffset(size) {
@@ -47,7 +47,7 @@ class Log extends Model {
   }
   
   parseInactiveBuild() {
-    // first fetch or navigated 'To Bottom'
+    // First fetch or navigated 'To Bottom'
     if (!this.fetchAction || this.fetchAction === 'bottom') {
       this.handleEndOfLogFetch();
     }
@@ -90,6 +90,7 @@ class Log extends Model {
   }
 
   parse() {
+    this.data = this.raw;
     this.fetchCount++;
     this.fetchTimestamp = Date.now();
     this.maxOffsetLoaded = Math.max(this.data.nextOffset, this.maxOffsetLoaded);

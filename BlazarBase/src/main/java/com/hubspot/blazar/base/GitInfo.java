@@ -14,22 +14,18 @@ public class GitInfo {
   private final String host;
   private final String organization;
   private final String repository;
-  private final int repositoryId;
+  private final long repositoryId;
   private final String branch;
   private final boolean active;
-  private final long createdTimestamp;
-  private final long updatedTimestamp;
 
   @JsonCreator
   public GitInfo(@JsonProperty("id") Optional<Integer> id,
                  @JsonProperty("host") String host,
                  @JsonProperty("organization") String organization,
                  @JsonProperty("repository") String repository,
-                 @JsonProperty("repositoryId") int repositoryId,
+                 @JsonProperty("repositoryId") long repositoryId,
                  @JsonProperty("branch") String branch,
-                 @JsonProperty("active") boolean active,
-                 @JsonProperty("createdTimestamp") long createdTimestamp,
-                 @JsonProperty("updatedTimestamp") long updatedTimestamp) {
+                 @JsonProperty("active") boolean active) {
     this.id = id;
     this.host = host;
     this.organization = organization;
@@ -37,8 +33,6 @@ public class GitInfo {
     this.repositoryId = repositoryId;
     this.branch = branch;
     this.active = active;
-    this.createdTimestamp = createdTimestamp;
-    this.updatedTimestamp = updatedTimestamp;
   }
 
   public Optional<Integer> getId() {
@@ -57,7 +51,7 @@ public class GitInfo {
     return repository;
   }
 
-  public int getRepositoryId() {
+  public long getRepositoryId() {
     return repositoryId;
   }
 
@@ -69,25 +63,13 @@ public class GitInfo {
     return active;
   }
 
-  public long getCreatedTimestamp() {
-    return createdTimestamp;
-  }
-
-  public long getUpdatedTimestamp() {
-    return updatedTimestamp;
-  }
-
   @JsonIgnore
   public String getFullRepositoryName() {
     return getOrganization() + '/' + getRepository();
   }
 
   public GitInfo withId(int id) {
-    return new GitInfo(Optional.of(id), host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp);
-  }
-
-  public GitInfo withBranch(String branch) {
-    return new GitInfo(id, host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp);
+    return new GitInfo(Optional.of(id), host, organization, repository, repositoryId, branch, active);
   }
 
   @Override
@@ -124,6 +106,6 @@ public class GitInfo {
     String organization = parts.get(1);
     String repository = parts.get(2);
 
-    return new GitInfo(Optional.<Integer>absent(), host, organization, repository, 0, ref, false, System.currentTimeMillis(), System.currentTimeMillis());
+    return new GitInfo(Optional.<Integer>absent(), host, organization, repository, 0, ref, false);
   }
 }

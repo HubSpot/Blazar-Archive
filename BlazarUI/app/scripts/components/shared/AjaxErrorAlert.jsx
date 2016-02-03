@@ -11,8 +11,9 @@ class AjaxErrorAlert extends Component {
     
     return (
       <Alert bsStyle="danger">
-        <h4>Status {this.props.error.status}. Sorry, we're experiencing an error.</h4>
-        <p>{this.props.error.responseText}</p>
+        <strong>Status {this.props.error.status}. Sorry, we're experiencing an error.</strong>
+        <p>Response: {this.props.error.responseText}</p>
+        <p>Check your console for more detail</p>
       </Alert>
     );
   }

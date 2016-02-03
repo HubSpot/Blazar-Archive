@@ -1,6 +1,6 @@
-// Using in favor of Deprecated ComponentHelpers.js
 import React from 'react';
 import {some, uniq, flatten, filter, contains} from 'underscore';
+import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
 import {LABELS, iconStatus} from './constants';
@@ -14,6 +14,10 @@ export const timestampFormatted = function(timestamp, format='lll') {
   }
   const timeObject = moment(timestamp);
   return timeObject.format(format);
+};
+
+export const timestampDuration = function(startTimestamp, endTimestamp, round='true') {
+  return humanizeDuration(endTimestamp - startTimestamp, {round: round});
 };
 
 // 'BUILD_SUCCEEEDED' => 'Build Succeeded'
@@ -69,19 +73,6 @@ export const uniqueBranches = function(branches) {
   });
 };
 
-export const uniqueModules = function(modules) {
-  const uniqueModules = uniq(modules, false, (m) => {
-    return m.module.name;
-  });
-
-  return uniqueModules.map((m) => {
-    return {
-      value: m.module.name,
-      label: m.module.name
-    };
-  });
-};
-
 export const tableRowBuildState = function(state) {
   if (state === BuildStates.FAILED) {
     return 'bgc-danger';
@@ -91,61 +82,36 @@ export const tableRowBuildState = function(state) {
   }
 };
 
-export const getFilteredModules = function(filters, modules) {
+export const getFilteredBranches = function(filters, branches) {
+  
   const branchFilters = filters.branch;
-  const moduleFilters = filters.module;
 
-  const filteredModules = modules.filter((m) => {
+  const filteredBranches = branches.filter((b) => {
     let passGo = false;
-
+  
     // not filtering
-    if (branchFilters.length === 0 && moduleFilters.length === 0) {
+    if (branchFilters.length === 0) {
       return true;
     }
-
-    // filtering both branch and module
-    if (branchFilters.length > 0 && moduleFilters.length > 0) {
+  
+    if (branchFilters.length > 0) {
       let branchMatch = false;
-      let moduleMatch = false;
-
+  
       branchFilters.some((branch) => {
-        if (branch.value === m.gitInfo.branch) {
+        if (branch.value === b.gitInfo.branch) {
           branchMatch = true;
         }
       });
-
-      moduleFilters.some((module) => {
-        if (module.value === m.module.name) {
-          moduleMatch = true;
-        }
-      });
       
-      return branchMatch && moduleMatch;
-
+      return branchMatch;
     }
-
-    if (branchFilters.length > 0) {        
-      branchFilters.forEach((bf) => {
-        if (m.gitInfo.branch === bf.value) {
-          passGo = true;
-        }
-      });
-    }
-
-    if (moduleFilters.length > 0) {        
-      moduleFilters.forEach((mf) => {
-        if (m.module.name === mf.value) {
-          passGo = true;
-        }
-      });
-    }
-
+  
     return passGo;
   });
-
-  //finallay sort by branch and module name
-  return filteredModules.sort( (a, b) => {
-    return cmp(a.gitInfo.branch, b.gitInfo.branch) || cmp(a.module.name, b.module.name);
+  
+  //finally sort by branch and bodule name
+  return filteredBranches.sort((a, b) => {
+    return cmp(a.gitInfo.branch, b.gitInfo.branch);
   });  
 };
 
@@ -154,7 +120,7 @@ export const buildIsOnDeck = function(buildState) {
 };
 
 export const buildIsInactive = function(buildState) {
-  contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState);
+  return contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState);
 };
 
 // DOM Helpers
@@ -185,7 +151,7 @@ export const getPathname = function() {
   return window.location.pathname;
 };
 
-// Components
+// To do: move these out as components in components/shared
 export const buildResultIcon = function(result) {
   const classNames = LABELS[result];
 
@@ -194,6 +160,17 @@ export const buildResultIcon = function(result) {
       name={iconStatus[result]}
       classNames={classNames}
       title={humanizeText(result)}
+    />
+  );
+};
+
+
+export const renderBuildStatusIcon = function(state) {
+  return (
+    <Icon
+      name={iconStatus[state]}
+      classNames={`icon-roomy ${LABELS[state]}`}
+      title={humanizeText(state)}
     />
   );
 };

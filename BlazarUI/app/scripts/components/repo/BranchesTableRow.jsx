@@ -3,87 +3,80 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
-
-import Helpers from '../ComponentHelpers';
-import {tableRowBuildState} from '../Helpers';
+import {tableRowBuildState, humanizeText, timestampFormatted, renderBuildStatusIcon} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
 class BranchesTableRow extends Component {
 
-  getBuildResult(build) {
-    const result = build.state;
-    const classNames = `icon-roomy ${LABELS[result]}`;
+  renderBranchLink(gitInfo) {
+    const {gitInfo} = this.props.data;
 
     return (
-      <Icon
-        name={iconStatus[result]}
-        classNames={classNames}
-        title={Helpers.humanizeText(result)}
-      />
+      <span>
+        <Icon for='branch' classNames="icon-roomy icon-muted" />
+        <Link to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
+      </span>
     );
   }
-
-  render() {
+  
+  renderNoHistoryTable() {
+    return (
+      <tr> 
+        <td></td>
+        <td>
+          {this.renderBranchLink()}
+        </td>
+        <td>No History</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr> 
+    )
+  } 
+  
+  renderFullTable() {
     const {
       lastBuild,
       inProgressBuild,
       pendingBuild,
-      module,
       gitInfo
     } = this.props.data;
-
-    if (!has(this.props.data, 'lastBuild') ) {
-      return (
-        <tr> 
-          <td>
-            <Icon for='branch' classNames="icon-roomy icon-muted" />
-            <Link to={module.blazarPath.branch}>{gitInfo.branch}</Link>
-          </td>
-          <td>
-            <Icon for='module' classNames="icon-roomy icon-muted" />
-            <Link to={module.blazarPath.module}>{module.name}</Link>
-          </td>  
-          <td>No History</td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr> 
-      )
-      
-    }
-
-    let sha;
-    const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
     
-    if (build.sha !== undefined) {
-      sha = <Sha gitInfo={gitInfo} build={build} />;
-    }
-
+    let sha, buildLink;
+    const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
     let duration = build.duration;
+
     if (build.state === BuildStates.IN_PROGRESS) {
       duration = 'In Progress...';
     }
 
+    if (build.sha !== undefined) {
+      sha = <Sha gitInfo={gitInfo} build={build} />;
+    }
+
+    if (build.blazarPath) {
+      buildLink = (
+        <Link to={build.blazarPath}>
+          {build.buildNumber}
+        </Link>
+      );
+    }
+
     return (
       <tr className={tableRowBuildState(build.state)}>
-        <td>
-          <Icon for='branch' classNames="icon-roomy icon-muted" />
-          <Link to={module.blazarPath.branch}>{gitInfo.branch}</Link>
+        <td className='build-status'>
+          {renderBuildStatusIcon(build.state)}
         </td>
         <td>
-          <Icon for='module' classNames="icon-roomy icon-muted" />
-          <Link to={module.blazarPath.module}>{module.name}</Link>
+          {this.renderBranchLink(gitInfo)}
         </td>
         <td className='build-result-link'>
-          <Link to={build.blazarPath}>
-            {this.getBuildResult(build)}
-            {build.buildNumber}
-          </Link>
+          {buildLink}
         </td>
         <td>
-          {Helpers.timestampFormatted(build.startTimestamp)}
+          {timestampFormatted(build.startTimestamp)}
         </td>
         <td>
           {duration}
@@ -93,7 +86,18 @@ class BranchesTableRow extends Component {
         </td>
       </tr>
     );
+  
   }
+
+  render() {
+    if (!has(this.props.data, 'lastBuild') ) {
+      return this.renderNoHistoryTable();
+    }
+    else {
+      return this.renderFullTable();
+    }
+  }
+
 }
 
 BranchesTableRow.propTypes = {

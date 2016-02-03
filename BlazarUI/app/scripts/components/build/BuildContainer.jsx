@@ -1,54 +1,33 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll, some, clone} from 'underscore';
-import {getPathname, buildIsOnDeck, getIsStarredState} from '../Helpers';
-import BuildStates from '../../constants/BuildStates.js';
+import {bindAll} from 'underscore';
+import {buildIsOnDeck} from '../Helpers';
+import classNames from 'classnames';
 
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import BuildHeadline from './BuildHeadline.jsx';
-import BuildDetail from './BuildDetail.jsx';
 import BuildLogNavigation from './BuildLogNavigation.jsx';
 import BuildLog from './BuildLog.jsx';
 
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
-import StarStore from '../../stores/starStore';
-import StarActions from '../../actions/starActions';
-import LocationStore from '../../stores/locationStore';
 
 const initialState = {
-  build: {
-    build: {
-    },
-    gitInfo: {},
-    // we need to fetch moduleID
-    module: {
-      id: -1
-    }
-  },
-  log: {
-    logLines: []
+  data: {
+    build: {},
+    log: { logLines: [] }
   },
   error: false,
-  stars: [],
-  loading: true,
-  loadingStars: true,
-  isStarred: false
+  loading: true
 }
 
 class BuildContainer extends Component {
 
   constructor(props) {
     super(props);
-    bindAll(this, 
-      'toggleStar', 
-      'triggerCancelBuild',
-      'onStatusChange',
-      'requestNavigationChange'
-    );
+    bindAll(this, 'onStatusChange', 'requestNavigationChange');
     this.haveMounted = false;
     this.state = initialState;
   }
@@ -67,21 +46,14 @@ class BuildContainer extends Component {
   componentWillUnmount() {
     this.tearDown()
   }
-  
+
   setup(props) {
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     BuildActions.loadBuild(props.params);
-    // we get this detail from the sidebar on mount but need
-    // to refresh it when we change to another build
-    if (this.haveMounted) {
-      StarActions.loadStars('buildContainer'); 
-    }
   }
 
   tearDown() {
     this.unsubscribeFromBuild();
-    this.unsubscribeFromStars();
     BuildActions.resetBuild();
   }
 
@@ -92,19 +64,11 @@ class BuildContainer extends Component {
   fetchPrevious() {
     BuildActions.fetchPrevious();
   }
-
-  triggerCancelBuild() {
-    BuildActions.cancelBuild();
-  }
-
-  toggleStar(isStarred, starInfo) {
-    StarActions.toggleStar(isStarred, starInfo);
-  }
   
   requestNavigationChange(position) {
     BuildActions.navigationChange(position);
   }
-  
+
   requestPollingStateChange(change) {
     BuildActions.setLogPollingState(change);
   }
@@ -112,68 +76,56 @@ class BuildContainer extends Component {
   onStatusChange(state) {
     this.setState(state);
 
-    if (state.build && buildIsOnDeck(state.build.build.state)) {
+    if (state.data.build && buildIsOnDeck(state.data.build.state)) {
       setTimeout( () => {
         BuildActions.loadBuild(this.props.params);
       }, 2000);
     }
   }
+  
+  getHeaderClasses() {
+    const buildState = this.state.data.build.state;
+    
+    if (buildState) {
+      return classNames([
+        'build-header',
+        `alert-state-${buildState}`
+      ]);
+    }
+    return null;
+  }
 
   render() {
     return (
       <PageContainer>
-        <div className='build-header'>
+        <div className={this.getHeaderClasses()}>
           <UIGrid containerClassName='build-header__name-and-buttons'>
             <UIGridItem size={7}>
               <BuildHeadline 
-                moduleName={this.props.params.module}
-                moduleId={this.state.build.module.id}
-                modulePath={getPathname()}
-                buildNumber={parseInt(this.props.params.buildNumber)}
-                toggleStar={this.toggleStar}
-                loading={this.state.loading}
-                loadingStars={this.state.loadingStars || this.state.build.module.id === -1}
-                isStarred={getIsStarredState(this.state.stars, this.state.build.module.id)}
+                {...this.props}
+                {...this.state}
               />
             </UIGridItem>
             <UIGridItem size={5} >
               <BuildLogNavigation 
-                loading={this.state.loading}
-                build={this.state.build}
-                loading={this.state.loading}
+                build={this.state.data.build}
                 requestNavigationChange={this.requestNavigationChange}
+                {...this.state}
               />
             </UIGridItem>
           </UIGrid>
-          <UIGrid>
-            <UIGridItem size={12}>
-              <GenericErrorMessage 
-                message={this.state.error}
-              />
-              <BuildDetail
-                build={this.state.build}
-                loading={this.state.loading}
-                error={this.state.error}
-                triggerCancelBuild={this.triggerCancelBuild}
-              />
-            </UIGridItem>
-          </UIGrid>  
         </div>
-        <div className='build-body'>
-          <div>  
-            <BuildLog
-              build={this.state.build}
-              log={this.state.log}
-              loading={this.state.loading}
-              fetchNext={this.fetchNext}
-              fetchPrevious={this.fetchPrevious}
-              positionChange={this.state.positionChange}
-              error={this.state.error}
-              requestPollingStateChange={this.requestPollingStateChange}
-            />
-          </div>
+        <div className='build-body'>  
+          <BuildLog
+            build={this.state.data.build}
+            log={this.state.data.log}
+            fetchNext={this.fetchNext}
+            fetchPrevious={this.fetchPrevious}
+            positionChange={this.state.data.positionChange}
+            requestPollingStateChange={this.requestPollingStateChange}
+            {...this.state}
+          />
         </div>
-      
       </PageContainer>
     );
   }
