@@ -8,6 +8,7 @@ cache:
 steps:
   - description: "Installing dependencies"
     commands:
+      - echo $PWD
       - npm install
       - npm install bender-deps
   - description: "Linting"
