@@ -2,6 +2,9 @@ buildDeps:
   - node-0.12.7
   - hs-build-tools
 
+cache:
+  - $PWD/node_modules
+
 steps:
   - description: "Installing dependencies"
     commands:
