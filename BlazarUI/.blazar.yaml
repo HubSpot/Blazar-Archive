@@ -16,6 +16,7 @@ steps:
           BLAZAR_API_URL=https://bootstrap.hubteam.com/blazar/v2
           BLAZAR_APP_URI=/blazarv2
           BLAZAR_STATIC_ROOT=https://static.hsappstatic.net/BlazarUIv2/static-1.$BUILD_NUMBER
+          BLAZAR_USERNAME_COOKIE='hs_tools_username'
           ./node_modules/.bin/gulp build
   - description: "Publishing to the CDN"
     commands:

@@ -7,16 +7,21 @@ import Alert from 'react-bootstrap/lib/Alert';
 import Feedback from '../../models/Feedback';
 import FeedbackActions from '../../actions/feedbackActions';
 import FeedbackStore from '../../stores/feedbackStore';
+import Cookies from 'js-cookie';
 
 class FeedbackForm extends Component {
 
   constructor() {
     bindAll(this, 'toggleShow', 'submitFeedback', 'handleNameChange', 'handleMessageChange', 'resetForm', 'onStatusChange');
+
+    name = Cookies.get(config['usernameCookie']);
+    name = (name == undefined) ? '' : name;
+
     this.state = {
       sendError: false,
       submitted: false,
       visible: false,
-      nameValue: '',
+      nameValue: name,
       messageValue: '',
       submitDisabled: true,
       submitted: false,
