@@ -6,18 +6,18 @@ import com.google.common.base.Optional;
 
 import java.util.Objects;
 
-public class BuildState extends BuildDefinition {
-  private final Optional<Build> lastBuild;
-  private final Optional<Build> inProgressBuild;
-  private final Optional<Build> pendingBuild;
+public class RepositoryState {
+  private final GitInfo gitInfo;
+  private final Optional<RepositoryBuild> lastBuild;
+  private final Optional<RepositoryBuild> inProgressBuild;
+  private final Optional<RepositoryBuild> pendingBuild;
 
   @JsonCreator
-  public BuildState(@JsonProperty("gitInfo") GitInfo gitInfo,
-                    @JsonProperty("module") Module module,
-                    @JsonProperty("lastBuild") Optional<Build> lastBuild,
-                    @JsonProperty("inProgressBuild") Optional<Build> inProgressBuild,
-                    @JsonProperty("pendingBuild") Optional<Build> pendingBuild) {
-    super(gitInfo, module);
+  public RepositoryState(@JsonProperty("gitInfo") GitInfo gitInfo,
+                         @JsonProperty("lastBuild") Optional<RepositoryBuild> lastBuild,
+                         @JsonProperty("inProgressBuild") Optional<RepositoryBuild> inProgressBuild,
+                         @JsonProperty("pendingBuild") Optional<RepositoryBuild> pendingBuild) {
+    this.gitInfo = gitInfo;
 
     if (lastBuild.isPresent() && !lastBuild.get().getId().isPresent()) {
       this.lastBuild = Optional.absent();
@@ -38,20 +38,20 @@ public class BuildState extends BuildDefinition {
     }
   }
 
-  public Optional<Build> getLastBuild() {
+  public GitInfo getGitInfo() {
+    return gitInfo;
+  }
+
+  public Optional<RepositoryBuild> getLastBuild() {
     return lastBuild;
   }
 
-  public Optional<Build> getInProgressBuild() {
+  public Optional<RepositoryBuild> getInProgressBuild() {
     return inProgressBuild;
   }
 
-  public Optional<Build> getPendingBuild() {
+  public Optional<RepositoryBuild> getPendingBuild() {
     return pendingBuild;
-  }
-
-  public BuildState withPendingBuild(Build pendingBuild) {
-    return new BuildState(getGitInfo(), getModule(), lastBuild, inProgressBuild, Optional.of(pendingBuild));
   }
 
   @Override
@@ -64,8 +64,8 @@ public class BuildState extends BuildDefinition {
       return false;
     }
 
-    BuildState that = (BuildState) o;
-    return super.equals(o) &&
+    RepositoryState that = (RepositoryState) o;
+    return Objects.equals(gitInfo, that.gitInfo) &&
         Objects.equals(lastBuild, that.lastBuild) &&
         Objects.equals(inProgressBuild, that.inProgressBuild) &&
         Objects.equals(pendingBuild, that.pendingBuild);
@@ -73,6 +73,6 @@ public class BuildState extends BuildDefinition {
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), lastBuild, inProgressBuild, pendingBuild);
+    return Objects.hash(gitInfo, lastBuild, inProgressBuild, pendingBuild);
   }
 }
