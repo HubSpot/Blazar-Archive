@@ -1,9 +1,11 @@
 package com.hubspot.blazar.discovery;
 
 import com.google.common.collect.ImmutableSet;
+import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.github.GitHubProtos.PushEvent;
+import com.hubspot.blazar.base.MalformedFile;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,23 +27,26 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
   }
 
   @Override
-  public boolean shouldRediscover(GitInfo gitInfo, PushEvent pushEvent) throws IOException {
+  public boolean shouldRediscover(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     for (ModuleDiscovery delegate : delegates) {
-      if (delegate.shouldRediscover(gitInfo, pushEvent)) {
+      if (delegate.shouldRediscover(gitInfo, commitInfo)) {
         return true;
       }
     }
 
-    return configDiscovery.shouldRediscover(gitInfo, pushEvent);
+    return configDiscovery.shouldRediscover(gitInfo, commitInfo);
   }
 
   @Override
-  public Set<DiscoveredModule> discover(GitInfo gitInfo) throws IOException {
+  public DiscoveryResult discover(GitInfo gitInfo) throws IOException {
     Map<String, Set<DiscoveredModule>> modulesByPath = new HashMap<>();
+    Set<MalformedFile> malformedFiles = new HashSet<>();
 
     for (ModuleDiscovery delegate : delegates) {
-      for (DiscoveredModule module : delegate.discover(gitInfo)) {
-        String folder = folderFor(module.getPath());
+      DiscoveryResult result  =delegate.discover(gitInfo);
+      malformedFiles.addAll(result.getMalformedFiles());
+      for (DiscoveredModule module : result.getModules()) {
+        String folder = module.getFolder();
 
         Set<DiscoveredModule> modules = modulesByPath.get(folder);
         if (modules == null) {
@@ -53,10 +58,14 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
       }
     }
 
-    for (DiscoveredModule module : configDiscovery.discover(gitInfo)) {
-      String folder = folderFor(module.getPath());
+    DiscoveryResult result = configDiscovery.discover(gitInfo);
+    malformedFiles.addAll(result.getMalformedFiles());
+    for (DiscoveredModule module : result.getModules()) {
+      String folder = module.getFolder();
 
-      if (!modulesByPath.containsKey(folder)) {
+      if (!module.isActive()) {
+        modulesByPath.remove(folder);
+      } else if (!modulesByPath.containsKey(folder)) {
         modulesByPath.put(folder, ImmutableSet.of(module));
       }
     }
@@ -66,10 +75,6 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
       modules.addAll(folderModules);
     }
 
-    return modules;
-  }
-
-  private static String folderFor(String path) {
-    return path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "/";
+    return new DiscoveryResult(modules, malformedFiles);
   }
 }

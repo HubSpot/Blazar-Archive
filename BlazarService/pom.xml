@@ -24,10 +24,6 @@
       <artifactId>BlazarData</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.hubspot.rosetta</groupId>
-      <artifactId>RosettaCore</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.hubspot</groupId>
       <artifactId>SingularityBase</artifactId>
     </dependency>
@@ -99,19 +95,11 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-assets</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-servlets</artifactId>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
@@ -134,17 +122,8 @@
       <artifactId>dropwizard-migrations</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-views</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-views-mustache</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlets</artifactId>
+      <groupId>com.codahale.metrics</groupId>
+      <artifactId>metrics-core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.codahale.metrics</groupId>
@@ -208,10 +187,6 @@
       <artifactId>HorizonNing</artifactId>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.argparse4j</groupId>
-      <artifactId>argparse4j</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.curator</groupId>
       <artifactId>curator-client</artifactId>
     </dependency>
@@ -231,10 +206,10 @@
       <groupId>io.netty</groupId>
       <artifactId>netty</artifactId>
     </dependency>
-      <dependency>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-validator</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+    </dependency>
   </dependencies>
 
   <profiles>
@@ -255,7 +230,7 @@
                 <image>
                   <name>hubspot/blazarservice:${project.version}</name>
                   <build>
-                    <from>java:8u45-jre</from>
+                    <from>java:8u65-jre</from>
                     <maintainer>platform-infrastructure-groups@hubspot.com</maintainer>
                     <ports>
                       <port>8099</port>
