@@ -23,24 +23,22 @@ class SidebarItem extends Component {
     return (
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='icon-muted'/>{ ' ' }
-        <Link to={gitInfo.blazarRepositoryPath} className='sidebar-item__module-branch-name'>
+        <Link to={gitInfo.blazarBranchPath} className='sidebar-item__module-branch-name'>
           {truncate(gitInfo.repository, 30, true)}
         </Link>
       </div>
     );
   }
 
-  renderBranchLink() {
+  renderBranchText() {
     const {gitInfo} = this.props;
 
     return (
       <div className='sidebar-item__branch-link'>
         <Icon type='octicon' name='git-branch' classNames='icon-muted'/>{ ' ' }
-        <Link 
-          to={gitInfo.blazarBranchPath}
-          className='sidebar-item__module-branch-name'>
-            {truncate(gitInfo.branch, 40, true)}
-        </Link>
+        <span className='sidebar-item__module-branch-name'>
+          {truncate(gitInfo.branch, 40, true)}
+        </span>
       </div>
     )
   }
@@ -87,7 +85,7 @@ class SidebarItem extends Component {
       <li className={this.getItemClasses()}>
         {this.renderBuildLink()}
         {this.renderRepoLink()}
-        {this.renderBranchLink()}
+        {this.renderBranchText()}
       </li>
     )
   }
