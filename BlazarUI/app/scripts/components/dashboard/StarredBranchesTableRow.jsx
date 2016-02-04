@@ -16,9 +16,8 @@ class StarredBranchesTableRow extends Component {
     const latestBuild = item.get('lastBuild');
     const latestBuildGitInfo = item.get('gitInfo');
 
-    const blazarRepositoryPath = latestBuildGitInfo.get('blazarRepositoryPath');
-    const repository = latestBuildGitInfo.get('repository');
     const blazarBranchPath = latestBuildGitInfo.get('blazarBranchPath');
+    const repository = latestBuildGitInfo.get('repository');
     const branch = latestBuildGitInfo.get('branch');
 
     if (latestBuild === undefined) {
@@ -26,10 +25,10 @@ class StarredBranchesTableRow extends Component {
         <tr>
           <td />
           <td>
-            <Link to={blazarRepositoryPath}>{repository}</Link>
+            <Link to={blazarBranchPath}>{repository}</Link>
           </td>
           <td>
-            <Link to={blazarBranchPath}>{branch}</Link>
+            {branch}
           </td>
           <td> No build history </td>
           <td />
@@ -66,10 +65,10 @@ class StarredBranchesTableRow extends Component {
           {buildResultIcon(latestBuild.get('state'))}
         </td>
         <td>
-          <Link to={blazarRepositoryPath}>{repository}</Link>
+          <Link to={blazarBranchPath}>{repository}</Link>
         </td>
         <td> 
-          <Link to={blazarBranchPath}>{branch}</Link>
+          {branch}
         </td>
         <td>
           <Link to={latestBuild.get('blazarPath')}>{latestBuild.get('buildNumber')}</Link>
