@@ -3,7 +3,7 @@ import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import {contains, has} from 'underscore';
-import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, renderBuildStatusIcon} from '../Helpers';
+import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
   
@@ -37,7 +37,7 @@ class RepoBuildModulesTableRow extends Component {
     return (
       <tr className={tableRowBuildState(data.state)}>
         <td className='build-status'>
-          {renderBuildStatusIcon(data.state)}
+          {buildResultIcon(data.state)}
         </td>
         <td className='table-cell-link'>
           {this.renderBuildLink()}

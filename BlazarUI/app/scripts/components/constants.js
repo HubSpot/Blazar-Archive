@@ -13,7 +13,7 @@ export const iconStatus = {
   'IN_PROGRESS': 'circle-o-notch fa-spin',
   'QUEUED': 'circle-o-notch fa-spin',
   'LAUNCHING': 'circle-o-notch fa-spin',
-  'CANCELLED': 'stop opacity-semi'
+  'CANCELLED': 'stop'
 };
 
 export const unicode = {
@@ -37,9 +37,9 @@ export const ICON_LIST = {
 export const BUILD_ICONS = {
   'LAUNCHING': 'hourglass-start',
   'IN_PROGRESS': 'hourglass-half',
-  'SUCCEEDED': 'check success',
-  'FAILED': 'close danger',
-  'CANCELLED': 'stop opacity-semi warning'
+  'SUCCEEDED': 'check',
+  'FAILED': 'close',
+  'CANCELLED': 'stop'
 };
 
 export const NO_MATCH_MESSAGES = {

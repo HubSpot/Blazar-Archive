@@ -3,8 +3,11 @@ import {some, uniq, flatten, filter, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
-import {LABELS, iconStatus} from './constants';
+import {LABELS, BUILD_ICONS, iconStatus} from './constants';
 import Icon from './shared/Icon.jsx';
+import IconStack from './shared/IconStack.jsx';
+import Immutable from 'Immutable';
+import classNames from 'classNames';
 
 // 1234567890 => 1 Aug 1991 15:00
 export const timestampFormatted = function(timestamp, format='lll') {
@@ -154,13 +157,16 @@ export const getPathname = function() {
 // To do: move these out as components in components/shared
 export const buildResultIcon = function(result) {
   const classNames = LABELS[result];
+  const resultSymbol = BUILD_ICONS[result];
 
   return (
-    <Icon
-      name={iconStatus[result]}
-      classNames={classNames}
-      title={humanizeText(result)}
-    />
+    <div className="table-icon-container">
+      <IconStack 
+        iconStackBase="circle"
+        iconNames={Immutable.List.of(iconStatus[result])}
+        classNames={classNames}
+      />
+    </div>
   );
 };
 
@@ -173,4 +179,17 @@ export const renderBuildStatusIcon = function(state) {
       title={humanizeText(state)}
     />
   );
+};
+
+export const getBuildStatusIconClassNames = function(result, prevBuildState) {
+  let prevBuildStateModifier = ``;
+
+  if (result === BuildStates.IN_PROGRESS && prevBuildState) {
+    prevBuildStateModifier = `-laststatus-${prevBuildState}`;
+  }
+
+  return classNames([
+    'building-icon',
+    `building-icon--${result}${prevBuildStateModifier}`
+  ]);
 };
