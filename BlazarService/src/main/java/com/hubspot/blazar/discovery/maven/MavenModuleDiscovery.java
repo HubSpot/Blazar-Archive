@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableSet;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.DiscoveryResult;
@@ -32,7 +33,7 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#v2"));
   private static final Optional<GitInfo> DEPLOYABLE_BUILDPACK =
       Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#v2-deployable"));
-  private static final String EXECUTABLE_MARKER = ".build-executable";
+  private static final Set<String> EXECUTABLE_MARKERS = ImmutableSet.of(".build-executable", ".build-thin");
 
   private final GitHubHelper gitHubHelper;
   private final ObjectMapper objectMapper;
@@ -109,7 +110,13 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
 
   private boolean isDeployable(String file, Set<String> allFiles) throws IOException {
     String folder = file.contains("/") ? file.substring(0, file.lastIndexOf('/') + 1) : "";
-    return allFiles.contains(folder + EXECUTABLE_MARKER);
+    for (String executableMarker : EXECUTABLE_MARKERS) {
+      if (allFiles.contains(folder + executableMarker)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private static boolean isPom(String path) {
@@ -117,6 +124,12 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
   }
 
   private static boolean isExecutableMarker(String path) {
-    return EXECUTABLE_MARKER.equals(path) || path.endsWith("/" + EXECUTABLE_MARKER);
+    for (String executableMarker : EXECUTABLE_MARKERS) {
+      if (executableMarker.equals(path) || path.endsWith("/" + executableMarker)){
+        return true;
+      }
+    }
+
+    return false;
   }
 }
