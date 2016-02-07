@@ -6,7 +6,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 
-public class BuildListenerModule implements Module {
+public class BuildVisitorModule implements Module {
 
   @Override
   public void configure(Binder binder) {

@@ -1,11 +1,11 @@
 package com.hubspot.blazar.listener;
 
 import com.google.common.base.Optional;
+import com.google.common.eventbus.EventBus;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.data.util.BuildNumbers;
-import com.hubspot.blazar.util.RepositoryBuildLauncher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,13 +17,13 @@ public class CompletedRepositoryBuildVisitor implements RepositoryBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(CompletedRepositoryBuildVisitor.class);
 
   private final RepositoryBuildService repositoryBuildService;
-  private final RepositoryBuildLauncher buildLauncher;
+  private final EventBus eventBus;
 
   @Inject
   public CompletedRepositoryBuildVisitor(RepositoryBuildService repositoryBuildService,
-                                         RepositoryBuildLauncher buildLauncher) {
+                                         EventBus eventBus) {
     this.repositoryBuildService = repositoryBuildService;
-    this.buildLauncher = buildLauncher;
+    this.eventBus = eventBus;
   }
 
   @Override
@@ -37,15 +37,12 @@ public class CompletedRepositoryBuildVisitor implements RepositoryBuildVisitor {
     BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(build.getBranchId());
 
     Optional<Long> pendingBuildId = buildNumbers.getPendingBuildId();
-    if (!buildNumbers.getPendingBuildId().isPresent()) {
-      LOG.info("No pending build for branch {}", build.getBranchId());
-    } else if (buildNumbers.getInProgressBuildId().isPresent()) {
-      LOG.info("In progress build for branch {}, not launching pending build {}", build.getBranchId(), pendingBuildId.get());
-    } else {
-      LOG.info("Going to launch pending build {} for branch {}", pendingBuildId.get(), build.getBranchId());
+    if (pendingBuildId.isPresent()) {
+      LOG.info("Posting event for pending build {} for branch {}", pendingBuildId.get(), build.getBranchId());
       RepositoryBuild toLaunch = repositoryBuildService.get(pendingBuildId.get()).get();
-      Optional<RepositoryBuild> previous = Optional.of(build);
-      buildLauncher.launch(toLaunch, previous);
+      eventBus.post(toLaunch);
+    } else {
+      LOG.info("No pending build for branch {}", build.getBranchId());
     }
   }
 }

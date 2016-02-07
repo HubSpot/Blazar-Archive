@@ -12,7 +12,7 @@ import javax.inject.Singleton;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Provides;
 import com.hubspot.blazar.discovery.DiscoveryModule;
-import com.hubspot.blazar.listener.BuildListenerModule;
+import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.resources.BranchStateResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
@@ -65,7 +65,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
     binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule());
-    binder.install(new BuildListenerModule());
+    binder.install(new BuildVisitorModule());
     binder.install(new DiscoveryModule());
 
     binder.bind(BranchResource.class);
