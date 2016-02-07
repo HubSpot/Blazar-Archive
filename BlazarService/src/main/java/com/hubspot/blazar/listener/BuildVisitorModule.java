@@ -20,7 +20,7 @@ public class BuildVisitorModule implements Module {
     repositoryBuildVisitors.addBinding().to(LaunchingRepositoryBuildVisitor.class);
     // cancel module builds
     repositoryBuildVisitors.addBinding().to(CancelledRepositoryBuildVisitor.class);
-    // launch any queued repository build if present
+    // post event for queued repository build if present
     repositoryBuildVisitors.addBinding().to(CompletedRepositoryBuildVisitor.class);
     // update GitHub status
     repositoryBuildVisitors.addBinding().to(GitHubStatusVisitor.class);
