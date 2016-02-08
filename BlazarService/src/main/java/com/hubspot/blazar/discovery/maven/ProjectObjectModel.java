@@ -20,25 +20,25 @@ public class ProjectObjectModel {
   private final String groupId;
   private final String artifactId;
   private final String packaging;
-  private final List<Map<String, String>> dependencies;
+  private final List<Map<String, Object>> dependencies;
   private final Set<String> depends;
 
   @JsonCreator
-  public ProjectObjectModel(@JsonProperty("parent") final Map<String, String> parent,
+  public ProjectObjectModel(@JsonProperty("parent") final Map<String, Object> parent,
                             @JsonProperty("groupId") Optional<String> groupId,
                             @JsonProperty("artifactId") String artifactId,
                             @JsonProperty("packaging") Optional<String> packaging,
-                            @JsonProperty("dependencies") List<Map<String, String>> dependencies) {
+                            @JsonProperty("dependencies") List<Map<String, Object>> dependencies) {
     this.groupId = groupId.or(new Supplier<String>() {
 
       @Override
       public String get() {
-        return parent.get("groupId");
+        return (String) parent.get("groupId");
       }
     });
     this.artifactId = Preconditions.checkNotNull(artifactId);
     this.packaging = packaging.or("jar");
-    this.dependencies = Objects.firstNonNull(dependencies, new ArrayList<Map<String, String>>());
+    this.dependencies = Objects.firstNonNull(dependencies, new ArrayList<Map<String, Object>>());
     if (parent != null) {
       this.dependencies.add(parent);
     }
@@ -57,7 +57,7 @@ public class ProjectObjectModel {
     return packaging;
   }
 
-  public List<Map<String, String>> getDependencies() {
+  public List<Map<String, Object>> getDependencies() {
     return dependencies;
   }
 
@@ -76,16 +76,16 @@ public class ProjectObjectModel {
     return Collections.singleton(groupId + ":" + artifactId);
   }
 
-  private static Set<String> toDepends(List<Map<String, String>> dependencies) {
+  private static Set<String> toDepends(List<Map<String, Object>> dependencies) {
     Set<String> depends = new HashSet<>();
 
     if (dependencies == null) {
       return depends;
     }
 
-    for (Map<String, String> dependency : dependencies) {
-      String groupId = Preconditions.checkNotNull(dependency.get("groupId"));
-      String artifactId = Preconditions.checkNotNull(dependency.get("artifactId"));
+    for (Map<String, Object> dependency : dependencies) {
+      String groupId = Preconditions.checkNotNull((String) dependency.get("groupId"));
+      String artifactId = Preconditions.checkNotNull((String) dependency.get("artifactId"));
       if (groupId.contains("${") || artifactId.contains("${")) {
         continue;
       }
