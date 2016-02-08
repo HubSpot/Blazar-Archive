@@ -21,6 +21,6 @@ public class ModuleDiscoveryService {
   @Transactional
   public void handleDiscoveryResult(GitInfo gitInfo, DiscoveryResult result) {
     moduleService.setModules(gitInfo, result.getModules());
-    malformedFileService.setMalformedFiles(result.getMalformedFiles());
+    malformedFileService.setMalformedFiles(gitInfo, result.getMalformedFiles());
   }
 }

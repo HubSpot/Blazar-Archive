@@ -1,5 +1,6 @@
 package com.hubspot.blazar.data.service;
 
+import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.data.dao.MalformedFileDao;
 
@@ -22,19 +23,10 @@ public class MalformedFileService {
   }
 
   @Transactional
-  public void setMalformedFiles(Set<MalformedFile> malformedFiles) {
-    if (malformedFiles.isEmpty()) {
-      return;
+  public void setMalformedFiles(GitInfo gitInfo, Set<MalformedFile> malformedFiles) {
+    malformedFileDao.clearMalformedFiles(gitInfo.getId().get());
+    if (!malformedFiles.isEmpty()) {
+      malformedFileDao.insertMalformedFile(malformedFiles);
     }
-
-    int branchId = malformedFiles.iterator().next().getBranchId();
-    for (MalformedFile file : malformedFiles) {
-      if (file.getBranchId() != branchId) {
-        throw new IllegalArgumentException("All files must be for the same repository");
-      }
-    }
-
-    malformedFileDao.clearMalformedFiles(branchId);
-    malformedFileDao.insertMalformedFile(malformedFiles);
   }
 }
