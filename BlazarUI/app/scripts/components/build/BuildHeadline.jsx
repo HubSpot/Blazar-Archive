@@ -17,10 +17,12 @@ class BuildHeadline extends Component {
     return (
         <Headline>
           {buildResultIcon(this.props.data.build.state)}
-          {moduleName}
-          <HeadlineDetail>
-            Status: {humanizeText(build.state)}
-          </HeadlineDetail>
+          <div className="build-headline">
+            {moduleName}
+            <HeadlineDetail>
+              Status: {humanizeText(build.state)}
+            </HeadlineDetail>
+          </div>
         </Headline>
     );
   }
