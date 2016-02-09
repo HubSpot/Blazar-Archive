@@ -3,7 +3,7 @@ import {some, uniq, flatten, filter, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
-import {LABELS, BUILD_ICONS, iconStatus} from './constants';
+import {LABELS, iconStatus} from './constants';
 import Icon from './shared/Icon.jsx';
 import IconStack from './shared/IconStack.jsx';
 import Immutable from 'Immutable';
@@ -155,29 +155,25 @@ export const getPathname = function() {
 };
 
 // To do: move these out as components in components/shared
-export const buildResultIcon = function(result) {
-  const classNames = LABELS[result];
-  const resultSymbol = BUILD_ICONS[result];
+export const buildResultIcon = function(result, prevBuildState='') {
+  let classNames = LABELS[result];
+  let resultSymbol = iconStatus[result];
+  let iconNames = Immutable.List.of(iconStatus[result]);
+
+  if (result == BuildStates.IN_PROGRESS) {
+    classNames = getBuildStatusIconClassNames(result, prevBuildState);
+    resultSymbol = iconStatus[prevBuildState];
+    iconNames = Immutable.List.of(iconStatus[prevBuildState]);
+  }
 
   return (
     <div className="table-icon-container">
       <IconStack 
         iconStackBase="circle"
-        iconNames={Immutable.List.of(iconStatus[result])}
+        iconNames={iconNames}
         classNames={classNames}
       />
     </div>
-  );
-};
-
-
-export const renderBuildStatusIcon = function(state) {
-  return (
-    <Icon
-      name={iconStatus[state]}
-      classNames={`icon-roomy ${LABELS[state]}`}
-      title={humanizeText(state)}
-    />
   );
 };
 

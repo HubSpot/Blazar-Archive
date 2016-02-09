@@ -8,7 +8,7 @@ import RepoBuildCancelButton from './RepoBuildCancelButton.jsx';
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
 import Icon from '../shared/Icon.jsx';
-import { BUILD_ICONS } from '../constants';
+import {buildResultIcon} from '../Helpers';
 
 import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
@@ -105,7 +105,6 @@ class RepoBuildBuildDetail extends Component {
       <div className={this.getWrapperClassNames(build)}>
         <div className='build-detail-header'>
           <p className='build-detail-header__build-state'>
-            <Icon name={BUILD_ICONS[build.state]} classNames="headline-icon"></Icon>
             Build {buildDetail.buildResult} 
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
           </p>

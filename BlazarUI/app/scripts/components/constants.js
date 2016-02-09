@@ -4,7 +4,8 @@ export const LABELS = {
   'CANCELLED': 'warning',
   'QUEUED': 'info',
   'LAUNCHING': 'info',
-  'IN_PROGRESS': 'info'
+  'IN_PROGRESS': 'info',
+  'SKIPPED': 'skipped'
 };
 
 export const iconStatus = {
@@ -13,7 +14,8 @@ export const iconStatus = {
   'IN_PROGRESS': 'circle-o-notch fa-spin',
   'QUEUED': 'circle-o-notch fa-spin',
   'LAUNCHING': 'circle-o-notch fa-spin',
-  'CANCELLED': 'stop'
+  'CANCELLED': 'stop',
+  'SKIPPED': 'ellipsis-h'
 };
 
 export const unicode = {
@@ -32,14 +34,6 @@ export const ICON_LIST = {
   'scroll-down': 'fa fa-arrow-circle-down',
   'scroll-up': 'fa fa-arrow-circle-up',
   'circle-check': 'fa fa-check-circle'
-};
-
-export const BUILD_ICONS = {
-  'LAUNCHING': 'hourglass-start',
-  'IN_PROGRESS': 'hourglass-half',
-  'SUCCEEDED': 'check',
-  'FAILED': 'close',
-  'CANCELLED': 'stop'
 };
 
 export const NO_MATCH_MESSAGES = {

@@ -74,6 +74,13 @@ class BranchContainer extends Component {
     }
     
     else {
+
+      let params = {};
+
+      if (this.state.builds && this.state.builds.get(1)) {
+        this.props.params.prevBuildState = this.state.builds.get(1).get('state');
+      }
+
       return (
         <BranchBuildHistoryTable
           data={this.state.builds}

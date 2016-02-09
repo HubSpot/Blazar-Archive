@@ -45,12 +45,17 @@ class BranchBuildHistoryTableRow extends Component {
   }
 
   render() {
-    const {data} = this.props;
+    const {data, params} = this.props;
+    let stateToRender = '';
+
+    if (data.state === BuildStates.IN_PROGRESS) {
+      stateToRender = params.prevBuildState;
+    }
 
     return (
       <tr className={tableRowBuildState(data.state)}>
         <td className='build-status'>
-          {buildResultIcon(data.state)}
+          {buildResultIcon(data.state, stateToRender)}
         </td>
         <td className='build-result-link'>
           <Link to={data.blazarPath}>{data.buildNumber}</Link>
