@@ -11,9 +11,6 @@ export const LABELS = {
 export const iconStatus = {
   'SUCCEEDED': 'check',
   'FAILED': 'close',
-  'IN_PROGRESS': 'circle-o-notch fa-spin',
-  'QUEUED': 'circle-o-notch fa-spin',
-  'LAUNCHING': 'circle-o-notch fa-spin',
   'CANCELLED': 'stop',
   'SKIPPED': 'ellipsis-h'
 };

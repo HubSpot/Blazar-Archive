@@ -30,6 +30,9 @@ buildInProgressStatus(color)
   
 .building-icon--IN_PROGRESS-laststatus-FAILED
   buildInProgressStatus($danger)
+  
+.building-icon--IN_PROGRESS-laststatus-SKIPPED
+  buildInProgressStatus($skipped)
 
 .building-icon--LAUNCHING
   buildInProgressStatus($default)
@@ -42,6 +45,9 @@ buildInProgressStatus(color)
 
 .building-icon--FAILED
   buildStatus($danger)
+  
+.building-icon--SKIPPED
+  buildStatus($skipped)
 
 .building-icon--never-built
   buildStatus($default)

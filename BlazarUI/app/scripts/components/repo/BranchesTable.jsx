@@ -16,6 +16,8 @@ class BranchesTable extends Component {
       );
     }
 
+    console.log(this.props.branches);
+
     return this.props.buildTable({
       data: this.props.branches,
       columnNames: ['', 'Branch', 'Latest Build', 'Start Time', 'Duration', 'Commit'],

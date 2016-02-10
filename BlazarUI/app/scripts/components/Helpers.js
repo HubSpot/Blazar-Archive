@@ -3,6 +3,7 @@ import {some, uniq, flatten, filter, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
+import FINAL_BUILD_STATES from '../constants/finalBuildStates';
 import {LABELS, iconStatus} from './constants';
 import Icon from './shared/Icon.jsx';
 import IconStack from './shared/IconStack.jsx';
@@ -156,15 +157,14 @@ export const getPathname = function() {
 
 // To do: move these out as components in components/shared
 export const buildResultIcon = function(result, prevBuildState='') {
-  let classNames = LABELS[result];
-  let resultSymbol = iconStatus[result];
-  let iconNames = Immutable.List.of(iconStatus[result]);
 
-  if (result == BuildStates.IN_PROGRESS) {
-    classNames = getBuildStatusIconClassNames(result, prevBuildState);
-    resultSymbol = iconStatus[prevBuildState];
-    iconNames = Immutable.List.of(iconStatus[prevBuildState]);
+  if (result === BuildStates.QUEUED || result === BuildStates.LAUNCHING) {
+    return;
   }
+
+  const classNames = getBuildStatusIconClassNames(result, prevBuildState);
+  const resultForIconSymbol = result != BuildStates.IN_PROGRESS ? result : prevBuildState;
+  const iconNames = Immutable.List.of(iconStatus[resultForIconSymbol]);
 
   return (
     <div className="table-icon-container">
@@ -189,3 +189,22 @@ export const getBuildStatusIconClassNames = function(result, prevBuildState) {
     `building-icon--${result}${prevBuildStateModifier}`
   ]);
 };
+
+export const getPreviousBuildState = function(builds) {
+  const numBuilds = builds.size;
+
+  if (numBuilds <= 1) {
+    return '';
+  }
+
+  let completedBuilds = builds.filter(function(build, i) {
+    return contains(FINAL_BUILD_STATES, build.get('state'));
+  });
+
+  if (completedBuilds.size === 0) {
+    return '';
+  }
+
+  return completedBuilds.get(0).get('state');
+};
+

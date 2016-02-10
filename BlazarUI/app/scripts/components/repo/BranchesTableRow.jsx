@@ -47,9 +47,11 @@ class BranchesTableRow extends Component {
     let sha, buildLink;
     const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
     let duration = build.duration;
+    let prevBuildState = '';
 
     if (build.state === BuildStates.IN_PROGRESS) {
       duration = 'In Progress...';
+      prevBuildState = lastBuild.state;
     }
 
     if (build.sha !== undefined) {
@@ -67,7 +69,7 @@ class BranchesTableRow extends Component {
     return (
       <tr className={tableRowBuildState(build.state)}>
         <td className='build-status'>
-          {buildResultIcon(build.state)}
+          {buildResultIcon(build.state, prevBuildState)}
         </td>
         <td>
           {this.renderBranchLink(gitInfo)}

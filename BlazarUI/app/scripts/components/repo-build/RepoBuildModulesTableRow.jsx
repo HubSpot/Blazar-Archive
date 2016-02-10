@@ -11,7 +11,9 @@ class RepoBuildModulesTableRow extends Component {
     const {data, params} = this.props;
 
     if (data.state == BuildStates.SKIPPED) {
-      return (<span>{data.name}</span>);
+      return (
+        <span>{data.name}</span>
+      );
     }
 
     return (
@@ -36,6 +38,25 @@ class RepoBuildModulesTableRow extends Component {
     );
   }
 
+  renderDuration() {
+    const {data} = this.props;
+    let durationText;
+
+    if (data.state === BuildStates.IN_PROGRESS) {
+      durationText = 'In Progress';
+    }
+
+    else if (data.state === BuildStates.SKIPPED) {
+      durationText = 'Skipped';
+    }
+
+    else {
+      durationText = timestampDuration(data.startTimestamp, data.endTimestamp)
+    }
+
+    return durationText;
+  }
+
   render() {
     const {data, params} = this.props;
     return (
@@ -50,7 +71,7 @@ class RepoBuildModulesTableRow extends Component {
           {timestampFormatted(data.startTimestamp)}
         </td>
         <td>
-          {data.state === BuildStates.IN_PROGRESS ? 'In Progress' : timestampDuration(data.startTimestamp, data.endTimestamp)}
+          {this.renderDuration()}
         </td>
         <td>
           {this.renderSingularityLink()}

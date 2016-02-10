@@ -16,6 +16,8 @@ import StarActions from '../../actions/starActions';
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
+import {getPreviousBuildState} from '../Helpers.js';
+
 let initialState = {
   builds: null,
   stars: [],
@@ -74,11 +76,9 @@ class BranchContainer extends Component {
     }
     
     else {
-
-      let params = {};
-
-      if (this.state.builds && this.state.builds.get(1)) {
-        this.props.params.prevBuildState = this.state.builds.get(1).get('state');
+      if (this.state.builds) {
+        this.props.params.prevBuildState = getPreviousBuildState(this.state.builds);
+        console.log(this.props.params.prevBuildState);
       }
 
       return (
