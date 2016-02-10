@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.hubspot.blazar.base.StepActivationCriteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,8 +104,11 @@ public class ModuleBuildLauncher {
     } else {
       user = executorConfiguration.getDefaultBuildUser();
     }
+    Map<String, StepActivationCriteria> stepActivation = new LinkedHashMap<>();
+    stepActivation.putAll(secondary.getStepActivation());
+    stepActivation.putAll(primary.getStepActivation());
 
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user));
+    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation);
   }
 
   private BuildConfig configAtSha(GitInfo gitInfo, Module module) throws IOException, NonRetryableBuildException {

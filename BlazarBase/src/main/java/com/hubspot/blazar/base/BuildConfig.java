@@ -18,6 +18,7 @@ public class BuildConfig {
   private final List<String> cache;
   private final Optional<GitInfo> buildpack;
   private final Optional<String> user;
+  private final Map<String, StepActivationCriteria> stepActivation;
 
   @JsonCreator
   public BuildConfig(@JsonProperty("steps") List<BuildStep> steps,
@@ -27,7 +28,8 @@ public class BuildConfig {
                      @JsonProperty("webhooks") List<String> webhooks,
                      @JsonProperty("cache") List<String> cache,
                      @JsonProperty("buildpack") Optional<GitInfo> buildpack,
-                     @JsonProperty("user") Optional<String> user) {
+                     @JsonProperty("user") Optional<String> user,
+                     @JsonProperty("stepActivation") Map<String, StepActivationCriteria> stepActivation) {
     this.steps = Objects.firstNonNull(steps, Collections.<BuildStep>emptyList());
     this.before = Objects.firstNonNull(before, Collections.<BuildStep>emptyList());
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
@@ -36,10 +38,11 @@ public class BuildConfig {
     this.buildpack = Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
     this.cache = Objects.firstNonNull(cache, Collections.<String>emptyList());
     this.user = Objects.firstNonNull(user, Optional.<String>absent());
+    this.stepActivation = Objects.firstNonNull(stepActivation, Collections.<String, StepActivationCriteria>emptyMap());
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null, null, null, null, null);
+    return new BuildConfig(null, null, null, null, null, null, null, null, null);
   }
 
   public List<BuildStep> getSteps() {
@@ -74,8 +77,12 @@ public class BuildConfig {
     return user;
   }
 
+  public Map<String, StepActivationCriteria> getStepActivation() {
+    return stepActivation;
+  }
+
   public BuildConfig withUser(String user) {
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, buildpack, Optional.of(user));
+    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, buildpack, Optional.of(user), stepActivation);
   }
 
 }
