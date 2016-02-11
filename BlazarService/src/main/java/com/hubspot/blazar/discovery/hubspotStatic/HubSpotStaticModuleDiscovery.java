@@ -12,6 +12,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyInfo;
@@ -28,10 +29,12 @@ public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
   private static final String STATIC_CONF = "static_conf.json";
 
   private final GitHubHelper gitHubHelper;
+  private final ObjectMapper objectMapper;
 
   @Inject
-  public HubSpotStaticModuleDiscovery(GitHubHelper gitHubHelper) {
+  public HubSpotStaticModuleDiscovery(GitHubHelper gitHubHelper, ObjectMapper objectMapper) {
     this.gitHubHelper = gitHubHelper;
+    this.objectMapper = objectMapper;
   }
 
   @Override
@@ -72,8 +75,9 @@ public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
     return new DependencyInfo(emtpySet, emtpySet);
   }
 
-  private static String moduleName(GitInfo gitInfo, String path) {
-    return path.contains("/") ? folderName(path) : gitInfo.getRepository();
+  private String moduleName(GitInfo gitInfo, String path) throws IOException {
+    String contents = gitHubHelper.contentsFor(path, gitHubHelper.repositoryFor(gitInfo), gitInfo);
+    return objectMapper.readValue(contents, HubSpotStaticConf.class).getName();
   }
 
   private static String folderName(String path) {
