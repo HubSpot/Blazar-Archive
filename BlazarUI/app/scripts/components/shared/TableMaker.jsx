@@ -11,7 +11,7 @@ function TableMaker(RenderedComponent, options) {
 
   let initialState = {
     page: 0,
-    rowsPerPage: 15,
+    rowsPerPage: 25,
     paginate: options.paginate
   };
 
