@@ -34,8 +34,8 @@ buildInProgressStatus(color)
 .building-icon--IN_PROGRESS-laststatus-SKIPPED
   buildInProgressStatus($skipped)
 
-.building-icon--LAUNCHING
-  buildInProgressStatus($default)
+.building-icon--QUEUED, .building-icon--LAUNCHING
+  buildStatus($info)
 
 .building-icon--CANCELLED
   buildStatus($warning)

@@ -7,7 +7,7 @@ import Icon from '../shared/Icon.jsx';
 import IconStack from '../shared/IconStack.jsx';
 import Star from '../shared/Star.jsx';
 import Immutable from 'Immutable'
-import {getBuildStatusIconClassNames} from '../Helpers.js';
+import {buildResultIcon} from '../Helpers.js';
 import {iconStatus} from '../constants.js';
 
 import {Link} from 'react-router'
@@ -50,13 +50,11 @@ class SidebarItem extends Component {
   renderBuildLink() {
     const {build, prevBuildState} = this.props;
     let icon, buildIdLink;
-
-    const nameList = Immutable.List.of(iconStatus[build.state] || iconStatus[prevBuildState]);
     
     if (prevBuildState) {
       icon = (
         <Link to={build.blazarPath} className='sidebar-item__building-icon-link'>
-          <IconStack classNames={getBuildStatusIconClassNames(build.state, prevBuildState)} iconStackBase="circle" iconNames={nameList} />
+          {buildResultIcon(build.state, prevBuildState)}
         </Link>
       );
 

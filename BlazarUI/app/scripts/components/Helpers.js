@@ -124,7 +124,7 @@ export const buildIsOnDeck = function(buildState) {
 };
 
 export const buildIsInactive = function(buildState) {
-  return contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState);
+  return contains(FINAL_BUILD_STATES, buildState);
 };
 
 // DOM Helpers
@@ -157,13 +157,8 @@ export const getPathname = function() {
 
 // To do: move these out as components in components/shared
 export const buildResultIcon = function(result, prevBuildState='') {
-
-  if (result === BuildStates.QUEUED || result === BuildStates.LAUNCHING) {
-    return;
-  }
-
   const classNames = getBuildStatusIconClassNames(result, prevBuildState);
-  const resultForIconSymbol = result != BuildStates.IN_PROGRESS ? result : prevBuildState;
+  const resultForIconSymbol = result != BuildStates.IN_PROGRESS ? result : prevBuildState != '' ? prevBuildState : BuildStates.IN_PROGRESS;
   const iconNames = Immutable.List.of(iconStatus[resultForIconSymbol]);
 
   return (

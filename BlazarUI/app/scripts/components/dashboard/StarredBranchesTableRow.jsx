@@ -14,6 +14,9 @@ class StarredBranchesTableRow extends Component {
   render() {
 
     const item = this.props.item;
+
+    console.log(item);
+
     const latestBuild = item.get('lastBuild');
     const latestBuildGitInfo = item.get('gitInfo');
 

@@ -50,6 +50,14 @@ class RepoBuildModulesTableRow extends Component {
       durationText = 'Skipped';
     }
 
+    else if (data.state === BuildStates.QUEUED) {
+      durationText = 'Queued';
+    }
+
+    else if (data.state === BuildStates.LAUNCHING) {
+      durationText = 'Launching';
+    }
+
     else {
       durationText = timestampDuration(data.startTimestamp, data.endTimestamp)
     }
