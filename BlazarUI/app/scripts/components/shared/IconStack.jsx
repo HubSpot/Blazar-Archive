@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import Icon from './Icon.jsx';
-import Immutable from 'Immutable';
-import classNames from 'classNames';
+import Immutable from 'immutable';
+import classNames from 'classnames';
 
 class IconStack extends Component {
 

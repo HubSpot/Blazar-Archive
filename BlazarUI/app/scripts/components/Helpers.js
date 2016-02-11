@@ -7,8 +7,8 @@ import FINAL_BUILD_STATES from '../constants/finalBuildStates';
 import {LABELS, iconStatus} from './constants';
 import Icon from './shared/Icon.jsx';
 import IconStack from './shared/IconStack.jsx';
-import Immutable from 'Immutable';
-import classNames from 'classNames';
+import Immutable from 'immutable';
+import classNames from 'classnames';
 
 // 1234567890 => 1 Aug 1991 15:00
 export const timestampFormatted = function(timestamp, format='lll') {
