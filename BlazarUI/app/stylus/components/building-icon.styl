@@ -19,9 +19,6 @@ buildInProgressStatus(color)
   width 10px
   height 10px
 
-.building-icon--IN_PROGRESS
-  buildInProgressStatus($info)
-  
 .building-icon--IN_PROGRESS-laststatus-SUCCEEDED
   buildInProgressStatus($success)
   
@@ -34,7 +31,7 @@ buildInProgressStatus(color)
 .building-icon--IN_PROGRESS-laststatus-SKIPPED
   buildInProgressStatus($skipped)
 
-.building-icon--QUEUED, .building-icon--LAUNCHING
+.building-icon--IN_PROGRESS, .building-icon--QUEUED, .building-icon--LAUNCHING
   buildStatus($info)
 
 .building-icon--CANCELLED

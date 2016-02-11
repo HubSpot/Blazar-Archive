@@ -32,33 +32,53 @@ class BranchBuildHistoryTableRow extends Component {
   renderDuration() {
     const {data} = this.props;
 
-    let duration = data.duration;
+    let durationText = data.duration;
+
     if (data.state === BuildStates.IN_PROGRESS) {
-      duration = 'In Progress...';
+      durationText = 'In Progress';
     }
 
-    return duration;
+    else if (data.state === BuildStates.SKIPPED) {
+      durationText = 'Skipped';
+    }
+
+    else if (data.state === BuildStates.QUEUED) {
+      durationText = 'Queued';
+    }
+
+    else if (data.state === BuildStates.LAUNCHING) {
+      durationText = 'Launching';
+    }
+
+    return durationText;
   }
   
   renderStartTime() {
     return timestampFormatted(this.props.data.startTimestamp);
   }
 
+  renderBuildLink() {
+    const {data} = this.props;
+    
+    if (data.state === BuildStates.LAUNCHING || data.state === BuildStates.QUEUED) {
+      return data.buildNumber;
+    }
+
+    return (
+      <Link to={data.blazarPath}>{data.buildNumber}</Link>
+    );
+  }
+
   render() {
     const {data, params} = this.props;
-    let prevBuildState = '';
-
-    if (data.state === BuildStates.IN_PROGRESS) {
-      prevBuildState = params.prevBuildState;
-    }
 
     return (
       <tr className={tableRowBuildState(data.state)}>
         <td className='build-status'>
-          {buildResultIcon(data.state, prevBuildState)}
+          {buildResultIcon(data.state)}
         </td>
         <td className='build-result-link'>
-          <Link to={data.blazarPath}>{data.buildNumber}</Link>
+          <span>{this.renderBuildLink()}</span>
         </td>
         <td>
           {this.renderStartTime()}
