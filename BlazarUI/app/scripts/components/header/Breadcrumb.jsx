@@ -8,10 +8,12 @@ class Breadcrumb extends Component {
 
   constructor(props) {
     super(props);
-    
+  }
+
+  refreshPaths() {
     const {appRoot, params} = this.props;
     const root = `${appRoot}/builds`;
-    
+
     this.paths = {
       host: `${root}/${params.host}`,
       org: `${root}/${params.host}/${params.org}`,
@@ -23,6 +25,8 @@ class Breadcrumb extends Component {
   }
 
   render() {
+    this.refreshPaths();
+
     if (this.props.isActive || this.props.dontLink) {
       const classes = ClassNames([
         'crumb',
