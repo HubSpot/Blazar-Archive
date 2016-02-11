@@ -11,9 +11,13 @@ import javax.inject.Singleton;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHTree;
 import org.kohsuke.github.GHTreeEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyInfo;
 import com.hubspot.blazar.base.DiscoveredModule;
@@ -27,6 +31,7 @@ import com.hubspot.blazar.util.GitHubHelper;
 public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
   private static final Optional<GitInfo> BUILD_CONFIGURATION = Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Static#master"));
   private static final String STATIC_CONF = "static_conf.json";
+  private static final Logger LOG = LoggerFactory.getLogger(HubSpotStaticModuleDiscovery.class);
 
   private final GitHubHelper gitHubHelper;
   private final ObjectMapper objectMapper;
@@ -61,12 +66,22 @@ public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
     }
 
     Set<DiscoveredModule> modules = new HashSet<>();
+    Set<MalformedFile> malformedFiles = new HashSet<>();
     for (String config: staticConfigs) {
-      String moduleName = moduleName(gitInfo, config);
-      String glob = (config.contains("/") ? config.substring(0, config.lastIndexOf('/') + 1) : "") + "**";
-      modules.add(new DiscoveredModule(moduleName, "hubspotStatic", config, glob,  BUILD_CONFIGURATION, getDockerfileDeps()));
+      try {
+        String moduleName = moduleName(gitInfo, repository, config);
+        Preconditions.checkNotNull(moduleName);
+        String glob = (config.contains("/") ? config.substring(0, config.lastIndexOf('/') + 1) : "") + "**";
+        modules.add(new DiscoveredModule(moduleName, "hubspotStatic", config, glob, BUILD_CONFIGURATION, getDockerfileDeps()));
+      } catch (NullPointerException e) {
+        LOG.error("Error module name in config {} in repo:branch {}:{} was null.", config, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+        malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "hubspotStatic", config, Throwables.getStackTraceAsString(e)));
+      } catch (IOException e) {
+        LOG.error("IO Error getting {} from GHE on repo:branch {}:{}.");
+        malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "hubspotStatic", config, Throwables.getStackTraceAsString(e)));
+      }
     }
-    return new DiscoveryResult(modules, Collections.<MalformedFile>emptySet());
+    return new DiscoveryResult(modules, malformedFiles);
   }
 
   private DependencyInfo getDockerfileDeps() throws IOException {
@@ -75,14 +90,9 @@ public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
     return new DependencyInfo(emtpySet, emtpySet);
   }
 
-  private String moduleName(GitInfo gitInfo, String path) throws IOException {
-    String contents = gitHubHelper.contentsFor(path, gitHubHelper.repositoryFor(gitInfo), gitInfo);
+  private String moduleName(GitInfo gitInfo, GHRepository repository, String path) throws IOException {
+    String contents = gitHubHelper.contentsFor(path, repository, gitInfo);
     return objectMapper.readValue(contents, HubSpotStaticConf.class).getName();
-  }
-
-  private static String folderName(String path) {
-    String folderPath = path.substring(0, path.lastIndexOf('/'));
-    return folderPath.contains("/") ? folderPath.substring(folderPath.lastIndexOf('/') + 1) : folderPath;
   }
 
   private static boolean isStaticConfig(String path) {
