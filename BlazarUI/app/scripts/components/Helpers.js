@@ -203,3 +203,30 @@ export const getPreviousBuildState = function(builds) {
   return completedBuilds.get(0).get('state');
 };
 
+export const sortBuildsByRepoAndBranch = function(builds) {
+  return builds.sort((a, b) => {
+    let repoNameA = a.gitInfo.repository.toLowerCase();
+    let repoNameB = b.gitInfo.repository.toLowerCase();
+
+    if (repoNameA < repoNameB) {
+      return -1;
+    }
+
+    else if (repoNameA > repoNameB) {
+      return 1;
+    }
+
+    let branchNameA = a.gitInfo.branch.toLowerCase();
+    let branchNameB = b.gitInfo.branch.toLowerCase();
+
+    if (branchNameA < branchNameB) {
+      return -1;
+    }
+
+    else if (branchNameA > branchNameB) {
+      return 1;
+    }
+
+    return 0;
+  });
+};

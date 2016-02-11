@@ -3,7 +3,8 @@ import {bindAll} from 'underscore';
 import LazyRender from '../shared/LazyRender.jsx';
 import Loader from '../shared/Loader.jsx';
 import SidebarItem from './SidebarItem.jsx';
-import {has} from 'underscore';
+import {has, sortBy} from 'underscore';
+import {sortBuildsByRepoAndBranch} from '../Helpers.js';
 
 class SidebarRepoList extends Component {
 
@@ -20,7 +21,7 @@ class SidebarRepoList extends Component {
       );
     }
 
-    const buildsList = filteredBuilds.map( (build) => {
+    const buildsList = sortBuildsByRepoAndBranch(filteredBuilds).map( (build) => {
       const buildType = has(build, 'inProgressBuild') ? 'inProgressBuild' : has(build, 'lastBuild') ? 'lastBuild' : 'neverBuilt'
 
       return (
