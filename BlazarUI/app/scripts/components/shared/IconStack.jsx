@@ -1,12 +1,12 @@
 import React, {Component, PropTypes} from 'react';
 import Icon from './Icon.jsx';
 import Immutable from 'Immutable';
-import ClassNames from 'ClassNames';
+import classNames from 'classNames';
 
 class IconStack extends Component {
 
   getBaseClassNames() {
-    return ClassNames([
+    return classNames([
       "fa-stack-2x",
       this.props.classNames
     ]);
@@ -18,9 +18,9 @@ class IconStack extends Component {
     );
   }
 
-  renderIcon(iconName) {
+  renderIcon(iconName, i) {
     return (
-      <Icon type="fa" classNames="fa-stack-1x" name={iconName} />
+      <Icon type="fa" key={i} classNames="fa-stack-1x" name={iconName} />
     );
   }
 
@@ -28,7 +28,7 @@ class IconStack extends Component {
     return (
       <span className="fa-icon-stack">
         {this.renderIconStackBase()}
-        {this.props.iconNames.map(iconName => this.renderIcon(iconName))}
+        {this.props.iconNames.map((iconName, i) => this.renderIcon(iconName, i))}
       </span>
     );
   }
@@ -37,13 +37,13 @@ class IconStack extends Component {
 IconStack.defaultProps = {
   iconStackBase: '',
   iconNames: Immutable.List.of(),
-  classNames: Immutable.List.of()
+  classNames: ''
 }
 
 IconStack.propTypes = {
   iconStackBase: PropTypes.string,
   iconNames: PropTypes.instanceOf(Immutable.List),
-  classNames: PropTypes.instanceOf(Immutable.List)
+  classNames: PropTypes.string
 }
 
 export default IconStack;
