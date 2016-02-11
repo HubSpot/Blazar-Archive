@@ -6,5 +6,6 @@ export default keyMirror({
   IN_PROGRESS: null,
   CANCELLED: null,
   LAUNCHING: null,
-  QUEUED: null
+  QUEUED: null,
+  SKIPPED: null
 });

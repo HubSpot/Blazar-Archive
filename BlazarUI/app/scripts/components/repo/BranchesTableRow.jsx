@@ -3,7 +3,7 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
-import {tableRowBuildState, humanizeText, timestampFormatted, renderBuildStatusIcon} from '../Helpers';
+import {tableRowBuildState, humanizeText, timestampFormatted, buildResultIcon} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -47,9 +47,11 @@ class BranchesTableRow extends Component {
     let sha, buildLink;
     const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
     let duration = build.duration;
+    let prevBuildState = '';
 
     if (build.state === BuildStates.IN_PROGRESS) {
       duration = 'In Progress...';
+      prevBuildState = lastBuild.state;
     }
 
     if (build.sha !== undefined) {
@@ -67,7 +69,7 @@ class BranchesTableRow extends Component {
     return (
       <tr className={tableRowBuildState(build.state)}>
         <td className='build-status'>
-          {renderBuildStatusIcon(build.state)}
+          {buildResultIcon(build.state, prevBuildState)}
         </td>
         <td>
           {this.renderBranchLink(gitInfo)}

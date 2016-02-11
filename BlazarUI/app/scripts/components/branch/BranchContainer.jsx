@@ -16,6 +16,8 @@ import StarActions from '../../actions/starActions';
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
+import {getPreviousBuildState} from '../Helpers.js';
+
 let initialState = {
   builds: null,
   stars: [],
@@ -74,6 +76,10 @@ class BranchContainer extends Component {
     }
     
     else {
+      if (this.state.builds) {
+        this.props.params.prevBuildState = getPreviousBuildState(this.state.builds);
+      }
+
       return (
         <BranchBuildHistoryTable
           data={this.state.builds}

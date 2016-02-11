@@ -3,8 +3,12 @@ import {some, uniq, flatten, filter, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
+import FINAL_BUILD_STATES from '../constants/finalBuildStates';
 import {LABELS, iconStatus} from './constants';
 import Icon from './shared/Icon.jsx';
+import IconStack from './shared/IconStack.jsx';
+import Immutable from 'Immutable';
+import classNames from 'classNames';
 
 // 1234567890 => 1 Aug 1991 15:00
 export const timestampFormatted = function(timestamp, format='lll') {
@@ -120,7 +124,7 @@ export const buildIsOnDeck = function(buildState) {
 };
 
 export const buildIsInactive = function(buildState) {
-  return contains([BuildStates.SUCCESS, BuildStates.FAILED, BuildStates.CANCELLED], buildState);
+  return contains(FINAL_BUILD_STATES, buildState);
 };
 
 // DOM Helpers
@@ -152,25 +156,50 @@ export const getPathname = function() {
 };
 
 // To do: move these out as components in components/shared
-export const buildResultIcon = function(result) {
-  const classNames = LABELS[result];
+export const buildResultIcon = function(result, prevBuildState='') {
+  const classNames = getBuildStatusIconClassNames(result, prevBuildState);
+  const resultForIconSymbol = result != BuildStates.IN_PROGRESS ? result : prevBuildState != '' ? prevBuildState : BuildStates.IN_PROGRESS;
+  const iconNames = Immutable.List.of(iconStatus[resultForIconSymbol]);
 
   return (
-    <Icon
-      name={iconStatus[result]}
-      classNames={classNames}
-      title={humanizeText(result)}
-    />
+    <div className="table-icon-container">
+      <IconStack 
+        iconStackBase="circle"
+        iconNames={iconNames}
+        classNames={classNames}
+      />
+    </div>
   );
 };
 
+export const getBuildStatusIconClassNames = function(result, prevBuildState) {
+  let prevBuildStateModifier = ``;
 
-export const renderBuildStatusIcon = function(state) {
-  return (
-    <Icon
-      name={iconStatus[state]}
-      classNames={`icon-roomy ${LABELS[state]}`}
-      title={humanizeText(state)}
-    />
-  );
+  if (result === BuildStates.IN_PROGRESS && prevBuildState) {
+    prevBuildStateModifier = `-laststatus-${prevBuildState}`;
+  }
+
+  return classNames([
+    'building-icon',
+    `building-icon--${result}${prevBuildStateModifier}`
+  ]);
 };
+
+export const getPreviousBuildState = function(builds) {
+  const numBuilds = builds.size;
+
+  if (numBuilds <= 1) {
+    return '';
+  }
+
+  let completedBuilds = builds.filter(function(build, i) {
+    return contains(FINAL_BUILD_STATES, build.get('state'));
+  });
+
+  if (completedBuilds.size === 0) {
+    return '';
+  }
+
+  return completedBuilds.get(0).get('state');
+};
+

@@ -1,24 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import classNames from 'classnames';
-import BuildStates from '../../constants/BuildStates'
+import {getBuildStatusIconClassNames} from '../Helpers.js';
 
 class BuildingIcon extends Component {
-
-  getClassNames() {
-    let prevBuildStateModifier = ``;
-
-    if (this.props.result === BuildStates.IN_PROGRESS && this.props.prevBuildState) {
-      prevBuildStateModifier = `-laststatus-${this.props.prevBuildState}`;
-    }
-
-    return classNames([
-        'building-icon',
-        'sidebar__active-building-icon',
-        `building-icon--${this.props.size}`,
-        `building-icon--${this.props.result}${prevBuildStateModifier}`,
-        this.props.classNames
-      ]);
-  }
 
   getInnerClassNames() {
     return classNames([
@@ -29,7 +13,9 @@ class BuildingIcon extends Component {
 
   render() {
     return (
-      <div className={this.getClassNames()}><div className={this.getInnerClassNames()}></div></div>
+      <div className={getBuildStatusIconClassNames(this.props.result, this.props.prevBuildState)}>
+        <div className={this.getInnerClassNames()}></div>
+      </div>
     );
   }
 

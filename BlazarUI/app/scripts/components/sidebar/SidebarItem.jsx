@@ -5,6 +5,7 @@ import {truncate} from '../Helpers.js';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
+import {buildResultIcon} from '../Helpers.js';
 
 import {Link} from 'react-router'
 
@@ -50,7 +51,7 @@ class SidebarItem extends Component {
     if (prevBuildState) {
       icon = (
         <Link to={build.blazarPath} className='sidebar-item__building-icon-link'>
-          <BuildingIcon result={build.state} prevBuildState={prevBuildState} size='small' />
+          {buildResultIcon(build.state, prevBuildState)}
         </Link>
       );
 

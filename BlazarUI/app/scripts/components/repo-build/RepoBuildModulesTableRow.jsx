@@ -3,15 +3,21 @@ import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import {contains, has} from 'underscore';
-import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, renderBuildStatusIcon} from '../Helpers';
+import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
   
   renderBuildLink() {
     const {data, params} = this.props;
 
+    if (data.state === BuildStates.SKIPPED || data.state === BuildStates.CANCELLED) {
+      return (
+        <span>{data.name}</span>
+      );
+    }
+
     return (
-      <Link to={data.blazarPath}>{data.name}</Link>   
+      <span><Link to={data.blazarPath}>{data.name}</Link></span>
     );    
   }
 
@@ -32,12 +38,39 @@ class RepoBuildModulesTableRow extends Component {
     );
   }
 
+  renderDuration() {
+    const {data} = this.props;
+    let durationText;
+
+    if (data.state === BuildStates.IN_PROGRESS) {
+      durationText = 'In Progress';
+    }
+
+    else if (data.state === BuildStates.SKIPPED) {
+      durationText = 'Skipped';
+    }
+
+    else if (data.state === BuildStates.QUEUED) {
+      durationText = 'Queued';
+    }
+
+    else if (data.state === BuildStates.LAUNCHING) {
+      durationText = 'Launching';
+    }
+
+    else {
+      durationText = timestampDuration(data.startTimestamp, data.endTimestamp)
+    }
+
+    return durationText;
+  }
+
   render() {
     const {data, params} = this.props;
     return (
       <tr className={tableRowBuildState(data.state)}>
         <td className='build-status'>
-          {renderBuildStatusIcon(data.state)}
+          {buildResultIcon(data.state)}
         </td>
         <td className='table-cell-link'>
           {this.renderBuildLink()}
@@ -46,7 +79,7 @@ class RepoBuildModulesTableRow extends Component {
           {timestampFormatted(data.startTimestamp)}
         </td>
         <td>
-          {data.state === BuildStates.IN_PROGRESS ? 'In Progress' : timestampDuration(data.startTimestamp, data.endTimestamp)}
+          {this.renderDuration()}
         </td>
         <td>
           {this.renderSingularityLink()}

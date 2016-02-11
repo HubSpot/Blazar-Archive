@@ -1,8 +1,7 @@
 @import 'variables'
 
 buildStatus(color)
-  background-color color
-  border 0 solid color
+  color color
   
 buildInProgressStatus(color)
   buildStatus(color)
@@ -31,9 +30,12 @@ buildInProgressStatus(color)
   
 .building-icon--IN_PROGRESS-laststatus-FAILED
   buildInProgressStatus($danger)
+  
+.building-icon--IN_PROGRESS-laststatus-SKIPPED
+  buildInProgressStatus($skipped)
 
-.building-icon--LAUNCHING
-  buildInProgressStatus($default)
+.building-icon--QUEUED, .building-icon--LAUNCHING
+  buildStatus($info)
 
 .building-icon--CANCELLED
   buildStatus($warning)
@@ -43,6 +45,9 @@ buildInProgressStatus(color)
 
 .building-icon--FAILED
   buildStatus($danger)
+  
+.building-icon--SKIPPED
+  buildStatus($skipped)
 
 .building-icon--never-built
   buildStatus($default)

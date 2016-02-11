@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Loader from '../shared/Loader.jsx';
-import {renderBuildStatusIcon, humanizeText} from '../Helpers';
+import {buildResultIcon, humanizeText} from '../Helpers';
 
 class BuildHeadline extends Component {
 
@@ -16,11 +16,13 @@ class BuildHeadline extends Component {
   
     return (
         <Headline>
-          {renderBuildStatusIcon(this.props.data.build.state)}
-          {moduleName}
-          <HeadlineDetail>
-            Status: {humanizeText(build.state)}
-          </HeadlineDetail>
+          {buildResultIcon(this.props.data.build.state)}
+          <div className="build-headline">
+            {moduleName}
+            <HeadlineDetail>
+              Status: {humanizeText(build.state)}
+            </HeadlineDetail>
+          </div>
         </Headline>
     );
   }
