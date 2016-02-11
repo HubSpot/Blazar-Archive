@@ -52,6 +52,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = gitInfo(createEvent);
       if (isOptedIn(gitInfo)) {
         branchService.upsert(gitInfo);
+        //repositoryBuildService.enqueue(gitInfo, BuildTrigger.forBranchCreation(gitInfo.getBranch()));
       }
     }
   }

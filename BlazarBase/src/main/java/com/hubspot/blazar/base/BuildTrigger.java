@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BuildTrigger {
   public enum Type {
-    PUSH, MANUAL
+    PUSH, MANUAL, BRANCH_CREATION
   }
 
   private final Type type;
@@ -23,6 +23,10 @@ public class BuildTrigger {
 
   public static BuildTrigger forUser(String user) {
     return new BuildTrigger(Type.MANUAL, user);
+  }
+
+  public static BuildTrigger forBranchCreation(String branch) {
+    return new BuildTrigger(Type.BRANCH_CREATION, branch);
   }
 
   public Type getType() {

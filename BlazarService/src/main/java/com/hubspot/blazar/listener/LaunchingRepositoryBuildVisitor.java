@@ -74,6 +74,8 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     final Set<Module> toBuild = new HashSet<>();
     if (build.getBuildTrigger().getType() == Type.MANUAL) {
       toBuild.addAll(modules);
+    } else if (build.getBuildTrigger().getType() == Type.BRANCH_CREATION) {
+      toBuild.addAll(modules);
     } else if (commitInfo.isTruncated()) {
       toBuild.addAll(modules);
     } else {
