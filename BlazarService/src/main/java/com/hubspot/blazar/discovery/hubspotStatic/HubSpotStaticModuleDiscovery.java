@@ -29,7 +29,7 @@ import com.hubspot.blazar.util.GitHubHelper;
 
 @Singleton
 public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
-  private static final Optional<GitInfo> BUILD_CONFIGURATION = Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Static#master"));
+  private static final Optional<GitInfo> BUILD_CONFIGURATION = Optional.of(GitInfo.fromString("git.hubteam.com/HubSpot/Blazar-Buildpack-Static#master"));
   private static final String STATIC_CONF = "static_conf.json";
   private static final Logger LOG = LoggerFactory.getLogger(HubSpotStaticModuleDiscovery.class);
 
