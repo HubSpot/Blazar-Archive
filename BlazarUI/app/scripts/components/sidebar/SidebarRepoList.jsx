@@ -3,7 +3,7 @@ import {bindAll} from 'underscore';
 import LazyRender from '../shared/LazyRender.jsx';
 import Loader from '../shared/Loader.jsx';
 import SidebarItem from './SidebarItem.jsx';
-import {has, sortBy} from 'underscore';
+import {has} from 'underscore';
 import {sortBuildsByRepoAndBranch} from '../Helpers.js';
 
 class SidebarRepoList extends Component {
