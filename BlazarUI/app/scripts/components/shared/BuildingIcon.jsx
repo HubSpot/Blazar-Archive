@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import classNames from 'classnames';
-import BuildStates from '../../constants/BuildStates';
 import {getBuildStatusIconClassNames} from '../Helpers.js';
 
 class BuildingIcon extends Component {
@@ -14,7 +13,9 @@ class BuildingIcon extends Component {
 
   render() {
     return (
-      <div className={getBuildStatusIconClassNames(this.props.result, this.props.prevBuildState)}><div className={this.getInnerClassNames()}></div></div>
+      <div className={getBuildStatusIconClassNames(this.props.result, this.props.prevBuildState)}>
+        <div className={this.getInnerClassNames()}></div>
+      </div>
     );
   }
 

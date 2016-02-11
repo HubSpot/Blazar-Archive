@@ -10,7 +10,7 @@ class RepoBuildModulesTableRow extends Component {
   renderBuildLink() {
     const {data, params} = this.props;
 
-    if (data.state == BuildStates.SKIPPED) {
+    if (data.state === BuildStates.SKIPPED || data.state === BuildStates.CANCELLED) {
       return (
         <span>{data.name}</span>
       );

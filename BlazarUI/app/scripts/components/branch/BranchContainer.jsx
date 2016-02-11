@@ -78,7 +78,6 @@ class BranchContainer extends Component {
     else {
       if (this.state.builds) {
         this.props.params.prevBuildState = getPreviousBuildState(this.state.builds);
-        console.log(this.props.params.prevBuildState);
       }
 
       return (

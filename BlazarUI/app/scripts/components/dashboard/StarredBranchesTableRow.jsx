@@ -4,7 +4,6 @@ import {has} from 'underscore';
 import {buildResultIcon, tableRowBuildState, timestampFormatted} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
-import IconStack from '../shared/IconStack.jsx';
 import Sha from '../shared/Sha.jsx';
 import CommitMessage from '../shared/CommitMessage.jsx';
 
@@ -14,9 +13,6 @@ class StarredBranchesTableRow extends Component {
   render() {
 
     const item = this.props.item;
-
-    console.log(item);
-
     const latestBuild = item.get('lastBuild');
     const latestBuildGitInfo = item.get('gitInfo');
 

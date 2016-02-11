@@ -7,8 +7,6 @@ import Loader from '../shared/Loader.jsx';
 import RepoBuildCancelButton from './RepoBuildCancelButton.jsx';
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
-import Icon from '../shared/Icon.jsx';
-import {buildResultIcon} from '../Helpers';
 
 import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';

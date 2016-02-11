@@ -4,11 +4,8 @@ import {has, contains} from 'underscore';
 import {truncate} from '../Helpers.js';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
-import IconStack from '../shared/IconStack.jsx';
 import Star from '../shared/Star.jsx';
-import Immutable from 'Immutable'
 import {buildResultIcon} from '../Helpers.js';
-import {iconStatus} from '../constants.js';
 
 import {Link} from 'react-router'
 
