@@ -111,7 +111,7 @@ class BranchContainer extends Component {
               />
             </UIGridItem>
             <UIGrid>
-              <UIGridItem size={12} align='RIGHT'>
+              <UIGridItem size={12} align='LEFT'>
                 {this.renderTable()}
               </UIGridItem>
             </UIGrid>
