@@ -1,5 +1,6 @@
 package com.hubspot.blazar.util;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -127,6 +128,9 @@ public class ModuleBuildLauncher {
       return buildConfig.or(BuildConfig.makeDefaultBuildConfig());
     } catch (JsonProcessingException e) {
       String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", configPath, repositoryName, gitInfo.getBranch());
+      throw new NonRetryableBuildException(message, e);
+    } catch (FileNotFoundException e) {
+      String message = String.format("No repository found for %s", gitInfo.getFullRepositoryName());
       throw new NonRetryableBuildException(message, e);
     }
   }
