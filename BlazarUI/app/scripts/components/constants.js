@@ -12,7 +12,7 @@ export const iconStatus = {
   'SUCCEEDED': 'check',
   'FAILED': 'close',
   'CANCELLED': 'stop',
-  'SKIPPED': 'ellipsis-h',
+  'SKIPPED': 'minus',
   'QUEUED': 'circle-o-notch fa-spin',
   'LAUNCHING': 'circle-o-notch fa-spin',
   'IN_PROGRESS': 'circle-o-notch fa-spin'
