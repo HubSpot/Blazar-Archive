@@ -108,7 +108,7 @@ class BuildApi {
       // fetch the latest log size, last offset, 
       // and start polling again
       if (state) {
-        this._getLog().done(this._pollLog);
+        this._getLog().done(this._pollLog.bind(this));
       }
     }
   }
