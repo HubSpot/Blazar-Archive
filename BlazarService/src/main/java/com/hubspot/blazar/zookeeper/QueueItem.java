@@ -15,14 +15,16 @@ import java.io.IOException;
 public class QueueItem {
   private final Class<?> type;
   private final Object item;
+  private final long timestamp;
 
   public QueueItem(Object item) {
-    this(item.getClass(), item);
+    this(item.getClass(), item, System.currentTimeMillis());
   }
 
-  private QueueItem(Class<?> type, Object item) {
+  private QueueItem(Class<?> type, Object item, long timestamp) {
     this.type = type;
     this.item = item;
+    this.timestamp = timestamp;
   }
 
   public Class<?> getType() {
@@ -31,6 +33,10 @@ public class QueueItem {
 
   public Object getItem() {
     return item;
+  }
+
+  public long getTimestamp() {
+    return timestamp;
   }
 
   static class QueueItemDeserializer extends StdDeserializer<QueueItem> {
@@ -44,18 +50,22 @@ public class QueueItem {
       GenericQueueItem genericQueueItem = p.readValueAs(GenericQueueItem.class);
 
       Object item = p.getCodec().treeToValue(genericQueueItem.getItem(), genericQueueItem.getType());
-      return new QueueItem(genericQueueItem.getType(), item);
+      return new QueueItem(genericQueueItem.getType(), item, genericQueueItem.getTimestamp());
     }
   }
 
   private static class GenericQueueItem {
     private final Class<?> type;
     private final JsonNode item;
+    private final long timestamp;
 
     @JsonCreator
-    public GenericQueueItem(@JsonProperty("type") Class<?> type, @JsonProperty("item") JsonNode item) {
+    public GenericQueueItem(@JsonProperty("type") Class<?> type,
+                            @JsonProperty("item") JsonNode item,
+                            @JsonProperty("timestamp") long timestamp) {
       this.type = type;
       this.item = item;
+      this.timestamp = timestamp;
     }
 
     public Class<?> getType() {
@@ -64,6 +74,10 @@ public class QueueItem {
 
     public JsonNode getItem() {
       return item;
+    }
+
+    public long getTimestamp() {
+      return timestamp;
     }
   }
 }

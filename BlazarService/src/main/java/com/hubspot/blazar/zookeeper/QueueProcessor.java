@@ -142,8 +142,12 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
     private boolean process(String path) throws Exception {
       try {
         byte[] data = curatorFramework.getData().forPath(path);
-        Object event = mapper.readValue(data, QueueItem.class).getItem();
-        return process(event);
+        QueueItem item = mapper.readValue(data, QueueItem.class);
+        long age = System.currentTimeMillis() - item.getTimestamp();
+        if (age < 100) {
+          Thread.sleep(100 - age);
+        }
+        return process(item.getItem());
       } catch (NoNodeException e) {
         LOG.warn("No node found for path: {}", e.getPath());
         return false;
