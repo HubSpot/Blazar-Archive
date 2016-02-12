@@ -94,7 +94,7 @@ class BuildApi {
     
     this.build.logCollection
       .fetchNext()
-      .done(this._triggerUpdate);
+      .done(this._triggerUpdate.bind(this));
   }
 
   setLogPollingState(state, cb) {
