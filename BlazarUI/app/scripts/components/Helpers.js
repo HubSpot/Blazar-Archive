@@ -203,3 +203,33 @@ export const getPreviousBuildState = function(builds) {
   return completedBuilds.get(0).get('state');
 };
 
+export const sortBuildsByRepoAndBranch = function(builds) {
+  return builds.sort((a, b) => {
+
+    // Sort by repo, DESC
+    let repoNameA = a.gitInfo.repository.toLowerCase();
+    let repoNameB = b.gitInfo.repository.toLowerCase();
+
+    if (repoNameA < repoNameB) {
+      return -1;
+    }
+
+    else if (repoNameA > repoNameB) {
+      return 1;
+    }
+
+    // Sort by branch, master at top
+    let branchNameA = a.gitInfo.branch.toLowerCase();
+    let branchNameB = b.gitInfo.branch.toLowerCase();
+
+    let branchAIsMaster = branchNameA === 'master';
+    let branchBIsMaster = branchNameB === 'master';
+
+    if (branchAIsMaster || branchBIsMaster) {
+      return (branchBIsMaster ? 1 : 0) - (branchAIsMaster ? 1 : 0);
+    }
+
+    // Sort by branch, DESC
+    return branchNameA.localeCompare(branchNameB);
+  });
+};
