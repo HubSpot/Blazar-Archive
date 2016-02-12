@@ -79,7 +79,7 @@ class BuildApi {
     }
 
     else {
-      log.fetchPrevious().done(this._triggerUpdate);
+      log.fetchPrevious().done(this._triggerUpdate.bind(this));
     }
   }
   
