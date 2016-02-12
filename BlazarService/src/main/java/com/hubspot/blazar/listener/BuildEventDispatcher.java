@@ -41,41 +41,47 @@ public class BuildEventDispatcher {
 
   @Subscribe
   public void dispatch(RepositoryBuild build) throws Exception {
-    RepositoryBuild current = repositoryBuildService.get(build.getId().get()).get();
-    if (current.getState() != build.getState()) {
-      LOG.warn("Ignoring stale event with state {} for repository build {}, current state is {}", build.getState(), build.getId().get(), current.getState());
-      return;
-    } else {
-      build = current;
-    }
-
     try {
       for (RepositoryBuildVisitor visitor : repositoryVisitors) {
         visitor.visit(build);
       }
-    } catch (NonRetryableBuildException e) {
-      LOG.warn("Failing build {}", build.getId().get(), e);
-      repositoryBuildService.fail(build);
+    } catch (Exception e) {
+      RepositoryBuild current = repositoryBuildService.get(build.getId().get()).get();
+      if (staleEvent(build, current)) {
+        LOG.warn("Ignoring stale event with state {} for repository build {}, current state is {}", build.getState(), build.getId().get(), current.getState(), e);
+      } else if (e instanceof NonRetryableBuildException) {
+        LOG.warn("Failing build {}", build.getId().get(), e);
+        repositoryBuildService.fail(build);
+      } else {
+        throw e;
+      }
     }
   }
 
   @Subscribe
   public void dispatch(ModuleBuild build) throws Exception {
-    ModuleBuild current = moduleBuildService.get(build.getId().get()).get();
-    if (current.getState() != build.getState()) {
-      LOG.warn("Ignoring stale event with state {} for module build {}, current state is {}", build.getState(), build.getId().get(), current.getState());
-      return;
-    } else {
-      build = current;
-    }
-
     try {
       for (ModuleBuildVisitor visitor : moduleVisitors) {
         visitor.visit(build);
       }
-    } catch (NonRetryableBuildException e) {
-      LOG.warn("Failing build {}", build.getId().get(), e);
-      moduleBuildService.fail(build);
+    } catch (Exception e) {
+      ModuleBuild current = moduleBuildService.get(build.getId().get()).get();
+      if (staleEvent(build, current)) {
+        LOG.warn("Ignoring stale event with state {} for module build {}, current state is {}", build.getState(), build.getId().get(), current.getState(), e);
+      } else if (e instanceof NonRetryableBuildException) {
+        LOG.warn("Failing build {}", build.getId().get(), e);
+        moduleBuildService.fail(build);
+      } else {
+        throw e;
+      }
     }
+  }
+
+  private boolean staleEvent(RepositoryBuild event, RepositoryBuild current) {
+    return event.getState() != current.getState();
+  }
+
+  private boolean staleEvent(ModuleBuild event, ModuleBuild current) {
+    return event.getState() != current.getState();
   }
 }
