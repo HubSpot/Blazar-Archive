@@ -64,7 +64,7 @@ public class BuildCommand {
     return new BuildCommand(
         Optional.<String>absent(),
         Optional.<List<String>>absent(),
-        Optional.of(command),
+        Optional.of(Preconditions.checkNotNull(command)),
         null,
         null
     );
