@@ -21,7 +21,7 @@ public class BuildStep {
                    @JsonProperty("activeByDefault") Optional<Boolean> activeByDefault) {
     this.name = Objects.firstNonNull(name, Optional.<String>absent());
     this.description = Objects.firstNonNull(description, Optional.<String>absent());
-    this.commands = commands;
+    this.commands = Objects.firstNonNull(commands, Collections.<BuildCommand>emptyList());
     this.activeByDefault = Objects.firstNonNull(activeByDefault, Optional.<Boolean>absent()).or(true);
   }
 
