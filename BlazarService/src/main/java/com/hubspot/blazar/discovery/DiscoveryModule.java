@@ -4,7 +4,7 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.discovery.docker.DockerModuleDiscovery;
-import com.hubspot.blazar.discovery.hubspotstatic.HubSpotStaticModuleDiscovery;
+import com.hubspot.blazar.discovery.hsstatic.HubSpotStaticModuleDiscovery;
 import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
 import com.hubspot.blazar.util.BlazarServiceLoader;
 

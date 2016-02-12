@@ -43,7 +43,7 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
     Set<MalformedFile> malformedFiles = new HashSet<>();
 
     for (ModuleDiscovery delegate : delegates) {
-      DiscoveryResult result  =delegate.discover(gitInfo);
+      DiscoveryResult result = delegate.discover(gitInfo);
       malformedFiles.addAll(result.getMalformedFiles());
       for (DiscoveredModule module : result.getModules()) {
         String folder = module.getFolder();
