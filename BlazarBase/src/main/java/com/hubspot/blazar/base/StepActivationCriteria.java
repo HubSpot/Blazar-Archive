@@ -18,4 +18,8 @@ public class StepActivationCriteria implements Predicate<GitInfo> {
   public boolean apply(GitInfo input) {
     return branches.contains(input.getBranch());
   }
+
+  public Set<String> getBranches() {
+    return branches;
+  }
 }
