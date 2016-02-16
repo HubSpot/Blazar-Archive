@@ -160,8 +160,11 @@ class BuildApi {
   
     if (this.build.logCollection.shouldPoll && this.build.model.data.state === BuildStates.IN_PROGRESS) {
       this._fetchLog().done((data, textStatus, jqxhr) => {
-        this._triggerUpdate();
-        this.build.logCollection.requestOffset = data.nextOffset;
+
+        if (data.nextOffset !== -1) {
+          this._triggerUpdate();
+          this.build.logCollection.requestOffset = data.nextOffset;
+        }
         
         setTimeout(() => {
           this._pollLog();
@@ -345,8 +348,8 @@ class BuildApi {
       return;
     }
 
-    logSizePromise.done((size) => {
-      this.build.logCollection.options.size = size;
+    logSizePromise.done((resp) => {
+      this.build.logCollection.options.size = resp.size;
     });
       
     return logSizePromise;
