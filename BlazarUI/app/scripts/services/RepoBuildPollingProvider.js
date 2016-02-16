@@ -117,7 +117,7 @@ class RepoBuildPollingProvider {
 
             setTimeout(() => {
               this.poll(cb);
-            }, config.buildsRefresh);
+            }, config.activeBuildModuleRefresh);
           
         }).fail((error) => {
           cb(error, null);
