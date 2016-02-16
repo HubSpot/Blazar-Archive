@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -189,13 +188,7 @@ public class ModuleBuildResource {
   }
 
   private boolean logCompleted(ModuleBuild build) {
-    if (!build.getState().isComplete()) {
-      return false;
-    } else if (build.getState() != State.CANCELLED) {
-      return true;
-    } else {
-      return taskComplete(build.getTaskId().get());
-    }
+    return build.getState().isComplete() && taskComplete(build.getTaskId().get());
   }
 
   private boolean taskComplete(String taskId) {
