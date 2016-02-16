@@ -66,7 +66,7 @@ class SidebarItem extends Component {
     else {
       icon = (
         <div className='sidebar-item__building-icon-link'>
-          <BuildingIcon result='never-built' size='small' />
+          {buildResultIcon(build.state, 'never-built')}
         </div>
       );
     }
