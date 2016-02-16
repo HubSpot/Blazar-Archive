@@ -1,14 +1,6 @@
 package com.hubspot.blazar.resources;
 
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.BuildTrigger;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.data.service.ModuleBuildService;
-import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.sun.jersey.api.NotFoundException;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -17,7 +9,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Set;
+
+import com.google.api.client.repackaged.com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
+import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.sun.jersey.api.NotFoundException;
 
 @Path("/branches/builds")
 @Produces(MediaType.APPLICATION_JSON)
@@ -37,14 +40,14 @@ public class RepositoryBuildResource {
 
   @POST
   @Path("/branch/{id}")
-  public RepositoryBuild trigger(@PathParam("id") int branchId) {
+  public RepositoryBuild trigger(@PathParam("id") int branchId, Set<Integer> moduleIds) {
     Optional<GitInfo> gitInfo = branchService.get(branchId);
     if (!gitInfo.isPresent()) {
       throw new NotFoundException("No branch found with id: " + branchId);
     }
 
     // TODO capture user
-    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), BuildTrigger.forUser("unknown"));
+    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), BuildTrigger.forUser("unknown", Objects.firstNonNull(moduleIds, ImmutableSet.<Integer>of())));
     return repositoryBuildService.get(repositoryBuildId).get();
   }
 

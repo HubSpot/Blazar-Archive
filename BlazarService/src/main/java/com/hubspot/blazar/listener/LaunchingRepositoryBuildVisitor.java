@@ -1,5 +1,17 @@
 package com.hubspot.blazar.listener;
 
+import java.nio.file.FileSystems;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildTrigger.Type;
@@ -13,16 +25,6 @@ import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.util.GitHubHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.nio.file.FileSystems;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 @Singleton
 public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor {
@@ -73,7 +75,16 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
     final Set<Module> toBuild = new HashSet<>();
     if (build.getBuildTrigger().getType() == Type.MANUAL) {
-      toBuild.addAll(modules);
+      if (build.getBuildTrigger().getModuleIds().isEmpty()) {
+        toBuild.addAll(modules);
+      } else {
+        final Set<Integer> moduleIds = build.getBuildTrigger().getModuleIds();
+        for (Module module : modules) {
+          if (moduleIds.contains(module.getId().or(-1))) {
+            toBuild.add(module);
+          }
+        }
+      }
     } else if (build.getBuildTrigger().getType() == Type.BRANCH_CREATION) {
       toBuild.addAll(modules);
     } else if (commitInfo.isTruncated()) {
