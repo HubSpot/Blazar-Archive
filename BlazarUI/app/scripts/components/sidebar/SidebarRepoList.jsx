@@ -4,7 +4,7 @@ import LazyRender from '../shared/LazyRender.jsx';
 import Loader from '../shared/Loader.jsx';
 import SidebarItem from './SidebarItem.jsx';
 import {has} from 'underscore';
-import {sortBuildsByRepoAndBranch} from '../Helpers.js';
+import {sortBuildsByRepoAndBranch, filterInactiveBuilds} from '../Helpers.js';
 
 class SidebarRepoList extends Component {
 
@@ -21,7 +21,7 @@ class SidebarRepoList extends Component {
       );
     }
 
-    const buildsList = sortBuildsByRepoAndBranch(filteredBuilds).map( (build) => {
+    const buildsList = sortBuildsByRepoAndBranch(filterInactiveBuilds(filteredBuilds)).map( (build) => {
       const buildType = has(build, 'inProgressBuild') ? 'inProgressBuild' : has(build, 'lastBuild') ? 'lastBuild' : 'neverBuilt'
 
       return (
