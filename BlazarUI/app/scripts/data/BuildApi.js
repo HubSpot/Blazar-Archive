@@ -165,7 +165,7 @@ class BuildApi {
         
         setTimeout(() => {
           this._pollLog();
-        }, config.activeBuildRefresh);
+        }, config.activeBuildLogRefresh);
       });
     }
 
