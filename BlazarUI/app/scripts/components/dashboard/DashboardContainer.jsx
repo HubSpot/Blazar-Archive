@@ -54,12 +54,9 @@ class DashboardContainer extends Component {
   onStatusChange(state) {
     this.setState(state);
     this.checkStarHistory();
-
-    console.log(this.state.starredBuilds.toJS());
   }
 
   render() {
-
     return (
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
