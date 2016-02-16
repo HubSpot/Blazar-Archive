@@ -12,7 +12,7 @@ import Icon from '../shared/Icon.jsx';
 import BranchFilter from './BranchFilter.jsx';
 import BranchesTable from './BranchesTable.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
-import {getFilteredBranches} from '../Helpers.js'
+import {getFilteredBranches, filterInactiveBuilds} from '../Helpers.js'
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import RepoStore from '../../stores/repoStore';
@@ -95,7 +95,7 @@ class RepoContainer extends Component {
             <BranchesTable 
               hide={this.state.error}
               {...this.state}
-              branches={getFilteredBranches(this.state.filters, this.state.branches.toJS())}
+              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.branches.toJS()))}
             />
           </UIGridItem>
         </UIGrid>

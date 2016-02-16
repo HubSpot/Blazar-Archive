@@ -233,3 +233,9 @@ export const sortBuildsByRepoAndBranch = function(builds) {
     return branchNameA.localeCompare(branchNameB);
   });
 };
+
+export const filterInactiveBuilds = function(builds) {
+  return builds.filter((build) => {
+    return build.gitInfo.active;
+  });
+};
