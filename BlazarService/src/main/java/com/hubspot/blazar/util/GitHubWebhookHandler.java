@@ -1,5 +1,16 @@
 package com.hubspot.blazar.util;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.kohsuke.github.GHRepository;
+
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -11,15 +22,6 @@ import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
-import org.kohsuke.github.GHRepository;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Set;
 
 @Singleton
 public class GitHubWebhookHandler {
@@ -84,20 +86,21 @@ public class GitHubWebhookHandler {
   }
 
   private boolean isOptedIn(GitInfo gitInfo) throws IOException {
-    return whitelist.contains(gitInfo.getRepository()) || branchExists(gitInfo) || blazarConfigExists(gitInfo);
-  }
-
-  private boolean branchExists(GitInfo gitInfo) {
-    return branchService.lookup(gitInfo).isPresent();
+    return whitelist.contains(gitInfo.getRepository()) || blazarConfigExists(gitInfo);
   }
 
   private boolean blazarConfigExists(GitInfo gitInfo) throws IOException  {
+    GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
     try {
-      GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
-      String config = gitHubHelper.contentsFor(".blazar.yaml", repository, gitInfo);
-      return config.contains("enabled: true");
+      gitHubHelper.contentsFor(".blazar-enabled", repository, gitInfo);
+      return true;
     } catch (FileNotFoundException e) {
-      return false;
+      try {
+        String config = gitHubHelper.contentsFor(".blazar.yaml", repository, gitInfo);
+        return config.contains("enabled: true");
+      } catch (FileNotFoundException e1) {
+        return false;
+      }
     }
   }
 
