@@ -70,48 +70,53 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     }
   }
 
-  private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> modules) {
+  private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> allModules) {
     CommitInfo commitInfo = build.getCommitInfo().get();
 
     final Set<Module> toBuild = new HashSet<>();
     if (build.getBuildTrigger().getType() == Type.MANUAL) {
-      if (build.getBuildTrigger().getModuleIds().isEmpty()) {
-        toBuild.addAll(modules);
+      if (!build.getBuildOptions().isPresent() || build.getBuildOptions().get().getModuleIds().isEmpty()) {
+        toBuild.addAll(allModules);
       } else {
-        final Set<Integer> moduleIds = build.getBuildTrigger().getModuleIds();
-        for (Module module : modules) {
-          if (moduleIds.contains(module.getId().or(-1))) {
+        final Set<Integer> requestedModuleIds = build.getBuildOptions().get().getModuleIds();
+        for (Module module : allModules) {
+          if (requestedModuleIds.contains(module.getId().get())) {
             toBuild.add(module);
           }
         }
+        addDownstreamModules(build, allModules, toBuild);
       }
     } else if (build.getBuildTrigger().getType() == Type.BRANCH_CREATION) {
-      toBuild.addAll(modules);
+      toBuild.addAll(allModules);
     } else if (commitInfo.isTruncated()) {
-      toBuild.addAll(modules);
+      toBuild.addAll(allModules);
     } else {
       for (String path : gitHubHelper.affectedPaths(commitInfo)) {
-        for (Module module : modules) {
+        for (Module module : allModules) {
           if (module.contains(FileSystems.getDefault().getPath(path))) {
             toBuild.add(module);
           }
         }
       }
 
-      Map<Integer, Module> moduleMap = mapByModuleId(modules);
-      DependencyGraph dependencyGraph = build.getDependencyGraph().get();
-      LOG.info("All modules: {}", moduleMap.keySet());
-      LOG.info("Changed modules: {}", mapByModuleId(toBuild).keySet());
-      LOG.info("Transitive reduction: {}", dependencyGraph.getTransitiveReduction());
-      for (Module module : ImmutableSet.copyOf(toBuild)) {
-        for (int downstreamModule : dependencyGraph.reachableVertices(module.getId().get())) {
-          toBuild.add(moduleMap.get(downstreamModule));
-        }
-      }
-      LOG.info("Modules to build: {}", mapByModuleId(toBuild).keySet());
+      addDownstreamModules(build, allModules, toBuild);
     }
 
     return toBuild;
+  }
+
+  private void addDownstreamModules(RepositoryBuild build, Set<Module> allModules, Set<Module> toBuild) {
+    Map<Integer, Module> moduleMap = mapByModuleId(allModules);
+    DependencyGraph dependencyGraph = build.getDependencyGraph().get();
+    LOG.info("All active modules: {}", moduleMap.keySet());
+    LOG.info("Modules directly selected for build (changed or selected by user): {}", mapByModuleId(toBuild).keySet());
+    LOG.info("Transitive reduction: {}", dependencyGraph.getTransitiveReduction());
+    for (Module module : ImmutableSet.copyOf(toBuild)) {
+      for (int downstreamModule : dependencyGraph.reachableVertices(module.getId().get())) {
+        toBuild.add(moduleMap.get(downstreamModule));
+      }
+    }
+    LOG.info("All modules to build (including downstream dependencies): {}", mapByModuleId(toBuild).keySet());
   }
 
   private static Set<Module> filterActive(Set<Module> modules) {

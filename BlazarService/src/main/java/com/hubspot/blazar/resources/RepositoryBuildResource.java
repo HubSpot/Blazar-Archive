@@ -10,9 +10,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
+import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -40,14 +39,14 @@ public class RepositoryBuildResource {
 
   @POST
   @Path("/branch/{id}")
-  public RepositoryBuild trigger(@PathParam("id") int branchId, Set<Integer> moduleIds) {
+  public RepositoryBuild trigger(@PathParam("id") int branchId, Optional<BuildOptions> buildOptions) {
     Optional<GitInfo> gitInfo = branchService.get(branchId);
     if (!gitInfo.isPresent()) {
       throw new NotFoundException("No branch found with id: " + branchId);
     }
 
     // TODO capture user
-    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), BuildTrigger.forUser("unknown", Objects.firstNonNull(moduleIds, ImmutableSet.<Integer>of())));
+    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), BuildTrigger.forUser("unknown"), buildOptions);
     return repositoryBuildService.get(repositoryBuildId).get();
   }
 

@@ -1,8 +1,20 @@
 package com.hubspot.blazar.util;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.kohsuke.github.GHRepository;
+
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.service.BranchService;
@@ -11,15 +23,6 @@ import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
-import org.kohsuke.github.GHRepository;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Set;
 
 @Singleton
 public class GitHubWebhookHandler {
@@ -52,7 +55,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = gitInfo(createEvent);
       if (isOptedIn(gitInfo)) {
         gitInfo = branchService.upsert(gitInfo);
-        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forBranchCreation(gitInfo.getBranch()));
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forBranchCreation(gitInfo.getBranch()), Optional.<BuildOptions>absent());
       }
     }
   }
@@ -78,7 +81,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = gitInfo(pushEvent);
       if (isOptedIn(gitInfo)) {
         gitInfo = branchService.upsert(gitInfo(pushEvent));
-        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()));
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), Optional.<BuildOptions>absent());
       }
     }
   }
@@ -91,7 +94,7 @@ public class GitHubWebhookHandler {
     return branchService.lookup(gitInfo).isPresent();
   }
 
-  private boolean blazarConfigExists(GitInfo gitInfo) throws IOException  {
+  private boolean blazarConfigExists(GitInfo gitInfo) throws IOException {
     try {
       GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
       String config = gitHubHelper.contentsFor(".blazar.yaml", repository, gitInfo);
