@@ -356,6 +356,8 @@ class BuildApi {
     const buildState = this.build.model.data.state;
 
     switch (buildState) {
+      case BuildStates.WAITING_FOR_UPSTREAM_BUILD:
+      case BuildStates.WAITING_FOR_BUILD_SLOT:
       case BuildStates.QUEUED:
       case BuildStates.LAUNCHING:
         this._processBuildOnDeck();
