@@ -4,11 +4,13 @@ import com.google.common.base.Optional;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
+import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
@@ -21,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Set;
 
 @Singleton
 public class RepositoryBuildLauncher {
@@ -28,6 +31,7 @@ public class RepositoryBuildLauncher {
 
   private final RepositoryBuildService repositoryBuildService;
   private final BranchService branchService;
+  private final ModuleService moduleService;
   private final DependenciesService dependenciesService;
   private final ModuleDiscoveryService moduleDiscoveryService;
   private final ModuleDiscovery moduleDiscovery;
@@ -36,12 +40,14 @@ public class RepositoryBuildLauncher {
   @Inject
   public RepositoryBuildLauncher(RepositoryBuildService repositoryBuildService,
                                  BranchService branchService,
+                                 ModuleService moduleService,
                                  DependenciesService dependenciesService,
                                  ModuleDiscoveryService moduleDiscoveryService,
                                  ModuleDiscovery moduleDiscovery,
                                  GitHubHelper gitHubHelper) {
     this.repositoryBuildService = repositoryBuildService;
     this.branchService = branchService;
+    this.moduleService = moduleService;
     this.dependenciesService = dependenciesService;
     this.moduleDiscoveryService = moduleDiscoveryService;
     this.moduleDiscovery = moduleDiscovery;
@@ -51,20 +57,22 @@ public class RepositoryBuildLauncher {
   public void launch(RepositoryBuild queued, Optional<RepositoryBuild> previous) throws Exception {
     GitInfo gitInfo = branchService.get(queued.getBranchId()).get();;
     CommitInfo commitInfo = commitInfo(gitInfo, commit(previous));
-    updateModules(gitInfo, commitInfo);
+    Set<Module> modules = updateModules(gitInfo, commitInfo);
 
     RepositoryBuild launching = queued.withStartTimestamp(System.currentTimeMillis())
         .withState(State.LAUNCHING)
         .withCommitInfo(commitInfo)
-        .withDependencyGraph(dependenciesService.buildDependencyGraph(gitInfo));
+        .withDependencyGraph(dependenciesService.buildDependencyGraph(gitInfo, modules));
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     repositoryBuildService.begin(launching);
   }
 
-  void updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
+  Set<Module> updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
       DiscoveryResult result = moduleDiscovery.discover(gitInfo);
-      moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
+      return moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
+    } else {
+      return moduleService.getByBranch(gitInfo.getId().get());
     }
   }
 

@@ -1,10 +1,14 @@
 package com.hubspot.blazar.data.service;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleDependency;
 import com.hubspot.blazar.data.dao.DependenciesDao;
 import com.hubspot.blazar.data.util.GraphUtils;
@@ -12,6 +16,8 @@ import com.hubspot.blazar.data.util.GraphUtils;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +32,7 @@ public class DependenciesService {
     this.dependenciesDao = dependenciesDao;
   }
 
-  public DependencyGraph buildDependencyGraph(GitInfo gitInfo) {
+  public DependencyGraph buildDependencyGraph(GitInfo gitInfo, Set<Module> allModules) {
     Map<String, Integer> providerMap = asMap(getProvides(gitInfo));
 
     SetMultimap<Integer, Integer> edges = HashMultimap.create();
@@ -38,7 +44,13 @@ public class DependenciesService {
 
     SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(edges);
     List<Integer> topologicalSort = GraphUtils.INSTANCE.topologicalSort(transitiveReduction);
-    return new DependencyGraph(transitiveReduction, topologicalSort);
+    List<Integer> missingModules = findMissingModules(topologicalSort, allModules);
+    Map<Integer, Set<Integer>> transitiveReductionMap = new HashMap<>(Multimaps.asMap(transitiveReduction));
+    for (int missingModule : missingModules) {
+      transitiveReductionMap.put(missingModule, Collections.<Integer>emptySet());
+    }
+
+    return new DependencyGraph(transitiveReductionMap, concat(missingModules, topologicalSort));
   }
 
   @Transactional
@@ -75,6 +87,22 @@ public class DependenciesService {
   private void updateDepends(DiscoveredModule module) {
     dependenciesDao.deleteDepends(module.getId().get());
     dependenciesDao.insertDepends(module.getDepends());
+  }
+
+  private static List<Integer> findMissingModules(List<Integer> topologicalSort, Set<Module> allModules) {
+    List<Integer> missing = new ArrayList<>();
+    for (Module module : allModules) {
+      if (!topologicalSort.contains(module.getId().get())) {
+        missing.add(module.getId().get());
+      }
+    }
+
+    Collections.sort(missing);
+    return missing;
+  }
+
+  private static List<Integer> concat(List<Integer> list1, List<Integer> list2) {
+    return ImmutableList.copyOf(Iterables.concat(list1, list2));
   }
 
   private static Map<String, Integer> asMap(Set<ModuleDependency> dependencies) {
