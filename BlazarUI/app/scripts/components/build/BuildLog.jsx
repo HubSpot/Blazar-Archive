@@ -290,7 +290,7 @@ class BuildLog extends Component {
   renderLogLines() {
     const {build, log, error} = this.props;
 
-    if (build.state === BuildStates.LAUNCHING || build.state === BuildStates.QUEUED) {
+    if (buildIsOnDeck(build.state)) {
       return (
         <div>
           <BuildLogLine text='Polling for updates...' />
