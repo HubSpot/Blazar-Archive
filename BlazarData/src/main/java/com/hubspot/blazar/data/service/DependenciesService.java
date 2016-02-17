@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +36,9 @@ public class DependenciesService {
       }
     }
 
-    return new DependencyGraph(GraphUtils.INSTANCE.transitiveReduction(edges));
+    SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(edges);
+    List<Integer> topologicalSort = GraphUtils.INSTANCE.topologicalSort(transitiveReduction);
+    return new DependencyGraph(transitiveReduction, topologicalSort);
   }
 
   @Transactional

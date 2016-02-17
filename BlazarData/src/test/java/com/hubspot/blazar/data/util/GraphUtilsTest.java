@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GraphUtilsTest {
@@ -28,5 +30,10 @@ public class GraphUtilsTest {
   @Test
   public void testTransitiveReduction() {
     assertThat(GraphUtils.INSTANCE.transitiveReduction(EDGES).asMap()).isEqualTo(REDUCED.asMap());
+  }
+
+  @Test
+  public void testTopologicalSort() {
+    assertThat(GraphUtils.INSTANCE.topologicalSort(REDUCED)).isEqualTo(Arrays.asList(1, 3, 4, 5, 2));
   }
 }
