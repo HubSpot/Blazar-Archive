@@ -19,7 +19,7 @@ class RepoBuildModulesTable extends Component {
 
     return this.props.buildTable({
       data: this.props.data,
-      columnNames: ['', 'Module Build', 'Start Time', 'Duration', 'Singularity Task', ''],
+      columnNames: ['', 'Module Build', 'Start Time', 'Duration', ''],
       rowComponent: RepoBuildModulesTableRow,
       showProgress: true,
       params: this.props.params

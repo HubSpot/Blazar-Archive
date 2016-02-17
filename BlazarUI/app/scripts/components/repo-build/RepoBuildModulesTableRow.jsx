@@ -21,7 +21,15 @@ class RepoBuildModulesTableRow extends Component {
     );    
   }
 
+  isDebugMode() {
+    return window.location.href.indexOf('?debug') > -1;
+  }
+
   renderSingularityLink() {
+    if (!this.isDebugMode()) {
+      return null;
+    }
+
     const {taskId} = this.props.data;
 
     if (!taskId) {
@@ -34,7 +42,9 @@ class RepoBuildModulesTableRow extends Component {
     const singularityPath = `https://tools.hubteamqa.com/singularity/task/${taskId}`;
 
     return (
-      <a href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>  
+      <td>
+        <a href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>
+      </td>
     );
   }
 
@@ -81,9 +91,7 @@ class RepoBuildModulesTableRow extends Component {
         <td>
           {this.renderDuration()}
         </td>
-        <td>
-          {this.renderSingularityLink()}
-        </td>
+        {this.renderSingularityLink()}
         <td>
         </td>
       </tr>
