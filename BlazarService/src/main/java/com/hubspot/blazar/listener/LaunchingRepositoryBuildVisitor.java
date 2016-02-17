@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.hubspot.blazar.base.BuildOptions.BuildDownstreams;
 import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
@@ -75,15 +76,16 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
     final Set<Module> toBuild = new HashSet<>();
     if (build.getBuildTrigger().getType() == Type.MANUAL) {
-      if (!build.getBuildOptions().isPresent() || build.getBuildOptions().get().getModuleIds().isEmpty()) {
+      if (build.getBuildOptions().getModuleIds().isEmpty()) {
         toBuild.addAll(allModules);
       } else {
-        final Set<Integer> requestedModuleIds = build.getBuildOptions().get().getModuleIds();
+        final Set<Integer> requestedModuleIds = build.getBuildOptions().getModuleIds();
         for (Module module : allModules) {
           if (requestedModuleIds.contains(module.getId().get())) {
             toBuild.add(module);
           }
         }
+
         addDownstreamModules(build, allModules, toBuild);
       }
     } else if (build.getBuildTrigger().getType() == Type.BRANCH_CREATION) {
@@ -106,6 +108,10 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
   }
 
   private void addDownstreamModules(RepositoryBuild build, Set<Module> allModules, Set<Module> toBuild) {
+    if (build.getBuildOptions().getBuildDownstreams().equals(BuildDownstreams.NONE)) {
+      return;
+    }
+
     Map<Integer, Module> moduleMap = mapByModuleId(allModules);
     DependencyGraph dependencyGraph = build.getDependencyGraph().get();
     LOG.info("All active modules: {}", moduleMap.keySet());

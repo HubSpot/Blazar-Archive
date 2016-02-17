@@ -39,7 +39,7 @@ public class RepositoryBuildResource {
 
   @POST
   @Path("/branch/{id}")
-  public RepositoryBuild trigger(@PathParam("id") int branchId, Optional<BuildOptions> buildOptions) {
+  public RepositoryBuild trigger(@PathParam("id") int branchId, BuildOptions buildOptions) {
     Optional<GitInfo> gitInfo = branchService.get(branchId);
     if (!gitInfo.isPresent()) {
       throw new NotFoundException("No branch found with id: " + branchId);

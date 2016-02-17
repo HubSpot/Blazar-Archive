@@ -55,7 +55,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = gitInfo(createEvent);
       if (isOptedIn(gitInfo)) {
         gitInfo = branchService.upsert(gitInfo);
-        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forBranchCreation(gitInfo.getBranch()), Optional.<BuildOptions>absent());
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forBranchCreation(gitInfo.getBranch()), BuildOptions.defaultOptions());
       }
     }
   }
@@ -81,7 +81,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = gitInfo(pushEvent);
       if (isOptedIn(gitInfo)) {
         gitInfo = branchService.upsert(gitInfo(pushEvent));
-        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), Optional.<BuildOptions>absent());
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), BuildOptions.defaultOptions());
       }
     }
   }

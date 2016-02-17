@@ -1,5 +1,6 @@
 package com.hubspot.blazar.base;
 
+
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -36,7 +37,7 @@ public class RepositoryBuild {
   @StoredAsJson
   private final Optional<DependencyGraph> dependencyGraph;
   @StoredAsJson
-  private final Optional<BuildOptions> buildOptions;
+  private final BuildOptions buildOptions;
 
   @JsonCreator
   public RepositoryBuild(@JsonProperty("id") Optional<Long> id,
@@ -49,7 +50,7 @@ public class RepositoryBuild {
                          @JsonProperty("sha") Optional<String> sha,
                          @JsonProperty("commitInfo") Optional<CommitInfo> commitInfo,
                          @JsonProperty("dependencyGraph") Optional<DependencyGraph> dependencyGraph,
-                         @JsonProperty("buildOptions") Optional<BuildOptions> buildOptions) {
+                         @JsonProperty("buildOptions") BuildOptions buildOptions) {
     this.id = id;
     this.branchId = branchId;
     this.buildNumber = buildNumber;
@@ -60,10 +61,10 @@ public class RepositoryBuild {
     this.sha = sha;
     this.commitInfo = commitInfo;
     this.dependencyGraph = dependencyGraph;
-    this.buildOptions = buildOptions;
+    this.buildOptions = com.google.common.base.Objects.firstNonNull(buildOptions, BuildOptions.defaultOptions());
   }
 
-  public static RepositoryBuild queuedBuild(GitInfo gitInfo, BuildTrigger trigger, int buildNumber, Optional<BuildOptions> buildOptions) {
+  public static RepositoryBuild queuedBuild(GitInfo gitInfo, BuildTrigger trigger, int buildNumber, BuildOptions buildOptions) {
     Optional<Long> absentLong = Optional.absent();
     Optional<String> absentString = Optional.absent();
     Optional<CommitInfo> commitInfo = Optional.absent();
@@ -112,7 +113,7 @@ public class RepositoryBuild {
     return dependencyGraph;
   }
 
-  public Optional<BuildOptions> getBuildOptions() {
+  public BuildOptions getBuildOptions() {
     return buildOptions;
   }
 
@@ -139,10 +140,6 @@ public class RepositoryBuild {
 
   public RepositoryBuild withDependencyGraph(DependencyGraph dependencyGraph) {
     return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, Optional.of(dependencyGraph), buildOptions);
-  }
-
-  public RepositoryBuild withBuildOptions(BuildOptions buildOptions) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph, Optional.of(buildOptions));
   }
 
   @Override

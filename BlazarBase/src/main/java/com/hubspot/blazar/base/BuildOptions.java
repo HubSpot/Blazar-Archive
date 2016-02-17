@@ -10,20 +10,28 @@ import com.google.common.collect.ImmutableSet;
 public class BuildOptions {
 
   private final Set<Integer> moduleIds;
-  private final boolean buildDownstreamModules;
+  private final BuildDownstreams buildDownstreams;
+
+  public enum BuildDownstreams {
+    NONE, WITHIN_REPOSITORY;
+  }
+
+  public static BuildOptions defaultOptions() {
+    return new BuildOptions(ImmutableSet.<Integer>of(), BuildDownstreams.WITHIN_REPOSITORY);
+  }
 
   @JsonCreator
-  public BuildOptions(@JsonProperty("moduleIds") Set<Integer> moduleIds, @JsonProperty("buildDownstreamModules") boolean buildDownstreamModules) {
+  public BuildOptions(@JsonProperty("moduleIds") Set<Integer> moduleIds, @JsonProperty("buildDownstreams") BuildDownstreams buildDownstreams) {
     this.moduleIds = Objects.firstNonNull(moduleIds, ImmutableSet.<Integer>of());
-    this.buildDownstreamModules = buildDownstreamModules;
+    this.buildDownstreams = buildDownstreams;
   }
 
   public Set<Integer> getModuleIds() {
     return moduleIds;
   }
 
-  public boolean isBuildDownstreamModules() {
-    return buildDownstreamModules;
+  public BuildDownstreams getBuildDownstreams() {
+    return buildDownstreams;
   }
 
 }

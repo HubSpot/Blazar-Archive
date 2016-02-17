@@ -52,7 +52,7 @@ public class RepositoryBuildService {
     return repositoryBuildDao.getBuildNumbers(branchId);
   }
 
-  public long enqueue(GitInfo gitInfo, BuildTrigger trigger, Optional<BuildOptions> buildOptions) {
+  public long enqueue(GitInfo gitInfo, BuildTrigger trigger, BuildOptions buildOptions) {
     BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
 
     if (buildNumbers.getPendingBuildId().isPresent()) {
