@@ -9,6 +9,8 @@ import BranchHeadline from './BranchHeadline.jsx';
 import Loader from '../shared/Loader.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import BuildButton from './BuildButton.jsx';
+import ModuleModal from '../shared/ModuleModal.jsx';
+import Immutable from 'immutable';
 
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
@@ -22,7 +24,10 @@ let initialState = {
   builds: null,
   stars: [],
   loadingBranches: true,
-  loadingStars: true
+  loadingStars: true,
+  showModuleModal: false,
+  modules: Immutable.List.of(),
+  checkedModuleIds: []
 };
 
 class BranchContainer extends Component {
@@ -54,6 +59,7 @@ class BranchContainer extends Component {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
     StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuilds(params);
+    BranchActions.loadModules(3);
   }
   
   tearDown() {
@@ -63,7 +69,26 @@ class BranchContainer extends Component {
   }
   
   triggerBuild() {
-    BranchActions.triggerBuild();
+    this.openModuleModal();
+    //BranchActions.triggerBuild();
+  }
+
+  openModuleModal() {
+    this.setState({
+      showModuleModal: true
+    });
+  }
+
+  closeModuleModal() {
+    this.setState({
+      showModuleModal: false
+    });
+  }
+
+  updateCheckedModuleIds(moduleIds) {
+    this.setState({
+      checkedModuleIds: modulesIds
+    })
   }
   
   renderTable() {
@@ -105,9 +130,15 @@ class BranchContainer extends Component {
             </UIGridItem>
             <UIGridItem size={2} align='RIGHT'>
               <BuildButton 
-                triggerBuild={this.triggerBuild} 
+                triggerBuild={this.triggerBuild.bind(this)} 
                 loading={this.state.loadingBranches}
                 error={this.state.error}
+              />
+              <ModuleModal 
+                showModal={this.state.showModuleModal}
+                whenDone={this.closeModuleModal.bind(this)}
+                okayGoBuild={this.updateCheckedModuleIds.bind(this)}
+                modules={this.state.modules}
               />
             </UIGridItem>
             <UIGrid>
