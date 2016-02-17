@@ -160,11 +160,8 @@ class BuildApi {
   
     if (this.build.logCollection.shouldPoll && this.build.model.data.state === BuildStates.IN_PROGRESS) {
       this._fetchLog().done((data, textStatus, jqxhr) => {
-
-        if (data.nextOffset !== -1) {
-          this._triggerUpdate();
-          this.build.logCollection.requestOffset = data.nextOffset;
-        }
+        this._triggerUpdate();
+        this.build.logCollection.requestOffset = data.nextOffset;
         
         setTimeout(() => {
           this._pollLog();
