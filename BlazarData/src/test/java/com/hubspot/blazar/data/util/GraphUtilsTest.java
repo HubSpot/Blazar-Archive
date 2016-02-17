@@ -27,6 +27,14 @@ public class GraphUtilsTest {
       .put(5, 2)
       .build();
 
+  private static final SetMultimap<Integer, Integer> BLAZAR = ImmutableSetMultimap.<Integer, Integer>builder()
+      .put(278, 280)
+      .put(280, 277)
+      .put(280, 281)
+      .put(280, 279)
+      .put(279, 276)
+      .build();
+
   @Test
   public void testTransitiveReduction() {
     assertThat(GraphUtils.INSTANCE.transitiveReduction(EDGES).asMap()).isEqualTo(REDUCED.asMap());
@@ -35,5 +43,10 @@ public class GraphUtilsTest {
   @Test
   public void testTopologicalSort() {
     assertThat(GraphUtils.INSTANCE.topologicalSort(REDUCED)).isEqualTo(Arrays.asList(1, 3, 4, 5, 2));
+  }
+
+  @Test
+  public void testBlazarTopologicalSort() {
+    assertThat(GraphUtils.INSTANCE.topologicalSort(BLAZAR)).isEqualTo(Arrays.asList(278, 280, 277, 279, 281, 276));
   }
 }

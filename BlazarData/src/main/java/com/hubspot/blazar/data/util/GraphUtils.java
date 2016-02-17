@@ -3,23 +3,24 @@ package com.hubspot.blazar.data.util;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
+import com.google.common.collect.TreeMultimap;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeSet;
 
 public enum GraphUtils {
   INSTANCE;
 
-  public <V> List<V> topologicalSort(SetMultimap<V, V> transitiveReduction) {
-    SetMultimap<V, V> graph = HashMultimap.create(transitiveReduction);
+  public <V extends Comparable<V>> List<V> topologicalSort(SetMultimap<V, V> transitiveReduction) {
+    SetMultimap<V, V> graph = TreeMultimap.create(transitiveReduction);
 
     List<V> sorted = new ArrayList<>();
-    Set<V> roots = new TreeSet<>();
+    Deque<V> roots = new ArrayDeque<>();
     for (V vertex : graph.keySet()) {
       if (incomingVertices(graph, vertex).isEmpty()) {
         roots.add(vertex);
@@ -27,15 +28,13 @@ public enum GraphUtils {
     }
 
     while (!roots.isEmpty()) {
-      Iterator<V> iterator = roots.iterator();
-      V root = iterator.next();
+      V root = roots.removeFirst();
       sorted.add(root);
-      iterator.remove();
 
       Set<V> children = graph.removeAll(root);
       for (V child : children) {
         if (incomingVertices(graph, child).isEmpty()) {
-          roots.add(child);
+          roots.addLast(child);
         }
       }
     }
@@ -49,8 +48,8 @@ public enum GraphUtils {
     SetMultimap<V, V> reduced = HashMultimap.create(paths);
     Set<V> vertices = vertices(paths);
 
-    for (V vertexI : vertices) {
-      for (V vertexJ : vertices) {
+    for (V vertexJ : vertices) {
+      for (V vertexI : vertices) {
         if (reduced.get(vertexI).contains(vertexJ)) {
           for (V vertexK : vertices) {
             if (reduced.get(vertexJ).contains(vertexK)) {
@@ -67,7 +66,7 @@ public enum GraphUtils {
   private <V> Set<V> incomingVertices(SetMultimap<V, V> graph, V target) {
     Set<V> incomingVertices = new HashSet<>();
     for (Entry<V, V> path : graph.entries()) {
-      if (path.getValue() == target) {
+      if (path.getValue().equals(target)) {
         incomingVertices.add(path.getKey());
       }
     }
