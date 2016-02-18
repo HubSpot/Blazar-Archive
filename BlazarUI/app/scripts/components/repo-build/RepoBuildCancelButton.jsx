@@ -36,7 +36,7 @@ class CancelBuildButton extends Component {
         <Modal.Header closeButton>
           <Modal.Title>
             Are you sure you want to cancel 
-            <strong> build #{this.props.build.buildNumber}</strong> {' '}.
+            <strong> build #{this.props.build.buildNumber}</strong> {' '}?
           </Modal.Title>
         </Modal.Header>
         <Modal.Footer>

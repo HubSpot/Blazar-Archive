@@ -94,16 +94,17 @@ class BranchBuildsApi extends StoredBuilds {
     });
   }
 
-  generateBuildModuleJsonBody(moduleIds) {
-    let body = {moduleIds: moduleIds, buildDownstreams: 'NONE'};
+  generateBuildModuleJsonBody(moduleIds, downstreamModules) {
+    let body = {moduleIds: moduleIds, buildDownstreams: downstreamModules};
     return body;
   }
 
-  triggerBuildModuleSpecific(moduleIds, cb) {
+  triggerBuildModuleSpecific(moduleIds, downstreamModules, cb) {
     const buildPromise = new Resource({
       url: `${config.apiRoot}/branches/builds/branch/${this.branchId}`,
       type: 'POST',
-      data: this.generateBuildModuleJsonBody(moduleIds)
+      contentType: 'application/json',
+      data: JSON.stringify(this.generateBuildModuleJsonBody(moduleIds, downstreamModules))
     }).send();
 
     buildPromise.then((resp) => {

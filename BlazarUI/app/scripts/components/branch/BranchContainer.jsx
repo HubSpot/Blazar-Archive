@@ -26,8 +26,7 @@ let initialState = {
   loadingBranches: true,
   loadingStars: true,
   showModuleModal: false,
-  modules: Immutable.List.of(),
-  checkedModuleIds: []
+  modules: Immutable.List.of()
 };
 
 class BranchContainer extends Component {
@@ -85,12 +84,8 @@ class BranchContainer extends Component {
     });
   }
 
-  updateCheckedModuleIds(moduleIds) {
-    this.setState({
-      checkedModuleIds: moduleIds
-    })
-
-    BranchActions.triggerBuildModuleSpecific(moduleIds);
+  updateCheckedModuleIds(moduleIds, downstreamToggle) {
+    BranchActions.triggerBuildModuleSpecific(moduleIds, downstreamToggle);
   }
   
   renderTable() {
