@@ -37,12 +37,10 @@ public class DownstreamModuleBuildCanceller extends AbstractModuleBuildVisitor {
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
     DependencyGraph dependencyGraph = repositoryBuild.getDependencyGraph().get();
 
-    Set<ModuleBuild> builds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
-    for (int downstreamModule : dependencyGraph.outgoingVertices(build.getModuleId())) {
-      for (ModuleBuild otherBuild : builds) {
-        if (otherBuild.getModuleId() == downstreamModule && !otherBuild.getState().isComplete()) {
-          moduleBuildService.cancel(otherBuild);
-        }
+    Set<Integer> downstreamModules = dependencyGraph.outgoingVertices(build.getModuleId());
+    for (ModuleBuild otherBuild : moduleBuildService.getByRepositoryBuild(build.getRepoBuildId())) {
+      if (downstreamModules.contains(otherBuild.getModuleId()) && !otherBuild.getState().isComplete()) {
+        moduleBuildService.cancel(otherBuild);
       }
     }
   }

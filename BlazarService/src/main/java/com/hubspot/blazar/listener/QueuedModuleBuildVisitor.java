@@ -12,6 +12,7 @@ import com.hubspot.blazar.util.ModuleBuildLauncher;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,7 +41,7 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
       moduleBuildLauncher.launch(repositoryBuild, build);
     } else {
       Set<ModuleBuild> moduleBuilds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
-      Set<Integer> buildingModules = extractModuleIds(filterSkipped(moduleBuilds));
+      Set<Integer> buildingModules = extractModuleIds(filterSucceeded(moduleBuilds));
       Set<Integer> upstreamModules = dependencyGraph.incomingVertices(build.getModuleId());
 
       if (Sets.intersection(buildingModules, upstreamModules).isEmpty()) {
@@ -49,10 +50,12 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
     }
   }
 
-  private static Set<ModuleBuild> filterSkipped(Set<ModuleBuild> builds) {
+  private static Set<ModuleBuild> filterSucceeded(Set<ModuleBuild> builds) {
+    Set<State> allowedStates = EnumSet.complementOf(EnumSet.of(State.SUCCEEDED, State.SKIPPED));
+
     Set<ModuleBuild> filtered = new HashSet<>();
     for (ModuleBuild build : builds) {
-      if (build.getState() != State.SKIPPED) {
+      if (allowedStates.contains(build.getState())) {
         filtered.add(build);
       }
     }
