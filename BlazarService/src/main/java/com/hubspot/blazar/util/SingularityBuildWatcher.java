@@ -120,7 +120,7 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
               age = System.currentTimeMillis() - startedTimestamp.get();
               long maxAge = executorConfiguration.getBuildTimeoutMillis();
               if (age > maxAge) {
-                LOG.info("Failing build {} because its age {} exceeded max of {}", taskId, build.getId().get(), age, maxAge);
+                LOG.info("Failing build {} because its age {} exceeded max of {}", build.getId().get(), age, maxAge);
                 moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
                 singularityTaskKiller.killTask(build);
               }
