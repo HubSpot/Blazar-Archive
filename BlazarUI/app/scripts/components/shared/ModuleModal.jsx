@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import Immutable from 'immutable';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
-import $ from 'jQuery';
+import $ from 'jquery';
 
 class ModuleModal extends Component {
 

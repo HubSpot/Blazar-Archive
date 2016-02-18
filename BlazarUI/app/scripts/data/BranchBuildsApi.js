@@ -95,7 +95,7 @@ class BranchBuildsApi extends StoredBuilds {
   }
 
   generateBuildModuleJsonBody(moduleIds) {
-    let body = {moduleIds: moduleIds, buildDownstreams: 'WITHIN_REPOSITORY'};
+    let body = {moduleIds: moduleIds, buildDownstreams: 'NONE'};
     return body;
   }
 
