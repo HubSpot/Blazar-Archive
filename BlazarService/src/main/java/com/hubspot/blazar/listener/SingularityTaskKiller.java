@@ -31,16 +31,20 @@ public class SingularityTaskKiller extends AbstractModuleBuildVisitor {
   }
 
   @Override
-  protected void visitCancelled(ModuleBuild build) throws Exception {
+  protected void visitCancelled(ModuleBuild build) {
     if (build.getTaskId().isPresent()) {
-      String taskId = build.getTaskId().get();
-      LOG.info("Killing singularity task {} for cancelled build {}", taskId, build.getId().get());
-      Optional<SingularityTaskCleanupResult> result = singularityClient.killTask(taskId, Optional.of(killTaskRequest));
-      if (result.isPresent()) {
-        LOG.info("Cleanup result for task {}: {}", result.get());
-      } else {
-        LOG.info("No cleanup result for task {}", taskId);
-      }
+      killTask(build);
+    }
+  }
+
+  public void killTask(ModuleBuild build) {
+    String taskId = build.getTaskId().get();
+    LOG.info("Killing singularity task for build {}", build.getId().get());
+    Optional<SingularityTaskCleanupResult> result = singularityClient.killTask(taskId, Optional.of(killTaskRequest));
+    if (result.isPresent()) {
+      LOG.info("Cleanup result for task {}: {}", result.get());
+    } else {
+      LOG.info("No cleanup result for task {}", taskId);
     }
   }
 }
