@@ -86,7 +86,7 @@ class BranchBuildsApi extends StoredBuilds {
     // TODO: run this when the branchId is set, not just repeating on timeout forever
     if (this.branchId === undefined) {
       setTimeout(() => {
-        this.getModuleForBranch(cb)
+        this.getModuleForBranch(cb);
       }, 500);
 
       return;
