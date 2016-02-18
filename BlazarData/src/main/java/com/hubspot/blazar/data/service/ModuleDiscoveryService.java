@@ -2,10 +2,12 @@ package com.hubspot.blazar.data.service;
 
 import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.util.Set;
 
 @Singleton
 public class ModuleDiscoveryService {
@@ -19,8 +21,9 @@ public class ModuleDiscoveryService {
   }
 
   @Transactional
-  public void handleDiscoveryResult(GitInfo gitInfo, DiscoveryResult result) {
-    moduleService.setModules(gitInfo, result.getModules());
+  public Set<Module> handleDiscoveryResult(GitInfo gitInfo, DiscoveryResult result) {
+    Set<Module> modules = moduleService.setModules(gitInfo, result.getModules());
     malformedFileService.setMalformedFiles(gitInfo, result.getMalformedFiles());
+    return modules;
   }
 }

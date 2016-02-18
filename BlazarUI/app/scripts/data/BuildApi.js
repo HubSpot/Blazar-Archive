@@ -165,7 +165,7 @@ class BuildApi {
         
         setTimeout(() => {
           this._pollLog();
-        }, config.activeBuildRefresh);
+        }, config.activeBuildLogRefresh);
       });
     }
 
@@ -345,8 +345,8 @@ class BuildApi {
       return;
     }
 
-    logSizePromise.done((size) => {
-      this.build.logCollection.options.size = size;
+    logSizePromise.done((resp) => {
+      this.build.logCollection.options.size = resp.size;
     });
       
     return logSizePromise;
@@ -356,6 +356,8 @@ class BuildApi {
     const buildState = this.build.model.data.state;
 
     switch (buildState) {
+      case BuildStates.WAITING_FOR_UPSTREAM_BUILD:
+      case BuildStates.WAITING_FOR_BUILD_SLOT:
       case BuildStates.QUEUED:
       case BuildStates.LAUNCHING:
         this._processBuildOnDeck();

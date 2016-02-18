@@ -3,9 +3,15 @@
 const appConfig = {
   // sidebar polling frequency in ms
   buildsRefresh: process.env.GLOBAL_REFRESH || 5000,
+
+  // active build module polling frequency in ms
+  activeBuildModuleRefresh: process.env.ACTIVE_BUILD_MODULE_REFRESH || 1000,
   
   // active build polling frequency in ms
   activeBuildRefresh: process.env.ACTIVE_BUILD_REFRESH || 2500,
+
+  // active build log polling frequency in ms
+  activeBuildLogRefresh: process.env.ACTIVE_BUILD_LOG_REFRESH || 500,
 
   // byte count when fetching log offsets
   offsetLength: process.env.BLAZAR_OFFSET_LENGTH || 50000,

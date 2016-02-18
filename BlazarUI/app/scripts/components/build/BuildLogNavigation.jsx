@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {dataTagValue} from '../Helpers';
+import {dataTagValue, buildIsOnDeck} from '../Helpers';
 import BuildStates from '../../constants/BuildStates';
 import JSONModal from '../shared/JSONModal.jsx';
 
@@ -33,7 +33,7 @@ class BuildLogNavigation extends Component {
   }
 
   render() {
-    if (this.props.loading || this.props.build.state === BuildStates.LAUNCHING || this.props.build.state === BuildStates.QUEUED) {
+    if (this.props.loading || buildIsOnDeck(this.props.build.state)) {
       return null;
     }
 

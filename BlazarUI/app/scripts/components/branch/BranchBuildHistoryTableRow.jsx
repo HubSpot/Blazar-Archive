@@ -3,7 +3,7 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 
-import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon} from '../Helpers';
+import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon, getTableDurationText, buildIsOnDeck} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -32,25 +32,7 @@ class BranchBuildHistoryTableRow extends Component {
   renderDuration() {
     const {data} = this.props;
 
-    let durationText = data.duration;
-
-    if (data.state === BuildStates.IN_PROGRESS) {
-      durationText = 'In Progress';
-    }
-
-    else if (data.state === BuildStates.SKIPPED) {
-      durationText = 'Skipped';
-    }
-
-    else if (data.state === BuildStates.QUEUED) {
-      durationText = 'Queued';
-    }
-
-    else if (data.state === BuildStates.LAUNCHING) {
-      durationText = 'Launching';
-    }
-
-    return durationText;
+    return getTableDurationText(data.state, data.duration);
   }
   
   renderStartTime() {
@@ -60,7 +42,7 @@ class BranchBuildHistoryTableRow extends Component {
   renderBuildLink() {
     const {data} = this.props;
     
-    if (data.state === BuildStates.LAUNCHING || data.state === BuildStates.QUEUED) {
+    if (buildIsOnDeck(data.state)) {
       return data.buildNumber;
     }
 

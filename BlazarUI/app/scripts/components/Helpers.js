@@ -4,6 +4,8 @@ import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
 import FINAL_BUILD_STATES from '../constants/finalBuildStates';
+import ACTIVE_BUILD_STATES from '../constants/ActiveBuildStates';
+import QUEUED_BUILD_STATES from '../constants/QueuedBuildStates';
 import {LABELS, iconStatus} from './constants';
 import Icon from './shared/Icon.jsx';
 import IconStack from './shared/IconStack.jsx';
@@ -120,7 +122,7 @@ export const getFilteredBranches = function(filters, branches) {
 };
 
 export const buildIsOnDeck = function(buildState) {
-  return contains([BuildStates.LAUNCHING, BuildStates.QUEUED], buildState);
+  return contains(QUEUED_BUILD_STATES, buildState);
 };
 
 export const buildIsInactive = function(buildState) {
@@ -232,4 +234,18 @@ export const sortBuildsByRepoAndBranch = function(builds) {
     // Sort by branch, DESC
     return branchNameA.localeCompare(branchNameB);
   });
+};
+
+export const filterInactiveBuilds = function(builds) {
+  return builds.filter((build) => {
+    return build.gitInfo.active;
+  });
+};
+
+export const getTableDurationText = function(state, duration) {
+  if (contains(ACTIVE_BUILD_STATES, state) || state === BuildStates.SKIPPED) {
+    return humanizeText(state);
+  }
+
+  return duration;
 };

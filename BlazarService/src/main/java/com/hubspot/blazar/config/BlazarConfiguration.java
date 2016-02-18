@@ -28,7 +28,7 @@ public class BlazarConfiguration extends Configuration {
   @Valid
   @NotNull
   @JsonProperty("executor")
-  private ExecutorConfiguration executorConfiguration = new ExecutorConfiguration("root");
+  private ExecutorConfiguration executorConfiguration = ExecutorConfiguration.defaultConfiguration();
 
   @Valid
   @NotNull

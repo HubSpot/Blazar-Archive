@@ -14,7 +14,7 @@ import java.util.Set;
 
 public interface BranchDao {
 
-  @SqlQuery("SELECT * FROM branches WHERE active = 1")
+  @SqlQuery("SELECT * FROM branches")
   Set<GitInfo> getAll();
 
   @SingleValueResult

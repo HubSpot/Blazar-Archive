@@ -5,8 +5,10 @@ import com.google.inject.name.Named;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.blazar.listener.SingularityTaskKiller;
 import com.hubspot.singularity.ExtendedTaskState;
 import com.hubspot.singularity.SingularityTaskHistory;
 import com.hubspot.singularity.SingularityTaskHistoryUpdate;
@@ -30,7 +32,9 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
   private final ScheduledExecutorService executorService;
   private final ModuleBuildService moduleBuildService;
   private final SingularityClient singularityClient;
+  private final SingularityTaskKiller singularityTaskKiller;
   private final SingularityConfiguration singularityConfiguration;
+  private final ExecutorConfiguration executorConfiguration;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
 
@@ -38,11 +42,14 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
   public SingularityBuildWatcher(@Named("QueueProcessor") ScheduledExecutorService executorService,
                                  ModuleBuildService moduleBuildService,
                                  SingularityClient singularityClient,
+                                 SingularityTaskKiller singularityTaskKiller,
                                  BlazarConfiguration blazarConfiguration) {
     this.executorService = executorService;
     this.moduleBuildService = moduleBuildService;
     this.singularityClient = singularityClient;
+    this.singularityTaskKiller = singularityTaskKiller;
     this.singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
+    this.executorConfiguration = blazarConfiguration.getExecutorConfiguration();
 
     this.running = new AtomicBoolean();
     this.leader = new AtomicBoolean();
@@ -96,16 +103,27 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
 
           for (ModuleBuild build : moduleBuildService.getByState(State.IN_PROGRESS)) {
             long age = System.currentTimeMillis() - build.getStartTimestamp().get();
-            if (age < TimeUnit.MINUTES.toMillis(2)) {
+            if (age < TimeUnit.MINUTES.toMillis(1)) {
               continue;
             }
 
             String taskId = build.getTaskId().get();
-            Optional<Long> completedTimestamp = completedTimestamp(taskId);
-
-            if (completedTimestamp.isPresent()) {
-              LOG.info("Updating build {} to FAILED because taskId {} is done", build.getId().get(), taskId);
+            Optional<SingularityTaskHistory> taskHistory = singularityClient.getHistoryForTask(taskId);
+            Optional<Long> startedTimestamp = startedTimestamp(taskHistory);
+            Optional<Long> completedTimestamp = completedTimestamp(taskHistory);
+            if (!taskHistory.isPresent()) {
+              LOG.warn("No task history found for taskId {}", taskId);
+            } else if (completedTimestamp.isPresent()) {
+              LOG.info("Failing build {} because taskId {} is done", build.getId().get(), taskId);
               moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(completedTimestamp.get()));
+            } else if (startedTimestamp.isPresent()) {
+              age = System.currentTimeMillis() - startedTimestamp.get();
+              long maxAge = executorConfiguration.getBuildTimeoutMillis();
+              if (age > maxAge) {
+                LOG.info("Failing build {} because its age {} exceeded max of {}", build.getId().get(), age, maxAge);
+                moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+                singularityTaskKiller.killTask(build);
+              }
             }
           }
         }
@@ -114,10 +132,22 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
       }
     }
 
-    private Optional<Long> completedTimestamp(String taskId) {
-      Optional<SingularityTaskHistory> taskHistory = singularityClient.getHistoryForTask(taskId);
+    private Optional<Long> startedTimestamp(Optional<SingularityTaskHistory> taskHistory) {
       if (!taskHistory.isPresent()) {
-        LOG.warn("No task history found for taskId {}", taskId);
+        return Optional.absent();
+      }
+
+      for (SingularityTaskHistoryUpdate taskUpdate : taskHistory.get().getTaskUpdates()) {
+        if (taskUpdate.getTaskState() == ExtendedTaskState.TASK_RUNNING) {
+          return Optional.of(taskUpdate.getTimestamp());
+        }
+      }
+
+      return Optional.absent();
+    }
+
+    private Optional<Long> completedTimestamp(Optional<SingularityTaskHistory> taskHistory) {
+      if (!taskHistory.isPresent()) {
         return Optional.absent();
       }
 

@@ -7,6 +7,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.SingularityConfiguration;
+import com.hubspot.blazar.listener.SingularityTaskKiller;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 import com.hubspot.blazar.util.SingularityBuildWatcher;
 import com.hubspot.singularity.client.SingularityClientModule;
@@ -33,5 +34,7 @@ public class BlazarSingularityModule extends ConfigurationAwareModule<BlazarConf
         .annotatedWith(Names.named("SingularityBuildWatcher"))
         .toProvider(new ManagedScheduledExecutorServiceProvider(1, "SingularityBuildWatcher"))
         .in(Scopes.SINGLETON);
+
+    binder.bind(SingularityTaskKiller.class);
   }
 }

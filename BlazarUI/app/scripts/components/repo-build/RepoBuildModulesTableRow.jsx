@@ -3,7 +3,7 @@ import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import {contains, has} from 'underscore';
-import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon} from '../Helpers';
+import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon, getTableDurationText} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
   
@@ -21,7 +21,15 @@ class RepoBuildModulesTableRow extends Component {
     );    
   }
 
+  isDebugMode() {
+    return window.location.href.indexOf('?debug') > -1;
+  }
+
   renderSingularityLink() {
+    if (!this.isDebugMode()) {
+      return null;
+    }
+
     const {taskId} = this.props.data;
 
     if (!taskId) {
@@ -34,35 +42,16 @@ class RepoBuildModulesTableRow extends Component {
     const singularityPath = `https://tools.hubteamqa.com/singularity/task/${taskId}`;
 
     return (
-      <a href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>  
+      <td>
+        <a href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>
+      </td>
     );
   }
 
   renderDuration() {
     const {data} = this.props;
-    let durationText;
-
-    if (data.state === BuildStates.IN_PROGRESS) {
-      durationText = 'In Progress';
-    }
-
-    else if (data.state === BuildStates.SKIPPED) {
-      durationText = 'Skipped';
-    }
-
-    else if (data.state === BuildStates.QUEUED) {
-      durationText = 'Queued';
-    }
-
-    else if (data.state === BuildStates.LAUNCHING) {
-      durationText = 'Launching';
-    }
-
-    else {
-      durationText = timestampDuration(data.startTimestamp, data.endTimestamp)
-    }
-
-    return durationText;
+    
+    return getTableDurationText(data.state, timestampDuration(data.startTimestamp, data.endTimestamp));
   }
 
   render() {
@@ -81,9 +70,7 @@ class RepoBuildModulesTableRow extends Component {
         <td>
           {this.renderDuration()}
         </td>
-        <td>
-          {this.renderSingularityLink()}
-        </td>
+        {this.renderSingularityLink()}
         <td>
         </td>
       </tr>

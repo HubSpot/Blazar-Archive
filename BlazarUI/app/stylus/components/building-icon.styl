@@ -31,7 +31,10 @@ buildInProgressStatus(color)
 .building-icon--IN_PROGRESS-laststatus-SKIPPED
   buildInProgressStatus($skipped)
 
-.building-icon--IN_PROGRESS, .building-icon--QUEUED, .building-icon--LAUNCHING
+.building-icon--IN_PROGRESS-laststatus-never-built
+  buildInProgressStatus($default)
+
+.building-icon--IN_PROGRESS, .building-icon--QUEUED, .building-icon--LAUNCHING, .building-icon--WAITING_FOR_UPSTREAM_BUILD, .building-icon--WAITING_FOR_BUILD_SLOT
   buildStatus($info)
 
 .building-icon--CANCELLED

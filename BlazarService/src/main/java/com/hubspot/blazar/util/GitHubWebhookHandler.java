@@ -87,20 +87,21 @@ public class GitHubWebhookHandler {
   }
 
   private boolean isOptedIn(GitInfo gitInfo) throws IOException {
-    return whitelist.contains(gitInfo.getRepository()) || branchExists(gitInfo) || blazarConfigExists(gitInfo);
-  }
-
-  private boolean branchExists(GitInfo gitInfo) {
-    return branchService.lookup(gitInfo).isPresent();
+    return whitelist.contains(gitInfo.getRepository()) || blazarConfigExists(gitInfo);
   }
 
   private boolean blazarConfigExists(GitInfo gitInfo) throws IOException {
+    GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
     try {
-      GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
-      String config = gitHubHelper.contentsFor(".blazar.yaml", repository, gitInfo);
-      return config.contains("enabled: true");
+      gitHubHelper.contentsFor(".blazar-enabled", repository, gitInfo);
+      return true;
     } catch (FileNotFoundException e) {
-      return false;
+      try {
+        String config = gitHubHelper.contentsFor(".blazar.yaml", repository, gitInfo);
+        return config.contains("enabled: true");
+      } catch (FileNotFoundException e1) {
+        return false;
+      }
     }
   }
 
