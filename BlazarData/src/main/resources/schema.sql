@@ -58,6 +58,7 @@ CREATE TABLE `repo_builds` (
   `buildNumber` int(11) unsigned NOT NULL,
   `state` varchar(40) NOT NULL,
   `buildTrigger` mediumtext NOT NULL,
+  `buildOptions` mediumtext,
   `startTimestamp` bigint(20) unsigned,
   `endTimestamp` bigint(20) unsigned,
   `commitInfo` mediumtext,
@@ -109,6 +110,8 @@ ALTER TABLE `repo_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
 ALTER TABLE `repo_builds` MODIFY `commitInfo` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+ALTER TABLE `repo_builds` MODIFY `buildOptions` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 ALTER TABLE `module_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
 ALTER TABLE `malformed_files` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
@@ -132,6 +135,3 @@ TRUNCATE TABLE `repo_builds`;
 TRUNCATE TABLE `module_builds`;
 
 TRUNCATE TABLE `malformed_files`;
-
---changeset gchomatas:5
-ALTER TABLE `repo_builds` ADD COLUMN `buildOptions` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
