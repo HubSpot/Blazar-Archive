@@ -1,8 +1,18 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
+import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -10,13 +20,6 @@ import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.dao.BranchDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
 import com.hubspot.blazar.data.util.BuildNumbers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
-import java.util.List;
 
 @Singleton
 public class RepositoryBuildService {
@@ -49,7 +52,7 @@ public class RepositoryBuildService {
     return repositoryBuildDao.getBuildNumbers(branchId);
   }
 
-  public long enqueue(GitInfo gitInfo, BuildTrigger trigger) {
+  public long enqueue(GitInfo gitInfo, BuildTrigger trigger, BuildOptions buildOptions) {
     BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
 
     if (buildNumbers.getPendingBuildId().isPresent()) {
@@ -59,7 +62,7 @@ public class RepositoryBuildService {
     } else {
       int nextBuildNumber = buildNumbers.getNextBuildNumber();
       LOG.info("Enqueuing build for repository {} with build number {}", gitInfo.getId().get(), nextBuildNumber);
-      RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber);
+      RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber, buildOptions);
       build = enqueue(build);
       LOG.info("Enqueued build for repository {} with id {}", gitInfo.getId().get(), build.getId().get());
       return build.getId().get();

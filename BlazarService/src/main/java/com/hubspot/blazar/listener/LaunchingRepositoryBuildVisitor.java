@@ -1,7 +1,20 @@
 package com.hubspot.blazar.listener;
 
+import java.nio.file.FileSystems;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.hubspot.blazar.base.BuildOptions.BuildDownstreams;
 import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
@@ -13,16 +26,6 @@ import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.util.GitHubHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.nio.file.FileSystems;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 @Singleton
 public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor {
@@ -68,39 +71,58 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     }
   }
 
-  private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> modules) {
+  private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> allModules) {
     CommitInfo commitInfo = build.getCommitInfo().get();
 
     final Set<Module> toBuild = new HashSet<>();
     if (build.getBuildTrigger().getType() == Type.MANUAL) {
-      toBuild.addAll(modules);
+      if (build.getBuildOptions().getModuleIds().isEmpty()) {
+        toBuild.addAll(allModules);
+      } else {
+        final Set<Integer> requestedModuleIds = build.getBuildOptions().getModuleIds();
+        for (Module module : allModules) {
+          if (requestedModuleIds.contains(module.getId().get())) {
+            toBuild.add(module);
+          }
+        }
+
+        addDownstreamModules(build, allModules, toBuild);
+      }
     } else if (build.getBuildTrigger().getType() == Type.BRANCH_CREATION) {
-      toBuild.addAll(modules);
+      toBuild.addAll(allModules);
     } else if (commitInfo.isTruncated()) {
-      toBuild.addAll(modules);
+      toBuild.addAll(allModules);
     } else {
       for (String path : gitHubHelper.affectedPaths(commitInfo)) {
-        for (Module module : modules) {
+        for (Module module : allModules) {
           if (module.contains(FileSystems.getDefault().getPath(path))) {
             toBuild.add(module);
           }
         }
       }
 
-      Map<Integer, Module> moduleMap = mapByModuleId(modules);
-      DependencyGraph dependencyGraph = build.getDependencyGraph().get();
-      LOG.info("All modules: {}", moduleMap.keySet());
-      LOG.info("Changed modules: {}", mapByModuleId(toBuild).keySet());
-      LOG.info("Transitive reduction: {}", dependencyGraph.getTransitiveReduction());
-      for (Module module : ImmutableSet.copyOf(toBuild)) {
-        for (int downstreamModule : dependencyGraph.reachableVertices(module.getId().get())) {
-          toBuild.add(moduleMap.get(downstreamModule));
-        }
-      }
-      LOG.info("Modules to build: {}", mapByModuleId(toBuild).keySet());
+      addDownstreamModules(build, allModules, toBuild);
     }
 
     return toBuild;
+  }
+
+  private void addDownstreamModules(RepositoryBuild build, Set<Module> allModules, Set<Module> toBuild) {
+    if (build.getBuildOptions().getBuildDownstreams().equals(BuildDownstreams.NONE)) {
+      return;
+    }
+
+    Map<Integer, Module> moduleMap = mapByModuleId(allModules);
+    DependencyGraph dependencyGraph = build.getDependencyGraph().get();
+    LOG.info("All active modules: {}", moduleMap.keySet());
+    LOG.info("Modules directly selected for build (changed or selected by user): {}", mapByModuleId(toBuild).keySet());
+    LOG.info("Transitive reduction: {}", dependencyGraph.getTransitiveReduction());
+    for (Module module : ImmutableSet.copyOf(toBuild)) {
+      for (int downstreamModule : dependencyGraph.reachableVertices(module.getId().get())) {
+        toBuild.add(moduleMap.get(downstreamModule));
+      }
+    }
+    LOG.info("All modules to build (including downstream dependencies): {}", mapByModuleId(toBuild).keySet());
   }
 
   private static Set<Module> filterActive(Set<Module> modules) {

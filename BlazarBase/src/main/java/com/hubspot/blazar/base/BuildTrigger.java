@@ -36,4 +36,5 @@ public class BuildTrigger {
   public String getId() {
     return id;
   }
+
 }

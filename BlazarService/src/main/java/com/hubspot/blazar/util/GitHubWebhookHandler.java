@@ -14,6 +14,7 @@ import org.kohsuke.github.GHRepository;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.service.BranchService;
@@ -54,7 +55,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = gitInfo(createEvent);
       if (isOptedIn(gitInfo)) {
         gitInfo = branchService.upsert(gitInfo);
-        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forBranchCreation(gitInfo.getBranch()));
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forBranchCreation(gitInfo.getBranch()), BuildOptions.defaultOptions());
       }
     }
   }
@@ -80,7 +81,7 @@ public class GitHubWebhookHandler {
       GitInfo gitInfo = gitInfo(pushEvent);
       if (isOptedIn(gitInfo)) {
         gitInfo = branchService.upsert(gitInfo(pushEvent));
-        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()));
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), BuildOptions.defaultOptions());
       }
     }
   }
@@ -89,7 +90,7 @@ public class GitHubWebhookHandler {
     return whitelist.contains(gitInfo.getRepository()) || blazarConfigExists(gitInfo);
   }
 
-  private boolean blazarConfigExists(GitInfo gitInfo) throws IOException  {
+  private boolean blazarConfigExists(GitInfo gitInfo) throws IOException {
     GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
     try {
       gitHubHelper.contentsFor(".blazar-enabled", repository, gitInfo);
