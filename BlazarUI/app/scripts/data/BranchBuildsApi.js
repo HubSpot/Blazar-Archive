@@ -82,10 +82,15 @@ class BranchBuildsApi extends StoredBuilds {
     });
   }
 
-  getModuleForBranch(branchId, cb) {
+  getModuleForBranch(cb) {
+    if (this.branchId === undefined) {
+      setTimeout(() => {this.getModuleForBranch(cb)}, 500);
+      return;
+    }
+
     // last get module build based on module id
     const buildModules = new Resource({
-      url: `${config.apiRoot}/branches/${branchId}/modules`,
+      url: `${config.apiRoot}/branches/${this.branchId}/modules`,
       type: 'GET'
     }).send();
 

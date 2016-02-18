@@ -14,8 +14,8 @@ const BranchStore = Reflux.createStore({
     }
   },
 
-  onLoadModules(branchId) {
-    this.branchBuildsApi.getModuleForBranch(branchId, (resp) => {
+  onLoadModules() {
+    this.branchBuildsApi.getModuleForBranch((resp) => {
       this.triggerModuleUpdate(resp);
     });
   },
