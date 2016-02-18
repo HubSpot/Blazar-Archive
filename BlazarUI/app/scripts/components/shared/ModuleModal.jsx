@@ -33,12 +33,15 @@ class ModuleModal extends Component {
 
   renderModuleList() {
     return (
-      <div>
-        {this.props.modules.map(this.renderModule)}
-        <br />
-        <br />
-        <br />
-        {this.renderDownstreamToggle()}
+      <div className='module-modal--container'>
+        <div className='module-modal--modules'>
+          <span className='module-modal--title'>Pick Modules</span>
+          {this.props.modules.map(this.renderModule)}
+        </div>
+        <div className='module-modal--downstream'>
+          <span className='module-modal--title'>Toggle Option</span><br />
+          {this.renderDownstreamToggle()}
+        </div>
       </div>
     );
   }
