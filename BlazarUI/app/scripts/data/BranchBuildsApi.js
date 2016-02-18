@@ -90,18 +90,20 @@ class BranchBuildsApi extends StoredBuilds {
     }).send();
 
     buildModules.then((resp) => {
-      console.log("new resp: ", resp);
       cb(resp);
     });
   }
 
-  triggerBuildModuleSpecific(moduleIds, cb) {
+  generateBuildModuleJsonBody(moduleIds) {
+    let body = {moduleIds: moduleIds, buildDownstreams: 'WITHIN_REPOSITORY'};
+    return body;
+  }
 
-    console.log("IN HERE");
-    /*const buildPromise = new Resource({
+  triggerBuildModuleSpecific(moduleIds, cb) {
+    const buildPromise = new Resource({
       url: `${config.apiRoot}/branches/builds/branch/${this.branchId}`,
       type: 'POST',
-      body: 
+      data: this.generateBuildModuleJsonBody(moduleIds)
     }).send();
 
     buildPromise.then((resp) => {
@@ -110,7 +112,7 @@ class BranchBuildsApi extends StoredBuilds {
     }, (error) => {
       console.warn(error);
       cb('Error triggering build. Check your console for more detail.');
-    });*/
+    });
   }
   
   triggerBuild(cb) {

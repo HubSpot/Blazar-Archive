@@ -13,7 +13,7 @@ class ModuleModal extends Component {
 
     return (
       <label>
-        <input type='checkbox' name='module-checkbox' value={moduleId} checked />
+        <input type='checkbox' name='module-checkbox' value={moduleId} />
         {moduleName}
         <br />
       </label>
@@ -29,11 +29,16 @@ class ModuleModal extends Component {
   }
 
   getModuleIdsAndBuild() {
+    // TODO: more specific/no $
     const moduleIds = $('input:checked').map(function() {
-      return $(this).val();
+      return parseInt($(this).val());
     }).get();
 
-    console.log(moduleIds);
+    /**
+      public enum BuildDownstreams {
+        NONE, WITHIN_REPOSITORY;
+      }
+    */
 
     this.props.okayGoBuild(moduleIds);
   }
@@ -46,7 +51,7 @@ class ModuleModal extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.whenDone}>Close</Button>
-          <Button onClick={this.getModuleIdsAndBuild} className='btn btn-primary'>BUILD THAT</Button>
+          <Button onClick={this.getModuleIdsAndBuild.bind(this)} className='btn btn-primary'>BUILD THAT</Button>
         </Modal.Footer>
       </Modal>
     );

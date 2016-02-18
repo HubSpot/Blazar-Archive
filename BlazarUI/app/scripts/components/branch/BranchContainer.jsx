@@ -59,7 +59,7 @@ class BranchContainer extends Component {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
     StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuilds(params);
-    BranchActions.loadModules(3);
+    BranchActions.loadModules(107);
   }
   
   tearDown() {
@@ -87,8 +87,10 @@ class BranchContainer extends Component {
 
   updateCheckedModuleIds(moduleIds) {
     this.setState({
-      checkedModuleIds: modulesIds
+      checkedModuleIds: moduleIds
     })
+
+    BranchActions.triggerBuildModuleSpecific(moduleIds);
   }
   
   renderTable() {

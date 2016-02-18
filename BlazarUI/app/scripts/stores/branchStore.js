@@ -16,8 +16,6 @@ const BranchStore = Reflux.createStore({
 
   onLoadModules(branchId) {
     this.branchBuildsApi.getModuleForBranch(branchId, (resp) => {
-      console.log("resp: ", resp);
-
       this.triggerModuleUpdate(resp);
     });
   },
@@ -67,7 +65,7 @@ const BranchStore = Reflux.createStore({
   triggerModuleUpdate(resp) {
     this.trigger({
       modules: Immutable.fromJS(resp)
-    })
+    });
   },
 
   triggerErrorUpdate() {
