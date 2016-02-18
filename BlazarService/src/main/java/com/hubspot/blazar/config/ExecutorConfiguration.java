@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.concurrent.TimeUnit;
 
 public class ExecutorConfiguration {
@@ -14,7 +14,7 @@ public class ExecutorConfiguration {
   @NotNull
   private final String defaultBuildUser;
 
-  @Size(min = 0)
+  @Min(0)
   private final long buildTimeoutMillis;
 
   @JsonCreator
