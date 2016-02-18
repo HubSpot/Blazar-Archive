@@ -54,18 +54,18 @@ class ModuleModal extends Component {
 
     const downstreamToggle = $('input[name=downstream-checkbox]:checked').size() > 0 ? 'WITHIN_REPOSITORY' : 'NONE';
 
-    this.props.okayGoBuild(moduleIds, downstreamToggle);
-    this.props.whenDone();
+    this.props.triggerBuild(moduleIds, downstreamToggle);
+    this.props.closeModal();
   }
 
   render() {
     return (
-      <Modal dialogClassName='module-modal' bsSize='large' show={this.props.showModal} onHide={this.props.whenDone}>
+      <Modal dialogClassName='module-modal' bsSize='large' show={this.props.showModal} onHide={this.props.closeModal}>
         <Modal.Body>
           {this.renderModuleList()}
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.props.whenDone}>Close</Button>
+          <Button onClick={this.props.closeModal}>Close</Button>
           <Button onClick={this.getModuleIdsAndBuild.bind(this)} className='btn btn-primary'>BUILD THAT</Button>
         </Modal.Footer>
       </Modal>
@@ -74,8 +74,8 @@ class ModuleModal extends Component {
 }
 
 ModuleModal.propTypes = {
-  whenDone: PropTypes.func.isRequired,
-  okayGoBuild: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  triggerBuild: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
   modules: PropTypes.instanceOf(Immutable.List)
 };

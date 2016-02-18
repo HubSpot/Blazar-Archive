@@ -122,14 +122,14 @@ class BranchContainer extends Component {
             </UIGridItem>
             <UIGridItem size={2} align='RIGHT'>
               <BuildButton 
-                triggerBuild={this.openModuleModal.bind(this)} 
+                openModuleModal={this.openModuleModal.bind(this)}
                 loading={this.state.loadingBranches}
                 error={this.state.error}
               />
               <ModuleModal 
                 showModal={this.state.showModuleModal}
-                whenDone={this.closeModuleModal.bind(this)}
-                okayGoBuild={this.triggerBuild.bind(this)}
+                closeModal={this.closeModuleModal.bind(this)}
+                triggerBuild={this.triggerBuild.bind(this)}
                 modules={this.state.modules}
               />
             </UIGridItem>
