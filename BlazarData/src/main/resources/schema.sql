@@ -133,5 +133,5 @@ TRUNCATE TABLE `module_builds`;
 
 TRUNCATE TABLE `malformed_files`;
 
---changeset gchomatas:5 dbms:mysql
+--changeset gchomatas:5
 ALTER TABLE `repo_builds` ADD COLUMN `buildOptions` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
