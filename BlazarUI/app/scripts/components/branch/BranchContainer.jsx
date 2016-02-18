@@ -66,11 +66,6 @@ class BranchContainer extends Component {
     this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
   }
-  
-  triggerBuild() {
-    this.openModuleModal();
-    //BranchActions.triggerBuild();
-  }
 
   openModuleModal() {
     this.setState({
@@ -84,8 +79,8 @@ class BranchContainer extends Component {
     });
   }
 
-  updateCheckedModuleIds(moduleIds, downstreamToggle) {
-    BranchActions.triggerBuildModuleSpecific(moduleIds, downstreamToggle);
+  triggerBuild(moduleIds, downstreamToggle) {
+    BranchActions.triggerBuild(moduleIds, downstreamToggle);
   }
   
   renderTable() {
@@ -127,14 +122,14 @@ class BranchContainer extends Component {
             </UIGridItem>
             <UIGridItem size={2} align='RIGHT'>
               <BuildButton 
-                triggerBuild={this.triggerBuild.bind(this)} 
+                triggerBuild={this.openModuleModal.bind(this)} 
                 loading={this.state.loadingBranches}
                 error={this.state.error}
               />
               <ModuleModal 
                 showModal={this.state.showModuleModal}
                 whenDone={this.closeModuleModal.bind(this)}
-                okayGoBuild={this.updateCheckedModuleIds.bind(this)}
+                okayGoBuild={this.triggerBuild.bind(this)}
                 modules={this.state.modules}
               />
             </UIGridItem>

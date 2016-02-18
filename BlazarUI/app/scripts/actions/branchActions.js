@@ -4,7 +4,6 @@ const BranchActions = Reflux.createActions([
   'loadBranchBuilds',
   'stopPolling',
   'triggerBuild',
-  'triggerBuildModuleSpecific',
   'loadModules'
 ]);
 

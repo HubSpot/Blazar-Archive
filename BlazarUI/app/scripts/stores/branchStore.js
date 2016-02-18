@@ -35,18 +35,9 @@ const BranchStore = Reflux.createStore({
       this.triggerUpdate();
     });
   },
-  
-  onTriggerBuild() {
-    this.branchBuildsApi.triggerBuild((error, resp) => {
-      if (error) {
-        this.error = error;
-        return this.triggerErrorUpdate();
-      }
-    });
-  },
 
-  onTriggerBuildModuleSpecific(moduleIds, downstreamModules) {
-    this.branchBuildsApi.triggerBuildModuleSpecific(moduleIds, downstreamModules, (error, resp) => {
+  onTriggerBuild(moduleIds, downstreamModules) {
+    this.branchBuildsApi.triggerBuild(moduleIds, downstreamModules, (error, resp) => {
       if (error) {
         this.error = error;
         return this.triggerErrorUpdate();

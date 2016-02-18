@@ -108,7 +108,7 @@ class BranchBuildsApi extends StoredBuilds {
     return body;
   }
 
-  triggerBuildModuleSpecific(moduleIds, downstreamModules, cb) {
+  triggerBuild(moduleIds, downstreamModules, cb) {
     const buildPromise = new Resource({
       url: `${config.apiRoot}/branches/builds/branch/${this.branchId}`,
       type: 'POST',
@@ -124,23 +124,6 @@ class BranchBuildsApi extends StoredBuilds {
       cb('Error triggering build. Check your console for more detail.');
     });
   }
-  
-  triggerBuild(cb) {
-    const buildPromise = new Resource({
-      url: `${config.apiRoot}/branches/builds/branch/${this.branchId}`,
-      type: 'POST'
-    }).send();
-
-    buildPromise.then((resp) => {
-      this._fetchBuildHistory();
-      cb(false, resp);
-    }, (error) => {
-      console.warn(error);
-      cb('Error triggering build. Check your console for more detail.');
-    });
-  }
-
-  
 }
 
 export default BranchBuildsApi;
