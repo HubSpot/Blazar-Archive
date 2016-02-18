@@ -3,6 +3,7 @@ package com.hubspot.blazar.resources;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -39,14 +40,22 @@ public class RepositoryBuildResource {
 
   @POST
   @Path("/branch/{id}")
-  public RepositoryBuild trigger(@PathParam("id") int branchId, BuildOptions buildOptions) {
+  public RepositoryBuild trigger(@PathParam("id") int branchId) {
+    return triggerWithOptions(branchId, BuildOptions.defaultOptions());
+  }
+
+  @POST
+  @Path("/branch/{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public RepositoryBuild triggerWithOptions(@PathParam("id") int branchId, BuildOptions buildOptions) {
     Optional<GitInfo> gitInfo = branchService.get(branchId);
     if (!gitInfo.isPresent()) {
       throw new NotFoundException("No branch found with id: " + branchId);
     }
 
     // TODO capture user
-    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), BuildTrigger.forUser("unknown"), buildOptions);
+    BuildTrigger buildTrigger = BuildTrigger.forUser("unknown");
+    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), buildTrigger, buildOptions);
     return repositoryBuildService.get(repositoryBuildId).get();
   }
 

@@ -5,10 +5,10 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 public class BuildOptions {
-
   private final Set<Integer> moduleIds;
   private final BuildDownstreams buildDownstreams;
 
@@ -21,9 +21,10 @@ public class BuildOptions {
   }
 
   @JsonCreator
-  public BuildOptions(@JsonProperty("moduleIds") Set<Integer> moduleIds, @JsonProperty("buildDownstreams") BuildDownstreams buildDownstreams) {
+  public BuildOptions(@JsonProperty("moduleIds") Set<Integer> moduleIds,
+                      @JsonProperty("buildDownstreams") BuildDownstreams buildDownstreams) {
     this.moduleIds = Objects.firstNonNull(moduleIds, ImmutableSet.<Integer>of());
-    this.buildDownstreams = buildDownstreams;
+    this.buildDownstreams = Preconditions.checkNotNull(buildDownstreams);
   }
 
   public Set<Integer> getModuleIds() {
@@ -33,5 +34,4 @@ public class BuildOptions {
   public BuildDownstreams getBuildDownstreams() {
     return buildDownstreams;
   }
-
 }

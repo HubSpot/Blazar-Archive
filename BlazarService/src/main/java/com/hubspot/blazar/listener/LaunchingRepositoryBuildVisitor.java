@@ -75,32 +75,30 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     CommitInfo commitInfo = build.getCommitInfo().get();
 
     final Set<Module> toBuild = new HashSet<>();
-    if (build.getBuildTrigger().getType() == Type.MANUAL) {
-      if (build.getBuildOptions().getModuleIds().isEmpty()) {
+    if (build.getBuildTrigger().getType() == Type.PUSH) {
+      if (commitInfo.isTruncated()) {
         toBuild.addAll(allModules);
       } else {
-        final Set<Integer> requestedModuleIds = build.getBuildOptions().getModuleIds();
-        for (Module module : allModules) {
-          if (requestedModuleIds.contains(module.getId().get())) {
-            toBuild.add(module);
+        for (String path : gitHubHelper.affectedPaths(commitInfo)) {
+          for (Module module : allModules) {
+            if (module.contains(FileSystems.getDefault().getPath(path))) {
+              toBuild.add(module);
+            }
           }
         }
-
-        addDownstreamModules(build, allModules, toBuild);
       }
-    } else if (build.getBuildTrigger().getType() == Type.BRANCH_CREATION) {
-      toBuild.addAll(allModules);
-    } else if (commitInfo.isTruncated()) {
+    } else if (build.getBuildOptions().getModuleIds().isEmpty()) {
       toBuild.addAll(allModules);
     } else {
-      for (String path : gitHubHelper.affectedPaths(commitInfo)) {
-        for (Module module : allModules) {
-          if (module.contains(FileSystems.getDefault().getPath(path))) {
-            toBuild.add(module);
-          }
+      final Set<Integer> requestedModuleIds = build.getBuildOptions().getModuleIds();
+      for (Module module : allModules) {
+        if (requestedModuleIds.contains(module.getId().get())) {
+          toBuild.add(module);
         }
       }
+    }
 
+    if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.WITHIN_REPOSITORY) {
       addDownstreamModules(build, allModules, toBuild);
     }
 
@@ -108,10 +106,6 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
   }
 
   private void addDownstreamModules(RepositoryBuild build, Set<Module> allModules, Set<Module> toBuild) {
-    if (build.getBuildOptions().getBuildDownstreams().equals(BuildDownstreams.NONE)) {
-      return;
-    }
-
     Map<Integer, Module> moduleMap = mapByModuleId(allModules);
     DependencyGraph dependencyGraph = build.getDependencyGraph().get();
     LOG.info("All active modules: {}", moduleMap.keySet());
