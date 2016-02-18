@@ -52,6 +52,7 @@ class ModuleModal extends Component {
     const downstreamToggle = $('input[name=downstream-checkbox]:checked').size() > 0 ? 'WITHIN_REPOSITORY' : 'NONE';
 
     this.props.okayGoBuild(moduleIds, downstreamToggle);
+    this.props.whenDone();
   }
 
   render() {
