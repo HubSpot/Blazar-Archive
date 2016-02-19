@@ -25,7 +25,7 @@ buildInProgressStatus(color)
 .building-icon--IN_PROGRESS-laststatus-CANCELLED
   buildInProgressStatus($warning)
   
-.building-icon--IN_PROGRESS-laststatus-FAILED
+.building-icon--IN_PROGRESS-laststatus-FAILED, .building-icon--IN_PROGRESS-laststatus-UNSTABLE
   buildInProgressStatus($danger)
   
 .building-icon--IN_PROGRESS-laststatus-SKIPPED
@@ -43,7 +43,7 @@ buildInProgressStatus(color)
 .building-icon--SUCCEEDED
   buildStatus($success)
 
-.building-icon--FAILED
+.building-icon--FAILED, .building-icon--UNSTABLE
   buildStatus($danger)
   
 .building-icon--SKIPPED

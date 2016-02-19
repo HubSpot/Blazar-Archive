@@ -80,7 +80,7 @@ export const uniqueBranches = function(branches) {
 };
 
 export const tableRowBuildState = function(state) {
-  if (state === BuildStates.FAILED) {
+  if (state === BuildStates.FAILED || state === BuildStats.UNSTABLE) {
     return 'bgc-danger';
   }
   else if (state === BuildStates.CANCELLED) {
