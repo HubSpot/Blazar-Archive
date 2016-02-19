@@ -6,6 +6,25 @@ import Loader from '../shared/Loader.jsx';
 
 class RepoBuildModulesTable extends Component {
 
+  sortModules() {
+    if (!this.props.currentRepoBuild) {
+      return this.props.data;
+    }
+
+    const topologicalSort = this.props.currentRepoBuild.get('dependencyGraph').get('topologicalSort').toJS();
+
+    return this.props.data.sort((a, b) => {
+      let indexA = topologicalSort.indexOf(a.id);
+      let indexB = topologicalSort.indexOf(b.id);
+
+      if (indexA < indexB) {
+        return -1;
+      }
+
+      return 1;
+    });
+  }
+
   render() {
     if (this.props.loading) {
       return null;
@@ -18,7 +37,7 @@ class RepoBuildModulesTable extends Component {
     }
 
     return this.props.buildTable({
-      data: this.props.data,
+      data: this.sortModules(),
       columnNames: ['', 'Module Build', 'Start Time', 'Duration', ''],
       rowComponent: RepoBuildModulesTableRow,
       showProgress: true,

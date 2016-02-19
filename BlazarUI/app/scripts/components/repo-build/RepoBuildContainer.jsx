@@ -116,6 +116,7 @@ class RepoBuildContainer extends Component {
           <RepoBuildModulesTable
             params={this.props.params}
             data={this.state.moduleBuilds ? this.state.moduleBuilds.toJS() : []}
+            currentRepoBuild={this.state.currentRepoBuild}
             loading={this.state.loadingModuleBuilds}
             {...this.state}
           />
