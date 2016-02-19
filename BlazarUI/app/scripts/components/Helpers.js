@@ -238,7 +238,7 @@ export const sortBuildsByRepoAndBranch = function(builds) {
 
 export const filterInactiveBuildsImmutable = function(builds) {
   return Immutable.fromJS(filterInactiveBuilds(builds.toJS()));
-}
+};
 
 export const filterInactiveBuilds = function(builds) {
   return builds.filter((build) => {
