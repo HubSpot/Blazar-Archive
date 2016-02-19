@@ -103,9 +103,9 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
       case SUCCEEDED:
         return GHCommitState.SUCCESS;
       case FAILED:
+      case UNSTABLE:
         return GHCommitState.FAILURE;
       case CANCELLED:
-      case UNSTABLE:
         return GHCommitState.ERROR;
       default:
         throw new IllegalArgumentException("Unexpected build state: " + state);
