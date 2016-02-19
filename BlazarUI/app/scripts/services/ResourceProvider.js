@@ -3,6 +3,7 @@
 //
 import { fromJS } from 'immutable';
 import $ from 'jquery';
+import {extend} from 'underscore';
 
 class ResourceProvider {
   
@@ -18,7 +19,7 @@ class ResourceProvider {
   }
 
   send() {
-    return $.ajax(Object.assign(this.defaultSettings(), this.settings));
+    return $.ajax(extend(this.defaultSettings(), this.settings));
   }
 
 }
