@@ -4,5 +4,6 @@ export default [
   BuildStates.SUCCEEDED,
   BuildStates.FAILED,
   BuildStates.CANCELLED,
-  BuildStates.SKIPPED
+  BuildStates.SKIPPED,
+  BuildStates.UNSTABLE
 ];

@@ -1,6 +1,7 @@
 export const LABELS = {
   'SUCCEEDED': 'success',
   'FAILED': 'danger',
+  'UNSTABLE': 'danger',
   'CANCELLED': 'warning',
   'QUEUED': 'info',
   'LAUNCHING': 'info',
@@ -11,6 +12,7 @@ export const LABELS = {
 export const iconStatus = {
   'SUCCEEDED': 'check',
   'FAILED': 'close',
+  'UNSTABLE': 'close',
   'CANCELLED': 'stop',
   'SKIPPED': 'minus',
   'QUEUED': 'circle-o-notch fa-spin',

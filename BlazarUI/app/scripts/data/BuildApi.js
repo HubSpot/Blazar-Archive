@@ -369,6 +369,7 @@ class BuildApi {
     
       case BuildStates.SUCCEEDED:
       case BuildStates.FAILED: 
+      case BuildStates.UNSTABLE:
         this._processFinishedBuild();
         break;
       

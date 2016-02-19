@@ -6,6 +6,7 @@ export default keyMirror({
   FAILED: null,
   CANCELLED: null,
   SKIPPED: null,
+  UNSTABLE: null,
 
   // Active build states
   WAITING_FOR_UPSTREAM_BUILD: null,
