@@ -14,9 +14,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
 public class BuildCommand {
-  private static final String DEFAULT_EXECUTABLE = "/bin/bash";
-  private static final String DEFAULT_ARG = "-c";
-  private static final Set<Integer> DEFAULT_SUCCESSFUL_RETURN_CODES = ImmutableSet.of(0);
+  public static final String DEFAULT_EXECUTABLE = "/bin/bash";
+  public static final String DEFAULT_ARG = "-c";
+  public static final Set<Integer> DEFAULT_SUCCESSFUL_RETURN_CODES = ImmutableSet.of(0);
 
   private final String executable;
   private final List<String> args;
