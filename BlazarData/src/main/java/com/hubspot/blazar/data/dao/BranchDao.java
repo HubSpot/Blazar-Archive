@@ -23,7 +23,7 @@ public interface BranchDao {
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM branches WHERE repositoryId = :repositoryId AND branch = :branch")
-  Optional<GitInfo> get(@BindWithRosetta GitInfo gitInfo);
+  Optional<GitInfo> getByRepositoryAndBranch(@Bind("repositoryId") int repositoryId, @Bind("branch") String branch);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO branches (host, organization, repository, repositoryId, branch, active) VALUES (:host, :organization, :repository, :repositoryId, :branch, :active)")

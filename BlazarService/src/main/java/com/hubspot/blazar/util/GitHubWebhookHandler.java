@@ -23,9 +23,13 @@ import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class GitHubWebhookHandler {
+  private static final Logger LOG = LoggerFactory.getLogger(GitHubWebhookHandler.class);
+
   private final BranchService branchService;
   private final RepositoryBuildService repositoryBuildService;
   private final GitHubHelper gitHubHelper;
@@ -79,8 +83,11 @@ public class GitHubWebhookHandler {
 
     if (!pushEvent.getRef().startsWith("refs/tags/") && !pushEvent.getDeleted()) {
       GitInfo gitInfo = gitInfo(pushEvent);
-      if (isOptedIn(gitInfo)) {
-        gitInfo = branchService.upsert(gitInfo(pushEvent));
+      if (!gitInfo.isActive()) {
+        String message = "Ignoring push event for inactive branch {}-{}@{}";
+        LOG.warn(message, gitInfo.getFullRepositoryName(), gitInfo.getBranch(), pushEvent.getAfter());
+      } else if (isOptedIn(gitInfo)) {
+        gitInfo = branchService.upsert(gitInfo);
         repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), BuildOptions.defaultOptions());
       }
     }
@@ -114,7 +121,11 @@ public class GitHubWebhookHandler {
   }
 
   private GitInfo gitInfo(PushEvent pushEvent) {
-    return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), true);
+    int repositoryId = pushEvent.getRepository().getId();
+    String branch = branchFromRef(pushEvent.getRef());
+    Optional<GitInfo> gitInfo = branchService.getByRepositoryAndBranch(repositoryId, branch);
+    boolean active = !gitInfo.isPresent() || gitInfo.get().isActive();
+    return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), active);
   }
 
   private GitInfo gitInfo(Repository repository, String ref, boolean active) {
@@ -126,8 +137,12 @@ public class GitHubWebhookHandler {
     String organization = fullName.substring(0, fullName.indexOf('/'));
     String repositoryName = fullName.substring(fullName.indexOf('/') + 1);
     int repositoryId = repository.getId();
-    String branch = ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
+    String branch = branchFromRef(ref);
 
     return new GitInfo(Optional.<Integer>absent(), host, organization, repositoryName, repositoryId, branch, active, System.currentTimeMillis(), System.currentTimeMillis());
+  }
+
+  private static String branchFromRef(String ref) {
+    return ref.startsWith("refs/heads/") ? ref.substring("refs/heads/".length()) : ref;
   }
 }

@@ -26,12 +26,12 @@ public class BranchService {
     return branchDao.get(id);
   }
 
-  public Optional<GitInfo> lookup(GitInfo gitInfo) {
-    return branchDao.get(gitInfo);
+  public Optional<GitInfo> getByRepositoryAndBranch(int repositoryId, String branch) {
+    return branchDao.getByRepositoryAndBranch(repositoryId, branch);
   }
 
   public GitInfo upsert(GitInfo gitInfo) {
-    Optional<GitInfo> existing = lookup(gitInfo);
+    Optional<GitInfo> existing = getByRepositoryAndBranch(gitInfo.getRepositoryId(), gitInfo.getBranch());
     if (existing.isPresent()) {
       gitInfo = gitInfo.withId(existing.get().getId().get());
 
@@ -47,7 +47,7 @@ public class BranchService {
         return gitInfo.withId(id);
       } catch (UnableToExecuteStatementException e) {
         if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-          return branchDao.get(gitInfo).get();
+          return getByRepositoryAndBranch(gitInfo.getRepositoryId(), gitInfo.getBranch()).get();
         } else {
           throw e;
         }
