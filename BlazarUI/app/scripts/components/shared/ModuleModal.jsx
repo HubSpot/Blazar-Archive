@@ -25,11 +25,14 @@ class ModuleModal extends Component {
 
   renderDownstreamToggle() {
     return (
-      <Checkbox
-        label=' Build Downstream Modules'
-        name='downstream-checkbox'
-        checked={true}
-        onCheckboxUpdate={this.updateDownstreamModules.bind(this)} />
+      <div className="downstream-checkbox-wrapper">
+        <Checkbox
+          label=' Build Downstream Modules'
+          name='downstream-checkbox'
+          checked={true}
+          onCheckboxUpdate={this.updateDownstreamModules.bind(this)} 
+        />
+      </div>
     );
   }
 
@@ -49,11 +52,11 @@ class ModuleModal extends Component {
                 modules={this.props.modules}
                 onSelectUpdate={this.updateSelectedModules.bind(this)}
               />
-              {this.renderDownstreamToggle()}
             </div>
           </div>
         </Modal.Body>
         <Modal.Footer>
+          {this.renderDownstreamToggle()}
           <Button onClick={this.props.closeModal}>Nevermind</Button>
           <Button onClick={this.getModuleIdsAndBuild.bind(this)} className='btn btn-primary'>Build</Button>
         </Modal.Footer>
