@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Checkbox from './Checkbox.jsx';
+import ModuleSelectWrapper from './ModuleSelectWrapper.jsx';
 import $ from 'jquery';
 
 class ModuleModal extends Component {
@@ -31,38 +32,35 @@ class ModuleModal extends Component {
     );
   }
 
-  renderModuleList() {
-    return (
-      <div className='module-modal--container'>
-        <div className='module-modal--modules'>
-          <span className='module-modal--title'>Pick Modules</span>
-          {this.props.modules.map(this.renderModule)}
-        </div>
-        <div className='module-modal--downstream'>
-          <span className='module-modal--title'>Toggle Option</span><br />
-          {this.renderDownstreamToggle()}
-        </div>
-      </div>
-    );
+  getModuleIdsAndBuild() {
+    this.props.triggerBuild();
+    this.props.closeModal();
   }
 
-  getModuleIdsAndBuild() {
-    // TODO: more specific/no $
-    const moduleIds = $('input[name=module-checkbox]:checked').map(function() {
-      return parseInt($(this).val());
-    }).get();
-
-    const downstreamToggle = $('input[name=downstream-checkbox]:checked').size() > 0 ? 'WITHIN_REPOSITORY' : 'NONE';
-
-    this.props.triggerBuild(moduleIds, downstreamToggle);
-    this.props.closeModal();
+  updateSelectedModules(modules) {
+    console.log(modules);
+    console.log(modules.split(','));
+    this.props.onSelectUpdate(modules.split(','));
   }
 
   render() {
     return (
       <Modal dialogClassName='module-modal' bsSize='large' show={this.props.showModal} onHide={this.props.closeModal}>
         <Modal.Body>
-          {this.renderModuleList()}
+          <div className='row'>
+            <div className='col-md-6'>
+              <span className='module-select-header'>
+                Choose modules to build
+              </span>
+              <ModuleSelectWrapper
+                modules={this.props.modules}
+                onSelectUpdate={this.updateSelectedModules.bind(this)}
+              />
+            </div>
+            <div className='col-mid-6'>
+              Toggle goes here
+            </div>
+          </div>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.props.closeModal}>Close</Button>
@@ -76,6 +74,7 @@ class ModuleModal extends Component {
 ModuleModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   triggerBuild: PropTypes.func.isRequired,
+  onSelectUpdate: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
   modules: PropTypes.instanceOf(Immutable.List)
 };

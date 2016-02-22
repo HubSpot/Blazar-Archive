@@ -26,7 +26,8 @@ let initialState = {
   loadingBranches: true,
   loadingStars: true,
   showModuleModal: false,
-  modules: Immutable.List.of()
+  modules: Immutable.List.of(),
+  selectedModules: []
 };
 
 class BranchContainer extends Component {
@@ -79,8 +80,14 @@ class BranchContainer extends Component {
     });
   }
 
-  triggerBuild(moduleIds, downstreamToggle) {
-    BranchActions.triggerBuild(moduleIds, downstreamToggle);
+  updateSelectedModules(modules) {
+    this.setState({
+      selectedModules: modules
+    });
+  }
+
+  triggerBuild() {
+    BranchActions.triggerBuild(this.state.selectedModules, 'WITHIN_REPOSITORY');
   }
   
   renderTable() {
@@ -130,6 +137,7 @@ class BranchContainer extends Component {
                 showModal={this.state.showModuleModal}
                 closeModal={this.closeModuleModal.bind(this)}
                 triggerBuild={this.triggerBuild.bind(this)}
+                onSelectUpdate={this.updateSelectedModules.bind(this)}
                 modules={this.state.modules}
               />
             </UIGridItem>
