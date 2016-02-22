@@ -14,6 +14,7 @@ import AjaxErrorAlert from '../shared/AjaxErrorAlert.jsx';
 import StarStore from '../../stores/starStore';
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
+import sidebarTabProvider from '../../services/sidebarTabProvider';
 
 import {NO_MATCH_MESSAGES} from '../constants';
 import {getFilterMatches} from '../../utils/buildsHelpers';
@@ -39,7 +40,7 @@ class SidebarContainer extends Component {
       loading: true,
       changingBuildsType: false,
       filterText: '',
-      toggleFilterState: 'starred',
+      toggleFilterState: sidebarTabProvider.getSidebarTab(),
       sidebarHeight: this.getSidebarHeight()
     };
   }
@@ -88,6 +89,7 @@ class SidebarContainer extends Component {
 
   setToggleState(toggleState) {
     BuildsActions.loadBuilds();
+    sidebarTabProvider.changeTab(toggleState);
 
     this.setState({
       filterText: this.state.filterText,
