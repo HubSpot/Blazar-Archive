@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
+import classNames from 'classnames';
 
 import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon, getTableDurationText, buildIsOnDeck} from '../Helpers';
 
@@ -11,7 +12,20 @@ import Sha from '../shared/Sha.jsx';
 
 class BranchBuildHistoryTableRow extends Component {
 
-  
+  onTableClick(e) {
+    if (e.target.className === 'sha-link') {
+      window.open(e.target.href, '_blank');
+      return false;
+    }
+  }
+
+  getRowClassNames(state) {
+    return classNames([
+      tableRowBuildState(state),
+      'branch-build-history-row'
+    ]);
+  }
+
   renderSha() {
     const {data, params} = this.props;
     let sha;
@@ -55,23 +69,25 @@ class BranchBuildHistoryTableRow extends Component {
     const {data, params} = this.props;
 
     return (
-      <tr className={tableRowBuildState(data.state)}>
-        <td className='build-status'>
-          {buildResultIcon(data.state)}
-        </td>
-        <td className='build-result-link'>
-          <span>{this.renderBuildLink()}</span>
-        </td>
-        <td>
-          {this.renderStartTime()}
-        </td>
-        <td>
-          {this.renderDuration()}
-        </td>
-        <td>
-          {this.renderSha()}
-        </td>
-      </tr>
+      <Link onClick={this.onTableClick.bind(this)} to={data.blazarPath}>
+        <tr className={this.getRowClassNames(data.state)}>
+          <td className='build-status'>
+            {buildResultIcon(data.state)}
+          </td>
+          <td className='build-result-link'>
+            <span>{this.renderBuildLink()}</span>
+          </td>
+          <td>
+            {this.renderStartTime()}
+          </td>
+          <td>
+            {this.renderDuration()}
+          </td>
+          <td>
+            {this.renderSha()}
+          </td>
+        </tr>
+      </Link>
     );
   }
 }
