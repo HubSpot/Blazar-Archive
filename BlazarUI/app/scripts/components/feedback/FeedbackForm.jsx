@@ -128,7 +128,7 @@ class FeedbackForm extends Component {
     return (
       <div>
         <p>
-          Running into an issue? Fill out the form below and we'll be alerted in Slack channel <a href="https://hubspot.slack.com/messages/blazar-feedback/" target="blank">#blazar-feedback</a>.
+          Running into an issue? Fill out the form below and we'll be alerted in the (private) Slack channel <a href="https://hubspot.slack.com/messages/paas-build-notifs/" target="blank">#paas-build-notifs</a>.
           <span className='text-muted'> (No need to include the url, we will receive it with your message)</span>
         </p>
         
