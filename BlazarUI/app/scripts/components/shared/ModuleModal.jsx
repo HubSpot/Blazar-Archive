@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import {bindAll} from 'underscore';
 import Immutable from 'immutable';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
@@ -8,6 +9,12 @@ import ModuleSelectWrapper from './ModuleSelectWrapper.jsx';
 import $ from 'jquery';
 
 class ModuleModal extends Component {
+
+  constructor(props) {
+    super(props);
+
+    bindAll(this, 'updateDownstreamModules', 'updateSelectedModules', 'getModuleIdsAndBuild');
+  }
 
   getModuleIdsAndBuild() {
     this.props.triggerBuild();
@@ -30,7 +37,7 @@ class ModuleModal extends Component {
           label=' Build Downstream Modules'
           name='downstream-checkbox'
           checked={true}
-          onCheckboxUpdate={this.updateDownstreamModules.bind(this)} 
+          onCheckboxUpdate={this.updateDownstreamModules} 
         />
       </div>
     );
@@ -50,7 +57,7 @@ class ModuleModal extends Component {
               Choose modules to build
               <ModuleSelectWrapper
                 modules={this.props.modules}
-                onSelectUpdate={this.updateSelectedModules.bind(this)}
+                onSelectUpdate={this.updateSelectedModules}
               />
             </div>
           </div>
@@ -58,7 +65,7 @@ class ModuleModal extends Component {
         <Modal.Footer>
           {this.renderDownstreamToggle()}
           <Button onClick={this.props.closeModal}>Nevermind</Button>
-          <Button onClick={this.getModuleIdsAndBuild.bind(this)} className='btn btn-primary'>Build</Button>
+          <Button onClick={this.getModuleIdsAndBuild} className='btn btn-primary'>Build</Button>
         </Modal.Footer>
       </Modal>
     );

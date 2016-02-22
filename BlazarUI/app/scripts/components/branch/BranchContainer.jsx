@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import {bindAll} from 'underscore';
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
@@ -35,6 +36,8 @@ class BranchContainer extends Component {
 
   constructor() {
     this.state = initialState;
+
+    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'triggerBuild');
   }
 
   componentDidMount() {
@@ -56,8 +59,8 @@ class BranchContainer extends Component {
   }
     
   setup(params) {
-    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuilds(params);
     BranchActions.loadModules();
@@ -136,16 +139,16 @@ class BranchContainer extends Component {
             </UIGridItem>
             <UIGridItem size={2} align='RIGHT'>
               <BuildButton 
-                openModuleModal={this.openModuleModal.bind(this)}
+                openModuleModal={this.openModuleModal}
                 loading={this.state.loadingBranches}
                 error={this.state.error}
               />
               <ModuleModal 
                 showModal={this.state.showModuleModal}
-                closeModal={this.closeModuleModal.bind(this)}
-                triggerBuild={this.triggerBuild.bind(this)}
-                onSelectUpdate={this.updateSelectedModules.bind(this)}
-                onCheckboxUpdate={this.updateDownstreamModules.bind(this)}
+                closeModal={this.closeModuleModal}
+                triggerBuild={this.triggerBuild}
+                onSelectUpdate={this.updateSelectedModules}
+                onCheckboxUpdate={this.updateDownstreamModules}
                 modules={this.state.modules}
               />
             </UIGridItem>
