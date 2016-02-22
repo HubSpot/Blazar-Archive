@@ -3,6 +3,7 @@ import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import {contains, has} from 'underscore';
+import moment from 'moment';
 import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon, getTableDurationText} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
@@ -50,6 +51,10 @@ class RepoBuildModulesTableRow extends Component {
 
   renderDuration() {
     const {data} = this.props;
+
+    if (data.state === BuildStates.IN_PROGRESS) {
+      data.endTimestamp = moment();
+    }
     
     return getTableDurationText(data.state, timestampDuration(data.startTimestamp, data.endTimestamp));
   }
