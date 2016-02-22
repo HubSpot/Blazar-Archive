@@ -247,7 +247,7 @@ export const filterInactiveBuilds = function(builds) {
 };
 
 export const getTableDurationText = function(state, duration) {
-  if (contains(ACTIVE_BUILD_STATES, state) || state === BuildStates.SKIPPED) {
+  if ((state !== BuildStates.IN_PROGRESS && contains(ACTIVE_BUILD_STATES, state)) || state === BuildStates.SKIPPED) {
     return humanizeText(state);
   }
 
