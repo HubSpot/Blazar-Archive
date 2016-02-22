@@ -27,7 +27,8 @@ let initialState = {
   loadingStars: true,
   showModuleModal: false,
   modules: Immutable.List.of(),
-  selectedModules: []
+  selectedModules: [],
+  buildDownstreamModules: 'WITHIN_REPOSITORY'
 };
 
 class BranchContainer extends Component {
@@ -86,8 +87,14 @@ class BranchContainer extends Component {
     });
   }
 
+  updateDownstreamModules(enumValue) {
+    this.setState({
+      buildDownstreamModules: enumValue
+    });
+  }
+
   triggerBuild() {
-    BranchActions.triggerBuild(this.state.selectedModules, 'WITHIN_REPOSITORY');
+    BranchActions.triggerBuild(this.state.selectedModules, this.state.buildDownstreamModules);
   }
   
   renderTable() {
@@ -138,6 +145,7 @@ class BranchContainer extends Component {
                 closeModal={this.closeModuleModal.bind(this)}
                 triggerBuild={this.triggerBuild.bind(this)}
                 onSelectUpdate={this.updateSelectedModules.bind(this)}
+                onCheckboxUpdate={this.updateDownstreamModules.bind(this)}
                 modules={this.state.modules}
               />
             </UIGridItem>

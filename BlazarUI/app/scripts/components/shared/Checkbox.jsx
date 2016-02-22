@@ -5,13 +5,16 @@ class Checkbox extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {isChecked: !!this.props.checked};
+    this.state = {isChecked: this.props.checked || false};
 
     this.onChange = this.onChange.bind(this);
   }
 
   onChange() {
-    this.setState({isChecked: !this.state.isChecked});
+    const isChecked = !this.state.isChecked;
+
+    this.setState({isChecked: isChecked});
+    this.props.onCheckboxUpdate(isChecked);
   }
 
   render() {

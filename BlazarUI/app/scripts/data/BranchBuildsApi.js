@@ -104,10 +104,7 @@ class BranchBuildsApi extends StoredBuilds {
   }
 
   generateBuildModuleJsonBody(moduleIds, downstreamModules) {
-    console.log(moduleIds);
-
-    let body = {moduleIds: moduleIds, buildDownstreams: downstreamModules};
-    return body;
+    return {moduleIds: moduleIds, buildDownstreams: downstreamModules};
   }
 
   triggerBuild(moduleIds, downstreamModules, cb) {

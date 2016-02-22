@@ -21,15 +21,18 @@ class ModuleSelectWrapper extends Component {
 
 	render() {
     return (
-      <Select
-        placeholder='No modules selected.'
-        className='module-select-input'
-        name='moduleSelect'
-        clearAllText='None'
-        multi={true}
-        options={this.createModuleSelectOptions()}
-        onChange={this.props.onSelectUpdate}
-      />
+      <div className='module-select-wrapper'>
+        <Select
+          placeholder='No modules selected.'
+          className='module-select-input'
+          name='moduleSelect'
+          clearAllText='None'
+          multi={true}
+          value={this.createModuleSelectOptions()}
+          options={this.createModuleSelectOptions()}
+          onChange={this.props.onSelectUpdate}
+        />
+      </div>
     );
   }
 }
