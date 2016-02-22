@@ -104,7 +104,7 @@ class FeedbackForm extends Component {
           <pre>{this.state.sendError}</pre>
           <p>Please visit channel  { ' ' }
             <span className="channel-name">
-              <a href="https://hubspot.slack.com/messages/blazar/" target="blank">#blazar</a>
+              <a href="https://hubspot.slack.com/messages/platform-support/" target="blank">#platform-support</a>
             </span> in Slack for support.</p>
         </Alert>
       )
@@ -116,7 +116,7 @@ class FeedbackForm extends Component {
         <p className="big-icon"><Icon for="circle-check"/></p>
         <p>To join the conversation, hit up { ' ' }
           <span className="channel-name">
-            <a href="https://hubspot.slack.com/messages/blazar/" target="blank">#blazar</a>
+            <a href="https://hubspot.slack.com/messages/platform-support/" target="blank">#platform-support</a>
           </span> in Slack.
         </p>
         <button onClick={this.resetForm} className='btn submit-more-btn'>Submit more feedback</button>
@@ -128,7 +128,7 @@ class FeedbackForm extends Component {
     return (
       <div>
         <p>
-          Running into an issue? Fill out the form below and we'll be alerted in Slack channel <a href="https://hubspot.slack.com/messages/blazar/" target="blank">#blazar</a>.
+          Running into an issue? Fill out the form below and we'll be alerted in the (private) Slack channel <a href="https://hubspot.slack.com/messages/paas-build-notifs/" target="blank">#paas-build-notifs</a>.
           <span className='text-muted'> (No need to include the url, we will receive it with your message)</span>
         </p>
         
