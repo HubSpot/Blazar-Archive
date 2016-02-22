@@ -26,6 +26,7 @@ let initialState = {
   stars: [],
   loadingBranches: true,
   loadingStars: true,
+  loadingModules: true,
   showModuleModal: false,
   modules: Immutable.List.of(),
   selectedModules: [],
@@ -143,7 +144,8 @@ class BranchContainer extends Component {
                 loading={this.state.loadingBranches}
                 error={this.state.error}
               />
-              <ModuleModal 
+              <ModuleModal
+                loadingModules={this.state.loadingModules}
                 showModal={this.state.showModuleModal}
                 closeModal={this.closeModuleModal}
                 triggerBuild={this.triggerBuild}

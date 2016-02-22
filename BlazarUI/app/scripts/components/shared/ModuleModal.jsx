@@ -5,6 +5,7 @@ import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import ButtonGroup from 'react-bootstrap/lib/ButtonGroup'
 import Checkbox from './Checkbox.jsx';
+import Loader from './Loader.jsx';
 import ModuleSelectWrapper from './ModuleSelectWrapper.jsx';
 import $ from 'jquery';
 
@@ -43,9 +44,17 @@ class ModuleModal extends Component {
     );
   }
 
-  render() {
+  renderModalContent() {
+    if (this.props.loadingModules) {
+      return (
+        <Modal.Body>
+          <Loader align='top-center' />
+        </Modal.Body>
+      );
+    }
+
     return (
-      <Modal dialogClassName='module-modal' bsSize='large' show={this.props.showModal} onHide={this.props.closeModal}>
+      <div>
         <Modal.Header>
           <Modal.Title>
             Build Options
@@ -67,6 +76,14 @@ class ModuleModal extends Component {
           <Button onClick={this.props.closeModal}>Nevermind</Button>
           <Button onClick={this.getModuleIdsAndBuild} className='btn btn-primary'>Build</Button>
         </Modal.Footer>
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <Modal dialogClassName='module-modal' bsSize='large' show={this.props.showModal} onHide={this.props.closeModal}>
+        {this.renderModalContent()}
       </Modal>
     );
   }
@@ -78,6 +95,7 @@ ModuleModal.propTypes = {
   onSelectUpdate: PropTypes.func.isRequired,
   onCheckboxUpdate: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
+  loadingModules: PropTypes.bool,
   modules: PropTypes.instanceOf(Immutable.List)
 };
 

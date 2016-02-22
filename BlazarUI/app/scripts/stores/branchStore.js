@@ -55,7 +55,8 @@ const BranchStore = Reflux.createStore({
 
   triggerModuleUpdate(resp) {
     this.trigger({
-      modules: Immutable.fromJS(resp)
+      modules: Immutable.fromJS(resp),
+      loadingModules: false
     });
   },
 
