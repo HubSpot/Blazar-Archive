@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import {bindAll} from 'underscore';
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
@@ -9,6 +10,8 @@ import BranchHeadline from './BranchHeadline.jsx';
 import Loader from '../shared/Loader.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import BuildButton from './BuildButton.jsx';
+import ModuleModal from '../shared/ModuleModal.jsx';
+import Immutable from 'immutable';
 
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
@@ -22,13 +25,20 @@ let initialState = {
   builds: null,
   stars: [],
   loadingBranches: true,
-  loadingStars: true
+  loadingStars: true,
+  loadingModules: true,
+  showModuleModal: false,
+  modules: Immutable.List.of(),
+  selectedModules: [],
+  buildDownstreamModules: 'WITHIN_REPOSITORY'
 };
 
 class BranchContainer extends Component {
 
   constructor() {
     this.state = initialState;
+
+    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'triggerBuild');
   }
 
   componentDidMount() {
@@ -50,10 +60,11 @@ class BranchContainer extends Component {
   }
     
   setup(params) {
-    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange.bind(this));
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange.bind(this));
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
+    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuilds(params);
+    BranchActions.loadModules();
   }
   
   tearDown() {
@@ -61,9 +72,33 @@ class BranchContainer extends Component {
     this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
   }
-  
+
+  openModuleModal() {
+    this.setState({
+      showModuleModal: true
+    });
+  }
+
+  closeModuleModal() {
+    this.setState({
+      showModuleModal: false
+    });
+  }
+
+  updateSelectedModules(modules) {
+    this.setState({
+      selectedModules: modules
+    });
+  }
+
+  updateDownstreamModules(enumValue) {
+    this.setState({
+      buildDownstreamModules: enumValue
+    });
+  }
+
   triggerBuild() {
-    BranchActions.triggerBuild();
+    BranchActions.triggerBuild(this.state.selectedModules, this.state.buildDownstreamModules);
   }
   
   renderTable() {
@@ -105,9 +140,18 @@ class BranchContainer extends Component {
             </UIGridItem>
             <UIGridItem size={2} align='RIGHT'>
               <BuildButton 
-                triggerBuild={this.triggerBuild} 
+                openModuleModal={this.openModuleModal}
                 loading={this.state.loadingBranches}
                 error={this.state.error}
+              />
+              <ModuleModal
+                loadingModules={this.state.loadingModules}
+                showModal={this.state.showModuleModal}
+                closeModal={this.closeModuleModal}
+                triggerBuild={this.triggerBuild}
+                onSelectUpdate={this.updateSelectedModules}
+                onCheckboxUpdate={this.updateDownstreamModules}
+                modules={this.state.modules}
               />
             </UIGridItem>
             <UIGrid>

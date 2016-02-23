@@ -81,11 +81,37 @@ class BranchBuildsApi extends StoredBuilds {
       console.warn(error);
     });
   }
-  
-  triggerBuild(cb) {
+
+  getModuleForBranch(cb) {
+    if (this.branchId === undefined) {
+      setTimeout(() => {
+        this.getModuleForBranch(cb);
+      }, 500);
+
+      return;
+    }
+
+    // last get module build based on module id
+    const buildModules = new Resource({
+      url: `${config.apiRoot}/branches/${this.branchId}/modules`,
+      type: 'GET'
+    }).send();
+
+    buildModules.then((resp) => {
+      cb(resp);
+    });
+  }
+
+  generateBuildModuleJsonBody(moduleIds, downstreamModules) {
+    return {moduleIds: moduleIds, buildDownstreams: downstreamModules};
+  }
+
+  triggerBuild(moduleIds, downstreamModules, cb) {
     const buildPromise = new Resource({
       url: `${config.apiRoot}/branches/builds/branch/${this.branchId}`,
-      type: 'POST'
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(this.generateBuildModuleJsonBody(moduleIds, downstreamModules))
     }).send();
 
     buildPromise.then((resp) => {
@@ -96,8 +122,6 @@ class BranchBuildsApi extends StoredBuilds {
       cb('Error triggering build. Check your console for more detail.');
     });
   }
-
-  
 }
 
 export default BranchBuildsApi;

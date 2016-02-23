@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 import BranchActions from '../actions/branchActions';
 import BranchBuildsApi from '../data/BranchBuildsApi';
+import Immutable from 'immutable';
 
 const BranchStore = Reflux.createStore({
 
@@ -11,6 +12,12 @@ const BranchStore = Reflux.createStore({
       this.branchBuildsApi.stopPollingBuilds();
       this.branchBuildsApi = undefined;  
     }
+  },
+
+  onLoadModules() {
+    this.branchBuildsApi.getModuleForBranch((resp) => {
+      this.triggerModuleUpdate(resp);
+    });
   },
 
   onLoadBranchBuilds(params) {
@@ -28,9 +35,9 @@ const BranchStore = Reflux.createStore({
       this.triggerUpdate();
     });
   },
-  
-  onTriggerBuild() {
-    this.branchBuildsApi.triggerBuild((error, resp) => {
+
+  onTriggerBuild(moduleIds, downstreamModules) {
+    this.branchBuildsApi.triggerBuild(moduleIds, downstreamModules, (error, resp) => {
       if (error) {
         this.error = error;
         return this.triggerErrorUpdate();
@@ -43,6 +50,13 @@ const BranchStore = Reflux.createStore({
       builds: this.data.builds,
       branchId: this.data.branchId,
       loadingBranches: false  
+    });
+  },
+
+  triggerModuleUpdate(resp) {
+    this.trigger({
+      modules: Immutable.fromJS(resp),
+      loadingModules: false
     });
   },
 
