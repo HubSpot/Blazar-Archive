@@ -7,7 +7,6 @@ import ButtonGroup from 'react-bootstrap/lib/ButtonGroup'
 import Checkbox from './Checkbox.jsx';
 import Loader from './Loader.jsx';
 import ModuleSelectWrapper from './ModuleSelectWrapper.jsx';
-import $ from 'jquery';
 
 class ModuleModal extends Component {
 
@@ -62,8 +61,8 @@ class ModuleModal extends Component {
         </Modal.Header>
         <Modal.Body>
           <div className='row'>
-            <div className='col-md-6 col-md-offset-1'>
-              Choose modules to build
+            <div className='col-md-6'>
+              <span className="module-modal__text">Choose modules to build:</span>
               <ModuleSelectWrapper
                 modules={this.props.modules}
                 onSelectUpdate={this.updateSelectedModules}

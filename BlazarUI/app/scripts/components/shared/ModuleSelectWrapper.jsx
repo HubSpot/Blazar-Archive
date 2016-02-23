@@ -21,10 +21,10 @@ class ModuleSelectWrapper extends Component {
 
 	render() {
     return (
-      <div className='module-select-wrapper'>
+      <div className='module-select'>
         <Select
           placeholder='No modules selected.'
-          className='module-select-input'
+          className='module-select__input'
           name='moduleSelect'
           clearAllText='None'
           multi={true}
