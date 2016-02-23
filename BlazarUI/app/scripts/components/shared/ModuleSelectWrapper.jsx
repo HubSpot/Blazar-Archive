@@ -27,6 +27,7 @@ class ModuleSelectWrapper extends Component {
           className='module-select__input'
           name='moduleSelect'
           clearAllText='None'
+          noResultsText='All modules have been selected.'
           multi={true}
           value={this.createModuleSelectOptions()}
           options={this.createModuleSelectOptions()}
