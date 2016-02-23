@@ -11,8 +11,22 @@
     height 100px
     padding-top 10px
 
+    & .Select-clear
+      color transparent
+
+      &::after
+        color grey
+        content "clear all"
+        font-size .75em
+
+      &:hover::after
+        text-decoration underline
+
     & .module-select__input
       width 500px
+
+      & .Select-control
+        1px solid #e5e5e5
 
   & .downstream-checkbox-wrapper
     float left
