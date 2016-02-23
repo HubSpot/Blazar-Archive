@@ -11,6 +11,7 @@ import RepoListing from './RepoListing.jsx';
 
 import OrgActions from '../../actions/orgActions';
 import OrgStore from '../../stores/orgStore';
+import OrgTable from './OrgTable.jsx';
 
 class OrgContainer extends Component {
 
@@ -93,10 +94,11 @@ class OrgContainer extends Component {
                 {...this.state}
                 {...this.props}
               />
-              <RepoListing 
+              <OrgTable 
                 {...this.state}
                 {...this.props}
-                filteredRepos={this.getFilteredRepos()}
+                repos={this.getFilteredRepos()}
+                loading={false}
               />
           </UIGridItem>
         </UIGrid>
