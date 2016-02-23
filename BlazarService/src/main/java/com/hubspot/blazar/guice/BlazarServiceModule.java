@@ -9,24 +9,15 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.inject.Provides;
-import com.hubspot.blazar.discovery.DiscoveryModule;
-import com.hubspot.blazar.listener.BuildVisitorModule;
-import com.hubspot.blazar.resources.BranchStateResource;
-import com.hubspot.blazar.resources.ModuleBuildResource;
-import com.hubspot.blazar.resources.RepositoryBuildResource;
-import com.hubspot.blazar.util.GitHubHelper;
-import com.hubspot.blazar.util.ModuleBuildLauncher;
-import com.hubspot.blazar.util.RepositoryBuildLauncher;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Binder;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
@@ -34,12 +25,22 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
+import com.hubspot.blazar.discovery.DiscoveryModule;
+import com.hubspot.blazar.integration.slack.SlackClient;
+import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.resources.BranchResource;
+import com.hubspot.blazar.resources.BranchStateResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
-import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.FeedbackResource;
+import com.hubspot.blazar.resources.GitHubWebhookResource;
+import com.hubspot.blazar.resources.ModuleBuildResource;
+import com.hubspot.blazar.resources.RepositoryBuildResource;
+import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
+import com.hubspot.blazar.util.ModuleBuildLauncher;
+import com.hubspot.blazar.util.RepositoryBuildLauncher;
+import com.hubspot.blazar.util.SingularityBuildLauncher;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
@@ -143,6 +144,13 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
     return new NingAsyncHttpClient(config);
   }
+
+  @Provides
+  @Singleton
+  public SlackClient providesSlackClientAs(AsyncHttpClient asyncHttpClient, BlazarConfiguration blazarConfiguration, ObjectMapper objectMapper) {
+    return new SlackClient(asyncHttpClient, blazarConfiguration, objectMapper);
+  }
+
 
   public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {
     final String endpoint;
