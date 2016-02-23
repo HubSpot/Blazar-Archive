@@ -3,8 +3,9 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import classNames from 'classnames';
+import moment from 'moment';
 
-import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon, getTableDurationText, buildIsOnDeck} from '../Helpers';
+import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon, getTableDurationText, buildIsOnDeck, timestampDuration} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -45,8 +46,13 @@ class BranchBuildHistoryTableRow extends Component {
   
   renderDuration() {
     const {data} = this.props;
+    let duration = data.duration;
 
-    return getTableDurationText(data.state, data.duration);
+    if (data.state === BuildStates.IN_PROGRESS) {
+      duration = timestampDuration(data.startTimestamp, moment());
+    }
+
+    return getTableDurationText(data.state, duration);
   }
   
   renderStartTime() {
@@ -67,6 +73,10 @@ class BranchBuildHistoryTableRow extends Component {
 
   render() {
     const {data, params} = this.props;
+
+    setTimeout(() => {
+      this.forceUpdate();
+    }, 1000);
 
     return (
       <Link onClick={this.onTableClick.bind(this)} to={data.blazarPath}>
