@@ -5,12 +5,12 @@ import Alert from 'react-bootstrap/lib/Alert';
 import Loader from '../shared/Loader.jsx';
 import TableHead from '../shared/TableHead.jsx';
 import StarredBranchesTableRow from './StarredBranchesTableRow.jsx';
-import {filterInactiveBuildsImmutable} from '../Helpers.js';
+import {filterInactiveBuildsImmutable, sortBuildsByRepoAndBranchImmutable} from '../Helpers.js';
 
 class StarredBranches extends Component {
 
   getRows() {
-    return filterInactiveBuildsImmutable(this.props.starredBuilds).map((item, i) => {
+    return sortBuildsByRepoAndBranchImmutable(filterInactiveBuildsImmutable(this.props.starredBuilds)).map((item, i) => {
       return (
         <StarredBranchesTableRow
           key={i}

@@ -205,6 +205,10 @@ export const getPreviousBuildState = function(builds) {
   return completedBuilds.get(0).get('state');
 };
 
+export const sortBuildsByRepoAndBranchImmutable = function(builds) {
+  return Immutable.fromJS(sortBuildsByRepoAndBranch(builds.toJS()));
+};
+
 export const sortBuildsByRepoAndBranch = function(builds) {
   return builds.sort((a, b) => {
 
