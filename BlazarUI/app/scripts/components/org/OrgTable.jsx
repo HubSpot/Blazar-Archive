@@ -2,12 +2,15 @@ import React, {Component, PropTypes} from 'react';
 import TableMaker from '../shared/TableMaker.jsx';
 import OrgTableRow from './OrgTableRow.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
+import Loader from '../shared/Loader.jsx';
 
 class OrgTable extends Component {
 
   render() {
-    if (this.props.hide) {
-      return null;
+    if (this.props.loading) {
+      return (
+        <Loader align='top-center' />
+      );
     }
 
     if (this.props.repos.size === 0) {

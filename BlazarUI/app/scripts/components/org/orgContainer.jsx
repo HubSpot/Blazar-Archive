@@ -96,7 +96,7 @@ class OrgContainer extends Component {
               {...this.state}
               {...this.props}
               repos={this.getFilteredRepos()}
-              loading={false}
+              loading={this.state.loading}
             />
           </UIGridItem>
         </UIGrid>
