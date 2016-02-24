@@ -6,16 +6,20 @@ class OrgApi extends StoredBuilds {
 
   _parse() {
     const {params} = this.options;
-    
+
     // get unique repos 
-    const repos = uniq(this.builds.toJS().map((build) => {
+    const repos = uniq(this.builds.toJS().filter((build) => {
+      return build.gitInfo.branch === 'master';
+    }).map((build) => {
       return {
         organization: build.gitInfo.organization,
         repository: build.gitInfo.repository,
-        blazarRepositoryPath: build.gitInfo.blazarRepositoryPath
+        blazarRepositoryPath: build.gitInfo.blazarRepositoryPath,
+        gitInfo: build.gitInfo,
+        lastBuild: build.lastBuild
       };
-    }), (b) => {
-      return b.repository;
+    }), (build) => {
+      return build.repository;
     });
 
     // filter by org

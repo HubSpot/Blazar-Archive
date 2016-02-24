@@ -11,6 +11,7 @@ import RepoListing from './RepoListing.jsx';
 
 import OrgActions from '../../actions/orgActions';
 import OrgStore from '../../stores/orgStore';
+import OrgTable from './OrgTable.jsx';
 
 class OrgContainer extends Component {
 
@@ -83,21 +84,20 @@ class OrgContainer extends Component {
                 Repositories
               </HeadlineDetail>
             </Headline>
-          </UIGridItem>
-          <UIGridItem size={8}>
-              <Filter
-                placeholder='Filter Repositories'
-                options={this.getFilterOptions()}
-                value={this.state.filterValue}
-                handleFilterChange={this.handleFilterChange}
-                {...this.state}
-                {...this.props}
-              />
-              <RepoListing 
-                {...this.state}
-                {...this.props}
-                filteredRepos={this.getFilteredRepos()}
-              />
+            <Filter
+              placeholder='Filter Repositories'
+              options={this.getFilterOptions()}
+              value={this.state.filterValue}
+              handleFilterChange={this.handleFilterChange}
+              {...this.state}
+              {...this.props}
+            />
+            <OrgTable
+              {...this.state}
+              {...this.props}
+              repos={this.getFilteredRepos()}
+              loading={false}
+            />
           </UIGridItem>
         </UIGrid>
       </PageContainer>
