@@ -8,6 +8,7 @@ import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.hubspot.blazar.data.service.SlackConfigurationService;
 import com.hubspot.blazar.data.service.StateService;
 
 public class BlazarDataModule extends AbstractModule {
@@ -24,5 +25,6 @@ public class BlazarDataModule extends AbstractModule {
     bind(DependenciesService.class);
     bind(MalformedFileService.class);
     bind(ModuleDiscoveryService.class);
+    bind(SlackConfigurationService.class);
   }
 }

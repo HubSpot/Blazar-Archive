@@ -24,8 +24,8 @@ public class SlackConfigurationService {
     return slackConfigurationDao.get(id);
   }
 
-  public Set<SlackConfiguration> getAllWithRepositoryId(long repositoryId) {
-    return slackConfigurationDao.getAllWithRepositoryId(repositoryId);
+  public Set<SlackConfiguration> getAllWithBranchId(long branchId) {
+    return slackConfigurationDao.getAllWithBranchId(branchId);
   }
 
   public long insert(SlackConfiguration slackConfiguration) {

@@ -40,6 +40,10 @@ public interface RepositoryBuildDao {
       "WHERE b.id = :branchId")
   BuildNumbers getBuildNumbers(@Bind("branchId") int branchId);
 
+  @SingleValueResult
+  @SqlQuery("SELECT * FROM repo_builds WHERE startTimestamp < :startTimestamp and branchId = :branchId ORDER BY startTimestamp DESC LIMIT 1")
+  Optional<RepositoryBuild> getPreviousBuild(@BindWithRosetta RepositoryBuild build);
+
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO repo_builds (branchId, buildNumber, state, buildTrigger, buildOptions) VALUES (:branchId, :buildNumber, :state, :buildTrigger, :buildOptions)")
   long enqueue(@BindWithRosetta RepositoryBuild build);

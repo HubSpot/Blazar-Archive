@@ -35,7 +35,6 @@ public class FeedbackResource {
       throw new WebApplicationException(new Throwable("To use the feedback endpoint the feedbackRoom needs to be set in BlazarSlackConfiguration"));
     }
 
-
     List<SlackAttachmentField> fields = new ArrayList<>();
     Optional<String> absentString = Optional.absent();
     if (feedback.getOther().isPresent()) {
@@ -43,16 +42,13 @@ public class FeedbackResource {
       fields.add(attachedField);
     }
 
-
     Optional<String> title = Optional.of(String.format("New Feedback from %s", feedback.getUsername()));
     String fallback = String.format("New Feedback from %s: %s", feedback.getUsername(), feedback.getMessage());
-    Optional<String> username = Optional.of(feedback.getUsername());
     Optional<String> link = Optional.of(feedback.getPage());
     Optional<String> message = Optional.of(feedback.getMessage());
 
     SlackAttachment attachment = new SlackAttachment(fallback, absentString, absentString, absentString, absentString, absentString, title, link, message, fields, absentString);
 
-    slackClient.sendMessage(new SlackMessage(absentString, absentString, "Blazar", Optional.of(":fire:"), blazarSlackConfiguration.getFeedbackRoom().get(), ImmutableList.of(attachment)));
-
+    slackClient.sendMessage(new SlackMessage(absentString, absentString, absentString, Optional.of(":fire:"), blazarSlackConfiguration.getFeedbackRoom().get(), ImmutableList.of(attachment)));
   }
 }

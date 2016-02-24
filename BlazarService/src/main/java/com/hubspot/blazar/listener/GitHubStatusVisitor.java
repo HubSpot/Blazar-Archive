@@ -3,22 +3,21 @@ package com.hubspot.blazar.listener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.kohsuke.github.GHCommitState;
+import org.kohsuke.github.GHRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.util.BlazarUrlService;
 import com.hubspot.blazar.util.GitHubHelper;
-import org.kohsuke.github.GHCommitState;
-import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.UriBuilder;
 
 @Singleton
 public class GitHubStatusVisitor implements RepositoryBuildVisitor {
@@ -26,14 +25,17 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
 
   private final BranchService branchService;
   private final GitHubHelper gitHubHelper;
+  private final BlazarUrlService blazarUrlService;
   private final UiConfiguration uiConfiguration;
 
   @Inject
   public GitHubStatusVisitor(BranchService branchService,
                              GitHubHelper gitHubHelper,
+                             BlazarUrlService blazarUrlService,
                              BlazarConfiguration configuration) {
     this.branchService = branchService;
     this.gitHubHelper = gitHubHelper;
+    this.blazarUrlService = blazarUrlService;
     this.uiConfiguration = configuration.getUiConfiguration();
   }
 
@@ -45,16 +47,7 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
     }
 
     GitInfo gitInfo = branchService.get(build.getBranchId()).get();
-
-    String url = UriBuilder.fromUri(uiConfiguration.getBaseUrl())
-        .segment("builds")
-        .segment(gitInfo.getHost())
-        .segment(gitInfo.getOrganization())
-        .segment(gitInfo.getRepository())
-        .segment(gitInfo.getBranch())
-        .segment(String.valueOf(build.getBuildNumber()))
-        .build()
-        .toString();
+    String url = blazarUrlService.getBlazarUiLink(build);
 
     GHCommitState state = toGHCommitState(build.getState());
     String sha = build.getSha().get();

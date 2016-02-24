@@ -1,5 +1,9 @@
 package com.hubspot.blazar.data;
 
+import javax.inject.Singleton;
+
+import org.skife.jdbi.v2.DBI;
+
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
@@ -11,6 +15,7 @@ import com.hubspot.blazar.data.dao.MalformedFileDao;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
+import com.hubspot.blazar.data.dao.SlackConfigurationDao;
 import com.hubspot.blazar.data.dao.StateDao;
 import com.hubspot.guice.transactional.DataSourceLocator;
 import com.hubspot.guice.transactional.TransactionalDataSource;
@@ -18,9 +23,6 @@ import com.hubspot.guice.transactional.TransactionalModule;
 import com.hubspot.guice.transactional.impl.DefaultDataSourceLocator;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
-import org.skife.jdbi.v2.DBI;
-
-import javax.inject.Singleton;
 
 public class BlazarDaoModule extends AbstractModule {
 
@@ -38,6 +40,7 @@ public class BlazarDaoModule extends AbstractModule {
     bindDao(binder(), ModuleBuildDao.class);
     bindDao(binder(), DependenciesDao.class);
     bindDao(binder(), MalformedFileDao.class);
+    bindDao(binder(), SlackConfigurationDao.class);
   }
 
   private static <T> void bindDao(Binder binder, Class<T> type) {

@@ -35,6 +35,7 @@ import com.hubspot.blazar.resources.FeedbackResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
+import com.hubspot.blazar.resources.SlackConfigurationResource;
 import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
@@ -75,6 +76,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(RepositoryBuildResource.class);
     binder.bind(BuildHistoryResource.class);
     binder.bind(FeedbackResource.class);
+    binder.bind(SlackConfigurationResource.class);
 
     binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
     binder.bind(PropertyFilteringMessageBodyWriter.class)
@@ -150,7 +152,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
   public SlackClient providesSlackClientAs(AsyncHttpClient asyncHttpClient, BlazarConfiguration blazarConfiguration, ObjectMapper objectMapper) {
     return new SlackClient(asyncHttpClient, blazarConfiguration, objectMapper);
   }
-
 
   public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {
     final String endpoint;

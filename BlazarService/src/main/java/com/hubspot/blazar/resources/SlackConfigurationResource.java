@@ -3,12 +3,15 @@ package com.hubspot.blazar.resources;
 
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
@@ -20,6 +23,8 @@ import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
 @Path("/slack")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class SlackConfigurationResource {
 
 
@@ -72,7 +77,7 @@ public class SlackConfigurationResource {
   @GET
   @Path("/repository/{id}")
   @PropertyFiltering
-  public Set<SlackConfiguration> getAllWithRepositoryId(@PathParam("id") long id) {
-    return slackConfigurationService.getAllWithRepositoryId(id);
+  public Set<SlackConfiguration> getAllWithBranchId(@PathParam("id") long id) {
+    return slackConfigurationService.getAllWithBranchId(id);
   }
 }

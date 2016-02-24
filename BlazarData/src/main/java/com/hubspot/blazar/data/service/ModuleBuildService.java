@@ -1,5 +1,15 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
@@ -9,14 +19,6 @@ import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Set;
 
 @Singleton
 public class ModuleBuildService {
