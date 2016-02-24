@@ -36,6 +36,7 @@ import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
 import com.hubspot.blazar.resources.SlackConfigurationResource;
+import com.hubspot.blazar.util.BlazarUrlHelper;
 import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
@@ -89,6 +90,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(RepositoryBuildLauncher.class);
     binder.bind(ModuleBuildLauncher.class);
     binder.bind(SingularityBuildLauncher.class);
+    binder.bind(BlazarUrlHelper.class);
 
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
     for (Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {

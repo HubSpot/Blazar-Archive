@@ -14,7 +14,7 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.util.BlazarUrlService;
+import com.hubspot.blazar.util.BlazarUrlHelper;
 import com.hubspot.blazar.util.GitHubHelper;
 
 @Singleton
@@ -23,15 +23,15 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
 
   private final BranchService branchService;
   private final GitHubHelper gitHubHelper;
-  private final BlazarUrlService blazarUrlService;
+  private final BlazarUrlHelper blazarUrlHelper;
 
   @Inject
   public GitHubStatusVisitor(BranchService branchService,
                              GitHubHelper gitHubHelper,
-                             BlazarUrlService blazarUrlService) {
+                             BlazarUrlHelper blazarUrlHelper) {
     this.branchService = branchService;
     this.gitHubHelper = gitHubHelper;
-    this.blazarUrlService = blazarUrlService;
+    this.blazarUrlHelper = blazarUrlHelper;
   }
 
   @Override
@@ -42,7 +42,7 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
     }
 
     GitInfo gitInfo = branchService.get(build.getBranchId()).get();
-    String url = blazarUrlService.getBlazarUiLink(build);
+    String url = blazarUrlHelper.getBlazarUiLink(build);
 
     GHCommitState state = toGHCommitState(build.getState());
     String sha = build.getSha().get();

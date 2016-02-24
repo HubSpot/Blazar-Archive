@@ -42,13 +42,13 @@ public class SlackAttachment {
 
     this.fallback = fallback;
     this.color = color == null? Optional.<String>absent() : color;
-    this.pretext = color == null? Optional.<String>absent() : pretext;
-    this.authorName = color == null? Optional.<String>absent() : authorName;
-    this.authorLink = color == null? Optional.<String>absent() : authorLink;
-    this.authorIcon = color == null? Optional.<String>absent() : authorIcon;
-    this.title = color == null? Optional.<String>absent() : title;
-    this.titleLink = color == null? Optional.<String>absent() : titleLink;
-    this.text = color == null? Optional.<String>absent() : text;
+    this.pretext = pretext == null? Optional.<String>absent() : pretext;
+    this.authorName = authorName == null? Optional.<String>absent() : authorName;
+    this.authorLink = authorLink == null? Optional.<String>absent() : authorLink;
+    this.authorIcon = authorIcon == null? Optional.<String>absent() : authorIcon;
+    this.title = title == null? Optional.<String>absent() : title;
+    this.titleLink = titleLink == null? Optional.<String>absent() : titleLink;
+    this.text = text == null? Optional.<String>absent() : text;
     this.fields = fields;
     this.thumbUrl = color == null? Optional.<String>absent() : thumbUrl;
   }

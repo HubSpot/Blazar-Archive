@@ -25,7 +25,7 @@ import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.data.service.SlackConfigurationService;
 import com.hubspot.blazar.integration.slack.SlackClient;
-import com.hubspot.blazar.util.BlazarUrlService;
+import com.hubspot.blazar.util.BlazarUrlHelper;
 
 @Singleton
 public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleBuildVisitor {
@@ -38,7 +38,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   private SlackConfigurationService slackConfigurationService;
   private final BranchService branchService;
   private final ModuleBuildService moduleBuildService;
-  private final BlazarUrlService blazarUrlService;
+  private final BlazarUrlHelper blazarUrlHelper;
   private final SlackClient slackClient;
   private final RepositoryBuildService repositoryBuildService;
 
@@ -46,13 +46,13 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   public SlackNotificationVisitor(SlackConfigurationService slackConfigurationService,
                                   BranchService branchService,
                                   ModuleBuildService moduleBuildService,
-                                  BlazarUrlService blazarUrlService,
+                                  BlazarUrlHelper blazarUrlHelper,
                                   SlackClient slackClient,
                                   RepositoryBuildService repositoryBuildService) {
     this.slackConfigurationService = slackConfigurationService;
     this.branchService = branchService;
     this.moduleBuildService = moduleBuildService;
-    this.blazarUrlService = blazarUrlService;
+    this.blazarUrlHelper = blazarUrlHelper;
     this.slackClient = slackClient;
     this.repositoryBuildService = repositoryBuildService;
   }
@@ -112,7 +112,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     }
 
     Optional<String> title = Optional.of(fallback);
-    Optional<String> link = Optional.of(blazarUrlService.getBlazarUiLink(build));
+    Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
     SlackAttachment attachment = new SlackAttachment(fallback, color, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, title, link, ABSENT_STRING, Collections.<SlackAttachmentField>emptyList(), ABSENT_STRING);
     SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, slackConfiguration.getChannelName(), Lists.newArrayList(attachment));
@@ -156,7 +156,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     }
 
     Optional<String> title = Optional.of(fallback);
-    Optional<String> link = Optional.of(blazarUrlService.getBlazarUiLink(build));
+    Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
     SlackAttachment attachment = new SlackAttachment(fallback, color, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, title, link, ABSENT_STRING, Collections.<SlackAttachmentField>emptyList(), ABSENT_STRING);
     SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, slackConfiguration.getChannelName(), Lists.newArrayList(attachment));

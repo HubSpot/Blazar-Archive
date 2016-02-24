@@ -3,6 +3,7 @@ package com.hubspot.blazar.util;
 import javax.ws.rs.core.UriBuilder;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -13,7 +14,8 @@ import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 
-public class BlazarUrlService {
+@Singleton
+public class BlazarUrlHelper {
 
   private final BranchService branchService;
   private final RepositoryBuildService repositoryBuildService;
@@ -21,10 +23,10 @@ public class BlazarUrlService {
   private final UiConfiguration uiConfiguration;
 
   @Inject
-  public BlazarUrlService(BranchService branchService,
-                          RepositoryBuildService repositoryBuildService,
-                          ModuleService moduleService,
-                          BlazarConfiguration configuration) {
+  public BlazarUrlHelper(BranchService branchService,
+                         RepositoryBuildService repositoryBuildService,
+                         ModuleService moduleService,
+                         BlazarConfiguration configuration) {
     this.branchService = branchService;
     this.repositoryBuildService = repositoryBuildService;
     this.moduleService = moduleService;
