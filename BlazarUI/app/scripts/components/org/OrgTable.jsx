@@ -16,11 +16,9 @@ class OrgTable extends Component {
       );
     }
 
-    console.log(this.props.repos.toJS());
-
     return this.props.buildTable({
       data: this.props.repos,
-      columnNames: [' ', 'Repository', '# of Active Branches'],
+      columnNames: [' ', 'Repository', 'Latest Build', 'Start Time', 'Duration', 'Commit', ' '],
       rowComponent: OrgTableRow
     });
   }

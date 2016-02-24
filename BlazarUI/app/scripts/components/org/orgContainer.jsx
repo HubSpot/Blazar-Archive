@@ -84,22 +84,20 @@ class OrgContainer extends Component {
                 Repositories
               </HeadlineDetail>
             </Headline>
-          </UIGridItem>
-          <UIGridItem size={8}>
-              <Filter
-                placeholder='Filter Repositories'
-                options={this.getFilterOptions()}
-                value={this.state.filterValue}
-                handleFilterChange={this.handleFilterChange}
-                {...this.state}
-                {...this.props}
-              />
-              <OrgTable 
-                {...this.state}
-                {...this.props}
-                repos={this.getFilteredRepos()}
-                loading={false}
-              />
+            <Filter
+              placeholder='Filter Repositories'
+              options={this.getFilterOptions()}
+              value={this.state.filterValue}
+              handleFilterChange={this.handleFilterChange}
+              {...this.state}
+              {...this.props}
+            />
+            <OrgTable
+              {...this.state}
+              {...this.props}
+              repos={this.getFilteredRepos()}
+              loading={false}
+            />
           </UIGridItem>
         </UIGrid>
       </PageContainer>
