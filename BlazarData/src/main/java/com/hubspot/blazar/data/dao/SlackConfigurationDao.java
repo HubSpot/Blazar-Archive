@@ -15,7 +15,7 @@ import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
 public interface SlackConfigurationDao {
 
-  @SqlQuery("SELECT * FROM slack_configs where active = 1")
+  @SqlQuery("SELECT * FROM slack_configs WHERE active = 1")
   Set<SlackConfiguration> getAll();
 
   @SingleValueResult
