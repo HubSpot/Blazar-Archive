@@ -9,6 +9,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 public class SlackMessage {
+  private static final Optional<String> ABSENT_STRING = Optional.absent();
   private final Optional<String> token;
   private final Optional<String> text;
   private final Optional<String> username;
@@ -25,9 +26,9 @@ public class SlackMessage {
       @JsonProperty("channel") String channel,
       @JsonProperty("attachments") List<SlackAttachment> attachments) {
 
-    this.token = token == null ? Optional.<String>absent() : token;
-    this.text = text == null ? Optional.<String>absent() : text;
-    this.username = username == null ? Optional.<String>absent() : username;
+    this.token = Objects.firstNonNull(token, ABSENT_STRING);
+    this.text = Objects.firstNonNull(text, ABSENT_STRING);
+    this.username = Objects.firstNonNull(username, ABSENT_STRING);
     this.iconEmoji = iconEmoji;
     this.channel = channel;
     this.attachments = attachments;

@@ -95,7 +95,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   private void sendSlackMessage(SlackConfiguration slackConfiguration, RepositoryBuild build, GitInfo gitInfo) {
     String fallback = String.format("Module Build %s-%s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getRepository(), gitInfo.getBranch(), build.getState().toString());
-    Optional<String> color = Optional.absent();
+    Optional<String> color = ABSENT_STRING;
     switch (build.getState()) {
       case SUCCEEDED:
         color = Optional.of("good");
@@ -139,7 +139,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   private void sendSlackMessage(SlackConfiguration slackConfiguration, ModuleBuild build, GitInfo gitInfo) {
     String fallback = String.format("Module Build %s-%s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getRepository(), gitInfo.getBranch(), build.getState().toString());
-    Optional<String> color = Optional.absent();
+    Optional<String> color = ABSENT_STRING;
     switch (build.getState()) {
       case SUCCEEDED:
         color = Optional.of("good");
