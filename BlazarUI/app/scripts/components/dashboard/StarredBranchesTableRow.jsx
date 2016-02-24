@@ -33,20 +33,12 @@ class StarredBranchesTableRow extends Component {
           <td> No build history </td>
           <td />
           <td />
-          <td />
         </tr>
       );
     }
 
     const commitInfo = latestBuild.get('commitInfo');
-    let commitMessage;
     let sha;
-
-    if (commitInfo !== undefined) {
-      commitMessage = (
-        <CommitMessage message={commitInfo.get('current').get('message')} />
-      );
-    }
     
     if (latestBuild.get('sha')) {
       const gitInfo = {
@@ -91,9 +83,6 @@ class StarredBranchesTableRow extends Component {
         </td>
         <td>
           {sha}
-        </td>
-        <td>
-          {commitMessage}
         </td>
       </tr>
     );

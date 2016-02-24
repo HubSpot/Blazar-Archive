@@ -45,12 +45,11 @@ class StarredBranches extends Component {
       'Branch',
       'Build Number',
       'Start Time',
-      'Commit',
-      'Commit Message'
+      'Commit'
     ];
 
     return (
-      <table className="table table-hover table-striped table-border">
+      <table className="table table-hover table-striped">
         <TableHead
           columnNames={columnNames}
         />
