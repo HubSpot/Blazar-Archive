@@ -10,6 +10,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -19,8 +20,6 @@ import com.hubspot.blazar.base.externalservice.slack.SlackMessage;
 import com.hubspot.blazar.base.slack.SlackConfiguration;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
-import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.BlazarSlackConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
@@ -28,13 +27,13 @@ import com.hubspot.blazar.data.service.SlackConfigurationService;
 import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.util.BlazarUrlService;
 
+@Singleton
 public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleBuildVisitor {
 
   private static final Logger LOG = LoggerFactory.getLogger(SlackNotificationVisitor.class);
   private static final Set<RepositoryBuild.State> FAILED_REPO_STATES = ImmutableSet.of(RepositoryBuild.State.CANCELLED, RepositoryBuild.State.FAILED, RepositoryBuild.State.UNSTABLE);
   private static final Set<ModuleBuild.State> FAILED_MODULE_STATES = ImmutableSet.of(ModuleBuild.State.CANCELLED, ModuleBuild.State.FAILED);
   private static final Optional<String> ABSENT_STRING = Optional.absent();
-  private final Optional<BlazarSlackConfiguration> blazarSlackConfig;
 
   private SlackConfigurationService slackConfigurationService;
   private final BranchService branchService;
@@ -45,7 +44,6 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   @Inject
   public SlackNotificationVisitor(SlackConfigurationService slackConfigurationService,
-                                  BlazarConfiguration blazarConfiguration,
                                   BranchService branchService,
                                   ModuleBuildService moduleBuildService,
                                   BlazarUrlService blazarUrlService,
@@ -57,7 +55,6 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     this.blazarUrlService = blazarUrlService;
     this.slackClient = slackClient;
     this.repositoryBuildService = repositoryBuildService;
-    this.blazarSlackConfig = blazarConfiguration.getSlackConfiguration();
   }
 
 
