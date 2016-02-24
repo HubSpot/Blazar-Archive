@@ -12,7 +12,7 @@ class OrgTableRow extends Component {
     const build = this.props.data.get('lastBuild').toJS();
     const gitInfo = this.props.data.get('gitInfo').toJS();
 
-    let buildLink, duration, sha;
+    let buildLink, sha;
 
     if (build.blazarPath) {
       buildLink = (
