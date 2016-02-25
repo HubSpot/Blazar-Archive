@@ -66,9 +66,9 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   @Override
   public void visit(RepositoryBuild build) throws Exception {
     Set<SlackConfiguration> configurationSet = slackConfigurationService.getAllWithBranchId(build.getBranchId());
+    Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (SlackConfiguration slackConfiguration : configurationSet) {
-      Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
-      if (previous.isPresent() && !shouldSend(slackConfiguration, build.getState(), previous.get())) {
+      if (!shouldSend(slackConfiguration, build.getState(), previous)) {
         continue;
       }
       GitInfo gitInfo = branchService.get(build.getBranchId()).get();
@@ -76,9 +76,9 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     }
   }
 
-  private boolean shouldSend(SlackConfiguration slackConfiguration, RepositoryBuild.State state, RepositoryBuild previous) {
+  private boolean shouldSend(SlackConfiguration slackConfiguration, RepositoryBuild.State state, Optional<RepositoryBuild> previous) {
     // OnChange
-    boolean changedState = previous.getState() == state;
+    boolean changedState = previous.isPresent() && previous.get().getState() == state;
     if (slackConfiguration.getOnChange() && changedState) {
       return true;
     }
@@ -87,7 +87,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
       return true;
     }
     // OnRecovery
-    boolean previousFailed = previous.getState().isComplete() && previous.getState() == RepositoryBuild.State.SUCCEEDED;
+    boolean previousFailed = previous.isPresent() && previous.get().getState().isComplete() && previous.get().getState() == RepositoryBuild.State.SUCCEEDED;
     if (slackConfiguration.getOnRecover() && previousFailed && state == RepositoryBuild.State.SUCCEEDED) {
       return true;
     }
@@ -128,9 +128,9 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   @Override
   public void visit(ModuleBuild build) throws Exception {
     Set<SlackConfiguration> configurationSet = slackConfigurationService.getAllWithModuleId(build.getModuleId());
+    Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
     for (SlackConfiguration slackConfiguration : configurationSet) {
-      Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
-      if (previous.isPresent() && !shouldSend(slackConfiguration, build.getState(), previous.get(), build)) {
+      if (!shouldSend(slackConfiguration, build.getState(), previous, build)) {
         continue;
       }
       Optional<GitInfo> gitInfo = branchService.get(repositoryBuildService.get(build.getRepoBuildId()).get().getBranchId());
@@ -169,10 +169,10 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     slackClient.sendMessage(message);
   }
 
-  private boolean shouldSend(SlackConfiguration slackConfiguration, ModuleBuild.State state, ModuleBuild previous, ModuleBuild thisBuild) {
+  private boolean shouldSend(SlackConfiguration slackConfiguration, ModuleBuild.State state, Optional<ModuleBuild> previous, ModuleBuild thisBuild) {
     final String logBase = String.format("Not sending Slack notification: ModuleBuild %s,", String.valueOf(thisBuild.getId()));
     // OnChange
-    boolean changedState = previous.getState() == state;
+    boolean changedState = previous.isPresent() && previous.get().getState() == state;
     if (slackConfiguration.getOnChange() && changedState) {
       return true;
     }
@@ -183,7 +183,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     }
     LOG.info("{} OnFinish {}, isComplete {}", logBase, slackConfiguration.getOnFinish(), state.isComplete());
     // OnRecovery
-    boolean previousFailed = previous.getState().isComplete() && previous.getState() == ModuleBuild.State.SUCCEEDED;
+    boolean previousFailed = previous.isPresent() && previous.get().getState().isComplete() && previous.get().getState() == ModuleBuild.State.SUCCEEDED;
     if (slackConfiguration.getOnRecover() && previousFailed && state == ModuleBuild.State.SUCCEEDED) {
       return true;
     }
