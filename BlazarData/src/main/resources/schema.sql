@@ -148,6 +148,6 @@ CREATE TABLE `slack_configs` (
   `onRecover` TINYINT(1),
   `active` TINYINT(1),
   PRIMARY KEY (`id`),
-  UNIQUE INDEX (`channelName`, `repositoryId`, `moduleId`),
+  UNIQUE INDEX (`channelName`, `branchId`, `moduleId`),
   INDEX (`channelName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
