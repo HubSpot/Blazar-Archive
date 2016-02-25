@@ -22,11 +22,11 @@ public interface SlackConfigurationDao {
   @SqlQuery("SELECT * FROM slack_configs WHERE id = :id")
   Optional<SlackConfiguration> get(@Bind("id") long id);
 
-  @SqlQuery("SELECT * FROM slack_configs WHERE branchId = :branchId and active = 1")
-  Set<SlackConfiguration> getAllWithBranchId(long branchId);
+  @SqlQuery("SELECT * FROM slack_configs WHERE branchId = :branchId and moduleId is NULL and active = 1")
+  Set<SlackConfiguration> getAllWithBranchId(@Bind("branchId") long branchId);
 
   @SqlQuery("SELECT * FROM slack_configs WHERE moduleId = :moduleId and active = 1")
-  Set<SlackConfiguration> getAllWithModuleId(long moduleId);
+  Set<SlackConfiguration> getAllWithModuleId(@Bind("moduleId") long moduleId);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO slack_configs (branchId, moduleId, channelName, onFinish, onFail, onChange, onRecover, active) VALUES (:branchId, :moduleId, :channelName, :onFinish, :onFail, :onChange, :onRecover, :active)")

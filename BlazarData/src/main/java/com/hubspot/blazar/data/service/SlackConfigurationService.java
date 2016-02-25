@@ -28,6 +28,10 @@ public class SlackConfigurationService {
     return slackConfigurationDao.getAllWithBranchId(branchId);
   }
 
+  public Set<SlackConfiguration> getAllWithModuleId(long moduleId) {
+    return slackConfigurationDao.getAllWithModuleId(moduleId);
+  }
+
   public long insert(SlackConfiguration slackConfiguration) {
     return slackConfigurationDao.insert(slackConfiguration);
   }

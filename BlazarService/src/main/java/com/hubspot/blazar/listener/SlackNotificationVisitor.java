@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.externalservice.slack.SlackAttachment;
@@ -22,6 +23,7 @@ import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.data.service.SlackConfigurationService;
 import com.hubspot.blazar.integration.slack.SlackClient;
@@ -37,6 +39,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   private SlackConfigurationService slackConfigurationService;
   private final BranchService branchService;
+  private ModuleService moduleService;
   private final ModuleBuildService moduleBuildService;
   private final BlazarUrlHelper blazarUrlHelper;
   private final SlackClient slackClient;
@@ -45,12 +48,14 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   @Inject
   public SlackNotificationVisitor(SlackConfigurationService slackConfigurationService,
                                   BranchService branchService,
+                                  ModuleService moduleService,
                                   ModuleBuildService moduleBuildService,
                                   BlazarUrlHelper blazarUrlHelper,
                                   SlackClient slackClient,
                                   RepositoryBuildService repositoryBuildService) {
     this.slackConfigurationService = slackConfigurationService;
     this.branchService = branchService;
+    this.moduleService = moduleService;
     this.moduleBuildService = moduleBuildService;
     this.blazarUrlHelper = blazarUrlHelper;
     this.slackClient = slackClient;
@@ -94,7 +99,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   }
 
   private void sendSlackMessage(SlackConfiguration slackConfiguration, RepositoryBuild build, GitInfo gitInfo) {
-    String fallback = String.format("Module Build %s-%s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getRepository(), gitInfo.getBranch(), build.getState().toString());
+    String fallback = String.format("Module Build %s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), build.getState().toString().toLowerCase());
     Optional<String> color = ABSENT_STRING;
     switch (build.getState()) {
       case SUCCEEDED:
@@ -122,10 +127,10 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   @Override
   public void visit(ModuleBuild build) throws Exception {
-    Set<SlackConfiguration> configurationSet = slackConfigurationService.getAllWithBranchId(build.getRepoBuildId());
+    Set<SlackConfiguration> configurationSet = slackConfigurationService.getAllWithModuleId(build.getModuleId());
     for (SlackConfiguration slackConfiguration : configurationSet) {
       Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
-      if (previous.isPresent() && !shouldSend(slackConfiguration, build.getState(), previous.get())) {
+      if (previous.isPresent() && !shouldSend(slackConfiguration, build.getState(), previous.get(), build)) {
         continue;
       }
       Optional<GitInfo> gitInfo = branchService.get(repositoryBuildService.get(build.getRepoBuildId()).get().getBranchId());
@@ -138,7 +143,8 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   }
 
   private void sendSlackMessage(SlackConfiguration slackConfiguration, ModuleBuild build, GitInfo gitInfo) {
-    String fallback = String.format("Module Build %s-%s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getRepository(), gitInfo.getBranch(), build.getState().toString());
+    Module module = moduleService.get(build.getModuleId()).get();
+    String fallback = String.format("Module Build %s-%s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), module.getName(), build.getState().toString().toLowerCase());
     Optional<String> color = ABSENT_STRING;
     switch (build.getState()) {
       case SUCCEEDED:
@@ -163,25 +169,30 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     slackClient.sendMessage(message);
   }
 
-  private boolean shouldSend(SlackConfiguration slackConfiguration, ModuleBuild.State state, ModuleBuild previous) {
+  private boolean shouldSend(SlackConfiguration slackConfiguration, ModuleBuild.State state, ModuleBuild previous, ModuleBuild thisBuild) {
+    final String logBase = String.format("Not sending Slack notification: ModuleBuild %s,", String.valueOf(thisBuild.getId()));
     // OnChange
     boolean changedState = previous.getState() == state;
     if (slackConfiguration.getOnChange() && changedState) {
       return true;
     }
+    LOG.info("{} OnChange {}, changedState {}", logBase, slackConfiguration.getOnChange(), changedState);
     // OnFinish
     if (slackConfiguration.getOnFinish() && state.isComplete()) {
       return true;
     }
+    LOG.info("{} OnFinish {}, isComplete {}", logBase, slackConfiguration.getOnFinish(), state.isComplete());
     // OnRecovery
     boolean previousFailed = previous.getState().isComplete() && previous.getState() == ModuleBuild.State.SUCCEEDED;
     if (slackConfiguration.getOnRecover() && previousFailed && state == ModuleBuild.State.SUCCEEDED) {
       return true;
     }
+    LOG.info("{} OnRecover {}, previousFailed {}, thisFailed {}", logBase, slackConfiguration.getOnRecover(), previousFailed, state == ModuleBuild.State.SUCCEEDED);
     // OnFailure
     if (slackConfiguration.getOnFail() && FAILED_MODULE_STATES.contains(state)) {
       return true;
     }
+    LOG.info("{} onFail {}, thisFailed {}", logBase, slackConfiguration.getOnFail(), FAILED_MODULE_STATES.contains(state));
 
     return false;
   }
