@@ -3,14 +3,34 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import classNames from 'classnames';
+import moment from 'moment';
 
-import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon, getTableDurationText, buildIsOnDeck} from '../Helpers';
+import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon, getTableDurationText, buildIsOnDeck, timestampDuration} from '../Helpers';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
+let initialState = {
+  moment: moment()
+}
 
 class BranchBuildHistoryTableRow extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = initialState;
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(this.updateMoment.bind(this), 1000);
+  }
+
+  updateMoment() {
+    this.setState({
+      moment: moment()
+    })
+  }
 
   onTableClick(e) {
     if (e.target.className === 'sha-link') {
@@ -45,8 +65,13 @@ class BranchBuildHistoryTableRow extends Component {
   
   renderDuration() {
     const {data} = this.props;
+    let duration = data.duration;
 
-    return getTableDurationText(data.state, data.duration);
+    if (data.state === BuildStates.IN_PROGRESS) {
+      duration = timestampDuration(data.startTimestamp, this.state.moment);
+    }
+
+    return getTableDurationText(data.state, duration);
   }
   
   renderStartTime() {
