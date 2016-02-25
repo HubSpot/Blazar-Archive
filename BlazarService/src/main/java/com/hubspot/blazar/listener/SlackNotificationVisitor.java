@@ -68,11 +68,10 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     Set<SlackConfiguration> configurationSet = slackConfigurationService.getAllWithBranchId(build.getBranchId());
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (SlackConfiguration slackConfiguration : configurationSet) {
-      if (!shouldSend(slackConfiguration, build.getState(), previous)) {
-        continue;
+      if (shouldSend(slackConfiguration, build.getState(), previous)) {
+        GitInfo gitInfo = branchService.get(build.getBranchId()).get();
+        sendSlackMessage(slackConfiguration, build, gitInfo);
       }
-      GitInfo gitInfo = branchService.get(build.getBranchId()).get();
-      sendSlackMessage(slackConfiguration, build, gitInfo);
     }
   }
 
@@ -130,16 +129,14 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     Set<SlackConfiguration> configurationSet = slackConfigurationService.getAllWithModuleId(build.getModuleId());
     Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
     for (SlackConfiguration slackConfiguration : configurationSet) {
-      if (!shouldSend(slackConfiguration, build.getState(), previous, build)) {
-        continue;
+      if (shouldSend(slackConfiguration, build.getState(), previous, build)) {
+        Optional<GitInfo> gitInfo = branchService.get(repositoryBuildService.get(build.getRepoBuildId()).get().getBranchId());
+        if (!gitInfo.isPresent()) {
+          throw new IllegalArgumentException(String.format("Tried to send slack message for moduleBuild %s with no associated branch", build.getId().get()));
+        }
+        sendSlackMessage(slackConfiguration, build, gitInfo.get());
       }
-      Optional<GitInfo> gitInfo = branchService.get(repositoryBuildService.get(build.getRepoBuildId()).get().getBranchId());
-      if (!gitInfo.isPresent()) {
-        throw new IllegalArgumentException(String.format("Tried to send slack message for moduleBuild %s with no associated branch", build.getId().get()));
-      }
-      sendSlackMessage(slackConfiguration, build, gitInfo.get());
     }
-
   }
 
   private void sendSlackMessage(SlackConfiguration slackConfiguration, ModuleBuild build, GitInfo gitInfo) {
