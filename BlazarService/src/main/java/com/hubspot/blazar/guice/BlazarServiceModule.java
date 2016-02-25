@@ -44,11 +44,13 @@ import com.hubspot.blazar.util.ModuleBuildLauncher;
 import com.hubspot.blazar.util.RepositoryBuildLauncher;
 import com.hubspot.blazar.util.SingularityBuildLauncher;
 import com.hubspot.horizon.AsyncHttpClient;
+import com.hubspot.horizon.HttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpResponse;
 import com.hubspot.horizon.RetryStrategy;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
+import com.hubspot.horizon.ning.NingHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import io.dropwizard.db.DataSourceFactory;
@@ -149,10 +151,17 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     return new NingAsyncHttpClient(config);
   }
 
+
+  @Provides
+  @com.google.inject.Singleton
+  public HttpClient provideHttpClient(ObjectMapper objectMapper) {
+    return new NingHttpClient(HttpConfig.newBuilder().setMaxRetries(5).setObjectMapper(objectMapper).build());
+  }
+
   @Provides
   @Singleton
-  public SlackClient providesSlackClientAs(AsyncHttpClient asyncHttpClient, BlazarConfiguration blazarConfiguration, ObjectMapper objectMapper) {
-    return new SlackClient(asyncHttpClient, blazarConfiguration, objectMapper);
+  public SlackClient providesSlackClient(AsyncHttpClient asyncHttpClient, BlazarConfiguration blazarConfiguration, ObjectMapper objectMapper, HttpClient httpClient) {
+    return new SlackClient(asyncHttpClient, blazarConfiguration, objectMapper, httpClient);
   }
 
   public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {

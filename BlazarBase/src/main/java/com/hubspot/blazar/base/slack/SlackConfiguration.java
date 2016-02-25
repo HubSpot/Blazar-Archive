@@ -1,6 +1,7 @@
 package com.hubspot.blazar.base.slack;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
@@ -17,6 +18,7 @@ public class SlackConfiguration {
   private final boolean onRecover;
   private final boolean active;
 
+  @JsonCreator
   public SlackConfiguration(@JsonProperty("id") Optional<Long> id,
                             @JsonProperty("branchId") long branchId,
                             @JsonProperty("moduleId") Optional<Long> moduleId,
