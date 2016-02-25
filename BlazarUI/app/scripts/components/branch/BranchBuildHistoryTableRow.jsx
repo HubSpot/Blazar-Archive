@@ -10,8 +10,27 @@ import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon, g
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
+let initialState = {
+  moment: moment()
+}
 
 class BranchBuildHistoryTableRow extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = initialState;
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(this.updateMoment.bind(this), 1000);
+  }
+
+  updateMoment() {
+    this.setState({
+      moment: moment()
+    })
+  }
 
   onTableClick(e) {
     if (e.target.className === 'sha-link') {
@@ -49,7 +68,7 @@ class BranchBuildHistoryTableRow extends Component {
     let duration = data.duration;
 
     if (data.state === BuildStates.IN_PROGRESS) {
-      duration = timestampDuration(data.startTimestamp, moment());
+      duration = timestampDuration(data.startTimestamp, this.state.moment);
     }
 
     return getTableDurationText(data.state, duration);

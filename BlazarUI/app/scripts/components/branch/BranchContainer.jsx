@@ -31,8 +31,7 @@ let initialState = {
   showModuleModal: false,
   modules: Immutable.List.of(),
   selectedModules: [],
-  buildDownstreamModules: 'WITHIN_REPOSITORY',
-  moment: moment()
+  buildDownstreamModules: 'WITHIN_REPOSITORY'
 };
 
 class BranchContainer extends Component {
@@ -45,18 +44,6 @@ class BranchContainer extends Component {
 
   componentDidMount() {
     this.setup(this.props.params);
-
-    this.updateMoment();
-  }
-
-  updateMoment() {
-    this.setState({
-      moment: moment()
-    });
-
-    setTimeout(() => {
-      this.updateMoment();
-    })
   }
 
   componentWillReceiveProps(nextprops) {
