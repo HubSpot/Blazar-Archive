@@ -26,17 +26,14 @@ class BranchBuildHistoryTableRow extends Component {
     this.interval = setInterval(this.updateMoment.bind(this), 1000);
   }
 
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
   updateMoment() {
     this.setState({
       moment: moment()
     })
-  }
-
-  onTableClick(e) {
-    if (e.target.className === 'sha-link') {
-      window.open(e.target.href, '_blank');
-      return false;
-    }
   }
 
   getRowClassNames(state) {
@@ -94,25 +91,23 @@ class BranchBuildHistoryTableRow extends Component {
     const {data, params} = this.props;
 
     return (
-      <Link onClick={this.onTableClick.bind(this)} to={data.blazarPath}>
-        <tr className={this.getRowClassNames(data.state)}>
-          <td className='build-status'>
-            {buildResultIcon(data.state)}
-          </td>
-          <td className='build-result-link'>
-            <span>{this.renderBuildLink()}</span>
-          </td>
-          <td>
-            {this.renderStartTime()}
-          </td>
-          <td>
-            {this.renderDuration()}
-          </td>
-          <td>
-            {this.renderSha()}
-          </td>
-        </tr>
-      </Link>
+      <tr className={this.getRowClassNames(data.state)}>
+        <td className='build-status'>
+          {buildResultIcon(data.state)}
+        </td>
+        <td className='build-result-link'>
+          <span>{this.renderBuildLink()}</span>
+        </td>
+        <td>
+          {this.renderStartTime()}
+        </td>
+        <td>
+          {this.renderDuration()}
+        </td>
+        <td>
+          {this.renderSha()}
+        </td>
+      </tr>
     );
   }
 }
