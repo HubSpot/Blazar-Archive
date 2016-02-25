@@ -74,10 +74,6 @@ class BranchBuildHistoryTableRow extends Component {
   render() {
     const {data, params} = this.props;
 
-    setTimeout(() => {
-      this.forceUpdate();
-    }, 1000);
-
     return (
       <Link onClick={this.onTableClick.bind(this)} to={data.blazarPath}>
         <tr className={this.getRowClassNames(data.state)}>
