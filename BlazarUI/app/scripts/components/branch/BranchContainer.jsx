@@ -12,7 +12,6 @@ import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import BuildButton from './BuildButton.jsx';
 import ModuleModal from '../shared/ModuleModal.jsx';
 import Immutable from 'immutable';
-import moment from 'moment';
 
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
@@ -120,7 +119,6 @@ class BranchContainer extends Component {
         <BranchBuildHistoryTable
           data={this.state.builds}
           loading={this.state.loadingBranches}
-          currentTimestamp={this.state.moment}
           {...this.state}
           {...this.props}
         />
