@@ -18,13 +18,13 @@ import com.hubspot.blazar.base.feedback.Feedback;
 import com.hubspot.blazar.config.BlazarSlackConfiguration;
 import com.hubspot.blazar.integration.slack.SlackClient;
 
-@Path("/feedback")
-public class FeedbackResource {
+@Path("/user-feedback")
+public class UserFeedbackResource {
   private final SlackClient slackClient;
   private BlazarSlackConfiguration blazarSlackConfiguration;
 
   @Inject
-  public FeedbackResource(SlackClient slackClient) {
+  public UserFeedbackResource(SlackClient slackClient) {
     this.slackClient = slackClient;
     this.blazarSlackConfiguration = slackClient.getBlazarSlackConfiguration();
   }

@@ -27,7 +27,7 @@ class Feedback {
     return $.ajax({
       type: 'POST',
       contentType: 'application/json',
-      url: `${config.apiRoot}/feedback`,
+      url: `${config.apiRoot}/user-feedback`,
       dataType: 'json',
       data: JSON.stringify(data)
     });
