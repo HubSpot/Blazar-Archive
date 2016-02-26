@@ -49,6 +49,14 @@ public class ModuleBuildService {
     return moduleBuildDao.getByModule(moduleId);
   }
 
+  public Optional<ModuleBuild> getPreviousBuild(ModuleBuild build) {
+    return moduleBuildDao.getPreviousBuild(build);
+  }
+
+  public Optional<ModuleBuild> getPreviousBuild(Module module) {
+    return moduleBuildDao.getPreviousBuild(module);
+  }
+
   public Optional<ModuleBuild> getByModuleAndNumber(int moduleId, int buildNumber) {
     return moduleBuildDao.getByModuleAndNumber(moduleId, buildNumber);
   }

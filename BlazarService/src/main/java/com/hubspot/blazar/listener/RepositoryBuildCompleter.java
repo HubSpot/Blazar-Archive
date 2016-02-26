@@ -1,6 +1,6 @@
 package com.hubspot.blazar.listener;
 
-import com.google.common.primitives.Ints;
+import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
@@ -11,10 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 
 @Singleton
@@ -47,7 +43,7 @@ public class RepositoryBuildCompleter implements ModuleBuildVisitor {
     Set<ModuleBuild> builds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
     if (allComplete(builds)) {
       LOG.info("All module builds complete, going to complete repository build {}", build.getRepoBuildId());
-      RepositoryBuild.State finalState = determineRepositoryBuildState(repositoryBuild, builds);
+      RepositoryBuild.State finalState = determineRepositoryBuildState(builds);
       LOG.info("Final state for repository build {} is {}", build.getRepoBuildId(), finalState);
       RepositoryBuild completed = repositoryBuild
           .withState(finalState)
@@ -56,7 +52,7 @@ public class RepositoryBuildCompleter implements ModuleBuildVisitor {
     }
   }
 
-  private RepositoryBuild.State determineRepositoryBuildState(RepositoryBuild repositoryBuild, Set<ModuleBuild> builds) {
+  private RepositoryBuild.State determineRepositoryBuildState(Set<ModuleBuild> builds) {
     for (ModuleBuild build : builds) {
       if (build.getState() == ModuleBuild.State.FAILED) {
         return RepositoryBuild.State.FAILED;
@@ -72,7 +68,7 @@ public class RepositoryBuildCompleter implements ModuleBuildVisitor {
     // if a module was skipped we need to carry over any previous failure
     for (ModuleBuild build : builds) {
       if (build.getState() == ModuleBuild.State.SKIPPED) {
-        if (!lastBuildSucceeded(build.getModuleId())) {
+        if (!lastBuildSucceeded(build)) {
           return RepositoryBuild.State.UNSTABLE;
         }
       }
@@ -81,29 +77,9 @@ public class RepositoryBuildCompleter implements ModuleBuildVisitor {
     return RepositoryBuild.State.SUCCEEDED;
   }
 
-  /**
-   * Go back until we find the last build that succeeded or failed for this module
-   * (ignore skipped and cancelled builds)
-   */
-  private boolean lastBuildSucceeded(int moduleId) {
-    List<ModuleBuild> builds = new ArrayList<>(moduleBuildService.getByModule(moduleId));
-    Collections.sort(builds, new Comparator<ModuleBuild>() {
-
-      @Override
-      public int compare(ModuleBuild build1, ModuleBuild build2) {
-        return -1 * Ints.compare(build1.getBuildNumber(), build2.getBuildNumber());
-      }
-    });
-
-    for (ModuleBuild build : builds) {
-      if (build.getState() == ModuleBuild.State.SUCCEEDED) {
-        return true;
-      } else if (build.getState() == ModuleBuild.State.FAILED) {
-        return false;
-      }
-    }
-
-    return false;
+  private boolean lastBuildSucceeded(ModuleBuild build) {
+    Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
+    return previous.isPresent() && previous.get().getState() == ModuleBuild.State.SUCCEEDED;
   }
 
   private static boolean allComplete(Set<ModuleBuild> builds) {

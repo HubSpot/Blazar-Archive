@@ -1,6 +1,7 @@
 package com.hubspot.blazar.data.dao;
 
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
@@ -31,6 +32,14 @@ public interface ModuleBuildDao {
   @SingleValueResult
   @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :moduleId AND buildNumber = :buildNumber")
   Optional<ModuleBuild> getByModuleAndNumber(@Bind("moduleId") int moduleId, @Bind("buildNumber") int buildNumber);
+
+  @SingleValueResult
+  @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :moduleId AND buildNumber < :buildNumber AND state != 'SKIPPED' ORDER BY buildNumber DESC LIMIT 1")
+  Optional<ModuleBuild> getPreviousBuild(@BindWithRosetta ModuleBuild build);
+
+  @SingleValueResult
+  @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :id AND state != 'SKIPPED' ORDER BY buildNumber DESC LIMIT 1")
+  Optional<ModuleBuild> getPreviousBuild(@BindWithRosetta Module module);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO module_builds (repoBuildId, moduleId, buildNumber, state) VALUES (:repoBuildId, :moduleId, :buildNumber, :state)")

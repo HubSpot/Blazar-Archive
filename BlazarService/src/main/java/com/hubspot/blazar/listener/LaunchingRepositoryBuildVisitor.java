@@ -9,6 +9,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.google.common.base.Optional;
+import com.hubspot.blazar.base.ModuleBuild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +85,8 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
           for (Module module : allModules) {
             if (module.contains(FileSystems.getDefault().getPath(path))) {
               toBuild.add(module);
+            } else if (!lastBuildSucceeded(module)) {
+              toBuild.add(module);
             }
           }
         }
@@ -117,6 +121,11 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
       }
     }
     LOG.info("All modules to build (including downstream dependencies): {}", mapByModuleId(toBuild).keySet());
+  }
+
+  private boolean lastBuildSucceeded(Module module) {
+    Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(module);
+    return previous.isPresent() && previous.get().getState() == ModuleBuild.State.SUCCEEDED;
   }
 
   private static Set<Module> filterActive(Set<Module> modules) {
