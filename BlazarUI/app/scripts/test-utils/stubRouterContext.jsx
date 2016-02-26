@@ -1,4 +1,4 @@
-const React = require('react/addons');
+const React = require('react');
 const objectAssign = require('object-assign');
 
 const stubRouterContext = (Component, props, stubs) => {

@@ -55,11 +55,12 @@ class App extends Component {
 
   render() {
     const modal = this.apiModal();
+
     return (
       <div>
         <div className="page-wrapper">
           <SidebarContainer/>
-          <RouteHandler/>
+          {this.props.children}
         </div>
         <FeedbackForm/>
         {modal}
