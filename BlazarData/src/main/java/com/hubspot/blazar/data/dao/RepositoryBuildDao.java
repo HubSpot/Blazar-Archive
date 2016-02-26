@@ -41,7 +41,7 @@ public interface RepositoryBuildDao {
   BuildNumbers getBuildNumbers(@Bind("branchId") int branchId);
 
   @SingleValueResult
-  @SqlQuery("SELECT * FROM repo_builds WHERE startTimestamp < :startTimestamp and branchId = :branchId ORDER BY startTimestamp DESC LIMIT 1")
+  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND buildNumber < :buildNumber ORDER BY buildNumber DESC limit 1")
   Optional<RepositoryBuild> getPreviousBuild(@BindWithRosetta RepositoryBuild build);
 
   @GetGeneratedKeys
