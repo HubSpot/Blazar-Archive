@@ -53,9 +53,6 @@ public class RepositoryBuildService {
   }
 
   public Optional<RepositoryBuild> getPreviousBuild(RepositoryBuild build) {
-    if (!build.getStartTimestamp().isPresent()) {
-      throw new IllegalArgumentException("Build must have start timestamp to find previous build");
-    }
     return repositoryBuildDao.getPreviousBuild(build);
   }
 
