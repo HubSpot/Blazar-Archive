@@ -52,6 +52,13 @@ public class RepositoryBuildService {
     return repositoryBuildDao.getBuildNumbers(branchId);
   }
 
+  public Optional<RepositoryBuild> getPreviousBuild(RepositoryBuild build) {
+    if (!build.getStartTimestamp().isPresent()) {
+      throw new IllegalArgumentException("Build must have start timestamp to find previous build");
+    }
+    return repositoryBuildDao.getPreviousBuild(build);
+  }
+
   public long enqueue(GitInfo gitInfo, BuildTrigger trigger, BuildOptions buildOptions) {
     BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
 

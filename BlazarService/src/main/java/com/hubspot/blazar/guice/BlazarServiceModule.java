@@ -9,24 +9,15 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.inject.Provides;
-import com.hubspot.blazar.discovery.DiscoveryModule;
-import com.hubspot.blazar.listener.BuildVisitorModule;
-import com.hubspot.blazar.resources.BranchStateResource;
-import com.hubspot.blazar.resources.ModuleBuildResource;
-import com.hubspot.blazar.resources.RepositoryBuildResource;
-import com.hubspot.blazar.util.GitHubHelper;
-import com.hubspot.blazar.util.ModuleBuildLauncher;
-import com.hubspot.blazar.util.RepositoryBuildLauncher;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Binder;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
@@ -34,18 +25,32 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
+import com.hubspot.blazar.discovery.DiscoveryModule;
+import com.hubspot.blazar.integration.slack.SlackClient;
+import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.resources.BranchResource;
+import com.hubspot.blazar.resources.BranchStateResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
+import com.hubspot.blazar.resources.UserFeedbackResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
-import com.hubspot.blazar.resources.FeedbackResource;
+import com.hubspot.blazar.resources.ModuleBuildResource;
+import com.hubspot.blazar.resources.RepositoryBuildResource;
+import com.hubspot.blazar.resources.InstantMessageResource;
+import com.hubspot.blazar.util.BlazarUrlHelper;
+import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
+import com.hubspot.blazar.util.ModuleBuildLauncher;
+import com.hubspot.blazar.util.RepositoryBuildLauncher;
+import com.hubspot.blazar.util.SingularityBuildLauncher;
 import com.hubspot.horizon.AsyncHttpClient;
+import com.hubspot.horizon.HttpClient;
 import com.hubspot.horizon.HttpConfig;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpResponse;
 import com.hubspot.horizon.RetryStrategy;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
+import com.hubspot.horizon.ning.NingHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import io.dropwizard.db.DataSourceFactory;
@@ -73,7 +78,9 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(ModuleBuildResource.class);
     binder.bind(RepositoryBuildResource.class);
     binder.bind(BuildHistoryResource.class);
-    binder.bind(FeedbackResource.class);
+    binder.bind(InstantMessageResource.class);
+    binder.bind(UserFeedbackResource.class);
+
 
     binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
     binder.bind(PropertyFilteringMessageBodyWriter.class)
@@ -86,6 +93,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(RepositoryBuildLauncher.class);
     binder.bind(ModuleBuildLauncher.class);
     binder.bind(SingularityBuildLauncher.class);
+    binder.bind(BlazarUrlHelper.class);
 
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
     for (Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {
@@ -142,6 +150,19 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     }).build();
 
     return new NingAsyncHttpClient(config);
+  }
+
+
+  @Provides
+  @com.google.inject.Singleton
+  public HttpClient provideHttpClient(ObjectMapper objectMapper) {
+    return new NingHttpClient(HttpConfig.newBuilder().setMaxRetries(5).setObjectMapper(objectMapper).build());
+  }
+
+  @Provides
+  @Singleton
+  public SlackClient providesSlackClient(AsyncHttpClient asyncHttpClient, BlazarConfiguration blazarConfiguration, ObjectMapper objectMapper, HttpClient httpClient) {
+    return new SlackClient(asyncHttpClient, blazarConfiguration, objectMapper, httpClient);
   }
 
   public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {

@@ -135,3 +135,19 @@ TRUNCATE TABLE `repo_builds`;
 TRUNCATE TABLE `module_builds`;
 
 TRUNCATE TABLE `malformed_files`;
+
+--changeset jgoodwin:5 dbms:h2
+CREATE TABLE `instant_message_configs` (
+  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `branchId` BIGINT(20) UNSIGNED NOT NULL,
+  `moduleId` BIGINT(20) UNSIGNED,
+  `channelName` varchar(21),
+  `onFinish` TINYINT(1),
+  `onFail` TINYINT(1),
+  `onChange` TINYINT(1),
+  `onRecover` TINYINT(1),
+  `active` TINYINT(1),
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX (`channelName`, `branchId`, `moduleId`),
+  INDEX (`channelName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

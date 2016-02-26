@@ -24,6 +24,8 @@ public class BuildVisitorModule implements Module {
     repositoryBuildVisitors.addBinding().to(CompletedRepositoryBuildVisitor.class);
     // update GitHub status
     repositoryBuildVisitors.addBinding().to(GitHubStatusVisitor.class);
+    // send Slack notifications
+    repositoryBuildVisitors.addBinding().to(SlackNotificationVisitor.class);
 
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder, ModuleBuildVisitor.class);
 
@@ -39,5 +41,7 @@ public class BuildVisitorModule implements Module {
     moduleBuildVisitors.addBinding().to(DownstreamModuleBuildCanceller.class);
     // complete the repository build once all of the module builds have finished
     moduleBuildVisitors.addBinding().to(RepositoryBuildCompleter.class);
+    // send Slack notifications
+    moduleBuildVisitors.addBinding().to(SlackNotificationVisitor.class);
   }
 }

@@ -83,10 +83,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>in.ashwanthkumar</groupId>
-      <artifactId>slack-java-webhook</artifactId>
-    </dependency>
     <!-- for jade and jets3t -->
     <dependency>
       <groupId>org.slf4j</groupId>

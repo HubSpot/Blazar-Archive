@@ -47,7 +47,7 @@ public class BlazarConfiguration extends Configuration {
 
   @Valid
   @JsonProperty("slack_blazar")
-  private Optional<SlackConfiguration> slackConfiguration = Optional.absent();
+  private Optional<BlazarSlackConfiguration> slackConfiguration = Optional.absent();
 
   private Set<String> whitelist = Collections.emptySet();
 
@@ -107,11 +107,11 @@ public class BlazarConfiguration extends Configuration {
     return this;
   }
 
-  public Optional<SlackConfiguration> getSlackConfiguration() {
+  public Optional<BlazarSlackConfiguration> getSlackConfiguration() {
     return slackConfiguration;
   }
 
-  public void setSlackConfiguration(Optional<SlackConfiguration> slackConfiguration) {
+  public void setSlackConfiguration(Optional<BlazarSlackConfiguration> slackConfiguration) {
     this.slackConfiguration = slackConfiguration;
   }
 
