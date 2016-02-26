@@ -15,7 +15,7 @@ import com.hubspot.blazar.data.dao.MalformedFileDao;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
-import com.hubspot.blazar.data.dao.SlackConfigurationDao;
+import com.hubspot.blazar.data.dao.InstantMessageConfigurationDao;
 import com.hubspot.blazar.data.dao.StateDao;
 import com.hubspot.guice.transactional.DataSourceLocator;
 import com.hubspot.guice.transactional.TransactionalDataSource;
@@ -40,7 +40,7 @@ public class BlazarDaoModule extends AbstractModule {
     bindDao(binder(), ModuleBuildDao.class);
     bindDao(binder(), DependenciesDao.class);
     bindDao(binder(), MalformedFileDao.class);
-    bindDao(binder(), SlackConfigurationDao.class);
+    bindDao(binder(), InstantMessageConfigurationDao.class);
   }
 
   private static <T> void bindDao(Binder binder, Class<T> type) {

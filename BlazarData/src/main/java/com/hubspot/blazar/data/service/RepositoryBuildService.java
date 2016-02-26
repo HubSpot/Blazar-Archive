@@ -59,7 +59,6 @@ public class RepositoryBuildService {
     return repositoryBuildDao.getPreviousBuild(build);
   }
 
-
   public long enqueue(GitInfo gitInfo, BuildTrigger trigger, BuildOptions buildOptions) {
     BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
 

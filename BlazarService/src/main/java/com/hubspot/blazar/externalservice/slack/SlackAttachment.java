@@ -1,4 +1,4 @@
-package com.hubspot.blazar.base.externalservice.slack;
+package com.hubspot.blazar.externalservice.slack;
 
 import java.util.List;
 

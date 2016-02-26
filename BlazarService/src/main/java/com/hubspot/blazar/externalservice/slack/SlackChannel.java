@@ -1,4 +1,4 @@
-package com.hubspot.blazar.base.externalservice.slack;
+package com.hubspot.blazar.externalservice.slack;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

@@ -35,7 +35,7 @@ import com.hubspot.blazar.resources.FeedbackResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
-import com.hubspot.blazar.resources.SlackConfigurationResource;
+import com.hubspot.blazar.resources.InstantMessageResource;
 import com.hubspot.blazar.util.BlazarUrlHelper;
 import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
@@ -78,8 +78,9 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(ModuleBuildResource.class);
     binder.bind(RepositoryBuildResource.class);
     binder.bind(BuildHistoryResource.class);
+    binder.bind(InstantMessageResource.class);
     binder.bind(FeedbackResource.class);
-    binder.bind(SlackConfigurationResource.class);
+
 
     binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
     binder.bind(PropertyFilteringMessageBodyWriter.class)

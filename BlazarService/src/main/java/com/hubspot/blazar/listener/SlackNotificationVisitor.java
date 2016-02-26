@@ -15,17 +15,17 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.externalservice.slack.SlackAttachment;
-import com.hubspot.blazar.base.externalservice.slack.SlackAttachmentField;
-import com.hubspot.blazar.base.externalservice.slack.SlackMessage;
-import com.hubspot.blazar.base.slack.SlackConfiguration;
+import com.hubspot.blazar.externalservice.slack.SlackAttachment;
+import com.hubspot.blazar.externalservice.slack.SlackAttachmentField;
+import com.hubspot.blazar.externalservice.slack.SlackMessage;
+import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.data.service.SlackConfigurationService;
+import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.util.BlazarUrlHelper;
 
@@ -37,7 +37,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   private static final Set<ModuleBuild.State> FAILED_MODULE_STATES = ImmutableSet.of(ModuleBuild.State.CANCELLED, ModuleBuild.State.FAILED);
   private static final Optional<String> ABSENT_STRING = Optional.absent();
 
-  private SlackConfigurationService slackConfigurationService;
+  private InstantMessageConfigurationService instantMessageConfigurationService;
   private final BranchService branchService;
   private ModuleService moduleService;
   private final ModuleBuildService moduleBuildService;
@@ -46,14 +46,14 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   private final RepositoryBuildService repositoryBuildService;
 
   @Inject
-  public SlackNotificationVisitor(SlackConfigurationService slackConfigurationService,
+  public SlackNotificationVisitor(InstantMessageConfigurationService instantMessageConfigurationService,
                                   BranchService branchService,
                                   ModuleService moduleService,
                                   ModuleBuildService moduleBuildService,
                                   BlazarUrlHelper blazarUrlHelper,
                                   SlackClient slackClient,
                                   RepositoryBuildService repositoryBuildService) {
-    this.slackConfigurationService = slackConfigurationService;
+    this.instantMessageConfigurationService = instantMessageConfigurationService;
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.moduleBuildService = moduleBuildService;
@@ -65,39 +65,39 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   @Override
   public void visit(RepositoryBuild build) throws Exception {
-    Set<SlackConfiguration> configurationSet = slackConfigurationService.getAllWithBranchId(build.getBranchId());
+    Set<InstantMessageConfiguration> configurationSet = instantMessageConfigurationService.getAllWithBranchId(build.getBranchId());
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
-    for (SlackConfiguration slackConfiguration : configurationSet) {
-      if (shouldSend(slackConfiguration, build.getState(), previous)) {
+    for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
+      if (shouldSend(instantMessageConfiguration, build.getState(), previous)) {
         GitInfo gitInfo = branchService.get(build.getBranchId()).get();
-        sendSlackMessage(slackConfiguration, build, gitInfo);
+        sendSlackMessage(instantMessageConfiguration, build, gitInfo);
       }
     }
   }
 
-  private boolean shouldSend(SlackConfiguration slackConfiguration, RepositoryBuild.State state, Optional<RepositoryBuild> previous) {
+  private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild.State state, Optional<RepositoryBuild> previous) {
     // OnChange
     boolean changedState = previous.isPresent() && previous.get().getState() == state;
-    if (slackConfiguration.getOnChange() && changedState) {
+    if (instantMessageConfiguration.getOnChange() && changedState) {
       return true;
     }
     // OnFinish
-    if (slackConfiguration.getOnFinish() && state.isComplete()) {
+    if (instantMessageConfiguration.getOnFinish() && state.isComplete()) {
       return true;
     }
     // OnRecovery
     boolean previousFailed = previous.isPresent() && previous.get().getState().isComplete() && previous.get().getState() == RepositoryBuild.State.SUCCEEDED;
-    if (slackConfiguration.getOnRecover() && previousFailed && state == RepositoryBuild.State.SUCCEEDED) {
+    if (instantMessageConfiguration.getOnRecover() && previousFailed && state == RepositoryBuild.State.SUCCEEDED) {
       return true;
     }
     // OnFailure
-    if (slackConfiguration.getOnFail() && FAILED_REPO_STATES.contains(state)) {
+    if (instantMessageConfiguration.getOnFail() && FAILED_REPO_STATES.contains(state)) {
       return true;
     }
     return false;
   }
 
-  private void sendSlackMessage(SlackConfiguration slackConfiguration, RepositoryBuild build, GitInfo gitInfo) {
+  private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build, GitInfo gitInfo) {
     String fallback = String.format("Module Build %s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), build.getState().toString().toLowerCase());
     Optional<String> color = ABSENT_STRING;
     switch (build.getState()) {
@@ -119,27 +119,27 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
     SlackAttachment attachment = new SlackAttachment(fallback, color, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, title, link, ABSENT_STRING, Collections.<SlackAttachmentField>emptyList(), ABSENT_STRING);
-    SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, slackConfiguration.getChannelName(), Lists.newArrayList(attachment));
+    SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, instantMessageConfiguration.getChannelName(), Lists.newArrayList(attachment));
     slackClient.sendMessage(message);
   }
 
 
   @Override
   public void visit(ModuleBuild build) throws Exception {
-    Set<SlackConfiguration> configurationSet = slackConfigurationService.getAllWithModuleId(build.getModuleId());
+    Set<InstantMessageConfiguration> configurationSet = instantMessageConfigurationService.getAllWithModuleId(build.getModuleId());
     Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
-    for (SlackConfiguration slackConfiguration : configurationSet) {
-      if (shouldSend(slackConfiguration, build.getState(), previous, build)) {
+    for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
+      if (shouldSend(instantMessageConfiguration, build.getState(), previous, build)) {
         Optional<GitInfo> gitInfo = branchService.get(repositoryBuildService.get(build.getRepoBuildId()).get().getBranchId());
         if (!gitInfo.isPresent()) {
-          throw new IllegalArgumentException(String.format("Tried to send slack message for moduleBuild %s with no associated branch", build.getId().get()));
+          throw new IllegalArgumentException(String.format("Tried to send IM for moduleBuild %s with no associated branch", build.getId().get()));
         }
-        sendSlackMessage(slackConfiguration, build, gitInfo.get());
+        sendSlackMessage(instantMessageConfiguration, build, gitInfo.get());
       }
     }
   }
 
-  private void sendSlackMessage(SlackConfiguration slackConfiguration, ModuleBuild build, GitInfo gitInfo) {
+  private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild build, GitInfo gitInfo) {
     Module module = moduleService.get(build.getModuleId()).get();
     String fallback = String.format("Module Build %s-%s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), module.getName(), build.getState().toString().toLowerCase());
     Optional<String> color = ABSENT_STRING;
@@ -162,34 +162,34 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
     SlackAttachment attachment = new SlackAttachment(fallback, color, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, title, link, ABSENT_STRING, Collections.<SlackAttachmentField>emptyList(), ABSENT_STRING);
-    SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, slackConfiguration.getChannelName(), Lists.newArrayList(attachment));
+    SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, instantMessageConfiguration.getChannelName(), Lists.newArrayList(attachment));
     slackClient.sendMessage(message);
   }
 
-  private boolean shouldSend(SlackConfiguration slackConfiguration, ModuleBuild.State state, Optional<ModuleBuild> previous, ModuleBuild thisBuild) {
+  private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild.State state, Optional<ModuleBuild> previous, ModuleBuild thisBuild) {
     final String logBase = String.format("Not sending Slack notification: ModuleBuild %s,", String.valueOf(thisBuild.getId()));
     // OnChange
     boolean changedState = previous.isPresent() && previous.get().getState() == state;
-    if (slackConfiguration.getOnChange() && changedState) {
+    if (instantMessageConfiguration.getOnChange() && changedState) {
       return true;
     }
-    LOG.info("{} OnChange {}, changedState {}", logBase, slackConfiguration.getOnChange(), changedState);
+    LOG.info("{} OnChange {}, changedState {}", logBase, instantMessageConfiguration.getOnChange(), changedState);
     // OnFinish
-    if (slackConfiguration.getOnFinish() && state.isComplete()) {
+    if (instantMessageConfiguration.getOnFinish() && state.isComplete()) {
       return true;
     }
-    LOG.info("{} OnFinish {}, isComplete {}", logBase, slackConfiguration.getOnFinish(), state.isComplete());
+    LOG.info("{} OnFinish {}, isComplete {}", logBase, instantMessageConfiguration.getOnFinish(), state.isComplete());
     // OnRecovery
     boolean previousFailed = previous.isPresent() && previous.get().getState().isComplete() && previous.get().getState() == ModuleBuild.State.SUCCEEDED;
-    if (slackConfiguration.getOnRecover() && previousFailed && state == ModuleBuild.State.SUCCEEDED) {
+    if (instantMessageConfiguration.getOnRecover() && previousFailed && state == ModuleBuild.State.SUCCEEDED) {
       return true;
     }
-    LOG.info("{} OnRecover {}, previousFailed {}, thisFailed {}", logBase, slackConfiguration.getOnRecover(), previousFailed, state == ModuleBuild.State.SUCCEEDED);
+    LOG.info("{} OnRecover {}, previousFailed {}, thisFailed {}", logBase, instantMessageConfiguration.getOnRecover(), previousFailed, state == ModuleBuild.State.SUCCEEDED);
     // OnFailure
-    if (slackConfiguration.getOnFail() && FAILED_MODULE_STATES.contains(state)) {
+    if (instantMessageConfiguration.getOnFail() && FAILED_MODULE_STATES.contains(state)) {
       return true;
     }
-    LOG.info("{} onFail {}, thisFailed {}", logBase, slackConfiguration.getOnFail(), FAILED_MODULE_STATES.contains(state));
+    LOG.info("{} onFail {}, thisFailed {}", logBase, instantMessageConfiguration.getOnFail(), FAILED_MODULE_STATES.contains(state));
 
     return false;
   }

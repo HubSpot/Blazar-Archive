@@ -1,4 +1,4 @@
-package com.hubspot.blazar.base.slack;
+package com.hubspot.blazar.base.notifications;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 
-public class SlackConfiguration {
+public class InstantMessageConfiguration {
 
   private final Optional<Long> id;
   private final long branchId;
@@ -19,15 +19,15 @@ public class SlackConfiguration {
   private final boolean active;
 
   @JsonCreator
-  public SlackConfiguration(@JsonProperty("id") Optional<Long> id,
-                            @JsonProperty("branchId") long branchId,
-                            @JsonProperty("moduleId") Optional<Long> moduleId,
-                            @JsonProperty("channelName") String channelName,
-                            @JsonProperty("onFinish") boolean onFinish,
-                            @JsonProperty("onFail") boolean onFail,
-                            @JsonProperty("onChange") boolean onChange,
-                            @JsonProperty("onRecover") boolean onRecover,
-                            @JsonProperty("active") Optional<Boolean> active) {
+  public InstantMessageConfiguration(@JsonProperty("id") Optional<Long> id,
+                                     @JsonProperty("branchId") long branchId,
+                                     @JsonProperty("moduleId") Optional<Long> moduleId,
+                                     @JsonProperty("channelName") String channelName,
+                                     @JsonProperty("onFinish") boolean onFinish,
+                                     @JsonProperty("onFail") boolean onFail,
+                                     @JsonProperty("onChange") boolean onChange,
+                                     @JsonProperty("onRecover") boolean onRecover,
+                                     @JsonProperty("active") Optional<Boolean> active) {
     this.id = id;
     this.branchId = branchId;
     this.moduleId = moduleId;
@@ -79,8 +79,5 @@ public class SlackConfiguration {
   public boolean isActive() {
     return active;
   }
-
-
-
 }
 

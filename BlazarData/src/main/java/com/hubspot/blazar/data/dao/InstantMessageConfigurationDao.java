@@ -10,30 +10,30 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
 import com.google.common.base.Optional;
-import com.hubspot.blazar.base.slack.SlackConfiguration;
+import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
-public interface SlackConfigurationDao {
+public interface InstantMessageConfigurationDao {
 
   @SqlQuery("SELECT * FROM slack_configs WHERE active = 1")
-  Set<SlackConfiguration> getAll();
+  Set<InstantMessageConfiguration> getAll();
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM slack_configs WHERE id = :id")
-  Optional<SlackConfiguration> get(@Bind("id") long id);
+  Optional<InstantMessageConfiguration> get(@Bind("id") long id);
 
   @SqlQuery("SELECT * FROM slack_configs WHERE branchId = :branchId and moduleId is NULL and active = 1")
-  Set<SlackConfiguration> getAllWithBranchId(@Bind("branchId") long branchId);
+  Set<InstantMessageConfiguration> getAllWithBranchId(@Bind("branchId") long branchId);
 
   @SqlQuery("SELECT * FROM slack_configs WHERE moduleId = :moduleId and active = 1")
-  Set<SlackConfiguration> getAllWithModuleId(@Bind("moduleId") long moduleId);
+  Set<InstantMessageConfiguration> getAllWithModuleId(@Bind("moduleId") long moduleId);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO slack_configs (branchId, moduleId, channelName, onFinish, onFail, onChange, onRecover, active) VALUES (:branchId, :moduleId, :channelName, :onFinish, :onFail, :onChange, :onRecover, :active)")
-  long insert(@BindWithRosetta SlackConfiguration slackConfiguration);
+  long insert(@BindWithRosetta InstantMessageConfiguration instantMessageConfiguration);
 
   @SqlUpdate("INSERT INTO slack_configs (branchId, moduleId, channelName, onFinish, onFail, onChange, onRecover, active) VALUES (:branchId, :moduleId, :channelName, :onFinish, :onFail, :onChange, :onRecover, :active)")
-  int update(@BindWithRosetta SlackConfiguration slackConfiguration);
+  int update(@BindWithRosetta InstantMessageConfiguration instantMessageConfiguration);
 
   @SqlUpdate("UPDATE slack_configs SET active = 0 WHERE id = :id")
   int delete(@Bind("id") long id);
