@@ -32,8 +32,9 @@ public class InstantMessageConfigurationService {
     return instantMessageConfigurationDao.getAllWithModuleId(moduleId);
   }
 
-  public long insert(InstantMessageConfiguration instantMessageConfiguration) {
-    return instantMessageConfigurationDao.insert(instantMessageConfiguration);
+  public InstantMessageConfiguration insert(InstantMessageConfiguration instantMessageConfiguration) {
+    long id = instantMessageConfigurationDao.insert(instantMessageConfiguration);
+    return instantMessageConfiguration.withNewId(id);
   }
 
   public int update(InstantMessageConfiguration instantMessageConfiguration) {

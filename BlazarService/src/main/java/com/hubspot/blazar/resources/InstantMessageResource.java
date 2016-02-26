@@ -17,9 +17,9 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
-import com.hubspot.blazar.externalservice.slack.SlackChannel;
 import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
+import com.hubspot.blazar.externalservice.slack.SlackChannel;
 import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
@@ -28,13 +28,11 @@ import com.hubspot.jackson.jaxrs.PropertyFiltering;
 @Consumes(MediaType.APPLICATION_JSON)
 public class InstantMessageResource {
 
-
   private final SlackClient slackClient;
   private InstantMessageConfigurationService instantMessageConfigurationService;
 
   @Inject
-  public InstantMessageResource(SlackClient slackClient,
-                                InstantMessageConfigurationService instantMessageConfigurationService) {
+  public InstantMessageResource(SlackClient slackClient, InstantMessageConfigurationService instantMessageConfigurationService) {
     this.slackClient = slackClient;
     this.instantMessageConfigurationService = instantMessageConfigurationService;
   }
@@ -46,23 +44,21 @@ public class InstantMessageResource {
     return instantMessageConfigurationService.getAll();
   }
 
-  @PUT
-  @Path("/configurations")
-  public Optional<InstantMessageConfiguration> insert(InstantMessageConfiguration instantMessageConfiguration) {
-    long id = instantMessageConfigurationService.insert(instantMessageConfiguration);
-    return instantMessageConfigurationService.get(id);
-  }
-
   @POST
   @Path("/configurations")
-  public Optional<InstantMessageConfiguration> update(InstantMessageConfiguration instantMessageConfiguration) {
-    instantMessageConfigurationService.update(instantMessageConfiguration);
-    return instantMessageConfigurationService.get(instantMessageConfiguration.getId().get());
+  public InstantMessageConfiguration insert(InstantMessageConfiguration instantMessageConfiguration) {
+    return instantMessageConfigurationService.insert(instantMessageConfiguration);
+  }
+
+  @PUT
+  @Path("/configurations/{id}")
+  public void update(InstantMessageConfiguration instantMessageConfiguration, @PathParam("id") long id) {
+    instantMessageConfigurationService.update(instantMessageConfiguration.withNewId(id));
   }
 
   @DELETE
-  @Path("/configurations")
-  public void delete(long id) {
+  @Path("/configurations/{id}")
+  public void delete(@PathParam("id") long id) {
     instantMessageConfigurationService.delete(id);
   }
 

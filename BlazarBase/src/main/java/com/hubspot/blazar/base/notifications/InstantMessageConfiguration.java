@@ -39,6 +39,11 @@ public class InstantMessageConfiguration {
     this.active = active.isPresent() ? active.get() : true;
   }
 
+  @JsonIgnore
+  public InstantMessageConfiguration withNewId(long id) {
+    return new InstantMessageConfiguration(Optional.of(id), branchId, moduleId, channelName, onFinish, onFail, onChange, onRecover, Optional.of(active));
+  }
+
   public Optional<Long> getId() {
     return id;
   }
