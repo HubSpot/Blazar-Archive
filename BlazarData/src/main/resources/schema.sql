@@ -137,7 +137,7 @@ TRUNCATE TABLE `module_builds`;
 TRUNCATE TABLE `malformed_files`;
 
 --changeset jgoodwin:5 dbms:h2
-CREATE TABLE `slack_configs` (
+CREATE TABLE `instant_message_configs` (
   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `branchId` BIGINT(20) UNSIGNED NOT NULL,
   `moduleId` BIGINT(20) UNSIGNED,
