@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {RouteHandler} from 'react-router';
 import SidebarContainer from '../components/sidebar/SidebarContainer.jsx';
 import FeedbackForm from '../components/feedback/FeedbackForm.jsx';
 import Modal from 'react-bootstrap/lib/Modal';
@@ -55,11 +54,12 @@ class App extends Component {
 
   render() {
     const modal = this.apiModal();
+
     return (
       <div>
         <div className="page-wrapper">
           <SidebarContainer/>
-          <RouteHandler/>
+          {this.props.children}
         </div>
         <FeedbackForm/>
         {modal}

@@ -46,7 +46,7 @@ class SidebarFilter extends Component {
 }
 
 SidebarFilter.contextTypes = {
-  router: PropTypes.func.isRequired
+  router: PropTypes.object.isRequired
 };
 
 SidebarFilter.propTypes = {
