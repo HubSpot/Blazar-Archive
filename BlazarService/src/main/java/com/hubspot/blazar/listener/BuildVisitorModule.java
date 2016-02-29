@@ -26,6 +26,8 @@ public class BuildVisitorModule implements Module {
     repositoryBuildVisitors.addBinding().to(GitHubStatusVisitor.class);
     // send Slack notifications
     repositoryBuildVisitors.addBinding().to(SlackNotificationVisitor.class);
+    // monitor repo build state changes
+    repositoryBuildVisitors.addBinding().to(MetricBuildVisitor.class);
 
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder, ModuleBuildVisitor.class);
 
@@ -43,5 +45,7 @@ public class BuildVisitorModule implements Module {
     moduleBuildVisitors.addBinding().to(RepositoryBuildCompleter.class);
     // send Slack notifications
     moduleBuildVisitors.addBinding().to(SlackNotificationVisitor.class);
+    // monitor module build state changes
+    moduleBuildVisitors.addBinding().to(MetricBuildVisitor.class);
   }
 }
