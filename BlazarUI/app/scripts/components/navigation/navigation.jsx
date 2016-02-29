@@ -5,7 +5,7 @@ import Image from '../shared/Image.jsx';
 class Navigation extends Component {
 
   render() {
-    const imgPath = `${window.config.staticRoot}/images/blazar-logo.png`;
+    const imgPath = `${window.config.staticRoot}/images/blazar-logo.ng`;
 
     return (
         <nav id='primary-nav' className="navbar navbar-default navbar-dark" role="navigation">

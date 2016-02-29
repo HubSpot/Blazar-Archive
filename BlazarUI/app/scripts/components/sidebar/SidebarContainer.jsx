@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import {bindAll, has, debounce} from 'underscore';
 import Immutable from 'immutable';

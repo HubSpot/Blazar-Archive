@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import { Link } from 'react-router';
+import { IndexLink } from 'react-router';
 import Image from '../shared/Image.jsx';
 import Classnames from 'classnames';
 
@@ -16,9 +16,9 @@ class Logo extends Component {
     const imgPath = `${window.config.staticRoot}/images/blazar-logo.png`;
     return (
       <div className={this.getRenderedClassNames()}>
-        <Link to="dashboard">
+        <IndexLink to="/">
           <Image classNames="logo-image" src={imgPath} />
-        </Link>
+        </IndexLink>
       </div>
     );
   }

@@ -5,8 +5,10 @@ import SidebarToggle from './SidebarToggle.jsx';
 
 class SidebarFilter extends Component {
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
+
+    console.log(context);
 
     this.state = {
       inputValue: ''
@@ -44,6 +46,10 @@ class SidebarFilter extends Component {
 
   }
 }
+
+SidebarFilter.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 SidebarFilter.propTypes = {
   updateResults: PropTypes.func.isRequired,
