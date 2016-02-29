@@ -19,15 +19,27 @@ public class MetricBuildVisitor implements ModuleBuildVisitor, RepositoryBuildVi
   @Inject
   public MetricBuildVisitor(MetricRegistry metricRegistry){
     this.metricRegistry = metricRegistry;
+    for (ModuleBuild.State state : ModuleBuild.State.values()) {
+      metricRegistry.register(makeMetricName(ModuleBuild.class, state), new Meter());
+    }
+
+    for (RepositoryBuild.State state : RepositoryBuild.State.values()) {
+      metricRegistry.register(makeMetricName(RepositoryBuild.class, state), new Meter());
+    }
   }
 
   public void visit(ModuleBuild moduleBuild) {
     SortedMap<String, Meter> meters = metricRegistry.getMeters();
-    meters.get(moduleBuild.getClass().getName() + "." + moduleBuild.getState().name().toLowerCase()).mark();
+    meters.get(makeMetricName(ModuleBuild.class, moduleBuild.getState())).mark();
   }
 
   public void visit(RepositoryBuild repositoryBuild) {
     SortedMap<String, Meter> meters = metricRegistry.getMeters();
-    meters.get(repositoryBuild.getClass().getName() + "." + repositoryBuild.getState().name().toLowerCase()).mark();
+    meters.get(makeMetricName(RepositoryBuild.class, repositoryBuild.getState())).mark();
+  }
+
+
+  private static String makeMetricName(Class<?> buildClass, Enum<?> state) {
+    return buildClass.getName() + "." + state.name();
   }
 }
