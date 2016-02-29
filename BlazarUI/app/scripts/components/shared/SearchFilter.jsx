@@ -14,7 +14,7 @@ class SearchFilter extends Component {
 
   componentWillMount() {
     this.handleSearchDebounced = debounce(function () {
-      this.props.onChange(this.refs.searchFilterInput.getDOMNode().value);
+      this.props.onChange(this.refs.searchFilterInput.value);
     }, 250);
   }
     
@@ -28,13 +28,14 @@ class SearchFilter extends Component {
   }
 
   focusInput() {
-    this.refs.searchFilterInput.getDOMNode().focus();
+    this.refs.searchFilterInput.focus();
   }
 
   handleChange() {    
     this.setState({
-      searchValue: this.refs.searchFilterInput.getDOMNode().value
+      searchValue: this.refs.searchFilterInput.value
     });
+    
     this.handleSearchDebounced();
   }
 

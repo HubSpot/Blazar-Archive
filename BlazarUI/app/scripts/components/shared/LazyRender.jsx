@@ -25,7 +25,7 @@ let LazyRender = React.createClass({
   },
 
   onScroll: function() {
-    let container = this.refs.container.getDOMNode();
+    let container = this.refs.container;
     let scrollTop = container.scrollTop;
 
     let childrenTop = Math.floor(scrollTop / this.state.childHeight);
@@ -133,13 +133,12 @@ let LazyRender = React.createClass({
     }
 
     let firstChild = this.refs['child-0'];
-    let el = React.findDOMNode(firstChild);
 
-    if (el === null) {
+    if (firstChild === null) {
       return this.props.maxHeight;
     }
 
-    return this.getElementHeight(el);
+    return this.getElementHeight(firstChild);
   },
 
   render: function() {
@@ -158,17 +157,30 @@ let LazyRender = React.createClass({
       return child;
     });
 
+    let childHeightTop = this.state.childrenTop * this.state.childHeight;
+    let childHeightBottom = this.state.childrenBottom * this.state.childHeight;
+
+    if (isNaN(childHeightTop)) {
+      childHeightTop = null;
+    }
+
+    if (isNaN(childHeightBottom)) {
+      childHeightBottom = null;
+    }
+
     children.unshift(
       <div style={
-        { height: this.state.childrenTop * this.state.childHeight }
+        { height: childHeightTop }
       } key="top"></div>
     );
 
     children.push(
       <div style={
-        { height: this.state.childrenBottom * this.state.childHeight }
+        { height: childHeightBottom }
       } key="bottom"></div>
     );
+
+    let height = isNaN(this.state.height) ? null : this.state.height;
 
     return (
       <div
@@ -178,7 +190,7 @@ let LazyRender = React.createClass({
         onMouseOut={() => {
           document.body.style.overflow = 'auto';
         }}
-        style={{ height: this.state.height, overflowY: 'auto' }}
+        style={{ height: height, overflowY: 'auto' }}
         className={this.props.className}
         ref="container"
         onScroll={this.onScroll}>

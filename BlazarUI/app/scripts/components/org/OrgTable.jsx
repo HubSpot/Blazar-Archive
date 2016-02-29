@@ -3,6 +3,7 @@ import TableMaker from '../shared/TableMaker.jsx';
 import OrgTableRow from './OrgTableRow.jsx';
 import EmptyMessage from '../shared/EmptyMessage.jsx';
 import Loader from '../shared/Loader.jsx';
+import Immutable from 'immutable';
 
 class OrgTable extends Component {
 
@@ -21,7 +22,7 @@ class OrgTable extends Component {
 
     return this.props.buildTable({
       data: this.props.repos,
-      columnNames: [' ', 'Repository', 'Latest Master Build', 'Start Time', 'Duration', 'Commit', ' '],
+      columnNames: [' ', 'Repository', 'Latest Master Build', 'Start Time', 'Duration', 'Commit'],
       rowComponent: OrgTableRow
     });
   }
@@ -29,7 +30,7 @@ class OrgTable extends Component {
 
 OrgTable.propTypes = {
   loading: PropTypes.bool,
-  repos: PropTypes.array.isRequired
+  repos: PropTypes.instanceOf(Immutable.List).isRequired
 };
 
 export default TableMaker(OrgTable, {showProgress: false});

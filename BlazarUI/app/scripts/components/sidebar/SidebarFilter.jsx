@@ -8,8 +8,6 @@ class SidebarFilter extends Component {
   constructor(props, context) {
     super(props, context);
 
-    console.log(context);
-
     this.state = {
       inputValue: ''
     };

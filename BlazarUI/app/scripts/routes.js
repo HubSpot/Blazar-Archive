@@ -19,15 +19,11 @@ function pagePath(path) {
 const routes = (
   <Route name='app' path='/' component={ App }>
     <IndexRoute name='dashboard' component={ Dashboard } />
-    <Route name='org' path={pagePath('/builds/:host/:org')} component={Org}>
-      <Route name='repo' path={pagePath('/builds/:host/:org/:repo')} component={Repo}>
-        <Route name='branch' path={pagePath('/builds/:host/:org/:repo/:branch')} component={Branch}>
-          <Route name='repoBuild' path={pagePath('/builds/:host/:org/:repo/:branch/:buildNumber')} component={RepoBuild}>
-            <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/:buildNumber/:moduleName')} component={Build}/>
-          </Route>
-        </Route>
-      </Route>
-    </Route>
+    <Route name='org' path={pagePath('/builds/:host/:org')} component={Org} />
+    <Route name='repo' path={pagePath('/builds/:host/:org/:repo')} component={Repo} />
+    <Route name='branch' path={pagePath('/builds/:host/:org/:repo/:branch')} component={Branch} />
+    <Route name='repoBuild' path={pagePath('/builds/:host/:org/:repo/:branch/:buildNumber')} component={RepoBuild} />
+    <Route name='build' path={pagePath('/builds/:host/:org/:repo/:branch/:buildNumber/:moduleName')} component={Build} />
     <Route name='notFound' path="*" component={ NotFound } />
   </Route>
 );
