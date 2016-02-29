@@ -1,7 +1,5 @@
 package com.hubspot.blazar.listener;
 
-import java.util.SortedMap;
-
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Inject;
@@ -29,13 +27,11 @@ public class MetricBuildVisitor implements ModuleBuildVisitor, RepositoryBuildVi
   }
 
   public void visit(ModuleBuild moduleBuild) {
-    SortedMap<String, Meter> meters = metricRegistry.getMeters();
-    meters.get(makeMetricName(ModuleBuild.class, moduleBuild.getState())).mark();
+    metricRegistry.meter(makeMetricName(ModuleBuild.class, moduleBuild.getState())).mark();
   }
 
   public void visit(RepositoryBuild repositoryBuild) {
-    SortedMap<String, Meter> meters = metricRegistry.getMeters();
-    meters.get(makeMetricName(RepositoryBuild.class, repositoryBuild.getState())).mark();
+    metricRegistry.meter(makeMetricName(RepositoryBuild.class, repositoryBuild.getState())).mark();
   }
 
 
