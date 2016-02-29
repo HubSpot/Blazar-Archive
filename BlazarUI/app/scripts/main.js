@@ -13,5 +13,5 @@ render(
 	<Router history={browserHistory}>
 		{routes}
 	</Router>, 
-	document.getElementById('new-app-container')
+	document.getElementById('app')
 );
