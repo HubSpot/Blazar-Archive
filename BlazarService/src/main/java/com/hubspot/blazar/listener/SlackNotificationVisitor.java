@@ -98,7 +98,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   }
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build, GitInfo gitInfo) {
-    String fallback = String.format("Module Build %s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), build.getState().toString().toLowerCase());
+    String fallback = String.format("Repository Build %s-%s finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), build.getState().toString().toLowerCase());
     Optional<String> color = ABSENT_STRING;
     switch (build.getState()) {
       case SUCCEEDED:
