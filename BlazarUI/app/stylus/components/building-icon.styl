@@ -2,11 +2,6 @@
 
 buildStatus(color)
   color color
-  
-buildInProgressStatus(color)
-  buildStatus(color)
-  opacity 0
-  animation: blink 1.5s ease-in 0s infinite
 
 .building-icon
   display block
@@ -18,21 +13,6 @@ buildInProgressStatus(color)
 .building-icon-inner--small
   width 10px
   height 10px
-
-.building-icon--IN_PROGRESS-laststatus-SUCCEEDED
-  buildInProgressStatus($success)
-  
-.building-icon--IN_PROGRESS-laststatus-CANCELLED
-  buildInProgressStatus($warning)
-  
-.building-icon--IN_PROGRESS-laststatus-FAILED, .building-icon--IN_PROGRESS-laststatus-UNSTABLE
-  buildInProgressStatus($danger)
-  
-.building-icon--IN_PROGRESS-laststatus-SKIPPED
-  buildInProgressStatus($skipped)
-
-.building-icon--IN_PROGRESS-laststatus-never-built
-  buildInProgressStatus($default)
 
 .building-icon--IN_PROGRESS, .building-icon--QUEUED, .building-icon--LAUNCHING, .building-icon--WAITING_FOR_UPSTREAM_BUILD, .building-icon--WAITING_FOR_BUILD_SLOT
   buildStatus($info)
