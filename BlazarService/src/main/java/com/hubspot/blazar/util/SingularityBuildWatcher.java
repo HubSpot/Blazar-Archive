@@ -108,7 +108,6 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
                 } else {
                   metricRegistry.meter(getClass().getName() + ".failed").mark();
                 }
-
               }
             }
           }
