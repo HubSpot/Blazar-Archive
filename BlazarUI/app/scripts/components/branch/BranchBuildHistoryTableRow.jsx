@@ -16,8 +16,8 @@ let initialState = {
 
 class BranchBuildHistoryTableRow extends Component {
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
 
     this.state = initialState;
   }
@@ -34,6 +34,15 @@ class BranchBuildHistoryTableRow extends Component {
     this.setState({
       moment: moment()
     })
+  }
+
+  onTableClick(blazarPath, e) {
+    if (e.target.className === 'sha-link') {
+      window.open(e.target.href, '_blank');
+      return false;
+    }
+
+    this.context.router.push(blazarPath);
   }
 
   getRowClassNames(state) {
@@ -91,7 +100,7 @@ class BranchBuildHistoryTableRow extends Component {
     const {data, params} = this.props;
 
     return (
-      <tr className={this.getRowClassNames(data.state)}>
+      <tr onClick={this.onTableClick.bind(this, data.blazarPath)} className={this.getRowClassNames(data.state)}>
         <td className='build-status'>
           {buildResultIcon(data.state)}
         </td>
@@ -110,6 +119,10 @@ class BranchBuildHistoryTableRow extends Component {
       </tr>
     );
   }
+}
+
+BranchBuildHistoryTableRow.contextTypes = {
+  router: PropTypes.object.isRequired
 }
 
 BranchBuildHistoryTableRow.propTypes = {
