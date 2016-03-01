@@ -159,9 +159,8 @@ export const getPathname = function() {
 
 // To do: move these out as components in components/shared
 export const buildResultIcon = function(result, prevBuildState='') {
-  const classNames = getBuildStatusIconClassNames(result, prevBuildState);
-  const resultForIconSymbol = result != BuildStates.IN_PROGRESS ? result : prevBuildState != '' ? prevBuildState : BuildStates.IN_PROGRESS;
-  const iconNames = Immutable.List.of(iconStatus[resultForIconSymbol]);
+  const classNames = getBuildStatusIconClassNames(result);
+  const iconNames = Immutable.List.of(iconStatus[result]);
 
   return (
     <div className="table-icon-container">
@@ -174,16 +173,10 @@ export const buildResultIcon = function(result, prevBuildState='') {
   );
 };
 
-export const getBuildStatusIconClassNames = function(result, prevBuildState) {
-  let prevBuildStateModifier = ``;
-
-  if (result === BuildStates.IN_PROGRESS && prevBuildState) {
-    prevBuildStateModifier = `-laststatus-${prevBuildState}`;
-  }
-
+export const getBuildStatusIconClassNames = function(result) {
   return classNames([
     'building-icon',
-    `building-icon--${result}${prevBuildStateModifier}`
+    `building-icon--${result}`
   ]);
 };
 
