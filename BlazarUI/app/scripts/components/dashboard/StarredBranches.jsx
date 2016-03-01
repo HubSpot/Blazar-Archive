@@ -33,7 +33,7 @@ class StarredBranches extends Component {
         <Alert bsStyle='info'>
           <p>You have no starred branches.</p>
           <p>ProTip: Starring branches allows you to quickly navigate to them from the sidebar, as well as view recent build history in the dashboard. 
-            To star a branch, click on the branch name in the sidebar. Then, click the star next to the branch name.
+            To star a branch, click on the repository name in the sidebar. Then, click the star next to the branch name.
           </p>
         </Alert>
       );
