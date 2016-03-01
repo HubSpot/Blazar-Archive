@@ -22,10 +22,10 @@ public interface InstantMessageConfigurationDao {
   @SqlQuery("SELECT * FROM instant_message_configs WHERE id = :id")
   Optional<InstantMessageConfiguration> get(@Bind("id") long id);
 
-  @SqlQuery("SELECT * FROM instant_message_configs WHERE branchId = :branchId and moduleId is NULL and active = 1")
+  @SqlQuery("SELECT * FROM instant_message_configs WHERE branchId = :branchId AND moduleId IS NULL AND active = 1")
   Set<InstantMessageConfiguration> getAllWithBranchId(@Bind("branchId") long branchId);
 
-  @SqlQuery("SELECT * FROM instant_message_configs WHERE moduleId = :moduleId and active = 1")
+  @SqlQuery("SELECT * FROM instant_message_configs WHERE moduleId = :moduleId AND active = 1")
   Set<InstantMessageConfiguration> getAllWithModuleId(@Bind("moduleId") long moduleId);
 
   @GetGeneratedKeys
