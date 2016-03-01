@@ -1,18 +1,5 @@
 package com.hubspot.blazar.zookeeper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
-import com.google.inject.name.Named;
-import io.dropwizard.lifecycle.Managed;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
-import org.apache.curator.utils.ZKPaths;
-import org.apache.zookeeper.KeeperException.NoNodeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +13,23 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
+import org.apache.curator.utils.ZKPaths;
+import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
+import com.google.inject.name.Named;
+import io.dropwizard.lifecycle.Managed;
+
 @Singleton
 public class QueueProcessor implements LeaderLatchListener, Managed {
   private static final Logger LOG = LoggerFactory.getLogger(QueueProcessor.class);
@@ -34,6 +38,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
   private final CuratorFramework curatorFramework;
   private final ZooKeeperEventBus eventBus;
   private final ObjectMapper mapper;
+  private MetricRegistry metricRegistry;
   private final Set<Object> erroredItems;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
@@ -43,11 +48,13 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
                         CuratorFramework curatorFramework,
                         ZooKeeperEventBus eventBus,
                         ObjectMapper mapper,
+                        MetricRegistry metricRegistry,
                         Set<Object> erroredItems) {
     this.executorService = executorService;
     this.curatorFramework = curatorFramework;
     this.eventBus = eventBus;
     this.mapper = mapper;
+    this.metricRegistry = metricRegistry;
     this.erroredItems = erroredItems;
 
     this.running = new AtomicBoolean();
@@ -58,6 +65,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
   public void start() {
     running.set(true);
     executorService.scheduleAtFixedRate(new QueueManager(), 0, 10, TimeUnit.SECONDS);
+
   }
 
   @Override
@@ -69,11 +77,13 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
   public void isLeader() {
     LOG.info("Now the leader, starting queue processing");
     leader.set(true);
+    registerGauges();
   }
 
   @Override
   public void notLeader() {
     LOG.info("Not the leader, stopping queue processing");
+    deRegisterGauges();
     leader.set(false);
   }
 
@@ -167,6 +177,43 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
       List<String> sorted = new ArrayList<>(unsorted);
       Collections.sort(sorted);
       return sorted;
+    }
+  }
+
+  private String zkPathToMetricName(String path) {
+    return getClass().getName() + path.replace('/', '.') + "." + "size";
+  }
+
+  private Gauge<Number> makeQueueGauge(final String path){
+    return new Gauge<Number>() {
+      @Override
+      public Number getValue() {
+        try {
+          return curatorFramework.getChildren().forPath(path).size();
+        } catch (Exception e) {
+          return 0;
+        }
+      }
+    };
+  }
+
+  private void deRegisterGauges() {
+    for (Map.Entry<String, Gauge> entry : metricRegistry.getGauges().entrySet()) {
+      if (entry.getKey().contains(getClass().getName())) {
+        metricRegistry.remove(entry.getKey());
+      }
+    }
+  }
+
+  private void registerGauges() {
+    metricRegistry.register(zkPathToMetricName("/queues"), makeQueueGauge("/queues"));
+    try {
+      for (String queue : curatorFramework.getChildren().forPath("/queues")) {
+        String queuePath = ZKPaths.makePath("/queues", queue);
+        metricRegistry.register(zkPathToMetricName(queuePath), makeQueueGauge(queuePath));
+      }
+    } catch (Exception e) {
+      LOG.error("Could not register the metric gauges", e);
     }
   }
 }
