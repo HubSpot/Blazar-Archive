@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PageContainer from '../components/shared/PageContainer.jsx';
-import { IndexLink } from 'react-router';
+import { Link } from 'react-router';
 
 class NotFound extends Component {
 
@@ -9,7 +9,7 @@ class NotFound extends Component {
       <PageContainer classNames='not-found-container'>
         <h1 className="notfound__heading">404. Page Not Found. <br/> Sorry about that.</h1>
         <p>
-          <IndexLink to='/'>Head back to the dashboard</IndexLink>
+          <Link to='/'>Head back to the dashboard</Link>
         </p>
       </PageContainer>
     );
