@@ -181,7 +181,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
   }
 
   private String zkPathToMetricName(String path) {
-    return getClass().getName() + path.replace('/', '.');
+    return getClass().getName() + path.replace('/', '.') + "." + "size";
   }
 
   private Gauge<Number> makeQueueGauge(final String path){
@@ -206,6 +206,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
   }
 
   private void registerGauges() {
+    metricRegistry.register(zkPathToMetricName("/queues"), makeQueueGauge("/queues"));
     try {
       for (String queue : curatorFramework.getChildren().forPath("/queues")) {
         String queuePath = ZKPaths.makePath("/queues", queue);
