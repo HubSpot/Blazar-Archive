@@ -13,7 +13,8 @@ const initialState = {
   logExpanded: false,
   isTailing: false,
   fetchingPrevious: false,
-  fetchingNext: false
+  fetchingNext: false,
+  shouldSetTail: true
 }
 
 const refreshedState = {
@@ -43,12 +44,17 @@ class BuildLog extends Component {
     const hasNavigatedAway = (this.props.build.id !== nextProps.build.id) && this.props.build.id !== -1;
     let stateUpdates = clone(hasNavigatedAway ? initialState : refreshedState);
 
-    if (nextProps.log.shouldPoll && !this.state.isTailing && buildInProgress) {
-      stateUpdates.isTailing = true
+    if (this.state.shouldSetTail && nextProps.log.shouldPoll && !this.state.isTailing && buildInProgress) {
+      stateUpdates.isTailing = true;
+      stateUpdates.shouldSetTail = false;
     }
 
     if (nextProps.positionChange === 'top' && buildInProgress) {
       stateUpdates.isTailing = false;
+    }
+
+    if (nextProps.positionChange === 'bottom' && buildInProgress) {
+      stateUpdates.isTailing = true;
     }
 
     if (nextLog) {
@@ -203,6 +209,10 @@ class BuildLog extends Component {
         else {
           this.props.fetchNext();
         }
+
+        this.setState({
+          shouldSetTail: true
+        });
         
       }
 
