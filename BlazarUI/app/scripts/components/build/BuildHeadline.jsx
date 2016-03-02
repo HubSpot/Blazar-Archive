@@ -2,9 +2,19 @@ import React, {Component, PropTypes} from 'react';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Loader from '../shared/Loader.jsx';
-import {buildResultIcon, humanizeText} from '../Helpers';
+import {buildResultIcon, humanizeText, timestampDuration, buildIsInactive} from '../Helpers';
 
 class BuildHeadline extends Component {
+
+  renderTimestampDurationMaybe() {
+    const {build} = this.props.data;
+
+    if (buildIsInactive(build.state)) {
+      return `(in ${timestampDuration(build.startTimestamp, build.endTimestamp)})`;
+    }
+
+    return '';
+  }
 
   render() {
     if (this.props.loading) {
@@ -20,7 +30,7 @@ class BuildHeadline extends Component {
           <div className="build-headline">
             {moduleName}
             <HeadlineDetail>
-              Status: {humanizeText(build.state)}
+              Status: {humanizeText(build.state)} { ' ' } {this.renderTimestampDurationMaybe()}
             </HeadlineDetail>
           </div>
         </Headline>
