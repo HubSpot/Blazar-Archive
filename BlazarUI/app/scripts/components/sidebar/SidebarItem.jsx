@@ -70,27 +70,33 @@ class SidebarItem extends Component {
     const gitInfo = build.gitInfo;
     const lastBuild = build.lastBuild;
 
+    if (lastBuild === undefined) {
+      return (<span />);
+    }
+
     return (
-      <div className='sidebar-item__branch-link'>
-        <div className='sidebar-item__building-icon-link'>
-          {buildResultIcon(lastBuild.state)}
-        </div>
-        { ' ' }
-        <span className='sidebar-item__module-branch-name'>
-          <Link to={lastBuild.blazarPath}>
-            {truncate(gitInfo.branch, 40, true)}
-          </Link>
-        </span>
-      </div>
-    )
+      <span className='sidebar-item__module-branch-name'>
+        <Link to={lastBuild.blazarPath}>
+          {truncate(gitInfo.branch, 40, true)}
+        </Link>
+      </span>
+    );
   }
 
   renderBranchRow(build) {
     const gitInfo = build.gitInfo;
     const lastBuild = build.lastBuild;
 
+    if (lastBuild === undefined) {
+      return (
+        <div>
+          {this.renderBranchText(build)}
+        </div>
+      );
+    }
+
     return (
-      <div>
+      <div className='sidebar-item__branch-link'>
         <div className='sidebar-item__building-icon-link'>
           {buildResultIcon(lastBuild.state, 'never-built')}
         </div>
@@ -105,8 +111,6 @@ class SidebarItem extends Component {
   renderBranchRows() {
     const {builds} = this.props;
     let realBuilds = builds.slice();
-
-    console.log(builds);
 
     if (realBuilds.length > 3 && !this.state.expanded) {
       const originalSize = realBuilds.length;

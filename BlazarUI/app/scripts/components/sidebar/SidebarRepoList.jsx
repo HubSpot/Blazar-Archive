@@ -47,20 +47,6 @@ class SidebarRepoList extends Component {
       );
     });
 
-    /*const buildsList = sortBuildsByRepoAndBranch(filterInactiveBuilds(filteredBuilds)).map( (build) => {
-      const buildType = has(build, 'inProgressBuild') ? 'inProgressBuild' : has(build, 'lastBuild') ? 'lastBuild' : 'neverBuilt'
-
-      return (
-        <SidebarItem
-          key={build[buildType].id}
-          build={build[buildType]}
-          prevBuildState={has(build, 'lastBuild') ? build['lastBuild'].state : false}
-          gitInfo={build.gitInfo}
-          isStarred={true}
-        />
-      );
-    });*/
-
     return (
       <LazyRender
         childHeight={71} 
