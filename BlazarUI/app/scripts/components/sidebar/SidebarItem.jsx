@@ -95,10 +95,12 @@ class SidebarItem extends Component {
       );
     }
 
+    let buildState = build.inProgressBuild !== undefined ? build.inProgressBuild.state : lastBuild.state;
+
     return (
       <div className='sidebar-item__branch-link'>
         <div className='sidebar-item__building-icon-link'>
-          {buildResultIcon(lastBuild.state, 'never-built')}
+          {buildResultIcon(buildState)}
         </div>
         {this.renderBranchText(build)}
         <Link to={lastBuild.blazarPath} className='sidebar-item__build-number'>

@@ -22,7 +22,8 @@ class SidebarRepoList extends Component {
     }
 
 
-    const buildsList = Object.keys(filteredBuilds).map((repo) => {
+
+    const buildsList = Object.keys(filteredBuilds).sort().map((repo) => {
       const branchesMap = filteredBuilds[repo];
 
       const builds = 
