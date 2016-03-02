@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import {Link} from 'react-router'
 import classnames from 'classnames';
 import {has, contains} from 'underscore';
 import {truncate} from '../Helpers.js';
@@ -7,15 +8,49 @@ import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
 import {buildResultIcon} from '../Helpers.js';
 
-import {Link} from 'react-router'
+let initialState = {
+  expanded: false
+};
 
 class SidebarItem extends Component {
+
+  constructor() {
+    this.state = initialState;
+  }
 
   getItemClasses() {
     return classnames([
       'sidebar-item',
       this.props.classNames
     ]);
+  }
+
+  toggleExpand() {
+    this.setState({
+      expanded: !this.state.expanded
+    });
+  }
+
+  renderExpandText(numberRemaining) {
+    const {builds} = this.props;
+
+    if (builds.length < 4) {
+      return '';
+    }
+
+    else if (!this.state.expanded) {
+      return (
+        <span onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
+          ...show {numberRemaining} more
+        </span>
+      );
+    }
+
+    return (
+      <span onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
+        ...hide
+      </span>
+    );
   }
   
   renderRepoLink() {
@@ -69,26 +104,28 @@ class SidebarItem extends Component {
 
   renderBranchRows() {
     const {builds} = this.props;
+    let realBuilds = builds.slice();
 
-    if (builds.length > 3) {
-      const originalSize = builds.length;
-      const splicedBuilds = builds.splice(0, 3);
+    console.log(builds);
+
+    if (realBuilds.length > 3 && !this.state.expanded) {
+      const originalSize = realBuilds.length;
+      const splicedBuilds = realBuilds.splice(0, 3);
       const numberRemaining = originalSize - 3;
 
-      //console.log(this.props.builds.length);
-
       return (
         <div>
-          {splicedBuilds.map((build) => {return this.renderBranchRow(build);})}
-          <span className='sidebar-item__and-more'>
-            ...and #{numberRemaining} more
-          </span>
+          {splicedBuilds.map((build) => {return this.renderBranchRow(build);})}       
+          {this.renderExpandText(numberRemaining)}
         </div>
       );
-    } else {
+    } 
+
+    else {
       return (
         <div>
-          {builds.map((build) => {return this.renderBranchRow(build);})}
+          {realBuilds.map((build) => {return this.renderBranchRow(build);})}
+          {this.renderExpandText(0)}
         </div>
       )
     }
