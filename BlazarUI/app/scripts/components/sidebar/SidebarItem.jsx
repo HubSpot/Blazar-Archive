@@ -19,74 +19,86 @@ class SidebarItem extends Component {
   }
   
   renderRepoLink() {
-    const {gitInfo} = this.props;
+    const {repository} = this.props;
     
     return (
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='icon-muted'/>{ ' ' }
-        <Link to={gitInfo.blazarBranchPath} className='sidebar-item__module-branch-name'>
-          {truncate(gitInfo.repository, 30, true)}
-        </Link>
+          <Link to="http://google.com" className='sidebar-item__module-branch-name'>
+            {truncate(repository, 30, true)}
+          </Link>
       </div>
     );
   }
 
-  renderBranchText() {
-    const {gitInfo} = this.props;
+  renderBranchText(build) {
+    const gitInfo = build.gitInfo;
+    const lastBuild = build.lastBuild;
 
     return (
       <div className='sidebar-item__branch-link'>
-        <Icon type='octicon' name='git-branch' classNames='icon-muted'/>{ ' ' }
+        <div className='sidebar-item__building-icon-link'>
+          {buildResultIcon(lastBuild.state)}
+        </div>
+        { ' ' }
         <span className='sidebar-item__module-branch-name'>
-          {truncate(gitInfo.branch, 40, true)}
+          <Link to={lastBuild.blazarPath}>
+            {truncate(gitInfo.branch, 40, true)}
+          </Link>
         </span>
       </div>
     )
   }
-  
-  renderBuildLink() {
-    const {build, prevBuildState} = this.props;
-    let icon, buildIdLink;
-    
-    if (prevBuildState) {
-      icon = (
-        <Link to={build.blazarPath} className='sidebar-item__building-icon-link'>
-          {buildResultIcon(build.state, prevBuildState)}
-        </Link>
-      );
 
-      buildIdLink =(
-        <Link to={build.blazarPath} className='sidebar-item__build-number'>
-          #{build.buildNumber}
-        </Link>
-      );  
-    }
+  renderBranchRow(build) {
+    const gitInfo = build.gitInfo;
+    const lastBuild = build.lastBuild;
 
-    // never built on blazar
-    else {
-      icon = (
-        <div className='sidebar-item__building-icon-link'>
-          {buildResultIcon(build.state, 'never-built')}
-        </div>
-      );
-    }
-    
     return (
       <div>
-        {icon}
-        {buildIdLink}
+        <div className='sidebar-item__building-icon-link'>
+          {buildResultIcon(lastBuild.state, 'never-built')}
+        </div>
+        {this.renderBranchText(build)}
+        <Link to={lastBuild.blazarPath} className='sidebar-item__build-number'>
+          #{lastBuild.buildNumber}
+        </Link>
       </div>
     );
   }
 
-  render() {    
-    const {build, gitInfo} = this.props;
+  renderBranchRows() {
+    const {builds} = this.props;
 
+    if (builds.length > 3) {
+      const originalSize = builds.length;
+      const splicedBuilds = builds.splice(0, 3);
+      const numberRemaining = originalSize - 3;
+
+      //console.log(this.props.builds.length);
+
+      return (
+        <div>
+          {splicedBuilds.map((build) => {return this.renderBranchRow(build);})}
+          <span className='sidebar-item__and-more'>
+            ...and #{numberRemaining} more
+          </span>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          {builds.map((build) => {return this.renderBranchRow(build);})}
+        </div>
+      )
+    }
+  }
+
+  render() {
     return (
       <li className={this.getItemClasses()}>
-        {this.renderBuildLink()}
         {this.renderRepoLink()}
-        {this.renderBranchText()}
+        {this.renderBranchRows()}
       </li>
     )
   }
@@ -94,7 +106,8 @@ class SidebarItem extends Component {
 
 SidebarItem.propTypes = {
   isStarred: PropTypes.bool,
-  build: PropTypes.object.isRequired
+  builds: PropTypes.array.isRequired,
+  repository: PropTypes.string.isRequired
 };
 
 export default SidebarItem;

@@ -21,7 +21,33 @@ class SidebarRepoList extends Component {
       );
     }
 
-    const buildsList = sortBuildsByRepoAndBranch(filterInactiveBuilds(filteredBuilds)).map( (build) => {
+
+    const buildsList = Object.keys(filteredBuilds).map((repo) => {
+      const branchesMap = filteredBuilds[repo];
+
+      const builds = 
+        sortBuildsByRepoAndBranch(
+          filterInactiveBuilds(
+            Object.keys(branchesMap).map((branch) => {
+              return branchesMap[branch];
+            })
+          )
+        );
+
+      if (builds.length === 0) {
+        return (<span />);
+      }
+
+      return (
+        <SidebarItem
+          key={repo}
+          builds={builds}
+          repository={builds[0].gitInfo.repository}
+        />
+      );
+    });
+
+    /*const buildsList = sortBuildsByRepoAndBranch(filterInactiveBuilds(filteredBuilds)).map( (build) => {
       const buildType = has(build, 'inProgressBuild') ? 'inProgressBuild' : has(build, 'lastBuild') ? 'lastBuild' : 'neverBuilt'
 
       return (
@@ -33,7 +59,7 @@ class SidebarRepoList extends Component {
           isStarred={true}
         />
       );
-    });
+    });*/
 
     return (
       <LazyRender
