@@ -8,6 +8,33 @@ import {sortBuildsByRepoAndBranch, filterInactiveBuilds} from '../Helpers.js';
 
 class SidebarRepoList extends Component {
 
+  renderBuildsList(builds) {
+    return Object.keys(builds).sort().map((repo, i) => {
+      const branchesMap = builds[repo];
+
+      const sortedBuilds = 
+        sortBuildsByRepoAndBranch(
+          filterInactiveBuilds(
+            Object.keys(branchesMap).map((branch, i) => {
+              return branchesMap[branch];
+            })
+          )
+        );
+
+      if (sortedBuilds.length === 0) {
+        return (<span key={i} />);
+      }
+
+      return (
+        <SidebarItem
+          key={i}
+          builds={sortedBuilds}
+          repository={sortedBuilds[0].gitInfo.repository}
+        />
+      );
+    });
+  }
+
   render() {    
     const {changingBuildsType, filteredBuilds, loading} = this.props;
 
@@ -21,38 +48,11 @@ class SidebarRepoList extends Component {
       );
     }
 
-
-
-    const buildsList = Object.keys(filteredBuilds).sort().map((repo) => {
-      const branchesMap = filteredBuilds[repo];
-
-      const builds = 
-        sortBuildsByRepoAndBranch(
-          filterInactiveBuilds(
-            Object.keys(branchesMap).map((branch) => {
-              return branchesMap[branch];
-            })
-          )
-        );
-
-      if (builds.length === 0) {
-        return (<span />);
-      }
-
-      return (
-        <SidebarItem
-          key={repo}
-          builds={builds}
-          repository={builds[0].gitInfo.repository}
-        />
-      );
-    });
-
     return (
       <LazyRender
         childHeight={71} 
         maxHeight={this.props.sidebarHeight}>
-        {buildsList}
+        {this.renderBuildsList(filteredBuilds)}
       </LazyRender>
     );
 
@@ -62,7 +62,7 @@ class SidebarRepoList extends Component {
 SidebarRepoList.propTypes = {
   sidebarHeight: PropTypes.number.isRequired,
   changingBuildsType: PropTypes.bool.isRequired,
-  filteredBuilds: PropTypes.array.isRequired,
+  filteredBuilds: PropTypes.object.isRequired,
   loading: PropTypes.bool.isRequired
 };
 

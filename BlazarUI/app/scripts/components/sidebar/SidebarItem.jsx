@@ -32,26 +32,26 @@ class SidebarItem extends Component {
     });
   }
 
-  renderExpandText(numberRemaining) {
+  renderExpandText(numberRemaining = 0) {
     const {builds} = this.props;
 
     if (builds.length < 4) {
       return '';
     }
 
-    else if (!this.state.expanded) {
-      return (
-        <div onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
-          show {numberRemaining} more
-        </div>
-      );
+    let toggleExpandMessage;
+
+    if (!this.state.expanded) {
+      toggleExpandMessage = `show ${numberRemaining} more`;
     }
 
-    const numberToHide = builds.length - 3;
+    else {
+      toggleExpandMessage = `show fewer`;
+    }
 
     return (
       <div onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
-        show fewer
+        {toggleExpandMessage}
       </div>
     );
   }
@@ -70,8 +70,7 @@ class SidebarItem extends Component {
   }
 
   renderBranchText(build) {
-    const gitInfo = build.gitInfo;
-    const lastBuild = build.lastBuild;
+    const {gitInfo, lastBuild} = build;
 
     if (lastBuild === undefined) {
       return (<span />);
@@ -99,13 +98,12 @@ class SidebarItem extends Component {
     );
   }
 
-  renderBranchRow(build) {
-    const gitInfo = build.gitInfo;
-    const lastBuild = build.lastBuild;
+  renderBranchRow(build, key) {
+    const {gitInfo, lastBuild} = build;
 
     if (lastBuild === undefined) {
       return (
-        <div>
+        <div key={key}>
           {this.renderBranchText(build)}
         </div>
       );
@@ -114,7 +112,7 @@ class SidebarItem extends Component {
     let buildState = build.inProgressBuild !== undefined ? build.inProgressBuild.state : lastBuild.state;
 
     return (
-      <div className='sidebar-item__branch-link'>
+      <div key={key} className='sidebar-item__branch-link'>
         {this.renderBuildIcon(buildState)}
         {this.renderBranchText(build)}
         <Link to={lastBuild.blazarPath} className='sidebar-item__build-number'>
@@ -135,7 +133,7 @@ class SidebarItem extends Component {
 
       return (
         <div>
-          {splicedBuilds.map((build) => {return this.renderBranchRow(build);})}       
+          {splicedBuilds.map((build, i) => {return this.renderBranchRow(build, i);})}       
           {this.renderExpandText(numberRemaining)}
         </div>
       );
@@ -144,8 +142,8 @@ class SidebarItem extends Component {
     else {
       return (
         <div>
-          {realBuilds.map((build) => {return this.renderBranchRow(build);})}
-          {this.renderExpandText(0)}
+          {realBuilds.map((build, i) => {return this.renderBranchRow(build, i);})}
+          {this.renderExpandText()}
         </div>
       )
     }

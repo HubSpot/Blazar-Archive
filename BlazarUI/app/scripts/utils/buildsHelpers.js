@@ -54,12 +54,11 @@ export const sidebarCombine = (builds) => {
   let sidebarMap = {};
 
   builds.map((build) => {
-    const repo = build.gitInfo.repository;
-    const branch = build.gitInfo.branch;
+    const {repository, branch} = build.gitInfo;
     let repoEntry;
 
-    if (repo in sidebarMap) {
-      repoEntry = sidebarMap[repo];
+    if (repository in sidebarMap) {
+      repoEntry = sidebarMap[repository];
     }
 
     else {
@@ -67,7 +66,7 @@ export const sidebarCombine = (builds) => {
     }
 
     repoEntry[branch] = build;
-    sidebarMap[repo] = repoEntry;
+    sidebarMap[repository] = repoEntry;
   });
 
   return sidebarMap;
