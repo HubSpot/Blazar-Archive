@@ -10,6 +10,8 @@
   position relative
   display block
   padding 10px 0 10px 10px
+  padding-bottom 0 //clean up
+  padding-top 5px // clean up
   border-bottom 1px solid #dadada
   font-weight 300
   a
@@ -42,13 +44,13 @@
   left 0px
 
 .sidebar-item__branch-link
-  margin 10px
+  margin 8px
   margin-left 20px //todo clean up
   margin-right 5px
   
 .sidebar-item__repo-link
   margin 5px
-  margin-bottom 13px
+  margin-bottom 1px
   margin-left 0px //todo clean up
 
 .sidebar-item__build-number
@@ -73,13 +75,18 @@
 .sidebar-item__and-more
   font-size 16px
   padding-right 10px
+  padding-bottom 5px
   width 100%
-  color #70C3D1
+  color #428bca
   text-align right
   cursor pointer
   
 .sidebar-item a
-  color #70C3D1 // move to color vars and above too
+  color #428bca // move to color vars and above too
+  
+  &:hover
+    text-decoration none
+    color #428bca
   
 .repo-octicon // todo clean up this nonsense
   color $gray-darker

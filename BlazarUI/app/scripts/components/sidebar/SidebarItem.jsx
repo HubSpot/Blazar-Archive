@@ -51,7 +51,7 @@ class SidebarItem extends Component {
 
     return (
       <div onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
-        show {numberToHide} less
+        show fewer
       </div>
     );
   }
@@ -63,7 +63,7 @@ class SidebarItem extends Component {
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='repo-octicon'/>{ '   ' }
           <span className='sidebar-item__module-repo-name'>
-            {truncate(repository, 25, true)}
+            {truncate(repository, 20, true)}
           </span>
       </div>
     );
