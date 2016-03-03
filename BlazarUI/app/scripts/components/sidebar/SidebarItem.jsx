@@ -89,7 +89,7 @@ class SidebarItem extends Component {
     return (
       <span className='sidebar-item__module-branch-name'>
         <Icon type='octicon' name='git-branch' classNames='repo-octicon'/>{ '   ' }
-        <Link to={lastBuild.blazarPath}>
+        <Link to={buildToUse.blazarPath}>
           {truncate(gitInfo.branch, 20, true)}
         </Link>
       </span>
@@ -108,29 +108,29 @@ class SidebarItem extends Component {
     );
   }
 
-  renderBranchRow(build, key) {
-    const {gitInfo, lastBuild} = build;
+  renderBuildNumber(build) {
+    const {lastBuild} = build;
 
     if (lastBuild === undefined) {
-
-      console.log("in here with: ", build);
-
-      return (
-        <div key={key}>
-          {this.renderBranchText(build)}
-        </div>
-      );
+      return (<span />);
     }
 
+    return (
+      <Link to={lastBuild.blazarPath} className='sidebar-item__build-number'>
+        #{lastBuild.buildNumber}
+      </Link>
+    );
+  }
+
+  renderBranchRow(build, key) {
+    const {gitInfo, lastBuild} = build;
     let buildState = build.inProgressBuild !== undefined ? build.inProgressBuild.state : lastBuild.state;
 
     return (
       <div key={key} className='sidebar-item__branch-link'>
         {this.renderBuildIcon(buildState)}
         {this.renderBranchText(build)}
-        <Link to={lastBuild.blazarPath} className='sidebar-item__build-number'>
-          #{lastBuild.buildNumber}
-        </Link>
+        {this.renderBuildNumber(build)}
       </div>
     );
   }

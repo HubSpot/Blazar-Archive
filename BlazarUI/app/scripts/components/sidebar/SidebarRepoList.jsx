@@ -12,8 +12,6 @@ class SidebarRepoList extends Component {
     return Object.keys(builds).sort().map((repo, i) => {
       const branchesMap = builds[repo];
 
-      console.log(repo);
-
       const sortedBuilds = 
         sortBuildsByRepoAndBranch(
           filterInactiveBuilds(
@@ -22,8 +20,6 @@ class SidebarRepoList extends Component {
             })
           )
         );
-
-      console.log(sortedBuilds);
 
       if (sortedBuilds.length === 0) {
         return (<span key={i} />);
