@@ -40,16 +40,16 @@ class SidebarItem extends Component {
 
     else if (!this.state.expanded) {
       return (
-        <span onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
-          ...show {numberRemaining} more
-        </span>
+        <div onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
+          +{numberRemaining} more
+        </div>
       );
     }
 
     return (
-      <span onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
+      <div onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
         ...hide
-      </span>
+      </div>
     );
   }
   
@@ -58,10 +58,10 @@ class SidebarItem extends Component {
     
     return (
       <div className='sidebar-item__repo-link'>
-        <Icon type='octicon' name='repo' classNames='icon-muted'/>{ ' ' }
-          <Link to="http://google.com" className='sidebar-item__module-branch-name'>
+        <Icon type='octicon' name='repo' classNames='repo-octicon'/>{ '   ' }
+          <span className='sidebar-item__module-branch-name'>
             {truncate(repository, 30, true)}
-          </Link>
+          </span>
       </div>
     );
   }
@@ -76,8 +76,9 @@ class SidebarItem extends Component {
 
     return (
       <span className='sidebar-item__module-branch-name'>
+        <Icon type='octicon' name='git-branch' classNames='repo-octicon'/>{ '   ' }
         <Link to={lastBuild.blazarPath}>
-          {truncate(gitInfo.branch, 40, true)}
+          {truncate(gitInfo.branch, 20, true)}
         </Link>
       </span>
     );
