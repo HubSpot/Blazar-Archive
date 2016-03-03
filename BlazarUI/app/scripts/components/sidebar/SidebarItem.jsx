@@ -6,6 +6,7 @@ import {truncate} from '../Helpers.js';
 import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
+import BuildStates from '../../constants/BuildStates.js';
 import {buildResultIcon} from '../Helpers.js';
 
 let initialState = {
@@ -41,14 +42,16 @@ class SidebarItem extends Component {
     else if (!this.state.expanded) {
       return (
         <div onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
-          +{numberRemaining} more
+          show {numberRemaining} more
         </div>
       );
     }
 
+    const numberToHide = builds.length - 3;
+
     return (
       <div onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
-        ...hide
+        show {numberToHide} less
       </div>
     );
   }
@@ -59,7 +62,7 @@ class SidebarItem extends Component {
     return (
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='repo-octicon'/>{ '   ' }
-          <span className='sidebar-item__module-branch-name'>
+          <span className='sidebar-item__module-repo-name'>
             {truncate(repository, 30, true)}
           </span>
       </div>
@@ -84,6 +87,18 @@ class SidebarItem extends Component {
     );
   }
 
+  renderBuildIcon(buildState) {
+    if (buildState === BuildStates.SUCCEEDED) {
+      return (<div />);
+    }
+
+    return (
+      <div className='sidebar-item__building-icon-link'>
+        {buildResultIcon(buildState)}
+      </div>
+    );
+  }
+
   renderBranchRow(build) {
     const gitInfo = build.gitInfo;
     const lastBuild = build.lastBuild;
@@ -100,9 +115,7 @@ class SidebarItem extends Component {
 
     return (
       <div className='sidebar-item__branch-link'>
-        <div className='sidebar-item__building-icon-link'>
-          {buildResultIcon(buildState)}
-        </div>
+        {this.renderBuildIcon(buildState)}
         {this.renderBranchText(build)}
         <Link to={lastBuild.blazarPath} className='sidebar-item__build-number'>
           #{lastBuild.buildNumber}

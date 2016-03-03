@@ -13,12 +13,19 @@
   border-bottom 1px solid #dadada
   a
     text-decoration none
-
+  
 .sidebar-item__module-branch-name
   color $gray-darker
   font-size 16px
   margin-left 10px
-  top -5px
+  
+  & a
+    padding-left 5px
+    
+.sidebar-item__module-repo-name
+  color $gray-darker
+  font-size 16px
+  margin-left 9px
 
 .sidebar__active-building-icon
   position absolute
@@ -29,16 +36,18 @@
 // adding padding to container
 .sidebar-item__building-icon-link
   position absolute
-  padding-top 10px
+  padding-top 8px
   padding-left 35px
   left 0px
 
 .sidebar-item__branch-link
-  margin 5px
+  margin 10px
   margin-left 20px //todo clean up
+  margin-right 5px
   
 .sidebar-item__repo-link
   margin 5px
+  margin-bottom 13px
   margin-left 0px //todo clean up
 
 .sidebar-item__build-number
@@ -64,11 +73,12 @@
   font-size 16px
   padding-right 10px
   width 100%
+  color #70C3D1
   text-align right
   cursor pointer
   
 .sidebar-item a
-  color #1FA5BC
+  color #70C3D1 // move to color vars and above too
   
-.repo-octicon
+.repo-octicon // todo clean up this nonsense
   color $gray-darker
