@@ -35,7 +35,7 @@ class SidebarItem extends Component {
   renderExpandText(numberRemaining = 0) {
     const {builds} = this.props;
 
-    if (builds.length < 4) {
+    if (builds.length < 3) {
       return '';
     }
 
@@ -139,10 +139,10 @@ class SidebarItem extends Component {
     const {builds} = this.props;
     let realBuilds = builds.slice();
 
-    if (realBuilds.length > 3 && !this.state.expanded) {
+    if (realBuilds.length > 2 && !this.state.expanded) {
       const originalSize = realBuilds.length;
-      const splicedBuilds = realBuilds.splice(0, 3);
-      const numberRemaining = originalSize - 3;
+      const splicedBuilds = realBuilds.splice(0, 2);
+      const numberRemaining = originalSize - 2;
 
       return (
         <div>
