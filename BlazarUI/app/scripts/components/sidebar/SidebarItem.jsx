@@ -70,10 +70,20 @@ class SidebarItem extends Component {
   }
 
   renderBranchText(build) {
-    const {gitInfo, lastBuild} = build;
+    const {gitInfo, lastBuild, inProgressBuild} = build;
+
+    let buildToUse;
 
     if (lastBuild === undefined) {
-      return (<span />);
+      if (inProgressBuild === undefined) {
+        return (<span />);
+      }
+
+      buildToUse = inProgressBuild;
+    }
+
+    else {
+      buildToUse = lastBuild;
     }
 
     return (
@@ -102,6 +112,9 @@ class SidebarItem extends Component {
     const {gitInfo, lastBuild} = build;
 
     if (lastBuild === undefined) {
+
+      console.log("in here with: ", build);
+
       return (
         <div key={key}>
           {this.renderBranchText(build)}
