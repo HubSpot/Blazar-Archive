@@ -17,7 +17,7 @@ import BuildsActions from '../../actions/buildsActions';
 import sidebarTabProvider from '../../services/sidebarTabProvider';
 
 import {NO_MATCH_MESSAGES} from '../constants';
-import {getFilterMatches} from '../../utils/buildsHelpers';
+import {sidebarCombine, getFilterMatches} from '../../utils/buildsHelpers';
 
 // $('.sidebar__filter') is inaccessible at render time,
 // so use this default until the window is resized
@@ -119,7 +119,7 @@ class SidebarContainer extends Component {
 
     const searchType = NO_MATCH_MESSAGES[toggleFilterState];
     const filteredBuilds = builds[this.state.toggleFilterState];
-    const matches = getFilterMatches(filteredBuilds.toJS(), filterText);
+    const matches = sidebarCombine(getFilterMatches(filteredBuilds.toJS(), filterText));
 
     return (
       <Sidebar>

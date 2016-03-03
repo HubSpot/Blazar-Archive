@@ -49,3 +49,25 @@ export const sortBuilds = (builds, type) => {
   }
 
 };
+
+export const sidebarCombine = (builds) => {
+  let sidebarMap = {};
+
+  builds.map((build) => {
+    const {repository, branch} = build.gitInfo;
+    let repoEntry;
+
+    if (repository in sidebarMap) {
+      repoEntry = sidebarMap[repository];
+    }
+
+    else {
+      repoEntry = {};
+    }
+
+    repoEntry[branch] = build;
+    sidebarMap[repository] = repoEntry;
+  });
+
+  return sidebarMap;
+};
