@@ -51,7 +51,8 @@ class SidebarRepoList extends Component {
     return (
       <LazyRender
         childHeight={71} 
-        maxHeight={this.props.sidebarHeight}>
+        maxHeight={this.props.sidebarHeight}
+        ignoreChildHeight={true}>
         {this.renderBuildsList(filteredBuilds)}
       </LazyRender>
     );
