@@ -90,7 +90,7 @@ class SidebarItem extends Component {
       <span className='sidebar-item__module-branch-name'>
         <Icon type='octicon' name='git-branch' classNames='repo-octicon'/>{ '   ' }
         <Link to={buildToUse.blazarPath}>
-          {truncate(gitInfo.branch, 20, true)}
+          {truncate(gitInfo.branch, 15, true)}
         </Link>
       </span>
     );
