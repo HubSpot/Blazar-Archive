@@ -63,7 +63,7 @@ class SidebarItem extends Component {
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='repo-octicon'/>{ '   ' }
           <span className='sidebar-item__module-repo-name'>
-            {truncate(repository, 20, true)}
+            {truncate(repository, 25, true)}
           </span>
       </div>
     );
@@ -88,9 +88,8 @@ class SidebarItem extends Component {
 
     return (
       <span className='sidebar-item__module-branch-name'>
-        <Icon type='octicon' name='git-branch' classNames='repo-octicon'/>{ '   ' }
         <Link to={buildToUse.blazarPath}>
-          {truncate(gitInfo.branch, 20, true)}
+          {truncate(gitInfo.branch, 25, true)}
         </Link>
       </span>
     );
