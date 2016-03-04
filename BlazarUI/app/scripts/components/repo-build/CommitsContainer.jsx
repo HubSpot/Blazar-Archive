@@ -27,12 +27,13 @@ class CommitsContainer extends Component {
   renderCommits() {
     const commitMap = this.splitCommitsIntoDays();
 
-    return Object.keys(commitMap).map((day) => {
+    return Object.keys(commitMap).map((day, i) => {
       const commitList = commitMap.get(day);
       const timestamp = commitList[0].timestamp;
 
       return (
         <Commits
+          key={i}
           commits={commitList}
           timestamp={timestamp} />
       );

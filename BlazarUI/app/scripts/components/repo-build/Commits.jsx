@@ -5,9 +5,10 @@ import Commit from './Commit.jsx';
 class Commits extends Component {
 
   renderCommits() {
-    return this.props.commits.map((commit) => {
+    return this.props.commits.map((commit, i) => {
       return (
         <Commit
+          key={i}
           commitInfo={commit} />
       );
     });
