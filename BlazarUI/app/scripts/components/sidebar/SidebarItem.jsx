@@ -32,6 +32,20 @@ class SidebarItem extends Component {
     });
   }
 
+  getBuildToUse(build) {
+    const {lastBuild, inProgressBuild} = build;
+
+    if (inProgressBuild !== undefined) {
+      return inProgressBuild;
+    }
+
+    else if (lastBuild !== undefined) {
+      return lastBuild;
+    }
+
+    return undefined;
+  }
+
   renderExpandText(numberRemaining = 0) {
     const {builds} = this.props;
 
@@ -70,20 +84,11 @@ class SidebarItem extends Component {
   }
 
   renderBranchText(build) {
-    const {gitInfo, lastBuild, inProgressBuild} = build;
+    const {gitInfo} = build;
+    const buildToUse = this.getBuildToUse(build);
 
-    let buildToUse;
-
-    if (lastBuild === undefined) {
-      if (inProgressBuild === undefined) {
-        return (<span />);
-      }
-
-      buildToUse = inProgressBuild;
-    }
-
-    else {
-      buildToUse = lastBuild;
+    if (buildToUse === undefined) {
+      return (<span />);
     }
 
     return (
@@ -108,15 +113,15 @@ class SidebarItem extends Component {
   }
 
   renderBuildNumber(build) {
-    const {lastBuild} = build;
+    const buildToUse = this.getBuildToUse(build);
 
-    if (lastBuild === undefined) {
+    if (buildToUse === undefined) {
       return (<span />);
     }
 
     return (
-      <Link to={lastBuild.blazarPath} className='sidebar-item__build-number'>
-        #{lastBuild.buildNumber}
+      <Link to={buildToUse.blazarPath} className='sidebar-item__build-number'>
+        #{buildToUse.buildNumber}
       </Link>
     );
   }
