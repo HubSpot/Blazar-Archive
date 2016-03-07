@@ -12,9 +12,6 @@ class Image extends Component {
   }
 
   render() {
-
-    console.log(this.props.src);
-
     return (
       <img src={this.props.src} style={this.getStyles()} className={this.props.classNames} />
     );
