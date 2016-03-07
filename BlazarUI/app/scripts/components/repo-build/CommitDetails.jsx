@@ -1,8 +1,36 @@
 import React, {Component, PropTypes} from 'react';
 import moment from 'moment';
+import classNames from 'classnames';
+
+import Icon from '../shared/Icon.jsx';
+
 import {Link} from 'react-router';
 
 class CommitDetails extends Component {
+
+  getClassNames() {
+    const {commitInfo} = this.props;
+    const rowSuffix = commitInfo.oddRow ? '--odd' : '--even';
+
+    return classNames([
+      'commits__commit',
+      'commits__commit' + rowSuffix
+    ]);
+  }
+
+  getPictureClassNames() {
+    const {commitInfo} = this.props;
+    const rowSuffix = commitInfo.oddRow ? '--odd' : '--even';
+    const firstRowSuffix = commitInfo.firstRow ? '--firstrow' : '';
+    const lastRowSuffix = commitInfo.lastRow ? '--lastrow' : '';
+
+    return classNames([
+      'commits__picture',
+      'commits__picture' + rowSuffix,
+      'commits__picture' + firstRowSuffix,
+      'commits__picture' + lastRowSuffix
+    ]);
+  }
 
   renderTimestamp() {
     const {timestamp} = this.props.commitInfo;
@@ -40,15 +68,19 @@ class CommitDetails extends Component {
   }
 
   renderPicture() {
-    //placeholder
+    const {commitInfo} = this.props;
+    const iconName = commitInfo.firstRow ? 'git-branch' : 'git-commit';
+
     return (
-      <div className="commits__picture" />
+      <div className={this.getPictureClassNames()}>
+        <Icon type="octicon" name={iconName} classNames="commits__picture-icon" />
+      </div>
     );
   }
 
   render() {
     return (
-      <div className="commits__commit">
+      <div className={this.getClassNames()}>
         {this.renderPicture()}
         {this.renderContent()}
         {this.renderTimestamp()}

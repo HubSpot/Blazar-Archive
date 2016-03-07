@@ -20,7 +20,7 @@ class RepoBuildBuildDetail extends Component {
     bindAll(this, 'handleResize')
     this.state = {
       windowWidth: window.innerWidth,
-      showCommits: false
+      showCommits: false,
     }
   }
 
@@ -43,6 +43,12 @@ class RepoBuildBuildDetail extends Component {
   handleResize(e) {
     this.setState({
       windowWidth: window.innerWidth
+    });
+  }
+
+  flipShowCommits() {
+    this.setState({
+      showCommits: !this.state.showCommits
     });
   }  
   
@@ -114,7 +120,9 @@ class RepoBuildBuildDetail extends Component {
           />
         </div>
         <Commits
-          commits={newCommits} />
+          commits={newCommits}
+          showCommits={this.state.showCommits}
+          flipShowCommits={this.flipShowCommits.bind(this)} />
       </div>
     );
   }

@@ -7,11 +7,22 @@ class Commits extends Component {
 
   splitCommitsIntoDays() {
     let commitMap = {}; // keyed by day
-    this.props.commits.sort((a, b) => {
-        return b.timestamp - a.timestamp;
-      }).map((commit) => {
+
+    let sortedCommits = this.props.commits.sort((a, b) => {
+      return b.timestamp - a.timestamp;
+    });
+
+    if (!this.props.showCommits) {
+      sortedCommits = sortedCommits.slice(0, 1);
+    }
+
+    sortedCommits.map((commit, i) => {
       const day = moment(parseInt(commit.timestamp, 10)).format('M-DD-YY');
       let entry;
+
+      commit.oddRow = i % 2 === 0;
+      commit.firstRow = i === 0;
+      commit.lastRow = i === sortedCommits.length - 1;
 
       if (commitMap[day] !== undefined) {
         entry = commitMap[day];
@@ -28,11 +39,29 @@ class Commits extends Component {
     return commitMap;
   }
 
+  renderSummary() {
+    const {commits, showCommits} = this.props;
+    let summaryText;
+
+    if (!showCommits) {
+      summaryText = 'Showing most recent commit for this build';
+    }
+
+    else {
+      summaryText = `Showing ${commits.length} commits for this build`;
+    }
+
+    return (
+      <span className="commits__summary">
+        {summaryText}
+      </span>
+    );
+  }
+
   renderCommits() {
     const commitMap = this.splitCommitsIntoDays();
-    let topBorder = true;
 
-    return Object.keys(commitMap).map((day, i) => {
+    const children = Object.keys(commitMap).map((day, i) => {
       const commitList = commitMap[day];
       const timestamp = parseInt(commitList[0].timestamp, 10);
       const isFirstCommit = i === 0;
@@ -45,19 +74,39 @@ class Commits extends Component {
           timestamp={timestamp} />
       );
     });
+
+    return (
+      <div className="commits">
+        {children}
+      </div>
+    );
+  }
+
+  renderShowText() {
+    const {showCommits} = this.props;
+
+    return (
+      <a className="commits__view-all" onClick={this.props.flipShowCommits}>
+        show {showCommits ? 'fewer' : 'more'}
+      </a>
+    );
   }
 
   render() {
     return (
-      <div className="commits">
+      <div className="commits__wrapper">
+        {this.renderSummary()}
         {this.renderCommits()}
+        {this.renderShowText()}
       </div>
     );
   }
 }
 
 Commits.propTypes = {
-  commits: PropTypes.array.isRequired
+  commits: PropTypes.array.isRequired,
+  showCommits: PropTypes.bool.isRequired,
+  flipShowCommits: PropTypes.func.isRequired
 };
 
 export default Commits;

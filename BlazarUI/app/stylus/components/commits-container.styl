@@ -2,36 +2,45 @@
 
 .commits
   width auto
-  padding-bottom 75px
+  border-bottom 1px solid $gray-light
+  margin-bottom 10px
+  margin-top 10px
+  
+.commits__summary
+  padding-left 10px
+  
+.commits__wrapper
+  margin-bottom 40px
   
 .commits__header
   background-color #F2F5F8
-  border-bottom 1px solid $gray-light
+  border 1px solid $gray-light
+  border-width 1px 0 1px 0
   padding 2px 2px 2px 10px
   
   span
     color $gray-dark
-    
-.commits__day-of-commits--first
-  border-top 1px solid $gray-light
 
 .commits__commit
   position relative
   height auto
+  
+.commits__commit--even
+  background-color #f9fafa
 
 .commits__commit-timestamp
   position absolute
-  top 0px
+  top 5px
   right 10px
   color $gray-dark
 
 .commits__commit-content
-  margin 7px 75px 7px 10px
+  padding 3px 75px 3px 45px
   
 .commits__commit-wrapper
   height auto
-  border 1px solid $gray-light
-  border-width 0 0 1px 0
+  border-left 1px solid $gray
+  margin-left 35px
   
 .commits__commit-author
   font-weight bold
@@ -46,3 +55,32 @@
   text-overflow ellipsis
   white-space nowrap
   display block
+
+.commits__picture
+  position absolute
+  left 28px
+  top 15px
+
+.commits__picture--even
+  background-color #f9fafa
+
+.commits__picture--odd
+  background-color white
+  
+.commits__picture--firstrow
+  left 30px
+  top 0
+  padding-top 15px
+  
+.commits__picture--lastrow
+  padding-bottom 14px
+  
+.commits__picture-icon
+  color #94AAC3
+
+.commits__view-all
+  padding-left 10px
+  
+  &:hover
+    cursor pointer
+    text-decoration none
