@@ -85,15 +85,10 @@ class SidebarItem extends Component {
 
   renderBranchText(build) {
     const {gitInfo} = build;
-    const buildToUse = this.getBuildToUse(build);
-
-    if (buildToUse === undefined) {
-      return (<span />);
-    }
 
     return (
       <span className='sidebar-item__module-branch-name'>
-        <Link to={buildToUse.blazarPath}>
+        <Link to={gitInfo.blazarBranchPath}>
           {truncate(gitInfo.branch, 30, true)}
         </Link>
       </span>
