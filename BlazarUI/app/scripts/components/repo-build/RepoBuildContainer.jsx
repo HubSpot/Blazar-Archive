@@ -83,8 +83,7 @@ class RepoBuildContainer extends Component {
   }
   
   renderError() {
-    console.log(this.state.error);
-    /*return (
+    return (
       <UIGrid>
         <UIGridItem size={10}>
           <GenericErrorMessage
@@ -92,7 +91,7 @@ class RepoBuildContainer extends Component {
           />
         </UIGridItem>
       </UIGrid>
-    );*/
+    );
   }
   
   renderPage() {

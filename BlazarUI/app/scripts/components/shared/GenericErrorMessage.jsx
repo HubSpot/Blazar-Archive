@@ -37,7 +37,7 @@ GenericErrorMessage.defaultProps = {
 }
 
 GenericErrorMessage.propTypes = {
-  message: PropTypes.message
+  message: PropTypes.node
 };
 
 export default GenericErrorMessage;

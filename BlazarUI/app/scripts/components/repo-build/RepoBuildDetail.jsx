@@ -101,14 +101,9 @@ class RepoBuildBuildDetail extends Component {
       );
     }
 
-    // todo use ClassNames
-    let wrapperClassNames = `build-detail-header ${this.getWrapperClassNames(build)}`;
-
-    console.log(build.commitInfo);
-
     return (
       <div>
-        <div className={wrapperClassNames}>
+        <div className={this.getWrapperClassNames(build)}>
           <p className='build-detail-header__build-state'>
             Build {buildDetail.buildResult} 
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>

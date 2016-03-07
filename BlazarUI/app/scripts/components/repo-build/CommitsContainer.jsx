@@ -53,7 +53,7 @@ class CommitsContainer extends Component {
 }
 
 CommitsContainer.propTypes = {
-  commits: PropTypes.array.isRequired // this is "newCommits" piece of the object
+  commits: PropTypes.array.isRequired
 };
 
 export default CommitsContainer;
