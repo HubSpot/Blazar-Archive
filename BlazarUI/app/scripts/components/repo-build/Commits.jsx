@@ -16,17 +16,17 @@ class Commits extends Component {
 
   renderHeader() {
     return (
-      <div class="commits-container--header">
-        {moment(this.props.timestamp).format('MMM D, YYYY')}
+      <div className="commits-container--header">
+        <span>{moment(this.props.timestamp).format('MMM D, YYYY')}</span>
       </div>
     );
   }
 
   render() {
     return (
-      <div class="commits-container--day-of-commits">
+      <div className="commits-container--day-of-commits">
         {this.renderHeader()}
-        <div class="commits-container--commit-list">
+        <div className="commits-container--commit-list">
           {this.renderCommits()}
         </div>
       </div>
@@ -36,7 +36,7 @@ class Commits extends Component {
 
 Commits.propTypes = {
   commits: PropTypes.array.isRequired,
-  timestamp: PropTypes.string.isRequired
+  timestamp: PropTypes.number.isRequired
 }
 
 export default Commits;

@@ -5,17 +5,20 @@ import Commits from './Commits.jsx';
 class CommitsContainer extends Component {
 
   splitCommitsIntoDays() {
-    let commitMap; // keyed by day
-    this.props.commits.map((commit) => {
-      const day = moment(commit.timestamp).format('M-DD-YY');
+    let commitMap = {}; // keyed by day
+    this.props.commits.sort((a, b) => {
+        return b.timestamp - a.timestamp;
+      }).map((commit) => {
+      const day = moment(parseInt(commit.timestamp, 10)).format('M-DD-YY');
       let entry;
 
-      if (day in commitMap) {
-        entry = [commit];
+      if (commitMap[day] !== undefined) {
+        entry = commitMap[day];
+        entry.push(commit);
       }
 
       else {
-        entry = commitMap[day];
+        entry = [commit];
       }
 
       commitMap[day] = entry;
@@ -28,8 +31,8 @@ class CommitsContainer extends Component {
     const commitMap = this.splitCommitsIntoDays();
 
     return Object.keys(commitMap).map((day, i) => {
-      const commitList = commitMap.get(day);
-      const timestamp = commitList[0].timestamp;
+      const commitList = commitMap[day];
+      const timestamp = parseInt(commitList[0].timestamp, 10);
 
       return (
         <Commits
@@ -42,7 +45,7 @@ class CommitsContainer extends Component {
 
   render() {
     return (
-      <div class="commits-container">
+      <div className="commits-container">
         {this.renderCommits()}
       </div>
     );
@@ -50,7 +53,7 @@ class CommitsContainer extends Component {
 }
 
 CommitsContainer.propTypes = {
-  commits: PropTypes.object.isRequired // this is "newCommits" piece of the object
+  commits: PropTypes.array.isRequired // this is "newCommits" piece of the object
 };
 
 export default CommitsContainer;

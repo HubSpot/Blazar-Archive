@@ -1,0 +1,51 @@
+@import './variables.styl'
+
+.commits-container
+  width auto
+  padding-bottom 75px
+  
+.commits-container--header
+  background-color #F2F5F8
+  border-bottom 1px solid #E6E6E6
+  padding 2px 2px 2px 10px
+  
+  span
+    color $gray-dark
+  
+//.commits-container--commit-list
+
+.commits-container--commit
+  position relative
+  height auto
+  
+.commits-container--day-of-commits
+  border 0px solid #E6E6E6
+  border-top-width 1px
+
+.commits-container--commit-timestamp
+  position absolute
+  top 0px
+  right 10px
+  color $gray-dark
+
+.commits-container--commit-content
+  margin 5px 75px 10px 10px
+  
+.commits-container--commit-wrapper
+  height auto
+  border 1px solid #E6E6E6
+  border-width 0 0 1px 0
+  
+.commits-container--commit-author
+  font-weight bold
+  color $gray-darker
+  
+.commits-container--commit-details
+  margin-top 5px
+  color $gray-dark
+  
+.commits-container--commit-message
+  overflow-x hidden
+  text-overflow ellipsis
+  white-space nowrap
+  display block

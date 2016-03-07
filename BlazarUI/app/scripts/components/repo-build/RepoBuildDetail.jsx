@@ -8,6 +8,8 @@ import RepoBuildCancelButton from './RepoBuildCancelButton.jsx';
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
 
+import CommitsContainer from './CommitsContainer.jsx';
+
 import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
 import {LABELS} from '../constants';
@@ -99,9 +101,14 @@ class RepoBuildBuildDetail extends Component {
       );
     }
 
+    // todo use ClassNames
+    let wrapperClassNames = `build-detail-header ${this.getWrapperClassNames(build)}`;
+
+    console.log(build.commitInfo);
+
     return (
-      <div className={this.getWrapperClassNames(build)}>
-        <div className='build-detail-header'>
+      <div>
+        <div className={wrapperClassNames}>
           <p className='build-detail-header__build-state'>
             Build {buildDetail.buildResult} 
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
@@ -111,16 +118,8 @@ class RepoBuildBuildDetail extends Component {
             build={build}
           />
         </div>
-        <div className='build-detail-body'>
-          <pre className='build-detail-body__commit-desc' title={currentCommit.message}>{truncate(currentCommit.message, this.state.windowWidth * .08, true)}</pre>
-        </div>
-        <div className='build-detail-footer'>
-          Triggered by <strong>{currentCommit.author.name}</strong> on { ' ' }
-          {timestampFormatted(currentCommit.timestamp, 'llll')} 
-          <span className='build-detail__sha'> 
-            commit <Sha gitInfo={gitInfo} build={build} />
-          </span>
-        </div>
+        <CommitsContainer
+          commits={newCommits} />
       </div>
     );
   }

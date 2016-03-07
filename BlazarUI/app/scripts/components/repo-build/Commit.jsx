@@ -1,34 +1,39 @@
 import React, {Component, PropTypes} from 'react';
 import moment from 'moment';
+import {Link} from 'react-router';
 
 class Commit extends Component {
 
   renderTimestamp() {
     const {timestamp} = this.props.commitInfo;
-    const formattedTime = moment(timestamp).format('LT');
+    const formattedTime = moment(parseInt(timestamp, 10)).format('LT');
 
     return (
-      <div class="commits-container--commit-timestamp">
+      <div className="commits-container--commit-timestamp">
         {formattedTime}
       </div>
     );
   }
 
   renderContent() {
-    const {message, author, modified, added, removed} = this.props.commitInfo;
+    const {message, author, modified, added, removed, url} = this.props.commitInfo;
     const {name} = author;
-    const filesChanged = modified.size() + added.size() + removed.size();
+    const filesChanged = modified.length + added.length + removed.length;
 
     return (
-      <div class="commits-container--commit-content">
-        <span class="commits-container--commit-message">
-          {message}
-        </span>
-        <div class="commits-container--commit-details">
-          <span class="commits-container--commit-author">
-            {name}
+      <div className="commits-container--commit-wrapper">
+        <div className="commits-container--commit-content">
+          <span className="commits-container--commit-message">
+            <Link to={url} target="_blank">
+              {message}
+            </Link>
           </span>
-          changed {filesChanged} file{filesChanged === 1 ? '' : 's'}
+          <div className="commits-container--commit-details">
+            <span className="commits-container--commit-author">
+              {name}
+            </span>
+            { ' ' } changed {filesChanged} file{filesChanged === 1 ? '' : 's'}
+          </div>
         </div>
       </div>
     );
@@ -37,13 +42,13 @@ class Commit extends Component {
   renderPicture() {
     //placeholder
     return (
-      <div class="commits-container--picture" />
+      <div className="commits-container--picture" />
     );
   }
 
   render() {
     return (
-      <div class="commits-container--commit">
+      <div className="commits-container--commit">
         {this.renderPicture()}
         {this.renderContent()}
         {this.renderTimestamp()}
