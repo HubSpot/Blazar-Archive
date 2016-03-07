@@ -8,7 +8,7 @@ import RepoBuildCancelButton from './RepoBuildCancelButton.jsx';
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
 
-import CommitsContainer from './CommitsContainer.jsx';
+import Commits from './Commits.jsx';
 
 import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
@@ -113,7 +113,7 @@ class RepoBuildBuildDetail extends Component {
             build={build}
           />
         </div>
-        <CommitsContainer
+        <Commits
           commits={newCommits} />
       </div>
     );

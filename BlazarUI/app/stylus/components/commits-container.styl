@@ -1,50 +1,47 @@
 @import './variables.styl'
 
-.commits-container
+.commits
   width auto
   padding-bottom 75px
   
-.commits-container--header
+.commits__header
   background-color #F2F5F8
   border-bottom 1px solid $gray-light
   padding 2px 2px 2px 10px
   
   span
     color $gray-dark
+    
+.commits__day-of-commits--first
+  border-top 1px solid $gray-light
 
-.commits-container--commit
+.commits__commit
   position relative
   height auto
 
-.commits-container--day-of-commits__first
-  border-top 1px solid $gray-light
-  
-.commits-container--day-of-commits__rest
-  margin-top 10px
-
-.commits-container--commit-timestamp
+.commits__commit-timestamp
   position absolute
   top 0px
   right 10px
   color $gray-dark
 
-.commits-container--commit-content
+.commits__commit-content
   margin 7px 75px 7px 10px
   
-.commits-container--commit-wrapper
+.commits__commit-wrapper
   height auto
   border 1px solid $gray-light
   border-width 0 0 1px 0
   
-.commits-container--commit-author
+.commits__commit-author
   font-weight bold
   color $gray-darker
   
-.commits-container--commit-details
+.commits__commit-details
   margin-top 3px
   color $gray-dark
   
-.commits-container--commit-message
+.commits__commit-message
   overflow-x hidden
   text-overflow ellipsis
   white-space nowrap

@@ -2,14 +2,14 @@ import React, {Component, PropTypes} from 'react';
 import moment from 'moment';
 import {Link} from 'react-router';
 
-class Commit extends Component {
+class CommitDetails extends Component {
 
   renderTimestamp() {
     const {timestamp} = this.props.commitInfo;
     const formattedTime = moment(parseInt(timestamp, 10)).format('LT');
 
     return (
-      <div className="commits-container--commit-timestamp">
+      <div className="commits__commit-timestamp">
         {formattedTime}
       </div>
     );
@@ -21,15 +21,15 @@ class Commit extends Component {
     const filesChanged = modified.length + added.length + removed.length;
 
     return (
-      <div className="commits-container--commit-wrapper">
-        <div className="commits-container--commit-content">
-          <span className="commits-container--commit-message">
+      <div className="commits__commit-wrapper">
+        <div className="commits__commit-content">
+          <span className="commits__commit-message">
             <Link to={url} target="_blank">
               {message}
             </Link>
           </span>
-          <div className="commits-container--commit-details">
-            <span className="commits-container--commit-author">
+          <div className="commits__commit-details">
+            <span className="commits__commit-author">
               {name}
             </span>
             { ' ' } changed {filesChanged} file{filesChanged === 1 ? '' : 's'}
@@ -42,13 +42,13 @@ class Commit extends Component {
   renderPicture() {
     //placeholder
     return (
-      <div className="commits-container--picture" />
+      <div className="commits__picture" />
     );
   }
 
   render() {
     return (
-      <div className="commits-container--commit">
+      <div className="commits__commit">
         {this.renderPicture()}
         {this.renderContent()}
         {this.renderTimestamp()}
@@ -57,8 +57,8 @@ class Commit extends Component {
   }
 }
 
-Commit.propTypes = {
+CommitDetails.propTypes = {
   commitInfo: PropTypes.object.isRequired
 }
 
-export default Commit;
+export default CommitDetails;

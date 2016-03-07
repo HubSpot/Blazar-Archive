@@ -1,56 +1,63 @@
 import React, {Component, PropTypes} from 'react';
 import moment from 'moment';
-import classNames from 'classnames';
 
-import Commit from './Commit.jsx';
+import CommitList from './CommitList.jsx';
 
 class Commits extends Component {
 
-  getClassNames() {
-    const baseClass = 'commits-container--day-of-commits';
-    const modifierSuffix = this.props.firstCommit ? '__first' : '__rest';
+  splitCommitsIntoDays() {
+    let commitMap = {}; // keyed by day
+    this.props.commits.sort((a, b) => {
+        return b.timestamp - a.timestamp;
+      }).map((commit) => {
+      const day = moment(parseInt(commit.timestamp, 10)).format('M-DD-YY');
+      let entry;
 
-    return classNames([
-      baseClass,
-      baseClass + modifierSuffix
-    ]);
+      if (commitMap[day] !== undefined) {
+        entry = commitMap[day];
+        entry.push(commit);
+      }
+
+      else {
+        entry = [commit];
+      }
+
+      commitMap[day] = entry;
+    });
+
+    return commitMap;
   }
 
   renderCommits() {
-    return this.props.commits.map((commit, i) => {
+    const commitMap = this.splitCommitsIntoDays();
+    let topBorder = true;
+
+    return Object.keys(commitMap).map((day, i) => {
+      const commitList = commitMap[day];
+      const timestamp = parseInt(commitList[0].timestamp, 10);
+      const isFirstCommit = i === 0;
+
       return (
-        <Commit
+        <CommitList
           key={i}
-          commitInfo={commit} />
+          isFirstCommit={isFirstCommit}
+          commits={commitList}
+          timestamp={timestamp} />
       );
     });
   }
 
-  renderHeader() {
-    return (
-      <div className="commits-container--header">
-        <span>{moment(this.props.timestamp).format('MMM D, YYYY')}</span>
-      </div>
-    );
-  }
-
   render() {
-
     return (
-      <div className={this.getClassNames()}>
-        {this.renderHeader()}
-        <div className="commits-container--commit-list">
-          {this.renderCommits()}
-        </div>
+      <div className="commits">
+        {this.renderCommits()}
       </div>
     );
   }
 }
 
 Commits.propTypes = {
-  commits: PropTypes.array.isRequired,
-  timestamp: PropTypes.number.isRequired,
-  firstCommit: PropTypes.bool.isRequired
-}
+  commits: PropTypes.array.isRequired
+};
 
 export default Commits;
