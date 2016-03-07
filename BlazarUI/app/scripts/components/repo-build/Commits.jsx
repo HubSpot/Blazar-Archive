@@ -83,7 +83,13 @@ class Commits extends Component {
   }
 
   renderShowText() {
-    const {showCommits} = this.props;
+    const {commits, showCommits} = this.props;
+
+    if (commits.length === 1) {
+      return (
+        <span />
+      );
+    }
 
     return (
       <a className="commits__view-all" onClick={this.props.flipShowCommits}>

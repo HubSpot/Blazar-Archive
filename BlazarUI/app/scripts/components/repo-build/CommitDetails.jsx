@@ -3,6 +3,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 
 import Icon from '../shared/Icon.jsx';
+import Image from '../shared/Image.jsx';
 
 import {Link} from 'react-router';
 
@@ -70,6 +71,15 @@ class CommitDetails extends Component {
   renderPicture() {
     const {commitInfo} = this.props;
     const iconName = commitInfo.firstRow ? 'git-branch' : 'git-commit';
+    const imageUrl = `${window.config.staticRoot}/images/branch_head.png`;
+
+    if (commitInfo.firstRow) {
+      return (
+        <div className="commits__git-branch-icon">
+          <Image src={imageUrl} height="25" width="25" classNames="commits__picture-icon" />
+        </div>
+      );
+    }
 
     return (
       <div className={this.getPictureClassNames()}>
