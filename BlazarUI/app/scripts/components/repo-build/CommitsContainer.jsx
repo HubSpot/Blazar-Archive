@@ -29,13 +29,20 @@ class CommitsContainer extends Component {
 
   renderCommits() {
     const commitMap = this.splitCommitsIntoDays();
+    let topBorder = true;
 
     return Object.keys(commitMap).map((day, i) => {
       const commitList = commitMap[day];
       const timestamp = parseInt(commitList[0].timestamp, 10);
+      let firstCommit = false;
+
+      if (i === 0) {
+        firstCommit = true;
+      }
 
       return (
         <Commits
+          firstCommit={firstCommit}
           key={i}
           commits={commitList}
           timestamp={timestamp} />

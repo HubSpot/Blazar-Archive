@@ -15,10 +15,12 @@
 .commits-container--commit
   position relative
   height auto
+
+.commits-container--day-of-commits__first
+  border-top 1px solid $gray-light
   
-.commits-container--day-of-commits
-  border 0px solid $gray-light
-  border-top-width 1px
+.commits-container--day-of-commits__rest
+  margin-top 10px
 
 .commits-container--commit-timestamp
   position absolute
@@ -27,7 +29,7 @@
   color $gray-dark
 
 .commits-container--commit-content
-  margin 5px 75px 10px 10px
+  margin 7px 75px 7px 10px
   
 .commits-container--commit-wrapper
   height auto
@@ -39,7 +41,7 @@
   color $gray-darker
   
 .commits-container--commit-details
-  margin-top 5px
+  margin-top 3px
   color $gray-dark
   
 .commits-container--commit-message

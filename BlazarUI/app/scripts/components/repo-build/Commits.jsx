@@ -1,8 +1,20 @@
 import React, {Component, PropTypes} from 'react';
 import moment from 'moment';
+import classNames from 'classnames';
+
 import Commit from './Commit.jsx';
 
 class Commits extends Component {
+
+  getClassNames() {
+    const baseClass = 'commits-container--day-of-commits';
+    const modifierSuffix = this.props.firstCommit ? '__first' : '__rest';
+
+    return classNames([
+      baseClass,
+      baseClass + modifierSuffix
+    ]);
+  }
 
   renderCommits() {
     return this.props.commits.map((commit, i) => {
@@ -23,8 +35,9 @@ class Commits extends Component {
   }
 
   render() {
+
     return (
-      <div className="commits-container--day-of-commits">
+      <div className={this.getClassNames()}>
         {this.renderHeader()}
         <div className="commits-container--commit-list">
           {this.renderCommits()}
@@ -36,7 +49,8 @@ class Commits extends Component {
 
 Commits.propTypes = {
   commits: PropTypes.array.isRequired,
-  timestamp: PropTypes.number.isRequired
+  timestamp: PropTypes.number.isRequired,
+  firstCommit: PropTypes.bool.isRequired
 }
 
 export default Commits;
