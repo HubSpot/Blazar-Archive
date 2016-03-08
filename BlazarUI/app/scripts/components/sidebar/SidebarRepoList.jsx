@@ -7,7 +7,7 @@ import {has} from 'underscore';
 import {sortBuildsByRepoAndBranch, filterInactiveBuilds} from '../Helpers.js';
 
 let initialState = {
-  extraChildHeight: 0
+  extraChildHeight: 4
 }
 
 class SidebarRepoList extends Component {
