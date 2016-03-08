@@ -107,6 +107,8 @@ class RepoBuildBuildDetail extends Component {
       );
     }
 
+    let commitList = newCommits.length === 0 ? [currentCommit] : newCommits;
+
     return (
       <div>
         <div className={this.getWrapperClassNames(build)}>
@@ -120,7 +122,7 @@ class RepoBuildBuildDetail extends Component {
           />
         </div>
         <Commits
-          commits={newCommits}
+          commits={commitList}
           showCommits={this.state.showCommits}
           flipShowCommits={this.flipShowCommits.bind(this)} />
       </div>
