@@ -1,0 +1,100 @@
+@import './variables.styl'
+
+.commits
+  width auto
+  border-bottom 1px solid $gray-light
+  margin-bottom 10px
+  margin-top 10px
+  
+.commits__summary
+  padding-left 10px
+  
+.commits__wrapper
+  margin-bottom 40px
+  
+.commits__header
+  background-color #F2F5F8
+  border 1px solid $gray-light
+  border-width 1px 0 1px 0
+  padding 2px 2px 2px 10px
+  
+  span
+    color $gray-dark
+
+.commits__commit
+  position relative
+  height auto
+  
+.commits__commit--even
+  background-color #f9fafa
+
+.commits__commit-timestamp
+  position absolute
+  top 5px
+  right 10px
+  color $gray-dark
+
+.commits__commit-content
+  padding 3px 75px 3px 45px
+  
+.commits__commit-wrapper
+  height auto
+  border-left 1px solid $gray
+  margin-left 35px
+  
+.commits__commit-author
+  font-weight bold
+  color $gray-darker
+  
+.commits__commit-details
+  margin-top 3px
+  color $gray-dark
+  
+.commits__commit-message
+  overflow-x hidden
+  text-overflow ellipsis
+  white-space nowrap
+  display block
+
+.commits__picture
+  position absolute
+  left 28px
+  top 15px
+
+.commits__picture--even
+  background-color #f9fafa
+
+.commits__picture--odd
+  background-color white
+  
+.commits__picture--firstrow
+  left 23px
+  top 0px
+  padding-top 12px
+  
+.commits__picture--lastrow
+  img
+    margin-bottom 12px
+    
+  i
+    padding-bottom 16px
+    
+
+  
+.commits__picture-icon
+  color #94AAC3
+
+.commits__git-branch-icon
+  position absolute
+  left 23px
+  background-color white
+
+.commits__git-branch-icon--lastrow
+  padding 10px 0
+
+.commits__view-all
+  padding-left 10px
+  
+  &:hover
+    cursor pointer
+    text-decoration none

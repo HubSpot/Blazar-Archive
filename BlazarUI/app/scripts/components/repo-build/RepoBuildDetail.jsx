@@ -8,6 +8,8 @@ import RepoBuildCancelButton from './RepoBuildCancelButton.jsx';
 import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
 
+import Commits from './Commits.jsx';
+
 import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
 import {LABELS} from '../constants';
@@ -41,6 +43,12 @@ class RepoBuildBuildDetail extends Component {
   handleResize(e) {
     this.setState({
       windowWidth: window.innerWidth
+    });
+  }
+
+  flipShowCommits() {
+    this.setState({
+      showCommits: !this.state.showCommits
     });
   }  
   
@@ -100,8 +108,8 @@ class RepoBuildBuildDetail extends Component {
     }
 
     return (
-      <div className={this.getWrapperClassNames(build)}>
-        <div className='build-detail-header'>
+      <div>
+        <div className={this.getWrapperClassNames(build)}>
           <p className='build-detail-header__build-state'>
             Build {buildDetail.buildResult} 
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
@@ -111,16 +119,10 @@ class RepoBuildBuildDetail extends Component {
             build={build}
           />
         </div>
-        <div className='build-detail-body'>
-          <pre className='build-detail-body__commit-desc' title={currentCommit.message}>{truncate(currentCommit.message, this.state.windowWidth * .08, true)}</pre>
-        </div>
-        <div className='build-detail-footer'>
-          Triggered by <strong>{currentCommit.author.name}</strong> on { ' ' }
-          {timestampFormatted(currentCommit.timestamp, 'llll')} 
-          <span className='build-detail__sha'> 
-            commit <Sha gitInfo={gitInfo} build={build} />
-          </span>
-        </div>
+        <Commits
+          commits={newCommits}
+          showCommits={this.state.showCommits}
+          flipShowCommits={this.flipShowCommits.bind(this)} />
       </div>
     );
   }
