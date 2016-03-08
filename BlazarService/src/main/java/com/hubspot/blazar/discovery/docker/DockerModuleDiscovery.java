@@ -25,7 +25,7 @@ import com.hubspot.blazar.util.GitHubHelper;
 @Singleton
 public class DockerModuleDiscovery implements ModuleDiscovery {
   private static final Optional<GitInfo> MASTER_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Docker#master"));
+      Optional.of(GitInfo.fromString("git.hubteam.com/HubSpot/Blazar-Buildpack-Docker#master"));
 
   private final GitHubHelper gitHubHelper;
 

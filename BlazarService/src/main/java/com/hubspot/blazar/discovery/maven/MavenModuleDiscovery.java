@@ -30,9 +30,9 @@ public class MavenModuleDiscovery implements ModuleDiscovery {
   private static final Logger LOG = LoggerFactory.getLogger(MavenModuleDiscovery.class);
 
   private static final Optional<GitInfo> STANDARD_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#v2"));
+      Optional.of(GitInfo.fromString("git.hubteam.com/HubSpot/Blazar-Buildpack-Java#v2"));
   private static final Optional<GitInfo> DEPLOYABLE_BUILDPACK =
-      Optional.of(GitInfo.fromString("git.hubteam.com/paas/Blazar-Buildpack-Java#v2-deployable"));
+      Optional.of(GitInfo.fromString("git.hubteam.com/HubSpot/Blazar-Buildpack-Java#v2-deployable"));
   private static final Set<String> EXECUTABLE_MARKERS = ImmutableSet.of(".build-executable", ".build-thin");
 
   private final GitHubHelper gitHubHelper;
