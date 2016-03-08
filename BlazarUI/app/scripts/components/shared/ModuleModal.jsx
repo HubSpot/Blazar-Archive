@@ -13,7 +13,7 @@ class ModuleModal extends Component {
   constructor(props) {
     super(props);
 
-    bindAll(this, 'updateDownstreamModules', 'updateSelectedModules', 'getModuleIdsAndBuild');
+    bindAll(this, 'updateDownstreamModules', 'updateSelectedModules', 'getModuleIdsAndBuild', 'maybeStartBuild');
   }
 
   getModuleIdsAndBuild() {
@@ -28,6 +28,13 @@ class ModuleModal extends Component {
   updateDownstreamModules(isChecked) {
     const enumValue = isChecked ? 'WITHIN_REPOSITORY' : 'NONE';
     this.props.onCheckboxUpdate(enumValue);
+  }
+
+  maybeStartBuild(target) {
+    if (target.charCode === 13) {
+      this.props.triggerBuild();
+      this.props.closeModal();
+    }
   }
 
   renderDownstreamToggle() {
@@ -81,7 +88,7 @@ class ModuleModal extends Component {
 
   render() {
     return (
-      <Modal dialogClassName='module-modal' bsSize='large' show={this.props.showModal} onHide={this.props.closeModal}>
+      <Modal dialogClassName='module-modal' bsSize='large' show={this.props.showModal} onKeyPress={this.maybeStartBuild} onHide={this.props.closeModal}>
         {this.renderModalContent()}
       </Modal>
     );
