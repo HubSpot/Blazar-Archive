@@ -45,8 +45,8 @@ let LazyRender = React.createClass({
     });
   },
 
-  getHeight: function(numChildren, childHeight, maxHeight) {
-    let fullHeight = (numChildren * childHeight) + this.props.extraChildHeight;
+  getHeight: function(numChildren, childHeight, maxHeight, extraChildHeight = 0) {
+    let fullHeight = (numChildren * childHeight) + extraChildHeight;
     if (fullHeight < maxHeight) {
       return fullHeight;
     }
@@ -77,7 +77,8 @@ let LazyRender = React.createClass({
     let height = this.getHeight(
       nextProps.children.length,
       this.state.childHeight,
-      nextProps.maxHeight
+      nextProps.maxHeight,
+      nextProps.extraChildHeight
     );
 
     let numberOfItems = Math.ceil(height / this.state.childHeight);
@@ -100,7 +101,8 @@ let LazyRender = React.createClass({
     let height = this.getHeight(
       this.props.children.length,
       childHeight,
-      this.props.maxHeight
+      this.props.maxHeight,
+      this.props.extraChildHeight
     );
 
     let numberOfItems = Math.ceil(height / childHeight);
