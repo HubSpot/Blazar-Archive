@@ -12,7 +12,7 @@ class BranchBuildsApi extends StoredBuilds {
     const {params} = this.options;
 
     const builds = resp.map((build) => {
-      build.blazarPath = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${build.buildNumber}`;
+      build.blazarPath = `${config.appRoot}/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${build.buildNumber}`.replace('#', '%23');
       if (build.endTimestamp && build.startTimestamp) {
         build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp, {round: true});   
       }
@@ -48,7 +48,7 @@ class BranchBuildsApi extends StoredBuilds {
     
     if (repoBuildGitInfo) {
       this.branchId = repoBuildGitInfo.id;
-    }
+  }
 
     else {
       this.cb('No such branch found');
