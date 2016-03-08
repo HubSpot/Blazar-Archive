@@ -41,7 +41,8 @@ class SidebarContainer extends Component {
       changingBuildsType: false,
       filterText: '',
       toggleFilterState: sidebarTabProvider.getSidebarTab(),
-      sidebarHeight: this.getSidebarHeight()
+      sidebarHeight: this.getSidebarHeight(),
+      dontDisplay: true
     };
   }
 
@@ -94,7 +95,8 @@ class SidebarContainer extends Component {
     this.setState({
       filterText: this.state.filterText,
       toggleFilterState: toggleState,
-      changingBuildsType: true
+      changingBuildsType: true,
+      dontDisplay: true
     });
   }
 
@@ -138,7 +140,7 @@ class SidebarContainer extends Component {
           />
           <SidebarMessage
             searchType={searchType}
-            numberOfBuilds={matches.length}
+            numberOfBuilds={matches.length || 0}
             {...this.state}
           />
         </div>
