@@ -70,12 +70,12 @@ class CommitDetails extends Component {
 
   renderPicture() {
     const {commitInfo} = this.props;
-    const iconName = commitInfo.firstRow ? 'git-branch' : 'git-commit';
-    const imageUrl = `${window.config.staticRoot}/images/branch_head.png`;
 
     if (commitInfo.firstRow) {
+      const imageUrl = `${window.config.staticRoot}/images/branch_head.png`;
+
       return (
-        <div className="commits__git-branch-icon">
+        <div className={this.getPictureClassNames()}>
           <Image src={imageUrl} height="25" width="25" classNames="commits__picture-icon" />
         </div>
       );
@@ -83,7 +83,7 @@ class CommitDetails extends Component {
 
     return (
       <div className={this.getPictureClassNames()}>
-        <Icon type="octicon" name={iconName} classNames="commits__picture-icon" />
+        <Icon type="octicon" name='git-commit' classNames="commits__picture-icon" />
       </div>
     );
   }

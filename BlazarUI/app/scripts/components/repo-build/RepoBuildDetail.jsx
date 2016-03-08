@@ -20,7 +20,7 @@ class RepoBuildBuildDetail extends Component {
     bindAll(this, 'handleResize')
     this.state = {
       windowWidth: window.innerWidth,
-      showCommits: false,
+      showCommits: false
     }
   }
 
