@@ -6,7 +6,21 @@ import SidebarItem from './SidebarItem.jsx';
 import {has} from 'underscore';
 import {sortBuildsByRepoAndBranch, filterInactiveBuilds} from '../Helpers.js';
 
+let initialState = {
+  extraChildHeight: 0
+}
+
 class SidebarRepoList extends Component {
+
+  constructor() {
+    this.state = initialState;
+  }
+
+  refreshSidebar(extraChildDelta) {
+    this.setState({
+      extraChildHeight: this.state.extraChildHeight + extraChildDelta
+    });
+  }
 
   renderBuildsList(builds) {
     return Object.keys(builds).sort().map((repo, i) => {
@@ -29,6 +43,7 @@ class SidebarRepoList extends Component {
         <SidebarItem
           key={i}
           builds={sortedBuilds}
+          onExpand={this.refreshSidebar.bind(this)}
           repository={sortedBuilds[0].gitInfo.repository}
         />
       );
@@ -37,7 +52,7 @@ class SidebarRepoList extends Component {
     });
   }
 
-  render() {    
+  render() {
     const {changingBuildsType, filteredBuilds, loading} = this.props;
 
     if (loading) {
@@ -53,7 +68,8 @@ class SidebarRepoList extends Component {
     return (
       <LazyRender
         childHeight={67}
-        maxHeight={this.props.sidebarHeight} >
+        maxHeight={this.props.sidebarHeight}
+        extraChildHeight={this.state.extraChildHeight} >
         {this.renderBuildsList(filteredBuilds)}
       </LazyRender>
     );

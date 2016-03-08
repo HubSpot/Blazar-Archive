@@ -10,7 +10,8 @@ import BuildStates from '../../constants/BuildStates.js';
 import {buildResultIcon} from '../Helpers.js';
 
 let initialState = {
-  expanded: false
+  expanded: false,
+  height: 67
 };
 
 class SidebarItem extends Component {
@@ -27,9 +28,22 @@ class SidebarItem extends Component {
   }
 
   toggleExpand() {
+    const heightWithChildren = 67 + (28 * (this.props.builds.length > 0 ? this.props.builds.length - 1 : 0));
+    let heightDelta;
+
+    if (this.state.expanded) {
+      heightDelta = 67 - heightWithChildren;
+    }
+
+    else {
+      heightDelta = heightWithChildren - 67;
+    }
+
     this.setState({
       expanded: !this.state.expanded
     });
+
+    this.props.onExpand(heightDelta);
   }
 
   getBuildToUse(build) {
@@ -174,7 +188,8 @@ class SidebarItem extends Component {
 SidebarItem.propTypes = {
   isStarred: PropTypes.bool,
   builds: PropTypes.array.isRequired,
-  repository: PropTypes.string.isRequired
+  repository: PropTypes.string.isRequired,
+  onExpand: PropTypes.func.isRequired
 };
 
 export default SidebarItem;
