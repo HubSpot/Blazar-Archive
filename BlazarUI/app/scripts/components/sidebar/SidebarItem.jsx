@@ -109,15 +109,19 @@ class SidebarItem extends Component {
     );
   }
 
-  renderBuildIcon(buildState) {
-    if (buildState === BuildStates.SUCCEEDED) {
+  renderBuildIcon(build) {
+    const buildToUse = this.getBuildToUse(build);
+
+    if (buildToUse.state === BuildStates.SUCCEEDED) {
       return (<div />);
     }
 
     return (
-      <div className='sidebar-item__building-icon-link'>
-        {buildResultIcon(buildState)}
-      </div>
+      <Link to={buildToUse.blazarPath}>
+        <div className='sidebar-item__building-icon-link'>
+          {buildResultIcon(buildToUse.state)}
+        </div>
+      </Link>
     );
   }
 
@@ -141,7 +145,7 @@ class SidebarItem extends Component {
 
     return (
       <div key={key} className='sidebar-item__branch-link'>
-        {this.renderBuildIcon(buildState)}
+        {this.renderBuildIcon(build)}
         {this.renderBranchText(build)}
         {this.renderBuildNumber(build)}
       </div>
