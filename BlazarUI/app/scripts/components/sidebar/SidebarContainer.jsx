@@ -140,7 +140,7 @@ class SidebarContainer extends Component {
           />
           <SidebarMessage
             searchType={searchType}
-            numberOfBuilds={matches.length || 0}
+            numberOfBuilds={Object.keys(matches).length}
             {...this.state}
           />
         </div>
