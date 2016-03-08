@@ -18,6 +18,11 @@
   color $gray-darker
   font-size 14px
   margin-left 3px
+  text-overflow ellipsis
+  overflow-x hidden
+  width 210px
+  display block
+  white-space nowrap
   
   & a
     padding-left 5px
@@ -36,12 +41,12 @@
 // adding padding to container
 .sidebar-item__building-icon-link
   position absolute
-  padding-top 8px
-  padding-left 35px
-  left 0px
+  margin-left -20px
+  margin-top 7px
 
 .sidebar-item__branch-link
   margin 8px 5px 8px 20px
+  position relative
   
 .sidebar-item__repo-link
   margin 5px 5px 1px 2px
@@ -50,6 +55,10 @@
   float right
   font-size 14px
   margin-right 5px
+  position absolute
+  right 0
+  top 0
+
   &:before
     content ' - '
     opacity: 0

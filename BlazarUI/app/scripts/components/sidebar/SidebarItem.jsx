@@ -103,7 +103,7 @@ class SidebarItem extends Component {
     return (
       <span className='sidebar-item__module-branch-name'>
         <Link to={gitInfo.blazarBranchPath}>
-          {truncate(gitInfo.branch, 25, true)}
+          {gitInfo.branch}
         </Link>
       </span>
     );
