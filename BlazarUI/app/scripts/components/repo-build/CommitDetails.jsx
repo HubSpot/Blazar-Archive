@@ -76,7 +76,7 @@ class CommitDetails extends Component {
 
       return (
         <div className={this.getPictureClassNames()}>
-          <Image src={imageUrl} height="25" width="25" classNames="commits__picture-icon" />
+          <Image src={imageUrl} height={25} width={25} classNames="commits__picture-icon" />
         </div>
       );
     }
