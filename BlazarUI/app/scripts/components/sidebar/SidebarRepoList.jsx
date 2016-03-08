@@ -32,6 +32,8 @@ class SidebarRepoList extends Component {
           repository={sortedBuilds[0].gitInfo.repository}
         />
       );
+    }).filter((build) => {
+      return build.type !== 'span';
     });
   }
 
@@ -50,9 +52,8 @@ class SidebarRepoList extends Component {
 
     return (
       <LazyRender
-        childHeight={71} 
-        maxHeight={this.props.sidebarHeight}
-        ignoreChildHeight={true}>
+        childHeight={67}
+        maxHeight={this.props.sidebarHeight} >
         {this.renderBuildsList(filteredBuilds)}
       </LazyRender>
     );

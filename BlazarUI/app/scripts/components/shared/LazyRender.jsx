@@ -6,14 +6,12 @@ let LazyRender = React.createClass({
     maxHeight: React.PropTypes.number.isRequired,
     childHeight: React.PropTypes.number,
     className: React.PropTypes.string,
-    itemPadding: React.PropTypes.number,
-    ignoreChildHeight: React.PropTypes.bool
+    itemPadding: React.PropTypes.number
   },
 
   getDefaultProps: function() {
     return {
-      itemPadding: 7,
-      ignoreChildHeight: false
+      itemPadding: 7
     };
   },
 
@@ -46,10 +44,6 @@ let LazyRender = React.createClass({
   },
 
   getHeight: function(numChildren, childHeight, maxHeight) {
-    if (this.props.ignoreChildHeight) {
-      return maxHeight;
-    }
-
     let fullHeight = numChildren * childHeight;
     if (fullHeight < maxHeight) {
       return fullHeight;
