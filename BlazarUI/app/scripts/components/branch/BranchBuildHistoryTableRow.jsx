@@ -48,7 +48,7 @@ class BranchBuildHistoryTableRow extends Component {
   getRowClassNames(state) {
     return classNames([
       tableRowBuildState(state),
-      'branch-build-history-row'
+      'clickable-table-row'
     ]);
   }
 
@@ -123,7 +123,7 @@ class BranchBuildHistoryTableRow extends Component {
 
 BranchBuildHistoryTableRow.contextTypes = {
   router: PropTypes.object.isRequired
-}
+};
 
 BranchBuildHistoryTableRow.propTypes = {
   data: PropTypes.object.isRequired

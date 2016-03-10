@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 const Link = require('react-router').Link;
 import {has} from 'underscore';
 import {buildResultIcon, tableRowBuildState, timestampFormatted} from '../Helpers';
+import classNames from 'classnames';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -9,6 +10,30 @@ import CommitMessage from '../shared/CommitMessage.jsx';
 
 class StarredBranchesTableRow extends Component {
 
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  getRowClassNames(state) {
+    return classNames([
+      tableRowBuildState(state),
+      'clickable-table-row'
+    ]);
+  }
+
+  onTableClick(blazarBranchPath, blazarPath, e) {
+    if (e.target.className === 'sha-link') {
+      window.open(e.target.href, '_blank');
+    }
+
+    else if (e.target.className === 'build-number') {
+      this.context.router.push(blazarPath);
+    }
+
+    else {
+      this.context.router.push(blazarBranchPath);
+    }
+  }
 
   render() {
 
@@ -54,7 +79,7 @@ class StarredBranchesTableRow extends Component {
     let buildToUse = item.get('inProgressBuild') !== undefined ? item.get('inProgressBuild') : latestBuild;
 
     return (
-      <tr className={tableRowBuildState(buildToUse.get('state'))}>
+      <tr onClick={this.onTableClick.bind(this, blazarBranchPath, buildToUse.get('blazarPath'))} className={this.getRowClassNames(buildToUse.get('state'))}>
         <td className='build-status'>
           {buildResultIcon(buildToUse.get('state'))}
         </td>
@@ -65,7 +90,7 @@ class StarredBranchesTableRow extends Component {
           {branch}
         </td>
         <td>
-          <Link to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
+          <Link className='build-number' to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
         </td>
         <td>
           {timestampFormatted(buildToUse.get('startTimestamp'))}
@@ -79,6 +104,10 @@ class StarredBranchesTableRow extends Component {
   }
   
 }
+
+StarredBranchesTableRow.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 StarredBranchesTableRow.propTypes = {
   item: PropTypes.object,
