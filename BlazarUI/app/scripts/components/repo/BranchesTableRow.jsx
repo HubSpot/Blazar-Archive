@@ -3,12 +3,35 @@ import BuildStates from '../../constants/BuildStates.js';
 import { Link } from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
-import {tableRowBuildState, humanizeText, timestampFormatted, buildResultIcon} from '../Helpers';
+import {tableRowBuildState, humanizeText, timestampFormatted, buildResultIcon, timestampDuration} from '../Helpers';
+import moment from 'moment';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
+let initialState = {
+  moment: moment()
+}
+
 class BranchesTableRow extends Component {
+
+  constructor() {
+    this.state = initialState;
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(this.updateMoment.bind(this), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  updateMoment() {
+    this.setState({
+      moment: moment()
+    })
+  }
 
   renderBranchLink(gitInfo) {
     const {gitInfo} = this.props.data;
@@ -48,10 +71,8 @@ class BranchesTableRow extends Component {
     const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
     let duration = build.duration;
 
-    console.log(build);
-
     if (build.state === BuildStates.IN_PROGRESS) {
-      duration = 'In Progress...';
+      duration = timestampDuration(build.startTimestamp, this.state.moment);
     }
 
     if (build.sha !== undefined) {
