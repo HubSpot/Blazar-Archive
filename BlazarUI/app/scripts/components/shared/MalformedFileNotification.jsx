@@ -59,7 +59,7 @@ class MalformedFileNotification extends Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          This branch contains {this.props.malformedFiles.length} malformed configuration file{numberOfFiles > 0 ? 's' : ''}. You'll need to correct these errors before can build your branch.
+          This branch contains {this.props.malformedFiles.length} malformed configuration file{numberOfFiles > 0 ? 's' : ''}. You'll need to correct these errors:
           {this.renderConfigInfo()}
         </Modal.Body>
         <Modal.Footer>
