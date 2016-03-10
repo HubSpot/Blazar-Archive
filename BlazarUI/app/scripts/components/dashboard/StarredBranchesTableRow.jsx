@@ -51,23 +51,12 @@ class StarredBranchesTableRow extends Component {
       sha = <Sha gitInfo={gitInfo} build={latestBuild} />;
     }
 
-    let currentState;
-    let previousState;
-
-    if (item.get('inProgressBuild') !== undefined) {
-      currentState = item.get('inProgressBuild').get('state');
-      previousState = latestBuild.get('state');
-    }
-
-    else {
-      currentState = latestBuild.get('state');
-      previousState = '';
-    }
+    let buildToUse = item.get('inProgressBuild') !== undefined ? item.get('inProgressBuild') : latestBuild;
 
     return (
-      <tr className={tableRowBuildState(latestBuild.state)}>
+      <tr className={tableRowBuildState(buildToUse.get('state'))}>
         <td className='build-status'>
-          {buildResultIcon(currentState, previousState)}
+          {buildResultIcon(buildToUse.get('state'))}
         </td>
         <td>
           <Link to={blazarBranchPath}>{repository}</Link>
@@ -76,10 +65,10 @@ class StarredBranchesTableRow extends Component {
           {branch}
         </td>
         <td>
-          <Link to={latestBuild.get('blazarPath')}>{latestBuild.get('buildNumber')}</Link>
+          <Link to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
         </td>
         <td>
-          {timestampFormatted(latestBuild.get('startTimestamp'))}
+          {timestampFormatted(buildToUse.get('startTimestamp'))}
         </td>
         <td>
           {sha}
