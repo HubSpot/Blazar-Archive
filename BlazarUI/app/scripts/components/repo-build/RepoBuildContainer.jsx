@@ -100,8 +100,8 @@ class RepoBuildContainer extends Component {
   }
 
   renderMalformedFileAlert() {
-    if (this.state.loadingMalformedFiles) {
-      return (<div />);
+    if (this.state.loadingMalformedFiles || this.state.malformedFiles.length === 0) {
+      return null;
     }
 
     return (
