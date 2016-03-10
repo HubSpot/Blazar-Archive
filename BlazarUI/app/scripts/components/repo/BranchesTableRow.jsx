@@ -47,11 +47,11 @@ class BranchesTableRow extends Component {
     let sha, buildLink;
     const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
     let duration = build.duration;
-    let prevBuildState = '';
+
+    console.log(build);
 
     if (build.state === BuildStates.IN_PROGRESS) {
       duration = 'In Progress...';
-      prevBuildState = lastBuild.state;
     }
 
     if (build.sha !== undefined) {
@@ -69,7 +69,7 @@ class BranchesTableRow extends Component {
     return (
       <tr className={tableRowBuildState(build.state)}>
         <td className='build-status'>
-          {buildResultIcon(build.state, prevBuildState)}
+          {buildResultIcon(build.state)}
         </td>
         <td>
           {this.renderBranchLink(gitInfo)}
@@ -92,12 +92,11 @@ class BranchesTableRow extends Component {
   }
 
   render() {
-    if (!has(this.props.data, 'lastBuild') ) {
-      return this.renderNoHistoryTable();
-    }
-    else {
+    if (has(this.props.data, 'lastBuild') || has(this.props.data, 'inProgressBuild') || has(this.props.data, 'pendingBuild')) {
       return this.renderFullTable();
     }
+
+    return this.renderNoHistoryTable();
   }
 
 }
