@@ -36,7 +36,7 @@ class BranchBuildsApi extends StoredBuilds {
   }
   
   _getBranchId() {
-    const builds = this.builds.toJS();
+    const builds = this.builds;
     const {params} = this.options;
     
     const repoBuildGitInfo = findWhere(builds.map((build) => build.gitInfo), {

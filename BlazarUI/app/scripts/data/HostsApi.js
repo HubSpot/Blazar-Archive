@@ -6,7 +6,7 @@ import StoredBuilds from './StoredBuilds';
 class HostsApi extends StoredBuilds {
 
   _parse() {
-    const grouped = groupBy(this.builds.toJS(), (build) => {
+    const grouped = groupBy(this.builds, (build) => {
       return build.gitInfo.host;
     });
 

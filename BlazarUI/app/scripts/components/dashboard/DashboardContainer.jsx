@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {contains, pluck, isEqual, filter} from 'underscore';
-import Immutable from 'immutable'
+import Immutable, {fromJS} from 'immutable'
 import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
@@ -19,7 +19,7 @@ class DashboardContainer extends Component {
     this.state = {
       stars: Immutable.List.of(),
       builds: Immutable.List.of(),
-      starredBuilds: Immutable.List.of(),
+      starredBuilds: [],
       loadingStars: true,
       loading: true
     }
@@ -44,7 +44,7 @@ class DashboardContainer extends Component {
 
     if (this.state.builds.all) {
       const starredBuilds = this.state.builds.all.filter((build) => {
-        return contains(this.state.stars, build.get('gitInfo').get('id'));
+        return contains(this.state.stars, build.gitInfo.id);
       });
 
       this.setState({ starredBuilds: starredBuilds });
@@ -60,7 +60,7 @@ class DashboardContainer extends Component {
     return (
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
-          starredBuilds={this.state.starredBuilds}
+          starredBuilds={fromJS(this.state.starredBuilds)}
           loadingStars={this.state.loadingStars}
           loadingBuilds={this.state.loading}
           params={this.props.params}

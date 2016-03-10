@@ -95,7 +95,7 @@ class RepoContainer extends Component {
             <BranchesTable 
               hide={this.state.error}
               {...this.state}
-              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.branches.toJS()))}
+              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.branches))}
             />
           </UIGridItem>
         </UIGrid>

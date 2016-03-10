@@ -8,7 +8,7 @@ class OrgApi extends StoredBuilds {
     const {params} = this.options;
 
     // get unique repos 
-    const repos = uniq(this.builds.toJS().filter((build) => {
+    const repos = uniq(this.builds.filter((build) => {
       return build.gitInfo.branch === 'master';
     }).map((build) => {
       return {
