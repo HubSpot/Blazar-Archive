@@ -15,7 +15,7 @@ import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
 import RepoBuildDetail from './RepoBuildDetail.jsx';
 
-import MalformedFileNotification from '../branch/MalformedFileNotification.jsx';
+import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 
 
 let initialState = {

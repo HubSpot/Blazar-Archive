@@ -11,7 +11,7 @@ import Loader from '../shared/Loader.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import BuildButton from './BuildButton.jsx';
 import ModuleModal from '../shared/ModuleModal.jsx';
-import MalformedFileNotification from './MalformedFileNotification.jsx';
+import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 import Immutable from 'immutable';
 
 import StarStore from '../../stores/starStore';

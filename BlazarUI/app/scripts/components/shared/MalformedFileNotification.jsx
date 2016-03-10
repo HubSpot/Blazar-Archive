@@ -79,13 +79,10 @@ class MalformedFileNotification extends Component {
 
   render() {
     if (this.props.loading || this.props.malformedFiles.length === 0) {
-      console.log("loading or no files");
       return (
         <div />
       );
     }
-
-    console.log("rendering icon");
 
     return (
       <div className="malformed-files">
