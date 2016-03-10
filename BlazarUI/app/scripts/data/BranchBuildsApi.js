@@ -102,6 +102,25 @@ class BranchBuildsApi extends StoredBuilds {
     });
   }
 
+  getMalformedFiles(cb) {
+    if (this.branchId === undefined) {
+      setTimeout(() => {
+        this.getMalformedFiles(cb);
+      }, 500);
+
+      return;
+    }
+
+    const malformedFiles = new Resource({
+      url: `${config.apiRoot}/branches/${this.branchId}/malformedFiles`,
+      type: 'GET'
+    }).send();
+
+    malformedFiles.then((resp) => {
+      cb(resp);
+    });
+  }
+
   generateBuildModuleJsonBody(moduleIds, downstreamModules) {
     return {moduleIds: moduleIds, buildDownstreams: downstreamModules};
   }

@@ -15,10 +15,14 @@ import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
 import RepoBuildDetail from './RepoBuildDetail.jsx';
 
+import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
+
 
 let initialState = {
   moduleBuilds: false,
   stars: [],
+  malformedFiles: [],
+  loadingMalformedFiles: true,
   loadingModuleBuilds: true,
   loadingStars: true
 };
@@ -51,6 +55,7 @@ class RepoBuildContainer extends Component {
     this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
     RepoBuildActions.loadModuleBuilds(params);
+    RepoBuildActions.loadMalformedFiles();
   }
 
   tearDown() {
@@ -93,12 +98,29 @@ class RepoBuildContainer extends Component {
       </UIGrid>
     );
   }
+
+  renderMalformedFileAlert() {
+    if (this.state.loadingMalformedFiles) {
+      return (<div />);
+    }
+
+    return (
+      <UIGrid>
+        <UIGridItem size={12}>
+          <MalformedFileNotification
+          loading={this.state.loadingMalformedFiles}
+          malformedFiles={this.state.malformedFiles} />
+        </UIGridItem>
+      </UIGrid>
+    );
+  }
   
   renderPage() {
     return (
       <div>
+        {this.renderMalformedFileAlert()}
         <UIGrid>
-          <UIGridItem size={12}>
+          <UIGridItem size={11}>
             <RepoBuildHeadline
               {...this.props}
               {...this.state}

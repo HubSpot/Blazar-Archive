@@ -11,6 +11,7 @@ import Loader from '../shared/Loader.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import BuildButton from './BuildButton.jsx';
 import ModuleModal from '../shared/ModuleModal.jsx';
+import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 import Immutable from 'immutable';
 
 import StarStore from '../../stores/starStore';
@@ -27,6 +28,8 @@ let initialState = {
   loadingBranches: true,
   loadingStars: true,
   loadingModules: true,
+  loadingMalformedFiles: true,
+  malformedFiles: [],
   showModuleModal: false,
   modules: Immutable.List.of(),
   selectedModules: [],
@@ -65,6 +68,7 @@ class BranchContainer extends Component {
     StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuilds(params);
     BranchActions.loadModules();
+    BranchActions.loadMalformedFiles();
   }
   
   tearDown() {
@@ -127,9 +131,26 @@ class BranchContainer extends Component {
     
   }
 
+  renderMalformedFileAlert() {
+    if (this.state.loadingMalformedFiles) {
+      return (<div />);
+    }
+
+    return (
+      <UIGrid>
+        <UIGridItem size={12}>
+          <MalformedFileNotification
+          loading={this.state.loadingMalformedFiles}
+          malformedFiles={this.state.malformedFiles} />
+        </UIGridItem>
+      </UIGrid>
+    );
+  }
+
   render() {
     return (
       <PageContainer>
+        {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={10}>
             <BranchHeadline

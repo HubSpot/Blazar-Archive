@@ -23,6 +23,12 @@ const RepoBuildStore = Reflux.createStore({
     this.api.cancelBuild();
   },
 
+  onLoadMalformedFiles() {
+    this.api.getMalformedFiles((resp) => {
+      this.triggerMalformedFileUpdate(resp);
+    });
+  },
+
   onLoadModuleBuilds(params) {
     this.api = new RepoBuildApi(params);
     
@@ -50,9 +56,14 @@ const RepoBuildStore = Reflux.createStore({
       branchId: this.builds.branchId,
       loadingModuleBuilds: false
     });
+  },
+  
+  triggerMalformedFileUpdate(resp) {
+    this.trigger({
+      malformedFiles: resp,
+      loadingMalformedFiles: false
+    });
   }
-  
-  
 
 });
 
