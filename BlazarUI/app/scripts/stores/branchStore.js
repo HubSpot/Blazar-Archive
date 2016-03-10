@@ -20,6 +20,12 @@ const BranchStore = Reflux.createStore({
     });
   },
 
+  onLoadMalformedFiles() {
+    this.branchBuildsApi.getMalformedFiles((resp) => {
+      this.triggerMalformedFileUpdate(resp);
+    });
+  },
+
   onLoadBranchBuilds(params) {
     this.branchBuildsApi = new BranchBuildsApi({
       params: params
@@ -57,6 +63,13 @@ const BranchStore = Reflux.createStore({
     this.trigger({
       modules: Immutable.fromJS(resp),
       loadingModules: false
+    });
+  },
+
+  triggerMalformedFileUpdate(resp) {
+    this.trigger({
+      malformedFiles: resp,
+      loadingMalformedFiles: false
     });
   },
 
