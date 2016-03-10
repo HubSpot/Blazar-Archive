@@ -49,15 +49,17 @@ class MalformedFileNotification extends Component {
   }
 
   renderModal() {
+    const numberOfFiles = this.props.malformedFiles.length;
+
     return (
       <Modal show={this.state.showModal} onHide={this.closeModal}>
         <Modal.Header closeButton>
           <Modal.Title>
-            This branch has malformed config files
+            Malformed Configuration Files - Action Required
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          This is the text that describes the issue and what you need to do to fix it.
+          This branch contains {this.props.malformedFiles.length} malformed configuration file{numberOfFiles > 0 ? 's' : ''}. You'll need to correct these errors before can build your branch.
           {this.renderConfigInfo()}
         </Modal.Body>
         <Modal.Footer>
@@ -71,7 +73,7 @@ class MalformedFileNotification extends Component {
     return (
       <div onClick={this.openModal} className='malformed-files__alert-wrapper'>
         <Alert bsStyle='danger' className='malformed-files__alert'>
-          One or more of your config files for this branch is malformed. Click this alert for more details.
+          One or more of your config files for this branch is malformed. Click for more details.
         </Alert>
       </div>
     );
