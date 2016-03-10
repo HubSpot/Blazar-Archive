@@ -42,6 +42,24 @@ class RepoBuildApi {
        
   }
 
+  getMalformedFiles(cb) {
+    if (this.branchId === undefined) {
+      setTimeout(() => {
+        this.getMalformedFiles(cb);
+      }, 500);
+
+      return;
+    }
+
+    const malformedFiles = new Resource({
+      url: `${config.apiRoot}/branches/${this.branchId}/malformedFiles`,
+      type: 'GET'
+    }).send();
+
+    malformedFiles.then((resp) => {
+      cb(resp);
+    });
+  }
 }
 
 export default RepoBuildApi;

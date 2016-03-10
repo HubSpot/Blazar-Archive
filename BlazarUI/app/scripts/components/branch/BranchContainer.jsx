@@ -131,14 +131,28 @@ class BranchContainer extends Component {
     
   }
 
+  renderMalformedFileAlert() {
+    if (this.state.loadingMalformedFiles) {
+      return (<div />);
+    }
+
+    return (
+      <UIGrid>
+        <UIGridItem size={12}>
+          <MalformedFileNotification
+          loading={this.state.loadingMalformedFiles}
+          malformedFiles={this.state.malformedFiles} />
+        </UIGridItem>
+      </UIGrid>
+    );
+  }
+
   render() {
     return (
       <PageContainer>
+        {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={10}>
-            <MalformedFileNotification
-              loading={this.state.loadingMalformedFiles}
-              malformedFiles={this.state.malformedFiles} />
             <BranchHeadline
               loading={this.state.loadingStars || this.state.loadingBranches}
               {...this.state}
