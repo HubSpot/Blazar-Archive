@@ -62,7 +62,7 @@ class BranchFilter extends Component {
           className='branch-filter-input'
           name="branchFilter"
           value={this.props.filters.branch}
-          options={uniqueBranches(this.props.branches.toJS())}
+          options={uniqueBranches(this.props.branches)}
           onChange={this.handleBranchFilterChange}
         />
 
@@ -73,7 +73,6 @@ class BranchFilter extends Component {
 
 BranchFilter.propTypes = {
   filters: PropTypes.object.isRequired,
-  branches: PropTypes.object,
   updateFilters: PropTypes.func.isRequired
 };
 

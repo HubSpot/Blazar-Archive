@@ -8,15 +8,15 @@ import StarProvider from '../services/starProvider';
 function _groupBuilds(builds) {
   const stars = StarProvider.getStars();
   
-  let groupedBuilds = { all: fromJS(builds) };
+  let groupedBuilds = { all: builds };
   
-  groupedBuilds.building = fromJS(builds.filter((build) => {
+  groupedBuilds.building = builds.filter((build) => {
     return has(build, 'inProgressBuild');
-  }));
+  });
   
-  groupedBuilds.starred = fromJS(builds.filter((build) => {
+  groupedBuilds.starred = builds.filter((build) => {
     return contains(stars, build.gitInfo.id);
-  })) || Immutable.List.of();
+  }) || [];
 
   return groupedBuilds;
 }

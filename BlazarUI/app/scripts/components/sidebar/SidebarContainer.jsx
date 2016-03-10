@@ -121,7 +121,7 @@ class SidebarContainer extends Component {
 
     const searchType = NO_MATCH_MESSAGES[toggleFilterState];
     const filteredBuilds = builds[this.state.toggleFilterState];
-    const matches = sidebarCombine(getFilterMatches(filteredBuilds.toJS(), filterText));
+    const matches = sidebarCombine(getFilterMatches(filteredBuilds, filterText));
 
     return (
       <Sidebar>
