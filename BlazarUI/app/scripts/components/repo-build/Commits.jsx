@@ -39,22 +39,39 @@ class Commits extends Component {
     return commitMap;
   }
 
-  renderSummary() {
-    const {commits, showCommits} = this.props;
-    let summaryText;
+  renderSummaryText() {
+    const {anyNewCommits, showCommits, commits} = this.props;
 
-    if (!showCommits) {
-      summaryText = 'Showing most recent commit for this build';
+    if (!anyNewCommits) {
+      return (
+        <span>
+          No new commits in this build. Most recent commit:
+        </span>
+      );
+    }
+
+    else if (!showCommits) {
+      return (
+        <span>
+          Showing 1 new commit in this build:
+        </span>
+      );
     }
 
     else {
-      summaryText = `Showing ${commits.length} commits for this build`;
+      return (
+        <span>
+          Showing {commits.length} new commit{commits.length === 1 ? '' : 's'} in this build:
+        </span>
+      );
     }
+  }
 
+  renderSummary() {
     return (
-      <span className="commits__summary">
-        {summaryText}
-      </span>
+      <div className="commits__summary">
+        {this.renderSummaryText()}
+      </div>
     );
   }
 
@@ -112,6 +129,7 @@ class Commits extends Component {
 Commits.propTypes = {
   commits: PropTypes.array.isRequired,
   showCommits: PropTypes.bool.isRequired,
+  anyNewCommits: PropTypes.bool.isRequired,
   flipShowCommits: PropTypes.func.isRequired
 };
 

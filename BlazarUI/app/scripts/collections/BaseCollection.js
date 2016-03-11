@@ -21,7 +21,7 @@ class BaseCollection extends Collection {
       } = item;
 
       if (has(item, 'build')) {
-        item.build.duration = humanizeDuration(item.build.endTimestamp - item.build.startTimestamp, {round: true});
+        item.build.duration = humanizeDuration(item.build.endTimestamp - item.build.startTimestamp, {round: true, units: ['h', 'm', 's']});
         item.build.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${item.build.buildNumber}`.replace('#', '%23');
       }
 
@@ -35,11 +35,11 @@ class BaseCollection extends Collection {
 
       if (has(item, 'inProgressBuild')) {
         item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${inProgressBuild.buildNumber}`.replace('#', '%23');
-        item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true});
+        item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true, units: ['h', 'm', 's']});
       }
 
       if (has(item, 'lastBuild')) {
-        item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true});
+        item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true, units: ['h', 'm', 's']});
         item.lastBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${module.name}/${lastBuild.buildNumber}`.replace('#', '%23');
       }
 
