@@ -26,12 +26,12 @@ class StarredBranchesTableRow extends Component {
       window.open(e.target.href, '_blank');
     }
 
-    else if (e.target.className === 'build-number') {
-      this.context.router.push(blazarPath);
+    else if (e.target.className === 'repo-link') {
+      this.context.router.push(blazarBranchPath);
     }
 
     else {
-      this.context.router.push(blazarBranchPath);
+      this.context.router.push(blazarPath);
     }
   }
 
@@ -84,13 +84,13 @@ class StarredBranchesTableRow extends Component {
           {buildResultIcon(buildToUse.get('state'))}
         </td>
         <td>
-          <Link to={blazarBranchPath}>{repository}</Link>
+          <Link className='repo-link' to={blazarBranchPath}>{repository}</Link>
         </td>
         <td> 
           {branch}
         </td>
         <td>
-          <Link className='build-number' to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
+          <Link to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
         </td>
         <td>
           {timestampFormatted(buildToUse.get('startTimestamp'))}
