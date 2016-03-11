@@ -5,6 +5,22 @@ import EmptyMessage from '../shared/EmptyMessage.jsx';
 
 class BranchesTable extends Component {
 
+  sortMasterFirst() {
+    let newBranches = [];
+
+    this.props.branches.map((b) => {
+      if (b.gitInfo.branch === "master") {
+        newBranches.unshift(b);
+      }
+
+      else {
+        newBranches.push(b);
+      }
+    });
+
+    return newBranches;
+  }
+
   render() {
     if (this.props.hide) {
       return null;
@@ -17,7 +33,7 @@ class BranchesTable extends Component {
     }
 
     return this.props.buildTable({
-      data: this.props.branches,
+      data: this.sortMasterFirst(),
       columnNames: ['', 'Branch', 'Latest Build', 'Start Time', 'Duration', 'Commit'],
       rowComponent: BranchesTableRow
     });
