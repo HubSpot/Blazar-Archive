@@ -32,7 +32,7 @@ class RepoBuildModulesTable extends Component {
 
     if (this.props.data.length === 0) {
       return (
-        <EmptyMessage> No build history </EmptyMessage>
+        <EmptyMessage> There's no information available for this build right now. </EmptyMessage>
       );
     }
 

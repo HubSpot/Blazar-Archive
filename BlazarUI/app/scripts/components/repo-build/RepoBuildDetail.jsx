@@ -14,7 +14,7 @@ import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
 import {LABELS} from '../constants';
 
-class RepoBuildBuildDetail extends Component {
+class RepoBuildDetail extends Component {
 
   constructor() {
     bindAll(this, 'handleResize')
@@ -51,6 +51,26 @@ class RepoBuildBuildDetail extends Component {
       showCommits: !this.state.showCommits
     });
   }  
+
+  renderCommits() {
+    const {currentRepoBuild} = this.props;
+    const build = currentRepoBuild.toJS();
+
+    if (!has(build, 'commitInfo')) {
+      return null;
+    }
+
+    const currentCommit = build.commitInfo.current;
+    const newCommits = build.commitInfo.newCommits;
+    const commitList = newCommits.length === 0 ? [currentCommit] : newCommits;
+
+    return (
+      <Commits
+        commits={commitList}
+        showCommits={this.state.showCommits}
+        flipShowCommits={this.flipShowCommits.bind(this)} />
+    );
+  }
   
   render() {
     const {currentRepoBuild} = this.props
@@ -68,8 +88,6 @@ class RepoBuildBuildDetail extends Component {
     }
     
     const build = this.props.currentRepoBuild.toJS();
-    const currentCommit = build.commitInfo.current
-    const newCommits = build.commitInfo.newCommits
 
     const gitInfo = {
       host: this.props.params.host,
@@ -84,12 +102,6 @@ class RepoBuildBuildDetail extends Component {
       duration: '',
       durationPrefix: '',
       buildResult: humanizeText(build.state)
-    }
-    
-    if (!has(build, 'commitInfo')) {
-      return (
-        <Alert>No detail available for this build</Alert>
-      );
     }
   
     if (contains(FINAL_BUILD_STATES, build.state)) {
@@ -107,8 +119,6 @@ class RepoBuildBuildDetail extends Component {
       );
     }
 
-    let commitList = newCommits.length === 0 ? [currentCommit] : newCommits;
-
     return (
       <div>
         <div className={this.getWrapperClassNames(build)}>
@@ -117,15 +127,12 @@ class RepoBuildBuildDetail extends Component {
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
           </p>
           <RepoBuildCancelButton 
+            params={this.props.params}
             triggerCancelBuild={this.props.triggerCancelBuild}
             build={build}
           />
         </div>
-        <Commits
-          commits={commitList}
-          showCommits={this.state.showCommits}
-          anyNewCommits={newCommits.length > 0 ? true : false}
-          flipShowCommits={this.flipShowCommits.bind(this)} />
+        {this.renderCommits()}
       </div>
     );
   }
@@ -133,10 +140,10 @@ class RepoBuildBuildDetail extends Component {
 }
 
 
-RepoBuildBuildDetail.propTypes = {
+RepoBuildDetail.propTypes = {
   loading: PropTypes.bool.isRequired,
   currentRepoBuild: PropTypes.object,
   error: PropTypes.string
 };
 
-export default RepoBuildBuildDetail;
+export default RepoBuildDetail;
