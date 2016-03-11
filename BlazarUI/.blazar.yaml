@@ -29,10 +29,12 @@ steps:
           ./node_modules/.bin/gulp build
   - name: publish
     description: "Publishing to the CDN"
+    activeByDefault: false
     commands:
       - ./node_modules/.bin/bender-deps cdn-publish BlazarUIv2@1.$BUILD_NUMBER dist
   - name: publish
     description: "Notifying deploy service"
+    activeByDefault: false
     commands:
       - command: CI_ENVIRONMENT=PROD publish-build-success --project BlazarUIv2 --version static-1.$BUILD_NUMBER
         env:
