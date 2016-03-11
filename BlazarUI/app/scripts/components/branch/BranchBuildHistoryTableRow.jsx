@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
-import { Link } from 'react-router';
+import {Link, browserHistory} from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -16,9 +16,7 @@ let initialState = {
 
 class BranchBuildHistoryTableRow extends Component {
 
-  constructor(props, context) {
-    super(props, context);
-
+  constructor() {
     this.state = initialState;
   }
 
@@ -42,7 +40,7 @@ class BranchBuildHistoryTableRow extends Component {
       return false;
     }
 
-    this.context.router.push(blazarPath);
+    browserHistory.push(blazarPath);
   }
 
   getRowClassNames(state) {
@@ -120,10 +118,6 @@ class BranchBuildHistoryTableRow extends Component {
     );
   }
 }
-
-BranchBuildHistoryTableRow.contextTypes = {
-  router: PropTypes.object.isRequired
-};
 
 BranchBuildHistoryTableRow.propTypes = {
   data: PropTypes.object.isRequired
