@@ -32,11 +32,11 @@ function _parse(data) {
 
     if (has(item, 'inProgressBuild')) {
       item.inProgressBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${inProgressBuild.buildNumber}`.replace('#', '%23');
-      item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true});
+      item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true, units: ['h', 'm', 's']});
     }
 
     if (has(item, 'lastBuild')) {
-      item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true});
+      item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true, units: ['h', 'm', 's']});
       item.lastBuild.blazarPath = `${config.appRoot}/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${lastBuild.buildNumber}`.replace('#', '%23');
     }
 
