@@ -127,6 +127,7 @@ class RepoBuildDetail extends Component {
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
           </p>
           <RepoBuildCancelButton 
+            params={this.props.params}
             triggerCancelBuild={this.props.triggerCancelBuild}
             build={build}
           />

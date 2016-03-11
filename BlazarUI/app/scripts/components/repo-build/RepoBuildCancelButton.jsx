@@ -3,12 +3,12 @@ import {Button} from 'react-bootstrap';
 import Icon from '../shared/Icon.jsx';
 import Modal from 'react-bootstrap/lib/Modal';
 import {bindAll, contains} from 'underscore';
+import {browserHistory} from 'react-router';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
 
 class CancelBuildButton extends Component {
 
-  constructor(props, context) {
-    super(props, context);
+  constructor() {
     bindAll(this, 'handleCancelBuild', 'cancelBuild', 'cancelModal', 'closeCancelModal');
     this.state = {
       cancelling: false,
@@ -21,6 +21,12 @@ class CancelBuildButton extends Component {
       showModal: true
     });
   }
+
+  buildBranchHistoryPagePath() {
+    const {host, org, repo, branch} = this.props.params;
+
+    return `/builds/${host}/${org}/${repo}/${branch}`;
+  }
   
   cancelBuild() {
     this.props.triggerCancelBuild();
@@ -30,8 +36,7 @@ class CancelBuildButton extends Component {
       showModal: false
     });
 
-    const parentPath = window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/'));
-    this.context.router.push(parentPath, null);
+    browserHistory.push(this.buildBranchHistoryPagePath(), null);
   }
 
   cancelModal() {
@@ -93,10 +98,6 @@ class CancelBuildButton extends Component {
   }
 
 }
-
-CancelBuildButton.contextTypes = {
-  router: PropTypes.object.isRequired
-};
 
 CancelBuildButton.propTypes = {
   triggerCancelBuild: PropTypes.func.isRequired,
