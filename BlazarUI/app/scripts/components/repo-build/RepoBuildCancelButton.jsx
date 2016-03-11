@@ -7,7 +7,8 @@ import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
 
 class CancelBuildButton extends Component {
 
-  constructor() {
+  constructor(props, context) {
+    super(props, context);
     bindAll(this, 'handleCancelBuild', 'cancelBuild', 'cancelModal', 'closeCancelModal');
     this.state = {
       cancelling: false,
@@ -27,7 +28,10 @@ class CancelBuildButton extends Component {
     this.setState({
       cancelling: true,
       showModal: false
-    });    
+    });
+
+    const parentPath = window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/'));
+    this.context.router.push(parentPath, null);
   }
 
   cancelModal() {
@@ -89,6 +93,10 @@ class CancelBuildButton extends Component {
   }
 
 }
+
+CancelBuildButton.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 CancelBuildButton.propTypes = {
   triggerCancelBuild: PropTypes.func.isRequired,

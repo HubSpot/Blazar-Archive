@@ -14,7 +14,7 @@ class RepoBuildHeadline extends Component {
     }
     
     const {stars, params, currentRepoBuild} = this.props;
-    const build = currentRepoBuild.toJS()
+    const build = currentRepoBuild.toJS();
 
     return (
       <Headline>
