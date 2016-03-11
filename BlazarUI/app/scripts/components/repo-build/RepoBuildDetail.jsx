@@ -68,6 +68,7 @@ class RepoBuildDetail extends Component {
       <Commits
         commits={commitList}
         showCommits={this.state.showCommits}
+        anyNewCommits={newCommits.length > 0}
         flipShowCommits={this.flipShowCommits.bind(this)} />
     );
   }
