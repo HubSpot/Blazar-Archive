@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {Link} from 'react-router';
+import {Link, browserHistory} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import {contains, has} from 'underscore';
@@ -8,10 +8,6 @@ import classNames from 'classnames';
 import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon, getTableDurationText} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
-
-  constructor(props, context) {
-    super(props, context);
-  }
 
   isDebugMode() {
     return window.location.href.indexOf('?debug') > -1;
@@ -37,7 +33,7 @@ class RepoBuildModulesTableRow extends Component {
     }
 
     else if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(data.state) === -1) {
-      this.context.router.push(data.blazarPath);
+      browserHistory.push(data.blazarPath);
     }
   }
 
@@ -112,10 +108,6 @@ class RepoBuildModulesTableRow extends Component {
   }
 
 }
-
-RepoBuildModulesTableRow.contextTypes = {
-  router: PropTypes.object.isRequired
-};
 
 RepoBuildModulesTableRow.propTypes = {
   data: PropTypes.object.isRequired

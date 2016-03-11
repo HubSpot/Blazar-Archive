@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-const Link = require('react-router').Link;
+import {Link, browserHistory} from 'react-router';
 import {has} from 'underscore';
 import {buildResultIcon, tableRowBuildState, timestampFormatted} from '../Helpers';
 import classNames from 'classnames';
@@ -9,10 +9,6 @@ import Sha from '../shared/Sha.jsx';
 import CommitMessage from '../shared/CommitMessage.jsx';
 
 class StarredBranchesTableRow extends Component {
-
-  constructor(props, context) {
-    super(props, context);
-  }
 
   getRowClassNames(state) {
     return classNames([
@@ -27,11 +23,11 @@ class StarredBranchesTableRow extends Component {
     }
 
     else if (e.target.className === 'repo-link') {
-      this.context.router.push(blazarBranchPath);
+      browserHistory.push(blazarBranchPath);
     }
 
     else {
-      this.context.router.push(blazarPath);
+      browserHistory.push(blazarPath);
     }
   }
 
@@ -104,10 +100,6 @@ class StarredBranchesTableRow extends Component {
   }
   
 }
-
-StarredBranchesTableRow.contextTypes = {
-  router: PropTypes.object.isRequired
-};
 
 StarredBranchesTableRow.propTypes = {
   item: PropTypes.object,

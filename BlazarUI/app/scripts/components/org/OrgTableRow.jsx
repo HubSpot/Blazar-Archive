@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import { Link } from 'react-router';
+import {Link, browserHistory} from 'react-router';
 import classNames from 'classnames';
 
 import BuildStates from '../../constants/BuildStates.js';
@@ -7,10 +7,6 @@ import {tableRowBuildState, humanizeText, timestampFormatted, buildResultIcon} f
 import Sha from '../shared/Sha.jsx';
 
 class OrgTableRow extends Component {
-
-  constructor(props, context) {
-    super(props, context);
-  }
 
   getRowClassNames(state) {
     return classNames([
@@ -25,11 +21,11 @@ class OrgTableRow extends Component {
     }
 
     else if (e.target.className === 'repo-link') {
-      this.context.router.push(blazarRepositoryPath);
+      browserHistory.push(blazarRepositoryPath);
     }
 
     else if (blazarPath !== undefined) {
-      this.context.router.push(blazarPath);
+      browserHistory.push(blazarPath);
     }
   }
 
@@ -79,10 +75,6 @@ class OrgTableRow extends Component {
   }
 
 }
-
-OrgTableRow.contextTypes = {
-  router: PropTypes.object.isRequired
-};
 
 OrgTableRow.propTypes = {
   data: PropTypes.object.isRequired
