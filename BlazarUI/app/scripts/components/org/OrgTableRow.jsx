@@ -1,11 +1,37 @@
 import React, {Component, PropTypes} from 'react';
 import { Link } from 'react-router';
+import classNames from 'classnames';
 
 import BuildStates from '../../constants/BuildStates.js';
 import {tableRowBuildState, humanizeText, timestampFormatted, buildResultIcon} from '../Helpers';
 import Sha from '../shared/Sha.jsx';
 
 class OrgTableRow extends Component {
+
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  getRowClassNames(state) {
+    return classNames([
+      tableRowBuildState(state),
+      'clickable-table-row'
+    ]);
+  }
+
+  onTableClick(blazarRepositoryPath, blazarPath, e) {
+    if (e.target.className === 'sha-link') {
+      window.open(e.target.href, '_blank');
+    }
+
+    else if (e.target.className === 'repo-link') {
+      this.context.router.push(blazarRepositoryPath);
+    }
+
+    else if (blazarPath !== undefined) {
+      this.context.router.push(blazarPath);
+    }
+  }
 
   render() {
 
@@ -27,12 +53,12 @@ class OrgTableRow extends Component {
     }
 
     return (
-      <tr className={tableRowBuildState(build.state)}>
+      <tr onClick={this.onTableClick.bind(this, this.props.data.get('blazarRepositoryPath'), build.blazarPath)} className={this.getRowClassNames(build.state)}>
         <td className='build-status'>
           {buildResultIcon(build.state)}
         </td>
         <td>
-          <Link to={this.props.data.get('blazarRepositoryPath')}>
+          <Link className='repo-link' to={this.props.data.get('blazarRepositoryPath')}>
             {this.props.data.get('repository')}
           </Link>
         </td>
@@ -53,6 +79,10 @@ class OrgTableRow extends Component {
   }
 
 }
+
+OrgTableRow.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 OrgTableRow.propTypes = {
   data: PropTypes.object.isRequired

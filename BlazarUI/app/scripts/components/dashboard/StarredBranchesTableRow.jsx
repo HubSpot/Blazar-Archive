@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 const Link = require('react-router').Link;
 import {has} from 'underscore';
 import {buildResultIcon, tableRowBuildState, timestampFormatted} from '../Helpers';
+import classNames from 'classnames';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -9,6 +10,30 @@ import CommitMessage from '../shared/CommitMessage.jsx';
 
 class StarredBranchesTableRow extends Component {
 
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  getRowClassNames(state) {
+    return classNames([
+      tableRowBuildState(state),
+      'clickable-table-row'
+    ]);
+  }
+
+  onTableClick(blazarBranchPath, blazarPath, e) {
+    if (e.target.className === 'sha-link') {
+      window.open(e.target.href, '_blank');
+    }
+
+    else if (e.target.className === 'repo-link') {
+      this.context.router.push(blazarBranchPath);
+    }
+
+    else {
+      this.context.router.push(blazarPath);
+    }
+  }
 
   render() {
 
@@ -51,35 +76,24 @@ class StarredBranchesTableRow extends Component {
       sha = <Sha gitInfo={gitInfo} build={latestBuild} />;
     }
 
-    let currentState;
-    let previousState;
-
-    if (item.get('inProgressBuild') !== undefined) {
-      currentState = item.get('inProgressBuild').get('state');
-      previousState = latestBuild.get('state');
-    }
-
-    else {
-      currentState = latestBuild.get('state');
-      previousState = '';
-    }
+    let buildToUse = item.get('inProgressBuild') !== undefined ? item.get('inProgressBuild') : latestBuild;
 
     return (
-      <tr className={tableRowBuildState(latestBuild.state)}>
+      <tr onClick={this.onTableClick.bind(this, blazarBranchPath, buildToUse.get('blazarPath'))} className={this.getRowClassNames(buildToUse.get('state'))}>
         <td className='build-status'>
-          {buildResultIcon(currentState, previousState)}
+          {buildResultIcon(buildToUse.get('state'))}
         </td>
         <td>
-          <Link to={blazarBranchPath}>{repository}</Link>
+          <Link className='repo-link' to={blazarBranchPath}>{repository}</Link>
         </td>
         <td> 
           {branch}
         </td>
         <td>
-          <Link to={latestBuild.get('blazarPath')}>{latestBuild.get('buildNumber')}</Link>
+          <Link to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
         </td>
         <td>
-          {timestampFormatted(latestBuild.get('startTimestamp'))}
+          {timestampFormatted(buildToUse.get('startTimestamp'))}
         </td>
         <td>
           {sha}
@@ -90,6 +104,10 @@ class StarredBranchesTableRow extends Component {
   }
   
 }
+
+StarredBranchesTableRow.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 StarredBranchesTableRow.propTypes = {
   item: PropTypes.object,

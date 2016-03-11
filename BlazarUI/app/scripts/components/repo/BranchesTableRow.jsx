@@ -5,6 +5,7 @@ import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
 import {tableRowBuildState, humanizeText, timestampFormatted, buildResultIcon, timestampDuration} from '../Helpers';
 import moment from 'moment';
+import classNames from 'classnames';
 
 import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
@@ -15,7 +16,9 @@ let initialState = {
 
 class BranchesTableRow extends Component {
 
-  constructor() {
+  constructor(props, context) {
+    super(props, context);
+
     this.state = initialState;
   }
 
@@ -33,13 +36,34 @@ class BranchesTableRow extends Component {
     })
   }
 
+  getRowClassNames(state) {
+    return classNames([
+      tableRowBuildState(state),
+      'clickable-table-row'
+    ]);
+  }
+
+  onTableClick(blazarBranchPath, blazarPath, e) {
+    if (e.target.className === 'sha-link') {
+      window.open(e.target.href, '_blank');
+    }
+
+    else if (e.target.className === 'branch-link') {
+      this.context.router.push(blazarBranchPath);
+    }
+
+    else if (blazarPath !== undefined) {
+      this.context.router.push(blazarPath);
+    }
+  }
+
   renderBranchLink(gitInfo) {
     const {gitInfo} = this.props.data;
 
     return (
       <span>
         <Icon for='branch' classNames="icon-roomy icon-muted" />
-        <Link to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
+        <Link className='branch-link' to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
       </span>
     );
   }
@@ -88,7 +112,7 @@ class BranchesTableRow extends Component {
     }
 
     return (
-      <tr className={tableRowBuildState(build.state)}>
+      <tr onClick={this.onTableClick.bind(this, gitInfo.blazarBranchPath, build.blazarPath)} className={this.getRowClassNames(build.state)}>
         <td className='build-status'>
           {buildResultIcon(build.state)}
         </td>
@@ -121,6 +145,10 @@ class BranchesTableRow extends Component {
   }
 
 }
+
+BranchesTableRow.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 BranchesTableRow.propTypes = {
   data: PropTypes.object.isRequired

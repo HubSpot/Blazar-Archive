@@ -4,10 +4,37 @@ import BuildStates from '../../constants/BuildStates.js';
 import ProgressBar from 'react-bootstrap/lib/ProgressBar';
 import {contains, has} from 'underscore';
 import moment from 'moment';
+import classNames from 'classnames';
 import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon, getTableDurationText} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
-  
+
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  isDebugMode() {
+    return window.location.href.indexOf('?debug') > -1;
+  }
+
+  getRowClassNames(state) {
+    return classNames([
+      tableRowBuildState(state),
+      'clickable-table-row'
+    ]);
+  }
+
+  onTableClick(e) {
+    const {data} = this.props;
+
+    if (e.target.className === 'singularity-link') {
+      window.open(e.target.href, '_blank');
+      return false;
+    }
+
+    this.context.router.push(data.blazarPath);
+  }
+
   renderBuildLink() {
     const {data, params} = this.props;
 
@@ -20,10 +47,6 @@ class RepoBuildModulesTableRow extends Component {
     return (
       <span><Link to={data.blazarPath}>{data.name}</Link></span>
     );    
-  }
-
-  isDebugMode() {
-    return window.location.href.indexOf('?debug') > -1;
   }
 
   renderSingularityLink() {
@@ -44,7 +67,7 @@ class RepoBuildModulesTableRow extends Component {
 
     return (
       <td>
-        <a href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>
+        <a className='singularity-link' href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>
       </td>
     );
   }
@@ -62,7 +85,7 @@ class RepoBuildModulesTableRow extends Component {
   render() {
     const {data, params} = this.props;
     return (
-      <tr className={tableRowBuildState(data.state)}>
+      <tr onClick={this.onTableClick.bind(this)}className={this.getRowClassNames(data.state)}>
         <td className='build-status'>
           {buildResultIcon(data.state)}
         </td>
@@ -83,6 +106,10 @@ class RepoBuildModulesTableRow extends Component {
   }
 
 }
+
+RepoBuildModulesTableRow.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 RepoBuildModulesTableRow.propTypes = {
   data: PropTypes.object.isRequired
