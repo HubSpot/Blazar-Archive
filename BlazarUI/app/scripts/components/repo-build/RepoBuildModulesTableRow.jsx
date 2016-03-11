@@ -18,6 +18,10 @@ class RepoBuildModulesTableRow extends Component {
   }
 
   getRowClassNames(state) {
+    if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(state) > -1) {
+      return tableRowBuildState(state);
+    }
+
     return classNames([
       tableRowBuildState(state),
       'clickable-table-row'
@@ -32,7 +36,9 @@ class RepoBuildModulesTableRow extends Component {
       return false;
     }
 
-    this.context.router.push(data.blazarPath);
+    else if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(data.state) === -1) {
+      this.context.router.push(data.blazarPath);
+    }
   }
 
   renderBuildLink() {
