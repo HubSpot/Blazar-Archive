@@ -50,21 +50,21 @@ class CommitDetails extends Component {
     const filesChanged = modified.length + added.length + removed.length;
 
     return (
-      <div className="commits__commit-wrapper">
-        <div className="commits__commit-content">
-          <span className="commits__commit-message">
-            <Link to={url} target="_blank">
+      <Link to={url} target="_blank">
+        <div className="commits__commit-wrapper">
+          <div className="commits__commit-content">
+            <span className="commits__commit-message">
               {message}
-            </Link>
-          </span>
-          <div className="commits__commit-details">
-            <span className="commits__commit-author">
-              {name}
             </span>
-            { ' ' } changed {filesChanged} file{filesChanged === 1 ? '' : 's'}
+            <div className="commits__commit-details">
+              <span className="commits__commit-author">
+                {name}
+              </span>
+              { ' ' } changed {filesChanged} file{filesChanged === 1 ? '' : 's'}
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
     );
   }
 
