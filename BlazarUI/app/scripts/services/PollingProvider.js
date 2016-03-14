@@ -7,16 +7,18 @@ import Resource from './ResourceProvider';
 
 class PollingProvider {
   
-  constructor({url, type, dataType, filter}) {
+  constructor({url, type, dataType, data = '', filter}) {
     this.url = url;
     this.type = type;
     this.dataType = dataType;
+    this.data = data;
     this.shouldPoll = true;
     
     this.resource = new Resource({
       url: this.url,
       type: this.type,
-      dataType: this.dataType
+      dataType: this.dataType,
+      data: this.data
     });
   }
 

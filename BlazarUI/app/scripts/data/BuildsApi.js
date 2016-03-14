@@ -60,6 +60,7 @@ function fetchBuilds(cb) {
   this.buildsPoller = new PollingProvider({
     url: `${config.apiRoot}/branches/state`,
     type: 'GET',
+    data: 'property=!pendingBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!lastBuild.commitInfo&property=!pendingBuild.dependencyGraph&property=!inProgressBuild.dependencyGraph&property=!lastBuild.dependencyGraph&property=!pendingBuild.buildOptions&property=!inProgressBuild.buildOptions&property=!lastBuild.buildOptions&property=!pendingBuild.buildTrigger&property=!inProgressBuild.buildTrigger&property=!lastBuild.buildTrigger',
     dataType: 'json'
   });
 
