@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
-import {Link, browserHistory} from 'react-router';
+import {Link} from 'react-router';
 import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
 import {tableRowBuildState, humanizeText, timestampFormatted, buildResultIcon, timestampDuration} from '../Helpers';
@@ -16,7 +16,9 @@ let initialState = {
 
 class BranchesTableRow extends Component {
 
-  constructor() {
+  constructor(props, context) {
+    super(props, context);
+
     this.state = initialState;
   }
 
@@ -47,11 +49,11 @@ class BranchesTableRow extends Component {
     }
 
     else if (e.target.className === 'branch-link') {
-      browserHistory.push(blazarBranchPath);
+      this.context.router.push(blazarBranchPath);
     }
 
     else if (blazarPath !== undefined) {
-      browserHistory.push(blazarPath);
+      this.context.router.push(blazarPath);
     }
   }
 
@@ -143,6 +145,10 @@ class BranchesTableRow extends Component {
   }
 
 }
+
+BranchesTableRow.contextTypes = {
+  router: PropTypes.object.isRequired
+};
 
 BranchesTableRow.propTypes = {
   data: PropTypes.object.isRequired
