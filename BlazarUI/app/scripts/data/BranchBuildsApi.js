@@ -14,7 +14,7 @@ class BranchBuildsApi extends StoredBuilds {
     const builds = resp.map((build) => {
       build.blazarPath = `/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${build.buildNumber}`.replace('#', '%23');
       if (build.endTimestamp && build.startTimestamp) {
-        build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp, {round: true, units: ['h', 'm', 's']});
+        build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp, {round: true});
       }
       return build;
     });

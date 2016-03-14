@@ -41,7 +41,7 @@ class Model {
     const build = this.data.build;
 
     if (build.startTimestamp && build.endTimestamp) {
-      build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp, {round: true, units: ['h', 'm', 's']});
+      build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp, {round: true});
     }
   }
 
