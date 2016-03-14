@@ -18,7 +18,7 @@ function pagePath(path) {
 
 const routes = (
   <Route name='app' path={pagePath('/')} component={ App }>
-    <IndexRoute component={ Dashboard } />
+    <IndexRoute name='dashboard' component={ Dashboard } />
     <Route name='org' path={pagePath('/builds/:host/:org')} component={Org} />
     <Route name='repo' path={pagePath('/builds/:host/:org/:repo')} component={Repo} />
     <Route name='branch' path={pagePath('/builds/:host/:org/:repo/:branch')} component={Branch} />
