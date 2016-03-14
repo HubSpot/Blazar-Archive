@@ -252,9 +252,6 @@ export const getTableDurationText = function(state, duration) {
 };
 
 export const sortBranchesByTimestamp = function(builds, isMasterPinned = true) {
-
-  console.log(builds);
-
   return builds.sort((a, b) => {
     // master at top if master is pinned
 
