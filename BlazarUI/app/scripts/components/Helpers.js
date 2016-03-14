@@ -250,3 +250,42 @@ export const getTableDurationText = function(state, duration) {
 
   return duration;
 };
+
+export const sortBranchesByTimestamp = function(builds) {
+  return builds.sort((a, b) => {
+    // master at top
+    if (a.gitInfo.branch === 'master') {
+      return 1;
+    }
+
+    else if (b.gitInfo.branch === 'master') {
+      return -1;
+    }
+
+    // prefer in progress builds' timestamps
+    const buildA = a.inProgressBuild !== undefined ? a.inProgressBuild : a.lastBuild;
+    const buildB = b.inProgressBuild !== undefined ? b.inProgressBuild : b.lastBuild;
+
+    if (buildA === undefined) {
+      if (buildB === undefined) {
+        return 0;
+      }
+
+      else {
+        return 1;
+      }
+    }
+
+    if (buildB === undefined) {
+      if (buildA === undefined) {
+        return 0;
+      }
+
+      else {
+        return -1;
+      }
+    }
+
+    return buildB.startTimestamp - buildA.startTimestamp;
+  });
+};
