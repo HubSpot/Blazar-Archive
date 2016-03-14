@@ -31,18 +31,18 @@ function _parse(data) {
     } = item;
 
     if (has(item, 'inProgressBuild')) {
-      item.inProgressBuild.blazarPath = `builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${inProgressBuild.buildNumber}`.replace('#', '%23');
+      item.inProgressBuild.blazarPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${inProgressBuild.buildNumber}`.replace('#', '%23');
       item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true, units: ['h', 'm', 's']});
     }
 
     if (has(item, 'lastBuild')) {
       item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true, units: ['h', 'm', 's']});
-      item.lastBuild.blazarPath = `builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${lastBuild.buildNumber}`.replace('#', '%23');
+      item.lastBuild.blazarPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}/${lastBuild.buildNumber}`.replace('#', '%23');
     }
 
-    item.gitInfo.blazarRepositoryPath = `builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
-    item.gitInfo.blazarBranchPath = `builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}`.replace('#', '%23');
-    item.gitInfo.blazarHostPath = `builds/${gitInfo.host}`;
+    item.gitInfo.blazarRepositoryPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
+    item.gitInfo.blazarBranchPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${gitInfo.branch}`.replace('#', '%23');
+    item.gitInfo.blazarHostPath = `/builds/${gitInfo.host}`;
 
     return item;
   });

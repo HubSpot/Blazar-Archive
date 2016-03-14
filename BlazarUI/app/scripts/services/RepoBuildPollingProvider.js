@@ -52,7 +52,7 @@ class RepoBuildPollingProvider {
     const {params} = this;
 
     const modules = modules.map((module) => {
-      module.blazarPath = `builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${params.buildNumber}/${module.name}`.replace('#', '%23');    
+      module.blazarPath = `/builds/${params.host}/${params.org}/${params.repo}/${params.branch}/${params.buildNumber}/${module.name}`.replace('#', '%23');    
       return module;
     });
 
