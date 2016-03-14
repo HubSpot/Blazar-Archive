@@ -71,7 +71,7 @@ public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
       String glob = (moduleDirectory.contains("/") ? moduleDirectory.substring(0, moduleDirectory.lastIndexOf('/') + 1) : "") + "**";
       Set<String> depends = new HashSet<>();
       Set<String> provides = new HashSet<>();
-      
+
       StaticConfig configObject;
       try {
          configObject = objectMapper.readValue(contents, StaticConfig.class);
