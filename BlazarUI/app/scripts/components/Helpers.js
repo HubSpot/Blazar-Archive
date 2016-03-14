@@ -251,15 +251,21 @@ export const getTableDurationText = function(state, duration) {
   return duration;
 };
 
-export const sortBranchesByTimestamp = function(builds) {
-  return builds.sort((a, b) => {
-    // master at top
-    if (a.gitInfo.branch === 'master') {
-      return 1;
-    }
+export const sortBranchesByTimestamp = function(builds, isMasterPinned = true) {
 
-    else if (b.gitInfo.branch === 'master') {
-      return -1;
+  console.log(builds);
+
+  return builds.sort((a, b) => {
+    // master at top if master is pinned
+
+    if (isMasterPinned) {
+      if (a.gitInfo.branch === 'master') {
+        return 1;
+      }
+
+      else if (b.gitInfo.branch === 'master') {
+        return -1;
+      }
     }
 
     // prefer in progress builds' timestamps
@@ -276,7 +282,7 @@ export const sortBranchesByTimestamp = function(builds) {
       }
     }
 
-    if (buildB === undefined) {
+    else if (buildB === undefined) {
       if (buildA === undefined) {
         return 0;
       }

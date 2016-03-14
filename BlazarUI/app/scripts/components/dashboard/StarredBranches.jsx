@@ -10,7 +10,7 @@ import {filterInactiveBuildsImmutable, sortBuildsByRepoAndBranchImmutable} from 
 class StarredBranches extends Component {
 
   getRows() {
-    return sortBuildsByRepoAndBranchImmutable(filterInactiveBuildsImmutable(this.props.starredBuilds)).map((item, i) => {
+    return filterInactiveBuildsImmutable(this.props.starredBuilds).map((item, i) => {
       return (
         <StarredBranchesTableRow
           key={i}

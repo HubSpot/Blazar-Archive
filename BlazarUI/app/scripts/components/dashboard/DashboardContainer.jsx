@@ -9,6 +9,8 @@ import BuildsStore from '../../stores/buildsStore';
 import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
 
+import {sortBranchesByTimestamp} from '../Helpers.js';
+
 class DashboardContainer extends Component {
 
   constructor(props) {
@@ -60,7 +62,7 @@ class DashboardContainer extends Component {
     return (
       <PageContainer classNames='page-dashboard'>
         <Dashboard 
-          starredBuilds={fromJS(this.state.starredBuilds)}
+          starredBuilds={fromJS(sortBranchesByTimestamp(this.state.starredBuilds, false))}
           loadingStars={this.state.loadingStars}
           loadingBuilds={this.state.loading}
           params={this.props.params}
