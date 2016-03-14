@@ -23,7 +23,7 @@ export const timestampFormatted = function(timestamp, format='lll') {
 };
 
 export const timestampDuration = function(startTimestamp, endTimestamp, round='true') {
-  return humanizeDuration(endTimestamp - startTimestamp, {round: round, units: ['h', 'm', 's']});
+  return humanizeDuration(endTimestamp - startTimestamp, {round: round});
 };
 
 // 'BUILD_SUCCEEEDED' => 'Build Succeeded'
