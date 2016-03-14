@@ -274,9 +274,7 @@ export const sortBranchesByTimestamp = function(builds, isMasterPinned = true) {
         return 0;
       }
 
-      else {
-        return 1;
-      }
+      return 1;
     }
 
     else if (buildB === undefined) {
@@ -284,9 +282,7 @@ export const sortBranchesByTimestamp = function(builds, isMasterPinned = true) {
         return 0;
       }
 
-      else {
-        return -1;
-      }
+      return -1;
     }
 
     return buildB.startTimestamp - buildA.startTimestamp;
