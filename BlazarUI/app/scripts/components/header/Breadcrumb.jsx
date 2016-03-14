@@ -12,7 +12,7 @@ class Breadcrumb extends Component {
 
   refreshPaths() {
     const {appRoot, params} = this.props;
-    const root = `${appRoot}/builds`;
+    const root = `/builds`;
 
     this.paths = {
       host: `${root}/${params.host}`,

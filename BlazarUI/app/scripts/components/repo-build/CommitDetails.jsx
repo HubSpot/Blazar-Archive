@@ -50,7 +50,7 @@ class CommitDetails extends Component {
     const filesChanged = modified.length + added.length + removed.length;
 
     return (
-      <Link to={url} target="_blank">
+      <a href={url} target="_blank">
         <div className="commits__commit-wrapper">
           <div className="commits__commit-content">
             <span className="commits__commit-message">
@@ -64,7 +64,7 @@ class CommitDetails extends Component {
             </div>
           </div>
         </div>
-      </Link>
+      </a>
     );
   }
 
