@@ -1,3 +1,4 @@
+/*global config*/
 import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
 import {Link, browserHistory} from 'react-router';
@@ -16,7 +17,8 @@ let initialState = {
 
 class BranchBuildHistoryTableRow extends Component {
 
-  constructor() {
+  constructor(props, context) {
+    super(props, context);
     this.state = initialState;
   }
 
@@ -40,7 +42,7 @@ class BranchBuildHistoryTableRow extends Component {
       return false;
     }
 
-    browserHistory.push(blazarPath);
+    this.context.router.push(config.appRoot + blazarPath);
   }
 
   getRowClassNames(state) {
@@ -117,6 +119,10 @@ class BranchBuildHistoryTableRow extends Component {
       </tr>
     );
   }
+}
+
+BranchBuildHistoryTableRow.contextTypes = {
+  router: PropTypes.object.isRequired
 }
 
 BranchBuildHistoryTableRow.propTypes = {
