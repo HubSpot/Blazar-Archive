@@ -1,4 +1,5 @@
 /*global config*/
+import $ from 'jquery';
 import { fromJS } from 'immutable';
 import {has, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
@@ -57,11 +58,28 @@ function fetchBuilds(cb) {
     this.buildsPoller = undefined;
   }
 
+  const exclusionOpts = {
+    property: [
+      '!pendingBuild.commitInfo',
+      '!inProgressBuild.commitInfo',
+      '!lastBuild.commitInfo',
+      '!pendingBuild.dependencyGraph',
+      '!inProgressBuild.dependencyGraph',
+      '!lastBuild.dependencyGraph',
+      '!pendingBuild.buildOptions',
+      '!inProgressBuild.buildOptions',
+      '!lastBuild.buildOptions',
+      '!pendingBuild.buildTrigger',
+      '!inProgressBuild.buildTrigger',
+      '!lastBuild.buildTrigger'
+    ]
+  };
+
   this.buildsPoller = new PollingProvider({
     url: `${config.apiRoot}/branches/state`,
     type: 'GET',
-    data: 'property=!pendingBuild.commitInfo&property=!inProgressBuild.commitInfo&property=!lastBuild.commitInfo&property=!pendingBuild.dependencyGraph&property=!inProgressBuild.dependencyGraph&property=!lastBuild.dependencyGraph&property=!pendingBuild.buildOptions&property=!inProgressBuild.buildOptions&property=!lastBuild.buildOptions&property=!pendingBuild.buildTrigger&property=!inProgressBuild.buildTrigger&property=!lastBuild.buildTrigger',
-    dataType: 'json'
+    dataType: 'json',
+    data: $.param(exclusionOpts).replace(/%5B%5D/g, '')
   });
 
   this.buildsPoller.poll((err, resp) => {
