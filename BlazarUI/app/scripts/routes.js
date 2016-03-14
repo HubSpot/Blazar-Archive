@@ -12,21 +12,15 @@ import Build from './pages/build.jsx';
 import RepoBuild from './pages/repoBuild.jsx';
 import NotFound from './pages/notFound.jsx';
 
-function pagePath(path) {
-  return config.appRoot + path;
-}
-
 const routes = (
   <Route name='app' path='/' component={App}>
     <IndexRoute name='dashboard' component={ Dashboard } />
-    <Route path={config.appRoot}>
-      <Route name='org' path='/builds/:host/:org' component={Org} />
-      <Route name='repo' path='/builds/:host/:org/:repo' component={Repo} />
-      <Route name='branch' path='/builds/:host/:org/:repo/:branch' component={Branch} />
-      <Route name='repoBuild' path='/builds/:host/:org/:repo/:branch/:buildNumber' component={RepoBuild} />
-      <Route name='build' path='/builds/:host/:org/:repo/:branch/:buildNumber/:moduleName' component={Build} />
-      <Route name='notFound' path="*" component={ NotFound } />
-    </Route>
+    <Route name='org' path='/builds/:host/:org' component={Org} />
+    <Route name='repo' path='/builds/:host/:org/:repo' component={Repo} />
+    <Route name='branch' path='/builds/:host/:org/:repo/:branch' component={Branch} />
+    <Route name='repoBuild' path='/builds/:host/:org/:repo/:branch/:buildNumber' component={RepoBuild} />
+    <Route name='build' path='/builds/:host/:org/:repo/:branch/:buildNumber/:moduleName' component={Build} />
+    <Route name='notFound' path="*" component={ NotFound } />
   </Route>
 );
 
