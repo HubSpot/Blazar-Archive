@@ -2,14 +2,16 @@ import React, {Component, PropTypes} from 'react';
 import {bindAll, debounce} from 'underscore';
 import Icon from '../shared/Icon.jsx';
 
+import SidebarFilterStore from '../../stores/SidebarFilterStore';
+
 // To do: Typeahead in input box
 class SearchFilter extends Component {
 
   constructor() {
-    bindAll(this, 'handleChange');
+    bindAll(this, 'handleChange', 'onStoreChange');
     this.state = {
       searchValue: ''
-    }
+    };
   }
 
   componentWillMount() {
@@ -20,11 +22,18 @@ class SearchFilter extends Component {
     
   componentDidMount() {
     window.addEventListener('keyup', this.handleKeyup);
+    this.unsubscribeFromSidebarFilter = SidebarFilterStore.listen(this.onStoreChange);
     this.focusInput();
   }
 
   componentWillUnmount() {
     window.removeEventListener('keyup', this.handleKeyup);
+    this.unsubscribeFromSidebarFilter();
+  }
+
+  onStoreChange(state) {
+    this.setState(state);
+    this.handleSearchDebounced();
   }
 
   focusInput() {
@@ -35,7 +44,6 @@ class SearchFilter extends Component {
     this.setState({
       searchValue: this.refs.searchFilterInput.value
     });
-    
     this.handleSearchDebounced();
   }
 

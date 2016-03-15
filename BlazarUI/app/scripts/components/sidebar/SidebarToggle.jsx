@@ -3,6 +3,8 @@ import Button from 'react-bootstrap/lib/Button';
 import Icon from '../shared/Icon.jsx';
 import {bindAll} from 'underscore';
 
+import SidebarFilterActions from '../../actions/sidebarFilterActions';
+
 class SidebarToggle extends Component {
 
   constructor(props) {
@@ -12,6 +14,7 @@ class SidebarToggle extends Component {
 
   handleToggle(e) {
     this.props.toggleFilter(e.target.id);
+    SidebarFilterActions.clearSearchValue();
   }
 
   getButtonClassNames(type) {
