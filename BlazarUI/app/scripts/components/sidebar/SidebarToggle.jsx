@@ -25,13 +25,7 @@ class SidebarToggle extends Component {
   render() {
     return (
       <div className="sidebar__filter-buttons">
-        <a
-          id="starred"
-          className={this.getButtonClassNames('starred')}
-          onClick={this.handleToggle}>
-            <span>starred</span>
-        </a>
-
+        
         <a
           id="all"
           className={this.getButtonClassNames('all')}
@@ -40,10 +34,17 @@ class SidebarToggle extends Component {
         </a>
 
         <a
+          id="starred"
+          className={this.getButtonClassNames('starred')}
+          onClick={this.handleToggle}>
+            Starred
+        </a>
+
+        <a
           id="building"
           className={this.getButtonClassNames('building')}
           onClick={this.handleToggle}>
-            building
+            Building
         </a>
 
       </div>
