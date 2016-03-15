@@ -3,7 +3,6 @@ import Button from 'react-bootstrap/lib/Button';
 import Icon from '../shared/Icon.jsx';
 import {bindAll} from 'underscore';
 
-import SidebarFilterStore from '../../stores/sidebarFilterStore';
 import SidebarFilterActions from '../../actions/sidebarFilterActions';
 
 class SidebarToggle extends Component {
