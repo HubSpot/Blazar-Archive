@@ -28,11 +28,14 @@ class SidebarFilter extends Component {
       return null;
     }
 
+    const selectorClass = `sidebar__filter-selector ${this.props.toggleFilterState}`;
+
     return (
       <div>
         <SidebarToggle
           toggleFilter={this.toggleFilter} 
           toggleFilterState={this.props.toggleFilterState} />
+        <div className={selectorClass} />
         <div className='sidebar__filter-search'>
           <SearchFilter
             ref="buildFilterSearch"
@@ -53,7 +56,8 @@ SidebarFilter.propTypes = {
   updateResults: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
   filterText: PropTypes.string.isRequired,
-  setToggleState: PropTypes.func.isRequired
+  setToggleState: PropTypes.func.isRequired,
+  toggleFilterState: PropTypes.string.isRequired
 };
 
 export default SidebarFilter;

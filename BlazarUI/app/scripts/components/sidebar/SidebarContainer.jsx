@@ -130,6 +130,7 @@ class SidebarContainer extends Component {
             {...this.state}
             updateResults={this.updateResults}
             setToggleState={this.setToggleState}
+            toggleFilterState={this.state.toggleFilterState}
           />
         </div>
         <div className='sidebar__list'>
