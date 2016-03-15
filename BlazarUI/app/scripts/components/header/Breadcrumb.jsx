@@ -18,9 +18,9 @@ class Breadcrumb extends Component {
       host: `${root}/${params.host}`,
       org: `${root}/${params.host}/${params.org}`,
       repo: `${root}/${params.host}/${params.org}/${params.repo}`,
-      branch: `${root}/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}`.replace('#', '%23'),
-      buildNumber: `${root}/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}/${params.buildNumber}`.replace('#', '%23'),
-      moduleName: `${root}/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}/${params.buildNumber}/${this.props.moduleName}`.replace('#', '%23')
+      branch: `${root}/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}`,
+      buildNumber: `${root}/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}/${params.buildNumber}`,
+      moduleName: `${root}/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}/${params.buildNumber}/${this.props.moduleName}`
     };
   }
 
