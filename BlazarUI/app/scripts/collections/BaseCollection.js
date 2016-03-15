@@ -21,7 +21,7 @@ class BaseCollection extends Collection {
 
       if (has(item, 'build')) {
         item.build.duration = humanizeDuration(item.build.endTimestamp - item.build.startTimestamp, {round: true});
-        item.build.blazarPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${encodeURIComponentCo(gitInfo.branch)}/${module.name}/${item.build.buildNumber}`.replace('#', '%23');
+        item.build.blazarPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${encodeURIComponent(gitInfo.branch)}/${module.name}/${item.build.buildNumber}`.replace('#', '%23');
       }
 
       if (has(item, 'module')) {
