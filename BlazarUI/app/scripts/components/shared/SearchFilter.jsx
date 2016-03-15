@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {bindAll, debounce} from 'underscore';
 import Icon from '../shared/Icon.jsx';
 
-import SidebarFilterStore from '../../stores/SidebarFilterStore';
+import SidebarFilterStore from '../../stores/sidebarFilterStore';
 
 // To do: Typeahead in input box
 class SearchFilter extends Component {
