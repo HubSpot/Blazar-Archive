@@ -37,12 +37,19 @@ class BranchBuildHistoryTableRow extends Component {
   }
 
   onTableClick(blazarPath, e) {
-    if (e.target.className === 'sha-link') {
-      window.open(e.target.href, '_blank');
-      return false;
+    const link = e.target.className;
+
+    if (link === 'build-link') {
+      return;
     }
 
-    this.context.router.push(blazarPath);
+    else if (link === 'sha-link') {
+      window.open(e.target.href, '_blank');
+    }
+
+    else {
+      this.context.router.push(blazarPath);
+    }
   }
 
   getRowClassNames(state) {
@@ -92,7 +99,7 @@ class BranchBuildHistoryTableRow extends Component {
     }
 
     return (
-      <Link to={data.blazarPath}>{data.buildNumber}</Link>
+      <Link className='build-link' to={data.blazarPath}>{data.buildNumber}</Link>
     );
   }
 

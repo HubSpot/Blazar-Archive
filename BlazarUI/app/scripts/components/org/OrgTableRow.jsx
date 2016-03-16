@@ -19,13 +19,15 @@ class OrgTableRow extends Component {
     ]);
   }
 
-  onTableClick(blazarRepositoryPath, blazarPath, e) {
-    if (e.target.className === 'sha-link') {
-      window.open(e.target.href, '_blank');
+  onTableClick(blazarPath, e) {
+    const link = e.target.className;
+
+    if (link === 'repo-link' || link === 'build-link') {
+      return;
     }
 
-    else if (e.target.className === 'repo-link') {
-      this.context.router.push(blazarRepositoryPath);
+    else if (link === 'sha-link') {
+      window.open(e.target.href, '_blank');
     }
 
     else if (blazarPath !== undefined) {
@@ -42,7 +44,7 @@ class OrgTableRow extends Component {
 
     if (build.blazarPath) {
       buildLink = (
-        <Link to={build.blazarPath}>
+        <Link className='build-link' to={build.blazarPath}>
           {build.buildNumber}
         </Link>
       );
@@ -53,7 +55,7 @@ class OrgTableRow extends Component {
     }
 
     return (
-      <tr onClick={this.onTableClick.bind(this, this.props.data.get('blazarRepositoryPath'), build.blazarPath)} className={this.getRowClassNames(build.state)}>
+      <tr onClick={this.onTableClick.bind(this, build.blazarPath)} className={this.getRowClassNames(build.state)}>
         <td className='build-status'>
           {buildResultIcon(build.state)}
         </td>

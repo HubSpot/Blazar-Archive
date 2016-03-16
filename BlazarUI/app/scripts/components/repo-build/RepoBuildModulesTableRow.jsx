@@ -30,10 +30,14 @@ class RepoBuildModulesTableRow extends Component {
 
   onTableClick(e) {
     const {data} = this.props;
+    const link = e.target.className;
 
-    if (e.target.className === 'singularity-link') {
+    if (link === 'build-link') {
+      return;
+    }
+
+    else if (link === 'singularity-link') {
       window.open(e.target.href, '_blank');
-      return false;
     }
 
     else if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(data.state) === -1) {
@@ -51,7 +55,7 @@ class RepoBuildModulesTableRow extends Component {
     }
 
     return (
-      <span><Link to={data.blazarPath}>{data.name}</Link></span>
+      <span><Link className='build-link' to={data.blazarPath}>{data.name}</Link></span>
     );    
   }
 

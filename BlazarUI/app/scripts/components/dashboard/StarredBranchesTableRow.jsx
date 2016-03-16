@@ -21,16 +21,18 @@ class StarredBranchesTableRow extends Component {
     ]);
   }
 
-  onTableClick(blazarBranchPath, blazarPath, e) {
-    if (e.target.className === 'sha-link') {
+  onTableClick(blazarPath, e) {
+    const link = e.target.className;
+
+    if (link === 'repo-link' || link === 'build-link') {
+      return;
+    }
+
+    else if (link === 'sha-link') {
       window.open(e.target.href, '_blank');
     }
 
-    else if (e.target.className === 'repo-link') {
-      this.context.router.push(blazarBranchPath);
-    }
-
-    else {
+    else if (blazarPath !== undefined) {
       this.context.router.push(blazarPath);
     }
   }
@@ -79,7 +81,7 @@ class StarredBranchesTableRow extends Component {
     let buildToUse = item.get('inProgressBuild') !== undefined ? item.get('inProgressBuild') : latestBuild;
 
     return (
-      <tr onClick={this.onTableClick.bind(this, blazarBranchPath, buildToUse.get('blazarPath'))} className={this.getRowClassNames(buildToUse.get('state'))}>
+      <tr onClick={this.onTableClick.bind(this, buildToUse.get('blazarPath'))} className={this.getRowClassNames(buildToUse.get('state'))}>
         <td className='build-status'>
           {buildResultIcon(buildToUse.get('state'))}
         </td>
@@ -90,7 +92,7 @@ class StarredBranchesTableRow extends Component {
           {branch}
         </td>
         <td>
-          <Link to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
+          <Link className='build-link' to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
         </td>
         <td>
           {timestampFormatted(buildToUse.get('startTimestamp'))}

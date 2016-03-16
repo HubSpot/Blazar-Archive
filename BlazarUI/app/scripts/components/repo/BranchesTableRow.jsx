@@ -43,13 +43,15 @@ class BranchesTableRow extends Component {
     ]);
   }
 
-  onTableClick(blazarBranchPath, blazarPath, e) {
-    if (e.target.className === 'sha-link') {
-      window.open(e.target.href, '_blank');
+  onTableClick(blazarPath, e) {
+    const link = e.target.className;
+
+    if (link === 'branch-link' || link === 'build-link') {
+      return;
     }
 
-    else if (e.target.className === 'branch-link') {
-      this.context.router.push(blazarBranchPath);
+    else if (link === 'sha-link') {
+      window.open(e.target.href, '_blank');
     }
 
     else if (blazarPath !== undefined) {
@@ -62,7 +64,6 @@ class BranchesTableRow extends Component {
 
     return (
       <span>
-        <Icon for='branch' classNames="icon-roomy icon-muted" />
         <Link className='branch-link' to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
       </span>
     );
@@ -105,14 +106,14 @@ class BranchesTableRow extends Component {
 
     if (build.blazarPath) {
       buildLink = (
-        <Link to={build.blazarPath}>
+        <Link className='build-link' to={build.blazarPath}>
           {build.buildNumber}
         </Link>
       );
     }
 
     return (
-      <tr onClick={this.onTableClick.bind(this, gitInfo.blazarBranchPath, build.blazarPath)} className={this.getRowClassNames(build.state)}>
+      <tr onClick={this.onTableClick.bind(this, build.blazarPath)} className={this.getRowClassNames(build.state)}>
         <td className='build-status'>
           {buildResultIcon(build.state)}
         </td>
