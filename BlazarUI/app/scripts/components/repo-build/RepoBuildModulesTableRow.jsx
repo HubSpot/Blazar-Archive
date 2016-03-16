@@ -32,12 +32,8 @@ class RepoBuildModulesTableRow extends Component {
     const {data} = this.props;
     const link = e.target.className;
 
-    if (link === 'build-link') {
+    if (link === 'build-link' || link === 'singularity-link') {
       return;
-    }
-
-    else if (link === 'singularity-link') {
-      window.open(e.target.href, '_blank');
     }
 
     else if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(data.state) === -1) {

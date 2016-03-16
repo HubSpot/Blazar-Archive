@@ -22,12 +22,8 @@ class OrgTableRow extends Component {
   onTableClick(blazarPath, e) {
     const link = e.target.className;
 
-    if (link === 'repo-link' || link === 'build-link') {
+    if (link === 'repo-link' || link === 'build-link' || link === 'sha-link') {
       return;
-    }
-
-    else if (link === 'sha-link') {
-      window.open(e.target.href, '_blank');
     }
 
     else if (blazarPath !== undefined) {

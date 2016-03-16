@@ -39,12 +39,8 @@ class BranchBuildHistoryTableRow extends Component {
   onTableClick(blazarPath, e) {
     const link = e.target.className;
 
-    if (link === 'build-link') {
+    if (link === 'build-link' || link === 'sha-link') {
       return;
-    }
-
-    else if (link === 'sha-link') {
-      window.open(e.target.href, '_blank');
     }
 
     else {
