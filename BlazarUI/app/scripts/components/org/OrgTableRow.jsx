@@ -35,6 +35,14 @@ class OrgTableRow extends Component {
     }
   }
 
+  renderBuildResultIcon(state) {
+    if (state === BuildStates.SUCCEEDED) {
+      return null;
+    }
+
+    return buildResultIcon(state);
+  }
+
   render() {
 
     const build = this.props.data.get('lastBuild').toJS();
@@ -57,7 +65,7 @@ class OrgTableRow extends Component {
     return (
       <tr onClick={this.onTableClick.bind(this, build.blazarPath)} className={this.getRowClassNames(build.state)}>
         <td className='build-status'>
-          {buildResultIcon(build.state)}
+          {this.renderBuildResultIcon(build.state)}
         </td>
         <td>
           <Link className='repo-link' to={this.props.data.get('blazarRepositoryPath')}>

@@ -68,6 +68,14 @@ class BranchesTableRow extends Component {
       </span>
     );
   }
+
+  renderBuildResultIcon(state) {
+    if (state === BuildStates.SUCCEEDED) {
+      return null;
+    }
+
+    return buildResultIcon(state);
+  }
   
   renderNoHistoryTable() {
     return (
@@ -115,7 +123,7 @@ class BranchesTableRow extends Component {
     return (
       <tr onClick={this.onTableClick.bind(this, build.blazarPath)} className={this.getRowClassNames(build.state)}>
         <td className='build-status'>
-          {buildResultIcon(build.state)}
+          {this.renderBuildResultIcon(build.state)}
         </td>
         <td>
           {this.renderBranchLink(gitInfo)}
