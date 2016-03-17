@@ -99,21 +99,13 @@ class BranchBuildHistoryTableRow extends Component {
     );
   }
 
-  renderBuildResultIcon(state) {
-    if (state === BuildStates.SUCCEEDED) {
-      return null;
-    }
-
-    return buildResultIcon(state);
-  }
-
   render() {
     const {data, params} = this.props;
 
     return (
       <tr onClick={this.onTableClick.bind(this, data.blazarPath)} className={this.getRowClassNames(data.state)}>
         <td className='build-status'>
-          {this.renderBuildResultIcon(data.state)}
+          {buildResultIcon(data.state)}
         </td>
         <td className='build-result-link'>
           <span>{this.renderBuildLink()}</span>

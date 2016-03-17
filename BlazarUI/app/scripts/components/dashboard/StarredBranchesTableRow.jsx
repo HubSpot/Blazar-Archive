@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import {has} from 'underscore';
 import {buildResultIcon, tableRowBuildState, timestampFormatted} from '../Helpers';
-import BuildStates from '../../constants/BuildStates';
 import classNames from 'classnames';
 
 import Icon from '../shared/Icon.jsx';
@@ -32,14 +31,6 @@ class StarredBranchesTableRow extends Component {
     else if (blazarPath !== undefined) {
       this.context.router.push(blazarPath);
     }
-  }
-
-  renderBuildResultIcon(state) {
-    if (state === BuildStates.SUCCEEDED) {
-      return null;
-    }
-
-    return buildResultIcon(state);
   }
 
   render() {
@@ -88,7 +79,7 @@ class StarredBranchesTableRow extends Component {
     return (
       <tr onClick={this.onTableClick.bind(this, buildToUse.get('blazarPath'))} className={this.getRowClassNames(buildToUse.get('state'))}>
         <td className='build-status'>
-          {this.renderBuildResultIcon(buildToUse.get('state'))}
+          {buildResultIcon(buildToUse.get('state'))}
         </td>
         <td>
           <Link className='repo-link' to={blazarBranchPath}>{repository}</Link>
