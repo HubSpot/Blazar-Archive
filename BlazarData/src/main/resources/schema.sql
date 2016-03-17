@@ -151,3 +151,32 @@ CREATE TABLE `instant_message_configs` (
   UNIQUE INDEX (`channelName`, `branchId`, `moduleId`),
   INDEX (`channelName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--changeset jgoodwin:6 dbms:h2
+CREATE TABLE inter_project_builds (
+  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `state` VARCHAR(40) NOT NULL,
+  `moduleIds` MEDIUMTEXT NOT NULL,
+  `buildTrigger` MEDIUMTEXT NOT NULL,
+  `startTimestamp` BIGINT(20) UNSIGNED,
+  `endTimestamp` BIGINT(20) UNSIGNED,
+  `dependencyGraph` MEDIUMTEXT,
+  PRIMARY KEY (`id`),
+  INDEX(`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE inter_project_module_build_mappings (
+  `interProjectBuildId` BIGINT(20),
+  `moduleId` INT(11),
+  `moduleBuildId` BIGINT(20),
+  PRIMARY KEY (`interProjectBuildId`, `moduleId`, `moduleBuildId`),
+  INDEX(`interProjectBuildId`, `moduleId`, `moduleBuildId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE inter_project_repo_build_mappings (
+  `interProjectBuildId` BIGINT(20),
+  `branchId` INT(11),
+  `repoBuildId` BIGINT(20),
+  PRIMARY KEY (`interProjectBuildId`, `branchId`, `repoBuildId`),
+  INDEX(`interProjectBuildId`, `branchId`, `repoBuildId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

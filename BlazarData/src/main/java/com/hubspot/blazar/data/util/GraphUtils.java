@@ -1,10 +1,5 @@
 package com.hubspot.blazar.data.util;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.TreeMultimap;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -12,6 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.TreeMultimap;
 
 public enum GraphUtils {
   INSTANCE;
@@ -58,7 +58,7 @@ public enum GraphUtils {
           }
         }
       }
-    }
+   }
 
     return reduced;
   }

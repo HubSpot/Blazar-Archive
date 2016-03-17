@@ -1,7 +1,24 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
@@ -13,23 +30,72 @@ import com.hubspot.blazar.base.ModuleDependency;
 import com.hubspot.blazar.data.dao.DependenciesDao;
 import com.hubspot.blazar.data.util.GraphUtils;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 @Singleton
 public class DependenciesService {
   private final DependenciesDao dependenciesDao;
+  private static final Logger LOG = LoggerFactory.getLogger(DependenciesService.class);
 
   @Inject
   public DependenciesService(DependenciesDao dependenciesDao) {
     this.dependenciesDao = dependenciesDao;
+  }
+
+  public DependencyGraph buildInterProjectDependencyGraph(Set<Module> modulesTriggered) {
+    long start = System.currentTimeMillis();
+    SetMultimap<Integer, Integer> edges = HashMultimap.create();
+
+    // Turn triggered modules into ModuleDependencies
+    Set<ModuleDependency> moduleDependenciesTriggered = new HashSet<>();
+    for (Module m : modulesTriggered ) {
+      LOG.info("InterProjectBuild has been triggered for module {}-{}", m.getName(), m.getId().get());
+      moduleDependenciesTriggered.addAll(getProvides(ImmutableSet.of(m.getId().get())));
+    }
+
+    Stack<ModuleDependency> stack = new Stack<>();
+    stack.addAll(moduleDependenciesTriggered);
+    Set<ModuleDependency> seen = new HashSet<>();
+    List<Long> queryTimes = new ArrayList<>();
+    while (!stack.empty()) {
+      ModuleDependency m = stack.pop();
+      seen.add(m);
+      LOG.debug("Found Node {}", m);
+      while(stack.remove(m)) {
+        LOG.debug("Removed copy of {} from stack", m);
+      }
+      long s = System.currentTimeMillis();
+      Set<ModuleDependency> newItems = getProvidesFromModuleDepends(m);
+      queryTimes.add(System.currentTimeMillis() - s);
+      for (ModuleDependency newItem : newItems) {
+        LOG.debug("Added {} <- {}", m, newItem);
+        edges.put(m.getModuleId(), newItem.getModuleId());
+      }
+      newItems.removeAll(seen);
+      stack.addAll(newItems);
+    }
+    long startGraph = System.currentTimeMillis();
+    SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(edges);
+    LOG.info("Transitive reduction calculation took {}", System.currentTimeMillis()-startGraph);
+    long startSort = System.currentTimeMillis();
+    List<Integer> topologicalSort = GraphUtils.INSTANCE.topologicalSort(edges);
+    LOG.info("Topological sort calculation took {}", System.currentTimeMillis()-startSort);
+    Map<Integer, Set<Integer>> transitiveReductionMap = new HashMap<>(Multimaps.asMap(transitiveReduction));
+    DependencyGraph graph = new DependencyGraph(transitiveReductionMap, topologicalSort);
+    long sum = 0;
+    long max = 0;
+    long min = Long.MAX_VALUE;
+    for (long i : queryTimes) {
+      sum = sum + i;
+      if (max < i) {
+        max = i;
+      }
+      if (min > i) {
+        min = i;
+      }
+    }
+    long average = queryTimes.size() == 0 ? sum : sum/queryTimes.size();
+    LOG.info("MysqlQueries max: {} min: {} ct: {} each: {} total: {}", max, min, queryTimes.size(), average, sum);
+    LOG.info("Building graph took {}", System.currentTimeMillis() - start);
+    return graph;
   }
 
   public DependencyGraph buildDependencyGraph(GitInfo gitInfo, Set<Module> allModules) {
@@ -69,6 +135,17 @@ public class DependenciesService {
   public void delete(int moduleId) {
     dependenciesDao.deleteProvides(moduleId);
     dependenciesDao.deleteDepends(moduleId);
+  }
+
+  private Set<ModuleDependency> getProvides(Set<Integer> moduleIds) {
+    if (moduleIds.size() > 0) {
+      return dependenciesDao.getProvides(moduleIds);
+    }
+    return new HashSet<>();
+  }
+
+  private Set<ModuleDependency> getProvidesFromModuleDepends(ModuleDependency moduleDependency) {
+    return dependenciesDao.getProvidesFromModuleDepends(moduleDependency);
   }
 
   private Set<ModuleDependency> getProvides(GitInfo gitInfo) {

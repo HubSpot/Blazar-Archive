@@ -1,9 +1,9 @@
 package com.hubspot.blazar.base;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Objects;
 
 public class ModuleDependency {
   private final int moduleId;
@@ -21,6 +21,11 @@ public class ModuleDependency {
 
   public String getName() {
     return name;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s-%d", name, moduleId);
   }
 
   @Override

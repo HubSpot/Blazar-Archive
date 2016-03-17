@@ -1,21 +1,25 @@
 package com.hubspot.blazar.data.dao;
 
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.rosetta.jdbi.BindWithRosetta;
+import java.util.Set;
+
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
-import java.util.Set;
+import com.google.common.base.Optional;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
 public interface BranchDao {
 
   @SqlQuery("SELECT * FROM branches")
   Set<GitInfo> getAll();
+
+  @SqlQuery("Select * from branches WHERE branch = :branch")
+  Set<GitInfo> getAllOnBranch(@Bind("branch") String branch);
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM branches WHERE id = :id")

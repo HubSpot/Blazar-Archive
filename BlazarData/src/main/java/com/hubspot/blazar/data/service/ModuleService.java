@@ -1,5 +1,13 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.transaction.Transactional;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -8,13 +16,6 @@ import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.dao.ModuleDao;
-
-import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 public class ModuleService {
   private final ModuleDao moduleDao;
@@ -32,6 +33,10 @@ public class ModuleService {
 
   public Set<Module> getByBranch(int branchId) {
     return moduleDao.getByBranch(branchId);
+  }
+
+  public int getBranchIdFromModuleId(int moduleId) {
+    return moduleDao.getBranchIdFromModuleId(moduleId);
   }
 
   @Transactional

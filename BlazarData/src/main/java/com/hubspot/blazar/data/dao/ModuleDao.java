@@ -1,16 +1,17 @@
 package com.hubspot.blazar.data.dao;
 
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.rosetta.jdbi.BindWithRosetta;
+import java.util.Set;
+
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
-import java.util.Set;
+import com.google.common.base.Optional;
+import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
 public interface ModuleDao {
 
@@ -20,6 +21,9 @@ public interface ModuleDao {
 
   @SqlQuery("SELECT * FROM modules WHERE branchId = :branchId")
   Set<Module> getByBranch(@Bind("branchId") int branchId);
+
+  @SqlQuery("SELECT branchId FROM modules WHERE id = :moduleId")
+  int getBranchIdFromModuleId(@Bind("moduleId") int moduleId);
 
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO modules (branchId, name, type, path, glob, active, buildpack) VALUES (:branchId, :name, :type, :path, :glob, :active, :buildpack)")

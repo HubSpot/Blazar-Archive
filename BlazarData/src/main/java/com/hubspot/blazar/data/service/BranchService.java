@@ -1,14 +1,15 @@
 package com.hubspot.blazar.data.service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Set;
+
+import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.dao.BranchDao;
-import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
-
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.Set;
 
 public class BranchService {
   private final BranchDao branchDao;
@@ -61,5 +62,9 @@ public class BranchService {
 
   public void delete(GitInfo gitInfo) {
     branchDao.delete(gitInfo);
+  }
+
+  public Set<GitInfo> getAllByBranch(String branch) {
+    return branchDao.getAllOnBranch(branch);
   }
 }

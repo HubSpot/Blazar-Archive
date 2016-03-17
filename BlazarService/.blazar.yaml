@@ -3,3 +3,4 @@ before:
     commands:
       - mvn dependency:get -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-SNAPSHOT -Dtransitive=false
       - mvn dependency:copy -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-SNAPSHOT -DoutputDirectory=target
+

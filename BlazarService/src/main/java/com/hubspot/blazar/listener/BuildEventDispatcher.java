@@ -1,21 +1,26 @@
 package com.hubspot.blazar.listener;
 
-import com.google.common.base.Optional;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
-import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
-import com.hubspot.blazar.data.service.ModuleBuildService;
-import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.exception.NonRetryableBuildException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Optional;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.hubspot.blazar.base.InterProjectBuild;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.base.visitor.InterProjectBuildVisitor;
+import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
+import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
+import com.hubspot.blazar.data.service.InterProjectBuildService;
+import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.hubspot.blazar.exception.NonRetryableBuildException;
 
 @Singleton
 public class BuildEventDispatcher {
@@ -24,17 +29,23 @@ public class BuildEventDispatcher {
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
   private final Set<RepositoryBuildVisitor> repositoryVisitors;
+  private final InterProjectBuildService interProjectBuildService;
+  private final Set<InterProjectBuildVisitor> interProjectBuildVisitors;
   private final Set<ModuleBuildVisitor> moduleVisitors;
 
   @Inject
   public BuildEventDispatcher(RepositoryBuildService repositoryBuildService,
                               ModuleBuildService moduleBuildService,
+                              InterProjectBuildService interProjectBuildService,
                               Set<RepositoryBuildVisitor> repositoryVisitors,
+                              Set<InterProjectBuildVisitor> interProjectBuildVisitors,
                               Set<ModuleBuildVisitor> moduleVisitors,
                               EventBus eventBus) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
+    this.interProjectBuildService = interProjectBuildService;
     this.repositoryVisitors = repositoryVisitors;
+    this.interProjectBuildVisitors = interProjectBuildVisitors;
     this.moduleVisitors = moduleVisitors;
 
     eventBus.register(this);
@@ -90,6 +101,26 @@ public class BuildEventDispatcher {
       return false;
     } else {
       return current.getSimpleState() == other.getSimpleState();
+    }
+  }
+
+  @Subscribe
+  public void dispatch(InterProjectBuild build) throws Exception {
+    InterProjectBuild current = interProjectBuildService.getWithId(build.getId().get()).get();
+    if (current.getState() != build.getState()) {
+      LOG.warn("Ignoring stale event with state {} for InterProjectBuild {}, current state is {}", build.getState(), build.getId().get(), current.getState());
+      return;
+    } else {
+      build = current;
+    }
+
+    try {
+      for (InterProjectBuildVisitor visitor : interProjectBuildVisitors) {
+        visitor.visit(build);
+      }
+    } catch (NonRetryableBuildException e) {
+      LOG.warn("Got non Retryable Exception in InterProjectBuild {}, marking as Finished", build.getId().get());
+      interProjectBuildService.finish(build);
     }
   }
 }
