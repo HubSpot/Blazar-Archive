@@ -24,6 +24,11 @@ public class ModuleDependency {
   }
 
   @Override
+  public String toString() {
+    return String.format("%s(%d)", name, moduleId);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
