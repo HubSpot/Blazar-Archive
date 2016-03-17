@@ -9,17 +9,34 @@ import com.hubspot.rosetta.annotations.StoredAsJson;
 import java.util.Objects;
 
 public class ModuleBuild {
+  public enum SimpleState { WAITING, RUNNING, COMPLETE }
+
   public enum State {
-    QUEUED(false), LAUNCHING(false), IN_PROGRESS(false), SUCCEEDED(true), CANCELLED(true), FAILED(true), SKIPPED(true);
+    QUEUED(SimpleState.WAITING),
+    WAITING_FOR_UPSTREAM_BUILD(SimpleState.WAITING),
+    LAUNCHING(SimpleState.RUNNING),
+    IN_PROGRESS(SimpleState.RUNNING),
+    SUCCEEDED(SimpleState.COMPLETE),
+    CANCELLED(SimpleState.COMPLETE),
+    FAILED(SimpleState.COMPLETE),
+    SKIPPED(SimpleState.COMPLETE);
 
-    private final boolean completed;
+    private final SimpleState simpleState;
 
-    State(boolean completed) {
-      this.completed = completed;
+    State(SimpleState simpleState) {
+      this.simpleState = simpleState;
+    }
+
+    public boolean isWaiting() {
+      return simpleState == SimpleState.WAITING;
+    }
+
+    public boolean isRunning() {
+      return simpleState == SimpleState.RUNNING;
     }
 
     public boolean isComplete() {
-      return completed;
+      return simpleState == SimpleState.COMPLETE;
     }
   }
 

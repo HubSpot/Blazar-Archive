@@ -136,7 +136,7 @@ public class ModuleBuildService {
       throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
     }
 
-    if (build.getState() == State.QUEUED) {
+    if (build.getState().isWaiting()) {
       beginNoPublish(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
     }
 
@@ -149,7 +149,7 @@ public class ModuleBuildService {
       throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
     }
 
-    if (build.getState() == State.QUEUED) {
+    if (build.getState().isWaiting()) {
       beginNoPublish(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
     }
 

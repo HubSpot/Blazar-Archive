@@ -34,19 +34,32 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
   @Override
   protected void visitQueued(ModuleBuild build) throws Exception {
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
+    if (upstreamsComplete(repositoryBuild, build)) {
+      moduleBuildLauncher.launch(repositoryBuild, build);
+    } else {
+      moduleBuildService.update(build.withState(State.WAITING_FOR_UPSTREAM_BUILD));
+    }
+  }
+
+  @Override
+  protected void visitWaitingForUpstreamBuild(ModuleBuild build) throws Exception {
+    RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
+    if (upstreamsComplete(repositoryBuild, build)) {
+      moduleBuildLauncher.launch(repositoryBuild, build);
+    }
+  }
+
+  private boolean upstreamsComplete(RepositoryBuild repositoryBuild, ModuleBuild build) {
     DependencyGraph dependencyGraph = repositoryBuild.getDependencyGraph().get();
 
-
     if (dependencyGraph.incomingVertices(build.getModuleId()).isEmpty()) {
-      moduleBuildLauncher.launch(repositoryBuild, build);
+      return true;
     } else {
       Set<ModuleBuild> moduleBuilds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
       Set<Integer> buildingModules = extractModuleIds(filterSucceeded(moduleBuilds));
       Set<Integer> upstreamModules = dependencyGraph.incomingVertices(build.getModuleId());
 
-      if (Sets.intersection(buildingModules, upstreamModules).isEmpty()) {
-        moduleBuildLauncher.launch(repositoryBuild, build);
-      }
+      return Sets.intersection(buildingModules, upstreamModules).isEmpty();
     }
   }
 

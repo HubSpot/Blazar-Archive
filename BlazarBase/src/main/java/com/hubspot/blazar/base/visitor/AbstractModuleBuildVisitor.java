@@ -10,6 +10,9 @@ public abstract class AbstractModuleBuildVisitor implements ModuleBuildVisitor {
       case QUEUED:
         visitQueued(build);
         break;
+      case WAITING_FOR_UPSTREAM_BUILD:
+        visitWaitingForUpstreamBuild(build);
+        break;
       case LAUNCHING:
         visitLaunching(build);
         break;
@@ -34,6 +37,7 @@ public abstract class AbstractModuleBuildVisitor implements ModuleBuildVisitor {
   }
 
   protected void visitQueued(ModuleBuild build) throws Exception {}
+  protected void visitWaitingForUpstreamBuild(ModuleBuild build) throws Exception {}
   protected void visitLaunching(ModuleBuild build) throws Exception {}
   protected void visitInProgress(ModuleBuild build) throws Exception {}
   protected void visitSucceeded(ModuleBuild build) throws Exception {}

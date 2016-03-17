@@ -50,12 +50,12 @@ public interface ModuleBuildDao {
   @SqlUpdate("INSERT INTO module_builds (repoBuildId, moduleId, buildNumber, state) VALUES (:repoBuildId, :moduleId, :buildNumber, :state)")
   long enqueue(@BindWithRosetta ModuleBuild build);
 
-  @SqlUpdate("UPDATE module_builds SET startTimestamp = :startTimestamp, state = :state, buildConfig = :buildConfig, resolvedConfig = :resolvedConfig WHERE id = :id AND state = 'QUEUED'")
+  @SqlUpdate("UPDATE module_builds SET startTimestamp = :startTimestamp, state = :state, buildConfig = :buildConfig, resolvedConfig = :resolvedConfig WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD')")
   int begin(@BindWithRosetta ModuleBuild build);
 
-  @SqlUpdate("UPDATE module_builds SET taskId = :taskId, state = :state WHERE id = :id AND state IN ('LAUNCHING', 'IN_PROGRESS')")
+  @SqlUpdate("UPDATE module_builds SET taskId = :taskId, state = :state WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS')")
   int update(@BindWithRosetta ModuleBuild build);
 
-  @SqlUpdate("UPDATE module_builds SET endTimestamp = :endTimestamp, taskId = :taskId, state = :state WHERE id = :id AND state IN ('QUEUED', 'LAUNCHING', 'IN_PROGRESS')")
+  @SqlUpdate("UPDATE module_builds SET endTimestamp = :endTimestamp, taskId = :taskId, state = :state WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS')")
   int complete(@BindWithRosetta ModuleBuild build);
 }
