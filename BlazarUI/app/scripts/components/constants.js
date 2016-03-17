@@ -6,6 +6,7 @@ export const LABELS = {
   'QUEUED': 'info',
   'LAUNCHING': 'info',
   'IN_PROGRESS': 'info',
+  'WAITING_FOR_UPSTREAM_BUILD': 'info',
   'SKIPPED': 'skipped'
 };
 
@@ -15,9 +16,10 @@ export const iconStatus = {
   'UNSTABLE': 'close',
   'CANCELLED': 'stop',
   'SKIPPED': 'minus',
-  'QUEUED': 'circle-o-notch fa-spin',
-  'LAUNCHING': 'circle-o-notch fa-spin',
-  'IN_PROGRESS': 'circle-o-notch fa-spin'
+  'IN_PROGRESS': 'circle-o-notch fa-spin',
+  'WAITING_FOR_UPSTREAM_BUILD': 'clock-o',
+  'QUEUED': 'clock-o',
+  'LAUNCHING': 'clock-o'
 };
 
 export const unicode = {

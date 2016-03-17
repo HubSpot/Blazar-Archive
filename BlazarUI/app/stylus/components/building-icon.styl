@@ -13,8 +13,11 @@ buildStatus(color)
 .building-icon-inner--small
   width 10px
   height 10px
+  
+.building-icon--QUEUED, .building-icon--LAUNCHING, .building-icon--WAITING_FOR_UPSTREAM_BUILD, .building-icon--WAITING_FOR_BUILD_SLOT
+  buildStatus($default)
 
-.building-icon--IN_PROGRESS, .building-icon--QUEUED, .building-icon--LAUNCHING, .building-icon--WAITING_FOR_UPSTREAM_BUILD, .building-icon--WAITING_FOR_BUILD_SLOT
+.building-icon--IN_PROGRESS
   buildStatus($info)
 
 .building-icon--CANCELLED
