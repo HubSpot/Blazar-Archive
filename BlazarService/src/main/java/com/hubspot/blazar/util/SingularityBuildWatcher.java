@@ -114,47 +114,29 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
 
           for (ModuleBuild build : moduleBuildService.getByState(State.IN_PROGRESS)) {
             long age = System.currentTimeMillis() - build.getStartTimestamp().get();
+            long maxAge = executorConfiguration.getBuildTimeoutMillis();
             if (age < TimeUnit.MINUTES.toMillis(1)) {
               continue;
             }
 
             String taskId = build.getTaskId().get();
             Optional<SingularityTaskHistory> taskHistory = singularityClient.getHistoryForTask(taskId);
-            Optional<Long> startedTimestamp = startedTimestamp(taskHistory);
             Optional<Long> completedTimestamp = completedTimestamp(taskHistory);
             if (!taskHistory.isPresent()) {
               LOG.warn("No task history found for taskId {}", taskId);
             } else if (completedTimestamp.isPresent()) {
               LOG.info("Failing build {} because taskId {} is done", build.getId().get(), taskId);
               moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(completedTimestamp.get()));
-            } else if (startedTimestamp.isPresent()) {
-              age = System.currentTimeMillis() - startedTimestamp.get();
-              long maxAge = executorConfiguration.getBuildTimeoutMillis();
-              if (age > maxAge) {
-                LOG.info("Failing build {} because its age {} exceeded max of {}", build.getId().get(), age, maxAge);
-                moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
-                singularityTaskKiller.killTask(build);
-              }
+            } else if (age > maxAge) {
+              LOG.info("Failing build {} because its age {} exceeded max of {}", build.getId().get(), age, maxAge);
+              moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+              singularityTaskKiller.killTask(build);
             }
           }
         }
       } catch (Throwable t) {
         LOG.error("Error checking for failed or lost tasks", t);
       }
-    }
-
-    private Optional<Long> startedTimestamp(Optional<SingularityTaskHistory> taskHistory) {
-      if (!taskHistory.isPresent()) {
-        return Optional.absent();
-      }
-
-      for (SingularityTaskHistoryUpdate taskUpdate : taskHistory.get().getTaskUpdates()) {
-        if (taskUpdate.getTaskState() == ExtendedTaskState.TASK_RUNNING) {
-          return Optional.of(taskUpdate.getTimestamp());
-        }
-      }
-
-      return Optional.absent();
     }
 
     private Optional<Long> completedTimestamp(Optional<SingularityTaskHistory> taskHistory) {
