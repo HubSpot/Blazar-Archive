@@ -9,7 +9,7 @@ class Sha extends Component {
 
     return (
       <span className='sha'>
-        <a href={commitLink} className='sha-link' target="_blank">{truncate(this.props.build.sha, this.props.truncate)}{ '  ' }</a>
+        <a href={commitLink} className='sha-link' target="_blank">{truncate(this.props.build.sha, this.props.truncate)}</a>
       </span>
     );
   }
