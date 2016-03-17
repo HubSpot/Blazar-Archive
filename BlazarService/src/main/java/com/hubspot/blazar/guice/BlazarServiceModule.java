@@ -9,6 +9,8 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
+import com.hubspot.blazar.exception.IllegalStateExceptionMapper;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -73,6 +75,9 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.install(new BuildVisitorModule());
     binder.install(new DiscoveryModule());
 
+    binder.bind(IllegalArgumentExceptionMapper.class);
+    binder.bind(IllegalStateExceptionMapper.class);
+
     binder.bind(BranchResource.class);
     binder.bind(BranchStateResource.class);
     binder.bind(ModuleBuildResource.class);
@@ -80,7 +85,6 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(BuildHistoryResource.class);
     binder.bind(InstantMessageResource.class);
     binder.bind(UserFeedbackResource.class);
-
 
     binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
     binder.bind(PropertyFilteringMessageBodyWriter.class)
