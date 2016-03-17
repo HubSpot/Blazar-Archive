@@ -45,7 +45,7 @@ public class DownstreamModuleBuildVisitor extends AbstractModuleBuildVisitor {
       for (ModuleBuild maybeDownstream : builds) {
         if (downstreamModules.contains(maybeDownstream.getModuleId())) {
           ModuleBuild downstreamBuild = maybeDownstream;
-          if (downstreamBuild.getState() == State.QUEUED) {
+          if (downstreamBuild.getState().isWaiting()) {
             LOG.info("Posting event for downstream build {}", downstreamBuild.getId().get());
             eventBus.post(downstreamBuild);
           } else {
