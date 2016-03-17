@@ -38,6 +38,10 @@ public class ModuleBuild {
     public boolean isComplete() {
       return simpleState == SimpleState.COMPLETE;
     }
+
+    public SimpleState getSimpleState() {
+      return simpleState;
+    }
   }
 
   private final Optional<Long> id;

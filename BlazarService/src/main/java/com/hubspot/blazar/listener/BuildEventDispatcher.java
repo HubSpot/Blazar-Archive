@@ -62,7 +62,7 @@ public class BuildEventDispatcher {
   @Subscribe
   public void dispatch(ModuleBuild build) throws Exception {
     ModuleBuild current = moduleBuildService.get(build.getId().get()).get();
-    if (current.getState() != build.getState()) {
+    if (!matchingState(current.getState(), build.getState())) {
       LOG.warn("Ignoring stale event with state {} for module build {}, current state is {}", build.getState(), build.getId().get(), current.getState());
       return;
     } else {
@@ -76,6 +76,16 @@ public class BuildEventDispatcher {
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", build.getId().get(), e);
       moduleBuildService.fail(build);
+    }
+  }
+
+  private boolean matchingState(ModuleBuild.State current, ModuleBuild.State other) {
+    if (current == other) {
+      return true;
+    } else if (current.isComplete()) {
+      return false;
+    } else {
+      return current.getSimpleState() == other.getSimpleState();
     }
   }
 }
