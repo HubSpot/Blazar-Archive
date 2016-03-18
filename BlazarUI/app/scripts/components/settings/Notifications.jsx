@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import {Button} from 'react-bootstrap';
 import {bindAll} from 'underscore';
 
 import NotificationsHeadline from './NotificationsHeadline.jsx';
@@ -9,7 +10,8 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 
 let initialState = {
-  selectedChannel: undefined
+  selectedChannel: undefined,
+  addingNewChannel: false
 };
 
 class Notifications extends Component {
@@ -17,7 +19,7 @@ class Notifications extends Component {
   constructor() {
     this.state = initialState;
 
-    bindAll(this, 'onChannelClick');
+    bindAll(this, 'onChannelClick', 'onButtonClick', 'onSelectedNewChannel');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -48,6 +50,18 @@ class Notifications extends Component {
     });
   }
 
+  onButtonClick() {
+    this.setState({
+      addingNewChannel: true
+    });
+  }
+
+  onSelectedNewChannel() {
+    this.setState({
+      addingNewChannel: false
+    });
+  }
+
   render() {
     return (
       <div className='notifications'>
@@ -56,7 +70,9 @@ class Notifications extends Component {
           <UIGridItem size={4}>
             <NotificationsChannels
               selectedChannel={this.state.selectedChannel}
+              addingNewChannel={this.state.addingNewChannel}
               onChannelClick={this.onChannelClick}
+              onSelectedNewChannel={this.onSelectedNewChannel}
               {...this.props}
             />
           </UIGridItem>
@@ -67,13 +83,15 @@ class Notifications extends Component {
             />
           </UIGridItem>
         </UIGrid>
+        <Button className='notifications__channel-button' onClick={this.onButtonClick} bsStyle='primary'>Add New Channel</Button>
       </div>
     );
   }
 }
 
 Notifications.propTypes = {
-  notifications: PropTypes.array.isRequired
+  notifications: PropTypes.array.isRequired,
+  slackChannels: PropTypes.array.isRequired
 };
 
 export default Notifications;

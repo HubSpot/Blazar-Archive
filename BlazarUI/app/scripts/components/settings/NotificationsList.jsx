@@ -15,8 +15,6 @@ class NotificationsList extends Component {
     let channelNotifications = findWhere(notifications, {channelName: channel});
     channelNotifications[event.target.id] = !channelNotifications[event.target.id];
 
-    console.log("about to try and update: ", channelNotifications);
-
     SettingsActions.updateNotification(channelNotifications);
   }
 
@@ -46,7 +44,7 @@ class NotificationsList extends Component {
             <Toggle
               id='onFail'
               onChange={this.toggleNotificationSetting}
-              defaultChecked={channelNotifications.onFail}
+              checked={channelNotifications.onFail}
             />
           </div>
         </div>
@@ -65,7 +63,7 @@ class NotificationsList extends Component {
             <Toggle
               id='onFinish'
               onChange={this.toggleNotificationSetting}
-              defaultChecked={channelNotifications.onFinish}
+              checked={channelNotifications.onFinish}
             />
           </div>
         </div>
@@ -84,7 +82,7 @@ class NotificationsList extends Component {
             <Toggle
               id='onChange'
               onChange={this.toggleNotificationSetting}
-              defaultChecked={channelNotifications.onChange}
+              checked={channelNotifications.onChange}
             />
           </div>
         </div>

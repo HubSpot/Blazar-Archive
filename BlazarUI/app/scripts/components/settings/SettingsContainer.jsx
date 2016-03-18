@@ -65,7 +65,8 @@ class SettingsContainer extends Component {
           <UIGridItem size={12}>
             {this.renderHeadline()}
             <Notifications 
-              notifications={this.state.notifications} />
+              notifications={this.state.notifications} 
+              slackChannels={this.state.slackChannels} />
           </UIGridItem>
         </UIGrid>
       </PageContainer>

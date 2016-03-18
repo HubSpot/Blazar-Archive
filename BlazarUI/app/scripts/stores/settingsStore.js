@@ -23,6 +23,17 @@ const SettingsStore = Reflux.createStore({
     });
   },
 
+  onAddNotification(channelName) {
+    SettingsApi.addNotification(this.params, channelName, (resp) => {
+      this.notifications = resp;
+
+      this.trigger({
+        notifications: this.notifications,
+        loading: false
+      })
+    });
+  },
+
   onUpdateNotification(notification) {
     SettingsApi.updateNotification(this.params, notification, (resp) => {
       this.notifications = resp;
@@ -37,8 +48,6 @@ const SettingsStore = Reflux.createStore({
   onLoadSlackChannels() {
     SettingsApi.fetchSlackChannels((resp) => {
       this.slackChannels = resp;
-
-      console.log(this.slackChannels);
 
       this.trigger({
         slackChannels: this.slackChannels

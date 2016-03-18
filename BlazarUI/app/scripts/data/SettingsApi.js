@@ -1,6 +1,15 @@
 /*global config*/
 import Resource from '../services/ResourceProvider';
 
+function _parseSlackChannels(slackChannels) {
+  return slackChannels.map((channel) => {
+    return {
+      value: channel.name,
+      label: channel.name
+    };
+  });
+}
+
 function fetchNotifications(params, cb) {
   const notificationsPromise = new Resource({
     url: `${config.apiRoot}/instant-message/configurations/branches/${params.branchId}`,
@@ -12,6 +21,29 @@ function fetchNotifications(params, cb) {
   });
 }
 
+function addNotification(params, channelName, cb) {
+  const notification = {
+    branchId: params.branchId,
+    channelName: channelName,
+    onFinish: false,
+    onFail: false,
+    onChange: false,
+    onRecover: false,
+    active: true
+  };
+
+  const notificationPromise = new Resource({
+    url: `${config.apiRoot}/instant-message/configurations`,
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(notification)
+  }).send();
+
+  return notificationPromise.then(() => {
+    this.fetchNotifications(params, cb);
+  });
+}
+
 function fetchSlackChannels(cb) {
   const channelsPromise = new Resource({
     url: `${config.apiRoot}/instant-message/slack/list-channels`,
@@ -19,12 +51,11 @@ function fetchSlackChannels(cb) {
   }).send();
 
   return channelsPromise.then((resp) => {
-    cb(resp);
+    cb(_parseSlackChannels(resp));
   });
 }
 
 function updateNotification(params, notification, cb) {
-  console.log(notification);
   const notificationsPromise = new Resource({
     url: `${config.apiRoot}/instant-message/configurations/${notification.id}`,
     type: 'PUT',
@@ -40,5 +71,6 @@ function updateNotification(params, notification, cb) {
 export default {
   fetchNotifications: fetchNotifications,
   updateNotification: updateNotification,
-  fetchSlackChannels: fetchSlackChannels
+  fetchSlackChannels: fetchSlackChannels,
+  addNotification: addNotification
 };
