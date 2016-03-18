@@ -12,7 +12,9 @@ class NotificationsChannels extends Component {
     return this.props.notifications.map((notification, i) => {
       return (
         <NotificationsChannel
-          channel={notification.channelName} 
+          channel={notification.channelName}
+          isSelected={this.props.selectedChannel === notification.channelName}
+          onClick={this.props.onChannelClick}
           key={i} />
       );
     });
@@ -21,6 +23,11 @@ class NotificationsChannels extends Component {
   render() {
     return (
       <div className='notifications__channels'>
+        <div className='notifications__channels-headline'>
+          <span>
+            Channels
+          </span>
+        </div>
         {this.renderChannels()}
       </div>
     );
@@ -28,7 +35,9 @@ class NotificationsChannels extends Component {
 }
 
 NotificationsChannels.propTypes = {
-  notifications: PropTypes.array.isRequired
+  notifications: PropTypes.array.isRequired,
+  onChannelClick: PropTypes.func.isRequired,
+  selectedChannel: PropTypes.string
 };
 
 export default NotificationsChannels;

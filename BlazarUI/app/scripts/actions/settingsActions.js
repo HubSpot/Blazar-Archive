@@ -2,7 +2,9 @@
 import Reflux from 'reflux';
 
 const SettingsActions = Reflux.createActions([
-  'loadNotifications'
+  'loadNotifications',
+  'updateNotification',
+  'loadSlackChannels'
 ]);
 
 export default SettingsActions;

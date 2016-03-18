@@ -15,6 +15,7 @@ import SettingsStore from '../../stores/settingsStore';
 
 let initialState = {
   notifications: [],
+  slackChannels: [],
   loading: true
 };
 
@@ -29,6 +30,7 @@ class SettingsContainer extends Component {
   componentDidMount() {
     this.unsubscribeFromSettings = SettingsStore.listen(this.onStatusChange);
     SettingsActions.loadNotifications(this.props.params);
+    SettingsActions.loadSlackChannels();
   }
 
   componentWillReceiveProps(nextprops) {

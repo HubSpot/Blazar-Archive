@@ -10,17 +10,38 @@ const SettingsStore = Reflux.createStore({
     this.notifications = [];
   },
 
-  getNotifications() {    
-    return this.notifications;
-  },
-
   onLoadNotifications(params) {
+    this.params = params;
+
     SettingsApi.fetchNotifications(params, (resp) => {
       this.notifications = resp;
 
       this.trigger({
         notifications: this.notifications,
         loading: false
+      });
+    });
+  },
+
+  onUpdateNotification(notification) {
+    SettingsApi.updateNotification(this.params, notification, (resp) => {
+      this.notifications = resp;
+
+      this.trigger({
+        notifications: this.notifications,
+        loading: false
+      });
+    });
+  },
+
+  onLoadSlackChannels() {
+    SettingsApi.fetchSlackChannels((resp) => {
+      this.slackChannels = resp;
+
+      console.log(this.slackChannels);
+
+      this.trigger({
+        slackChannels: this.slackChannels
       });
     });
   }
