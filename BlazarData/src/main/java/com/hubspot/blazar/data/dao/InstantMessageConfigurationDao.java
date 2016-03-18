@@ -32,7 +32,16 @@ public interface InstantMessageConfigurationDao {
   @SqlUpdate("INSERT INTO instant_message_configs (branchId, moduleId, channelName, onFinish, onFail, onChange, onRecover, active) VALUES (:branchId, :moduleId, :channelName, :onFinish, :onFail, :onChange, :onRecover, :active)")
   long insert(@BindWithRosetta InstantMessageConfiguration instantMessageConfiguration);
 
-  @SqlUpdate("INSERT INTO instant_message_configs (branchId, moduleId, channelName, onFinish, onFail, onChange, onRecover, active) VALUES (:branchId, :moduleId, :channelName, :onFinish, :onFail, :onChange, :onRecover, :active)")
+  @SqlUpdate("UPDATE instant_message_configs SET " +
+          "branchId = :branchId, " +
+          "moduleId = :moduleId, " +
+          "channelName = :channelName, " +
+          "onFinish = :onFinish, " +
+          "onFail = :onFail, " +
+          "onChange = :onChange, " +
+          "onRecover = :onRecover, " +
+          "active = :active " +
+          "WHERE id = :id")
   int update(@BindWithRosetta InstantMessageConfiguration instantMessageConfiguration);
 
   @SqlUpdate("UPDATE instant_message_configs SET active = 0 WHERE id = :id")
