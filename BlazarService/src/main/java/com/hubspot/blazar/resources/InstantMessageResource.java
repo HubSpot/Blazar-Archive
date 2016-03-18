@@ -70,10 +70,10 @@ public class InstantMessageResource {
   }
 
   @GET
-  @Path("/configurations/branches/{id}")
+  @Path("/configurations/branches/{branchId}")
   @PropertyFiltering
-  public Set<InstantMessageConfiguration> getAllWithBranchId(@PathParam("id") long id) {
-    return instantMessageConfigurationService.getAllWithBranchId(id);
+  public Set<InstantMessageConfiguration> getAllWithBranchId(@PathParam("branchId") long branchId) {
+    return instantMessageConfigurationService.getAllWithBranchId(branchId);
   }
 
   @GET
