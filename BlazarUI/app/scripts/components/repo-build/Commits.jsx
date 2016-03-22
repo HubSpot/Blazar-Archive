@@ -71,7 +71,7 @@ class Commits extends Component {
 
     return (
       <span>
-        {msg}{compareNode !== undefined ? ' ' : ''}{compareNode}:
+        {msg}{compareNode !== undefined ? ' ' : ''}{compareNode}
       </span>
     )
   }
