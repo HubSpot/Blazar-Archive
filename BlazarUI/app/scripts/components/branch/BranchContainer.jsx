@@ -1,4 +1,7 @@
+/*global config*/
 import React, {Component, PropTypes} from 'react';
+import {Link} from 'react-router';
+import {Button} from 'react-bootstrap';
 import {bindAll} from 'underscore';
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -33,7 +36,8 @@ let initialState = {
   showModuleModal: false,
   modules: Immutable.List.of(),
   selectedModules: [],
-  buildDownstreamModules: 'WITHIN_REPOSITORY'
+  buildDownstreamModules: 'WITHIN_REPOSITORY',
+  branchId: 0
 };
 
 class BranchContainer extends Component {
@@ -147,39 +151,58 @@ class BranchContainer extends Component {
     );
   }
 
+  renderBuildSettingsButton() {
+    if (this.state.loadingBranches) {
+      return;
+    }
+
+    const buildSettingsLink = `${config.appRoot}/settings/branch/${this.state.branchId}`;
+
+    return (
+      <Link to={buildSettingsLink}>
+        <Button>
+            Build Settings
+        </Button>
+      </Link>
+    );
+  }
+
   render() {
     return (
       <PageContainer>
         {this.renderMalformedFileAlert()}
         <UIGrid>
-          <UIGridItem size={10}>
+          <UIGridItem size={8}>
             <BranchHeadline
               loading={this.state.loadingStars || this.state.loadingBranches}
               {...this.state}
               {...this.props}
             />
+          </UIGridItem>
+          <UIGridItem size={2} align='RIGHT'>
+            <BuildButton 
+              openModuleModal={this.openModuleModal}
+              loading={this.state.loadingBranches}
+              error={this.state.error}
+            />
+            <ModuleModal
+              loadingModules={this.state.loadingModules}
+              showModal={this.state.showModuleModal}
+              closeModal={this.closeModuleModal}
+              triggerBuild={this.triggerBuild}
+              onSelectUpdate={this.updateSelectedModules}
+              onCheckboxUpdate={this.updateDownstreamModules}
+              modules={this.state.modules}
+            />
+          </UIGridItem>
+          <UIGridItem size={1} align='RIGHT'>
+            {this.renderBuildSettingsButton()}
+          </UIGridItem>
+          <UIGrid>
+            <UIGridItem size={12}>
+              {this.renderTable()}
             </UIGridItem>
-            <UIGridItem size={2} align='RIGHT'>
-              <BuildButton 
-                openModuleModal={this.openModuleModal}
-                loading={this.state.loadingBranches}
-                error={this.state.error}
-              />
-              <ModuleModal
-                loadingModules={this.state.loadingModules}
-                showModal={this.state.showModuleModal}
-                closeModal={this.closeModuleModal}
-                triggerBuild={this.triggerBuild}
-                onSelectUpdate={this.updateSelectedModules}
-                onCheckboxUpdate={this.updateDownstreamModules}
-                modules={this.state.modules}
-              />
-            </UIGridItem>
-            <UIGrid>
-              <UIGridItem size={12}>
-                {this.renderTable()}
-              </UIGridItem>
-            </UIGrid>
+          </UIGrid>
         </UIGrid>
       </PageContainer>
     );

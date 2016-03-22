@@ -37,7 +37,7 @@ class NotificationsList extends Component {
   renderNotificationsList() {
     const {notifications, channel} = this.props;
 
-    if (channel === undefined) {
+    if (channel === undefined || !notifications.length) {
       return this.renderDefault();
     }
 
@@ -52,7 +52,7 @@ class NotificationsList extends Component {
         <div className='notifications__setting'>
           <div className='notifications__setting-title'>
             <span>
-              Build Failure
+              On Failure
             </span>
           </div>
           <div className='notifications__setting-description'>
@@ -71,7 +71,7 @@ class NotificationsList extends Component {
         <div className='notifications__setting'>
           <div className='notifications__setting-title'>
             <span>
-              Build Success
+              On Success
             </span>
           </div>
           <div className='notifications__setting-description'>
@@ -90,7 +90,7 @@ class NotificationsList extends Component {
         <div className='notifications__setting'>
           <div className='notifications__setting-title'>
             <span>
-              Build Status Change
+              On Status Change
             </span>
           </div>
           <div className='notifications__setting-description'>
