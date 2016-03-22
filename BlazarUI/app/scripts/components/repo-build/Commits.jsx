@@ -42,7 +42,7 @@ class Commits extends Component {
   buildCompareLink() {
     const {currentCommit, previousCommit} = this.props;
 
-    return previousCommit.url + '...' + currentCommit.id;
+    return previousCommit.url.replace('/commit/', '/compare/') + '...' + currentCommit.id;
   }
 
   renderSummaryText() {
@@ -65,15 +65,13 @@ class Commits extends Component {
 
     if (truncated && previousCommit !== undefined) {
       compareNode = (
-        <a href={this.buildCompareLink()}> (results truncated: see full commit list here)</a>
+        <a href={this.buildCompareLink()}> (see untruncated list)</a>
       );
     }
 
-
     return (
       <span>
-        {msg}{compareNode}:
-
+        {msg}{compareNode !== undefined ? ' ' : ''}{compareNode}:
       </span>
     )
   }

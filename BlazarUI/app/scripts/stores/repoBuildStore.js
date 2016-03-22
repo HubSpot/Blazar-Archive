@@ -34,6 +34,8 @@ const RepoBuildStore = Reflux.createStore({
     
     this.api.startPolling((err, resp) => {
       if (err) {
+        console.log(err);
+        console.log(resp);
         this.trigger({
           loadingModuleBuilds: false,
           error: {
