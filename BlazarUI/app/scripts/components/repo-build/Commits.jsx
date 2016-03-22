@@ -39,32 +39,43 @@ class Commits extends Component {
     return commitMap;
   }
 
+  buildCompareLink() {
+    const {currentCommit, previousCommit} = this.props;
+
+    return previousCommit.url + '...' + currentCommit.id;
+  }
+
   renderSummaryText() {
-    const {anyNewCommits, showCommits, commits} = this.props;
+    const {anyNewCommits, showCommits, commits, truncated, previousCommit} = this.props;
+    let msg;
 
     if (!anyNewCommits) {
-      return (
-        <span>
-          No new commits in this build. Most recent commit:
-        </span>
-      );
+      msg = 'No new commits in this build. Most recent commit';
     }
 
     else if (!showCommits) {
-      return (
-        <span>
-          Showing 1 new commit in this build:
-        </span>
-      );
+      msg = `Showing 1 of ${commits.length} new commits in this build`;
     }
 
     else {
-      return (
-        <span>
-          Showing {commits.length} new commit{commits.length === 1 ? '' : 's'} in this build:
-        </span>
+      msg = `Showing ${commits.length} of ${commits.length} new commit${commits.length === 1 ? '' : 's'} in this build`;
+    }
+
+    let compareNode;
+
+    if (truncated && previousCommit !== undefined) {
+      compareNode = (
+        <a href={this.buildCompareLink()}> (results truncated: see full commit list here)</a>
       );
     }
+
+
+    return (
+      <span>
+        {msg}{compareNode}:
+
+      </span>
+    )
   }
 
   renderSummary() {
@@ -127,6 +138,9 @@ class Commits extends Component {
 }
 
 Commits.propTypes = {
+  truncated: PropTypes.bool.isRequired,
+  currentCommit: PropTypes.object.isRequired,
+  previousCommit: PropTypes.object,
   commits: PropTypes.array.isRequired,
   showCommits: PropTypes.bool.isRequired,
   anyNewCommits: PropTypes.bool.isRequired,
