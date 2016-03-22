@@ -62,7 +62,7 @@ const SettingsStore = Reflux.createStore({
       this.trigger({
         notifications: this.notifications,
         loading: false
-      })
+      });
     });
   }
 
