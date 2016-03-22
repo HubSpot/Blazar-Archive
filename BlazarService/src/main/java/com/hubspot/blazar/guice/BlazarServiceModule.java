@@ -65,6 +65,10 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
   public void configure(Binder binder) {
     binder.install(new BlazarZooKeeperModule(getConfiguration()));
     binder.bind(GitHubWebhookResource.class);
+    binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
+    binder.bind(XmlFactory.class).toInstance(new XmlFactory());
+    binder.bind(MetricRegistry.class).toInstance(getEnvironment().metrics());
+    binder.bind(ObjectMapper.class).toInstance(getEnvironment().getObjectMapper());
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 
     if (getConfiguration().isWebhookOnly()) {
@@ -106,11 +110,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       String host = entry.getKey();
       mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
     }
-
-    binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
-    binder.bind(XmlFactory.class).toInstance(new XmlFactory());
-    binder.bind(MetricRegistry.class).toInstance(getEnvironment().metrics());
-    binder.bind(ObjectMapper.class).toInstance(getEnvironment().getObjectMapper());
   }
 
   @Provides
