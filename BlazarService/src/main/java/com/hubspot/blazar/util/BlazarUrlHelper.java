@@ -14,6 +14,8 @@ import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 
+import java.net.URI;
+
 @Singleton
 public class BlazarUrlHelper {
 
@@ -34,14 +36,19 @@ public class BlazarUrlHelper {
     this.uiConfiguration = configuration.getUiConfiguration();
   }
 
-  public String getBlazarUiLink(RepositoryBuild build) {
-    GitInfo gitInfo = branchService.get(build.getBranchId()).get();
+  public URI getBlazarUiLink(GitInfo gitInfo) {
     return UriBuilder.fromUri(uiConfiguration.getBaseUrl())
         .segment("builds")
         .segment(gitInfo.getHost())
         .segment(gitInfo.getOrganization())
         .segment(gitInfo.getRepository())
         .segment(gitInfo.getBranch())
+        .build();
+  }
+
+  public String getBlazarUiLink(RepositoryBuild build) {
+    GitInfo gitInfo = branchService.get(build.getBranchId()).get();
+    return UriBuilder.fromUri(getBlazarUiLink(gitInfo))
         .segment(String.valueOf(build.getBuildNumber()))
         .build()
         .toString();
@@ -51,12 +58,7 @@ public class BlazarUrlHelper {
     RepositoryBuild repoBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
     GitInfo gitInfo = branchService.get(repoBuild.getBranchId()).get();
     Module module = moduleService.get(build.getModuleId()).get();
-    return UriBuilder.fromUri(uiConfiguration.getBaseUrl())
-        .segment("builds")
-        .segment(gitInfo.getHost())
-        .segment(gitInfo.getOrganization())
-        .segment(gitInfo.getRepository())
-        .segment(gitInfo.getBranch())
+    return UriBuilder.fromUri(getBlazarUiLink(gitInfo))
         .segment(String.valueOf(repoBuild.getBuildNumber()))
         .segment(module.getName())
         .build()

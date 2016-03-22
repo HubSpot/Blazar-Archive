@@ -94,6 +94,11 @@
         <version>1.1.1</version>
       </dependency>
       <dependency>
+        <groupId>com.hubspot.dropwizard</groupId>
+        <artifactId>dropwizard-guicier</artifactId>
+        <version>0.7.1.2</version>
+      </dependency>
+      <dependency>
         <groupId>com.hubspot.jackson</groupId>
         <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
         <version>0.7.2</version>

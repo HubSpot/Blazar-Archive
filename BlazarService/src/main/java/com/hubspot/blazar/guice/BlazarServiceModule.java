@@ -9,8 +9,10 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import com.hubspot.blazar.cctray.CCTrayProjectFactory;
 import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
 import com.hubspot.blazar.exception.IllegalStateExceptionMapper;
+import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 
@@ -56,22 +58,21 @@ import com.hubspot.horizon.ning.NingHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import io.dropwizard.db.DataSourceFactory;
-import io.dropwizard.setup.Environment;
 
-public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfiguration> {
+public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfiguration> {
 
   @Override
-  protected void configure(Binder binder, BlazarConfiguration configuration) {
-    binder.install(new BlazarZooKeeperModule());
+  public void configure(Binder binder) {
+    binder.install(new BlazarZooKeeperModule(getConfiguration()));
     binder.bind(GitHubWebhookResource.class);
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 
-    if (configuration.isWebhookOnly()) {
+    if (getConfiguration().isWebhookOnly()) {
       return;
     }
 
     binder.install(new BlazarDataModule());
-    binder.install(new BlazarSingularityModule());
+    binder.install(new BlazarSingularityModule(getConfiguration()));
     binder.install(new BuildVisitorModule());
     binder.install(new DiscoveryModule());
 
@@ -86,7 +87,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(InstantMessageResource.class);
     binder.bind(UserFeedbackResource.class);
 
-    binder.bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
+    binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());
     binder.bind(PropertyFilteringMessageBodyWriter.class)
         .toConstructor(defaultConstructor(PropertyFilteringMessageBodyWriter.class))
         .in(Scopes.SINGLETON);
@@ -98,36 +99,18 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
     binder.bind(ModuleBuildLauncher.class);
     binder.bind(SingularityBuildLauncher.class);
     binder.bind(BlazarUrlHelper.class);
+    binder.bind(CCTrayProjectFactory.class);
 
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
-    for (Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {
+    for (Entry<String, GitHubConfiguration> entry : getConfiguration().getGitHubConfiguration().entrySet()) {
       String host = entry.getKey();
       mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
     }
-  }
 
-  @Provides
-  @Singleton
-  public YAMLFactory providesYAMLFactory() {
-    return new YAMLFactory();
-  }
-
-  @Provides
-  @Singleton
-  public XmlFactory providesXmlFactory() {
-    return new XmlFactory();
-  }
-
-  @Provides
-  @Singleton
-  public MetricRegistry providesMetricRegistry(Environment environment) {
-    return environment.metrics();
-  }
-
-  @Provides
-  @Singleton
-  public ObjectMapper providesObjectMapper(Environment environment) {
-    return environment.getObjectMapper();
+    binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
+    binder.bind(XmlFactory.class).toInstance(new XmlFactory());
+    binder.bind(MetricRegistry.class).toInstance(getEnvironment().metrics());
+    binder.bind(ObjectMapper.class).toInstance(getEnvironment().getObjectMapper());
   }
 
   @Provides
@@ -158,7 +141,7 @@ public class BlazarServiceModule extends ConfigurationAwareModule<BlazarConfigur
 
 
   @Provides
-  @com.google.inject.Singleton
+  @Singleton
   public HttpClient provideHttpClient(ObjectMapper objectMapper) {
     return new NingHttpClient(HttpConfig.newBuilder().setMaxRetries(5).setObjectMapper(objectMapper).build());
   }

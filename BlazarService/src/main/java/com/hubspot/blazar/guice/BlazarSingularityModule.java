@@ -2,6 +2,7 @@ package com.hubspot.blazar.guice;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
+import com.google.inject.Module;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
@@ -15,12 +16,15 @@ import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-public class BlazarSingularityModule extends ConfigurationAwareModule<BlazarConfiguration> {
+public class BlazarSingularityModule implements Module {
+  private final SingularityConfiguration singularityConfiguration;
+
+  public BlazarSingularityModule(BlazarConfiguration configuration) {
+    this.singularityConfiguration = configuration.getSingularityConfiguration();
+  }
 
   @Override
-  protected void configure(Binder binder, BlazarConfiguration configuration) {
-    SingularityConfiguration singularityConfiguration = configuration.getSingularityConfiguration();
-
+  public void configure(Binder binder) {
     binder.install(new SingularityClientModule(ImmutableList.of(singularityConfiguration.getHost())));
     if (singularityConfiguration.getPath().isPresent()) {
       SingularityClientModule.bindContextPath(binder).toInstance(singularityConfiguration.getPath().get());

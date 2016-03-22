@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Binder;
+import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
@@ -30,15 +31,20 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class BlazarZooKeeperModule extends ConfigurationAwareModule<BlazarConfiguration> {
+public class BlazarZooKeeperModule implements Module {
+  private final boolean isWebhookOnly;
+
+  public BlazarZooKeeperModule(BlazarConfiguration configuration) {
+    this.isWebhookOnly = configuration.isWebhookOnly();
+  }
 
   @Override
-  protected void configure(Binder binder, BlazarConfiguration configuration) {
+  public void configure(Binder binder) {
     binder.bind(CuratorFramework.class).toProvider(BlazarCuratorProvider.class).in(Scopes.SINGLETON);
     binder.bind(ZooKeeperEventBus.class);
     Multibinder.newSetBinder(binder, ConnectionStateListener.class); // TODO
 
-    if (!configuration.isWebhookOnly()) {
+    if (!isWebhookOnly) {
       binder.bind(LeaderLatch.class).to(BlazarLeaderLatch.class);
       Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(QueueProcessor.class);
       binder.bind(ScheduledExecutorService.class)
