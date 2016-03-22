@@ -33,7 +33,7 @@ public class CCTrayProjectFactory implements Function<RepositoryState, Optional<
 
     RepositoryBuild lastBuild = repositoryState.getLastBuild().get();
 
-    String name = repositoryState.getGitInfo().getRepository();
+    String name = computeCCTrayName(repositoryState.getGitInfo());
     CCTrayActivity activity = computeCCTrayActivity(repositoryState.getInProgressBuild());
     CCTrayStatus lastBuildState = computeLastBuildState(lastBuild);
     String lastBuildLabel = computeLastBuildLabel(lastBuild);
@@ -42,6 +42,10 @@ public class CCTrayProjectFactory implements Function<RepositoryState, Optional<
 
 
     return Optional.of(new CCTrayProject(name, activity, lastBuildState, lastBuildLabel, lastBuildTime, webUrl));
+  }
+
+  private String computeCCTrayName(GitInfo gitInfo) {
+    return gitInfo.getRepository() + '/' + gitInfo.getBranch();
   }
 
   private CCTrayActivity computeCCTrayActivity(Optional<RepositoryBuild> inProgressBuild) {
