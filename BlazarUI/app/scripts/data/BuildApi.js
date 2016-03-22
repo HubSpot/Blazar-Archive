@@ -264,7 +264,7 @@ class BuildApi {
 
           return repoBuildModules.then((modules) => {
 
-            const repoBuildModule = findWhere(modules, {name: this.params.moduleName});
+            const repoBuildModule = findWhere(modules, {name: this.params.moduleName, active: true});
 
             // last get module build based on module id
             const buildModules = new Resource({
