@@ -56,12 +56,20 @@ class NotificationsChannels extends Component {
       return null;
     }
 
+    const existingChannels = this.props.notifications.map((notification) => {
+      return notification.channelName;
+    });
+
+    const slackChannels = this.props.slackChannels.filter((slackChannel) => {
+      return existingChannels.indexOf(slackChannel.label) === -1;
+    });
+
     return (
       <Select
         placeholder='Select a Slack channel'
         className='slack-channel-input'
         name="slackChannel"
-        options={this.props.slackChannels}
+        options={slackChannels}
         onChange={this.handleSlackChannelPicked}
         />
     );

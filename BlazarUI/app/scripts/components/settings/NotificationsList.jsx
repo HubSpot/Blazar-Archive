@@ -2,6 +2,8 @@ import React, {Component, PropTypes} from 'react';
 import {findWhere, bindAll} from 'underscore';
 import Toggle from 'react-toggle';
 
+import Icon from '../shared/Icon.jsx';
+
 import SettingsActions from '../../actions/settingsActions';
 
 class NotificationsList extends Component {
@@ -18,11 +20,25 @@ class NotificationsList extends Component {
     SettingsActions.updateNotification(channelNotifications);
   }
 
+  renderDefault() {
+    return (
+      <div className='notifications__list--empty'>
+        <Icon type='fa' name='bell-slash-o' />
+        <p>
+          No channels configured for notifications.
+        </p>
+        <p>
+          Add your first one here.
+        </p>
+      </div>
+    );
+  }
+
   renderNotificationsList() {
     const {notifications, channel} = this.props;
 
     if (channel === undefined) {
-      return null;
+      return this.renderDefault();
     }
 
     const channelNotifications = findWhere(notifications, {channelName: channel});

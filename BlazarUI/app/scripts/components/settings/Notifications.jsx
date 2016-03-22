@@ -23,7 +23,7 @@ class Notifications extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.selectedChannel !== undefined) {
+    if (nextProps.notifications.length === this.props.notifications.length) {
       return;
     }
 
@@ -63,11 +63,7 @@ class Notifications extends Component {
   }
 
   onChannelDelete(channelName) {
-    if (this.state.selectedChannel === channelName) {
-      this.setState({
-        selectedChannel: undefined
-      });
-    }
+    // you can use this information
   }
 
   render() {
@@ -92,7 +88,13 @@ class Notifications extends Component {
             />
           </UIGridItem>
         </UIGrid>
-        <Button className='notifications__channel-button' onClick={this.onButtonClick} bsStyle='primary'>Add New Channel</Button>
+        <UIGrid className='notifications__grid'>
+          <UIGridItem size={4}>
+            <Button className='notifications__channel-button' onClick={this.onButtonClick} bsStyle='primary'>Add New Channel</Button>
+          </UIGridItem>
+          <UIGridItem size={8}>
+          </UIGridItem>
+        </UIGrid>
       </div>
     );
   }

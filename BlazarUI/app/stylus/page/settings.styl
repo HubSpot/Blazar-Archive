@@ -10,10 +10,10 @@
     padding 0
     
   & .col-sm-4
-    max-width 300px
+    max-width 250px
     
   & .col-sm-8
-    max-width 600px
+    max-width 500px
 
 .notifications__headline-title
   font-size 28px
@@ -27,9 +27,10 @@
     color #4a4a4a
 
 .notifications__channel-button
-  position absolute
-  left 75px
-  bottom -50px
+  margin-left 50px
+  margin-top -50px
+  background-color #425b76
+  border-color #425b76
 
 .notifications__channel
   cursor pointer
@@ -102,6 +103,75 @@
     color white
 
 .notifications__delete-select
-  border 1px solid black 
+  border 0px solid #6281c9 
+  border-width 0 1px 1px 1px
+  border-bottom-left-radius 3px
+  border-bottom-right-radius 3px
   background-color white
   padding 0 
+  font-size 12px
+  line-height 1.2
+  position relative
+  min-height 30px
+  transition height 1s
+  cursor default
+  
+  & span
+    color #425b76
+    font-family HelveticaNeue-Medium
+    
+.notifications__delete-select-yes
+  padding 2px 20px
+  background-color #ff7a59
+  position absolute
+  top 5px
+  left 100px
+  border-radius 3px
+  border 1px solid #ff7a59
+  width 60px
+  cursor pointer
+  
+  & span
+    color white
+  
+.notifications__delete-select-no
+  padding 2px 15px
+  background-color white
+  position absolute
+  top 5px
+  left 175px
+  border-radius 3px
+  border 1px solid #ff7a59
+  width 60px
+  cursor pointer
+  
+  & span
+    color #ff7a59
+  
+.notifications__delete-select-question
+  position absolute
+  left 20px
+  top 8px
+  
+.slack-channel-input
+  border-radius 3px
+  border 0.5px solid #7c98b6
+  
+  & .Select-control
+    background-color rgba(243, 248, 252, 0.5)
+  
+.notifications__list--empty
+  text-align center
+
+  & i
+    width 100%
+    font-size 48px
+    color #cbd6e2
+    padding-bottom 20px
+  
+  & p
+    margin-top 5px
+    width 100%
+    font-family HelveticaNeue
+    font-size 20px
+    color #cbd6e2

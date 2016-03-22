@@ -9,7 +9,7 @@ class NotificationsHeadline extends Component {
           Build Notifications
         </span>
         <p className='notifications-headline-details'>
-          This is where we describe build notifications. Yeah! YEAH
+          Create and modify build notifications.
         </p>
       </div>
     );

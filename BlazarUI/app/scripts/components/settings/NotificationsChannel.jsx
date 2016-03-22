@@ -24,9 +24,15 @@ class NotificationsChannel extends Component {
   }
 
   onClickTrashCan() {
-    this.setState({
-      deleteConfirmation: true
-    });
+    if (!this.state.deleteConfirmation) {
+      this.setState({
+        deleteConfirmation: true
+      });
+    }
+
+    else {
+      this.hideDeleteConfirmation();
+    }
   }
 
   renderDeleteConfirmation() {
@@ -36,9 +42,19 @@ class NotificationsChannel extends Component {
 
     return (
       <div className='notifications__delete-select'>
-        Delete? 
-        <div onClick={this.deleteNotification.bind(this)}>Yes</div>
-        <div onClick={this.hideDeleteConfirmation.bind(this)}>No</div>
+        <span className='notifications__delete-select-question'>
+          Remove? 
+        </span>
+        <div className='notifications__delete-select-yes' onClick={this.deleteNotification.bind(this)}>
+          <span>
+            Yes
+          </span>
+        </div>
+        <div className='notifications__delete-select-no' onClick={this.hideDeleteConfirmation.bind(this)}>
+          <span>
+            Keep
+          </span>
+        </div>
       </div>
     );
   }
