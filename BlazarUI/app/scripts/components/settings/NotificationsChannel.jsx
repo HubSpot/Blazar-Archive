@@ -49,7 +49,9 @@ class NotificationsChannel extends Component {
 
     return (
       <div className={finalClassName} onClick={this.props.onClick.bind(this, this.props.channel)}>
-        # {this.props.channel}
+        <div className='notifications__channel-wrapper'>
+          # {this.props.channel}
+        </div>
         <div className='notifications__delete' onClick={this.onClickTrashCan.bind(this)}>
           <Icon type='fa' name='trash' />
         </div>
