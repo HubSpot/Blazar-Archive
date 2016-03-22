@@ -77,7 +77,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild.State state, Optional<RepositoryBuild> previous) {
     // OnChange
-    boolean changedState = previous.isPresent() && previous.get().getState() == state;
+    boolean changedState = previous.isPresent() && previous.get().getState() != state;
     if (instantMessageConfiguration.getOnChange() && changedState) {
       return true;
     }
