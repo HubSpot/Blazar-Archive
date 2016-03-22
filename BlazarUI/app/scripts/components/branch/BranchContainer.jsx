@@ -1,4 +1,3 @@
-/*global config*/
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import {Button} from 'react-bootstrap';
@@ -156,7 +155,7 @@ class BranchContainer extends Component {
       return;
     }
 
-    const buildSettingsLink = `${config.appRoot}/settings/branch/${this.state.branchId}`;
+    const buildSettingsLink = `/settings/branch/${this.state.branchId}`;
 
     return (
       <Link to={buildSettingsLink}>
