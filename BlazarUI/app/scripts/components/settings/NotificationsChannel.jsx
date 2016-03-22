@@ -12,6 +12,14 @@ class NotificationsChannel extends Component {
     this.state = initialState;
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.isSelected) {
+      this.setState({
+        deleteConfirmation: false
+      });
+    }
+  }
+
   deleteNotification() {
     this.props.onDelete();
     this.hideDeleteConfirmation();
@@ -36,12 +44,19 @@ class NotificationsChannel extends Component {
   }
 
   renderDeleteConfirmation() {
+
+    if (!this.props.isSelected) {
+      return;
+    }
+
+    let divClass = 'notifications__delete-select';
+
     if (!this.state.deleteConfirmation) {
-      return null;
+      divClass += ' hidden';
     }
 
     return (
-      <div className='notifications__delete-select'>
+      <div className={divClass}>
         <span className='notifications__delete-select-question'>
           Remove? 
         </span>
@@ -59,6 +74,18 @@ class NotificationsChannel extends Component {
     );
   }
 
+  renderTrashCan() {
+    if (!this.props.isSelected) {
+      return null;
+    }
+
+    return (
+      <div className='notifications__delete' onClick={this.onClickTrashCan.bind(this)}>
+        <Icon type='fa' name='trash' />
+      </div>
+    );
+  }
+
   render() {
     const extraClassName = this.props.isSelected ? ' selected' : '';
     const finalClassName = `notifications__channel${extraClassName}`;
@@ -68,9 +95,7 @@ class NotificationsChannel extends Component {
         <div className='notifications__channel-wrapper'>
           # {this.props.channel}
         </div>
-        <div className='notifications__delete' onClick={this.onClickTrashCan.bind(this)}>
-          <Icon type='fa' name='trash' />
-        </div>
+        {this.renderTrashCan()}
         {this.renderDeleteConfirmation()}
       </div>
     );

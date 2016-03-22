@@ -1,7 +1,7 @@
 .notifications
   font-family HelveticaNeue
   position relative
-  
+
 .notifications__grid
   margin-top 50px
   height 250px
@@ -44,9 +44,6 @@
   &.selected
     background-color #f2f5f8
     
-  &:hover .notifications__delete
-    display inline
-    
 .notifications__channel-wrapper
   padding 5px 10px
   
@@ -71,7 +68,6 @@
   font-weight bold
   
 .notifications__delete
-  display none
   position absolute
   top 4px
   right 10px
@@ -113,7 +109,7 @@
   line-height 1.2
   position relative
   min-height 30px
-  transition height 1s
+  transition display 1s
   cursor default
   
   & span

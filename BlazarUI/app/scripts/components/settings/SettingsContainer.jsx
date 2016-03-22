@@ -46,13 +46,17 @@ class SettingsContainer extends Component {
     this.setState(state);
   }
 
+  goBack() {
+    window.history.back();
+  }
+
   renderHeadline() {
     return (
       <Headline>
         <Icon type="fa" name="wrench" classNames="headline-icon" />
         <span>Settings</span>
         <HeadlineDetail>
-          Back to branch
+          <a style={{cursor: 'pointer'}} onClick={this.goBack}>Back to branch</a>
         </HeadlineDetail>
       </Headline>
     );
