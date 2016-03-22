@@ -35,7 +35,6 @@ class CommitList extends Component {
   }
 
   render() {
-
     return (
       <div className={this.getClassNames()}>
         {this.renderHeader()}

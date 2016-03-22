@@ -7,7 +7,7 @@ import Loader from '../shared/Loader.jsx';
 class RepoBuildModulesTable extends Component {
 
   sortModules() {
-    if (!this.props.currentRepoBuild) {
+    if (!this.props.currentRepoBuild || !this.props.currentRepoBuild.get('dependencyGraph') || !this.props.currentRepoBuild.get('dependencyGraph').get('topologicalSort')) {
       return this.props.data;
     }
 
