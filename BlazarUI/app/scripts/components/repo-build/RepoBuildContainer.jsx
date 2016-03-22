@@ -88,8 +88,6 @@ class RepoBuildContainer extends Component {
   }
   
   renderError() {
-    console.log(this.state.error);
-    
     return (
       <UIGrid>
         <UIGridItem size={10}>
