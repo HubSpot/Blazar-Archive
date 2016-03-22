@@ -2,7 +2,6 @@ package com.hubspot.blazar.cctray;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlEnumValue;
-import java.util.Date;
 
 public class CCTrayProject {
   public enum CCTrayActivity {
@@ -22,7 +21,7 @@ public class CCTrayProject {
   private final CCTrayActivity activity;
   private final CCTrayStatus lastBuildStatus;
   private final String lastBuildLabel;
-  private final Date lastBuildTime;
+  private final String lastBuildTime;
   private final String webUrl;
 
   // for jaxb
@@ -34,7 +33,7 @@ public class CCTrayProject {
                 CCTrayActivity activity,
                 CCTrayStatus lastBuildStatus,
                 String lastBuildLabel,
-                Date lastBuildTime,
+                String lastBuildTime,
                 String webUrl) {
     this.name = name;
     this.activity = activity;
@@ -65,7 +64,7 @@ public class CCTrayProject {
   }
 
   @XmlAttribute
-  public Date getLastBuildTime() {
+  public String getLastBuildTime() {
     return lastBuildTime;
   }
 

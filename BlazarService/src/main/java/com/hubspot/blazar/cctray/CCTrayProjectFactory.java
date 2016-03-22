@@ -9,14 +9,17 @@ import com.hubspot.blazar.base.RepositoryState;
 import com.hubspot.blazar.cctray.CCTrayProject.CCTrayActivity;
 import com.hubspot.blazar.cctray.CCTrayProject.CCTrayStatus;
 import com.hubspot.blazar.util.BlazarUrlHelper;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Date;
 
 @Singleton
 public class CCTrayProjectFactory implements Function<RepositoryState, Optional<CCTrayProject>> {
+  private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTimeNoMillis();
+
   private final BlazarUrlHelper urlHelper;
 
   @Inject
@@ -37,7 +40,7 @@ public class CCTrayProjectFactory implements Function<RepositoryState, Optional<
     CCTrayActivity activity = computeCCTrayActivity(repositoryState.getInProgressBuild());
     CCTrayStatus lastBuildState = computeLastBuildState(lastBuild);
     String lastBuildLabel = computeLastBuildLabel(lastBuild);
-    Date lastBuildTime = computeLastBuildTime(lastBuild);
+    String lastBuildTime = computeLastBuildTime(lastBuild);
     String webUrl = computeWebUrl(repositoryState.getGitInfo());
 
 
@@ -78,12 +81,8 @@ public class CCTrayProjectFactory implements Function<RepositoryState, Optional<
     return String.valueOf(lastBuild.getBuildNumber());
   }
 
-  private Date computeLastBuildTime(RepositoryBuild lastBuild) {
-    if (lastBuild.getStartTimestamp().isPresent()) {
-      return new Date(lastBuild.getStartTimestamp().get());
-    } else {
-      return new Date(0);
-    }
+  private String computeLastBuildTime(RepositoryBuild lastBuild) {
+    return DATE_FORMATTER.print(lastBuild.getStartTimestamp().or(0L));
   }
 
   private String computeWebUrl(GitInfo gitInfo) {
