@@ -46,7 +46,7 @@ class Commits extends Component {
   }
 
   renderSummaryText() {
-    const {anyNewCommits, showCommits, commits, truncated, previousCommit} = this.props;
+    const {anyNewCommits, showCommits, commits, previousCommit} = this.props;
     let msg;
 
     if (!anyNewCommits) {
@@ -63,9 +63,9 @@ class Commits extends Component {
 
     let compareNode;
 
-    if (truncated && previousCommit !== undefined) {
+    if (previousCommit !== undefined) {
       compareNode = (
-        <a href={this.buildCompareLink()}> (see untruncated list)</a>
+        <a href={this.buildCompareLink()}> (diff)</a>
       );
     }
 
@@ -136,7 +136,6 @@ class Commits extends Component {
 }
 
 Commits.propTypes = {
-  truncated: PropTypes.bool.isRequired,
   currentCommit: PropTypes.object.isRequired,
   previousCommit: PropTypes.object,
   commits: PropTypes.array.isRequired,

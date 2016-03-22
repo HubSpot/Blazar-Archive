@@ -66,7 +66,6 @@ class RepoBuildDetail extends Component {
 
     return (
       <Commits
-        truncated={build.commitInfo.truncated}
         currentCommit={build.commitInfo.current}
         previousCommit={build.commitInfo.previous}
         commits={commitList}
