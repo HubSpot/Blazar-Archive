@@ -65,13 +65,16 @@ class Commits extends Component {
 
     if (previousCommit !== undefined) {
       compareNode = (
-        <a href={this.buildCompareLink()}> (diff)</a>
+        <a href={this.buildCompareLink()}>compare</a>
       );
     }
 
     return (
       <span>
-        {msg}{compareNode !== undefined ? ' ' : ''}{compareNode}
+        {msg}
+        <span className='commits__compare-link'>
+          {compareNode}
+        </span>
       </span>
     )
   }
