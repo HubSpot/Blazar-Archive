@@ -56,21 +56,34 @@ function fetchSlackChannels(cb) {
 }
 
 function updateNotification(params, notification, cb) {
-  const notificationsPromise = new Resource({
+  const notificationPromise = new Resource({
     url: `${config.apiRoot}/instant-message/configurations/${notification.id}`,
     type: 'PUT',
     contentType: 'application/json',
     data: JSON.stringify(notification)
   }).send();
 
-  return notificationsPromise.then(() => {
+  return notificationPromise.then(() => {
     return this.fetchNotifications(params, cb);
-  })
+  });
+}
+
+function deleteNotification(params, notificationId, cb) {
+  const notificationPromise = new Resource({
+    url: `${config.apiRoot}/instant-message/configurations/${notificationId}`, 
+    type: 'DELETE',
+    contentType: 'application/json'
+  }).send();
+
+  notificationPromise.then(() => {
+    return this.fetchNotifications(params, cb);
+  });
 }
 
 export default {
   fetchNotifications: fetchNotifications,
   updateNotification: updateNotification,
   fetchSlackChannels: fetchSlackChannels,
-  addNotification: addNotification
+  addNotification: addNotification,
+  deleteNotification: deleteNotification
 };

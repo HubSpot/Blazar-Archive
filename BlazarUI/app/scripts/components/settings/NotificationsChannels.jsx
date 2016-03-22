@@ -6,15 +6,36 @@ import NotificationsChannel from './NotificationsChannel.jsx';
 
 import SettingsActions from '../../actions/settingsActions';
 
+let initialState = {
+  channelDeleted: undefined
+};
+
 class NotificationsChannels extends Component {
   
   constructor() {
+    this.state = initialState;
+
     bindAll(this, 'handleSlackChannelPicked');
   }
 
   handleSlackChannelPicked(channelName) {
     SettingsActions.addNotification(channelName);
     this.props.onSelectedNewChannel();
+  }
+
+  deleteNotification(notificationId, channelName) {
+    SettingsActions.deleteNotification(notificationId);
+    this.props.onChannelDelete(channelName);
+
+    this.setState({
+      channelDeleted: channelName
+    });
+
+    setTimeout(() => {
+      this.setState({
+        channelDeleted: undefined
+      });
+    }, 5000);
   }
 
   renderChannels() {
@@ -24,6 +45,7 @@ class NotificationsChannels extends Component {
           channel={notification.channelName}
           isSelected={this.props.selectedChannel === notification.channelName}
           onClick={this.props.onChannelClick}
+          onDelete={this.deleteNotification.bind(this, notification.id, notification.channelName)}
           key={i} />
       );
     });
@@ -45,6 +67,21 @@ class NotificationsChannels extends Component {
     );
   }
 
+  renderToast() {
+    if (this.state.channelDeleted === undefined) {
+      return null;
+    }
+
+    return (
+      <div className='notifications__delete-toast'>
+        <div className='notifications__delete-toast-inner'>
+          <span>Notification channel removed</span>
+          <p>You will no longer receive notifications in <strong>#{this.state.channelDeleted}</strong></p>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className='notifications__channels'>
@@ -55,6 +92,7 @@ class NotificationsChannels extends Component {
         </div>
         {this.renderChannels()}
         {this.renderNewChannel()}
+        {this.renderToast()}
       </div>
     );
   }
@@ -65,6 +103,7 @@ NotificationsChannels.propTypes = {
   slackChannels: PropTypes.array.isRequired,
   onChannelClick: PropTypes.func.isRequired,
   onSelectedNewChannel: PropTypes.func.isRequired,
+  onChannelDelete: PropTypes.func.isRequired,
   addingNewChannel: PropTypes.bool.isRequired,
   selectedChannel: PropTypes.string
 };

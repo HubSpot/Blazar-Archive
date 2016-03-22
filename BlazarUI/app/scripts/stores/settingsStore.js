@@ -53,6 +53,17 @@ const SettingsStore = Reflux.createStore({
         slackChannels: this.slackChannels
       });
     });
+  },
+
+  onDeleteNotification(notificationId) {
+    SettingsApi.deleteNotification(this.params, notificationId, (resp) => {
+      this.notifications = resp;
+
+      this.trigger({
+        notifications: this.notifications,
+        loading: false
+      })
+    });
   }
 
 });

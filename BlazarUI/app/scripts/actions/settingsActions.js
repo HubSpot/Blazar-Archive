@@ -5,7 +5,8 @@ const SettingsActions = Reflux.createActions([
   'loadNotifications',
   'updateNotification',
   'addNotification',
-  'loadSlackChannels'
+  'loadSlackChannels',
+  'deleteNotification'
 ]);
 
 export default SettingsActions;

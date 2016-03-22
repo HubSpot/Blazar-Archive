@@ -19,7 +19,7 @@ class Notifications extends Component {
   constructor() {
     this.state = initialState;
 
-    bindAll(this, 'onChannelClick', 'onButtonClick', 'onSelectedNewChannel');
+    bindAll(this, 'onChannelClick', 'onButtonClick', 'onSelectedNewChannel', 'onChannelDelete');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -62,6 +62,14 @@ class Notifications extends Component {
     });
   }
 
+  onChannelDelete(channelName) {
+    if (this.state.selectedChannel === channelName) {
+      this.setState({
+        selectedChannel: undefined
+      });
+    }
+  }
+
   render() {
     return (
       <div className='notifications'>
@@ -73,6 +81,7 @@ class Notifications extends Component {
               addingNewChannel={this.state.addingNewChannel}
               onChannelClick={this.onChannelClick}
               onSelectedNewChannel={this.onSelectedNewChannel}
+              onChannelDelete={this.onChannelDelete}
               {...this.props}
             />
           </UIGridItem>

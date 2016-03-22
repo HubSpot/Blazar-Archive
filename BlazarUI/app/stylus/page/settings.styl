@@ -32,18 +32,27 @@
   bottom -50px
 
 .notifications__channel
-  padding 10px
+  padding 5px 10px
   cursor pointer
   font-size 16px
+  position relative
+  color #425B76
   
-  &.selected, &:hover
+  &:hover
+    background-color #F9FBFD
+  
+  &.selected
     background-color #f2f5f8
+    
+  &:hover .notifications__delete
+    display inline
   
 .notifications__list
   padding 40px
   margin-top 48px
   background-color #f2f5f8
   min-height 250px
+  min-width 500px
   
 .notifications__setting
   padding 5px
@@ -57,3 +66,40 @@
   
 .notifications__setting-title
   font-weight bold
+  
+.notifications__delete
+  display none
+  position absolute
+  top 4px
+  right 10px
+  color #00a4bd
+  
+.notifications__delete-toast
+  width 300px
+  position fixed
+  top 45px
+  left 50%
+  z-index 10
+  background-image linear-gradient(to bottom, #5967bc, #6a78d1)
+  box-shadow 0 1px 24px 0 rgba(0, 0, 0, 0.08)
+  border-radius 3px
+  
+.notifications__delete-toast-inner
+  padding 20px 25px
+  
+  & > span
+    font-size 16px
+    font-family HelveticaNeue-Bold
+    
+  & > p
+    padding-top 10px
+    font-size 14px
+    line-height 1.7
+  
+  & > span, & > p
+    color white
+
+.notifications__delete-select
+  border 1px solid black 
+  background-color white
+  padding 0 

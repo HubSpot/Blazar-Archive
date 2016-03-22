@@ -27,6 +27,10 @@ class NotificationsList extends Component {
 
     const channelNotifications = findWhere(notifications, {channelName: channel});
 
+    if (channelNotifications === undefined) {
+      return;
+    }
+
     return (
       <div>
         <div className='notifications__setting'>
