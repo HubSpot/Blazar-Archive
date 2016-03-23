@@ -71,6 +71,7 @@ class NotificationsChannels extends Component {
         name="slackChannel"
         options={slackChannels}
         onChange={this.handleSlackChannelPicked}
+        allowCreate={true}
         />
     );
   }
