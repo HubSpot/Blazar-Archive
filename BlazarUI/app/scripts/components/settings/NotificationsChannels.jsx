@@ -92,15 +92,17 @@ class NotificationsChannels extends Component {
 
   render() {
     return (
-      <div className='notifications__channels'>
+      <div>
         <div className='notifications__channels-headline'>
           <span>
             Channels
           </span>
         </div>
-        {this.renderChannels()}
-        {this.renderNewChannel()}
-        {this.renderToast()}
+        <div className='notifications__channels'>
+          {this.renderChannels()}
+          {this.renderNewChannel()}
+          {this.renderToast()}
+        </div>
       </div>
     );
   }
