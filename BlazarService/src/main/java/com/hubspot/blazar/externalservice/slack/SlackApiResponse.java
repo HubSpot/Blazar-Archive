@@ -38,10 +38,14 @@ public class SlackApiResponse {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
-        .add("ok", ok)
-        .add("error", error.get())
-        .toString();
+    Objects.ToStringHelper h = Objects.toStringHelper(this);
+    h.add("ok", ok);
+    if (error.isPresent()) {
+      h.add("error", error.get());
+    } else {
+      h.add("error", Optional.absent().toString());
+    }
+    return h.toString();
   }
 
 }
