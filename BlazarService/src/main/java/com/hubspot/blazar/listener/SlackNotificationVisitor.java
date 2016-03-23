@@ -66,6 +66,9 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   @Override
   public void visit(RepositoryBuild build) throws Exception {
     Set<InstantMessageConfiguration> configurationSet = instantMessageConfigurationService.getAllWithBranchId(build.getBranchId());
+    if (!(build.getState().isComplete())) {
+      return;
+    }
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSend(instantMessageConfiguration, build.getState(), previous)) {
@@ -82,11 +85,11 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
       return true;
     }
     // OnFinish
-    if (instantMessageConfiguration.getOnFinish() && state.isComplete()) {
+    if (instantMessageConfiguration.getOnFinish()) {
       return true;
     }
     // OnRecovery
-    boolean previousFailed = previous.isPresent() && previous.get().getState().isComplete() && previous.get().getState() == RepositoryBuild.State.SUCCEEDED;
+    boolean previousFailed = previous.isPresent() && previous.get().getState() != RepositoryBuild.State.SUCCEEDED;
     if (instantMessageConfiguration.getOnRecover() && previousFailed && state == RepositoryBuild.State.SUCCEEDED) {
       return true;
     }
@@ -126,6 +129,9 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   @Override
   public void visit(ModuleBuild build) throws Exception {
+    if (!(build.getState().isComplete())) {
+      return;
+    }
     Set<InstantMessageConfiguration> configurationSet = instantMessageConfigurationService.getAllWithModuleId(build.getModuleId());
     Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
@@ -175,12 +181,12 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     }
     LOG.info("{} OnChange {}, changedState {}", logBase, instantMessageConfiguration.getOnChange(), changedState);
     // OnFinish
-    if (instantMessageConfiguration.getOnFinish() && state.isComplete()) {
+    if (instantMessageConfiguration.getOnFinish()) {
       return true;
     }
-    LOG.info("{} OnFinish {}, isComplete {}", logBase, instantMessageConfiguration.getOnFinish(), state.isComplete());
+    LOG.info("{} OnFinish {}", logBase, instantMessageConfiguration.getOnFinish());
     // OnRecovery
-    boolean previousFailed = previous.isPresent() && previous.get().getState().isComplete() && previous.get().getState() == ModuleBuild.State.SUCCEEDED;
+    boolean previousFailed = previous.isPresent() && previous.get().getState() != ModuleBuild.State.SUCCEEDED;
     if (instantMessageConfiguration.getOnRecover() && previousFailed && state == ModuleBuild.State.SUCCEEDED) {
       return true;
     }
