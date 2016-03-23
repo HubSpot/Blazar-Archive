@@ -65,10 +65,10 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   @Override
   public void visit(RepositoryBuild build) throws Exception {
-    Set<InstantMessageConfiguration> configurationSet = instantMessageConfigurationService.getAllWithBranchId(build.getBranchId());
     if (!(build.getState().isComplete())) {
       return;
     }
+    Set<InstantMessageConfiguration> configurationSet = instantMessageConfigurationService.getAllWithBranchId(build.getBranchId());
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSend(instantMessageConfiguration, build.getState(), previous)) {
