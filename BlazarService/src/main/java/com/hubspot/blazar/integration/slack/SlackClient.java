@@ -57,7 +57,7 @@ public class SlackClient {
         .setContentType(HttpRequest.ContentType.FORM);
 
     requestBuilder.setFormParam("token").to(message.getToken().or(blazarSlackConfiguration.getSlackApiToken()));
-    requestBuilder.setFormParam("channel").to(message.getChannel());
+    requestBuilder.setFormParam("channel").to("#" + message.getChannel());
     requestBuilder.setFormParam("text").to(message.getText().or(""));
     requestBuilder.setFormParam("username").to(message.getUsername().or(blazarSlackConfiguration.getUsername()));
 
@@ -82,8 +82,8 @@ public class SlackClient {
       @Override
       public void completed(HttpResponse httpResponse) {
         if (httpResponse.isSuccess()) {
-          String apiResponse = httpResponse.getAsString();
-          if (apiResponse.contains("ok")) {
+          SlackApiResponse apiResponse = httpResponse.getAs(SlackApiResponse.class);
+          if (apiResponse.getOk()) {
             LOG.debug("Successfully sent Slack notification to channel {}.  Response: {}", message.getChannel(), apiResponse);
           } else {
             LOG.error("Slack didn't returned an ok for notification to channel {}. Slack response is: {}", message.getChannel(), apiResponse);
