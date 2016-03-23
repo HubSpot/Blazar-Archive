@@ -58,6 +58,7 @@ import com.hubspot.horizon.ning.NingHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import io.dropwizard.db.DataSourceFactory;
+import org.kohsuke.github.RateLimitHandler;
 
 public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfiguration> {
 
@@ -159,7 +160,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       endpoint = "https://" + host + "/api/v3";
     }
 
-    GitHubBuilder builder = new GitHubBuilder().withEndpoint(endpoint);
+    GitHubBuilder builder = new GitHubBuilder().withEndpoint(endpoint).withRateLimitHandler(RateLimitHandler.FAIL);
 
     if (gitHubConfig.getOauthToken().isPresent()) {
       builder.withOAuthToken(gitHubConfig.getOauthToken().get(), gitHubConfig.getUser().orNull());
