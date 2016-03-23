@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {Button} from 'react-bootstrap';
 import {bindAll} from 'underscore';
+import $ from 'jquery';
 
 import NotificationsHeadline from './NotificationsHeadline.jsx';
 import NotificationsChannels from './NotificationsChannels.jsx';
@@ -54,6 +55,10 @@ class Notifications extends Component {
     this.setState({
       addingNewChannel: true
     });
+
+    setTimeout(() => {
+      $('.Select-input > input').focus();
+    }, 50);
   }
 
   onSelectedNewChannel() {
