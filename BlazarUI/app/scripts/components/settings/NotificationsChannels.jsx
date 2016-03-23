@@ -72,6 +72,7 @@ class NotificationsChannels extends Component {
         options={slackChannels}
         onChange={this.handleSlackChannelPicked}
         allowCreate={true}
+        addLabelText='{label}'
         />
     );
   }
