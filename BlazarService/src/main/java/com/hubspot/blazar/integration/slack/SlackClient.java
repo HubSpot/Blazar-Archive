@@ -1,6 +1,7 @@
 package com.hubspot.blazar.integration.slack;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,14 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BlazarSlackConfiguration;
 import com.hubspot.blazar.externalservice.slack.SlackApiResponse;
 import com.hubspot.blazar.externalservice.slack.SlackChannel;
 import com.hubspot.blazar.externalservice.slack.SlackMessage;
-import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.BlazarSlackConfiguration;
+import com.hubspot.blazar.externalservice.slack.SlackUser;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.AsyncHttpClient.Callback;
 import com.hubspot.horizon.HttpClient;
@@ -31,6 +34,7 @@ public class SlackClient {
   private final ObjectMapper objectMapper;
   private final HttpClient httpClient;
   private final BlazarSlackConfiguration blazarSlackConfiguration;
+  private List<SlackUser> slackUsers;
 
   @Inject
   public SlackClient(AsyncHttpClient asyncHttpClient,
@@ -41,6 +45,7 @@ public class SlackClient {
     this.objectMapper = objectMapper;
     this.httpClient = httpClient;
     this.blazarSlackConfiguration = blazarConfiguration.getSlackConfiguration().get();
+    this.slackUsers = new ArrayList<>();
   }
 
   public BlazarSlackConfiguration getBlazarSlackConfiguration() {
@@ -57,7 +62,7 @@ public class SlackClient {
 
     requestBuilder.setFormParam("token").to(message.getToken().or(blazarSlackConfiguration.getSlackApiToken()));
     requestBuilder.setFormParam("channel").to("#" + message.getChannel());
-    requestBuilder.setFormParam("text").to(message.getText().or(""));
+    requestBuilder.setFormParam("text").to(message.getText());
     requestBuilder.setFormParam("username").to(message.getUsername().or(blazarSlackConfiguration.getUsername()));
 
     if (message.getAttachments() != null) {
@@ -67,8 +72,8 @@ public class SlackClient {
         throw Throwables.propagate(e);
       }
     }
-    if (message.getIconEmoji().isPresent()) {
-      requestBuilder.setFormParam("icon_emoji").to(message.getIconEmoji().get());
+    if (message.getIcon_emoji().isPresent()) {
+      requestBuilder.setFormParam("icon_emoji").to(message.getIcon_emoji().get());
     }
     asyncHttpClient.execute(requestBuilder.build(), new Callback() {
 
@@ -94,25 +99,64 @@ public class SlackClient {
     });
   }
 
+  public Optional<SlackUser> getUserByEmail(String email) throws IOException {
+    Optional<SlackUser> foundUser = findSlackUserInListByEmail(slackUsers, email);
+    if (foundUser.isPresent()) {
+      return foundUser;
+    }
+    return findSlackUserInListByEmail(getSlackUsers(), email);
+  }
+
+  public List<SlackUser> getSlackUsers() throws IOException {
+    HttpResponse httpResponse = httpClient.execute(makeWithApiUrl("/users.list"));
+    if (!httpResponse.isSuccess()) {
+      throw makeException(httpResponse);
+    }
+    SlackApiResponse apiResponse = httpResponse.getAs(SlackApiResponse.class);
+    if (httpResponse.isSuccess() && apiResponse.getOk()) {
+      slackUsers = apiResponse.getUsers().get();
+      return slackUsers;
+    } else if (apiResponse.getOk()) {
+      return Collections.emptyList();
+    } else {
+      throw makeException(httpResponse);
+    }
+  }
+
   public List<SlackChannel> getSlackChannels() throws IOException {
-    final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-        .setUrl(blazarSlackConfiguration.getSlackApiBaseUrl() + "/channels.list")
+    HttpResponse httpResponse = httpClient.execute(makeWithApiUrl("/channels.list"));
+    if (!httpResponse.isSuccess()) {
+      throw makeException(httpResponse);
+    }
+    SlackApiResponse slackApiResponse = httpResponse.getAs(SlackApiResponse.class);
+    if (slackApiResponse.getOk() && slackApiResponse.getChannels().isPresent()) {
+      return slackApiResponse.getChannels().get();
+    } if (slackApiResponse.getOk()) {
+      return Collections.emptyList();
+    } else {
+      throw makeException(httpResponse);
+    }
+  }
+
+  private Optional<SlackUser> findSlackUserInListByEmail(List<SlackUser> users, String email) {
+    for (SlackUser user : slackUsers) {
+      if (user.getProfile().getEmail().equals(email)) {
+         return Optional.of(user);
+      }
+    }
+    return Optional.absent();
+  }
+
+  private HttpRequest makeWithApiUrl(String apiEndpoint) {
+    HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+        .setUrl(blazarSlackConfiguration.getSlackApiBaseUrl() + apiEndpoint)
         .setMethod(Method.POST)
         .setContentType(HttpRequest.ContentType.FORM);
     requestBuilder.setFormParam("token").to(blazarSlackConfiguration.getSlackApiToken());
+    return requestBuilder.build();
+  }
 
-    HttpResponse httpResponse = httpClient.execute(requestBuilder.build());
-    if (httpResponse.isSuccess()) {
-      SlackApiResponse slackApiResponse = httpResponse.getAs(SlackApiResponse.class);
-      if (slackApiResponse.getOk() && slackApiResponse.getChannels().isPresent()) {
-        return slackApiResponse.getChannels().get();
-      } else if (slackApiResponse.getOk()) {
-        return Collections.EMPTY_LIST;
-      } else {
-        throw new RuntimeException(String.format("Non OK response from Slack API %s", httpResponse.getAsString()));
-      }
-    } else {
-      throw new RuntimeException(String.format("Bad response from Slack Api %s", String.valueOf(httpResponse.getStatusCode())));
-    }
+  private static RuntimeException makeException(HttpResponse httpResponse) {
+    return new RuntimeException(String.format("Non OK response from Slack API code: %d response: %s", httpResponse.getStatusCode(), httpResponse.getAsString()));
   }
 }

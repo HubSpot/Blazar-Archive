@@ -1,5 +1,6 @@
 package com.hubspot.blazar.externalservice.slack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -119,5 +120,129 @@ public class SlackAttachment {
         .add("fields", fields)
         .add("thumbUrl", thumbUrl)
         .toString();
+  }
+
+  public static Builder getBuilder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private String fallback;
+    private Optional<String> color;
+    private Optional<String> pretext;
+    private Optional<String> authorName;
+    private Optional<String> authorLink;
+    private Optional<String> authorIcon;
+    private Optional<String> title;
+    private Optional<String> titleLink;
+    private Optional<String> text;
+    private List<SlackAttachmentField> fields;
+    private Optional<String> thumbUrl;
+
+    public Builder () {
+      this.fallback = "";
+      this.color = Optional.absent();
+      this.pretext = Optional.absent();
+      this.authorName = Optional.absent();
+      this.authorLink = Optional.absent();
+      this.authorIcon = Optional.absent();
+      this.title = Optional.absent();
+      this.titleLink = Optional.absent();
+      this.text = Optional.absent();
+      this.fields = new ArrayList<>();
+      this.thumbUrl = Optional.absent();
+    }
+
+    public SlackAttachment build() {
+      return new SlackAttachment(fallback, color, pretext, authorName, authorLink, authorIcon, title, titleLink, text, fields, thumbUrl);
+    }
+
+    public String getFallback() {
+      return fallback;
+    }
+
+    public Optional<String> getColor() {
+      return color;
+    }
+
+    public Optional<String> getPretext() {
+      return pretext;
+    }
+
+    public Optional<String> getAuthorName() {
+      return authorName;
+    }
+
+    public Optional<String> getAuthorLink() {
+      return authorLink;
+    }
+
+    public Optional<String> getAuthorIcon() {
+      return authorIcon;
+    }
+
+    public Optional<String> getTitle() {
+      return title;
+    }
+
+    public Optional<String> getTitleLink() {
+      return titleLink;
+    }
+
+    public Optional<String> getText() {
+      return text;
+    }
+
+    public List<SlackAttachmentField> getFields() {
+      return fields;
+    }
+
+    public Optional<String> getThumbUrl() {
+      return thumbUrl;
+    }
+
+    public void setFallback(String fallback) {
+      this.fallback = fallback;
+    }
+
+    public void setColor(Optional<String> color) {
+      this.color = color;
+    }
+
+    public void setPretext(Optional<String> pretext) {
+      this.pretext = pretext;
+    }
+
+    public void setAuthorName(Optional<String> authorName) {
+      this.authorName = authorName;
+    }
+
+    public void setAuthorLink(Optional<String> authorLink) {
+      this.authorLink = authorLink;
+    }
+
+    public void setAuthorIcon(Optional<String> authorIcon) {
+      this.authorIcon = authorIcon;
+    }
+
+    public void setTitle(Optional<String> title) {
+      this.title = title;
+    }
+
+    public void setTitleLink(Optional<String> titleLink) {
+      this.titleLink = titleLink;
+    }
+
+    public void setText(Optional<String> text) {
+      this.text = text;
+    }
+
+    public void setFields(List<SlackAttachmentField> fields) {
+      this.fields = fields;
+    }
+
+    public void setThumbUrl(Optional<String> thumbUrl) {
+      this.thumbUrl = thumbUrl;
+    }
   }
 }

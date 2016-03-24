@@ -32,9 +32,9 @@ import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.util.BlazarUrlHelper;
 
 @Singleton
-public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleBuildVisitor {
+public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, ModuleBuildVisitor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SlackNotificationVisitor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SlackRoomNotificationVisitor.class);
   private static final Set<RepositoryBuild.State> FAILED_REPO_STATES = ImmutableSet.of(RepositoryBuild.State.CANCELLED, RepositoryBuild.State.FAILED, RepositoryBuild.State.UNSTABLE);
   private static final Set<ModuleBuild.State> FAILED_MODULE_STATES = ImmutableSet.of(ModuleBuild.State.CANCELLED, ModuleBuild.State.FAILED);
   private static final Optional<String> ABSENT_STRING = Optional.absent();
@@ -48,13 +48,13 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
   private final RepositoryBuildService repositoryBuildService;
 
   @Inject
-  public SlackNotificationVisitor(InstantMessageConfigurationService instantMessageConfigurationService,
-                                  BranchService branchService,
-                                  ModuleService moduleService,
-                                  ModuleBuildService moduleBuildService,
-                                  BlazarUrlHelper blazarUrlHelper,
-                                  SlackClient slackClient,
-                                  RepositoryBuildService repositoryBuildService) {
+  public SlackRoomNotificationVisitor(InstantMessageConfigurationService instantMessageConfigurationService,
+                                      BranchService branchService,
+                                      ModuleService moduleService,
+                                      ModuleBuildService moduleBuildService,
+                                      BlazarUrlHelper blazarUrlHelper,
+                                      SlackClient slackClient,
+                                      RepositoryBuildService repositoryBuildService) {
     this.instantMessageConfigurationService = instantMessageConfigurationService;
     this.branchService = branchService;
     this.moduleService = moduleService;
@@ -63,7 +63,6 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     this.slackClient = slackClient;
     this.repositoryBuildService = repositoryBuildService;
   }
-
 
   @Override
   public void visit(RepositoryBuild build) throws Exception {
@@ -137,9 +136,17 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     Optional<String> title = Optional.of(fallback);
     Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
-    SlackAttachment attachment = new SlackAttachment(fallback, color, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, title, link, attachmentText, fields, ABSENT_STRING);
-    SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, instantMessageConfiguration.getChannelName(), Lists.newArrayList(attachment));
-    slackClient.sendMessage(message);
+    SlackAttachment.Builder ab = SlackAttachment.getBuilder();
+    ab.setFallback(fallback);
+    ab.setColor(color);
+    ab.setTitle(title);
+    ab.setTitleLink(link);
+
+    SlackMessage.Builder b = SlackMessage.getBuilder();
+    b.setChannel(instantMessageConfiguration.getChannelName());
+    b.setAttachments(Lists.newArrayList(ab.build()));
+
+    slackClient.sendMessage(b.build());
   }
 
 
@@ -179,13 +186,20 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
         color = Optional.of("danger");
         break;
     }
-
     Optional<String> title = Optional.of(fallback);
     Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
-    SlackAttachment attachment = new SlackAttachment(fallback, color, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, title, link, ABSENT_STRING, Collections.<SlackAttachmentField>emptyList(), ABSENT_STRING);
-    SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, instantMessageConfiguration.getChannelName(), Lists.newArrayList(attachment));
-    slackClient.sendMessage(message);
+    SlackAttachment.Builder ab = SlackAttachment.getBuilder();
+    ab.setFallback(fallback);
+    ab.setColor(color);
+    ab.setTitle(title);
+    ab.setTitleLink(link);
+
+    SlackMessage.Builder b = SlackMessage.getBuilder();
+    b.setChannel(instantMessageConfiguration.getChannelName());
+    b.setAttachments(Lists.newArrayList(ab.build()));
+
+    slackClient.sendMessage(b.build());
   }
 
   private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild.State state, Optional<ModuleBuild> previous, ModuleBuild thisBuild) {
