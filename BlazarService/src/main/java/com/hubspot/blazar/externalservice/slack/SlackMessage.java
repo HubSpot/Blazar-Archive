@@ -83,7 +83,7 @@ public class SlackMessage {
         .add("attachments", attachments)
         .toString();
   }
-  public static Builder getBuilder() {
+  public static Builder newBuilder() {
     return new Builder();
   }
 

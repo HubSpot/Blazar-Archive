@@ -95,7 +95,7 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
   }
 
   private SlackMessage buildForIm(String message, SlackUser user) {
-    SlackMessage.Builder builder = SlackMessage.getBuilder();
+    SlackMessage.Builder builder = SlackMessage.newBuilder();
     builder.setAs_user(true);
     builder.setText(message);
     builder.setChannel(user.getId());

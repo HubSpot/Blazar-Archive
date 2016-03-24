@@ -49,6 +49,10 @@ public class UserFeedbackResource {
 
     SlackAttachment attachment = new SlackAttachment(fallback, absentString, absentString, absentString, absentString, absentString, title, link, message, fields, absentString);
 
-    slackClient.sendMessage(new SlackMessage(absentString, absentString, absentString, Optional.of(":fire:"), blazarSlackConfiguration.getFeedbackRoom().get(), ImmutableList.of(attachment)));
+    SlackMessage.Builder b = SlackMessage.newBuilder();
+    b.setIcon_emoji(Optional.of(":fire:"));
+    b.setChannel(blazarSlackConfiguration.getFeedbackRoom().get());
+    b.setAttachments(ImmutableList.of(attachment));
+    slackClient.sendMessage(b.build());
   }
 }

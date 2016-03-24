@@ -136,13 +136,13 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Optional<String> title = Optional.of(fallback);
     Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
-    SlackAttachment.Builder ab = SlackAttachment.getBuilder();
+    SlackAttachment.Builder ab = SlackAttachment.newBuilder();
     ab.setFallback(fallback);
     ab.setColor(color);
     ab.setTitle(title);
     ab.setTitleLink(link);
 
-    SlackMessage.Builder b = SlackMessage.getBuilder();
+    SlackMessage.Builder b = SlackMessage.newBuilder();
     b.setChannel(instantMessageConfiguration.getChannelName());
     b.setAttachments(Lists.newArrayList(ab.build()));
 
@@ -189,13 +189,13 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Optional<String> title = Optional.of(fallback);
     Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
-    SlackAttachment.Builder ab = SlackAttachment.getBuilder();
+    SlackAttachment.Builder ab = SlackAttachment.newBuilder();
     ab.setFallback(fallback);
     ab.setColor(color);
     ab.setTitle(title);
     ab.setTitleLink(link);
 
-    SlackMessage.Builder b = SlackMessage.getBuilder();
+    SlackMessage.Builder b = SlackMessage.newBuilder();
     b.setChannel(instantMessageConfiguration.getChannelName());
     b.setAttachments(Lists.newArrayList(ab.build()));
 
