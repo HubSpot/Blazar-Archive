@@ -1,9 +1,11 @@
 package com.hubspot.blazar.discovery.hsstatic;
 
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Objects;
 
 public class StaticConfig {
 
@@ -22,8 +24,8 @@ public class StaticConfig {
     this.name = name;
     this.majorVersion = majorVersion;
     this.isCurrentVersion = isCurrentVersion;
-    this.runtimeDeps = runtimeDeps;
-    this.deps = deps;
+    this.runtimeDeps = Objects.firstNonNull(runtimeDeps, Collections.<String, Integer>emptyMap());
+    this.deps = Objects.firstNonNull(deps, Collections.<String, Integer>emptyMap());
   }
 
   public String getName() {
