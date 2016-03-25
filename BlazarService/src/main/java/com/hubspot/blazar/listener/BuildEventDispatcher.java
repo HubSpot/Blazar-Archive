@@ -1,5 +1,6 @@
 package com.hubspot.blazar.listener;
 
+import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -41,12 +42,15 @@ public class BuildEventDispatcher {
 
   @Subscribe
   public void dispatch(RepositoryBuild build) throws Exception {
-    RepositoryBuild current = repositoryBuildService.get(build.getId().get()).get();
-    if (current.getState() != build.getState()) {
-      LOG.warn("Ignoring stale event with state {} for repository build {}, current state is {}", build.getState(), build.getId().get(), current.getState());
+    Optional<RepositoryBuild> current = repositoryBuildService.get(build.getId().get());
+    if (!current.isPresent()) {
+      LOG.warn("No repository build {}, ignoring event", build.getId().get());
+      return;
+    } else if (current.get().getState() != build.getState()) {
+      LOG.warn("Ignoring stale event with state {} for repository build {}, current state is {}", build.getState(), build.getId().get(), current.get().getState());
       return;
     } else {
-      build = current;
+      build = current.get();
     }
 
     try {
