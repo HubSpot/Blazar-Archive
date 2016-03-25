@@ -59,6 +59,26 @@ public class DependencyGraph {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    DependencyGraph that = (DependencyGraph) o;
+    return java.util.Objects.equals(transitiveReduction, that.transitiveReduction) &&
+        java.util.Objects.equals(topologicalSort, that.topologicalSort);
+  }
+
+  @Override
+  public int hashCode() {
+    return java.util.Objects.hash(transitiveReduction, topologicalSort);
+  }
+
+  @Override
   public String toString() {
     return transitiveReduction.toString();
   }
