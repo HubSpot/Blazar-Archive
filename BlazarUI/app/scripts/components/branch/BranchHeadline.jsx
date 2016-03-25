@@ -28,7 +28,7 @@ class RepoBuildHeadline extends Component {
         <Icon type="octicon" name="git-branch" classNames="headline-icon" />
         {this.props.params.repo} - {this.props.params.branch}
         <HeadlineDetail>
-          Branch Builds
+          Branch Builds 
           <Image src={imgPath}/>
         </HeadlineDetail>
       </Headline>
