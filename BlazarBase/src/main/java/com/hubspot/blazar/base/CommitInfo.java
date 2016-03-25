@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 
 import java.util.List;
+import java.util.Objects;
 
 public class CommitInfo {
   private final Commit current;
@@ -38,5 +39,27 @@ public class CommitInfo {
 
   public boolean isTruncated() {
     return truncated;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    CommitInfo that = (CommitInfo) o;
+    return Objects.equals(truncated, that.truncated) &&
+        Objects.equals(current, that.current) &&
+        Objects.equals(previous, that.previous) &&
+        Objects.equals(newCommits, that.newCommits);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(current, previous, newCommits, truncated);
   }
 }
