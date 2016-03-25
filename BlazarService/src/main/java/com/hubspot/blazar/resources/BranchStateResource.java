@@ -1,6 +1,8 @@
 package com.hubspot.blazar.resources;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -78,13 +80,15 @@ public class BranchStateResource {
     if (state.get().getLastBuild().isPresent()) {
       path = pickImage(state.get().getLastBuild().get().getState());
     } else {
-      path = "/shields/build-???-lightgrey.svg";
+      path = "/shields/build-???-lightgrey.png";
     }
 
     return new StreamingOutput() {
       @Override
-      public void write(OutputStream outputStream ) throws IOException, WebApplicationException {
-        ImageIO.write(ImageIO.read(getClass().getResource(path).openStream()), "png", outputStream);
+      public void write(OutputStream outputStream) throws IOException, WebApplicationException {
+        InputStream imageStream = getClass().getResource(path).openStream();
+        BufferedImage image = ImageIO.read(imageStream);
+        ImageIO.write(image, "png", outputStream);
       }
     };
   }
@@ -99,15 +103,15 @@ public class BranchStateResource {
   private static String pickImage(RepositoryBuild.State state) {
     switch (state) {
       case FAILED:
-        return "/shields/build-failed-red.png";
+        return "/shields/build-failing-red.png";
       case SUCCEEDED:
-        return "/shields/build-passed-green.png";
+        return "/shields/build-passing-green.png";
       case CANCELLED:
-        return "/sheilds/build-cancelled-yellow.svg";
+        return "/shields/build-cancelled-yellow.png";
       case UNSTABLE:
-        return "/sheilds/build-unstable-red.svg";
+        return "/shields/build-unstable-red.png";
       default:
-        return "/shields/build-???-lightgrey.svg";
+        return "/shields/build-???-lightgrey.png";
     }
   }
 }

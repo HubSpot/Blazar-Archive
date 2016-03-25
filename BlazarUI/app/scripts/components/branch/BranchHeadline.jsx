@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {contains} from 'underscore';
+import Image from '../shared/Image.jsx'
 import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';
 import Headline from '../shared/headline/Headline.jsx';
@@ -13,7 +14,7 @@ class RepoBuildHeadline extends Component {
     if (this.props.loading) {
       return null;
     }
-    
+    const imgPath = `${config.apiRoot}/branches/state/${this.props.branchId}/shield`;
     const {stars, params, currentRepoBuild} = this.props;
 
     return (
@@ -27,6 +28,9 @@ class RepoBuildHeadline extends Component {
         {this.props.params.repo} - {this.props.params.branch}
         <HeadlineDetail>
           Branch Builds
+        </HeadlineDetail>
+        <HeadlineDetail>
+          <Image src={imgPath}/>
         </HeadlineDetail>
       </Headline>
     )
