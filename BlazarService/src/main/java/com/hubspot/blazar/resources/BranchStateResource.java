@@ -1,13 +1,10 @@
 package com.hubspot.blazar.resources;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -18,6 +15,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
 import com.google.common.base.Optional;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Resources;
 import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryState;
@@ -80,15 +79,13 @@ public class BranchStateResource {
     if (state.get().getLastBuild().isPresent()) {
       path = pickImage(state.get().getLastBuild().get().getState());
     } else {
-      path = "/shields/build-???-lightgrey.png";
+      path = "shields/build-???-lightgrey.png";
     }
 
     return new StreamingOutput() {
       @Override
       public void write(OutputStream outputStream) throws IOException, WebApplicationException {
-        InputStream imageStream = getClass().getResource(path).openStream();
-        BufferedImage image = ImageIO.read(imageStream);
-        ImageIO.write(image, "png", outputStream);
+        ByteStreams.copy(Resources.getResource(path).openStream(), outputStream);
       }
     };
   }
@@ -103,15 +100,15 @@ public class BranchStateResource {
   private static String pickImage(RepositoryBuild.State state) {
     switch (state) {
       case FAILED:
-        return "/shields/build-failing-red.png";
+        return "shields/build-failing-red.png";
       case SUCCEEDED:
-        return "/shields/build-passing-green.png";
+        return "shields/build-passing-green.png";
       case CANCELLED:
-        return "/shields/build-cancelled-yellow.png";
+        return "shields/build-cancelled-yellow.png";
       case UNSTABLE:
-        return "/shields/build-unstable-red.png";
+        return "shields/build-unstable-red.png";
       default:
-        return "/shields/build-???-lightgrey.png";
+        return "shields/build-???-lightgrey.png";
     }
   }
 }

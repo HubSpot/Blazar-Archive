@@ -1,3 +1,4 @@
+/* global config */
 import React, {Component, PropTypes} from 'react';
 import {contains} from 'underscore';
 import Image from '../shared/Image.jsx'
@@ -28,8 +29,6 @@ class RepoBuildHeadline extends Component {
         {this.props.params.repo} - {this.props.params.branch}
         <HeadlineDetail>
           Branch Builds
-        </HeadlineDetail>
-        <HeadlineDetail>
           <Image src={imgPath}/>
         </HeadlineDetail>
       </Headline>
