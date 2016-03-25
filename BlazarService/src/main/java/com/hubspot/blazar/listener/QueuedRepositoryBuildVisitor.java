@@ -31,7 +31,8 @@ public class QueuedRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor
     BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(build.getBranchId());
 
     if (build.getBuildNumber() != buildNumbers.getPendingBuildNumber().or(-1)) {
-      LOG.info("Build {} is no longer pending for branch {}, not launching", build.getId().get(), build.getBranchId());
+      // now that we allow multiple queued builds this will get hit
+      LOG.info("Build {} is not the pending build for branch {}, not launching", build.getId().get(), build.getBranchId());
     } else if (buildNumbers.getInProgressBuildId().isPresent()) {
       LOG.info("In progress build for branch {}, not launching pending build {}", build.getBranchId(), build.getId().get());
     } else {
