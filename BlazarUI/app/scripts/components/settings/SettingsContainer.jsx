@@ -54,7 +54,7 @@ class SettingsContainer extends Component {
     return (
       <Headline>
         <Icon type="fa" name="wrench" classNames="headline-icon" />
-        <span>Settings</span>
+        <span>Settings</span> <br />
         <HeadlineDetail>
           <a style={{cursor: 'pointer'}} onClick={this.goBack}>Back to branch</a>
         </HeadlineDetail>
@@ -68,8 +68,8 @@ class SettingsContainer extends Component {
         <UIGrid>
           <UIGridItem size={12}>
             {this.renderHeadline()}
-            <Notifications 
-              notifications={this.state.notifications} 
+            <Notifications
+              notifications={this.state.notifications}
               slackChannels={this.state.slackChannels} />
           </UIGridItem>
         </UIGrid>

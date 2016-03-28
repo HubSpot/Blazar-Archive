@@ -75,8 +75,21 @@ class Notifications extends Component {
     return (
       <div className='notifications'>
         <NotificationsHeadline />
+        <UIGrid>
+          <UIGridItem size={12}>
+            <div className='notifications__channels-headline'>
+              <span>
+                Channels
+              </span>
+            </div>
+          </UIGridItem>
+        </UIGrid>
         <UIGrid className='notifications__grid'>
-          <UIGridItem size={4}>
+<<<<<<< HEAD
+          <UIGridItem size={4} className='notifications__channel-list'>
+=======
+          <UIGridItem size={4} className='notifications__channelList'>
+>>>>>>> 883076d39b7b8636697263aba8b3aabb5fc15d79
             <NotificationsChannels
               selectedChannel={this.state.selectedChannel}
               addingNewChannel={this.state.addingNewChannel}
@@ -85,6 +98,7 @@ class Notifications extends Component {
               onChannelDelete={this.onChannelDelete}
               {...this.props}
             />
+            <Button className='notifications__channel-button' onClick={this.onButtonClick} bsStyle='primary'>Add New Channel</Button>
           </UIGridItem>
           <UIGridItem size={8}>
             <NotificationsList
@@ -94,9 +108,6 @@ class Notifications extends Component {
           </UIGridItem>
         </UIGrid>
         <UIGrid className='notifications__grid'>
-          <UIGridItem size={4}>
-            <Button className='notifications__channel-button' onClick={this.onButtonClick} bsStyle='primary'>Add New Channel</Button>
-          </UIGridItem>
           <UIGridItem size={8}>
           </UIGridItem>
         </UIGrid>
