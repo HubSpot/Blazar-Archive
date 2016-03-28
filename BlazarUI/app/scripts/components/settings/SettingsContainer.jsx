@@ -54,7 +54,7 @@ class SettingsContainer extends Component {
     return (
       <Headline>
         <Icon type="fa" name="wrench" classNames="headline-icon" />
-        <span>Settings</span> <br />
+        <span>Settings</span>
         <HeadlineDetail>
           <a style={{cursor: 'pointer'}} onClick={this.goBack}>Back to branch</a>
         </HeadlineDetail>
