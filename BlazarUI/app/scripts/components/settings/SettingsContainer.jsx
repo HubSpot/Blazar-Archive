@@ -52,7 +52,7 @@ class SettingsContainer extends Component {
 
   renderHeadline() {
     return (
-      <Headline>
+      <Headline className='notifications__page-headline'>
         <Icon type="fa" name="wrench" classNames="headline-icon" />
         <span>Settings</span>
         <HeadlineDetail>
