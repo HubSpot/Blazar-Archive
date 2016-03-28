@@ -9,7 +9,8 @@ class NotificationsHeadline extends Component {
           Build Notifications
         </span>
         <p className='notifications-headline-details'>
-          Create and modify build notifications.
+          Blazar allows you to send notifications about your builds to multiple
+          Slack channels.
         </p>
       </div>
     );

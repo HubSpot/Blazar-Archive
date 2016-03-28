@@ -11,7 +11,7 @@ let initialState = {
 };
 
 class NotificationsChannels extends Component {
-  
+
   constructor() {
     this.state = initialState;
 
@@ -94,12 +94,7 @@ class NotificationsChannels extends Component {
 
   render() {
     return (
-      <div>
-        <div className='notifications__channels-headline'>
-          <span>
-            Channels
-          </span>
-        </div>
+      <div className='notifications__channels-container'>
         <div className='notifications__channels'>
           {this.renderChannels()}
           {this.renderNewChannel()}
