@@ -74,9 +74,24 @@ public class RepositoryBuildServiceTest extends BlazarDataTestBase {
   }
 
   @Test
-  public void itReturnsPendingBuildWhenPresent() {
-    long newBuildId = repositoryBuildService.enqueue(branchOne, buildTriggerOne, buildOptionsOne);
+  public void itReturnsPendingBuildForSecondPushEvent() {
+    long newBuildId = repositoryBuildService.enqueue(branchOne, buildTriggerTwo, buildOptionsTwo);
     assertThat(newBuildId).isEqualTo(buildIdOne);
+  }
+
+  @Test
+  public void itEnqueuesNewBuildForManualTrigger() {
+    BuildTrigger manualTrigger = BuildTrigger.forUser("test");
+    long newBuildId = repositoryBuildService.enqueue(branchOne, manualTrigger, buildOptionsOne);
+    assertThat(newBuildId).isNotEqualTo(buildIdOne);
+
+    RepositoryBuild repositoryBuild = repositoryBuildService.get(newBuildId).get();
+
+    validateBuild(RepositoryBuild.queuedBuild(branchOne, manualTrigger, 2, buildOptionsOne), repositoryBuild);
+
+    BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(branchOne.getId().get());
+    assertThat(buildNumbers.getPendingBuildId().get()).isEqualTo(buildIdOne);
+    assertThat(buildNumbers.getPendingBuildNumber().get()).isEqualTo(1);
   }
 
   @Test

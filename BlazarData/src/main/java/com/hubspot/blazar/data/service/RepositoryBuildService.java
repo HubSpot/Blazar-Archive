@@ -57,28 +57,38 @@ public class RepositoryBuildService {
   }
 
   public long enqueue(GitInfo gitInfo, BuildTrigger trigger, BuildOptions buildOptions) {
-    BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
+    int branchId = gitInfo.getId().get();
 
-    if (buildNumbers.getPendingBuildId().isPresent()) {
-      long pendingBuildId = buildNumbers.getPendingBuildId().get();
-      LOG.info("Not enqueuing build for repository {}, pending build {} already exists", gitInfo.getId().get(), pendingBuildId);
-      return pendingBuildId;
-    } else {
-      int nextBuildNumber = buildNumbers.getNextBuildNumber();
-      LOG.info("Enqueuing build for repository {} with build number {}", gitInfo.getId().get(), nextBuildNumber);
-      RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber, buildOptions);
-      build = enqueue(build);
-      LOG.info("Enqueued build for repository {} with id {}", gitInfo.getId().get(), build.getId().get());
-      return build.getId().get();
+    // determine build number first (unique index will prevent concurrent modification)
+    List<RepositoryBuild> queuedBuilds = repositoryBuildDao.getByBranchAndState(branchId, State.QUEUED);
+    int nextBuildNumber = determineNextBuildNumber(branchId, queuedBuilds);
+
+    // check for existing queued build triggered by push event
+    if (trigger.getType() == BuildTrigger.Type.PUSH) {
+      for (RepositoryBuild build : queuedBuilds) {
+        if (build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
+          long existingBuildId = build.getId().get();
+          LOG.info("Not enqueuing build for push to {}, pending build {} already exists", branchId, existingBuildId);
+          return existingBuildId;
+        }
+      }
     }
+
+    RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber, buildOptions);
+    LOG.info("Enqueuing build for repository {} with build number {}", branchId, nextBuildNumber);
+    // if no queued builds, we expect our update to succeed otherwise it shouldn't
+    int expectedUpdateCount = queuedBuilds.isEmpty() ? 1 : 0;
+    build = enqueue(build, expectedUpdateCount);
+    LOG.info("Enqueued build for repository {} with id {}", branchId, build.getId().get());
+    return build.getId().get();
   }
 
   @Transactional
-  protected RepositoryBuild enqueue(RepositoryBuild build) {
+  protected RepositoryBuild enqueue(RepositoryBuild build, int expectedUpdateCount) {
     long id = repositoryBuildDao.enqueue(build);
     build = build.withId(id);
 
-    checkAffectedRowCount(branchDao.updatePendingBuild(build));
+    checkAffectedRowCount(branchDao.updatePendingBuild(build), expectedUpdateCount);
 
     eventBus.post(build);
 
@@ -141,7 +151,31 @@ public class RepositoryBuildService {
     }
   }
 
+  private int determineNextBuildNumber(int branchId, List<RepositoryBuild> queuedBuilds) {
+    if (queuedBuilds.isEmpty()) {
+      BuildNumbers buildNumbers = getBuildNumbers(branchId);
+      if (buildNumbers.getInProgressBuildNumber().isPresent()) {
+        return buildNumbers.getInProgressBuildNumber().get() + 1;
+      } else if (buildNumbers.getLastBuildNumber().isPresent()) {
+        return buildNumbers.getLastBuildNumber().get() + 1;
+      } else {
+        return 1;
+      }
+    } else {
+      int max = 0;
+      for (RepositoryBuild build : queuedBuilds) {
+        max = Math.max(max, build.getBuildNumber());
+      }
+
+      return max + 1;
+    }
+  }
+
   private static void checkAffectedRowCount(int affectedRows) {
-    Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
+    checkAffectedRowCount(affectedRows, 1);
+  }
+
+  private static void checkAffectedRowCount(int affectedRows, int expectedAffectedRows) {
+    Preconditions.checkState(affectedRows == expectedAffectedRows, "Expected to update %s rows but updated %s", expectedAffectedRows, affectedRows);
   }
 }
