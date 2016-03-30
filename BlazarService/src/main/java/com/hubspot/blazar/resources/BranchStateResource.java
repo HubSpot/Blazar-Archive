@@ -68,7 +68,7 @@ public class BranchStateResource {
 
   @GET
   @Path("/{id}/shield")
-  @Produces("image/svg")
+  @Produces("image/svg+xml")
   public StreamingOutput getShield(@PathParam("id") int branchId) {
     Optional<RepositoryState> state = stateService.getRepositoryState(branchId);
     if (!state.isPresent()) {
