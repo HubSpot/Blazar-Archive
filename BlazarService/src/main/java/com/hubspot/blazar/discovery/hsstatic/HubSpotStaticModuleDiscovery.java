@@ -74,7 +74,7 @@ public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
 
       StaticConfig configObject;
       try {
-         configObject = objectMapper.readValue(contents, StaticConfig.class);
+        configObject = objectMapper.readValue(contents, StaticConfig.class);
       } catch (IOException e) {
         LOG.error("Error parsing static_conf.json at path {} for repo {}@{}", path, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
         malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "hs-static", path, Throwables.getStackTraceAsString(e)));
@@ -82,10 +82,10 @@ public class HubSpotStaticModuleDiscovery implements ModuleDiscovery {
       }
 
       for (Map.Entry<String, Integer> entry: configObject.getDeps().entrySet()) {
-        depends.add(String.format("%s-%d", entry.getKey(), entry.getValue()));
+        depends.add(String.format("%s-%s", entry.getKey(), entry.getValue()));
       }
       for (Map.Entry<String, Integer> entry : configObject.getRuntimeDeps().entrySet()) {
-        depends.add(String.format("%s-%d", entry.getKey(), entry.getValue()));
+        depends.add(String.format("%s-%s", entry.getKey(), entry.getValue()));
       }
       provides.add(String.format("%s-%d", configObject.getName(), configObject.getMajorVersion()));
       modules.add(new DiscoveredModule(configObject.getName(), "hs-static", moduleDirectory, glob, BUILD_CONFIGURATION, new DependencyInfo(depends, provides)));
