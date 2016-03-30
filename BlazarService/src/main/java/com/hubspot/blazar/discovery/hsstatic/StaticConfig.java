@@ -1,11 +1,17 @@
 package com.hubspot.blazar.discovery.hsstatic;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import com.google.common.base.Function;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
+
+import javax.annotation.Nullable;
 
 public class StaticConfig {
 
@@ -19,13 +25,13 @@ public class StaticConfig {
   public StaticConfig(@JsonProperty("name") String name,
                       @JsonProperty("majorVersion") int majorVersion,
                       @JsonProperty("isCurrentVersion") boolean isCurrentVersion,
-                      @JsonProperty("runtimeDeps") Map<String, Integer> runtimeDeps,
-                      @JsonProperty("deps") Map<String, Integer> deps) {
+                      @JsonProperty("runtimeDeps") Map<String, String> runtimeDeps,
+                      @JsonProperty("deps") Map<String, String> deps) {
     this.name = name;
     this.majorVersion = majorVersion;
     this.isCurrentVersion = isCurrentVersion;
-    this.runtimeDeps = Objects.firstNonNull(runtimeDeps, Collections.<String, Integer>emptyMap());
-    this.deps = Objects.firstNonNull(deps, Collections.<String, Integer>emptyMap());
+    this.runtimeDeps = parseMajorVersions(runtimeDeps);
+    this.deps = parseMajorVersions(deps);
   }
 
   public String getName() {
@@ -46,5 +52,31 @@ public class StaticConfig {
 
   public Map<String, Integer> getDeps() {
     return deps;
+  }
+
+  private static Map<String, Integer> parseMajorVersions(@Nullable Map<String, String> versionMap) {
+    if (versionMap == null) {
+      return Collections.emptyMap();
+    }
+
+    return Maps.transformValues(versionMap, new Function<String, Integer>() {
+
+      @Override
+      public Integer apply(String input) {
+        Set<Integer> majorVersions = new HashSet<>();
+        for (String version : Splitter.on("||").trimResults().split(input)) {
+          final int majorVersion;
+          if (version.contains(".")) {
+            majorVersion = Integer.valueOf(version.substring(0, version.indexOf('.')));
+          } else {
+            majorVersion = Integer.valueOf(version);
+          }
+
+          majorVersions.add(majorVersion);
+        }
+
+        return Collections.max(majorVersions);
+      }
+    });
   }
 }
