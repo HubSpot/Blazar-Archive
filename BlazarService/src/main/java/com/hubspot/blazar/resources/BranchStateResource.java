@@ -68,7 +68,7 @@ public class BranchStateResource {
 
   @GET
   @Path("/{id}/shield")
-  @Produces("image/png")
+  @Produces("image/svg+xml")
   public StreamingOutput getShield(@PathParam("id") int branchId) {
     Optional<RepositoryState> state = stateService.getRepositoryState(branchId);
     if (!state.isPresent()) {
@@ -79,7 +79,7 @@ public class BranchStateResource {
     if (state.get().getLastBuild().isPresent()) {
       path = pickImage(state.get().getLastBuild().get().getState());
     } else {
-      path = "shields/build-???-lightgrey.png";
+      path = "shields/build-???-lightgrey.svg";
     }
 
     return new StreamingOutput() {
@@ -100,15 +100,15 @@ public class BranchStateResource {
   private static String pickImage(RepositoryBuild.State state) {
     switch (state) {
       case FAILED:
-        return "shields/build-failing-red.png";
+        return "shields/build-failing-red.svg";
       case SUCCEEDED:
-        return "shields/build-passing-green.png";
+        return "shields/build-passing-green.svg";
       case CANCELLED:
-        return "shields/build-cancelled-yellow.png";
+        return "shields/build-cancelled-yellow.svg";
       case UNSTABLE:
-        return "shields/build-unstable-red.png";
+        return "shields/build-unstable-red.svg";
       default:
-        return "shields/build-???-lightgrey.png";
+        return "shields/build-???-lightgrey.svg";
     }
   }
 }
