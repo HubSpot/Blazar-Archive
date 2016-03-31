@@ -126,7 +126,33 @@ public class RepositoryBuildServiceTest extends BlazarDataTestBase {
     assertThat(buildNumbers.getPendingBuildId().isPresent()).isFalse();
     assertThat(buildNumbers.getPendingBuildNumber().isPresent()).isFalse();
     assertThat(buildNumbers.getInProgressBuildId().get()).isEqualTo(buildIdOne);
-    assertThat(buildNumbers.getInProgressBuildId().get()).isEqualTo(1);
+    assertThat(buildNumbers.getInProgressBuildNumber().get()).isEqualTo(1);
+  }
+
+  @Test
+  public void itMovesNextQueuedBuildIntoPendingSlotWhenBuildBegins() {
+    BuildTrigger manualTrigger = BuildTrigger.forUser("test");
+    long newBuildId = repositoryBuildService.enqueue(branchOne, manualTrigger, buildOptionsOne);
+    assertThat(newBuildId).isNotEqualTo(buildIdOne);
+
+    RepositoryBuild pending = repositoryBuildService.get(buildIdOne).get();
+
+    RepositoryBuild launching = pending.withState(State.LAUNCHING)
+        .withStartTimestamp(123L)
+        .withCommitInfo(commitInfoOne)
+        .withDependencyGraph(dependencyGraphOne);
+
+    repositoryBuildService.begin(launching);
+
+    RepositoryBuild fetched = repositoryBuildService.get(buildIdOne).get();
+
+    validateBuild(launching, fetched);
+
+    BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(branchOne.getId().get());
+    assertThat(buildNumbers.getPendingBuildId().get()).isEqualTo(newBuildId);
+    assertThat(buildNumbers.getPendingBuildNumber().get()).isEqualTo(2);
+    assertThat(buildNumbers.getInProgressBuildId().get()).isEqualTo(buildIdOne);
+    assertThat(buildNumbers.getInProgressBuildNumber().get()).isEqualTo(1);
   }
 
   @Test
