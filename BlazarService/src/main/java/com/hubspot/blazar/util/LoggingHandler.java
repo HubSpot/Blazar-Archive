@@ -21,6 +21,6 @@ public class LoggingHandler {
 
   @Subscribe
   public void logEvent(Message message) throws IOException {
-    LOG.info(message.toString());
+    LOG.debug(message.toString());
   }
 }
