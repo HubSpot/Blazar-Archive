@@ -1,11 +1,14 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
+import com.google.common.primitives.Ints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,10 +147,45 @@ public class RepositoryBuildService {
     }
 
     if (build.getState() == State.QUEUED) {
+      // call this method before deleting the row
+      boolean isThePendingBuild = isThePendingBuild(build);
       checkAffectedRowCount(repositoryBuildDao.delete(build));
-      checkAffectedRowCount(branchDao.deletePendingBuild(build));
+      if (isThePendingBuild) {
+        // need to move the next queued build into the pending slot
+        Optional<RepositoryBuild> nextQueuedBuild = nextQueuedBuild(build.getBranchId());
+        if (nextQueuedBuild.isPresent()) {
+          checkAffectedRowCount(branchDao.updatePendingBuild(build, nextQueuedBuild.get()));
+
+          eventBus.post(nextQueuedBuild.get());
+        } else {
+          checkAffectedRowCount(branchDao.deletePendingBuild(build));
+        }
+      } else {
+        // this shouldn't update any rows
+        checkAffectedRowCount(branchDao.deletePendingBuild(build), 0);
+      }
     } else {
       update(build.withState(State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
+    }
+  }
+
+  private boolean isThePendingBuild(RepositoryBuild build) {
+    BuildNumbers buildNumbers = getBuildNumbers(build.getBranchId());
+    return buildNumbers.getPendingBuildId().equals(build.getId());
+  }
+
+  private Optional<RepositoryBuild> nextQueuedBuild(int branchId) {
+    List<RepositoryBuild> queuedBuilds = repositoryBuildDao.getByBranchAndState(branchId, State.QUEUED);
+    if (queuedBuilds.isEmpty()) {
+      return Optional.absent();
+    } else {
+      return Optional.of(Collections.min(queuedBuilds, new Comparator<RepositoryBuild>() {
+
+        @Override
+        public int compare(RepositoryBuild build1, RepositoryBuild build2) {
+          return Ints.compare(build1.getBuildNumber(), build2.getBuildNumber());
+        }
+      }));
     }
   }
 
