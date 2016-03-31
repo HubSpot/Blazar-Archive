@@ -140,7 +140,6 @@ public class RepositoryBuildService {
     update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
   }
 
-  @Transactional
   public void cancel(RepositoryBuild build) {
     if (build.getState().isComplete()) {
       throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
