@@ -147,25 +147,30 @@ public class RepositoryBuildService {
     }
 
     if (build.getState() == State.QUEUED) {
-      // call this method before deleting the row
-      boolean isThePendingBuild = isThePendingBuild(build);
-      checkAffectedRowCount(repositoryBuildDao.delete(build));
-      if (isThePendingBuild) {
-        // need to move the next queued build into the pending slot
-        Optional<RepositoryBuild> nextQueuedBuild = nextQueuedBuild(build.getBranchId());
-        if (nextQueuedBuild.isPresent()) {
-          checkAffectedRowCount(branchDao.updatePendingBuild(build, nextQueuedBuild.get()));
-
-          eventBus.post(nextQueuedBuild.get());
-        } else {
-          checkAffectedRowCount(branchDao.deletePendingBuild(build));
-        }
-      } else {
-        // this shouldn't update any rows
-        checkAffectedRowCount(branchDao.deletePendingBuild(build), 0);
-      }
+      deleteQueuedBuild(build);
     } else {
       update(build.withState(State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
+    }
+  }
+
+  @Transactional
+  void deleteQueuedBuild(RepositoryBuild build) {
+    // call this method before deleting the row
+    boolean isThePendingBuild = isThePendingBuild(build);
+    checkAffectedRowCount(repositoryBuildDao.delete(build));
+    if (isThePendingBuild) {
+      // need to move the next queued build into the pending slot
+      Optional<RepositoryBuild> nextQueuedBuild = nextQueuedBuild(build.getBranchId());
+      if (nextQueuedBuild.isPresent()) {
+        checkAffectedRowCount(branchDao.updatePendingBuild(build, nextQueuedBuild.get()));
+
+        eventBus.post(nextQueuedBuild.get());
+      } else {
+        checkAffectedRowCount(branchDao.deletePendingBuild(build));
+      }
+    } else {
+      // this shouldn't update any rows
+      checkAffectedRowCount(branchDao.deletePendingBuild(build), 0);
     }
   }
 
