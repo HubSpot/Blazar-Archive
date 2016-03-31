@@ -142,6 +142,40 @@ public class RepositoryBuildServiceTest extends BlazarDataTestBase {
     assertThat(buildNumbers.getPendingBuildNumber().isPresent()).isFalse();
   }
 
+  @Test
+  public void itCancelsExtraQueuedBuildProperly() {
+    BuildTrigger manualTrigger = BuildTrigger.forUser("test");
+    long newBuildId = repositoryBuildService.enqueue(branchOne, manualTrigger, buildOptionsOne);
+    assertThat(newBuildId).isNotEqualTo(buildIdOne);
+
+    RepositoryBuild repositoryBuild = repositoryBuildService.get(newBuildId).get();
+
+    repositoryBuildService.cancel(repositoryBuild);
+
+    assertThat(repositoryBuildService.get(newBuildId).isPresent()).isFalse();
+
+    BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(branchOne.getId().get());
+    assertThat(buildNumbers.getPendingBuildId().get()).isEqualTo(buildIdOne);
+    assertThat(buildNumbers.getPendingBuildNumber().get()).isEqualTo(1);
+  }
+
+  @Test
+  public void itMovesNextQueuedBuildIntoPendingSlotProperly() {
+    BuildTrigger manualTrigger = BuildTrigger.forUser("test");
+    long newBuildId = repositoryBuildService.enqueue(branchOne, manualTrigger, buildOptionsOne);
+    assertThat(newBuildId).isNotEqualTo(buildIdOne);
+
+    RepositoryBuild repositoryBuild = repositoryBuildService.get(buildIdOne).get();
+
+    repositoryBuildService.cancel(repositoryBuild);
+
+    assertThat(repositoryBuildService.get(buildIdOne).isPresent()).isFalse();
+
+    BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(branchOne.getId().get());
+    assertThat(buildNumbers.getPendingBuildId().get()).isEqualTo(newBuildId);
+    assertThat(buildNumbers.getPendingBuildNumber().get()).isEqualTo(2);
+  }
+
   private static void validateBuild(RepositoryBuild expected, RepositoryBuild actual) {
     assertThat(actual.getBranchId()).isEqualTo(expected.getBranchId());
     assertThat(actual.getBuildNumber()).isEqualTo(expected.getBuildNumber());
