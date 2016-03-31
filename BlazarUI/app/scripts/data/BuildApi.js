@@ -220,7 +220,7 @@ class BuildApi {
   _getBuild() {
     // first get all builds so we can find the build id
     const buildStates = new Resource({
-      url: `${config.apiRoot}/branches/state`,
+      url: `${config.apiRoot}/branches/state?property=gitInfo`,
       type: 'GET'
     }).send();
 
@@ -234,7 +234,7 @@ class BuildApi {
       
       // get branch id
       const branchIdPromise = new Resource({ 
-        url: `${config.apiRoot}/branches/state`,
+        url: `${config.apiRoot}/branches/state?property=gitInfo&property=lastBuild.id`,
         type: 'GET'
       }).send();
       
