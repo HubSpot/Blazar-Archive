@@ -38,6 +38,9 @@ public interface BranchDao {
   @SqlUpdate("UPDATE branches SET pendingBuildId = :id WHERE id = :branchId AND pendingBuildId IS NULL")
   int updatePendingBuild(@BindWithRosetta RepositoryBuild build);
 
+  @SqlUpdate("UPDATE branches SET pendingBuildId = :next.id WHERE id = :previous.branchId AND id = :next.branchId AND pendingBuildId = :previous.id")
+  int updatePendingBuild(@BindWithRosetta("previous") RepositoryBuild previous, @BindWithRosetta("next") RepositoryBuild next);
+
   @SqlUpdate("UPDATE branches SET pendingBuildId = NULL WHERE id = :branchId AND pendingBuildId = :id")
   int deletePendingBuild(@BindWithRosetta RepositoryBuild build);
 

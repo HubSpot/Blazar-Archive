@@ -1,11 +1,14 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
+import com.google.common.primitives.Ints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,28 +60,38 @@ public class RepositoryBuildService {
   }
 
   public long enqueue(GitInfo gitInfo, BuildTrigger trigger, BuildOptions buildOptions) {
-    BuildNumbers buildNumbers = getBuildNumbers(gitInfo.getId().get());
+    int branchId = gitInfo.getId().get();
 
-    if (buildNumbers.getPendingBuildId().isPresent()) {
-      long pendingBuildId = buildNumbers.getPendingBuildId().get();
-      LOG.info("Not enqueuing build for repository {}, pending build {} already exists", gitInfo.getId().get(), pendingBuildId);
-      return pendingBuildId;
-    } else {
-      int nextBuildNumber = buildNumbers.getNextBuildNumber();
-      LOG.info("Enqueuing build for repository {} with build number {}", gitInfo.getId().get(), nextBuildNumber);
-      RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber, buildOptions);
-      build = enqueue(build);
-      LOG.info("Enqueued build for repository {} with id {}", gitInfo.getId().get(), build.getId().get());
-      return build.getId().get();
+    // determine build number first (unique index will prevent concurrent modification)
+    List<RepositoryBuild> queuedBuilds = repositoryBuildDao.getByBranchAndState(branchId, State.QUEUED);
+    int nextBuildNumber = determineNextBuildNumber(branchId, queuedBuilds);
+
+    // check for existing queued build triggered by push event
+    if (trigger.getType() == BuildTrigger.Type.PUSH) {
+      for (RepositoryBuild build : queuedBuilds) {
+        if (build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
+          long existingBuildId = build.getId().get();
+          LOG.info("Not enqueuing build for push to {}, pending build {} already exists", branchId, existingBuildId);
+          return existingBuildId;
+        }
+      }
     }
+
+    RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber, buildOptions);
+    LOG.info("Enqueuing build for repository {} with build number {}", branchId, nextBuildNumber);
+    // if no queued builds, we expect our update to succeed otherwise it shouldn't
+    int expectedUpdateCount = queuedBuilds.isEmpty() ? 1 : 0;
+    build = enqueue(build, expectedUpdateCount);
+    LOG.info("Enqueued build for repository {} with id {}", branchId, build.getId().get());
+    return build.getId().get();
   }
 
   @Transactional
-  protected RepositoryBuild enqueue(RepositoryBuild build) {
+  protected RepositoryBuild enqueue(RepositoryBuild build, int expectedUpdateCount) {
     long id = repositoryBuildDao.enqueue(build);
     build = build.withId(id);
 
-    checkAffectedRowCount(branchDao.updatePendingBuild(build));
+    checkAffectedRowCount(branchDao.updatePendingBuild(build), expectedUpdateCount);
 
     eventBus.post(build);
 
@@ -127,21 +140,84 @@ public class RepositoryBuildService {
     update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
   }
 
-  @Transactional
   public void cancel(RepositoryBuild build) {
     if (build.getState().isComplete()) {
       throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
     }
 
     if (build.getState() == State.QUEUED) {
-      checkAffectedRowCount(repositoryBuildDao.delete(build));
-      checkAffectedRowCount(branchDao.deletePendingBuild(build));
+      deleteQueuedBuild(build);
     } else {
       update(build.withState(State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
     }
   }
 
+  @Transactional
+  void deleteQueuedBuild(RepositoryBuild build) {
+    // call this method before deleting the row
+    boolean isThePendingBuild = isThePendingBuild(build);
+    checkAffectedRowCount(repositoryBuildDao.delete(build));
+    if (isThePendingBuild) {
+      // need to move the next queued build into the pending slot
+      Optional<RepositoryBuild> nextQueuedBuild = nextQueuedBuild(build.getBranchId());
+      if (nextQueuedBuild.isPresent()) {
+        checkAffectedRowCount(branchDao.updatePendingBuild(build, nextQueuedBuild.get()));
+
+        eventBus.post(nextQueuedBuild.get());
+      } else {
+        checkAffectedRowCount(branchDao.deletePendingBuild(build));
+      }
+    } else {
+      // this shouldn't update any rows
+      checkAffectedRowCount(branchDao.deletePendingBuild(build), 0);
+    }
+  }
+
+  private boolean isThePendingBuild(RepositoryBuild build) {
+    BuildNumbers buildNumbers = getBuildNumbers(build.getBranchId());
+    return buildNumbers.getPendingBuildId().equals(build.getId());
+  }
+
+  private Optional<RepositoryBuild> nextQueuedBuild(int branchId) {
+    List<RepositoryBuild> queuedBuilds = repositoryBuildDao.getByBranchAndState(branchId, State.QUEUED);
+    if (queuedBuilds.isEmpty()) {
+      return Optional.absent();
+    } else {
+      return Optional.of(Collections.min(queuedBuilds, new Comparator<RepositoryBuild>() {
+
+        @Override
+        public int compare(RepositoryBuild build1, RepositoryBuild build2) {
+          return Ints.compare(build1.getBuildNumber(), build2.getBuildNumber());
+        }
+      }));
+    }
+  }
+
+  private int determineNextBuildNumber(int branchId, List<RepositoryBuild> queuedBuilds) {
+    if (queuedBuilds.isEmpty()) {
+      BuildNumbers buildNumbers = getBuildNumbers(branchId);
+      if (buildNumbers.getInProgressBuildNumber().isPresent()) {
+        return buildNumbers.getInProgressBuildNumber().get() + 1;
+      } else if (buildNumbers.getLastBuildNumber().isPresent()) {
+        return buildNumbers.getLastBuildNumber().get() + 1;
+      } else {
+        return 1;
+      }
+    } else {
+      int max = 0;
+      for (RepositoryBuild build : queuedBuilds) {
+        max = Math.max(max, build.getBuildNumber());
+      }
+
+      return max + 1;
+    }
+  }
+
   private static void checkAffectedRowCount(int affectedRows) {
-    Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
+    checkAffectedRowCount(affectedRows, 1);
+  }
+
+  private static void checkAffectedRowCount(int affectedRows, int expectedAffectedRows) {
+    Preconditions.checkState(affectedRows == expectedAffectedRows, "Expected to update %s rows but updated %s", expectedAffectedRows, affectedRows);
   }
 }
