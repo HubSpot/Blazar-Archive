@@ -19,8 +19,8 @@ import Immutable from 'immutable';
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
 
-import BranchStore from '../../stores/branchStore';
-import BranchActions from '../../actions/branchActions';
+import NewBranchStore from '../../stores/newBranchStore';
+import NewBranchActions from '../../actions/newBranchActions';
 
 import {getPreviousBuildState} from '../Helpers.js';
 
@@ -36,7 +36,8 @@ let initialState = {
   modules: Immutable.List.of(),
   selectedModules: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
-  branchId: 0
+  branchId: 0,
+  branchInfo: {}
 };
 
 class BranchContainer extends Component {
@@ -66,16 +67,17 @@ class BranchContainer extends Component {
   }
     
   setup(params) {
-    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
+    this.unsubscribeFromBranch = NewBranchStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
-    BranchActions.loadBranchBuilds(params);
-    BranchActions.loadModules();
-    BranchActions.loadMalformedFiles();
+    NewBranchActions.loadBranchBuildHistory(params);
+    NewBranchActions.loadBranchInfo(params);
+    NewBranchActions.loadBranchModules(params);
+    NewBranchActions.loadBranchMalformedFiles(params);
   }
   
   tearDown() {
-    BranchActions.stopPolling();
+    //BranchActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
   }
@@ -155,7 +157,7 @@ class BranchContainer extends Component {
       return;
     }
 
-    const buildSettingsLink = `/settings/branch/${this.state.branchId}`;
+    const buildSettingsLink = `/settings/branch/${this.props.params.branchId}`;
 
     return (
       <Link to={buildSettingsLink}>
@@ -174,6 +176,7 @@ class BranchContainer extends Component {
           <UIGridItem size={8}>
             <BranchHeadline
               loading={this.state.loadingStars || this.state.loadingBranches}
+              branchInfo={this.state.branchInfo}
               {...this.state}
               {...this.props}
             />

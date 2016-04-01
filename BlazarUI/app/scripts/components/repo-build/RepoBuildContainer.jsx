@@ -7,9 +7,10 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import StarStore from '../../stores/starStore';
-import RepoBuildStore from '../../stores/repoBuildStore';
 import StarActions from '../../actions/starActions';
-import RepoBuildActions from '../../actions/repoBuildActions';
+
+import NewRepoBuildStore from '../../stores/newRepoBuildStore';
+import NewRepoBuildActions from '../../actions/newRepoBuildActions';
 
 import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
@@ -52,14 +53,15 @@ class RepoBuildContainer extends Component {
   
   setup(params) { 
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
-    this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromRepoBuild = NewRepoBuildStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
-    RepoBuildActions.loadModuleBuilds(params);
-    RepoBuildActions.loadMalformedFiles();
+    NewRepoBuildActions.loadModuleBuilds(params);
+    NewRepoBuildActions.loadRepoBuild(params);
+    //RepoBuildActions.loadMalformedFiles();
   }
 
   tearDown() {
-    RepoBuildActions.stopPolling();
+    //NewRepoBuildActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromRepoBuild();
   }
@@ -70,11 +72,11 @@ class RepoBuildContainer extends Component {
   
   // to do
   triggerCancelBuild() {
-    RepoBuildActions.cancelBuild();
+    //RepoBuildActions.cancelBuild();
   }
   
   triggerBuild() {
-    RepoBuildActions.triggerBuild();
+    //RepoBuildActions.triggerBuild();
   }
 
   renderSectionContent() {
@@ -137,7 +139,7 @@ class RepoBuildContainer extends Component {
           />
           <RepoBuildModulesTable
             params={this.props.params}
-            data={this.state.moduleBuilds ? this.state.moduleBuilds.toJS() : []}
+            data={this.state.moduleBuilds}
             currentRepoBuild={this.state.currentRepoBuild}
             loading={this.state.loadingModuleBuilds}
             {...this.state}

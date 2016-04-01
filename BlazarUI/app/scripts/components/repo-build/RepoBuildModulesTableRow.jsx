@@ -50,6 +50,8 @@ class RepoBuildModulesTableRow extends Component {
       );
     }
 
+    console.log(data);
+
     return (
       <span><Link className='build-link' to={data.blazarPath}>{data.name}</Link></span>
     );    
@@ -90,8 +92,11 @@ class RepoBuildModulesTableRow extends Component {
 
   render() {
     const {data, params} = this.props;
+
+    console.log(data);
+
     return (
-      <tr onClick={this.onTableClick.bind(this)}className={this.getRowClassNames(data.state)}>
+      <tr onClick={this.onTableClick.bind(this)} className={this.getRowClassNames(data.state)}>
         <td className='build-status'>
           {buildResultIcon(data.state)}
         </td>

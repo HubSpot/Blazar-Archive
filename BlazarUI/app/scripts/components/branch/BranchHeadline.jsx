@@ -15,18 +15,19 @@ class RepoBuildHeadline extends Component {
     if (this.props.loading) {
       return null;
     }
-    const imgPath = `${config.apiRoot}/branches/state/${this.props.branchId}/shield`;
+    const imgPath = `${config.apiRoot}/branches/state/${this.props.params.branchId}/shield`;
     const {stars, params, currentRepoBuild} = this.props;
+    const branchId = parseInt(this.props.params.branchId, 10);
 
     return (
       <Headline>
         <Star
           className='icon-roomy'
-          isStarred={contains(stars, this.props.branchId)}
-          id={this.props.branchId}
+          isStarred={contains(stars, branchId)}
+          id={branchId}
         />
         <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-        {this.props.params.repo} - {this.props.params.branch}
+        {this.props.branchInfo.repository} - {this.props.branchInfo.branch}
         <HeadlineDetail>
           Branch Builds 
           <Image src={imgPath}/>
@@ -39,7 +40,8 @@ class RepoBuildHeadline extends Component {
 RepoBuildHeadline.propTypes = {
   params: PropTypes.object.isRequired,
   branchId: PropTypes.number,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  branchInfo: PropTypes.object.isRequired
 };
 
 export default RepoBuildHeadline;

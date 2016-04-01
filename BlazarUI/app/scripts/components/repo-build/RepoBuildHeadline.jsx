@@ -9,12 +9,12 @@ import Star from '../shared/Star.jsx';
 class RepoBuildHeadline extends Component {
     
   render() {
-    if (this.props.loading) {
+    if (this.props.loading || this.props.currentRepoBuild === undefined) {
       return null;
     }
     
     const {stars, params, currentRepoBuild} = this.props;
-    const build = currentRepoBuild.toJS();
+    console.log(currentRepoBuild);
 
     return (
       <Headline>
@@ -25,7 +25,7 @@ class RepoBuildHeadline extends Component {
         />
         {params.repo}
         <HeadlineDetail>
-          - {params.branch} build #{build.buildNumber}
+          - {params.branch} build #{currentRepoBuild.buildNumber}
         </HeadlineDetail>
       </Headline>
     )
