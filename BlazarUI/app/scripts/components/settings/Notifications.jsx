@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {Button} from 'react-bootstrap';
 import {bindAll} from 'underscore';
 import $ from 'jquery';
+import classNames from 'classnames';
 
 import NotificationsHeadline from './NotificationsHeadline.jsx';
 import NotificationsChannels from './NotificationsChannels.jsx';
@@ -72,9 +73,14 @@ class Notifications extends Component {
   }
 
   renderButton() {
+    const buttonClasses = classNames([
+      'notifications__channel-button',
+      this.state.addingNewChannel ? ' disabled' : ''
+    ]);
+
     return (
       <Button 
-        className='notifications__channel-button' 
+        className={buttonClasses}
         onClick={this.onButtonClick} 
         bsStyle='primary'>
         Add New Channel
