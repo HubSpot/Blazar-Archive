@@ -332,7 +332,7 @@ class BuildApi {
 
     sizePromise.fail((err) => {
       console.warn('Error requesting log size. ', err);
-      this._buildError('Error accessing build log, or log does not exist. View console for more detail');
+      this._buildError('Error accessing build log, or log does not exist (build was not succesfully started). Manually rebuilding is safe, see #Platform-Support if problem persists.');
     });
 
     return sizePromise;
