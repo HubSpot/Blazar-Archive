@@ -1,68 +1,72 @@
-//
-// Holds individual modules builds triggered by a Repo Build
-//
 import Reflux from 'reflux';
+
 import RepoBuildActions from '../actions/repoBuildActions';
 import RepoBuildApi from '../data/RepoBuildApi';
+import ActiveBuildStates from '../constants/ActiveBuildStates';
+
+import { buildIsInactive } from '../components/Helpers';
 
 const RepoBuildStore = Reflux.createStore({
 
   listenables: RepoBuildActions,
 
-  getModuleBuilds() {
-    return this.builds;
-  },
-  
-  onStopPolling() {
-    if (this.api) {
-      this.api.stopPolling();  
-    }
-  },
-  
-  onCancelBuild() {
-    this.api.cancelBuild();
+  init() {  
+    this.repoBuild = {};
+    this.moduleBuilds = [];
+    this.shouldPoll = true;
   },
 
-  onLoadMalformedFiles() {
-    this.api.getMalformedFiles((resp) => {
-      this.triggerMalformedFileUpdate(resp);
+  onLoadRepoBuild(params) {
+    this.params = params;
+
+    RepoBuildApi.fetchRepoBuild(params, (resp) => {
+      this.repoBuild = resp;
+
+      if (buildIsInactive(this.repoBuild.state)) {
+        this.shouldPoll = false;
+      }
+
+      this.trigger({
+        currentRepoBuild: this.repoBuild,
+        loadingRepoBuild: false
+      });
     });
   },
 
   onLoadModuleBuilds(params) {
-    this.api = new RepoBuildApi(params);
-    
-    this.api.startPolling((err, resp) => {
-      if (err) {
-        this.trigger({
-          loadingModuleBuilds: false,
-          error: {
-            status: err.status,
-            statusText: err.statusText
-          }
-        });
-        return;
-      }
+    this.params = params;
 
-      this.builds = resp;
-      this.triggerUpdate();
-    });    
-  },
-  
-  triggerUpdate() {
-    this.trigger({
-      moduleBuilds: this.builds.moduleBuilds,
-      currentRepoBuild: this.builds.currentRepoBuild,
-      branchId: this.builds.branchId,
-      loadingModuleBuilds: false
+    RepoBuildApi.fetchModuleBuilds(params, (resp) => {
+      this.moduleBuilds = resp;
+
+      this.trigger({
+        moduleBuilds: this.moduleBuilds,
+        loadingModuleBuilds: false
+      });
     });
   },
-  
-  triggerMalformedFileUpdate(resp) {
-    this.trigger({
-      malformedFiles: resp,
-      loadingMalformedFiles: false
-    });
+
+  onStartPolling(params) {
+    this.params = params;
+    this.shouldPoll = true;
+    this._poll();
+  },
+
+  onStopPolling() {
+    this.shouldPoll = false;
+  },
+
+  onCancelBuild(params) {
+    RepoBuildApi.cancelBuild(params);
+  },
+
+  _poll() {
+    this.onLoadModuleBuilds(this.params);
+    this.onLoadRepoBuild(this.params);
+
+    if (this.shouldPoll) {
+      setTimeout(this._poll, config.activeBuildModuleRefresh);
+    }
   }
 
 });

@@ -19,8 +19,8 @@ import Immutable from 'immutable';
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
 
-import NewBranchStore from '../../stores/newBranchStore';
-import NewBranchActions from '../../actions/newBranchActions';
+import BranchStore from '../../stores/branchStore';
+import BranchActions from '../../actions/branchActions';
 
 import {getPreviousBuildState} from '../Helpers.js';
 
@@ -67,18 +67,18 @@ class BranchContainer extends Component {
   }
     
   setup(params) {
-    this.unsubscribeFromBranch = NewBranchStore.listen(this.onStatusChange);
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
-    NewBranchActions.loadBranchBuildHistory(params);
-    NewBranchActions.loadBranchInfo(params);
-    NewBranchActions.loadBranchModules(params);
-    NewBranchActions.loadBranchMalformedFiles(params);
-    NewBranchActions.startPolling(params);
+    BranchActions.loadBranchBuildHistory(params);
+    BranchActions.loadBranchInfo(params);
+    BranchActions.loadBranchModules(params);
+    BranchActions.loadMalformedFiles(params);
+    BranchActions.startPolling(params);
   }
   
   tearDown() {
-    NewBranchActions.stopPolling();
+    BranchActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
   }
@@ -108,7 +108,7 @@ class BranchContainer extends Component {
   }
 
   triggerBuild() {
-    BranchActions.triggerBuild(this.state.selectedModules, this.state.buildDownstreamModules);
+    BranchActions.triggerBuild(this.props.params, this.state.selectedModules, this.state.buildDownstreamModules);
   }
   
   renderTable() {

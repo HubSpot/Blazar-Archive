@@ -9,11 +9,11 @@ import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
 
-import NewRepoBuildStore from '../../stores/newRepoBuildStore';
-import NewRepoBuildActions from '../../actions/newRepoBuildActions';
+import RepoBuildStore from '../../stores/repoBuildStore';
+import RepoBuildActions from '../../actions/repoBuildActions';
 
-import NewBranchStore from '../../stores/newBranchStore';
-import NewBranchActions from '../../actions/newBranchActions';
+import BranchStore from '../../stores/branchStore';
+import BranchActions from '../../actions/branchActions';
 
 import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
@@ -38,7 +38,7 @@ class RepoBuildContainer extends Component {
     super(props);
     this.state = initialState;
 
-    bindAll(this, 'onStatusChange')
+    bindAll(this, 'onStatusChange', 'triggerCancelBuild')
   }
   
   componentDidMount() {
@@ -57,18 +57,18 @@ class RepoBuildContainer extends Component {
   
   setup(params) { 
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
-    this.unsubscribeFromRepoBuild = NewRepoBuildStore.listen(this.onStatusChange);
-    this.unsubscribeFromBranch = NewBranchStore.listen(this.onStatusChange);
+    this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
-    NewRepoBuildActions.loadModuleBuilds(params);
-    NewRepoBuildActions.loadRepoBuild(params);
-    NewRepoBuildActions.startPolling(params);
-    NewBranchActions.loadBranchInfo(params);
-    //RepoBuildActions.loadMalformedFiles();
+    RepoBuildActions.loadModuleBuilds(params);
+    RepoBuildActions.loadRepoBuild(params);
+    RepoBuildActions.startPolling(params);
+    BranchActions.loadBranchInfo(params);
+    BranchActions.loadMalformedFiles(params);
   }
 
   tearDown() {
-    NewRepoBuildActions.stopPolling();
+    RepoBuildActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromRepoBuild();
     this.unsubscribeFromBranch();
@@ -78,13 +78,8 @@ class RepoBuildContainer extends Component {
     this.setState(state);
   }
   
-  // to do
   triggerCancelBuild() {
-    //RepoBuildActions.cancelBuild();
-  }
-  
-  triggerBuild() {
-    //RepoBuildActions.triggerBuild();
+    RepoBuildActions.cancelBuild(this.props.params);
   }
 
   renderSectionContent() {

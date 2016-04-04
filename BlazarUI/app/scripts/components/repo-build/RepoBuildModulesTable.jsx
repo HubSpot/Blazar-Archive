@@ -7,15 +7,15 @@ import Loader from '../shared/Loader.jsx';
 class RepoBuildModulesTable extends Component {
 
   sortModules() {
-    if (!this.props.currentRepoBuild || !this.props.currentRepoBuilddependencyGraph || !this.props.currentRepoBuild.dependencyGraph.topologicalSort) {
+    if (!this.props.currentRepoBuild || !this.props.currentRepoBuild.dependencyGraph || !this.props.currentRepoBuild.dependencyGraph.topologicalSort) {
       return this.props.data;
     }
 
     const topologicalSort = this.props.currentRepoBuild.dependencyGraph.topologicalSort;
 
     return this.props.data.sort((a, b) => {
-      let indexA = topologicalSort.indexOf(a.id);
-      let indexB = topologicalSort.indexOf(b.id);
+      let indexA = topologicalSort.indexOf(a.moduleId);
+      let indexB = topologicalSort.indexOf(b.moduleId);
 
       if (indexA < indexB) {
         return -1;

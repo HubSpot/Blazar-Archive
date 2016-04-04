@@ -52,14 +52,37 @@ function fetchBranchModules(params, cb) {
   });
 }
 
-function fetchBranchMalformedFiles(params, cb) {
-  const branchMalformedFilesPromise = new Resource({
+function fetchMalformedFiles(params, cb) {
+  const malformedFilesPromise = new Resource({
     url: `${config.apiRoot}/branches/${params.branchId}/malformedFiles`,
     type: 'GET'
   }).send();
 
-  branchMalformedFilesPromise.then((resp) => {
+  malformedFilesPromise.then((resp) => {
     cb(resp);
+  });
+}
+
+function _generateBuildModuleJsonBody(moduleIds, downstreamModules) {
+  return JSON.stringify({
+    moduleIds: moduleIds, 
+    buildDownstreams: downstreamModules
+  });
+}
+
+function triggerBuild(params, moduleIds, downstreamModules, cb) {
+  const buildPromise = new Resource({
+    url: `${config.apiRoot}/branches/builds/branch/${params.branchId}`,
+    type: 'POST',
+    contentType: 'application/json',
+    data: _generateBuildModuleJsonBody(moduleIds, downstreamModules)
+  }).send();
+
+  buildPromise.then((resp) => {
+    cb(false, resp);
+  }, (error) => {
+    console.warn(error);
+    cb('Error triggering build. Check your console for more detail.');
   });
 }
 
@@ -67,5 +90,6 @@ export default {
   fetchBranchBuildHistory: fetchBranchBuildHistory,
   fetchBranchInfo: fetchBranchInfo,
   fetchBranchModules: fetchBranchModules,
-  fetchBranchMalformedFiles: fetchBranchMalformedFiles
+  fetchMalformedFiles: fetchMalformedFiles,
+  triggerBuild: triggerBuild
 };

@@ -1,11 +1,14 @@
+/*global config*/
 import Reflux from 'reflux';
 
 const BranchActions = Reflux.createActions([
-  'loadBranchBuilds',
+  'loadBranchBuildHistory',
+  'loadBranchInfo',
+  'loadBranchModules',
+  'loadMalformedFiles',
+  'startPolling',
   'stopPolling',
-  'triggerBuild',
-  'loadModules',
-  'loadMalformedFiles'
+  'triggerBuild'
 ]);
 
 export default BranchActions;

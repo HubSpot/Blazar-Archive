@@ -1,75 +1,84 @@
+/*global config*/
 import Reflux from 'reflux';
 import BranchActions from '../actions/branchActions';
-import BranchBuildsApi from '../data/BranchBuildsApi';
-import Immutable from 'immutable';
+import BranchApi from '../data/BranchApi';
 
 const BranchStore = Reflux.createStore({
 
   listenables: BranchActions,
 
+  init() {  
+    this.branchBuildHistory = [];
+    this.shouldPoll = true;
+  },
+
+  onLoadBranchBuildHistory(params) {
+    this.params = params;
+
+    BranchApi.fetchBranchBuildHistory(params, (resp) => {
+      this.branchBuildHistory = resp;
+
+      this.trigger({
+        builds: this.branchBuildHistory,
+        loadingBranches: false
+      });
+    });
+  },
+
+  onLoadBranchInfo(params) {
+    this.params = params;
+
+    BranchApi.fetchBranchInfo(params, (resp) => {
+      this.branchInfo = resp;
+
+      this.trigger({
+        branchInfo: this.branchInfo
+      });
+    });
+  },
+
+  onLoadBranchModules(params) {
+    this.params = params;
+
+    BranchApi.fetchBranchModules(params, (resp) => {
+      this.modules = resp;
+
+      this.trigger({
+        modules: this.modules,
+        loadingModules: false
+      });
+    });
+  },
+
+  onLoadMalformedFiles(params) {
+    this.params = params;
+
+    BranchApi.fetchMalformedFiles(params, (resp) => {
+      this.malformedFiles = resp;
+
+      this.trigger({
+        malformedFiles: this.malformedFiles,
+        loadingMalformedFiles: false
+      });
+    });
+  },
+
+  onStartPolling(params) {
+    this.params = params;
+    this.shouldPoll = true;
+    this._poll();
+  },
+
   onStopPolling() {
-    if (this.branchBuildsApi) {
-      this.branchBuildsApi.stopPollingBuilds();
-      this.branchBuildsApi = undefined;  
-    }
+    this.shouldPoll = false;
   },
 
-  onLoadModules() {
-    this.branchBuildsApi.getModuleForBranch((resp) => {
-      this.triggerModuleUpdate(resp);
-    });
-  },
-
-  onLoadMalformedFiles() {
-    this.branchBuildsApi.getMalformedFiles((resp) => {
-      this.triggerMalformedFileUpdate(resp);
-    });
-  },
-
-  onLoadBranchBuilds(params) {
-    this.branchBuildsApi = new BranchBuildsApi({
-      params: params
-    });
-
-    this.branchBuildsApi.fetchBuilds((error, resp) => {
+  onTriggerBuild(params, moduleIds, downstreamModules) {
+    BranchApi.triggerBuild(params, moduleIds, downstreamModules, (error, resp) => {
       if (error) {
         this.error = error;
         return this.triggerErrorUpdate();
       }
-
-      this.data = resp;
-      this.triggerUpdate();
-    });
-  },
-
-  onTriggerBuild(moduleIds, downstreamModules) {
-    this.branchBuildsApi.triggerBuild(moduleIds, downstreamModules, (error, resp) => {
-      if (error) {
-        this.error = error;
-        return this.triggerErrorUpdate();
-      }
-    });
-  },
-
-  triggerUpdate() {
-    this.trigger({
-      builds: this.data.builds,
-      branchId: this.data.branchId,
-      loadingBranches: false  
-    });
-  },
-
-  triggerModuleUpdate(resp) {
-    this.trigger({
-      modules: Immutable.fromJS(resp),
-      loadingModules: false
-    });
-  },
-
-  triggerMalformedFileUpdate(resp) {
-    this.trigger({
-      malformedFiles: resp,
-      loadingMalformedFiles: false
     });
   },
 
@@ -80,8 +89,16 @@ const BranchStore = Reflux.createStore({
     });
 
     this.error = undefined;
+  },
+
+  _poll() {
+    this.onLoadBranchBuildHistory(this.params);
+
+    if (this.shouldPoll) {
+      setTimeout(this._poll, config.buildsRefresh);
+    }
   }
 
 });
-  
+
 export default BranchStore;
