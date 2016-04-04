@@ -16,10 +16,12 @@ import NotFound from './pages/notFound.jsx';
 const routes = (
   <Route name='app' path='/' component={App}>
     <IndexRoute name='dashboard' component={ Dashboard } />
-    <Route name='branch' path='/builds/branch/:branchId' component={Branch} />
-    <Route name='settings' path='/settings/branch/:branchId' component={Settings} />
-    <Route name='repoBuild' path='/builds/branch/:branchId/build/:buildNumber' component={RepoBuild} />
-    <Route name='build' path='/builds/branch/:branchId/build/:buildNumber/module/:moduleName' component={Build} />
+    <Route name='host' path='/builds/org/:org' component={ Org } />
+    <Route name='repo' path='/builds/repo/:repo' component={ Repo } />
+    <Route name='branch' path='/builds/branch/:branchId' component={ Branch } />
+    <Route name='settings' path='/settings/branch/:branchId' component={ Settings } />
+    <Route name='repoBuild' path='/builds/branch/:branchId/build/:buildNumber' component={ RepoBuild } />
+    <Route name='build' path='/builds/branch/:branchId/build/:buildNumber/module/:moduleName' component={ Build } />
     <Route name='notFound' path="*" component={ NotFound } />
   </Route>
 );

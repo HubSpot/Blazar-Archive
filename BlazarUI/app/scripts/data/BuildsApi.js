@@ -32,18 +32,17 @@ function _parse(data) {
     } = item;
 
     if (has(item, 'inProgressBuild')) {
-      item.inProgressBuild.blazarPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${encodeURIComponent(gitInfo.branch)}/${inProgressBuild.buildNumber}`;
       item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true});
+      item.inProgressBuild.blazarPath = `/builds/branch/${gitInfo.id}/build/${inProgressBuild.buildNumber}`;
     }
 
     if (has(item, 'lastBuild')) {
       item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true});
-      item.lastBuild.blazarPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${encodeURIComponent(gitInfo.branch)}/${lastBuild.buildNumber}`;
+      item.lastBuild.blazarPath = `/builds/branch/${gitInfo.id}/build/${lastBuild.buildNumber}`;
     }
 
-    item.gitInfo.blazarRepositoryPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}`;
-    item.gitInfo.blazarBranchPath = `/builds/${gitInfo.host}/${gitInfo.organization}/${gitInfo.repository}/${encodeURIComponent(gitInfo.branch)}`;
-    item.gitInfo.blazarHostPath = `/builds/${gitInfo.host}`;
+    item.gitInfo.blazarRepositoryPath = `/builds/repo/${gitInfo.repository}`;
+    item.gitInfo.blazarBranchPath = `/builds/branch/${gitInfo.id}`;
 
     return item;
   });

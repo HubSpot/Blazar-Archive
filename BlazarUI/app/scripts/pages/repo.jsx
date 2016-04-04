@@ -9,6 +9,7 @@ class Repo extends Component {
   }
 
   render() {
+    console.log("at the page");
     return (
       <div>
         <HeaderContainer 
