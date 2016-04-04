@@ -7,11 +7,11 @@ import Loader from '../shared/Loader.jsx';
 class RepoBuildModulesTable extends Component {
 
   sortModules() {
-    if (!this.props.currentRepoBuild || !this.props.currentRepoBuild.get('dependencyGraph') || !this.props.currentRepoBuild.get('dependencyGraph').get('topologicalSort')) {
+    if (!this.props.currentRepoBuild || !this.props.currentRepoBuilddependencyGraph || !this.props.currentRepoBuild.dependencyGraph.topologicalSort) {
       return this.props.data;
     }
 
-    const topologicalSort = this.props.currentRepoBuild.get('dependencyGraph').get('topologicalSort').toJS();
+    const topologicalSort = this.props.currentRepoBuild.dependencyGraph.topologicalSort;
 
     return this.props.data.sort((a, b) => {
       let indexA = topologicalSort.indexOf(a.id);

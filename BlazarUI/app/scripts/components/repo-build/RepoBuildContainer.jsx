@@ -12,6 +12,9 @@ import StarActions from '../../actions/starActions';
 import NewRepoBuildStore from '../../stores/newRepoBuildStore';
 import NewRepoBuildActions from '../../actions/newRepoBuildActions';
 
+import NewBranchStore from '../../stores/newBranchStore';
+import NewBranchActions from '../../actions/newBranchActions';
+
 import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
 import RepoBuildDetail from './RepoBuildDetail.jsx';
@@ -25,7 +28,8 @@ let initialState = {
   malformedFiles: [],
   loadingMalformedFiles: true,
   loadingModuleBuilds: true,
-  loadingStars: true
+  loadingStars: true,
+  branchInfo: {}
 };
 
 class RepoBuildContainer extends Component {
@@ -54,9 +58,11 @@ class RepoBuildContainer extends Component {
   setup(params) { 
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     this.unsubscribeFromRepoBuild = NewRepoBuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromBranch = NewBranchStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
     NewRepoBuildActions.loadModuleBuilds(params);
     NewRepoBuildActions.loadRepoBuild(params);
+    NewBranchActions.loadBranchInfo(params);
     //RepoBuildActions.loadMalformedFiles();
   }
 
@@ -64,6 +70,7 @@ class RepoBuildContainer extends Component {
     //NewRepoBuildActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromRepoBuild();
+    this.unsubscribeFromBranch();
   }
   
   onStatusChange(state) {
@@ -126,6 +133,7 @@ class RepoBuildContainer extends Component {
             <RepoBuildHeadline
               {...this.props}
               {...this.state}
+              branchInfo={this.state.branchInfo}
               loading={this.state.loadingStars || this.state.loadingModuleBuilds}
             />
           </UIGridItem>

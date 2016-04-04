@@ -13,19 +13,19 @@ class RepoBuildHeadline extends Component {
       return null;
     }
     
-    const {stars, params, currentRepoBuild} = this.props;
-    console.log(currentRepoBuild);
+    const {stars, params, currentRepoBuild, branchInfo} = this.props;
+    const branchId = parseInt(params.branchId, 10);
 
     return (
       <Headline>
         <Star
           className='icon-roomy'
-          isStarred={contains(stars, this.props.branchId)}
-          id={this.props.branchId}
+          isStarred={contains(stars, branchId)}
+          id={branchId}
         />
-        {params.repo}
+        {branchInfo.repository}
         <HeadlineDetail>
-          - {params.branch} build #{currentRepoBuild.buildNumber}
+          - {branchInfo.branch} build #{currentRepoBuild.buildNumber}
         </HeadlineDetail>
       </Headline>
     )
@@ -34,8 +34,8 @@ class RepoBuildHeadline extends Component {
 
 RepoBuildHeadline.propTypes = {
   params: PropTypes.object.isRequired,
-  branchId: PropTypes.number,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  branchInfo: PropTypes.object.isRequired
 };
 
 export default RepoBuildHeadline;

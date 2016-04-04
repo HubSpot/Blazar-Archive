@@ -1,6 +1,7 @@
 /*global config*/
 import Resource from '../services/ResourceProvider';
-import { findWhere } from 'underscore';
+import Q from 'q';
+import { findWhere, map, extend } from 'underscore';
 
 function _fetchModuleNames(params) {
   const moduleNamesPromise = new Resource({
@@ -41,29 +42,22 @@ function fetchModuleBuilds(params, cb) {
       url: `${config.apiRoot}/branches/builds/${repoBuild.id}/modules`,
       type: 'GET'
     }).send();
+    const moduleInfoPromise = _fetchModuleNames(params);
 
-    return moduleBuildsPromise.then((resp) => {
-      console.log(resp);
-      return cb(resp);
-    });
-  })
-}
+    Q.spread([moduleInfoPromise, moduleBuildsPromise],
+      (moduleInfos, moduleBuilds) => {
+        const moduleBuildsWithNames = map(moduleBuilds, (build) => {
+          const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
+          const moduleInfoExtended = {
+            name: moduleInfo.name,
+            blazarPath: `${config.appRoot}/builds/branch/${params.branchId}/build/${params.buildNumber}/module/${moduleInfo.name}`
+          };
 
-function fetchModuleBuilds(params, cb) {
-  return _fetchBranchBuildHistory(params).then((resp) => {
-    const repoBuild = findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
-    const moduleBuildsPromise = new Resource({
-      url: `${config.apiRoot}/branches/builds/${repoBuild.id}/modules`,
-      type: 'GET'
-    }).send();
+          return extend(build, moduleInfoExtended);
+        });
 
-    _fetchModuleNames(params).then((resp) => {
-      console.log("modules: ", resp);
-    });
-
-    return moduleBuildsPromise.then((resp) => {
-      return cb(resp);
-    });
+        cb(moduleBuildsWithNames);
+      });
   })
 }
 
