@@ -2,6 +2,15 @@
 import Resource from '../services/ResourceProvider';
 import Q from 'q';
 import { findWhere, map, extend } from 'underscore';
+import humanizeDuration from 'humanize-duration';
+
+function _parse(resp) {
+  if (resp.startTimestamp && resp.endTimestamp) {
+    resp.duration = humanizeDuration(resp.endTimestamp - resp.startTimestamp, {round: true});
+  }
+  
+  return resp;
+}
 
 function _fetchModuleNames(params) {
   const moduleNamesPromise = new Resource({
@@ -30,7 +39,7 @@ function fetchRepoBuild(params, cb) {
     }).send();
 
     return repoBuildPromise.then((resp) => {
-      return cb(resp);
+      return cb(_parse(resp));
     });
   });
 }

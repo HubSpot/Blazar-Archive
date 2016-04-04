@@ -19,7 +19,7 @@ const routes = (
     <Route name='branch' path='/builds/branch/:branchId' component={Branch} />
     <Route name='settings' path='/settings/branch/:branchId' component={Settings} />
     <Route name='repoBuild' path='/builds/branch/:branchId/build/:buildNumber' component={RepoBuild} />
-    <Route name='build' path='/builds/:host/:org/:repo/:branch/:buildNumber/:moduleName' component={Build} />
+    <Route name='build' path='/builds/branch/:branchId/build/:buildNumber/module/:moduleName' component={Build} />
     <Route name='notFound' path="*" component={ NotFound } />
   </Route>
 );

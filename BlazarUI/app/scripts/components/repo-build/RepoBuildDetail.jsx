@@ -112,7 +112,7 @@ class RepoBuildDetail extends Component {
       const conjunction = build.state === BuildStates.CANCELLED ? 'after' : 'in';
 
       buildDetail.duration = (
-        <span>{conjunction} {build.duration}</span>
+        <span className='build-detail-header__timestamp'>{conjunction} {build.duration}</span>
       );
     } 
 
@@ -127,7 +127,7 @@ class RepoBuildDetail extends Component {
         <div className={this.getWrapperClassNames(build)}>
           <p className='build-detail-header__build-state'>
             Build {buildDetail.buildResult} 
-            <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
+            {buildDetail.duration}
           </p>
           <RepoBuildCancelButton 
             params={this.props.params}
