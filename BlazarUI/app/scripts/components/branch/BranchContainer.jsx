@@ -74,10 +74,11 @@ class BranchContainer extends Component {
     NewBranchActions.loadBranchInfo(params);
     NewBranchActions.loadBranchModules(params);
     NewBranchActions.loadBranchMalformedFiles(params);
+    NewBranchActions.startPolling(params);
   }
   
   tearDown() {
-    //BranchActions.stopPolling();
+    NewBranchActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
   }

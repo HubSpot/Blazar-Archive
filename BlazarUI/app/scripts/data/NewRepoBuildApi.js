@@ -8,7 +8,7 @@ function _parse(resp) {
   if (resp.startTimestamp && resp.endTimestamp) {
     resp.duration = humanizeDuration(resp.endTimestamp - resp.startTimestamp, {round: true});
   }
-  
+
   return resp;
 }
 
@@ -67,7 +67,7 @@ function fetchModuleBuilds(params, cb) {
 
         cb(moduleBuildsWithNames);
       });
-  })
+  });
 }
 
 export default {

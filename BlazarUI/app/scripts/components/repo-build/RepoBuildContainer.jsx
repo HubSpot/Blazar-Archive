@@ -62,12 +62,13 @@ class RepoBuildContainer extends Component {
     StarActions.loadStars('repoBuildContainer');
     NewRepoBuildActions.loadModuleBuilds(params);
     NewRepoBuildActions.loadRepoBuild(params);
+    NewRepoBuildActions.startPolling(params);
     NewBranchActions.loadBranchInfo(params);
     //RepoBuildActions.loadMalformedFiles();
   }
 
   tearDown() {
-    //NewRepoBuildActions.stopPolling();
+    NewRepoBuildActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromRepoBuild();
     this.unsubscribeFromBranch();

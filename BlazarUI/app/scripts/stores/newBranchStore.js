@@ -8,6 +8,7 @@ const NewBranchStore = Reflux.createStore({
 
   init() {  
     this.branchBuildHistory = [];
+    this.shouldPoll = true;
   },
 
   onLoadBranchBuildHistory(params) {
@@ -59,6 +60,24 @@ const NewBranchStore = Reflux.createStore({
         loadingMalformedFiles: false
       });
     });
+  },
+
+  onStartPolling(params) {
+    this.params = params;
+    this.shouldPoll = true;
+    this._poll();
+  },
+
+  onStopPolling() {
+    this.shouldPoll = false;
+  },
+
+  _poll() {
+    this.onLoadBranchBuildHistory(this.params);
+
+    if (this.shouldPoll) {
+      setTimeout(this._poll, 5000); // TODO: replace with config var
+    }
   }
 
 });
