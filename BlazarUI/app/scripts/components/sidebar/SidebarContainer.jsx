@@ -10,6 +10,7 @@ import SidebarRepoList from './SidebarRepoList.jsx';
 import SidebarMessage from './SidebarMessage.jsx';
 import Loader from '../shared/Loader.jsx';
 import AjaxErrorAlert from '../shared/AjaxErrorAlert.jsx';
+import Logo from '../shared/Logo.jsx';
 
 import StarStore from '../../stores/starStore';
 import BuildsStore from '../../stores/buildsStore';
@@ -21,7 +22,7 @@ import {sidebarCombine, getFilterMatches} from '../../utils/buildsHelpers';
 
 // $('.sidebar__filter') is inaccessible at render time,
 // so use this default until the window is resized
-const defaultSidebarFilterHeight = 79;
+const defaultSidebarFilterHeight = 95;
 
 class SidebarContainer extends Component {
 
@@ -69,7 +70,8 @@ class SidebarContainer extends Component {
   
   getSidebarHeight() {
     let filterHeight = $('.sidebar__filter').height() || defaultSidebarFilterHeight;
-    return $(window).height() - filterHeight;
+    let logoHeight = $('.sidebar__logo').height() || 45;
+    return $(window).height() - filterHeight - logoHeight;
   }
 
   onStoreChange(state) {
@@ -125,7 +127,10 @@ class SidebarContainer extends Component {
 
     return (
       <Sidebar>
-        <div className="sidebar__filter">
+        <div className='sidebar__logo'>
+          <Logo crumb={false} />
+        </div>
+        <div className='sidebar__filter'>
           <SidebarFilter
             {...this.state}
             updateResults={this.updateResults}
