@@ -30,7 +30,7 @@ public class CCTrayProjectFactory implements Function<RepositoryState, Optional<
 
   @Override
   public Optional<CCTrayProject> apply(@Nullable RepositoryState repositoryState) {
-    if (repositoryState == null || !repositoryState.getLastBuild().isPresent()) {
+    if (repositoryState == null || !repositoryState.getGitInfo().isActive() || !repositoryState.getLastBuild().isPresent()) {
       return Optional.absent();
     }
 

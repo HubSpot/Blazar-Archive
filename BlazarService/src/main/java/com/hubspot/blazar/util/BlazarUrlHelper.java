@@ -10,7 +10,6 @@ import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
-import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 
@@ -18,18 +17,14 @@ import java.net.URI;
 
 @Singleton
 public class BlazarUrlHelper {
-
-  private final BranchService branchService;
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleService moduleService;
   private final UiConfiguration uiConfiguration;
 
   @Inject
-  public BlazarUrlHelper(BranchService branchService,
-                         RepositoryBuildService repositoryBuildService,
+  public BlazarUrlHelper(RepositoryBuildService repositoryBuildService,
                          ModuleService moduleService,
                          BlazarConfiguration configuration) {
-    this.branchService = branchService;
     this.repositoryBuildService = repositoryBuildService;
     this.moduleService = moduleService;
 
@@ -37,31 +32,32 @@ public class BlazarUrlHelper {
   }
 
   public URI getBlazarUiLink(GitInfo gitInfo) {
-    return UriBuilder.fromUri(uiConfiguration.getBaseUrl())
-        .segment("builds")
-        .segment(gitInfo.getHost())
-        .segment(gitInfo.getOrganization())
-        .segment(gitInfo.getRepository())
-        .segment(gitInfo.getBranch())
-        .build();
+    return getBlazarUiLink(gitInfo.getId().get());
   }
 
   public String getBlazarUiLink(RepositoryBuild build) {
-    GitInfo gitInfo = branchService.get(build.getBranchId()).get();
-    return UriBuilder.fromUri(getBlazarUiLink(gitInfo))
-        .segment(String.valueOf(build.getBuildNumber()))
+    return UriBuilder.fromUri(getBlazarUiLink(build.getBranchId()))
+        .segment("build")
+        .segment(Integer.toString(build.getBuildNumber()))
         .build()
         .toString();
   }
 
   public String getBlazarUiLink(ModuleBuild build) {
     RepositoryBuild repoBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
-    GitInfo gitInfo = branchService.get(repoBuild.getBranchId()).get();
     Module module = moduleService.get(build.getModuleId()).get();
-    return UriBuilder.fromUri(getBlazarUiLink(gitInfo))
-        .segment(String.valueOf(repoBuild.getBuildNumber()))
+    return UriBuilder.fromUri(getBlazarUiLink(repoBuild))
+        .segment("module")
         .segment(module.getName())
         .build()
         .toString();
+  }
+
+  private URI getBlazarUiLink(int branchId) {
+    return UriBuilder.fromUri(uiConfiguration.getBaseUrl())
+        .segment("builds")
+        .segment("branch")
+        .segment(Integer.toString(branchId))
+        .build();
   }
 }
