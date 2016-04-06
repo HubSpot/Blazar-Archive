@@ -182,7 +182,7 @@ class BranchContainer extends Component {
               {...this.props}
             />
           </UIGridItem>
-          <UIGridItem size={6} align='RIGHT'>
+          <UIGridItem style={{'paddingTop': '10px'}} size={6} align='RIGHT'>
             <BuildButton 
               openModuleModal={this.openModuleModal}
               loading={this.state.loadingBranches}
