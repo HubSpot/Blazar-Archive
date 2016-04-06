@@ -110,7 +110,15 @@ public class RepositoryBuildService {
     Preconditions.checkArgument(build.getStartTimestamp().isPresent());
 
     checkAffectedRowCount(repositoryBuildDao.begin(build));
-    checkAffectedRowCount(branchDao.updateInProgressBuild(build));
+    // need to move the next queued build into the pending slot
+    Optional<RepositoryBuild> nextQueuedBuild = nextQueuedBuild(build.getBranchId());
+    if (nextQueuedBuild.isPresent()) {
+      checkAffectedRowCount(branchDao.updateInProgressBuild(build, nextQueuedBuild.get()));
+
+      eventBus.post(nextQueuedBuild.get());
+    } else {
+      checkAffectedRowCount(branchDao.updateInProgressBuild(build));
+    }
   }
 
   @Transactional

@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {Button} from 'react-bootstrap';
 import {bindAll} from 'underscore';
 import $ from 'jquery';
+import classNames from 'classnames';
 
 import NotificationsHeadline from './NotificationsHeadline.jsx';
 import NotificationsChannels from './NotificationsChannels.jsx';
@@ -71,6 +72,22 @@ class Notifications extends Component {
     // you can use this information
   }
 
+  renderButton() {
+    const buttonClasses = classNames([
+      'notifications__channel-button',
+      this.state.addingNewChannel ? ' disabled' : ''
+    ]);
+
+    return (
+      <Button 
+        className={buttonClasses}
+        onClick={this.onButtonClick} 
+        bsStyle='primary'>
+        Add New Channel
+      </Button>
+    )
+  }
+
   render() {
     return (
       <div className='notifications'>
@@ -86,7 +103,6 @@ class Notifications extends Component {
         </UIGrid>
         <UIGrid className='notifications__grid'>
           <UIGridItem size={4} className='notifications__channel-list'>
-
             <NotificationsChannels
               selectedChannel={this.state.selectedChannel}
               addingNewChannel={this.state.addingNewChannel}
@@ -95,7 +111,6 @@ class Notifications extends Component {
               onChannelDelete={this.onChannelDelete}
               {...this.props}
             />
-            <Button className='notifications__channel-button' onClick={this.onButtonClick} bsStyle='primary'>Add New Channel</Button>
           </UIGridItem>
           <UIGridItem size={8}>
             <NotificationsList
@@ -105,6 +120,9 @@ class Notifications extends Component {
           </UIGridItem>
         </UIGrid>
         <UIGrid className='notifications__grid'>
+          <UIGridItem size={4}>
+            {this.renderButton()}
+          </UIGridItem>
           <UIGridItem size={8}>
           </UIGridItem>
         </UIGrid>

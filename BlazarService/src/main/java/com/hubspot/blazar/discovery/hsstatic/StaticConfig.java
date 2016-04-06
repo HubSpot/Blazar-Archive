@@ -8,6 +8,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
@@ -17,19 +18,17 @@ public class StaticConfig {
 
   private final String name;
   private final int majorVersion;
-  private final boolean isCurrentVersion;
   private Map<String, Integer> runtimeDeps;
   private final Map<String, Integer> deps;
 
   @JsonCreator
   public StaticConfig(@JsonProperty("name") String name,
-                      @JsonProperty("majorVersion") int majorVersion,
-                      @JsonProperty("isCurrentVersion") boolean isCurrentVersion,
+                      @JsonProperty("majorVersion") Optional<Integer> majorVersionCamel,
+                      @JsonProperty("major_version") Optional<Integer> majorVersionUnderscore,
                       @JsonProperty("runtimeDeps") Map<String, String> runtimeDeps,
                       @JsonProperty("deps") Map<String, String> deps) {
     this.name = name;
-    this.majorVersion = majorVersion;
-    this.isCurrentVersion = isCurrentVersion;
+    this.majorVersion = majorVersionCamel.or(majorVersionUnderscore).or(1);
     this.runtimeDeps = parseMajorVersions(runtimeDeps);
     this.deps = parseMajorVersions(deps);
   }
@@ -40,10 +39,6 @@ public class StaticConfig {
 
   public int getMajorVersion() {
     return majorVersion;
-  }
-
-  public boolean isCurrentVersion() {
-    return isCurrentVersion;
   }
 
   public Map<String, Integer> getRuntimeDeps() {
