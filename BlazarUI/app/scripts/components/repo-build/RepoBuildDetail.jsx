@@ -54,7 +54,7 @@ class RepoBuildDetail extends Component {
 
   renderCommits() {
     const {currentRepoBuild} = this.props;
-    const build = currentRepoBuild.toJS();
+    const build = currentRepoBuild;
 
     if (!has(build, 'commitInfo')) {
       return null;
@@ -78,7 +78,7 @@ class RepoBuildDetail extends Component {
   render() {
     const {currentRepoBuild} = this.props
 
-    if (this.props.error) {
+    if (this.props.error || this.props.currentRepoBuild === undefined) {
       return null;
     }
   
@@ -90,7 +90,7 @@ class RepoBuildDetail extends Component {
       );
     }
     
-    const build = this.props.currentRepoBuild.toJS();
+    const build = this.props.currentRepoBuild;
 
     const gitInfo = {
       host: this.props.params.host,
@@ -111,15 +111,11 @@ class RepoBuildDetail extends Component {
       buildDetail.endtime = timestampFormatted(build.endTimestamp)
       const conjunction = build.state === BuildStates.CANCELLED ? 'after' : 'in';
 
-      buildDetail.duration = (
-        <span>{conjunction} {build.duration}</span>
-      );
+      buildDetail.duration = `${conjunction} ${build.duration}`;
     } 
 
     else if (build.state === BuildStates.IN_PROGRESS) {
-      buildDetail.duration = (
-        <span>started {timestampFormatted(build.startTimestamp)}</span>
-      );
+      buildDetail.duration = `started ${timestampFormatted(build.startTimestamp)}`;
     }
 
     return (

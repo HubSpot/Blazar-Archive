@@ -1,5 +1,7 @@
+/*global config*/
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
+import {Link} from 'react-router';
 
 import Notifications from './Notifications.jsx';
 
@@ -46,17 +48,15 @@ class SettingsContainer extends Component {
     this.setState(state);
   }
 
-  goBack() {
-    window.history.back();
-  }
-
   renderHeadline() {
+    const branchUrl = `/builds/branch/${this.props.params.branchId}`;
+
     return (
       <Headline className='notifications__page-headline'>
         <Icon type="fa" name="wrench" classNames="headline-icon" />
         <span>Settings</span>
         <HeadlineDetail>
-          <a style={{cursor: 'pointer'}} onClick={this.goBack}>Back to branch</a>
+          <Link style={{cursor: 'pointer'}} to={branchUrl}>Back to branch</Link>
         </HeadlineDetail>
       </Headline>
     );

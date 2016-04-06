@@ -7,9 +7,13 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import StarStore from '../../stores/starStore';
-import RepoBuildStore from '../../stores/repoBuildStore';
 import StarActions from '../../actions/starActions';
+
+import RepoBuildStore from '../../stores/repoBuildStore';
 import RepoBuildActions from '../../actions/repoBuildActions';
+
+import BranchStore from '../../stores/branchStore';
+import BranchActions from '../../actions/branchActions';
 
 import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
@@ -24,7 +28,8 @@ let initialState = {
   malformedFiles: [],
   loadingMalformedFiles: true,
   loadingModuleBuilds: true,
-  loadingStars: true
+  loadingStars: true,
+  branchInfo: {}
 };
 
 class RepoBuildContainer extends Component {
@@ -33,7 +38,7 @@ class RepoBuildContainer extends Component {
     super(props);
     this.state = initialState;
 
-    bindAll(this, 'onStatusChange')
+    bindAll(this, 'onStatusChange', 'triggerCancelBuild')
   }
   
   componentDidMount() {
@@ -53,28 +58,28 @@ class RepoBuildContainer extends Component {
   setup(params) { 
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
     RepoBuildActions.loadModuleBuilds(params);
-    RepoBuildActions.loadMalformedFiles();
+    RepoBuildActions.loadRepoBuild(params);
+    RepoBuildActions.startPolling(params);
+    BranchActions.loadBranchInfo(params);
+    BranchActions.loadMalformedFiles(params);
   }
 
   tearDown() {
     RepoBuildActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromRepoBuild();
+    this.unsubscribeFromBranch();
   }
   
   onStatusChange(state) {
     this.setState(state);
   }
   
-  // to do
   triggerCancelBuild() {
-    RepoBuildActions.cancelBuild();
-  }
-  
-  triggerBuild() {
-    RepoBuildActions.triggerBuild();
+    RepoBuildActions.cancelBuild(this.props.params);
   }
 
   renderSectionContent() {
@@ -124,6 +129,7 @@ class RepoBuildContainer extends Component {
             <RepoBuildHeadline
               {...this.props}
               {...this.state}
+              branchInfo={this.state.branchInfo}
               loading={this.state.loadingStars || this.state.loadingModuleBuilds}
             />
           </UIGridItem>
@@ -137,7 +143,7 @@ class RepoBuildContainer extends Component {
           />
           <RepoBuildModulesTable
             params={this.props.params}
-            data={this.state.moduleBuilds ? this.state.moduleBuilds.toJS() : []}
+            data={this.state.moduleBuilds}
             currentRepoBuild={this.state.currentRepoBuild}
             loading={this.state.loadingModuleBuilds}
             {...this.state}

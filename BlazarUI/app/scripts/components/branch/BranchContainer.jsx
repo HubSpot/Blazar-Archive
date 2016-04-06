@@ -36,7 +36,8 @@ let initialState = {
   modules: Immutable.List.of(),
   selectedModules: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
-  branchId: 0
+  branchId: 0,
+  branchInfo: {}
 };
 
 class BranchContainer extends Component {
@@ -69,9 +70,11 @@ class BranchContainer extends Component {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
-    BranchActions.loadBranchBuilds(params);
-    BranchActions.loadModules();
-    BranchActions.loadMalformedFiles();
+    BranchActions.loadBranchBuildHistory(params);
+    BranchActions.loadBranchInfo(params);
+    BranchActions.loadBranchModules(params);
+    BranchActions.loadMalformedFiles(params);
+    BranchActions.startPolling(params);
   }
   
   tearDown() {
@@ -105,7 +108,7 @@ class BranchContainer extends Component {
   }
 
   triggerBuild() {
-    BranchActions.triggerBuild(this.state.selectedModules, this.state.buildDownstreamModules);
+    BranchActions.triggerBuild(this.props.params, this.state.selectedModules, this.state.buildDownstreamModules);
   }
   
   renderTable() {
@@ -155,7 +158,7 @@ class BranchContainer extends Component {
       return;
     }
 
-    const buildSettingsLink = `/settings/branch/${this.state.branchId}`;
+    const buildSettingsLink = `/settings/branch/${this.props.params.branchId}`;
 
     return (
       <Link to={buildSettingsLink}>
@@ -171,9 +174,10 @@ class BranchContainer extends Component {
       <PageContainer>
         {this.renderMalformedFileAlert()}
         <UIGrid>
-          <UIGridItem size={8}>
+          <UIGridItem size={9}>
             <BranchHeadline
               loading={this.state.loadingStars || this.state.loadingBranches}
+              branchInfo={this.state.branchInfo}
               {...this.state}
               {...this.props}
             />
@@ -194,14 +198,14 @@ class BranchContainer extends Component {
               modules={this.state.modules}
             />
           </UIGridItem>
-          <UIGridItem size={1} align='RIGHT'>
+          <UIGridItem size={1}>
             {this.renderBuildSettingsButton()}
           </UIGridItem>
-          <UIGrid>
-            <UIGridItem size={12}>
-              {this.renderTable()}
-            </UIGridItem>
-          </UIGrid>
+        </UIGrid>
+        <UIGrid>
+          <UIGridItem size={12}>
+            {this.renderTable()}
+          </UIGridItem>
         </UIGrid>
       </PageContainer>
     );

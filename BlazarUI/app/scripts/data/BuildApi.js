@@ -218,83 +218,47 @@ class BuildApi {
   }
 
   _getBuild() {
-    // first get all builds so we can find the build id
-    const buildStates = new Resource({
-      url: `${config.apiRoot}/branches/state?property=gitInfo`,
+    const branchHistoryPromise = new Resource({ 
+      url: `${config.apiRoot}/builds/history/branch/${this.params.branchId}`,
       type: 'GET'
     }).send();
-
-    return buildStates.then((builds) => {
-      const repoBuild = findWhere(builds.map((build) => build.gitInfo), {
-        host: this.params.host,
-        organization: this.params.org,
-        repository: this.params.repo,
-        branch: this.params.branch
-      });
+    
+    return branchHistoryPromise.then((resp) => {
       
-      // get branch id
-      const branchIdPromise = new Resource({ 
-        url: `${config.apiRoot}/branches/state?property=gitInfo&property=lastBuild.id`,
+      const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
+      
+      // now get modules so we can get the moduleId by the module name
+      const repoBuildModules = new Resource({
+        url: `${config.apiRoot}/branches/${this.params.branchId}/modules`,
         type: 'GET'
       }).send();
-      
-      return branchIdPromise.then((resp) => {
-        
-        const branchId = findWhere(resp.map((build) => build.gitInfo), {
-          host: this.params.host,
-          organization: this.params.org,
-          repository: this.params.repo,
-          branch: this.params.branch
-        }).id;
 
-        const branchHistoryPromise = new Resource({ 
-          url: `${config.apiRoot}/builds/history/branch/${branchId}`,
+      return repoBuildModules.then((modules) => {
+
+        const repoBuildModule = findWhere(modules, {name: this.params.moduleName, active: true});
+
+        // last get module build based on module id
+        const buildModules = new Resource({
+          url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
           type: 'GET'
         }).send();
-        
-        return branchHistoryPromise.then((resp) => {
-          
-          const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
-          
-          // now get modules so we can get the moduleId by the module name
-          const repoBuildModules = new Resource({
-            url: `${config.apiRoot}/branches/${branchId}/modules`,
-            type: 'GET'
-          }).send();
 
-          return repoBuildModules.then((modules) => {
+        return buildModules.then((modules) => {
+          const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});
 
-            const repoBuildModule = findWhere(modules, {name: this.params.moduleName, active: true});
-
-            // last get module build based on module id
-            const buildModules = new Resource({
-              url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
-              type: 'GET'
-            }).send();
-
-            return buildModules.then((modules) => {
-              const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});
-
-              this.build.model = new Build({
-                id: moduleBuild.id,
-                repoBuildId: moduleBuild.repoBuildId
-              });
-
-              return this._fetchBuild();
-            });
-
+          this.build.model = new Build({
+            id: moduleBuild.id,
+            repoBuildId: moduleBuild.repoBuildId
           });
 
-        }, (error) => {
-          this.cb(error);
+          return this._fetchBuild();
         });
-        
-      }, (error) => {
-        this.cb(error);
+
       });
 
-    });  
-
+    }, (error) => {
+      this.cb(error);
+    });
   }
 
   _getLog() {

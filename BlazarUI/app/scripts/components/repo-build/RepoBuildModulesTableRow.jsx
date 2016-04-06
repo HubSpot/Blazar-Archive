@@ -90,8 +90,9 @@ class RepoBuildModulesTableRow extends Component {
 
   render() {
     const {data, params} = this.props;
+
     return (
-      <tr onClick={this.onTableClick.bind(this)}className={this.getRowClassNames(data.state)}>
+      <tr onClick={this.onTableClick.bind(this)} className={this.getRowClassNames(data.state)}>
         <td className='build-status'>
           {buildResultIcon(data.state)}
         </td>

@@ -6,19 +6,19 @@ import EmptyMessage from '../shared/EmptyMessage.jsx';
 class BranchesTable extends Component {
 
   sortMasterFirst() {
-    let newBranches = [];
+    let branches = [];
 
     this.props.branches.map((b) => {
       if (b.gitInfo.branch === "master") {
-        newBranches.unshift(b);
+        branches.unshift(b);
       }
 
       else {
-        newBranches.push(b);
+        branches.push(b);
       }
     });
 
-    return newBranches;
+    return branches;
   }
 
   render() {
