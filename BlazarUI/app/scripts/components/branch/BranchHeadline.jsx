@@ -33,7 +33,7 @@ class RepoBuildHeadline extends Component {
 
     const {stars, params, currentRepoBuild} = this.props;
     const branchId = parseInt(this.props.params.branchId, 10);
-    const repoLink = `${config.appRoot}/builds/repo/${this.props.branchInfo.repository}`;
+    const repoLink = `/builds/repo/${this.props.branchInfo.repository}`;
 
     return (
       <Headline>

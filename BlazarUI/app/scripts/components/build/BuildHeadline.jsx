@@ -25,7 +25,7 @@ class BuildHeadline extends Component {
     
     const {moduleName} = this.props.params;
     const {build} = this.props.data;
-    const buildLink = `${config.appRoot}/builds/branch/${this.props.params.branchId}/build/${this.props.params.buildNumber}`;
+    const buildLink = `/builds/branch/${this.props.params.branchId}/build/${this.props.params.buildNumber}`;
   
     return (
         <Headline className='build__headline'>

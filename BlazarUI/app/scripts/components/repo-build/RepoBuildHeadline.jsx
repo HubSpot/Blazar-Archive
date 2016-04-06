@@ -17,7 +17,7 @@ class RepoBuildHeadline extends Component {
     
     const {stars, params, currentRepoBuild, branchInfo} = this.props;
     const branchId = parseInt(params.branchId, 10);
-    const branchLink = `${config.appRoot}/builds/branch/${this.props.params.branchId}`;
+    const branchLink = `/builds/branch/${this.props.params.branchId}`;
 
     return (
       <Headline className='repobuild-headline'>
