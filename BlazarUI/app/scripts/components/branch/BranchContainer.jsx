@@ -174,7 +174,7 @@ class BranchContainer extends Component {
       <PageContainer>
         {this.renderMalformedFileAlert()}
         <UIGrid>
-          <UIGridItem size={8}>
+          <UIGridItem size={9}>
             <BranchHeadline
               loading={this.state.loadingStars || this.state.loadingBranches}
               branchInfo={this.state.branchInfo}
@@ -198,14 +198,14 @@ class BranchContainer extends Component {
               modules={this.state.modules}
             />
           </UIGridItem>
-          <UIGridItem size={1} align='RIGHT'>
+          <UIGridItem size={1}>
             {this.renderBuildSettingsButton()}
           </UIGridItem>
-          <UIGrid>
-            <UIGridItem size={12}>
-              {this.renderTable()}
-            </UIGridItem>
-          </UIGrid>
+        </UIGrid>
+        <UIGrid>
+          <UIGridItem size={12}>
+            {this.renderTable()}
+          </UIGridItem>
         </UIGrid>
       </PageContainer>
     );

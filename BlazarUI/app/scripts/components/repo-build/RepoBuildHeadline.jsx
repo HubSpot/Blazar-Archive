@@ -1,5 +1,7 @@
+/*global config*/
 import React, {Component, PropTypes} from 'react';
 import {contains} from 'underscore';
+import {Link} from 'react-router';
 import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';
 import Headline from '../shared/headline/Headline.jsx';
@@ -15,17 +17,19 @@ class RepoBuildHeadline extends Component {
     
     const {stars, params, currentRepoBuild, branchInfo} = this.props;
     const branchId = parseInt(params.branchId, 10);
+    const branchLink = `${config.appRoot}/builds/branch/${this.props.params.branchId}`;
 
     return (
-      <Headline>
+      <Headline className='repobuild-headline'>
         <Star
           className='icon-roomy'
           isStarred={contains(stars, branchId)}
           id={branchId}
         />
-        {branchInfo.repository}
+        {branchInfo.repository} - {branchInfo.branch}
         <HeadlineDetail>
-          - {branchInfo.branch} build #{currentRepoBuild.buildNumber}
+          build #{currentRepoBuild.buildNumber}<br />
+          <Link to={branchLink}>&lt; back to {branchInfo.branch}</Link>
         </HeadlineDetail>
       </Headline>
     )

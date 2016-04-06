@@ -49,16 +49,7 @@ class HeaderContainer extends Component {
   }
 
   render() {
-    return (
-      <PageHeader>
-        <Breadcrumbs
-          appRoot={ConfigStore.appRoot}
-          params={this.props.params}
-          hosts={this.state.hosts}
-          loadingHosts={this.state.loadingHosts}
-        />        
-      </PageHeader>
-    );
+    return null;
   }
 }
 

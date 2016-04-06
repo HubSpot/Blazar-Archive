@@ -1,6 +1,7 @@
 /* global config */
 import React, {Component, PropTypes} from 'react';
 import {contains} from 'underscore';
+import {Link} from 'react-router';
 import Image from '../shared/Image.jsx'
 import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';
@@ -10,14 +11,29 @@ import Star from '../shared/Star.jsx';
 import Icon from '../shared/Icon.jsx';
 
 class RepoBuildHeadline extends Component {
+
+  renderShield() {
+    if (this.props.loading) {
+      return null;
+    }
+
+    const imgPath = `${config.apiRoot}/branches/state/${this.props.params.branchId}/shield`;
+
+    return (
+      <div className='branch__shield'>
+        <Image src={imgPath} />
+      </div>
+    );
+  }
     
   render() {
     if (this.props.loading) {
       return null;
     }
-    const imgPath = `${config.apiRoot}/branches/state/${this.props.params.branchId}/shield`;
+
     const {stars, params, currentRepoBuild} = this.props;
     const branchId = parseInt(this.props.params.branchId, 10);
+    const repoLink = `${config.appRoot}/builds/repo/${this.props.branchInfo.repository}`;
 
     return (
       <Headline>
@@ -28,9 +44,9 @@ class RepoBuildHeadline extends Component {
         />
         <Icon type="octicon" name="git-branch" classNames="headline-icon" />
         {this.props.branchInfo.repository} - {this.props.branchInfo.branch}
+        {this.renderShield()}
         <HeadlineDetail>
-          Branch Builds 
-          <Image src={imgPath}/>
+          <Link to={repoLink}>&lt; Back to {this.props.branchInfo.repository}</Link>
         </HeadlineDetail>
       </Headline>
     )
