@@ -13,6 +13,7 @@ class BuildButton extends Component {
       <Button 
         bsStyle="primary" 
         onClick={this.props.openModuleModal}
+        style={{'marginRight': '5px'}}
       >
         Build Now
       </Button>

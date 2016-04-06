@@ -174,7 +174,7 @@ class BranchContainer extends Component {
       <PageContainer>
         {this.renderMalformedFileAlert()}
         <UIGrid>
-          <UIGridItem size={9}>
+          <UIGridItem size={6}>
             <BranchHeadline
               loading={this.state.loadingStars || this.state.loadingBranches}
               branchInfo={this.state.branchInfo}
@@ -182,7 +182,7 @@ class BranchContainer extends Component {
               {...this.props}
             />
           </UIGridItem>
-          <UIGridItem size={2} align='RIGHT'>
+          <UIGridItem size={6} align='RIGHT'>
             <BuildButton 
               openModuleModal={this.openModuleModal}
               loading={this.state.loadingBranches}
@@ -197,8 +197,6 @@ class BranchContainer extends Component {
               onCheckboxUpdate={this.updateDownstreamModules}
               modules={this.state.modules}
             />
-          </UIGridItem>
-          <UIGridItem size={1}>
             {this.renderBuildSettingsButton()}
           </UIGridItem>
         </UIGrid>
