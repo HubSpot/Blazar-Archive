@@ -28,13 +28,15 @@ class BuildHeadline extends Component {
     const buildLink = `/builds/branch/${this.props.params.branchId}/build/${this.props.params.buildNumber}`;
   
     return (
-        <Headline className='build__headline'>
+        <Headline className='build__headline headline--no-padding'>
+          <HeadlineDetail block={true}>
+            <Link to={buildLink}>&lt; back to build #{this.props.params.buildNumber}</Link>
+          </HeadlineDetail>
           {buildResultIcon(this.props.data.build.state)}
           <div className="build-headline">
             {moduleName}
             <HeadlineDetail>
               Status: {humanizeText(build.state)} { ' ' } {this.renderTimestampDurationMaybe()}<br />
-              <Link to={buildLink}>&lt; back to build #{this.props.params.buildNumber}</Link>
             </HeadlineDetail>
           </div>
         </Headline>

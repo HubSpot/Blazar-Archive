@@ -36,7 +36,10 @@ class RepoBuildHeadline extends Component {
     const repoLink = `/builds/repo/${this.props.branchInfo.repository}`;
 
     return (
-      <Headline>
+      <Headline className='headline--no-padding'>
+        <HeadlineDetail block={true}>
+          <Link to={repoLink}>&lt; Back to {this.props.branchInfo.repository}</Link>
+        </HeadlineDetail>
         <Star
           className='icon-roomy'
           isStarred={contains(stars, branchId)}
@@ -45,9 +48,6 @@ class RepoBuildHeadline extends Component {
         <Icon type="octicon" name="git-branch" classNames="headline-icon" />
         {this.props.branchInfo.repository} - {this.props.branchInfo.branch}
         {this.renderShield()}
-        <HeadlineDetail>
-          <Link to={repoLink}>&lt; Back to {this.props.branchInfo.repository}</Link>
-        </HeadlineDetail>
       </Headline>
     )
   }
