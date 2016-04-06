@@ -52,6 +52,13 @@ public class BranchResource {
   }
 
   @GET
+  @Path("/repo/{repositoryId}")
+  @PropertyFiltering
+  public Set<GitInfo> getByRepositoryId(@PathParam("repositoryId") int repositoryId) {
+    return branchService.getByRepository(repositoryId);
+  }
+
+  @GET
   @Path("/{id}")
   @PropertyFiltering
   public Optional<GitInfo> get(@PathParam("id") int branchId) {

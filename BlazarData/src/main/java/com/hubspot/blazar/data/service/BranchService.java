@@ -26,6 +26,10 @@ public class BranchService {
     return branchDao.get(id);
   }
 
+  public Set<GitInfo> getByRepository(int repositoryId) {
+    return branchDao.getByRepository(repositoryId);
+  }
+
   public Optional<GitInfo> getByRepositoryAndBranch(int repositoryId, String branch) {
     return branchDao.getByRepositoryAndBranch(repositoryId, branch);
   }
