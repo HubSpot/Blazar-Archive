@@ -76,9 +76,9 @@ class RepoBuildDetail extends Component {
   }
   
   render() {
-    const {currentRepoBuild} = this.props
+    const {currentRepoBuild} = this.props;
 
-    if (this.props.error || this.props.currentRepoBuild === undefined) {
+    if (this.props.error) {
       return null;
     }
   

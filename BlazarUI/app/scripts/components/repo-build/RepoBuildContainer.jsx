@@ -138,14 +138,14 @@ class RepoBuildContainer extends Component {
           <RepoBuildDetail 
             {...this.props}
             {...this.state}
-            loading={this.state.loadingModuleBuilds}
+            loading={this.state.loadingStars || this.state.loadingModuleBuilds}
             triggerCancelBuild={this.triggerCancelBuild}
           />
           <RepoBuildModulesTable
             params={this.props.params}
             data={this.state.moduleBuilds}
             currentRepoBuild={this.state.currentRepoBuild}
-            loading={this.state.loadingModuleBuilds}
+            loading={this.state.loadingStars || this.state.loadingModuleBuilds}
             {...this.state}
           />
         </UIGridItem>
