@@ -127,9 +127,11 @@ class SidebarContainer extends Component {
 
     return (
       <Sidebar>
-        <div className='sidebar__logo'>
-          <Logo crumb={false} />
-        </div>
+        <Link to='/'>
+          <div className='sidebar__logo'>
+            <Logo crumb={false} />
+          </div>
+        </Link>
         <div className='sidebar__filter'>
           <SidebarFilter
             {...this.state}
