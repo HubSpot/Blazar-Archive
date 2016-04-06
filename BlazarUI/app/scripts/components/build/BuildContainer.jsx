@@ -106,7 +106,7 @@ class BuildContainer extends Component {
                 {...this.state}
               />
             </UIGridItem>
-            <UIGridItem size={5} >
+            <UIGridItem size={5} style={{'paddingTop': '10px'}}>
               <BuildLogNavigation 
                 build={this.state.data.build}
                 requestNavigationChange={this.requestNavigationChange}
