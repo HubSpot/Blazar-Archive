@@ -104,7 +104,7 @@ export const getFilteredBranches = function(filters, branches) {
       let branchMatch = false;
   
       branchFilters.some((branch) => {
-        if (branch.value === b.gitInfo.branch) {
+        if (branch.value === b.branch) {
           branchMatch = true;
         }
       });
@@ -117,7 +117,7 @@ export const getFilteredBranches = function(filters, branches) {
   
   //finally sort by branch and bodule name
   return filteredBranches.sort((a, b) => {
-    return cmp(a.gitInfo.branch, b.gitInfo.branch);
+    return cmp(a.branch, b.branch);
   });  
 };
 
@@ -239,7 +239,7 @@ export const filterInactiveBuildsImmutable = function(builds) {
 
 export const filterInactiveBuilds = function(builds) {
   return builds.filter((build) => {
-    return build.gitInfo.active;
+    return build.active;
   });
 };
 

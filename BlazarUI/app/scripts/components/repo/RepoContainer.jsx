@@ -19,7 +19,7 @@ import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
 
 let initialState = {
-  branches: Immutable.List.of(),
+  branches: [],
   loading: true,
   filters: {
     branch: [],
@@ -62,7 +62,7 @@ class RepoContainer extends Component {
   }
   
   tearDown() {
-    RepoActions.stopPolling();
+    //RepoActions.stopPolling();
     this.unsubscribeFromRepo();
   }
   
@@ -73,6 +73,7 @@ class RepoContainer extends Component {
   }
 
   render() {
+    console.log(this.state.branches);
     return (
       <PageContainer>
         <UIGrid>
@@ -95,7 +96,7 @@ class RepoContainer extends Component {
             <BranchesTable 
               hide={this.state.error}
               {...this.state}
-              branches={sortBranchesByTimestamp(filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.branches)))}
+              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.branches))}
             />
           </UIGridItem>
         </UIGrid>
