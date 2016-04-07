@@ -117,9 +117,9 @@ ALTER TABLE `module_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 ALTER TABLE `malformed_files` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
 --changeset jhaber:3 dbms:h2
-CREATE TRIGGER `upd_branch_timestamp` AFTER UPDATE ON `branches` FOR EACH ROW CALL "com.hubspot.blazar.data.UpdateTimestampTrigger";
+CREATE TRIGGER `upd_branch_timestamp` AFTER UPDATE ON `branches` FOR EACH ROW CALL "com.hubspot.blazar.test.base.data.UpdateTimestampTrigger";
 
-CREATE TRIGGER `upd_module_timestamp` AFTER UPDATE ON `modules` FOR EACH ROW CALL "com.hubspot.blazar.data.UpdateTimestampTrigger";
+CREATE TRIGGER `upd_module_timestamp` AFTER UPDATE ON `modules` FOR EACH ROW CALL "com.hubspot.blazar.test.base.data.UpdateTimestampTrigger";
 
 --changeset jhaber:4 dbms:h2 runAlways:true
 TRUNCATE TABLE `branches`;

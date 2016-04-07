@@ -18,8 +18,6 @@ import liquibase.resource.ResourceAccessor;
 public abstract class BlazarTestBase {
   protected static final AtomicReference<Injector> injector = new AtomicReference<>();
 
-
-
   protected <T> T getFromGuice(Class<T> type) {
     return injector.get().getInstance(type);
   }
@@ -30,7 +28,6 @@ public abstract class BlazarTestBase {
 
   protected static void runSql(String resourceName) throws Exception {
     liquibase.logging.LogFactory.setInstance(new LogFactory() {
-
       @Override
       public Logger getLog(String name) {
         liquibase.logging.Logger log = new Slf4jLogger();
@@ -38,6 +35,7 @@ public abstract class BlazarTestBase {
         return log;
       }
     });
+
     try (Connection connection = getConnection()) {
       ResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
       JdbcConnection jdbcConnection = new JdbcConnection(connection);

@@ -1,10 +1,11 @@
 package com.hubspot.blazar.data.service;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.BlazarDataTestBase;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

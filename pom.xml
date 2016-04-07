@@ -54,6 +54,7 @@
     <module>BlazarService</module>
     <module>BlazarData</module>
     <module>BlazarClient</module>
+    <module>BlazarTestBase</module>
   </modules>
 
   <dependencyManagement>
@@ -71,6 +72,11 @@
       <dependency>
         <groupId>com.hubspot</groupId>
         <artifactId>BlazarService</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot</groupId>
+        <artifactId>BlazarTestBase</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -193,6 +199,11 @@
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
         <version>3.4.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>1.10.19</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

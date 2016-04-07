@@ -1,5 +1,7 @@
 package com.hubspot.blazar.zookeeper;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
@@ -8,8 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.hubspot.blazar.zookeeper.QueueItem.QueueItemDeserializer;
-
-import java.io.IOException;
 
 @JsonDeserialize(using = QueueItemDeserializer.class)
 public class QueueItem {
@@ -41,7 +41,7 @@ public class QueueItem {
 
   static class QueueItemDeserializer extends StdDeserializer<QueueItem> {
 
-    public QueueItemDeserializer() {
+    QueueItemDeserializer() {
       super(QueueItem.class);
     }
 
@@ -60,9 +60,9 @@ public class QueueItem {
     private final long timestamp;
 
     @JsonCreator
-    public GenericQueueItem(@JsonProperty("type") Class<?> type,
-                            @JsonProperty("item") JsonNode item,
-                            @JsonProperty("timestamp") long timestamp) {
+    GenericQueueItem(@JsonProperty("type") Class<?> type,
+                     @JsonProperty("item") JsonNode item,
+                     @JsonProperty("timestamp") long timestamp) {
       this.type = type;
       this.item = item;
       this.timestamp = timestamp;

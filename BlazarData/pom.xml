@@ -46,10 +46,6 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-jdbi</artifactId>
     </dependency>
     <dependency>
@@ -129,6 +125,11 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.hubspot</groupId>
+      <artifactId>BlazarTestBase</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

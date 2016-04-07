@@ -1,5 +1,12 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildOptions.BuildDownstreams;
@@ -12,12 +19,6 @@ import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.BlazarDataTestBase;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
