@@ -22,7 +22,7 @@ class OrgTable extends Component {
 
     return this.props.buildTable({
       data: this.props.repos,
-      columnNames: [' ', 'Repository', 'Latest Master Build', 'Start Time', 'Duration', 'Commit'],
+      columnNames: [' ', 'Repository', 'Latest Master Build', 'Start Time', 'Duration'],
       rowComponent: OrgTableRow
     });
   }

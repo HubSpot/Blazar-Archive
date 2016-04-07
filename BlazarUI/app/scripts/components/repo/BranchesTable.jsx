@@ -34,7 +34,7 @@ class BranchesTable extends Component {
 
     return this.props.buildTable({
       data: this.sortMasterFirst(),
-      columnNames: ['', 'Branch', 'Latest Build', 'Start Time', 'Duration', 'Commit'],
+      columnNames: ['', 'Branch', 'Latest Build', 'Start Time', 'Duration'],
       rowComponent: BranchesTableRow
     });
   }

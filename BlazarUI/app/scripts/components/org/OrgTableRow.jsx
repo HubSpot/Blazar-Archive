@@ -69,9 +69,6 @@ class OrgTableRow extends Component {
         <td>
           {build.duration}
         </td>
-        <td>
-          {sha}
-        </td>
       </tr>
     );
   }

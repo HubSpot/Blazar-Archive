@@ -125,9 +125,6 @@ class BranchesTableRow extends Component {
         <td>
           {duration}
         </td>
-        <td>
-          {sha}
-        </td>
       </tr>
     );
   
