@@ -5,7 +5,11 @@ import {githubShaLink, truncate} from '../Helpers';
 class Sha extends Component {
 
   render() {
-    const commitLink = githubShaLink({gitInfo: this.props.gitInfo, build: this.props.build});
+    if (!this.props.build.commitInfo) {
+      return null; //TODO: find this info somewhere else, then
+    }
+
+    const commitLink = this.props.build.commitInfo.current.url;
 
     return (
       <span className='sha'>
