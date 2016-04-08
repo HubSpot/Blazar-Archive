@@ -155,7 +155,7 @@ class BranchContainer extends Component {
       return (
         <BranchBuildHistoryTable
           data={this.state.builds}
-          loading={this.state.loadingBranches}
+          loading={this.isLoading()}
           {...this.state}
           {...this.props}
         />
