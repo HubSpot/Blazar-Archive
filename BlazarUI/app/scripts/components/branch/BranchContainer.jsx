@@ -99,6 +99,10 @@ class BranchContainer extends Component {
     RepoActions.loadBranches(this.state.branchInfo.repositoryId);
   }
 
+  refreshBranches() {
+    this.tryLoadBranches();
+  }
+
   openModuleModal() {
     this.setState({
       showModuleModal: true
@@ -202,6 +206,7 @@ class BranchContainer extends Component {
               loading={this.isLoading()}
               branchInfo={this.state.branchInfo}
               branches={this.state.branches}
+              refreshBranches={this.refreshBranches.bind(this)}
               {...this.state}
               {...this.props}
             />

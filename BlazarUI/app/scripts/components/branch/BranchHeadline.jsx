@@ -31,6 +31,7 @@ class RepoBuildHeadline extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.branchInfo.branch !== nextProps.branchInfo.branch) {
       this.replacePlaceholder();
+      this.props.refreshBranches();
     }
   }
 
@@ -46,12 +47,14 @@ class RepoBuildHeadline extends Component {
   }
 
   onBranchSelect(selected) {
-    const branchLink = `${config.appRoot}/builds/branch/${selected.value}`;
+    const branchLink = `/builds/branch/${selected.value}`;
     this.context.router.push(branchLink);
   }
 
   getFilteredBranches() {
     const {branches, branchInfo} = this.props;
+
+    console.log(branches);
 
     return branches.filter((branch) => {
       return branch.label !== branchInfo.branch;
@@ -103,6 +106,7 @@ class RepoBuildHeadline extends Component {
           className='branch-select-input'
           name='branchSelect'
           placeholder=''
+          noResultsText='No other branches'
           value={this.state.selectedBranch}
           options={this.getFilteredBranches()}
           onChange={this.onBranchSelect.bind(this)}
