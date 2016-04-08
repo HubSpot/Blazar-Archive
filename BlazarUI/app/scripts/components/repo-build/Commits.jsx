@@ -50,7 +50,7 @@ class Commits extends Component {
     let msg;
 
     if (!anyNewCommits) {
-      msg = 'No new commits in this build. Most recent commit';
+      msg = 'No new commits in this build. Showing most recent commit';
     }
 
     else if (!showCommits) {
