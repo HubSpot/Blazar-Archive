@@ -45,8 +45,9 @@ class OrgContainer extends Component {
   }
   
   handleFilterChange(newValue) {
+    let valueToSet = newValue ? newValue.value : '';
     this.setState({
-      filterValue: newValue
+      filterValue: valueToSet
     });
   }
   
