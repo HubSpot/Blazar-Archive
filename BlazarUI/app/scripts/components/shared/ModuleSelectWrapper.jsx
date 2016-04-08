@@ -1,22 +1,26 @@
 import React, {Component, PropTypes} from 'react';
-import Immutable from 'immutable';
+import Immutable, { fromJS } from 'immutable';
 import Select from 'react-select-plus';
 
 class ModuleSelectWrapper extends Component {
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.modules.size != this.props.modules.size;
+  constructor(props) {
+    super(props);
+
+    this.state = {};
   }
 
-  createModuleSelectOptions() {
-    const modules = this.props.modules;
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextProps.selectedModules.length !== this.props.selectedModules.length;
+  }
 
+  createModuleSelectOptions(modules) {
     return modules.map((m) => {
       return {
-        value: m.get('id'),
-        label: m.get('name')
+        value: m.id || m.value,
+        label: m.name || m.label
       };
-    }).toJS();
+    });
   }
 
 	render() {
@@ -29,8 +33,8 @@ class ModuleSelectWrapper extends Component {
           clearAllText='None'
           noResultsText='All modules have been selected.'
           multi={true}
-          value={this.createModuleSelectOptions()}
-          options={this.createModuleSelectOptions()}
+          value={this.createModuleSelectOptions(this.props.selectedModules)}
+          options={this.createModuleSelectOptions(this.props.modules)}
           onChange={this.props.onSelectUpdate}
         />
       </div>
@@ -39,7 +43,8 @@ class ModuleSelectWrapper extends Component {
 }
 
 ModuleSelectWrapper.propTypes = {
-  modules: PropTypes.instanceOf(Immutable.List),
+  modules: PropTypes.array.isRequired,
+  selectedModules: PropTypes.array.isRequired,
   onSelectUpdate: PropTypes.func.isRequired
 };
 

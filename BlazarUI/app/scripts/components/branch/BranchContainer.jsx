@@ -36,7 +36,7 @@ let initialState = {
   loadingRepo: true,
   malformedFiles: [],
   showModuleModal: false,
-  modules: Immutable.List.of(),
+  modules: [],
   selectedModules: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
   branchId: 0,
@@ -219,6 +219,7 @@ class BranchContainer extends Component {
             />
             <ModuleModal
               loadingModules={this.isLoading()}
+              selectedModules={this.state.selectedModules}
               showModal={this.state.showModuleModal}
               closeModal={this.closeModuleModal}
               triggerBuild={this.triggerBuild}

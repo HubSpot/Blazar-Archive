@@ -54,8 +54,6 @@ class RepoBuildHeadline extends Component {
   getFilteredBranches() {
     const {branches, branchInfo} = this.props;
 
-    console.log(branches);
-
     return branches.filter((branch) => {
       return branch.label !== branchInfo.branch;
     }).sort((a, b) => {

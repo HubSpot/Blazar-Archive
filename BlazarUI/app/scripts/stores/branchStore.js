@@ -45,6 +45,7 @@ const BranchStore = Reflux.createStore({
 
       this.trigger({
         modules: this.modules,
+        selectedModules: this.modules,
         loadingModules: false
       });
     });

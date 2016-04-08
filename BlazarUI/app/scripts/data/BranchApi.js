@@ -12,11 +12,11 @@ function _parse(params, resp) {
     return build;
   });
   
-  return fromJS(resp);
+  return fromJS(builds);
 }
 
 function _parseModules(resp) {
-  return fromJS(resp);
+  return resp;
 }
 
 function fetchBranchBuildHistory(params, cb) {
@@ -63,19 +63,23 @@ function fetchMalformedFiles(params, cb) {
   });
 }
 
-function _generateBuildModuleJsonBody(moduleIds, downstreamModules) {
+function _generateBuildModuleJsonBody(modules, downstreamModules) {
+  const moduleIds = modules.map((module) => {
+    return module.value;
+  });
+
   return JSON.stringify({
     moduleIds: moduleIds, 
     buildDownstreams: downstreamModules
   });
 }
 
-function triggerBuild(params, moduleIds, downstreamModules, cb) {
+function triggerBuild(params, modules, downstreamModules, cb) {
   const buildPromise = new Resource({
     url: `${config.apiRoot}/branches/builds/branch/${params.branchId}`,
     type: 'POST',
     contentType: 'application/json',
-    data: _generateBuildModuleJsonBody(moduleIds, downstreamModules)
+    data: _generateBuildModuleJsonBody(modules, downstreamModules)
   }).send();
 
   buildPromise.then((resp) => {
