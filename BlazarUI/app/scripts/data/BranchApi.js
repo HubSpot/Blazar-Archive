@@ -65,7 +65,7 @@ function fetchMalformedFiles(params, cb) {
 
 function _generateBuildModuleJsonBody(modules, downstreamModules) {
   const moduleIds = modules.map((module) => {
-    return module.value;
+    return module.value || module.id;
   });
 
   return JSON.stringify({
