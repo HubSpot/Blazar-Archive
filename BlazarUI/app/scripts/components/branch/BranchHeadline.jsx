@@ -47,7 +47,7 @@ class RepoBuildHeadline extends Component {
   }
 
   onBranchSelect(selected) {
-    const branchLink = `/builds/branch/${selected.value}`;
+    const branchLink = `/builds/branch/${selected}`;
     this.context.router.push(branchLink);
   }
 

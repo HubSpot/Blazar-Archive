@@ -11,7 +11,7 @@ class ModuleSelectWrapper extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.selectedModules.length !== this.props.selectedModules.length;
+    return nextProps.modules.length !== this.props.modules.length;
   }
 
   createModuleSelectOptions(modules) {
@@ -33,7 +33,7 @@ class ModuleSelectWrapper extends Component {
           clearAllText='None'
           noResultsText='All modules have been selected.'
           multi={true}
-          value={this.createModuleSelectOptions(this.props.selectedModules)}
+          value={this.createModuleSelectOptions(this.props.modules)}
           options={this.createModuleSelectOptions(this.props.modules)}
           onChange={this.props.onSelectUpdate}
         />
@@ -44,7 +44,6 @@ class ModuleSelectWrapper extends Component {
 
 ModuleSelectWrapper.propTypes = {
   modules: PropTypes.array.isRequired,
-  selectedModules: PropTypes.array.isRequired,
   onSelectUpdate: PropTypes.func.isRequired
 };
 

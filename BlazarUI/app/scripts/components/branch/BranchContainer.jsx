@@ -219,7 +219,6 @@ class BranchContainer extends Component {
             />
             <ModuleModal
               loadingModules={this.isLoading()}
-              selectedModules={this.state.selectedModules}
               showModal={this.state.showModuleModal}
               closeModal={this.closeModuleModal}
               triggerBuild={this.triggerBuild}

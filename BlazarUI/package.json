@@ -62,7 +62,7 @@
     "react-classset": "0.0.2",
     "react-dom": "^0.14.7",
     "react-router": "^2.0.0",
-    "react-select": "^1.0.0-beta12",
+    "react-select": "^0.9.1",
     "react-toggle": "^2.0.1",
     "react-tools": "^0.13.1",
     "reflux": "^0.2.7",

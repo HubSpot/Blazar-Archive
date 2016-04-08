@@ -63,23 +63,19 @@ function fetchMalformedFiles(params, cb) {
   });
 }
 
-function _generateBuildModuleJsonBody(modules, downstreamModules) {
-  const moduleIds = modules.map((module) => {
-    return module.value || module.id;
-  });
-
+function _generateBuildModuleJsonBody(moduleIds, downstreamModules) {
   return JSON.stringify({
     moduleIds: moduleIds, 
     buildDownstreams: downstreamModules
   });
 }
 
-function triggerBuild(params, modules, downstreamModules, cb) {
+function triggerBuild(params, moduleIds, downstreamModules, cb) {
   const buildPromise = new Resource({
     url: `${config.apiRoot}/branches/builds/branch/${params.branchId}`,
     type: 'POST',
     contentType: 'application/json',
-    data: _generateBuildModuleJsonBody(modules, downstreamModules)
+    data: _generateBuildModuleJsonBody(moduleIds, downstreamModules)
   }).send();
 
   buildPromise.then((resp) => {

@@ -22,7 +22,7 @@ class ModuleModal extends Component {
   }
 
   updateSelectedModules(modules) {
-    const finalModules = modules || [];
+    const finalModules = modules.split(',');
     this.props.onSelectUpdate(finalModules);
   }
 
@@ -73,7 +73,6 @@ class ModuleModal extends Component {
               <span className="module-modal__text">Choose modules to build:</span>
               <ModuleSelectWrapper
                 modules={this.props.modules}
-                selectedModules={this.props.selectedModules}
                 onSelectUpdate={this.updateSelectedModules}
               />
             </div>
@@ -99,7 +98,6 @@ class ModuleModal extends Component {
 
 ModuleModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
-  selectedModules: PropTypes.array.isRequired,
   triggerBuild: PropTypes.func.isRequired,
   onSelectUpdate: PropTypes.func.isRequired,
   onCheckboxUpdate: PropTypes.func.isRequired,
