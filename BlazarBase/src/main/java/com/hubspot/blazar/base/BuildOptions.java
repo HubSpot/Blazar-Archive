@@ -11,20 +11,23 @@ import com.google.common.collect.ImmutableSet;
 public class BuildOptions {
   private final Set<Integer> moduleIds;
   private final BuildDownstreams buildDownstreams;
+  private final boolean resetCaches;
 
   public enum BuildDownstreams {
     NONE, WITHIN_REPOSITORY;
   }
 
   public static BuildOptions defaultOptions() {
-    return new BuildOptions(ImmutableSet.<Integer>of(), BuildDownstreams.WITHIN_REPOSITORY);
+    return new BuildOptions(ImmutableSet.<Integer>of(), BuildDownstreams.WITHIN_REPOSITORY, false);
   }
 
   @JsonCreator
   public BuildOptions(@JsonProperty("moduleIds") Set<Integer> moduleIds,
-                      @JsonProperty("buildDownstreams") BuildDownstreams buildDownstreams) {
+                      @JsonProperty("buildDownstreams") BuildDownstreams buildDownstreams,
+                      @JsonProperty("resetCaches") boolean resetCaches) {
     this.moduleIds = com.google.common.base.Objects.firstNonNull(moduleIds, ImmutableSet.<Integer>of());
     this.buildDownstreams = Preconditions.checkNotNull(buildDownstreams);
+    this.resetCaches = resetCaches;
   }
 
   public Set<Integer> getModuleIds() {
@@ -33,6 +36,10 @@ public class BuildOptions {
 
   public BuildDownstreams getBuildDownstreams() {
     return buildDownstreams;
+  }
+
+  public boolean isResetCaches() {
+    return resetCaches;
   }
 
   @Override
@@ -46,11 +53,13 @@ public class BuildOptions {
     }
 
     BuildOptions that = (BuildOptions) o;
-    return Objects.equals(moduleIds, that.moduleIds) && Objects.equals(buildDownstreams, that.buildDownstreams);
+    return Objects.equals(resetCaches, that.resetCaches) &&
+        Objects.equals(moduleIds, that.moduleIds) &&
+        Objects.equals(buildDownstreams, that.buildDownstreams);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(moduleIds, buildDownstreams);
+    return Objects.hash(moduleIds, buildDownstreams, resetCaches);
   }
 }
