@@ -71,6 +71,10 @@ function _generateBuildModuleJsonBody(moduleIds, downstreamModules) {
 }
 
 function triggerBuild(params, moduleIds, downstreamModules, cb) {
+  if (moduleIds === null) {
+    moduleIds = [];
+  }
+
   const buildPromise = new Resource({
     url: `${config.apiRoot}/branches/builds/branch/${params.branchId}`,
     type: 'POST',
