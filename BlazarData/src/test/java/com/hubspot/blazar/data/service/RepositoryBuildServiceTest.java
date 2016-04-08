@@ -50,13 +50,13 @@ public class RepositoryBuildServiceTest extends BlazarDataTestBase {
     Set<Integer> emptyIntegers = Collections.emptySet();
 
     buildTriggerOne = BuildTrigger.forCommit("abc");
-    buildOptionsOne = new BuildOptions(Collections.singleton(123), BuildDownstreams.NONE);
+    buildOptionsOne = new BuildOptions(Collections.singleton(123), BuildDownstreams.NONE, true);
     buildIdOne = repositoryBuildService.enqueue(branchOne, buildTriggerOne, buildOptionsOne);
     commitInfoOne = new CommitInfo(Commit.newBuilder().setId("abc").build(), absentCommit, emptyCommits, false);
     dependencyGraphOne = new DependencyGraph(Collections.singletonMap(123, emptyIntegers), Collections.singletonList(123));
 
     buildTriggerTwo = BuildTrigger.forCommit("def");
-    buildOptionsTwo = new BuildOptions(Collections.singleton(456), BuildDownstreams.NONE);
+    buildOptionsTwo = new BuildOptions(Collections.singleton(456), BuildDownstreams.NONE, false);
     buildIdTwo = repositoryBuildService.enqueue(branchTwo, buildTriggerTwo, buildOptionsTwo);
     commitInfoTwo = new CommitInfo(Commit.newBuilder().setId("def").build(), absentCommit, emptyCommits, false);
     dependencyGraphTwo = new DependencyGraph(Collections.singletonMap(456, emptyIntegers), Collections.singletonList(456));
