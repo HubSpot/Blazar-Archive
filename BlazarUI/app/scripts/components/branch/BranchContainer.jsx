@@ -21,6 +21,8 @@ import StarActions from '../../actions/starActions';
 
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
+import RepoStore from '../../stores/repoStore';
+import RepoActions from '../../actions/repoActions';
 
 import {getPreviousBuildState} from '../Helpers.js';
 
@@ -31,13 +33,15 @@ let initialState = {
   loadingStars: true,
   loadingModules: true,
   loadingMalformedFiles: true,
+  loadingRepo: true,
   malformedFiles: [],
   showModuleModal: false,
   modules: Immutable.List.of(),
   selectedModules: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
   branchId: 0,
-  branchInfo: {}
+  branchInfo: {},
+  branches: []
 };
 
 class BranchContainer extends Component {
@@ -68,6 +72,7 @@ class BranchContainer extends Component {
     
   setup(params) {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
+    this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuildHistory(params);
@@ -75,12 +80,23 @@ class BranchContainer extends Component {
     BranchActions.loadBranchModules(params);
     BranchActions.loadMalformedFiles(params);
     BranchActions.startPolling(params);
+    this.tryLoadBranches();
   }
   
   tearDown() {
     BranchActions.stopPolling();
     this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
+    this.unsubscribeFromRepo();
+  }
+
+  tryLoadBranches() {
+    if (!this.state || !this.state.branchInfo.repositoryId) {
+      setTimeout(this.tryLoadBranches.bind(this), 200);
+      return;
+    }
+
+    RepoActions.loadBranches(this.state.branchInfo.repositoryId);
   }
 
   openModuleModal() {
@@ -109,6 +125,13 @@ class BranchContainer extends Component {
 
   triggerBuild() {
     BranchActions.triggerBuild(this.props.params, this.state.selectedModules, this.state.buildDownstreamModules);
+  }
+
+  isLoading() {
+    return this.state.loadingBranches
+      || this.state.loadingStars
+      || this.state.loadingModules
+      || this.state.loadingRepo;
   }
   
   renderTable() {
@@ -154,7 +177,7 @@ class BranchContainer extends Component {
   }
 
   renderBuildSettingsButton() {
-    if (this.state.loadingBranches) {
+    if (this.state.loadingBranches || this.state.loadingRepo) {
       return;
     }
 
@@ -176,20 +199,21 @@ class BranchContainer extends Component {
         <UIGrid>
           <UIGridItem size={7}>
             <BranchHeadline
-              loading={this.state.loadingStars || this.state.loadingBranches}
+              loading={this.isLoading()}
               branchInfo={this.state.branchInfo}
+              branches={this.state.branches}
               {...this.state}
               {...this.props}
             />
           </UIGridItem>
-          <UIGridItem style={{'paddingTop': '20px'}} size={5} align='RIGHT'>
+          <UIGridItem style={{'paddingTop': '6px'}} size={5} align='RIGHT'>
             <BuildButton 
               openModuleModal={this.openModuleModal}
-              loading={this.state.loadingBranches}
+              loading={this.isLoading()}
               error={this.state.error}
             />
             <ModuleModal
-              loadingModules={this.state.loadingModules}
+              loadingModules={this.isLoading()}
               showModal={this.state.showModuleModal}
               closeModal={this.closeModuleModal}
               triggerBuild={this.triggerBuild}

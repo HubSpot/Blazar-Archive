@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import Select from 'react-select';
+import Select from 'react-select-plus';
 import {bindAll} from 'underscore';
 
 class Filter extends Component {

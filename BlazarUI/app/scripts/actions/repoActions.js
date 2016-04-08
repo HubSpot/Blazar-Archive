@@ -1,8 +1,7 @@
 import Reflux from 'reflux';
 
 const RepoActions = Reflux.createActions([
-  'loadBranches',
-  'stopPolling'
+  'loadBranches'
 ]);
 
 export default RepoActions;

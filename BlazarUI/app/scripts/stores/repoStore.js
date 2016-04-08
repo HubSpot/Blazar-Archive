@@ -1,28 +1,27 @@
+/*global config*/
 import Reflux from 'reflux';
 import RepoActions from '../actions/repoActions';
-import BranchesApi from '../data/BranchesApi';
+import RepoApi from '../data/RepoApi';
 
 const RepoStore = Reflux.createStore({
 
   listenables: RepoActions,
 
-  onLoadBranches(params) {
+  init() {  
+    this.branches = [];
+  },
 
-    this.branchesApi = new BranchesApi({params});
+  onLoadBranches(repoId) {
+    this.repoId = repoId;
 
-    this.branchesApi.fetchBuilds((branches) => {      
+    RepoApi.fetchBranchesInRepo(repoId, (resp) => {
+      this.branches = resp;
+
       this.trigger({
-        branches: branches,
-        loading: false
+        branches: this.branches,
+        loadingRepo: false
       });
     });
-
-  },
-  
-  onStopPolling() {
-    if (this.branchesApi) {
-      this.branchesApi.stopPollingBuilds();  
-    }
   }
 
 });
