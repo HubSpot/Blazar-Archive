@@ -50,6 +50,14 @@ class RepoBuildHeadline extends Component {
     this.context.router.push(branchLink);
   }
 
+  getFilteredBranches() {
+    const {branches, branchInfo} = this.props;
+
+    return branches.filter((branch) => {
+      return branch.label !== branchInfo.branch;
+    });
+  }
+
   renderShield() {
     if (this.props.loading) {
       return null;
@@ -71,13 +79,9 @@ class RepoBuildHeadline extends Component {
 
     const {stars, params, currentRepoBuild} = this.props;
     const branchId = parseInt(this.props.params.branchId, 10);
-    const repoLink = `/builds/repo/${this.props.branchInfo.repository}`;
 
     return (
-      <Headline className='headline--no-padding'>
-        <HeadlineDetail block={true}>
-          <Link to={repoLink}>&lt; Back to {this.props.branchInfo.repository}</Link>
-        </HeadlineDetail>
+      <Headline>
         <Star
           className='icon-roomy'
           isStarred={contains(stars, branchId)}
@@ -89,7 +93,7 @@ class RepoBuildHeadline extends Component {
           className='branch-select-input'
           name="branchSelect"
           value={this.state.selectedBranch}
-          options={this.props.branches}
+          options={this.getFilteredBranches()}
           onChange={this.onBranchSelect.bind(this)}
           searchable={false}
           clearable={false}
