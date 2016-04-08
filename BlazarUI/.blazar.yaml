@@ -3,7 +3,6 @@ buildDeps:
   - hs-build-tools
 
 cache:
-  - $PWD/node_modules
   - $PWD/bower_components
 
 steps:
