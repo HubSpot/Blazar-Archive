@@ -11,15 +11,15 @@ const RepoStore = Reflux.createStore({
     this.branches = [];
   },
 
-  onLoadBranches(params) {
-    this.params = params;
+  onLoadBranches(repoId) {
+    this.repoId = repoId;
 
-    RepoApi.fetchBranchesInRepo(params, (resp) => {
+    RepoApi.fetchBranchesInRepo(repoId, (resp) => {
       this.branches = resp;
 
       this.trigger({
         branches: this.branches,
-        loading: false
+        loadingRepo: false
       });
     });
   }

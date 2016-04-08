@@ -2,6 +2,8 @@
 import React, {Component, PropTypes} from 'react';
 import {contains} from 'underscore';
 import {Link} from 'react-router';
+import $ from 'jquery';
+import Select from 'react-select-plus';
 import Image from '../shared/Image.jsx'
 import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';
@@ -10,7 +12,43 @@ import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Star from '../shared/Star.jsx';
 import Icon from '../shared/Icon.jsx';
 
+let initialState = {
+  selectedBranch: ''
+}
+
 class RepoBuildHeadline extends Component {
+
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = initialState;
+  }
+
+  componentDidMount() {
+    this.replacePlaceholder();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.branchInfo.branch !== nextProps.branchInfo.branch) {
+      this.replacePlaceholder();
+    }
+  }
+
+  replacePlaceholder() {
+    if (this.props.loading) {
+      setTimeout(() => {
+        this.replacePlaceholder();
+      }, 50);
+      return;
+    }
+
+    $('.Select-placeholder')[0].innerHTML = this.props.branchInfo.branch;
+  }
+
+  onBranchSelect(selected) {
+    const branchLink = `${config.appRoot}/builds/branch/${selected.value}`;
+    this.context.router.push(branchLink);
+  }
 
   renderShield() {
     if (this.props.loading) {
@@ -46,7 +84,16 @@ class RepoBuildHeadline extends Component {
           id={branchId}
         />
         <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-        {this.props.branchInfo.repository} - {this.props.branchInfo.branch}
+        {this.props.branchInfo.repository} - 
+        <Select
+          className='branch-select-input'
+          name="branchSelect"
+          value={this.state.selectedBranch}
+          options={this.props.branches}
+          onChange={this.onBranchSelect.bind(this)}
+          searchable={false}
+          clearable={false}
+        />
         {this.renderShield()}
       </Headline>
     )
@@ -58,6 +105,10 @@ RepoBuildHeadline.propTypes = {
   branchId: PropTypes.number,
   loading: PropTypes.bool.isRequired,
   branchInfo: PropTypes.object.isRequired
+};
+
+RepoBuildHeadline.contextTypes = {
+  router: PropTypes.object.isRequired
 };
 
 export default RepoBuildHeadline;

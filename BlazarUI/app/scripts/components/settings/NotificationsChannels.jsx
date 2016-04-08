@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
-import Select from 'react-select';
+import Select from 'react-select-plus';
 
 import NotificationsChannel from './NotificationsChannel.jsx';
 
