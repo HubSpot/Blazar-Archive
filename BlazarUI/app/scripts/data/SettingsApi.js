@@ -22,6 +22,10 @@ function fetchNotifications(params, cb) {
 }
 
 function addNotification(params, channelName, cb) {
+  if (!channelName) {
+    return;
+  }
+  
   const notification = {
     branchId: params.branchId,
     channelName: channelName.label,

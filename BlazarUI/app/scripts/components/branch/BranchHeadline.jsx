@@ -3,7 +3,7 @@ import React, {Component, PropTypes} from 'react';
 import {contains} from 'underscore';
 import {Link} from 'react-router';
 import $ from 'jquery';
-import Select from 'react-select-plus';
+import Select from 'react-select';
 import Image from '../shared/Image.jsx'
 import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';

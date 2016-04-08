@@ -73,7 +73,7 @@ gulp.task('vendorStyles', function () {
     './node_modules/font-awesome/css/font-awesome.css',
     './node_modules/react-select/dist/default.css',
     './bower_components/octicons/octicons/octicons.css',
-    './node_modules/react-select-plus/dist/react-select-plus.css'
+    './node_modules/react-select/dist/react-select.css'
   ];
   return gulp.src(files)
     .pipe(concatCss('vendor.css'))

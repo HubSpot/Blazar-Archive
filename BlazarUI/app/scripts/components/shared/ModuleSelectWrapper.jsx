@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import Immutable, { fromJS } from 'immutable';
-import Select from 'react-select-plus';
+import Select from 'react-select';
 
 class ModuleSelectWrapper extends Component {
 
