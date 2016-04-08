@@ -59,6 +59,9 @@ class DashboardContainer extends Component {
   }
 
   render() {
+    console.log(this.state.starredBuilds);
+    console.log(this.state.stars);
+    
     return (
       <PageContainer classNames='page-dashboard'>
         <Dashboard 

@@ -126,6 +126,13 @@ class BranchContainer extends Component {
   triggerBuild() {
     BranchActions.triggerBuild(this.props.params, this.state.selectedModules, this.state.buildDownstreamModules);
   }
+
+  isLoading() {
+    return this.state.loadingBranches
+      || this.state.loadingStars
+      || this.state.loadingModules
+      || this.state.loadingRepo;
+  }
   
   renderTable() {
     if (this.state.error) {
@@ -192,7 +199,7 @@ class BranchContainer extends Component {
         <UIGrid>
           <UIGridItem size={7}>
             <BranchHeadline
-              loading={this.state.loadingStars || this.state.loadingBranches || this.state.loadingRepo}
+              loading={this.isLoading()}
               branchInfo={this.state.branchInfo}
               branches={this.state.branches}
               {...this.state}
@@ -202,11 +209,11 @@ class BranchContainer extends Component {
           <UIGridItem style={{'paddingTop': '6px'}} size={5} align='RIGHT'>
             <BuildButton 
               openModuleModal={this.openModuleModal}
-              loading={this.state.loadingBranches}
+              loading={this.isLoading()}
               error={this.state.error}
             />
             <ModuleModal
-              loadingModules={this.state.loadingModules}
+              loadingModules={this.isLoading()}
               showModal={this.state.showModuleModal}
               closeModal={this.closeModuleModal}
               triggerBuild={this.triggerBuild}

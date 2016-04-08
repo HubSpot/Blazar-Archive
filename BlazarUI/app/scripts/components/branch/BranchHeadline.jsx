@@ -14,7 +14,7 @@ import Icon from '../shared/Icon.jsx';
 
 let initialState = {
   selectedBranch: ''
-}
+};
 
 class RepoBuildHeadline extends Component {
 
@@ -35,7 +35,7 @@ class RepoBuildHeadline extends Component {
   }
 
   replacePlaceholder() {
-    if (this.props.loading) {
+    if (this.props.loading || !this.props.branchInfo.branch) {
       setTimeout(() => {
         this.replacePlaceholder();
       }, 50);
@@ -55,6 +55,16 @@ class RepoBuildHeadline extends Component {
 
     return branches.filter((branch) => {
       return branch.label !== branchInfo.branch;
+    }).sort((a, b) => {
+      if (a.label === 'master') {
+        return -1;
+      }
+
+      else if (b.label === 'master') {
+        return 1;
+      }
+
+      return a.label.localeCompare(b.label);
     });
   }
 
@@ -91,7 +101,8 @@ class RepoBuildHeadline extends Component {
         {this.props.branchInfo.repository} - 
         <Select
           className='branch-select-input'
-          name="branchSelect"
+          name='branchSelect'
+          placeholder=''
           value={this.state.selectedBranch}
           options={this.getFilteredBranches()}
           onChange={this.onBranchSelect.bind(this)}
