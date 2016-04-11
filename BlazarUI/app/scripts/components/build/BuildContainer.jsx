@@ -97,7 +97,7 @@ class BuildContainer extends Component {
 
   render() {
     return (
-      <PageContainer>
+      <PageContainer classNames='build-container'>
         <div className={this.getHeaderClasses()}>
           <UIGrid containerClassName='build-header__name-and-buttons'>
             <UIGridItem size={7}>
