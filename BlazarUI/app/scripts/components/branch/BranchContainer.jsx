@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import {Button} from 'react-bootstrap';
 import {bindAll} from 'underscore';
+import classNames from 'classnames';
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
@@ -112,6 +113,13 @@ class BranchContainer extends Component {
         });
       }
     }, this));
+  }
+
+  getClassNames() {
+    return classNames([
+      'branch-container',
+      this.state.builds === null || this.state.maxRows >= this.state.builds.size ? 'normal-padding' : ''
+    ]);
   }
 
   refreshBranches() {
@@ -225,7 +233,7 @@ class BranchContainer extends Component {
 
   render() {
     return (
-      <PageContainer classNames='branch-container'>
+      <PageContainer classNames={this.getClassNames()}>
         {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={7}>
