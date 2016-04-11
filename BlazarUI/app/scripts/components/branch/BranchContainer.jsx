@@ -92,6 +92,7 @@ class BranchContainer extends Component {
     this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
     this.unsubscribeFromRepo();
+    $(window).unbind('scroll');
   }
 
   tryLoadBranches() {

@@ -6,7 +6,6 @@
 
 .notifications__grid
   margin-top 10px
-  height 250px
   min-width 750px
   padding-left 15px
 
@@ -26,6 +25,10 @@
 .notifications__headline-title
   font-size 28px
   color #4a4a4a
+  
+.notifications__channels
+  max-height 242px
+  overflow-y scroll
 
 .notifications__channels-headline
   margin-top 20px
@@ -59,7 +62,7 @@
   padding 40px
   padding-bottom 0px
   background-color #f2f5f8
-  min-height 250px
+  min-height 242px
   min-width 500px
 
 .notifications__setting
@@ -84,12 +87,19 @@
 .notifications__delete-toast
   width 300px
   position fixed
-  top 45px
+  top 0
   left 50%
   z-index 10
   background-image linear-gradient(to bottom, #5967bc, #6a78d1)
   box-shadow 0 1px 24px 0 rgba(0, 0, 0, 0.08)
   border-radius 3px
+  opacity 0
+  visibility hidden
+  transition opacity .25s
+  
+  &.revealed
+    visibility visible
+    opacity 1
 
 .notifications__delete-toast-inner
   padding 20px 25px
@@ -163,6 +173,7 @@
 
   & .Select-control
     background-color rgba(243, 248, 252, 0.5)
+    border 0
 
 .notifications__list--empty
   text-align center
@@ -179,6 +190,3 @@
     font-family HelveticaNeue
     font-size 20px
     color #cbd6e2
-  
-/*.build-headline .headline__detail, .repobuild-headline .headline__detail
-  display inline*/

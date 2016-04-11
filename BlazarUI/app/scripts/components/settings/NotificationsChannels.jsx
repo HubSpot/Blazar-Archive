@@ -7,7 +7,8 @@ import NotificationsChannel from './NotificationsChannel.jsx';
 import SettingsActions from '../../actions/settingsActions';
 
 let initialState = {
-  channelDeleted: undefined
+  channelDeleted: undefined,
+  showToast: false
 };
 
 class NotificationsChannels extends Component {
@@ -28,12 +29,19 @@ class NotificationsChannels extends Component {
     this.props.onChannelDelete(channelName);
 
     this.setState({
-      channelDeleted: channelName
+      channelDeleted: channelName,
+      showToast: true
     });
 
     setTimeout(() => {
       this.setState({
         channelDeleted: undefined
+      });
+    }, 5250);
+
+    setTimeout(() => {
+      this.setState({
+        showToast: false
       });
     }, 5000);
   }
@@ -78,12 +86,16 @@ class NotificationsChannels extends Component {
   }
 
   renderToast() {
-    if (this.state.channelDeleted === undefined) {
-      return null;
+    let opacityModifier = '';
+
+    if (this.state.showToast) {
+      opacityModifier = ' revealed'
     }
 
+    const classNames = `notifications__delete-toast${opacityModifier}`;
+
     return (
-      <div className='notifications__delete-toast'>
+      <div className={classNames}>
         <div className='notifications__delete-toast-inner'>
           <span>Notification channel removed</span>
           <p>You will no longer receive notifications in <strong>#{this.state.channelDeleted}</strong></p>
