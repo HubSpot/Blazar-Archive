@@ -11,14 +11,20 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 import Icon from '../shared/Icon.jsx';
+import Loader from '../shared/Loader.jsx';
 
 import SettingsActions from '../../actions/settingsActions';
 import SettingsStore from '../../stores/settingsStore';
 
+import BranchActions from '../../actions/branchActions';
+import BranchStore from '../../stores/branchStore';
+
 let initialState = {
   notifications: [],
   slackChannels: [],
-  loading: true
+  branchInfo: {},
+  loading: true,
+  loadingBranchInfo: true
 };
 
 class SettingsContainer extends Component {
@@ -31,6 +37,8 @@ class SettingsContainer extends Component {
 
   componentDidMount() {
     this.unsubscribeFromSettings = SettingsStore.listen(this.onStatusChange);
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
+    BranchActions.loadBranchInfo(this.props.params);
     SettingsActions.loadNotifications(this.props.params);
     SettingsActions.loadSlackChannels();
   }
@@ -42,6 +50,7 @@ class SettingsContainer extends Component {
 
   componentWillUnmount() {
     this.unsubscribeFromSettings();
+    this.unsubscribeFromBranch();
   }
 
   onStatusChange(state) {
@@ -56,13 +65,19 @@ class SettingsContainer extends Component {
         <Icon type="fa" name="wrench" classNames="headline-icon" />
         <span>Settings</span>
         <HeadlineDetail>
-          <Link style={{cursor: 'pointer'}} to={branchUrl}>Back to branch</Link>
+          <Link style={{cursor: 'pointer'}} to={branchUrl}>Back to {this.state.branchInfo.branch}</Link>
         </HeadlineDetail>
       </Headline>
     );
   }
 
   render() {
+    if (this.state.loading || this.state.loadingBranchInfo) {
+      return (
+        <Loader align='left' />
+      )
+    }
+
     return (
       <PageContainer>
         <UIGrid>

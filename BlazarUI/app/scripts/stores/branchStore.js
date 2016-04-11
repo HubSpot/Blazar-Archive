@@ -32,7 +32,8 @@ const BranchStore = Reflux.createStore({
       this.branchInfo = resp;
 
       this.trigger({
-        branchInfo: this.branchInfo
+        branchInfo: this.branchInfo,
+        loadingBranchInfo: false
       });
     });
   },
