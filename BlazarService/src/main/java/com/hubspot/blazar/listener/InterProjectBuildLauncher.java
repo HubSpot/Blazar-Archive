@@ -60,7 +60,7 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
       s.add(moduleService.get(i).get());
     }
     DependencyGraph d = dependenciesService.buildInterProjectDependencyGraph(s);
-    LOG.info("Build graph for InterProjectBuild {} in {}", build.getId().get(), System.currentTimeMillis()-start);
+    LOG.debug("Built graph for InterProjectBuild {} in {}", build.getId().get(), System.currentTimeMillis()-start);
     interProjectBuildService.start(InterProjectBuild.withDependencyGraph(build, d));
   }
 

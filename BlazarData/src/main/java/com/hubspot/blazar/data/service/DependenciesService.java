@@ -47,7 +47,7 @@ public class DependenciesService {
     // Turn triggered modules into ModuleDependencies
     Set<ModuleDependency> moduleDependenciesTriggered = new HashSet<>();
     for (Module m : modulesTriggered ) {
-      LOG.info("InterProjectBuild has been triggered for module {}-{}", m.getName(), m.getId().get());
+      LOG.info("InterProjectBuild has been triggered for module {}({})", m.getName(), m.getId().get());
       moduleDependenciesTriggered.addAll(getProvides(ImmutableSet.of(m.getId().get())));
     }
 

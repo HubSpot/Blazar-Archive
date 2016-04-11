@@ -4,8 +4,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 
 import com.google.inject.Guice;
-import com.hubspot.blazar.data.service.BlazarTestBase;
-import com.hubspot.blazar.data.service.BlazarTestModule;
+import com.hubspot.blazar.test.base.service.BlazarTestBase;
 
 public class BlazarDataTestBase extends BlazarTestBase {
 
@@ -13,7 +12,7 @@ public class BlazarDataTestBase extends BlazarTestBase {
   public static void setup() throws Exception {
     synchronized (injector) {
       if (injector.get() == null) {
-        injector.set(Guice.createInjector(new BlazarTestModule(), new BlazarDataModule()));
+        injector.set(Guice.createInjector(new BlazarDataTestModule()));
         runSql("schema.sql");
       }
     }
@@ -23,5 +22,4 @@ public class BlazarDataTestBase extends BlazarTestBase {
   public void cleanup() throws Exception {
     runSql("schema.sql");
   }
-
 }

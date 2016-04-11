@@ -28,6 +28,7 @@ public abstract class BlazarTestBase {
 
   protected static void runSql(String resourceName) throws Exception {
     liquibase.logging.LogFactory.setInstance(new LogFactory() {
+
       @Override
       public Logger getLog(String name) {
         liquibase.logging.Logger log = new Slf4jLogger();
@@ -35,7 +36,6 @@ public abstract class BlazarTestBase {
         return log;
       }
     });
-
     try (Connection connection = getConnection()) {
       ResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
       JdbcConnection jdbcConnection = new JdbcConnection(connection);

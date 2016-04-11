@@ -25,7 +25,7 @@ public class ModuleDependency {
 
   @Override
   public String toString() {
-    return String.format("%s-%d", name, moduleId);
+    return String.format("%s(%d)", name, moduleId);
   }
 
   @Override

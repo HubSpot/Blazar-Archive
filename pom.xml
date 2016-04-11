@@ -205,6 +205,16 @@
         <artifactId>mockito-core</artifactId>
         <version>1.10.19</version>
       </dependency>
+      <dependency>
+        <groupId>com.mattbertolini</groupId>
+        <artifactId>liquibase-slf4j</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jukito</groupId>
+        <artifactId>jukito</artifactId>
+        <version>1.4.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
