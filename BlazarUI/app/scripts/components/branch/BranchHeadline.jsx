@@ -12,39 +12,7 @@ import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Star from '../shared/Star.jsx';
 import Icon from '../shared/Icon.jsx';
 
-let initialState = {
-  selectedBranch: ''
-};
-
 class RepoBuildHeadline extends Component {
-
-  constructor(props, context) {
-    super(props, context);
-
-    this.state = initialState;
-  }
-
-  componentDidMount() {
-    this.replacePlaceholder();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.branchInfo.branch !== nextProps.branchInfo.branch) {
-      this.replacePlaceholder();
-      this.props.refreshBranches();
-    }
-  }
-
-  replacePlaceholder() {
-    if (this.props.loading || !this.props.branchInfo.branch) {
-      setTimeout(() => {
-        this.replacePlaceholder();
-      }, 50);
-      return;
-    }
-
-    $('.Select-placeholder')[0].innerHTML = this.props.branchInfo.branch;
-  }
 
   onBranchSelect(selected) {
     const branchLink = `/builds/branch/${selected}`;
@@ -104,10 +72,9 @@ class RepoBuildHeadline extends Component {
         <Select
           className='branch-select-input'
           name='branchSelect'
-          placeholder=''
           noResultsText='No other branches'
-          value={this.state.selectedBranch}
-          options={this.props.branches}
+          value={this.props.branchInfo.branch}
+          options={this.getFilteredBranches()}
           onChange={this.onBranchSelect.bind(this)}
           searchable={false}
           clearable={false}
