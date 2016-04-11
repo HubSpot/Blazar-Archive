@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import {Button} from 'react-bootstrap';
 import {bindAll} from 'underscore';
-import classNames from 'classnames';
+import classNames from 'classnames'
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
@@ -41,6 +41,7 @@ let initialState = {
   modules: [],
   selectedModules: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
+  resetCache: false,
   branchId: 0,
   branchInfo: {},
   branches: [],
@@ -149,6 +150,12 @@ class BranchContainer extends Component {
     this.setState({
       buildDownstreamModules: enumValue
     });
+  }
+
+  updateResetCache() {
+    this.setState({
+      resetCache: !this.state.resetCache
+    })
   }
 
   triggerBuild() {
@@ -260,6 +267,7 @@ class BranchContainer extends Component {
               triggerBuild={this.triggerBuild}
               onSelectUpdate={this.updateSelectedModules}
               onCheckboxUpdate={this.updateDownstreamModules}
+              onResetCacheUpdate={this.updateResetCache}
               modules={this.state.modules}
             />
             {this.renderBuildSettingsButton()}

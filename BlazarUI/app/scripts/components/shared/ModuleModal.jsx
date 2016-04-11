@@ -1,19 +1,28 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import Immutable from 'immutable';
+import ReactTooltip from 'react-tooltip';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
+import Tooltip from 'react-bootstrap/lib/Tooltip';
+import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
 import ButtonGroup from 'react-bootstrap/lib/ButtonGroup'
 import Checkbox from './Checkbox.jsx';
 import Loader from './Loader.jsx';
+import Icon from './Icon.jsx';
 import ModuleSelectWrapper from './ModuleSelectWrapper.jsx';
+
+let initialState = {
+  showDownstreamTooltip: false,
+  showCacheTooltip: false
+}
 
 class ModuleModal extends Component {
 
   constructor(props) {
     super(props);
 
-    bindAll(this, 'updateDownstreamModules', 'updateSelectedModules', 'getModuleIdsAndBuild', 'maybeStartBuild');
+    bindAll(this, 'updateDownstreamModules', 'updateResetCache', 'updateSelectedModules', 'getModuleIdsAndBuild', 'maybeStartBuild');
   }
 
   getModuleIdsAndBuild() {
@@ -24,6 +33,10 @@ class ModuleModal extends Component {
   updateSelectedModules(modules) {
     const finalModules = modules.split(',');
     this.props.onSelectUpdate(finalModules);
+  }
+
+  updateResetCache() {
+    this.props.onResetCacheUpdate();
   }
 
   updateDownstreamModules(isChecked) {
@@ -47,6 +60,50 @@ class ModuleModal extends Component {
           checked={true}
           onCheckboxUpdate={this.updateDownstreamModules} 
         />
+        <a data-tip data-for='downstream-tooltip'>
+          <Icon
+            type='fa'
+            name='question-circle'
+            classNames='checkbox-tooltip'
+          />
+        </a>
+        <ReactTooltip
+          id='downstream-tooltip'
+          place='bottom'
+          type='dark'
+          effect='solid'>
+          Content
+        </ReactTooltip>
+      </div>
+    );
+  }
+
+  renderResetCache() {
+    return (
+      <div className="cache-checkbox-wrapper">
+        <Checkbox
+          label=' Reset Cache'
+          name='cache-checkbox'
+          checked={false}
+          onCheckboxUpdate={this.updateResetCache} 
+        />
+        <div className='tooltip-wrapper'>
+          <a data-tip data-for='cache-tooltip'>
+            <Icon
+              type='fa'
+              name='question-circle'
+              classNames='checkbox-tooltip'
+            />
+          </a>
+         <ReactTooltip
+            className='cache-tooltip'
+            id='cache-tooltip'
+            place='bottom'
+            type='dark'
+            effect='solid'>
+            Content
+          </ReactTooltip>
+        </div>
       </div>
     );
   }
@@ -77,9 +134,12 @@ class ModuleModal extends Component {
               />
             </div>
           </div>
+          <div className='checkbox-wrapper'>
+            {this.renderDownstreamToggle()}
+            {this.renderResetCache()}
+          </div>
         </Modal.Body>
         <Modal.Footer>
-          {this.renderDownstreamToggle()}
           <Button onClick={this.props.closeModal}>Nevermind</Button>
           <Button onClick={this.getModuleIdsAndBuild} className='btn btn-primary'>Build</Button>
         </Modal.Footer>
@@ -101,6 +161,7 @@ ModuleModal.propTypes = {
   triggerBuild: PropTypes.func.isRequired,
   onSelectUpdate: PropTypes.func.isRequired,
   onCheckboxUpdate: PropTypes.func.isRequired,
+  onResetCacheUpdate: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
   loadingModules: PropTypes.bool,
   modules: PropTypes.array.isRequired
