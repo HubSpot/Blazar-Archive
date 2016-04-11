@@ -90,9 +90,10 @@ class RepoBuildHeadline extends Component {
 
     const {stars, params, currentRepoBuild} = this.props;
     const branchId = parseInt(this.props.params.branchId, 10);
+    const repoLink = `/builds/repo/${this.props.branchInfo.repository}`;
 
     return (
-      <Headline>
+      <Headline className='headline'>
         <Star
           className='icon-roomy'
           isStarred={contains(stars, branchId)}
@@ -106,7 +107,7 @@ class RepoBuildHeadline extends Component {
           placeholder=''
           noResultsText='No other branches'
           value={this.state.selectedBranch}
-          options={this.getFilteredBranches()}
+          options={this.props.branches}
           onChange={this.onBranchSelect.bind(this)}
           searchable={false}
           clearable={false}
