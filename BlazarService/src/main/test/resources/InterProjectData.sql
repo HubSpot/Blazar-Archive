@@ -29,7 +29,8 @@ INSERT INTO `modules` (`id`, `branchId`, `name`, `type`, `path`, `glob`, `active
   (12,4,'Module3','config','/module3','/module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
 -- Repo5 modules
   (13,5,'Module1','config','/module1','/module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (14,5,'Module2','config','/module2','/module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL);
+  (14,5,'Module2','config','/module2','/module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (15,5,'Module3','config','/module3','/module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL);
 
 -- insert providers
 --changeset InterProjectTestInsertProviders:3 dbms:h2 runAlways:true
@@ -43,7 +44,7 @@ INSERT INTO `module_depends` (`moduleId`, `name`) VALUES
   / \                     |     |
 4.1(10) 4.2(11)       4.3(12)   |
  \  /                     |     |
- 5.1(13)                  +--->5.2(14)
+ 5.1(13)                  +--->5.2(14)   5.3
  */
 -- Repo1
 -- 1.1, 1.2 have no deps (root of their trees)
@@ -88,4 +89,5 @@ INSERT INTO `module_provides` (`moduleId`, `name`) VALUES
   (12, 'Repo4-Module3'),
 -- Repo5
   (13, 'Repo5-Module1'),
-  (14, 'Repo5-Module2');
+  (14, 'Repo5-Module2'),
+  (15, 'Repo5-Module3');

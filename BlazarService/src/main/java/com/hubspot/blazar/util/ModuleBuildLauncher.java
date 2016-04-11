@@ -67,7 +67,7 @@ public class ModuleBuildLauncher {
         .withBuildConfig(buildConfig)
         .withResolvedConfig(resolvedConfig);
 
-    LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
+    LOG.info("Updating status of Module Build {} to {}", launching.getId().get(), launching.getState());
     moduleBuildService.begin(launching);
   }
 

@@ -95,6 +95,14 @@ public class InterProjectBuild {
   }
 
   @Override
+  public String toString() {
+    return com.google.common.base.Objects.toStringHelper(this)
+        .add("id", id)
+        .add("state", state)
+        .toString();
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;

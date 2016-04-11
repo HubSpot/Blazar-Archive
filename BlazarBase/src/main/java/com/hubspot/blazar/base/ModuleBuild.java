@@ -1,12 +1,12 @@
 package com.hubspot.blazar.base;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 import com.hubspot.rosetta.annotations.StoredAsJson;
-
-import java.util.Objects;
 
 public class ModuleBuild {
   public enum SimpleState { WAITING, RUNNING, COMPLETE }
@@ -167,6 +167,16 @@ public class ModuleBuild {
 
   public ModuleBuild withResolvedConfig(BuildConfig resolvedConfig) {
     return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, Optional.of(resolvedConfig));
+  }
+
+  @Override
+  public String toString() {
+    return com.google.common.base.Objects.toStringHelper(this)
+        .add("id", id)
+        .add("moduleId", moduleId)
+        .add("repoBuildId", repoBuildId)
+        .add("state", state)
+        .toString();
   }
 
   @Override

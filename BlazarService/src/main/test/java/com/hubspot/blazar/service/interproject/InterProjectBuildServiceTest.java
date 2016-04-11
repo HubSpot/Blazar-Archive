@@ -3,8 +3,9 @@ package com.hubspot.blazar.service.interproject;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.jukito.JukitoRunner;
@@ -12,39 +13,35 @@ import org.jukito.UseModules;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHRepository;
-import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
-import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.InterProjectModuleBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectRepositoryBuildMappingService;
+import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.listener.BuildEventDispatcher;
 import com.hubspot.blazar.service.BlazarServiceTestBase;
 import com.hubspot.blazar.service.BlazarServiceTestModule;
-import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.blazar.util.SingularityBuildLauncher;
 import io.dropwizard.db.ManagedDataSource;
 import liquibase.Contexts;
@@ -56,7 +53,6 @@ import liquibase.resource.ResourceAccessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.doAnswer;
 
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarServiceTestModule.class})
@@ -80,6 +76,10 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   private InterProjectRepositoryBuildMappingService iPRepositoryBuildMappingService;
   @Inject
   private InterProjectModuleBuildMappingService iPModuleBuildMappingService;
+  @Inject
+  private RepositoryBuildService repositoryBuildService;
+  @Inject
+  private ModuleBuildService moduleBuildService;
 
   @Before
   public void before() throws IOException, SQLException, LiquibaseException {
@@ -108,87 +108,32 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
   @Test
   public void testInterProjectBuildEnqueue(SingularityBuildLauncher singularityBuildLauncher,
-                                           BlazarConfiguration blazarConfiguration,
-                                           GitHubHelper gitHubHelper,
-                                           final GHRepository gHRepository,
-                                           final GHCommit gHCommit) throws Exception {
-    // do mocks
-    Answer<Void> answer = new Answer<Void>() {
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        ModuleBuild m = (ModuleBuild) invocation.getArguments()[1];
-        LOG.info("PRETENDING TO LAUNCH {}", m);
-        return null;
+                                           BlazarConfiguration blazarConfiguration) throws Exception {
+    List<Integer> branchIds = Lists.newArrayList(1,2,3,4,5);
+    List<RepositoryBuild> buildSeedList = new ArrayList<>();
+    for (int i : branchIds) {
+      LOG.debug("Launching Repository Build to seed db with successes for all modules on {branchId=1}");
+      buildSeedList.add(makeRepoBuild(i));
+    }
+    LOG.info("All branch builds launched");
+    for (RepositoryBuild r : buildSeedList){
+      Set<ModuleBuild> moduleBuilds = moduleBuildService.getByRepositoryBuild(r.getId().get());
+      for (ModuleBuild b : moduleBuilds) {
+        assertThat(b.getState().isComplete()).isTrue();
+        assertThat(b.getState()).isEqualTo(ModuleBuild.State.SUCCEEDED);
       }
-    };
-    doAnswer(answer).when(singularityBuildLauncher).launchBuild(Matchers.<ModuleBuild>any());
+    }
+    LOG.info("All seed builds succeeded");
 
-    final Answer<GHRepository> ghRepositoryAnswer = new Answer<GHRepository>() {
-      @Override
-      public GHRepository answer(InvocationOnMock invocation) {
-        return gHRepository;
-      }
-    };
-    doAnswer(ghRepositoryAnswer).when(gitHubHelper).repositoryFor(Matchers.<GitInfo>any());
-
-    Answer<Optional<String>> shaAnswer = new Answer<Optional<String>>() {
-      @Override
-      public Optional<String> answer(InvocationOnMock invocation) {
-        LOG.debug("returned fake sha");
-        return Optional.of("0000000000000000000000000000000000000000"); // fake sha
-      }
-    };
-    doAnswer(shaAnswer).when(gitHubHelper).shaFor(Matchers.<GHRepository>any(), Matchers.<GitInfo>any());
-
-    final Answer<GHCommit> ghCommitAnswer = new Answer<GHCommit> () {
-      @Override
-      public GHCommit answer(InvocationOnMock invocation) {
-        return gHCommit;
-      }
-    };
-    doAnswer(ghCommitAnswer).when(gHRepository).getCommit(Matchers.<String>any());
-
-    Answer<Commit> toCommitAnswer = new Answer<Commit> () {
-      @Override
-      public Commit answer(InvocationOnMock invocation) {
-        Commit.Builder builder = Commit.newBuilder()
-            .setId("0000000000000000000000000000000000000000")
-            .setMessage("fake message")
-            .setTimestamp("0");
-        return builder.build();
-      }
-    };
-    doAnswer(toCommitAnswer).when(gitHubHelper).toCommit(Matchers.<GHCommit>any());
-
-    final Answer<CommitInfo> commitInfoAnswer = new Answer<CommitInfo>() {
-      @Override
-      public CommitInfo answer(InvocationOnMock invocation) {
-        Commit.Builder builder = Commit.newBuilder()
-            .setId("0000000000000000000000000000000000000000")
-            .setMessage("fake message")
-            .setTimestamp("0");
-        return new CommitInfo(builder.build(), Optional.<Commit>absent(), Collections.<Commit>emptyList(), false);
-      }
-    };
-    doAnswer(commitInfoAnswer).when(gitHubHelper).commitInfoFor(Matchers.<GHRepository>any(), Matchers.<Commit>any(), Matchers.<Optional<Commit>>any());
-
-    final Answer<UiConfiguration> uiConfigurationAnswer = new Answer<UiConfiguration> () {
-      @Override
-      public UiConfiguration answer(InvocationOnMock invocation) {
-        return new UiConfiguration("http://localhost/test/base/url");
-      }
-    };
-    doAnswer(uiConfigurationAnswer).when(blazarConfiguration).getUiConfiguration();
-
-    // do tests
-
+    // Trigger interProjectBuild
+    LOG.info("Starting inter-project-build test");
     InterProjectBuild build = InterProjectBuild.getQueuedBuild(Sets.newHashSet(1), BuildTrigger.forInterProjectBuild(branchService.get(1).get()));
     long id = interProjectBuildService.enqueue(build);
     Optional<InterProjectBuild> maybeQueued = interProjectBuildService.getWithId(id);
     int count = 0;
     // wait for build to finish
     while (maybeQueued.isPresent() && maybeQueued.get().getState() != InterProjectBuild.State.FINISHED) {
-      if (count > 10) {
+      if (count > 1) {
         fail("InterProject did not finish in 10s");
       }
       count++;
@@ -209,6 +154,11 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
   private void postSingularityEvents(ModuleBuild build) {
     LOG.info("Build for moduleId {} triggered", build.getModuleId());
+  }
+
+  private RepositoryBuild makeRepoBuild(int branchId) {
+    long id = repositoryBuildService.enqueue(branchService.get(branchId).get(), BuildTrigger.forBranchCreation("master"), BuildOptions.defaultOptions());
+    return repositoryBuildService.get(id).get();
   }
 
 }

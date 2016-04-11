@@ -35,8 +35,7 @@ public class SingularityBuildLauncher {
         Optional.of(false),
         Optional.of(buildId),
         Optional.of(Arrays.asList(
-            "--dryRun", "true",
-            "--blazarApiDomain", "http://bootstrap.hubteamqa.com",
+            "--blazarApiDomain", "http://bootstrap.hubteam.com",
             "--blazarUiUrl", "http://private.hubteamqa.com/blazar",
             "--buildId", buildId))
     );

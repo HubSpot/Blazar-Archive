@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.InterProjectBuild;
@@ -67,12 +66,20 @@ public class BuildEventDispatcher {
 
     try {
       for (RepositoryBuildVisitor visitor : repositoryVisitors) {
-        visitor.visit(build);
+        try {
+
+          visitor.visit(build);
+        } catch (Exception e) {
+          e.printStackTrace();
+          LOG.info("Bad happened");
+        }
       }
-    } catch (NonRetryableBuildException e) {
-      LOG.warn("Failing build {}", build.getId().get(), e);
-      repositoryBuildService.fail(build);
+    } finally {
     }
+    //} catch (NonRetryableBuildException e) {
+    //  LOG.warn("Failing build {}", build.getId().get(), e);
+    //  repositoryBuildService.fail(build);J
+    //}
   }
 
   @Subscribe
@@ -87,12 +94,19 @@ public class BuildEventDispatcher {
 
     try {
       for (ModuleBuildVisitor visitor : moduleVisitors) {
-        visitor.visit(build);
+        try {
+          visitor.visit(build);
+        } catch (Exception e) {
+          e.printStackTrace();
+          LOG.info("Bad happened");
+        }
       }
-    } catch (NonRetryableBuildException e) {
-      LOG.warn("Failing build {}", build.getId().get(), e);
-      moduleBuildService.fail(build);
+    } finally {
     }
+    // } catch (NonRetryableBuildException e) {
+    //   LOG.warn("Failing build {}", build.getId().get(), e);
+    //   moduleBuildService.fail(build);
+    // }
   }
 
   private boolean matchingState(ModuleBuild.State current, ModuleBuild.State other) {

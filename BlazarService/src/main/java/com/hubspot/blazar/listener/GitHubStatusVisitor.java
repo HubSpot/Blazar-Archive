@@ -56,11 +56,11 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
       return;
     }
 
-    LOG.info("Setting status of commit {} to {} for build {}", sha, state, build.getId().get());
+    LOG.info("Setting status of commit {} to {} for build {}", sha.substring(0, 8), state, build.getId().get());
     try {
       repository.createCommitStatus(sha, state, url, description, "Blazar");
     } catch (IOException e) {
-      LOG.error("Error setting status of commit {} to {} for build {}", sha, state, build.getId().get(), e);
+      LOG.error("Error setting status of commit {} to {} for build {}", sha.substring(0, 8), state, build.getId().get(), e);
     }
   }
 

@@ -1,0 +1,205 @@
+---
+  config:
+    git.example.com:
+      - name: "Repo1"   # Git Repo in git.example.com
+        owner:          # specifies which org
+          name: "test"
+          login: "test" # TODO The names stuff is probably wrong
+          email: "test@example.com"
+        tree:
+          sha: "1111111111111111111111111111111111111111"
+          tree:
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module1/.blazar.yaml"
+              content: "git/example/com/Repo1/module1/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module2/.blazar.yaml"
+              content: "git/example/com/Repo1/module2/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module3/.blazar.yaml"
+              content: "git/example/com/Repo1/module3/.blazar.yaml"
+        commits:
+          - sha1: "1111111111111111111111111111111111111111"
+            files:
+              - fileName: "/module1/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+            commitShortInfo:
+              message: "initial commit"
+              commiter:  # TODO wonder if it would be easy to make this just be 1 thing for tests at least
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+              author:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+        branches:
+          master:    # branches _actually_ contain commit objects, we fake that to reduce complexity/duplication, this sha must reference a sha provided in the repo commits list
+            name: "master"
+            sha: "1111111111111111111111111111111111111111"
+      - name: "Repo2"   # Git Repo in git.example.com
+        owner:          # specifies which org
+          name: "test"
+          login: "test" # TODO The names stuff is probably wrong
+          email: "test@example.com"
+        tree:
+          sha: "1111111111111111111111111111111111111111"
+          tree:
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module1/.blazar.yaml"
+              content: "git/example/com/Repo2/module1/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module2/.blazar.yaml"
+              content: "git/example/com/Repo2/module2/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module3/.blazar.yaml"
+              content: "git/example/com/Repo2/module3/.blazar.yaml"
+        commits:
+          - sha1: "1111111111111111111111111111111111111111"
+            files:
+              - fileName: "/module1/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+            commitShortInfo:
+              message: "initial commit"
+              commiter:  # TODO wonder if it would be easy to make this just be 1 thing for tests at least
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+              author:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+        branches:
+          master:    # branches _actually_ contain commit objects, we fake that to reduce complexity/duplication, this sha must reference a sha provided in the repo commits list
+            name: "master"
+            sha: "1111111111111111111111111111111111111111"
+      - name: "Repo3"   # Git Repo in git.example.com
+        owner:          # specifies which org
+          name: "test"
+          login: "test" # TODO The names stuff is probably wrong
+          email: "test@example.com"
+        tree:
+          sha: "1111111111111111111111111111111111111111"
+          tree:
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module1/.blazar.yaml"
+              content: "git/example/com/Repo3/module1/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module2/.blazar.yaml"
+              content: "git/example/com/Repo3/module2/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module3/.blazar.yaml"
+              content: "git/example/com/Repo3/module3/.blazar.yaml"
+        commits:
+          - sha1: "1111111111111111111111111111111111111111"
+            files:
+              - fileName: "/module1/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+            commitShortInfo:
+              message: "initial commit"
+              commiter:  # TODO wonder if it would be easy to make this just be 1 thing for tests at least
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+              author:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+        branches:
+          master:    # branches _actually_ contain commit objects, we fake that to reduce complexity/duplication, this sha must reference a sha provided in the repo commits list
+            name: "master"
+            sha: "1111111111111111111111111111111111111111"
+      - name: "Repo4"   # Git Repo in git.example.com
+        owner:          # specifies which org
+          name: "test"
+          login: "test" # TODO The names stuff is probably wrong
+          email: "test@example.com"
+        tree:
+          sha: "1111111111111111111111111111111111111111"
+          tree:
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module1/.blazar.yaml"
+              content: "git/example/com/Repo4/module1/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module2/.blazar.yaml"
+              content: "git/example/com/Repo4/module2/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module3/.blazar.yaml"
+              content: "git/example/com/Repo4/module3/.blazar.yaml"
+        commits:
+          - sha1: "1111111111111111111111111111111111111111"
+            files:
+              - fileName: "/module1/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+            commitShortInfo:
+              message: "initial commit"
+              commiter:  # TODO wonder if it would be easy to make this just be 1 thing for tests at least
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+              author:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+        branches:
+          master:    # branches _actually_ contain commit objects, we fake that to reduce complexity/duplication, this sha must reference a sha provided in the repo commits list
+            name: "master"
+            sha: "1111111111111111111111111111111111111111"
+      - name: "Repo5"   # Git Repo in git.example.com
+        owner:          # specifies which org
+          name: "test"
+          login: "test" # TODO The names stuff is probably wrong
+          email: "test@example.com"
+        tree:
+          sha: "1111111111111111111111111111111111111111"
+          tree:
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module1/.blazar.yaml"
+              content: "git/example/com/Repo5/module1/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module2/.blazar.yaml"
+              content: "git/example/com/Repo5/module2/.blazar.yaml"
+            - sha: "1111111111111111111111111111111111111111"
+              path: "/module3/.blazar.yaml"
+              content: "git/example/com/Repo5/module3/.blazar.yaml"
+        commits:
+          - sha1: "1111111111111111111111111111111111111111"
+            files:
+              - fileName: "/module1/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+              - fileName: "/module3/.blazar.yaml"
+                status: "added"
+            commitShortInfo:
+              message: "initial commit"
+              commiter:  # TODO wonder if it would be easy to make this just be 1 thing for tests at least
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+              author:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+        branches:
+          master:    # branches _actually_ contain commit objects, we fake that to reduce complexity/duplication, this sha must reference a sha provided in the repo commits list
+            name: "master"
+            sha: "1111111111111111111111111111111111111111"
+
+

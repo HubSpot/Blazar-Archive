@@ -1,5 +1,16 @@
 package com.hubspot.blazar.util;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.kohsuke.github.GHRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveryResult;
@@ -15,15 +26,6 @@ import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
-import org.kohsuke.github.GHRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Set;
 
 @Singleton
 public class RepositoryBuildLauncher {
@@ -63,7 +65,7 @@ public class RepositoryBuildLauncher {
         .withState(State.LAUNCHING)
         .withCommitInfo(commitInfo)
         .withDependencyGraph(dependenciesService.buildDependencyGraph(gitInfo, modules));
-    LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
+    LOG.info("Updating status of Repo Build {} to {}", launching.getId().get(), launching.getState());
     repositoryBuildService.begin(launching);
   }
 
@@ -91,7 +93,7 @@ public class RepositoryBuildLauncher {
       String message = String.format("Couldn't find branch %s for repository %s", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
       throw new NonRetryableBuildException(message);
     } else {
-      LOG.info("Found sha {} for branch {}/{}", sha.get(), gitInfo.getRepository(), gitInfo.getBranch());
+      LOG.info("Found sha {} for branch {}/{}", sha.get().substring(0, 8), gitInfo.getRepository(), gitInfo.getBranch());
 
       Commit currentCommit = gitHubHelper.toCommit(repository.getCommit(sha.get()));
       return gitHubHelper.commitInfoFor(repository, currentCommit, previousCommit);
