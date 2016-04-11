@@ -26,9 +26,8 @@
   font-size 28px
   color #4a4a4a
   
-.notifications__channels
-  max-height 242px
-  overflow-y scroll
+.channel-button
+  height 300px
 
 .notifications__channels-headline
   margin-top 20px
@@ -168,12 +167,17 @@
   top 8px
 
 .slack-channel-input
+  margin-top 20px
   border-radius 3px
   border 0.5px solid #7c98b6
 
   & .Select-control
     background-color rgba(243, 248, 252, 0.5)
     border 0
+    
+  & .Select-menu-outer
+    height 300px
+    position absolute
 
 .notifications__list--empty
   text-align center

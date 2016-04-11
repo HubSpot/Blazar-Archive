@@ -109,9 +109,9 @@ class NotificationsChannels extends Component {
       <div className='notifications__channels-container'>
         <div className='notifications__channels'>
           {this.renderChannels()}
-          {this.renderNewChannel()}
           {this.renderToast()}
         </div>
+        {this.renderNewChannel()}
       </div>
     );
   }

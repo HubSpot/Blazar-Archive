@@ -119,7 +119,7 @@ class Notifications extends Component {
             />
           </UIGridItem>
         </UIGrid>
-        <UIGrid className='notifications__grid'>
+        <UIGrid className='notifications__grid channel-button'>
           <UIGridItem size={4}>
             {this.renderButton()}
           </UIGridItem>
