@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import Select from 'react-select';
+import moment from 'moment';
 
 import NotificationsChannel from './NotificationsChannel.jsx';
 
@@ -8,7 +9,8 @@ import SettingsActions from '../../actions/settingsActions';
 
 let initialState = {
   channelDeleted: undefined,
-  showToast: false
+  showToast: false,
+  showedToastAt: moment()
 };
 
 class NotificationsChannels extends Component {
@@ -30,16 +32,25 @@ class NotificationsChannels extends Component {
 
     this.setState({
       channelDeleted: channelName,
-      showToast: true
+      showToast: true,
+      moment: moment()
     });
 
     setTimeout(() => {
+      if (moment() - this.state.moment < 5250) {
+        return;
+      }
+
       this.setState({
         channelDeleted: undefined
       });
     }, 5250);
 
     setTimeout(() => {
+      if (moment() - this.state.moment < 5000) {
+        return;
+      }
+
       this.setState({
         showToast: false
       });
