@@ -11,8 +11,33 @@ import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Star from '../shared/Star.jsx';
 import Icon from '../shared/Icon.jsx';
+import moment from 'moment';
 
-class RepoBuildHeadline extends Component {
+let initialState = {
+  moment: moment()
+};
+
+class BranchHeadline extends Component {
+
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = initialState;
+  }
+
+  componentDidMount() {
+    this.interval = setInterval(this.updateMoment.bind(this), 5000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  updateMoment() {
+    this.setState({
+      moment: moment()
+    });
+  }
 
   onBranchSelect(selected) {
     const branchLink = `/builds/branch/${selected}`;
@@ -42,7 +67,7 @@ class RepoBuildHeadline extends Component {
       return null;
     }
 
-    const imgPath = `${config.apiRoot}/branches/state/${this.props.params.branchId}/shield`;
+    const imgPath = `${config.apiRoot}/branches/state/${this.props.params.branchId}/shield?${this.state.moment}`;
 
     return (
       <div className='branch__shield'>
@@ -85,15 +110,15 @@ class RepoBuildHeadline extends Component {
   }
 }
 
-RepoBuildHeadline.propTypes = {
+BranchHeadline.propTypes = {
   params: PropTypes.object.isRequired,
   branchId: PropTypes.number,
   loading: PropTypes.bool.isRequired,
   branchInfo: PropTypes.object.isRequired
 };
 
-RepoBuildHeadline.contextTypes = {
+BranchHeadline.contextTypes = {
   router: PropTypes.object.isRequired
 };
 
-export default RepoBuildHeadline;
+export default BranchHeadline;
