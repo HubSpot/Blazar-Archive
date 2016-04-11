@@ -99,7 +99,7 @@ public class RepositoryBuildLauncher {
   }
 
   private static Optional<Commit> commit(Optional<RepositoryBuild> build) {
-    if (build.isPresent() && build.get().getCommitInfo() != null) {
+    if (build.isPresent() && build.get().getCommitInfo() != null && build.get().getCommitInfo().isPresent()) {
       return Optional.of(build.get().getCommitInfo().get().getCurrent());
     } else {
       return Optional.absent();
