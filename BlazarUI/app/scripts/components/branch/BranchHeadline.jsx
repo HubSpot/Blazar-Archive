@@ -29,6 +29,12 @@ class BranchHeadline extends Component {
     this.interval = setInterval(this.updateMoment.bind(this), 5000);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.branchInfo.branch !== nextProps.branchInfo.branch) {
+      this.props.refreshBranches();
+    }
+  }
+
   componentWillUnmount() {
     clearInterval(this.interval);
   }
