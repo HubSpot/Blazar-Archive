@@ -15,6 +15,7 @@ import BuildButton from './BuildButton.jsx';
 import ModuleModal from '../shared/ModuleModal.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 import Immutable from 'immutable';
+import $ from 'jquery';
 
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
@@ -41,7 +42,8 @@ let initialState = {
   buildDownstreamModules: 'WITHIN_REPOSITORY',
   branchId: 0,
   branchInfo: {},
-  branches: []
+  branches: [],
+  maxRows: 50
 };
 
 class BranchContainer extends Component {
@@ -81,6 +83,7 @@ class BranchContainer extends Component {
     BranchActions.loadMalformedFiles(params);
     BranchActions.startPolling(params);
     this.tryLoadBranches();
+    this.setScrollListener();
   }
   
   tearDown() {
@@ -97,6 +100,18 @@ class BranchContainer extends Component {
     }
 
     RepoActions.loadBranches(this.state.branchInfo.repositoryId);
+  }
+
+  setScrollListener() {
+    $(window).scroll($.proxy(function() {
+      const scrolledToBottom = $(window).scrollTop() + $(window).height() == $(document).height();
+
+      if (scrolledToBottom) {
+        this.setState({
+          maxRows: this.state.maxRows + 50
+        });
+      }
+    }, this));
   }
 
   refreshBranches() {
@@ -154,7 +169,7 @@ class BranchContainer extends Component {
 
       return (
         <BranchBuildHistoryTable
-          data={this.state.builds}
+          data={this.state.builds !== null ? this.state.builds.slice(0, this.state.maxRows) : null}
           loading={this.isLoading()}
           {...this.state}
           {...this.props}
@@ -181,7 +196,7 @@ class BranchContainer extends Component {
   }
 
   renderBuildSettingsButton() {
-    if (this.state.loadingBranches || this.state.loadingRepo) {
+    if (this.isLoading()) {
       return;
     }
 
@@ -196,9 +211,21 @@ class BranchContainer extends Component {
     );
   }
 
+  renderLoader() {
+    const showedAllRows = this.state.builds === null || this.state.maxRows >= this.state.builds.size;
+    
+    if (this.isLoading() || showedAllRows) {
+      return;
+    }
+
+    return (
+      <Loader align='center' />
+    );
+  }
+
   render() {
     return (
-      <PageContainer>
+      <PageContainer classNames='branch-container'>
         {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={7}>
@@ -234,6 +261,7 @@ class BranchContainer extends Component {
             {this.renderTable()}
           </UIGridItem>
         </UIGrid>
+        {this.renderLoader()}
       </PageContainer>
     );
   }
