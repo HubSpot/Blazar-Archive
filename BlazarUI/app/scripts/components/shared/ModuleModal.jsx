@@ -60,7 +60,7 @@ class ModuleModal extends Component {
           checked={true}
           onCheckboxUpdate={this.updateDownstreamModules} 
         />
-        <a data-tip data-for='downstream-tooltip'>
+        <a data-tip data-for='downstreamTooltip'>
           <Icon
             type='fa'
             name='question-circle'
@@ -68,11 +68,11 @@ class ModuleModal extends Component {
           />
         </a>
         <ReactTooltip
-          id='downstream-tooltip'
+          id='downstreamTooltip'
           place='bottom'
           type='dark'
           effect='solid'>
-          Content
+          Build dependent downstream modules
         </ReactTooltip>
       </div>
     );
@@ -101,7 +101,7 @@ class ModuleModal extends Component {
             place='bottom'
             type='dark'
             effect='solid'>
-            Content
+            Clear cached directories set in blazar.yaml
           </ReactTooltip>
         </div>
       </div>
