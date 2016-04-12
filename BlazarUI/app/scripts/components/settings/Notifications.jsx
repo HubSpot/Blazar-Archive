@@ -33,6 +33,18 @@ class Notifications extends Component {
         selectedChannel: notifications[0].channelName
       });
     }
+
+    $(window).keyup($.proxy(function(event) {
+      if (event.keyCode === 27 && this.state.addingNewChannel) {
+        this.setState({
+          addingNewChannel: false
+        });
+      }
+    }, this));
+  }
+
+  componentWillUnmount() {
+    $(window).unbind('keyup');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -44,7 +56,7 @@ class Notifications extends Component {
 
     if (notifications.length) {
       this.setState({
-        selectedChannel: notifications[0].channelName
+        selectedChannel: notifications[notifications.length - 1].channelName
       });
     }
   }
@@ -122,19 +134,15 @@ class Notifications extends Component {
               onChannelDelete={this.onChannelDelete}
               {...this.props}
             />
+            <div className='notifications__new-channel-button-wrapper'>
+              {this.renderButton()}
+            </div>
           </UIGridItem>
           <UIGridItem size={8}>
             <NotificationsList
               channel={this.state.selectedChannel}
               {...this.props}
             />
-          </UIGridItem>
-        </UIGrid>
-        <UIGrid className='notifications__grid channel-button'>
-          <UIGridItem size={4}>
-            {this.renderButton()}
-          </UIGridItem>
-          <UIGridItem size={8}>
           </UIGridItem>
         </UIGrid>
       </div>

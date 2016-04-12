@@ -22,8 +22,20 @@ class NotificationsChannels extends Component {
   }
 
   handleSlackChannelPicked(channelName) {
+    if (this.channelAlreadyHasNotification(channelName) || channelName === '') {
+      return;
+    }
+
     SettingsActions.addNotification(channelName);
     this.props.onSelectedNewChannel();
+  }
+
+  channelAlreadyHasNotification(channelName) {
+    const existingChannels = this.props.notifications.map((notification) => {
+      return notification.channelName;
+    });
+
+    return existingChannels.indexOf(channelName) !== -1;
   }
 
   deleteNotification(notificationId, channelName) {
@@ -84,15 +96,17 @@ class NotificationsChannels extends Component {
     });
 
     return (
+      <div className='notifications__new-channel-hashtag'>
+      #
       <Select
-        placeholder='Select a Slack channel'
+        placeholder="Choose a channel"
         className='slack-channel-input'
         name="slackChannel"
         options={slackChannels}
         onChange={this.handleSlackChannelPicked}
         allowCreate={true}
-        addLabelText='{label}'
-        />
+        addLabelText='{label}' />
+      </div>
     );
   }
 
@@ -120,9 +134,9 @@ class NotificationsChannels extends Component {
       <div className='notifications__channels-container'>
         <div className='notifications__channels'>
           {this.renderChannels()}
+          {this.renderNewChannel()}
           {this.renderToast()}
         </div>
-        {this.renderNewChannel()}
       </div>
     );
   }

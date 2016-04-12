@@ -74,6 +74,16 @@ class NotificationsChannel extends Component {
     );
   }
 
+  renderArrow() {
+    if (!this.props.isSelected) {
+      return null;
+    }
+
+    return (
+      <div className='notifications__triangle' />
+    );
+  }
+
   renderTrashCan() {
     if (!this.props.isSelected) {
       return null;
@@ -96,6 +106,7 @@ class NotificationsChannel extends Component {
           # {this.props.channel}
         </div>
         {this.renderTrashCan()}
+        {this.renderArrow()}
         {this.renderDeleteConfirmation()}
       </div>
     );
