@@ -53,7 +53,7 @@ class BranchContainer extends Component {
   constructor() {
     this.state = initialState;
 
-    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'triggerBuild');
+    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'triggerBuild');
   }
 
   componentDidMount() {
@@ -159,7 +159,7 @@ class BranchContainer extends Component {
   }
 
   triggerBuild() {
-    BranchActions.triggerBuild(this.props.params, this.state.selectedModules, this.state.buildDownstreamModules);
+    BranchActions.triggerBuild(this.props.params, this.state);
   }
 
   isLoading() {
