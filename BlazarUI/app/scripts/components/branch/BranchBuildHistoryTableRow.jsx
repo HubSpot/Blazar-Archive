@@ -44,7 +44,14 @@ class BranchBuildHistoryTableRow extends Component {
     }
 
     else {
-      this.context.router.push(blazarPath);
+      if (!e.metaKey) {
+        this.context.router.push(blazarPath);
+      }
+
+      else {
+        window.open(blazarPath);
+        return;
+      }
     }
   }
 

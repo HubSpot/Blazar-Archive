@@ -29,7 +29,14 @@ class StarredBranchesTableRow extends Component {
     }
 
     else if (blazarPath !== undefined) {
-      this.context.router.push(blazarPath);
+      if (!e.metaKey) {
+        this.context.router.push(blazarPath);
+      }
+
+      else {
+        window.open(blazarPath);
+        return;
+      }
     }
   }
 

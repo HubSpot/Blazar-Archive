@@ -37,7 +37,14 @@ class RepoBuildModulesTableRow extends Component {
     }
 
     else if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(data.state) === -1) {
-      this.context.router.push(data.blazarPath);
+      if (!e.metaKey) {
+        this.context.router.push(data.blazarPath);
+      }
+
+      else {
+        window.open(data.blazarPath);
+        return;
+      }
     }
   }
 
