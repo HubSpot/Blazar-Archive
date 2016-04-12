@@ -22,8 +22,20 @@ class NotificationsChannels extends Component {
   }
 
   handleSlackChannelPicked(channelName) {
+    if (this.channelAlreadyHasNotification(channelName) || channelName === '') {
+      return;
+    }
+
     SettingsActions.addNotification(channelName);
     this.props.onSelectedNewChannel();
+  }
+
+  channelAlreadyHasNotification(channelName) {
+    const existingChannels = this.props.notifications.map((notification) => {
+      return notification.channelName;
+    });
+
+    return existingChannels.indexOf(channelName) !== -1;
   }
 
   deleteNotification(notificationId, channelName) {
