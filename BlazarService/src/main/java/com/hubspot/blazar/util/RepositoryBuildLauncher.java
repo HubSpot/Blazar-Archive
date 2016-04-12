@@ -55,7 +55,7 @@ public class RepositoryBuildLauncher {
   }
 
   public void launch(RepositoryBuild queued, Optional<RepositoryBuild> previous) throws Exception {
-    GitInfo gitInfo = branchService.get(queued.getBranchId()).get();;
+    GitInfo gitInfo = branchService.get(queued.getBranchId()).get();
     CommitInfo commitInfo = commitInfo(gitInfo, commit(previous));
     Set<Module> modules = updateModules(gitInfo, commitInfo);
 
