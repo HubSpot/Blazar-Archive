@@ -4,9 +4,6 @@ import Immutable from 'immutable';
 import ReactTooltip from 'react-tooltip';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
-import Tooltip from 'react-bootstrap/lib/Tooltip';
-import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
-import ButtonGroup from 'react-bootstrap/lib/ButtonGroup'
 import Checkbox from './Checkbox.jsx';
 import Loader from './Loader.jsx';
 import Icon from './Icon.jsx';
