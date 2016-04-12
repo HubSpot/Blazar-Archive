@@ -56,7 +56,7 @@ class Notifications extends Component {
 
     if (notifications.length) {
       this.setState({
-        selectedChannel: notifications[0].channelName
+        selectedChannel: notifications[notifications.length - 1].channelName
       });
     }
   }
