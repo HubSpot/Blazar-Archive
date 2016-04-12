@@ -18,10 +18,21 @@ let initialState = {
 
 class Notifications extends Component {
 
-  constructor() {
-    this.state = initialState;
+  constructor(props, context) {
+    super(props, context);
 
+    this.state = initialState;
     bindAll(this, 'onChannelClick', 'onButtonClick', 'onSelectedNewChannel', 'onChannelDelete');
+  }
+
+  componentDidMount() {
+    const {notifications} = this.props;
+
+    if (notifications.length) {
+      this.setState({
+        selectedChannel: notifications[0].channelName
+      });
+    }
   }
 
   componentWillReceiveProps(nextProps) {
