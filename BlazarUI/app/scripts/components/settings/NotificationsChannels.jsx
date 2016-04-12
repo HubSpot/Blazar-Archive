@@ -84,15 +84,17 @@ class NotificationsChannels extends Component {
     });
 
     return (
+      <div className='notifications__new-channel-hashtag'>
+      #
       <Select
-        placeholder='Select a Slack channel'
+        placeholder="Choose a channel"
         className='slack-channel-input'
         name="slackChannel"
         options={slackChannels}
         onChange={this.handleSlackChannelPicked}
         allowCreate={true}
-        addLabelText='{label}'
-        />
+        addLabelText='{label}' />
+      </div>
     );
   }
 
@@ -120,9 +122,9 @@ class NotificationsChannels extends Component {
       <div className='notifications__channels-container'>
         <div className='notifications__channels'>
           {this.renderChannels()}
+          {this.renderNewChannel()}
           {this.renderToast()}
         </div>
-        {this.renderNewChannel()}
       </div>
     );
   }

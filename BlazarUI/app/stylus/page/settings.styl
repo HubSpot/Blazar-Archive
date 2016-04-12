@@ -2,12 +2,17 @@
   font-family HelveticaNeue
   position relative
   overflow-x scroll
-  min-width 800px
+  width 800px
+  height 800px
 
 .notifications__grid
-  margin-top 10px
-  min-width 750px
-  padding-left 15px
+  border 1px solid #CFCFCF
+  border-radius 3px 3px
+  height 300px
+  width 760px
+  
+  & *
+    border-radius 3px 3px
 
   & .col-sm-4, .col-sm-8, .col-sm-12
     padding 0
@@ -25,9 +30,6 @@
 .notifications__headline-title
   font-size 28px
   color #4a4a4a
-  
-.channel-button
-  height 300px
 
 .notifications__channels-headline
   margin-top 20px
@@ -36,9 +38,13 @@
   & span
     font-size 20px
     color #4a4a4a
+    
+.notifications__channels-container
+  height 248px
+  background-color #F9FBFD
 
 .notifications__channel-button
-  margin-left 50px
+  margin 8px 0 0 55px
   background-color #425b76
   border-color #425b76
 
@@ -49,18 +55,18 @@
   color #425B76
 
   &:hover
-    background-color #F9FBFD
+    background-color #f2f5f8
 
   &.selected
-    background-color #f2f5f8
+    background-color #E5F5F8
+    z-index 1
 
 .notifications__channel-wrapper
   padding 5px 10px
 
 .notifications__list
-  padding 40px
-  padding-bottom 0px
-  background-color #f2f5f8
+  padding 60px 40px 0 40px
+  background-color white
   min-height 242px
   min-width 500px
 
@@ -80,7 +86,7 @@
 .notifications__delete
   position absolute
   top 4px
-  right 10px
+  right 20px
   color #00a4bd
 
 .notifications__delete-toast
@@ -167,16 +173,22 @@
   top 8px
 
 .slack-channel-input
-  margin-top 20px
   border-radius 3px
   border 0.5px solid #7c98b6
+  width 215px
+  float right
+  margin-right 10px
+  
+  & .Select-placeholder
+    color #cbd6e2
+    font-size 16px
 
   & .Select-control
     background-color rgba(243, 248, 252, 0.5)
     border 0
     
   & .Select-menu-outer
-    height 300px
+    max-height 300px
     position absolute
 
 .notifications__list--empty
@@ -194,3 +206,29 @@
     font-family HelveticaNeue
     font-size 20px
     color #cbd6e2
+
+.notifications__new-channel-button-wrapper
+  height 50px
+  background-color #EAF0F6
+  
+.notifications__triangle
+  height 25px
+  position absolute
+  right -12px
+  top 0
+  border-top 16px solid transparent
+  border-bottom 16px solid transparent
+  border-left 13px solid #E5F5F8
+  background-color transparent
+  
+.notifications__new-channel-hashtag
+  position relative
+  
+  & > span
+    font-family HelveticaNeue
+    font-size 16px
+    color #425B76
+    position absolute
+    left 10px
+    top 7px
+
