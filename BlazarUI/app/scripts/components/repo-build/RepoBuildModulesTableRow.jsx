@@ -42,7 +42,7 @@ class RepoBuildModulesTableRow extends Component {
       }
 
       else {
-        window.open(data.blazarPath);
+        window.open(config.appRoot + data.blazarPath);
         return;
       }
     }

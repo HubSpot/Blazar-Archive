@@ -56,7 +56,7 @@ class BranchesTableRow extends Component {
       }
 
       else {
-        window.open(blazarPath);
+        window.open(config.appRoot + blazarPath);
         return;
       }
     }

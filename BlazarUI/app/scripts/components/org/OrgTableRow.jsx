@@ -1,3 +1,4 @@
+/*global config*/
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import classNames from 'classnames';
@@ -32,7 +33,7 @@ class OrgTableRow extends Component {
       }
 
       else {
-        window.open(blazarPath);
+        window.open(config.appRoot + blazarPath);
         return;
       }
     }
