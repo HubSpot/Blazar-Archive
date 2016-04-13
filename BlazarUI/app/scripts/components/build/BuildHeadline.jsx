@@ -3,6 +3,7 @@ import React, {Component, PropTypes} from 'react';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Loader from '../shared/Loader.jsx';
+import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
 import {Link} from 'react-router';
 import {buildResultIcon, humanizeText, timestampDuration, buildIsInactive} from '../Helpers';
 
@@ -25,13 +26,15 @@ class BuildHeadline extends Component {
     
     const {moduleName} = this.props.params;
     const {build} = this.props.data;
-    const buildLink = `/builds/branch/${this.props.params.branchId}/build/${this.props.params.buildNumber}`;
   
     return (
-        <Headline className='build__headline headline--no-padding'>
-          <HeadlineDetail block={true}>
-            <Link to={buildLink}>&lt; back to build #{this.props.params.buildNumber}</Link>
-          </HeadlineDetail>
+      <div>
+        <SimpleBreadcrumbs 
+          repo={true}
+          branch={true}
+          build={true}
+          {...this.props} />
+        <Headline className='build__headline'>
           {buildResultIcon(this.props.data.build.state)}
           <div className="build-headline">
             {moduleName}
@@ -40,6 +43,7 @@ class BuildHeadline extends Component {
             </HeadlineDetail>
           </div>
         </Headline>
+      </div>
     );
   }
 }

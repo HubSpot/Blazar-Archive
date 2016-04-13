@@ -44,7 +44,7 @@ let initialState = {
   resetCache: false,
   branchId: 0,
   branchInfo: {},
-  branches: [],
+  branchesList: [],
   maxRows: 50
 };
 
@@ -248,13 +248,13 @@ class BranchContainer extends Component {
             <BranchHeadline
               loading={this.isLoading()}
               branchInfo={this.state.branchInfo}
-              branches={this.state.branches}
+              branchesList={this.state.branchesList}
               refreshBranches={this.refreshBranches.bind(this)}
               {...this.state}
               {...this.props}
             />
           </UIGridItem>
-          <UIGridItem style={{'paddingTop': '5px'}} size={5} align='RIGHT'>
+          <UIGridItem style={{'paddingTop': '33px'}} size={5} align='RIGHT'>
             <BuildButton 
               openModuleModal={this.openModuleModal}
               loading={this.isLoading()}

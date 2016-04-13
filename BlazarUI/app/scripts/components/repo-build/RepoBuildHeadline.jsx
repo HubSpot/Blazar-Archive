@@ -6,7 +6,7 @@ import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
-import Star from '../shared/Star.jsx';
+import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
 
 class RepoBuildHeadline extends Component {
     
@@ -17,23 +17,17 @@ class RepoBuildHeadline extends Component {
     
     const {stars, params, currentRepoBuild, branchInfo} = this.props;
     const branchId = parseInt(params.branchId, 10);
-    const branchLink = `/builds/branch/${this.props.params.branchId}`;
 
     return (
-      <Headline className='repobuild-headline headline--no-padding'>
-        <HeadlineDetail block={true}>
-          <Link to={branchLink}>&lt; back to {branchInfo.branch}</Link><br />
-        </HeadlineDetail>
-        <Star
-          className='icon-roomy'
-          isStarred={contains(stars, branchId)}
-          id={branchId}
-        />
-        {branchInfo.repository} - {branchInfo.branch}
-        <HeadlineDetail>
-          build #{currentRepoBuild.buildNumber}
-        </HeadlineDetail>
-      </Headline>
+      <div>
+        <SimpleBreadcrumbs 
+          repo={true} 
+          branch={true}
+          {...this.props} />
+        <Headline className='repobuild-headline'>
+          <span>Build #{currentRepoBuild.buildNumber}</span>
+        </Headline>
+      </div>
     )
   }
 }

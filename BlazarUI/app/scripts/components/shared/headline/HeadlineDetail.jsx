@@ -5,6 +5,7 @@ class HeadlineDetail extends Component{
   render() {
 
   	let extraClass = 'headline__detail' + (this.props.block ? ' headline-block' : '');
+    extraClass += this.props.crumb ? ' headline-crumb' : '';
 
     return (
       <span className={extraClass}>
@@ -16,7 +17,8 @@ class HeadlineDetail extends Component{
 
 HeadlineDetail.propTypes = {
   children: PropTypes.node,
-  block: PropTypes.bool
+  block: PropTypes.bool,
+  crumb: PropTypes.bool
 };
 
 export default HeadlineDetail;

@@ -11,6 +11,7 @@ import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Star from '../shared/Star.jsx';
 import Icon from '../shared/Icon.jsx';
+import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
 import moment from 'moment';
 
 let initialState = {
@@ -51,9 +52,9 @@ class BranchHeadline extends Component {
   }
 
   getFilteredBranches() {
-    const {branches, branchInfo} = this.props;
+    const {branchesList, branchInfo} = this.props;
 
-    return branches.filter((branch) => {
+    return branchesList.filter((branch) => {
       return branch.label !== branchInfo.branch;
     }).sort((a, b) => {
       if (a.label === 'master') {
@@ -89,29 +90,33 @@ class BranchHeadline extends Component {
 
     const {stars, params, currentRepoBuild} = this.props;
     const branchId = parseInt(this.props.params.branchId, 10);
-    const repoLink = `/builds/repo/${this.props.branchInfo.repository}`;
 
     return (
-      <Headline className='headline'>
-        <Star
-          className='icon-roomy'
-          isStarred={contains(stars, branchId)}
-          id={branchId}
-        />
-        <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-        {this.props.branchInfo.repository} - 
-        <Select
-          className='branch-select-input'
-          name='branchSelect'
-          noResultsText='No other branches'
-          value={this.props.branchInfo.branch}
-          options={this.getFilteredBranches()}
-          onChange={this.onBranchSelect.bind(this)}
-          searchable={false}
-          clearable={false}
-        />
-        {this.renderShield()}
-      </Headline>
+      <div>
+        <SimpleBreadcrumbs 
+          repo={true}
+          {...this.props} />
+        <Headline className='headline branch-headline'>
+          <Star
+            className='icon-roomy'
+            isStarred={contains(stars, branchId)}
+            id={branchId}
+          />
+          <Icon type="octicon" name="git-branch" classNames="headline-icon" />
+          {this.props.branchInfo.repository} - 
+          <Select
+            className='branch-select-input'
+            name='branchSelect'
+            noResultsText='No other branches'
+            value={this.props.branchInfo.branch}
+            options={this.getFilteredBranches()}
+            onChange={this.onBranchSelect.bind(this)}
+            searchable={false}
+            clearable={false}
+          />
+          {this.renderShield()}
+        </Headline>
+      </div>
     )
   }
 }
