@@ -32,7 +32,7 @@ class BuildHeadline extends Component {
     return (
         <Headline className='build__headline headline--no-padding'>
           <HeadlineDetail crumb={true} block={true}>
-            <Link to={repoLink}>All branches</Link>
+            <Link to={repoLink}>{this.props.branchInfo.repository}</Link>
             &nbsp;&gt;&nbsp;
             <Link to={branchLink}>{this.props.branchInfo.branch}</Link>
             &nbsp;&gt;&nbsp;

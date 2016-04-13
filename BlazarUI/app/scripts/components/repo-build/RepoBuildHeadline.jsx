@@ -6,7 +6,6 @@ import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
-import Star from '../shared/Star.jsx';
 
 class RepoBuildHeadline extends Component {
     
@@ -23,19 +22,11 @@ class RepoBuildHeadline extends Component {
     return (
       <Headline className='repobuild-headline headline--no-padding'>
         <HeadlineDetail crumb={true} block={true}>
-          <Link to={repoLink}>All branches</Link>
+          <Link to={repoLink}>{this.props.branchInfo.repository}</Link>
           &nbsp;&gt;&nbsp;
           <Link to={branchLink}>{this.props.branchInfo.branch}</Link><br />
         </HeadlineDetail>
-        <Star
-          className='icon-roomy'
-          isStarred={contains(stars, branchId)}
-          id={branchId}
-        />
-        {branchInfo.repository} - {branchInfo.branch}
-        <HeadlineDetail>
-          build #{currentRepoBuild.buildNumber}
-        </HeadlineDetail>
+        <span style={{'paddingLeft' : '5px'}}>Build #{currentRepoBuild.buildNumber}</span>
       </Headline>
     )
   }

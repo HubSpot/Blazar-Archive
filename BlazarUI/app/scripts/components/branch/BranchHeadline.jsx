@@ -94,7 +94,7 @@ class BranchHeadline extends Component {
     return (
       <Headline className='headline headline--no-padding'>
         <HeadlineDetail crumb={true} block={true}>
-          <Link to={repoLink}>All branches</Link><br />
+          <Link to={repoLink}>{this.props.branchInfo.repository}</Link><br />
         </HeadlineDetail>
         <Star
           className='icon-roomy'
