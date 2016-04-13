@@ -69,7 +69,7 @@ class ModuleModal extends Component {
           place='bottom'
           type='dark'
           effect='solid'>
-          Build dependent downstream modules
+          Build dependent downstream modules within the same repository
         </ReactTooltip>
       </div>
     );
@@ -98,7 +98,7 @@ class ModuleModal extends Component {
             place='bottom'
             type='dark'
             effect='solid'>
-            Clear cached directories set in blazar.yaml
+            Reset data cached from the previous build
           </ReactTooltip>
         </div>
       </div>
