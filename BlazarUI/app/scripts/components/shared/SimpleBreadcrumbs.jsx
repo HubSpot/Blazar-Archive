@@ -2,6 +2,8 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 
+import Icon from './Icon.jsx';
+
 class SimpleBreadcrumbs extends Component {
 	constructor(props) {
     super(props);
@@ -34,7 +36,7 @@ class SimpleBreadcrumbs extends Component {
 
     return (
       <span className='simple-breadcrumbs__branch'>
-        &nbsp;&gt;&nbsp;
+        <Icon type='fa' name='angle-right' />
         <Link to={branchLink}>{branchInfo.branch}</Link>
       </span>
     );
@@ -51,7 +53,7 @@ class SimpleBreadcrumbs extends Component {
 
     return (
       <span className='simple-breadcrumbs__build'>
-        &nbsp;&gt;&nbsp;
+        <Icon type='fa' name='angle-right' />
         <Link to={buildLink}>#{params.buildNumber}</Link>
       </span>
     );
