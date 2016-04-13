@@ -16,7 +16,9 @@ function _parse(params, resp) {
 }
 
 function _parseModules(resp) {
-  return resp;
+  return resp.filter((module) => {
+    return module.active;
+  });
 }
 
 function fetchBranchBuildHistory(params, cb) {
