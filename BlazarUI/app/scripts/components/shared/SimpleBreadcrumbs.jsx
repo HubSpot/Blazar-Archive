@@ -1,0 +1,79 @@
+/*global config*/
+import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
+
+class SimpleBreadcrumbs extends Component {
+	constructor(props) {
+    super(props);
+  }
+
+  renderRepoCrumb() {
+    const {params, repo, branchInfo} = this.props;
+
+    if (!repo) {
+      return null;
+    }
+
+    const repoLink = `/builds/repo/${branchInfo.repository}`;
+
+    return (
+      <span className='simple-breadcrumbs__repo'>
+        <Link to={repoLink}>{branchInfo.repository}</Link>
+      </span>
+    );
+  }
+
+  renderBranchCrumb() {
+    const {params, branch, branchInfo} = this.props;
+
+    if (!branch) {
+      return null;
+    }
+
+    const branchLink = `/builds/branch/${params.branchId}`;
+
+    return (
+      <span className='simple-breadcrumbs__branch'>
+        &nbsp;&gt;&nbsp;
+        <Link to={branchLink}>{branchInfo.branch}</Link>
+      </span>
+    );
+  }
+
+  renderBuildCrumb() {
+    const {params, build, branchInfo} = this.props;
+
+    if (!build) {
+      return null;
+    }
+
+    const buildLink = `/builds/branch/${params.branchId}/build/${params.buildNumber}`;
+
+    return (
+      <span className='simple-breadcrumbs__build'>
+        &nbsp;&gt;&nbsp;
+        <Link to={buildLink}>#{params.buildNumber}</Link>
+      </span>
+    );
+  }
+
+  render() {
+    return (
+      <div className='simple-breadcrumbs'>
+        {this.renderRepoCrumb()}
+        {this.renderBranchCrumb()}
+        {this.renderBuildCrumb()}
+      </div>
+    )
+  }
+}
+
+SimpleBreadcrumbs.propTypes = {
+  repo: PropTypes.bool,
+  branch: PropTypes.bool,
+  build: PropTypes.bool,
+  params: PropTypes.object,
+  branchInfo: PropTypes.object
+};
+
+export default SimpleBreadcrumbs;
