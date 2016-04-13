@@ -41,6 +41,7 @@ let initialState = {
   modules: [],
   selectedModules: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
+  resetCache: false,
   branchId: 0,
   branchInfo: {},
   branches: [],
@@ -52,7 +53,7 @@ class BranchContainer extends Component {
   constructor() {
     this.state = initialState;
 
-    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'triggerBuild');
+    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'triggerBuild');
   }
 
   componentDidMount() {
@@ -151,8 +152,14 @@ class BranchContainer extends Component {
     });
   }
 
+  updateResetCache() {
+    this.setState({
+      resetCache: !this.state.resetCache
+    })
+  }
+
   triggerBuild() {
-    BranchActions.triggerBuild(this.props.params, this.state.selectedModules, this.state.buildDownstreamModules);
+    BranchActions.triggerBuild(this.props.params, this.state);
   }
 
   isLoading() {
@@ -260,6 +267,7 @@ class BranchContainer extends Component {
               triggerBuild={this.triggerBuild}
               onSelectUpdate={this.updateSelectedModules}
               onCheckboxUpdate={this.updateDownstreamModules}
+              onResetCacheUpdate={this.updateResetCache}
               modules={this.state.modules}
             />
             {this.renderBuildSettingsButton()}
