@@ -26,11 +26,17 @@ class BuildHeadline extends Component {
     const {moduleName} = this.props.params;
     const {build} = this.props.data;
     const buildLink = `/builds/branch/${this.props.params.branchId}/build/${this.props.params.buildNumber}`;
+    const branchLink = `/builds/branch/${this.props.params.branchId}`;
+    const repoLink = `/builds/repo/${this.props.branchInfo.repository}`;
   
     return (
         <Headline className='build__headline headline--no-padding'>
-          <HeadlineDetail block={true}>
-            <Link to={buildLink}>&lt; back to build #{this.props.params.buildNumber}</Link>
+          <HeadlineDetail crumb={true} block={true}>
+            <Link to={repoLink}>All branches</Link>
+            &nbsp;&gt;&nbsp;
+            <Link to={branchLink}>{this.props.branchInfo.branch}</Link>
+            &nbsp;&gt;&nbsp;
+            <Link to={buildLink}>#{this.props.params.buildNumber}</Link>
           </HeadlineDetail>
           {buildResultIcon(this.props.data.build.state)}
           <div className="build-headline">

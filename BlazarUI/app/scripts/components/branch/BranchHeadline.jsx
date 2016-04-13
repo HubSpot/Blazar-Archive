@@ -92,7 +92,10 @@ class BranchHeadline extends Component {
     const repoLink = `/builds/repo/${this.props.branchInfo.repository}`;
 
     return (
-      <Headline className='headline'>
+      <Headline className='headline headline--no-padding'>
+        <HeadlineDetail crumb={true} block={true}>
+          <Link to={repoLink}>All branches</Link><br />
+        </HeadlineDetail>
         <Star
           className='icon-roomy'
           isStarred={contains(stars, branchId)}

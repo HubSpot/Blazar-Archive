@@ -18,11 +18,14 @@ class RepoBuildHeadline extends Component {
     const {stars, params, currentRepoBuild, branchInfo} = this.props;
     const branchId = parseInt(params.branchId, 10);
     const branchLink = `/builds/branch/${this.props.params.branchId}`;
+    const repoLink = `/builds/repo/${this.props.branchInfo.repository}`;
 
     return (
       <Headline className='repobuild-headline headline--no-padding'>
-        <HeadlineDetail block={true}>
-          <Link to={branchLink}>&lt; back to {branchInfo.branch}</Link><br />
+        <HeadlineDetail crumb={true} block={true}>
+          <Link to={repoLink}>All branches</Link>
+          &nbsp;&gt;&nbsp;
+          <Link to={branchLink}>{this.props.branchInfo.branch}</Link><br />
         </HeadlineDetail>
         <Star
           className='icon-roomy'

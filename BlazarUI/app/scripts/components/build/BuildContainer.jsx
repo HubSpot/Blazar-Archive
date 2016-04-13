@@ -14,13 +14,18 @@ import BuildLog from './BuildLog.jsx';
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
 
+import BranchStore from '../../stores/branchStore';
+import BranchActions from '../../actions/branchActions';
+
 const initialState = {
   data: {
     build: {},
     log: { logLines: [] }
   },
+  branchInfo: {},
   error: false,
-  loading: true
+  loading: true,
+  loadingBranchInfo: true
 }
 
 class BuildContainer extends Component {
@@ -49,11 +54,14 @@ class BuildContainer extends Component {
 
   setup(props) {
     this.unsubscribeFromBuild = BuildStore.listen(this.onStatusChange);
+    this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     BuildActions.loadBuild(props.params);
+    BranchActions.loadBranchInfo(props.params);
   }
 
   tearDown() {
     this.unsubscribeFromBuild();
+    this.unsubscribeFromBranch();
     BuildActions.resetBuild();
   }
 
@@ -76,7 +84,7 @@ class BuildContainer extends Component {
   onStatusChange(state) {
     this.setState(state);
 
-    if (state.data.build && buildIsOnDeck(state.data.build.state)) {
+    if (state.data && state.data.build && buildIsOnDeck(state.data.build.state)) {
       setTimeout( () => {
         BuildActions.loadBuild(this.props.params);
       }, 2000);
