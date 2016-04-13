@@ -9,17 +9,17 @@ const RepoStore = Reflux.createStore({
   listenables: RepoActions,
 
   init() {  
-    this.branches = [];
+    this.branchesList = [];
   },
 
   onLoadBranches(repoId) {
     this.repoId = repoId;
 
     RepoApi.fetchBranchesInRepo(repoId, (resp) => {
-      this.branches = resp;
+      this.branchesList = resp;
 
       this.trigger({
-        branches: this.branches,
+        branchesList: this.branchesList,
         loadingRepo: false
       });
     });

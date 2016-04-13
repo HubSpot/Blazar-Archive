@@ -51,9 +51,9 @@ class BranchHeadline extends Component {
   }
 
   getFilteredBranches() {
-    const {branches, branchInfo} = this.props;
+    const {branchesList, branchInfo} = this.props;
 
-    return branches.filter((branch) => {
+    return branchesList.filter((branch) => {
       return branch.label !== branchInfo.branch;
     }).sort((a, b) => {
       if (a.label === 'master') {
