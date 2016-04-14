@@ -1,7 +1,3 @@
-buildDeps:
-  - node-0.12.7
-  - hs-build-tools
-
 cache:
   - $PWD/node_modules
   - $PWD/bower_components
@@ -21,12 +17,7 @@ steps:
       - ./node_modules/.bin/gulp lint
   - description: "Running gulp build"
     commands:
-      - >
-          BLAZAR_API_URL=https://private.hubapi.com/blazar/v2
-          BLAZAR_APP_URI=/blazar
-          BLAZAR_STATIC_ROOT=https://static.hsappstatic.net/BlazarUIv2/static-1.$BUILD_NUMBER
-          BLAZAR_USERNAME_COOKIE='hs_tools_username'
-          ./node_modules/.bin/gulp build
+      - ./node_modules/.bin/gulp build
   - name: publish
     description: "Publishing to the CDN"
     activeByDefault: false
@@ -43,3 +34,9 @@ steps:
 stepActivation:
   publish:
     branches: [master]
+
+buildpack:
+  host: git.hubteam.com
+  organization: HubSpot
+  repository: blazar-ui-buildpack
+  branch: master
