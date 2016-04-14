@@ -10,9 +10,8 @@ if (!config.apiRoot) {
   console.warn('e.g. localStorage["apiRootOverride"] = "https://path.to-api.com/v1/api"');
 }
 
-if (config.fullstoryToken) {
-  const username = config.usernameCookie || 'anonymous';
-  FS.identify(username, {
+if (config.fullstoryToken && config.usernameCookie) {
+  FS.identify(config.usernameCookie, {
     app: 'blazar'
   });
 }
