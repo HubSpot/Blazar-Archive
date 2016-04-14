@@ -23,7 +23,9 @@ const appConfig = {
 
   staticRoot: process.env.BLAZAR_STATIC_ROOT || '',
 
-  usernameCookie: process.env.BLAZAR_USERNAME_COOKIE || ''
+  usernameCookie: process.env.BLAZAR_USERNAME_COOKIE || '',
+
+  fullstoryToken: process.env.FULLSTORY_TOKEN || false
 }
 
 module.exports = appConfig;
