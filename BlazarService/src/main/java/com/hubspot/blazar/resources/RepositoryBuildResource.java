@@ -53,12 +53,7 @@ public class RepositoryBuildResource {
     if (!gitInfo.isPresent()) {
       throw new NotFoundException("No branch found with id: " + branchId);
     }
-    BuildTrigger buildTrigger;
-    if (username.isPresent()) {
-      buildTrigger = BuildTrigger.forUser(username.get());
-    }  else {
-      buildTrigger = BuildTrigger.forUser("unknown");
-    }
+    BuildTrigger buildTrigger = BuildTrigger.forUser(username.or("unknown"));
     long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), buildTrigger, buildOptions);
     return repositoryBuildService.get(repositoryBuildId).get();
   }
