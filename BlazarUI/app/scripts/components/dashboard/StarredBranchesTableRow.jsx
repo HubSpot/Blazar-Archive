@@ -100,9 +100,6 @@ class StarredBranchesTableRow extends Component {
         <td>
           {timestampFormatted(buildToUse.get('startTimestamp'))}
         </td>
-        <td>
-          {sha}
-        </td>
       </tr>
     );
 

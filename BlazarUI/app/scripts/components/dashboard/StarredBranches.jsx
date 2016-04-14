@@ -44,8 +44,7 @@ class StarredBranches extends Component {
       'Repo',
       'Branch',
       'Build Number',
-      'Start Time',
-      'Commit'
+      'Start Time'
     ];
 
     return (
