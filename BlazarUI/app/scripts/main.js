@@ -10,13 +10,20 @@ if (!config.apiRoot) {
   console.warn('e.g. localStorage["apiRootOverride"] = "https://path.to-api.com/v1/api"');
 }
 
+if (config.fullstoryToken) {
+  const username = config.usernameCookie || 'anonymous';
+  FS.identify(username, {
+    app: 'blazar'
+  });
+}
+
 const browserHistory = useRouterHistory(createHistory) ({
   basename: config.appRoot
 });
 
 render(
-	<Router history={browserHistory}>
-		{routes}
-	</Router>, 
-	document.getElementById('app')
+  <Router history={browserHistory}>
+    {routes}
+  </Router>,
+  document.getElementById('app')
 );
