@@ -1,5 +1,18 @@
 package com.hubspot.blazar.discovery;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHTree;
+import org.kohsuke.github.GHTreeEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
@@ -11,17 +24,6 @@ import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.util.GitHubHelper;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHTree;
-import org.kohsuke.github.GHTreeEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 @Singleton
 public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
@@ -88,7 +90,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
       if (canBuild(buildConfig)) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
-        modules.add(new DiscoveredModule(moduleName, "config", blazarConfig, glob, buildConfig.getBuildpack(), DependencyInfo.unknown()));
+        modules.add(new DiscoveredModule(moduleName, "config", blazarConfig, glob, buildConfig.getBuildpack(), new DependencyInfo(buildConfig.getDepends(), buildConfig.getProvides())));
       }
     }
 
