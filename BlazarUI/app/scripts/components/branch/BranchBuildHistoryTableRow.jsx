@@ -11,7 +11,7 @@ import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
 let initialState = {
-  moment: moment().format('x')
+  moment: moment()
 }
 
 class BranchBuildHistoryTableRow extends Component {
@@ -84,7 +84,7 @@ class BranchBuildHistoryTableRow extends Component {
     let duration = data.duration;
 
     if (data.state === BuildStates.IN_PROGRESS) {
-      duration = timestampDuration(data.startTimestamp, this.state.moment);
+      duration = timestampDuration(data.startTimestamp, this.state.moment.format('x'));
     }
 
     return getTableDurationText(data.state, duration);
