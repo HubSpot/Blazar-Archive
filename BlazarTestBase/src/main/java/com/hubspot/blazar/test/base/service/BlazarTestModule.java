@@ -22,8 +22,12 @@ public class BlazarTestModule extends AbstractModule {
   private DataSourceFactory buildDataSourceFactory() {
     final DataSourceFactory dataSourceFactory = new DataSourceFactory();
     dataSourceFactory.setDriverClass("org.h2.Driver");
+    // dataSourceFactory.setDriverClass("com.mysql.jdbc.Driver");
     dataSourceFactory.setUrl("jdbc:h2:mem:blazar;DB_CLOSE_DELAY=-1;mode=MySQL");
+    // dataSourceFactory.setUrl("jdbc:mysql://localhost:3306/BlazarV2");
+
     dataSourceFactory.setUser("user");
+    // dataSourceFactory.setUser("app_blazar");
     dataSourceFactory.setPassword("password");
 
     return dataSourceFactory;

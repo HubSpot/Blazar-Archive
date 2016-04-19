@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.config.BlazarConfiguration;
@@ -12,13 +13,16 @@ import com.hubspot.singularity.client.SingularityClient;
 
 public class TestSingularityBuildLauncher extends SingularityBuildLauncher {
   private static final Logger LOG = LoggerFactory.getLogger(TestSingularityBuildLauncher.class);
+  private final EventBus eventBus;
   private final ModuleBuildResource moduleBuildResource;
 
   @Inject
   public TestSingularityBuildLauncher(SingularityClient singularityClient,
                                       BlazarConfiguration blazarConfiguration,
+                                      EventBus eventBus,
                                       ModuleBuildResource moduleBuildResource) {
     super(singularityClient, blazarConfiguration);
+    this.eventBus = eventBus;
     this.moduleBuildResource = moduleBuildResource;
   }
 
@@ -28,7 +32,8 @@ public class TestSingularityBuildLauncher extends SingularityBuildLauncher {
     while (build.getState().isWaiting()) {
       build = moduleBuildResource.get(build.getId().get()).get();
       LOG.info("{} is waiting for upstream build", build);
-      Thread.sleep(10);
+      eventBus.post(build);
+      return;
     }
     LOG.debug("Pretending to launch {} calling start", build);
     ModuleBuild inProgress = moduleBuildResource.start(build.getId().get(), Optional.of(build.toString()));
