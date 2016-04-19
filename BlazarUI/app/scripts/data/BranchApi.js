@@ -2,6 +2,7 @@
 import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import humanizeDuration from 'humanize-duration';
+import Cookies from 'js-cookie';
 
 function _parse(params, resp) {
   const builds = resp.map((build) => {
@@ -77,9 +78,9 @@ function triggerBuild(params, moduleIds, downstreamModules, resetCache, cb) {
   if (moduleIds === null) {
     moduleIds = [];
   }
-
+  const username = config.usernameCookie && Cookies.get(config.usernameCookie) ? `username=${Cookies.get(config.usernameCookie)}` : '';
   const buildPromise = new Resource({
-    url: `${config.apiRoot}/branches/builds/branch/${params.branchId}`,
+    url: `${config.apiRoot}/branches/builds/branch/${params.branchId}?${username}`,
     type: 'POST',
     contentType: 'application/json',
     data: _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache)

@@ -9,6 +9,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
@@ -41,20 +42,18 @@ public class RepositoryBuildResource {
   @POST
   @Path("/branch/{id}")
   public RepositoryBuild trigger(@PathParam("id") int branchId) {
-    return triggerWithOptions(branchId, BuildOptions.defaultOptions());
+    return triggerWithOptions(branchId, BuildOptions.defaultOptions(), Optional.<String>absent());
   }
 
   @POST
   @Path("/branch/{id}")
   @Consumes(MediaType.APPLICATION_JSON)
-  public RepositoryBuild triggerWithOptions(@PathParam("id") int branchId, BuildOptions buildOptions) {
+  public RepositoryBuild triggerWithOptions(@PathParam("id") int branchId, BuildOptions buildOptions, @QueryParam("username") Optional<String> username) {
     Optional<GitInfo> gitInfo = branchService.get(branchId);
     if (!gitInfo.isPresent()) {
       throw new NotFoundException("No branch found with id: " + branchId);
     }
-
-    // TODO capture user
-    BuildTrigger buildTrigger = BuildTrigger.forUser("unknown");
+    BuildTrigger buildTrigger = BuildTrigger.forUser(username.or("unknown"));
     long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), buildTrigger, buildOptions);
     return repositoryBuildService.get(repositoryBuildId).get();
   }
