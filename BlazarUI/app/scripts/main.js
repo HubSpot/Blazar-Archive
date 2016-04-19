@@ -13,7 +13,7 @@ if (!config.apiRoot) {
 
 if (config.fullstoryToken && config.usernameCookie && Cookies.get(config.usernameCookie)) {
   FS.identify(Cookies.get(config.usernameCookie), {
-    app: 'blazar'
+    app_str: 'blazar'
   });
 }
 
