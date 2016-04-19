@@ -80,7 +80,7 @@ function triggerBuild(params, moduleIds, downstreamModules, resetCache, cb) {
   }
   const username = config.usernameCookie && Cookies.get(config.usernameCookie) ? `username=${Cookies.get(config.usernameCookie)}` : '';
   const buildPromise = new Resource({
-  url: `${config.apiRoot}/branches/builds/branch/${params.branchId}?${username}`
+    url: `${config.apiRoot}/branches/builds/branch/${params.branchId}?${username}`,
     type: 'POST',
     contentType: 'application/json',
     data: _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache)
