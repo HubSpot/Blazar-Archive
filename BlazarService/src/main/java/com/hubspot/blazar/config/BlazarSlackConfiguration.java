@@ -1,6 +1,5 @@
 package com.hubspot.blazar.config;
 
-
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,7 +1,7 @@
 package com.hubspot.blazar.resources;
 
-
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -28,12 +28,13 @@ import com.hubspot.jackson.jaxrs.PropertyFiltering;
 @Consumes(MediaType.APPLICATION_JSON)
 public class InstantMessageResource {
 
-  private final SlackClient slackClient;
-  private InstantMessageConfigurationService instantMessageConfigurationService;
+  @Inject(optional = true)
+  private SlackClient slackClient;
+
+  private final InstantMessageConfigurationService instantMessageConfigurationService;
 
   @Inject
-  public InstantMessageResource(SlackClient slackClient, InstantMessageConfigurationService instantMessageConfigurationService) {
-    this.slackClient = slackClient;
+  public InstantMessageResource(InstantMessageConfigurationService instantMessageConfigurationService) {
     this.instantMessageConfigurationService = instantMessageConfigurationService;
   }
 
@@ -79,6 +80,6 @@ public class InstantMessageResource {
   @GET
   @Path("/slack/list-channels")
   public List<SlackChannel> getChannels() throws IOException {
-    return slackClient.getSlackChannels();
+    return slackClient == null ? Collections.<SlackChannel>emptyList() : slackClient.getSlackChannels();
   }
 }

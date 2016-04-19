@@ -23,7 +23,6 @@ import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpRequest.Method;
 import com.hubspot.horizon.HttpResponse;
 
-
 @Singleton
 public class SlackClient {
   private static final Logger LOG = LoggerFactory.getLogger(SlackClient.class);

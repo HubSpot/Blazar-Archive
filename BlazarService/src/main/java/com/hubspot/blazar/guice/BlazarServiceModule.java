@@ -78,7 +78,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
     binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule(getConfiguration()));
-    binder.install(new BuildVisitorModule());
+    binder.install(new BuildVisitorModule(getConfiguration()));
     binder.install(new DiscoveryModule());
 
     binder.bind(IllegalArgumentExceptionMapper.class);
@@ -90,7 +90,11 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(RepositoryBuildResource.class);
     binder.bind(BuildHistoryResource.class);
     binder.bind(InstantMessageResource.class);
-    binder.bind(UserFeedbackResource.class);
+
+    if (getConfiguration().getSlackConfiguration().isPresent()) {
+      binder.bind(SlackClient.class);
+      binder.bind(UserFeedbackResource.class);
+    }
 
     binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());
     binder.bind(PropertyFilteringMessageBodyWriter.class)
@@ -144,12 +148,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
   @Singleton
   public HttpClient provideHttpClient(ObjectMapper objectMapper) {
     return new NingHttpClient(HttpConfig.newBuilder().setMaxRetries(5).setObjectMapper(objectMapper).build());
-  }
-
-  @Provides
-  @Singleton
-  public SlackClient providesSlackClient(AsyncHttpClient asyncHttpClient, BlazarConfiguration blazarConfiguration, ObjectMapper objectMapper, HttpClient httpClient) {
-    return new SlackClient(asyncHttpClient, blazarConfiguration, objectMapper, httpClient);
   }
 
   public static GitHub toGitHub(String host, GitHubConfiguration gitHubConfig) {
