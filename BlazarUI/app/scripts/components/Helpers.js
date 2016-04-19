@@ -1,3 +1,4 @@
+/*global config*/
 import React from 'react';
 import {some, uniq, flatten, filter, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
@@ -11,6 +12,15 @@ import Icon from './shared/Icon.jsx';
 import IconStack from './shared/IconStack.jsx';
 import Immutable from 'immutable';
 import classNames from 'classnames';
+import Cookies from 'js-cookie';
+
+export const getUsernameFromCookie = function() {
+  if (!config.usernameCookie) {
+    return undefined;
+  }
+
+  return Cookies.get(config.usernameCookie);
+}
 
 // 1234567890 => 1 Aug 1991 15:00
 export const timestampFormatted = function(timestamp, format='lll') {

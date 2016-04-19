@@ -2,6 +2,7 @@
 import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import humanizeDuration from 'humanize-duration';
+import { getUsernameFromCookie } from '../components/Helpers.js';
 
 function _parse(params, resp) {
   const builds = resp.map((build) => {
@@ -77,7 +78,7 @@ function triggerBuild(params, moduleIds, downstreamModules, resetCache, cb) {
   if (moduleIds === null) {
     moduleIds = [];
   }
-  const username = localStorage.getItem(config.usernameCookie) ? `username=${localStorage.getItem(config.usernameCookie)}` : '';
+  const username = getUsernameFromCookie() ? `username=${getUsernameFromCookie()}` : '';
   const buildPromise = new Resource({
     url: `${config.apiRoot}/branches/builds/branch/${params.branchId}?${username}`,
     type: 'POST',

@@ -47,6 +47,7 @@
     "intersect": "^1.0.1",
     "jest-cli": "^0.4.0",
     "jquery": "~2.1.4",
+    "js-cookie": "^2.0.3",
     "json-to-html": "^0.1.2",
     "keymirror": "^0.1.1",
     "mathjs": "^2.4.0",

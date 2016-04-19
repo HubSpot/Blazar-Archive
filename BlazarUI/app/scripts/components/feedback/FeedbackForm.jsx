@@ -7,6 +7,7 @@ import Alert from 'react-bootstrap/lib/Alert';
 import Feedback from '../../models/Feedback';
 import FeedbackActions from '../../actions/feedbackActions';
 import FeedbackStore from '../../stores/feedbackStore';
+import { getUsernameFromCookie } from '../Helpers.js';
 
 class FeedbackForm extends Component {
 
@@ -16,7 +17,7 @@ class FeedbackForm extends Component {
       sendError: false,
       submitted: false,
       visible: false,
-      nameValue: localStorage.getItem(config.usernameCookie) || '',
+      nameValue: getUsernameFromCookie() || '',
       messageValue: '',
       submitDisabled: true,
       submitted: false,
