@@ -10,7 +10,7 @@ if (!config.apiRoot) {
   console.warn('e.g. localStorage["apiRootOverride"] = "https://path.to-api.com/v1/api"');
 }
 
-if (config.fullstoryToken && config.usernameCookie && localStorage.getItem(config.usernameCookie)) {
+if (config.fullstoryToken && localStorage.getItem(config.usernameCookie)) {
   FS.identify(`${localStorage.getItem(config.usernameCookie)}-blazar`, {
     displayName: localStorage.getItem(config.usernameCookie),
     app_str: 'blazar'
