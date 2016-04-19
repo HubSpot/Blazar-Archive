@@ -11,7 +11,7 @@ github:
     organizations:
       - org1
       - org2
-  api.github.com:
+  github.com:
     oauthToken: my-public-github-token
     organizations:
       - org3
@@ -20,10 +20,16 @@ singularity:
   host: singularity.mycompany.com
   # optional, defaults to /singularity/api
   path: /my/singularity/api
+  # What singularity request should be invoked to execute builds?
+  request: my-singularity-request
   # optional
   credentials:
     headerName: Auth-Key
     token: my-singularity-auth-key
+    
+ui:
+  # Where the UI is being hosted, so that the backend can generate links
+  baseUrl: https://blazar.mycompany.com   
 
 zookeeper:
   quorum: my.zk.host:2181
