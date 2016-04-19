@@ -1,5 +1,8 @@
 steps:
   - description: Provide steps so blazar will try to build this
     commands:
-      - echo "TESTING 123"
-provides: [ Repo3-module3 ]
+      - echo TESTING 123
+provides:
+  - Repo3-Module3
+depends:
+  - Repo3-Module2

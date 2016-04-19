@@ -25,6 +25,11 @@ public class TestSingularityBuildLauncher extends SingularityBuildLauncher {
 
   @Override
   public synchronized void launchBuild(ModuleBuild build) throws Exception {
+    while (build.getState().isWaiting()) {
+      build = moduleBuildResource.get(build.getId().get()).get();
+      LOG.info("{} is waiting for upstream build", build);
+      Thread.sleep(10);
+    }
     LOG.debug("Pretending to launch {} calling start", build);
     ModuleBuild inProgress = moduleBuildResource.start(build.getId().get(), Optional.of(build.toString()));
     LOG.debug("Build {} now in progress, publishing success", inProgress);

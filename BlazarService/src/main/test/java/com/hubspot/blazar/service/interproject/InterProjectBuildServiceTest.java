@@ -1,8 +1,5 @@
 package com.hubspot.blazar.service.interproject;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,13 +40,6 @@ import com.hubspot.blazar.listener.BuildEventDispatcher;
 import com.hubspot.blazar.service.BlazarServiceTestBase;
 import com.hubspot.blazar.service.BlazarServiceTestModule;
 import com.hubspot.blazar.util.SingularityBuildLauncher;
-import io.dropwizard.db.ManagedDataSource;
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
-import liquibase.resource.ResourceAccessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -82,18 +72,13 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   private ModuleBuildService moduleBuildService;
 
   @Before
-  public void before() throws IOException, SQLException, LiquibaseException {
+  public void before() throws Exception {
     // set up the data for these inter-project build tests
-    Connection connection = getFromGuice(ManagedDataSource.class).getConnection();
-    JdbcConnection jdbcConnection = new JdbcConnection(connection);
-    ResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
-    Liquibase liquibase = new Liquibase("interProjectData.sql", resourceAccessor, jdbcConnection);
-    liquibase.update(new Contexts());
+    runSql("interProjectData.sql");
   }
 
   @Test
   public void checkTableSetup() {
-    BranchService branchService = getFromGuice(BranchService.class);
     Optional<GitInfo> branch = branchService.get(1);
     assertThat(branch.isPresent()).isTrue();
     assertThat(branch.get().getBranch()).isEqualTo("master");
@@ -146,10 +131,6 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     assertThat(Arrays.asList(1, 4, 7, 8, 10, 9, 13)).isEqualTo(interProjectBuildService.getWithId(1).get().getDependencyGraph().get().getTopologicalSort());
     Set<InterProjectBuildMapping> repoBuildsMappings = iPRepositoryBuildMappingService.getMappingsForInterProjectBuild(testableBuild);
     Set<InterProjectBuildMapping> moduleBuildMappings = iPModuleBuildMappingService.getMappingsForBuild(testableBuild);
-  }
-
-  @Test
-  public void testSingularityMock() {
   }
 
   private void postSingularityEvents(ModuleBuild build) {
