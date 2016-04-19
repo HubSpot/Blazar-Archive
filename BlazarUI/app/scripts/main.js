@@ -12,10 +12,15 @@ if (!config.apiRoot) {
 }
 
 if (config.fullstoryToken && config.usernameCookie && Cookies.get(config.usernameCookie)) {
+  console.log("Got in the if");
   FS.identify(Cookies.get(config.usernameCookie), {
     app: 'blazar'
   });
 }
+
+console.log("Fullstory token: ", config.fullstoryToken);
+console.log("Cookie key: ", config.usernameCookie);
+console.log("Cookie val: ", Cookies.get(config.usernameCookie));
 
 const browserHistory = useRouterHistory(createHistory) ({
   basename: config.appRoot
