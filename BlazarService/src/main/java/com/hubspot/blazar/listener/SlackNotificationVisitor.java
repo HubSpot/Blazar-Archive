@@ -110,8 +110,8 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
       attachmentText = Optional.of("The failing modules are:");
       Set<ModuleBuild> builtModules = moduleBuildService.getByRepositoryBuild(build.getId().get());
       for (ModuleBuild b : builtModules) {
-        // If a build fails, SUCCEEDED & CANCELLED are common, and unnecessary to include
-        if (!b.getState().equals(ModuleBuild.State.SUCCEEDED) && !b.getState().equals(ModuleBuild.State.CANCELLED)) {
+        // If a build fails, SUCCEEDED & Skipped & CANCELLED are common, and unnecessary to include
+        if (!b.getState().equals(ModuleBuild.State.SUCCEEDED) && !b.getState().equals(ModuleBuild.State.CANCELLED) && !b.getState().equals(ModuleBuild.State.SKIPPED)) {
           Module m = moduleService.get(b.getModuleId()).get();
           fields.add(new SlackAttachmentField(m.getName(), b.getState().name().toLowerCase(), true));
         }
