@@ -60,7 +60,7 @@ class JSONModal extends Component {
   render() {
     return (
       <span>
-        <button onClick={this.handleTriggerJsonModal} className={this.getClassNames()}>JSON</button>
+        <button id='json-modal-button' onClick={this.handleTriggerJsonModal} className={this.getClassNames()}>JSON</button>
         {this.modal()}
       </span>
     );
