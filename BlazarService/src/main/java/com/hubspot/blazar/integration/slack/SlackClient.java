@@ -71,7 +71,6 @@ public class SlackClient {
     if (message.getIconEmoji().isPresent()) {
       requestBuilder.setFormParam("icon_emoji").to(message.getIconEmoji().get());
     }
-
     asyncHttpClient.execute(requestBuilder.build(), new Callback() {
 
       @Override

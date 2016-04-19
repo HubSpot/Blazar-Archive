@@ -1,6 +1,8 @@
 package com.hubspot.blazar.listener;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -15,17 +17,17 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.externalservice.slack.SlackAttachment;
-import com.hubspot.blazar.externalservice.slack.SlackAttachmentField;
-import com.hubspot.blazar.externalservice.slack.SlackMessage;
 import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
+import com.hubspot.blazar.externalservice.slack.SlackAttachment;
+import com.hubspot.blazar.externalservice.slack.SlackAttachmentField;
+import com.hubspot.blazar.externalservice.slack.SlackMessage;
 import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.util.BlazarUrlHelper;
 
@@ -102,6 +104,20 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build, GitInfo gitInfo) {
     String fallback = String.format("Repository Build %s-%s#%d finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), build.getBuildNumber(), build.getState().toString().toLowerCase());
+    List<SlackAttachmentField> fields = new ArrayList<>();
+    Optional<String> attachmentText = Optional.absent();
+    if (build.getState().equals(RepositoryBuild.State.FAILED)) {
+      attachmentText = Optional.of("The failing modules are:");
+      Set<ModuleBuild> builtModules = moduleBuildService.getByRepositoryBuild(build.getId().get());
+      for (ModuleBuild b : builtModules) {
+        // If a build fails, SUCCEEDED & CANCELLED are common, and unnecessary to include
+        if (!b.getState().equals(ModuleBuild.State.SUCCEEDED) && !b.getState().equals(ModuleBuild.State.CANCELLED)) {
+          Module m = moduleService.get(b.getModuleId()).get();
+          fields.add(new SlackAttachmentField(m.getName(), b.getState().name().toLowerCase(), true));
+        }
+      }
+    }
+
     Optional<String> color = ABSENT_STRING;
     switch (build.getState()) {
       case SUCCEEDED:
@@ -121,7 +137,7 @@ public class SlackNotificationVisitor implements RepositoryBuildVisitor, ModuleB
     Optional<String> title = Optional.of(fallback);
     Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
 
-    SlackAttachment attachment = new SlackAttachment(fallback, color, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, title, link, ABSENT_STRING, Collections.<SlackAttachmentField>emptyList(), ABSENT_STRING);
+    SlackAttachment attachment = new SlackAttachment(fallback, color, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, title, link, attachmentText, fields, ABSENT_STRING);
     SlackMessage message = new SlackMessage(ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, ABSENT_STRING, instantMessageConfiguration.getChannelName(), Lists.newArrayList(attachment));
     slackClient.sendMessage(message);
   }
