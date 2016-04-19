@@ -108,13 +108,13 @@ class BuildContainer extends Component {
       <PageContainer classNames='build-container'>
         <div className={this.getHeaderClasses()}>
           <UIGrid containerClassName='build-header__name-and-buttons'>
-            <UIGridItem size={7}>
+            <UIGridItem size={8}>
               <BuildHeadline 
                 {...this.props}
                 {...this.state}
               />
             </UIGridItem>
-            <UIGridItem size={5} style={{'paddingTop': '15px'}}>
+            <UIGridItem size={4} style={{'paddingTop': '15px'}}>
               <BuildLogNavigation 
                 build={this.state.data.build}
                 requestNavigationChange={this.requestNavigationChange}
