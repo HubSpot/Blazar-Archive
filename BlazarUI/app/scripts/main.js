@@ -16,7 +16,9 @@ if (config.fullstoryToken && Cookies.get(config.usernameCookie)) {
   FS.identify(Cookies.get(config.usernameCookie), {
     app: 'blazar'
   });
-} else {
+} 
+
+else {
   console.log("Did not get in the if");
 }
 
