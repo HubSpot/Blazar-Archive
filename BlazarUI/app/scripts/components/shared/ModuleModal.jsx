@@ -137,8 +137,8 @@ class ModuleModal extends Component {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this.props.closeModal}>Nevermind</Button>
-          <Button onClick={this.getModuleIdsAndBuild} className='btn btn-primary'>Build</Button>
+          <Button id='module-modal-nevermind-button' onClick={this.props.closeModal}>Nevermind</Button>
+          <Button id='module-modal-build-button' onClick={this.getModuleIdsAndBuild} className='btn btn-primary'>Build</Button>
         </Modal.Footer>
       </div>
     );

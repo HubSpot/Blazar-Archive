@@ -220,7 +220,7 @@ class BranchContainer extends Component {
 
     return (
       <Link to={buildSettingsLink}>
-        <Button>
+        <Button id='build-settings-button'>
             Build Settings
         </Button>
       </Link>
