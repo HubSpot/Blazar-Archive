@@ -82,6 +82,8 @@ const BranchStore = Reflux.createStore({
         this.error = error;
         return this.triggerErrorUpdate();
       }
+
+      this.onLoadBranchBuildHistory(params);
     });
   },
 
