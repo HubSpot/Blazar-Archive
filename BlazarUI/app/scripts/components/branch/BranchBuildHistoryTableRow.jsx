@@ -11,7 +11,7 @@ import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 
 let initialState = {
-  moment: moment()
+  moment: moment().format('x')
 }
 
 class BranchBuildHistoryTableRow extends Component {
