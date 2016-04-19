@@ -86,7 +86,7 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
     for (Map.Entry<Integer, Set<Integer>> entry : Multimaps.asMap(launchable).entrySet()) {
       GitInfo gitInfo = branchService.get(entry.getKey()).get();
       BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(gitInfo);
-      BuildOptions buildOptions = new BuildOptions(entry.getValue(), BuildOptions.BuildDownstreams.NONE);
+      BuildOptions buildOptions = new BuildOptions(entry.getValue(), BuildOptions.BuildDownstreams.NONE, false);
       long buildId = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
       interProjectRepositoryBuildMappingService.addMapping(new InterProjectBuildMapping(build.getId().get(), entry.getKey(), Optional.of(buildId)));
       LOG.info("Queued repo build {} as part of InterProjectBuild {}", buildId, build.getId().get());

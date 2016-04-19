@@ -72,7 +72,7 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     for (Map.Entry<Integer, Set<Integer>> entry : Multimaps.asMap(launchable).entrySet()) {
       GitInfo gitInfo = branchService.get(entry.getKey()).get();
       BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(gitInfo);
-      BuildOptions buildOptions = new BuildOptions(entry.getValue(), BuildOptions.BuildDownstreams.NONE);
+      BuildOptions buildOptions = new BuildOptions(entry.getValue(), BuildOptions.BuildDownstreams.NONE, false);
       long buildId = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
       interProjectRepositoryBuildMappingService.addMapping(new InterProjectBuildMapping(interProjectBuild.getId().get(), entry.getKey(), Optional.of(buildId)));
       LOG.info("Queued repo build {} as part of InterProjectBuild {}", buildId, interProjectBuild.getId().get());
