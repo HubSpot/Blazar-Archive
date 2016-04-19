@@ -1,22 +1,21 @@
 package com.hubspot.blazar.discovery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
-import com.hubspot.blazar.discovery.docker.DockerModuleDiscovery;
-import com.hubspot.blazar.discovery.hsstatic.HubSpotStaticModuleDiscovery;
-import com.hubspot.blazar.discovery.maven.MavenModuleDiscovery;
 import com.hubspot.blazar.util.BlazarServiceLoader;
 
 public class DiscoveryModule implements Module {
+  private static final Logger LOG = LoggerFactory.getLogger(DiscoveryModule.class);
 
   @Override
   public void configure(Binder binder) {
     Multibinder<ModuleDiscovery> multibinder = Multibinder.newSetBinder(binder, ModuleDiscovery.class);
-    multibinder.addBinding().to(MavenModuleDiscovery.class);
-    multibinder.addBinding().to(DockerModuleDiscovery.class);
-    multibinder.addBinding().to(HubSpotStaticModuleDiscovery.class);
     for (Class<? extends ModuleDiscovery> moduleDiscovery : BlazarServiceLoader.load(ModuleDiscovery.class)) {
+      LOG.info("Found module discovery: " + moduleDiscovery);
       multibinder.addBinding().to(moduleDiscovery);
     }
 
