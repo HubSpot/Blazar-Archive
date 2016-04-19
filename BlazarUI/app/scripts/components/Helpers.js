@@ -20,7 +20,7 @@ export const getUsernameFromCookie = function() {
   }
 
   return Cookies.get(config.usernameCookie);
-}
+};
 
 // 1234567890 => 1 Aug 1991 15:00
 export const timestampFormatted = function(timestamp, format='lll') {
