@@ -2,3 +2,4 @@ steps:
   - description: Provide steps so blazar will try to build this
     commands:
       - echo "TESTING 123"
+provides: [ Repo2-module3 ]

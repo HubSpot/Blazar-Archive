@@ -12,25 +12,25 @@ INSERT INTO `branches` (`id`, `host`, `organization`, `repository`, `repositoryI
 --changeset InterProjectTestInsertModules:2 dbms:h2 runAlways:true
 INSERT INTO `modules` (`id`, `branchId`, `name`, `type`, `path`, `glob`, `active`, `pendingBuildId`, `inProgressBuildId`, `lastBuildId`, `createdTimestamp`, `updatedTimestamp`, `buildpack`) VALUES
 -- Repo1 modules
-  (1,1,'Module1','config','/module1','/module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:09','2016-04-06 13:17:09',NULL),
-  (2,1,'Module2','config','/module2','/module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (3,1,'Module3','config','/module3','/module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (1,1,'Module1','config','/Module1','/Module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:09','2016-04-06 13:17:09',NULL),
+  (2,1,'Module2','config','/Module2','/Module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (3,1,'Module3','config','/Module3','/Module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
 -- Repo2 modules
-  (4,2,'Module1','config','/module1','/module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (5,2,'Module2','config','/module2','/module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (6,2,'Module3','config','/module3','/module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (4,2,'Module1','config','/Module1','/Module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (5,2,'Module2','config','/Module2','/Module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (6,2,'Module3','config','/Module3','/Module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
 -- Repo3 modules
-  (7,3,'Module1','config','/module1','/module1/*',1,NULL,NULL,NULL,'2016-04-06 13:18:05','2016-04-06 13:18:05',NULL),
-  (8,3,'Module2','config','/module2','/module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (9,3,'Module3','config','/module3','/module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (7,3,'Module1','config','/Module1','/Module1/*',1,NULL,NULL,NULL,'2016-04-06 13:18:05','2016-04-06 13:18:05',NULL),
+  (8,3,'Module2','config','/Module2','/Module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (9,3,'Module3','config','/Module3','/Module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
 -- Repo4 modules
-  (10,4,'Module1','config','/module1','/module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (11,4,'Module2','config','/module2','/module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (12,4,'Module3','config','/module3','/module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (10,4,'Module1','config','/Module1','/Module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (11,4,'Module2','config','/Module2','/Module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (12,4,'Module3','config','/Module3','/Module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
 -- Repo5 modules
-  (13,5,'Module1','config','/module1','/module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (14,5,'Module2','config','/module2','/module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
-  (15,5,'Module3','config','/module3','/module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL);
+  (13,5,'Module1','config','/Module1','/Module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (14,5,'Module2','config','/Module2','/Module2/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL),
+  (15,5,'Module3','config','/Module3','/Module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL);
 
 -- insert providers
 --changeset InterProjectTestInsertProviders:3 dbms:h2 runAlways:true
