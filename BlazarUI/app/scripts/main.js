@@ -11,20 +11,11 @@ if (!config.apiRoot) {
   console.warn('e.g. localStorage["apiRootOverride"] = "https://path.to-api.com/v1/api"');
 }
 
-if (config.fullstoryToken && Cookies.get(config.usernameCookie)) {
-  console.log("Got in the if");
+if (config.fullstoryToken && config.usernameCookie && Cookies.get(config.usernameCookie)) {
   FS.identify(Cookies.get(config.usernameCookie), {
     app: 'blazar'
   });
-} 
-
-else {
-  console.log("Did not get in the if");
 }
-
-console.log("Fullstory token: ", config.fullstoryToken);
-console.log("Cookie key: ", config.usernameCookie);
-console.log("Cookie val: ", Cookies.get(config.usernameCookie));
 
 const browserHistory = useRouterHistory(createHistory) ({
   basename: config.appRoot
