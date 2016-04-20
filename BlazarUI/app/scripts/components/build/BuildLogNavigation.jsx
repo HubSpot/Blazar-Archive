@@ -43,8 +43,8 @@ class BuildLogNavigation extends Component {
           classname='log-nav-btn log-nav-btn--json hidden-sm hidden-xs'
           json={this.props.build}
         />
-        <button data-position='top' disabled={this.state.topDisabled} onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Top</button>
-        <button data-position='bottom' disabled={this.state.bottomDisabled} onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Bottom</button>
+        <button id='module-build-to-top-button' data-position='top' disabled={this.state.topDisabled} onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Top</button>
+        <button id='module-build-to-bottom-button' data-position='bottom' disabled={this.state.bottomDisabled} onClick={this.handleNavClick} className='log-nav-btn btn btn-default'>To Bottom</button>
       </nav>
     );
   }
