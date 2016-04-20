@@ -153,7 +153,7 @@ let LazyRender = React.createClass({
     let start = this.state.childrenTop;
     let end = this.state.childrenTop + this.state.childrenToRender;
 
-    let childrenToRender = this.props.children.slice(start, end);
+    let childrenToRender = this.props.children.slice(0, end);
     let children = childrenToRender.map(function(child, index) {
       if (index === 0) {
         return React.cloneElement(child, {ref: 'child-' + index, key: index});
@@ -171,12 +171,6 @@ let LazyRender = React.createClass({
     if (isNaN(childHeightBottom)) {
       childHeightBottom = null;
     }
-
-    children.unshift(
-      <div style={
-        { height: childHeightTop }
-      } key="top"></div>
-    );
 
     children.push(
       <div style={
