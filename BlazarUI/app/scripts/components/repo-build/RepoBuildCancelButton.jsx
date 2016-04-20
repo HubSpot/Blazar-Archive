@@ -50,8 +50,8 @@ class CancelBuildButton extends Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Footer>
-          <Button onClick={this.closeCancelModal}>No, nevermind</Button>
-          <Button onClick={this.cancelBuild} bsStyle="danger">Yes, cancel build</Button>
+          <Button id='cancel-modal-yes-button' onClick={this.closeCancelModal}>No, nevermind</Button>
+          <Button id='cancel-modal-no-button' onClick={this.cancelBuild} bsStyle="danger">Yes, cancel build</Button>
         </Modal.Footer>
       </Modal>
     )
