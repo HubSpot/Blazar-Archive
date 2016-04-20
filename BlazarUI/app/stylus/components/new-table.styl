@@ -1,0 +1,38 @@
+.new-table
+  width 1000px
+
+  & tbody
+    & tr
+      height 50px
+      background-color white !important
+      border 1px solid #CCD6E2 !important
+      border-radius 15px
+      max-width 1000px
+      
+      &.expanded
+        max-width 1200px
+        height 100px
+      
+      & td
+        border 0
+        vertical-align middle
+        position relative
+        font-size 14px
+        
+        &.build-status
+          padding 0
+          
+          & span
+            position absolute
+            left 0px
+            top 15px
+
+            & i
+              width 45px
+
+        &.repo-and-branch
+          & > *
+            display block
+
+        &.timestamp
+          text-align right

@@ -48,10 +48,7 @@ class StarredBranches extends Component {
     ];
 
     return (
-      <table className="table table-hover table-striped">
-        <TableHead
-          columnNames={columnNames}
-        />
+      <table className="new-table table table-hover table-striped">
         <tbody>
           {this.getRows()}
         </tbody>

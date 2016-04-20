@@ -8,36 +8,29 @@ import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
 import CommitMessage from '../shared/CommitMessage.jsx';
 
+let initialState = {
+  expanded: false
+};
+
 class StarredBranchesTableRow extends Component {
 
   constructor(props, context) {
     super(props, context);
+
+    this.state = initialState;
   }
 
   getRowClassNames(state) {
     return classNames([
-      tableRowBuildState(state),
-      'clickable-table-row'
+      'clickable-table-row',
+      this.state.expanded ? 'expanded' : ''
     ]);
   }
 
   onTableClick(blazarPath, e) {
-    const link = e.target.className;
-
-    if (link === 'repo-link' || link === 'build-link' || link === 'sha-link') {
-      return;
-    }
-
-    else if (blazarPath !== undefined) {
-      if (!e.metaKey) {
-        this.context.router.push(blazarPath);
-      }
-
-      else {
-        window.open(config.appRoot + blazarPath);
-        return;
-      }
-    }
+    this.setState({
+      expanded: !this.state.expanded
+    });
   }
 
   render() {
@@ -88,16 +81,14 @@ class StarredBranchesTableRow extends Component {
         <td className='build-status'>
           {buildResultIcon(buildToUse.get('state'))}
         </td>
-        <td>
+        <td className='repo-and-branch'>
           <Link className='repo-link' to={blazarBranchPath}>{repository}</Link>
-        </td>
-        <td> 
-          {branch}
+          <span>{branch}</span>
         </td>
         <td>
-          <Link className='build-link' to={buildToUse.get('blazarPath')}>{buildToUse.get('buildNumber')}</Link>
+          <Link className='build-link' to={buildToUse.get('blazarPath')}>#{buildToUse.get('buildNumber')}</Link>
         </td>
-        <td>
+        <td className='timestamp'>
           {timestampFormatted(buildToUse.get('startTimestamp'))}
         </td>
       </tr>
