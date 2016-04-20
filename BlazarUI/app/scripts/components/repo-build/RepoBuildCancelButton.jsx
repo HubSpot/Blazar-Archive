@@ -8,7 +8,8 @@ import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
 
 class CancelBuildButton extends Component {
 
-  constructor() {
+  constructor(props, context) {
+    super(props, context);
     bindAll(this, 'handleCancelBuild', 'cancelBuild', 'cancelModal', 'closeCancelModal');
     this.state = {
       cancelling: false,
@@ -23,9 +24,9 @@ class CancelBuildButton extends Component {
   }
 
   buildBranchHistoryPagePath() {
-    const {host, org, repo, branch} = this.props.params;
+    const {branchId} = this.props.params;
 
-    return `/builds/${host}/${org}/${repo}/${branch}`;
+    return `/builds/branch/${branchId}`;
   }
   
   cancelBuild() {
@@ -36,7 +37,7 @@ class CancelBuildButton extends Component {
       showModal: false
     });
 
-    browserHistory.push(this.buildBranchHistoryPagePath(), null);
+    this.context.router.push(this.buildBranchHistoryPagePath());
   }
 
   cancelModal() {
@@ -102,6 +103,10 @@ class CancelBuildButton extends Component {
 CancelBuildButton.propTypes = {
   triggerCancelBuild: PropTypes.func.isRequired,
   build: PropTypes.object.isRequired
+};
+
+CancelBuildButton.contextTypes = {
+  router: PropTypes.object.isRequired
 };
 
 export default CancelBuildButton;
