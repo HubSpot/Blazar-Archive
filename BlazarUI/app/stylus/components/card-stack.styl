@@ -1,6 +1,6 @@
 .card-stack
   width 100%
-  padding-bottom 50px
+  padding 50px 0
 
 .card-stack__card
   height 70px
@@ -10,9 +10,9 @@
     
 .card-stack__card--expanded
   height 200px
-  margin-left -20px
-  margin-right -20px
+  margin -10px -20px 0 -20px
   border-bottom 1px solid #CCD6E2
+  // box-shadow 0 0 6px rgba(0,0,0,.16),0 6px 12px rgba(0,0,0,.32)
   
   & .card-stack__card-main
     background-color rgba(229, 246, 248, 1)
@@ -74,12 +74,15 @@
   padding 15px
 
 .card-stack__card-main
-  padding 10px 10px 0 10px
+  padding 10px
+  margin-bottom -5px
   height 70px
   cursor pointer
+  transition background .1s
   
   &:hover
     background-color rgba(229, 246, 248, 1)
+    border-bottom 1px solid #CCD6E2
   
   & > *
     display inline-block
