@@ -92,8 +92,8 @@ class RepoBranchCard extends Card {
     const gitInfo = item.get('gitInfo');
 
     return (
-      <div onClick={this.props.onClick} className={this.getClassNames()}>
-        <div className='card-stack__card-main'>
+      <div className={this.getClassNames()}>
+        <div onClick={this.props.onClick} className='card-stack__card-main'>
           <div className='card-stack__card-status'>
             {buildResultIcon(build.get('state'))}
           </div>
