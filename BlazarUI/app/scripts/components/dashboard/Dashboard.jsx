@@ -86,7 +86,7 @@ class Dashboard extends Component {
           <Headline>
             Starred Branches
           </Headline>
-          <CardStack>
+          <CardStack loading={this.props.loadingBuilds || this.props.loadingStars}>
             {this.renderCards()}
           </CardStack>
         </UIGridItem>

@@ -1,11 +1,21 @@
 import React, { Component, PropTypes } from 'react';
 
+import Loader from './Loader.jsx';
+
 class CardStack extends Component {
   constructor(props) {
     super(props);
   }
 
   render() {
+    if (this.props.loading) {
+      return (
+        <div className='card-stack'>
+          <Loader align='center' roomy={true} />
+        </div>
+      );
+    }
+
     return (
       <div className='card-stack'>
         <div className='card-stack__wrapper'>
@@ -17,6 +27,7 @@ class CardStack extends Component {
 }
 
 CardStack.propTypes = {
+  loading: PropTypes.bool.isRequired,
   children: PropTypes.node
 };
 
