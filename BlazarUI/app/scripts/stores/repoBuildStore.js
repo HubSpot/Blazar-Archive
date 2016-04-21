@@ -33,6 +33,15 @@ const RepoBuildStore = Reflux.createStore({
     });
   },
 
+  onLoadRepoBuildById(repoBuildId) {
+    RepoBuildApi.fetchRepoBuildById(repoBuildId, (resp) => {
+      this.trigger({
+        repoBuild: resp,
+        loading: false
+      });
+    });
+  },
+
   onLoadModuleBuilds(params) {
     this.params = params;
 
@@ -41,6 +50,15 @@ const RepoBuildStore = Reflux.createStore({
 
       this.trigger({
         moduleBuilds: this.moduleBuilds,
+        loadingModuleBuilds: false
+      });
+    });
+  },
+
+  onLoadModuleBuildsById(repoBuildId, branchId) {
+    RepoBuildApi.fetchModuleBuildsById(repoBuildId, branchId, (resp) => {
+      this.trigger({
+        moduleBuilds: resp,
         loadingModuleBuilds: false
       });
     });

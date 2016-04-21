@@ -1,0 +1,86 @@
+.card-stack
+  width 100%
+  padding-bottom 50px
+
+.card-stack__card
+  height 70px
+  border 1px solid #CCD6E2
+  border-bottom 0
+  transition height .3s, margin .3s, box-shadow .3s
+    
+  &:hover
+    cursor pointer
+    
+.card-stack__card--expanded
+  height 200px
+  margin-left -20px
+  margin-right -20px
+  border-bottom 1px solid #CCD6E2
+  
+  & .card-stack__card-main
+    background-color rgba(229, 246, 248, 1)
+  
+  & i
+    transition padding .3s
+    
+  & .card-stack__card-status
+    width 70px
+    
+  & .card-stack__card-timestamp
+    padding-right 20px
+
+.card-stack__card--last
+  border-bottom 1px solid #CCD6E2
+
+.card-stack__card--below-expanded
+  border-top 0
+  
+.card-stack__wrapper
+  padding 0 20px
+
+.card-stack__card-status
+  width 50px
+  float left
+  height 100%
+  transition width .3s
+  
+  & i
+    transition padding .3s
+    padding-left 50px
+    padding-top 10px
+  
+.card-stack__card-repo-and-branch
+  width 150px
+  height 100%
+  vertical-align middle
+  
+  & span
+    display block
+
+.card-stack__card-build-number
+  min-width 50px
+  height 100%
+  vertical-align middle
+
+.card-stack__card-timestamp
+  min-width 100px
+  float right
+  height 100%
+  vertical-align middle
+  transition padding .3s
+
+.card-stack__card-details
+  width 100%
+  height 122px
+  background-color white
+  padding 15px
+
+.card-stack__card-main
+  padding 10px 10px 0 10px
+  height 70px
+  
+  &:hover
+    background-color rgba(229, 246, 248, 1)
+  
+  & > *
+    display inline-block
