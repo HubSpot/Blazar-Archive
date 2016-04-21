@@ -51,13 +51,22 @@ class RepoBranchCard extends Card {
       );
     }
 
-    return moduleBuilds.map((build, key) => {
+    const failedModuleNodes = moduleBuilds.map((build, key) => {
       return (
         <div key={key} className='card-stack__card-failed-module'>
-          {build.name}
+          <Link to={build.blazarPath}>
+            {build.name}
+          </Link>
         </div>
       );
     });
+
+    return (
+      <div className='card-stack__card-failed-modules-wrapper'>
+        These modules failed:<br />
+        {failedModuleNodes}
+      </div>
+    );
   }
 
   renderDetails() {

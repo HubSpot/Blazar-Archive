@@ -90,7 +90,7 @@ function fetchModuleBuilds(params, cb) {
   });
 }
 
-function fetchModuleBuildsById(repoBuildId, branchId, cb) {
+function fetchModuleBuildsById(branchId, repoBuildId, buildNumber, cb) {
   const moduleBuildsPromise = new Resource({
     url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
     type: 'GET'
@@ -102,9 +102,8 @@ function fetchModuleBuildsById(repoBuildId, branchId, cb) {
       const moduleBuildsWithNames = map(moduleBuilds, (build) => {
         const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
         const moduleInfoExtended = {
-          name: moduleInfo.name
-          // LATER maybe, if we want to link it which we probably do
-          //blazarPath: `/builds/branch/${params.branchId}/build/${params.buildNumber}/module/${moduleInfo.name}`
+          name: moduleInfo.name,
+          blazarPath: `/builds/branch/${branchId}/build/${buildNumber}/module/${moduleInfo.name}`
         };
 
         return extend(build, moduleInfoExtended);

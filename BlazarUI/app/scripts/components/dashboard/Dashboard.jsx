@@ -55,9 +55,10 @@ class Dashboard extends Component {
     });
 
     const repoBuildId = build.has('inProgressBuild') ? build.get('inProgressBuild').get('id') : build.get('lastBuild').get('id');
+    const buildNumber = build.has('inProgressBuild') ? build.get('inProgressBuild').get('buildNumber') : build.get('lastBuild').get('buildNumber');
     const branchId = build.get('gitInfo').get('id');
     RepoBuildActions.loadRepoBuildById(repoBuildId);
-    RepoBuildActions.loadModuleBuildsById(repoBuildId, branchId);
+    RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
   }
 
   renderCards() {
