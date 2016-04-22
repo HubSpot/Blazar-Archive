@@ -1,4 +1,7 @@
+// local variables
 $card-stack-border-color = #CCD6E2
+$card-bg-color = rgba(229, 246, 248, 1)
+$card-bg-color-hover = rgba(229, 246, 248, 0.4)
 $border = 1px solid $card-stack-border-color
 $initial-height = 60px
 $transition-duration = .3s
@@ -12,19 +15,19 @@ $bg-transition-duration = .15s
   height $initial-height
   border $border
   border-bottom 0
-  transition height $transition-duration, margin $transition-duration
+  transition height $transition-duration, margin $transition-duration, padding $transition-duration
     
 .card-stack__card--expanded
   height 190px
-  margin 0 -20px
+  margin -10px -20px 0 -20px
   border-bottom $border
   
   & .card-stack__card-main
-    background-color rgba(229, 246, 248, 1)
+    background-color $card-bg-color
     border-bottom 1px solid $card-stack-border-color
     
     &:hover
-      background-color rgba(229, 246, 248, 1)
+      background-color $card-bg-color
   
   & i
     transition padding $transition-duration
@@ -37,8 +40,14 @@ $bg-transition-duration = .15s
 
 .card-stack__card--last
   border-bottom $border
+
 .card-stack__card--below-expanded
   border-top 0
+  height 50px
+  
+  & .card-stack__card-main
+    padding 0 10px
+    height 50px
   
 .card-stack__wrapper
   padding 0 20px
@@ -90,7 +99,7 @@ $bg-transition-duration = .15s
   transition background $bg-transition-duration
   
   &:hover
-    background-color rgba(229, 246, 248, 0.4)
+    background-color $card-bg-color-hover
   
-  & > *
+  & > div
     display inline-block

@@ -32,12 +32,10 @@ class Dashboard extends Component {
 
   componentDidMount() {
     this.unsubscribeFromRepo = RepoBuildStore.listen(this.onStatusChange.bind(this));
-    $(window).click(this.maybeCloseCards);
   }
 
   componentWillUnmount() {
     this.unsubscribeFromRepo();
-    $(window).unbind('click');
   }
 
   onStatusChange(state) {
@@ -52,7 +50,9 @@ class Dashboard extends Component {
   }
 
   maybeCloseCards(event) {
-    if ($(event.target).attr('class').indexOf('card-stack__') === -1) {
+    const targetClass = $(event.target).attr('class') || '';
+
+    if (targetClass.indexOf('card-stack__') === -1) {
       this.resetSelectedCard();
     }
   }
@@ -101,7 +101,9 @@ class Dashboard extends Component {
           <Headline>
             Starred Branches
           </Headline>
-          <CardStack loading={this.props.loadingBuilds || this.props.loadingStars}>
+          <CardStack 
+            onClick={this.maybeCloseCards}
+            loading={this.props.loadingBuilds || this.props.loadingStars}>
             {this.renderCards()}
           </CardStack>
         </UIGridItem>

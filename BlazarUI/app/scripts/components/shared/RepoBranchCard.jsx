@@ -63,7 +63,10 @@ class RepoBranchCard extends Card {
 
     return (
       <div className='card-stack__card-failed-modules-wrapper'>
-        These modules failed:<br />
+        <span className='card-stack__card-failed-modules-title'>
+          These modules failed:
+        </span>
+        <br />
         {failedModuleNodes}
       </div>
     );
