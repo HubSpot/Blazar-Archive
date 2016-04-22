@@ -1,6 +1,9 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
 import Immutable from 'immutable'
+import $ from 'jquery';
+import { bindAll } from 'underscore';
+
 import CardStack from '../shared/CardStack.jsx';
 import RepoBranchCard from '../shared/RepoBranchCard.jsx';
 
@@ -24,27 +27,39 @@ class Dashboard extends Component {
     super(props);
 
     this.state = initialState;
+    bindAll(this, 'maybeCloseCards');
   }
 
   componentDidMount() {
     this.unsubscribeFromRepo = RepoBuildStore.listen(this.onStatusChange.bind(this));
+    $(window).click(this.maybeCloseCards);
   }
 
   componentWillUnmount() {
     this.unsubscribeFromRepo();
+    $(window).unbind('click');
   }
 
   onStatusChange(state) {
     this.setState(state);
   }
 
+  resetSelectedCard() {
+    this.setState({
+      expandedCard: -1,
+      build: undefined
+    });
+  }
+
+  maybeCloseCards(event) {
+    if ($(event.target).attr('class').indexOf('card-stack__') === -1) {
+      this.resetSelectedCard();
+    }
+  }
+
   onCardClick(key, build) {
     if (key === this.state.expandedCard) {
-      this.setState({
-        expandedCard: -1,
-        build: undefined
-      });
-
+      this.resetSelectedCard();
       return;
     }
 

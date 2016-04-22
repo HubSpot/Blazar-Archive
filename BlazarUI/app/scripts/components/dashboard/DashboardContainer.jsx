@@ -46,7 +46,8 @@ class DashboardContainer extends Component {
 
     if (this.state.builds.all) {
       const starredBuilds = this.state.builds.all.filter((build) => {
-        return contains(this.state.stars, build.gitInfo.id);
+        return contains(this.state.stars, build.gitInfo.id)
+          && build.gitInfo.active;
       });
 
       this.setState({ starredBuilds: starredBuilds });
