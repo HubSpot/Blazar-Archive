@@ -13,6 +13,11 @@
   font-weight 300
   a
     text-decoration none
+    color $link-color
+    
+    &:hover
+      text-decoration none
+      color $link-color
   
 .sidebar-item__module-branch-name
   color $gray-darker
@@ -28,9 +33,14 @@
     padding-left 5px
     
 .sidebar-item__module-repo-name
-  color $gray-darker
   font-size 14px
   margin-left 9px
+  
+  & a
+    color $gray-darker
+    
+    &:hover
+      color $gray-darker
 
 .sidebar__active-building-icon
   position absolute
@@ -78,20 +88,12 @@
   font-size 12px
   padding-right 10px
   padding-bottom 5px
-  width 100%
   color $link-color
   text-align right
   cursor pointer
   position absolute
   top 12px
   right 0
-  
-.sidebar-item a
-  color $link-color // move to color vars and above too
-  
-  &:hover
-    text-decoration none
-    color $link-color
   
 .repo-octicon // todo clean up this nonsense
   color $gray-darker
