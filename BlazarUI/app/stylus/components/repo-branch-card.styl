@@ -1,0 +1,26 @@
+@import './card-variables.styl'
+
+// Repo-branch card  
+.repo-branch-card__repo-and-branch
+  width 150px
+  height 100%
+  vertical-align middle
+  
+  & span
+    display block
+
+.repo-branch-card__build-number
+  min-width 50px
+  height 100%
+  vertical-align middle
+  
+.repo-branch-card__timestamp
+  min-width 100px
+  text-align right
+  float right
+  height 100%
+  vertical-align middle
+
+.card-stack__card--expanded
+  & .repo-branch-card__repo-and-branch, .repo-branch-card__timestamp, .repo-branch-card__build-number, .repo-branch-card__timestamp
+    padding 0 20px

@@ -52,7 +52,7 @@ class Dashboard extends Component {
   maybeCloseCards(event) {
     const targetClass = $(event.target).attr('class') || '';
 
-    if (targetClass.indexOf('card-stack__') === -1) {
+    if (targetClass.indexOf('card-stack__') === -1 && targetClass.indexOf('repo-branch-card__') === -1) {
       this.resetSelectedCard();
     }
   }

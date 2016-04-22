@@ -1,12 +1,4 @@
-// local variables
-$card-stack-border-color = #CCD6E2
-$card-bg-color = rgba(229, 246, 248, 1)
-$card-bg-color-hover = rgba(229, 246, 248, 0.4)
-$border = 1px solid $card-stack-border-color
-$initial-height = 80px
-$transition-duration = .3s
-$bg-transition-duration = .15s
-
+@import './card-variables.styl'
 
 // Outer classes
 .card-stack
@@ -66,32 +58,6 @@ $bg-transition-duration = .15s
   
   & > div
     display inline-block
-    
-
-// Repo-branch card  
-.repo-branch-card__repo-and-branch
-  width $initial-height + 90px
-  height 100%
-  vertical-align middle
-  
-  & span
-    display block
-
-.repo-branch-card__build-number
-  min-width 50px
-  height 100%
-  vertical-align middle
-  
-.repo-branch-card__timestamp
-  min-width 100px
-  text-align right
-  float right
-  height 100%
-  vertical-align middle
-
-.card-stack__card--expanded
-  & .repo-branch-card__repo-and-branch, .repo-branch-card__timestamp, .repo-branch-card__build-number, .repo-branch-card__timestamp
-    padding 0 20px
 
 
 // Detailed card content

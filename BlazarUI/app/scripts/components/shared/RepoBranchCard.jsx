@@ -18,6 +18,16 @@ class RepoBranchCard extends Card {
     ]);
   }
 
+  getBuildToDisplay() {
+    const {item} = this.props;
+
+    if (item.get('inProgressBuild') !== undefined) {
+      return item.get('inProgressBuild');
+    }
+
+    return item.get('lastBuild');
+  }
+
   renderRepoLink() {
     const {item} = this.props;
     const gitInfo = item.get('gitInfo');
@@ -31,7 +41,7 @@ class RepoBranchCard extends Card {
 
   renderBuildNumberLink() {
     const {item} = this.props;
-    const build = item.get('inProgressBuild') !== undefined ? item.get('inProgressBuild') : item.get('lastBuild');
+    const build = this.getBuildToDisplay();
     const gitInfo = item.get('gitInfo');
     
     return (
@@ -50,7 +60,7 @@ class RepoBranchCard extends Card {
 
     const failedModuleNodes = moduleBuilds.map((build, key) => {
       return (
-        <div key={key} className='card-stack__card-failed-module'>
+        <div key={key} className='repo-branch-card__failed-module'>
           <Link to={build.blazarPath}>
             {build.name}
           </Link>
@@ -59,8 +69,8 @@ class RepoBranchCard extends Card {
     });
 
     return (
-      <div className='card-stack__card-failed-modules-wrapper'>
-        <span className='card-stack__card-failed-modules-title'>
+      <div className='repo-branch-card__failed-modules-wrapper'>
+        <span className='repo-branch-card__failed-modules-title'>
           These modules failed:
         </span>
         <br />
@@ -79,7 +89,7 @@ class RepoBranchCard extends Card {
     else if (this.props.loading) {
       return (
         <div className='card-stack__card-details'>
-          <Loader roomy={true} />
+          <Loader align='center' roomy={true} />
         </div>
       );
     }
