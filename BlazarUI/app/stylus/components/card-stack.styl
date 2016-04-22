@@ -3,7 +3,7 @@ $card-stack-border-color = #CCD6E2
 $card-bg-color = rgba(229, 246, 248, 1)
 $card-bg-color-hover = rgba(229, 246, 248, 0.4)
 $border = 1px solid $card-stack-border-color
-$initial-height = 60px
+$initial-height = 80px
 $transition-duration = .3s
 $bg-transition-duration = .15s
 
@@ -11,6 +11,8 @@ $bg-transition-duration = .15s
 // Outer classes
 .card-stack
   width 100%
+  min-width 600px
+  max-width 1000px
   padding 50px 0
   
 .card-stack__wrapper
@@ -25,7 +27,7 @@ $bg-transition-duration = .15s
   transition height $transition-duration, margin $transition-duration, padding $transition-duration, box-shadow $transition-duration
     
 .card-stack__card--expanded
-  height 190px
+  height $initial-height + 130px
   margin -10px -20px 0 -20px
   border-bottom $border
   
@@ -39,11 +41,11 @@ $bg-transition-duration = .15s
   & i
     transition padding $transition-duration
     
-  & .card-stack__card-status
+  & .repo-branch-card__status
     width 70px
     
-  & .card-stack__card-timestamp
-    padding-right 20px
+  & .repo-branch-card__timestamp
+    padding-right 30px
     
 .card-stack__card--below-expanded
   border-top 0
@@ -72,8 +74,10 @@ $bg-transition-duration = .15s
   
   & > div
     display inline-block
+    
 
-.card-stack__card-status
+// Repo-branch card
+.repo-branch-card__status
   width 50px
   float left
   height 100%
@@ -84,7 +88,7 @@ $bg-transition-duration = .15s
     padding-left 50px
     padding-top 10px
   
-.card-stack__card-repo-and-branch
+.repo-branch-card__repo-and-branch
   width $initial-height + 90px
   height 100%
   vertical-align middle
@@ -92,12 +96,12 @@ $bg-transition-duration = .15s
   & span
     display block
 
-.card-stack__card-build-number
+.repo-branch-card__build-number
   min-width 50px
   height 100%
   vertical-align middle
 
-.card-stack__card-timestamp
+.repo-branch-card__timestamp
   min-width 100px
   float right
   height 100%
@@ -108,6 +112,5 @@ $bg-transition-duration = .15s
 // Detailed card content
 .card-stack__card-details
   width 100%
-  height $initial-height + 62px
   background-color white
   padding 15px

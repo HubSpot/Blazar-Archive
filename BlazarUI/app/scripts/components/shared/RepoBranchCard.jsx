@@ -1,7 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import classNames from 'classnames';
 import { Link } from 'react-router';
-import { buildResultIcon, timestampFormatted } from '../Helpers';
+import { buildResultIcon } from '../Helpers';
+import moment from 'moment';
 
 import Card from './Card.jsx';
 import Icon from '../shared/Icon.jsx';
@@ -106,22 +107,22 @@ class RepoBranchCard extends Card {
     return (
       <div className={this.getClassNames()}>
         <div onClick={this.props.onClick} className='card-stack__card-main'>
-          <div className='card-stack__card-status'>
+          <div className='repo-branch-card__status'>
             {buildResultIcon(build.get('state'))}
           </div>
-          <div className='card-stack__card-repo-and-branch'>
+          <div className='repo-branch-card__repo-and-branch'>
             <span className='card-stack__card-repo'>
               {this.renderRepoLink()}
             </span>
-            <span className='card-stack__card-branch'>
+            <span className='repo-branch-card__branch'>
               {gitInfo.get('branch')}
             </span>
           </div>
-          <div className='card-stack__card-build-number'>
+          <div className='repo-branch-card__build-number'>
             <span>{this.renderBuildNumberLink()}</span>
           </div>
-          <div className='card-stack__card-timestamp'>
-            <span>{timestampFormatted(build.get('startTimestamp'))}</span>
+          <div className='repo-branch-card__timestamp'>
+            <span>{moment(build.get('startTimestamp')).fromNow()}</span>
           </div>
         </div>
         {this.renderDetails()}
