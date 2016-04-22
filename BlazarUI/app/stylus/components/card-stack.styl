@@ -15,12 +15,13 @@ $bg-transition-duration = .15s
   height $initial-height
   border $border
   border-bottom 0
-  transition height $transition-duration, margin $transition-duration, padding $transition-duration
+  transition height $transition-duration, margin $transition-duration, padding $transition-duration, box-shadow $transition-duration
     
 .card-stack__card--expanded
   height 190px
   margin -10px -20px 0 -20px
   border-bottom $border
+  box-shadow 1px 1px 5px #AAA
   
   & .card-stack__card-main
     background-color $card-bg-color
