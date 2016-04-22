@@ -15,6 +15,9 @@ $bg-transition-duration = .15s
   max-width 1000px
   padding 50px 0
   
+  & *
+    transition height $transition-duration, margin $transition-duration, padding $transition-duration, background $bg-transition-duration
+  
 .card-stack__wrapper
   padding 0 20px
 
@@ -24,7 +27,6 @@ $bg-transition-duration = .15s
   height $initial-height
   border $border
   border-bottom 0
-  transition height $transition-duration, margin $transition-duration, padding $transition-duration, box-shadow $transition-duration
     
 .card-stack__card--expanded
   height $initial-height + 130px
@@ -58,7 +60,6 @@ $bg-transition-duration = .15s
   padding 10px
   height $initial-height
   cursor pointer
-  transition background $bg-transition-duration
   
   &:hover
     background-color $card-bg-color-hover
@@ -72,7 +73,6 @@ $bg-transition-duration = .15s
   width $initial-height + 90px
   height 100%
   vertical-align middle
-  transition padding $transition-duration
   
   & span
     display block
@@ -81,16 +81,13 @@ $bg-transition-duration = .15s
   min-width 50px
   height 100%
   vertical-align middle
-  transition padding $transition-duration
-
+  
 .repo-branch-card__timestamp
   min-width 100px
   text-align right
   float right
   height 100%
   vertical-align middle
-  transition padding $transition-duration
-  
 
 .card-stack__card--expanded
   & .repo-branch-card__repo-and-branch, .repo-branch-card__timestamp, .repo-branch-card__build-number, .repo-branch-card__timestamp
