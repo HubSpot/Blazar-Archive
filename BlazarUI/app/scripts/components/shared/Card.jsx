@@ -9,11 +9,11 @@ class Card extends Component {
 }
 
 Card.propTypes = {
-  first: PropTypes.bool.isRequired,
-  last: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
   expanded: PropTypes.bool.isRequired,
-  belowExpanded: PropTypes.bool.isRequired
+  belowExpanded: PropTypes.bool.isRequired,
+  first: PropTypes.bool,
+  last: PropTypes.bool
 };
 
 export default Card;
