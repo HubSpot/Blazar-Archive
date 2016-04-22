@@ -86,12 +86,15 @@ class SidebarItem extends Component {
   
   renderRepoLink() {
     const {repository} = this.props;
+    const blazarRepositoryPath = `/builds/repo/${repository}`;
     
     return (
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='repo-octicon'/>{ '   ' }
           <span className='sidebar-item__module-repo-name'>
-            {truncate(repository, 22, true)}
+            <Link to={blazarRepositoryPath}>
+              {truncate(repository, 22, true)}
+            </Link>
           </span>
       </div>
     );
