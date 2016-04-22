@@ -7,10 +7,17 @@ $initial-height = 60px
 $transition-duration = .3s
 $bg-transition-duration = .15s
 
+
+// Outer classes
 .card-stack
   width 100%
   padding 50px 0
+  
+.card-stack__wrapper
+  padding 0 20px
 
+
+// Individual card and variations
 .card-stack__card
   height $initial-height
   border $border
@@ -21,7 +28,6 @@ $bg-transition-duration = .15s
   height 190px
   margin -10px -20px 0 -20px
   border-bottom $border
-  box-shadow 1px 1px 5px #AAA
   
   & .card-stack__card-main
     background-color $card-bg-color
@@ -38,20 +44,34 @@ $bg-transition-duration = .15s
     
   & .card-stack__card-timestamp
     padding-right 20px
-
-.card-stack__card--last
-  border-bottom $border
-
+    
 .card-stack__card--below-expanded
   border-top 0
-  height 50px
+  height $initial-height - 10
   
   & .card-stack__card-main
     padding 0 10px
-    height 50px
+    height $initial-height - 10
+
+.card-stack__card--last
+  border-bottom $border
+    
+  &:hover
+    border-bottom $border
+
+
+// Top card content
+.card-stack__card-main
+  padding 10px
+  height $initial-height
+  cursor pointer
+  transition background $bg-transition-duration
   
-.card-stack__wrapper
-  padding 0 20px
+  &:hover
+    background-color $card-bg-color-hover
+  
+  & > div
+    display inline-block
 
 .card-stack__card-status
   width 50px
@@ -65,7 +85,7 @@ $bg-transition-duration = .15s
     padding-top 10px
   
 .card-stack__card-repo-and-branch
-  width 150px
+  width $initial-height + 90px
   height 100%
   vertical-align middle
   
@@ -84,23 +104,10 @@ $bg-transition-duration = .15s
   vertical-align middle
   transition padding $transition-duration
 
+
+// Detailed card content
 .card-stack__card-details
   width 100%
-  height 122px
+  height $initial-height + 62px
   background-color white
   padding 15px
-  
-.car-stack__card--last:hover
-  border-bottom $border
-
-.card-stack__card-main
-  padding 10px
-  height $initial-height
-  cursor pointer
-  transition background $bg-transition-duration
-  
-  &:hover
-    background-color $card-bg-color-hover
-  
-  & > div
-    display inline-block
