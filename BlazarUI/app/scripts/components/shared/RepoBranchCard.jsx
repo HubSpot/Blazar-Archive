@@ -13,12 +13,8 @@ class RepoBranchCard extends Card {
 
   getClassNames() {
     return classNames([
-      'card-stack__card',
-      'card-stack__card--repo-branch',
-      this.props.expanded ? 'card-stack__card--expanded' : '',
-      this.props.first ? 'card-stack__card--first' : '',
-      this.props.last ? 'card-stack__card--last' : '',
-      this.props.belowExpanded ? 'card-stack__card--below-expanded' : ''
+      this.getBaseClassNames(),
+      'card-stack__card--repo-branch'
     ]);
   }
 
