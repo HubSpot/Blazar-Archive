@@ -107,9 +107,6 @@ class RepoBranchCard extends Card {
     return (
       <div className={this.getClassNames()}>
         <div onClick={this.props.onClick} className='card-stack__card-main'>
-          <div className='repo-branch-card__status'>
-            {buildResultIcon(build.get('state'))}
-          </div>
           <div className='repo-branch-card__repo-and-branch'>
             <span className='card-stack__card-repo'>
               {this.renderRepoLink()}
