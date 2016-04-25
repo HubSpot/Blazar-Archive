@@ -45,7 +45,7 @@ class RepoBranchCard extends Card {
     const gitInfo = item.get('gitInfo');
     
     return (
-      <Link to={build.get('blazarPath')}>
+      <Link className='repo-branch-card__build-number' to={build.get('blazarPath')}>
         #{build.get('buildNumber')}
       </Link>
     );
@@ -105,30 +105,103 @@ class RepoBranchCard extends Card {
     );
   }
 
+  renderInfo() {
+    const {item} = this.props;
+    const gitInfo = item.get('gitInfo');
+
+    return (
+      <div className='repo-branch-card__info'>
+        <div className='repo-branch-card__repo'>
+          {this.renderRepoLink()}
+        </div>
+        <div className='repo-branch-card__branch-and-build'>
+          <span className='repo-branch-card__branch'>
+            {gitInfo.get('branch')}
+          </span>
+          <span> is on build </span>
+          {this.renderBuildNumberLink()}
+        </div>
+      </div>
+    );
+  }
+
+  renderBuildAuthorMaybe() {
+    const {item} = this.props;
+    const someCheck = false;
+
+    if (!someCheck) {
+      return null;
+    }
+
+    return (
+      <span>
+        by <span>AUTHOR</span>
+      </span>
+    );
+  }
+
+  renderLastBuild() {
+    const {item} = this.props;
+    const build = this.getBuildToDisplay();
+
+    return (
+      <div className='repo-branch-card__last-build'>
+        <span className='repo-branch-card__last-build-time'>
+          {moment(build.get('startTimestamp')).fromNow()}
+        </span>
+        {this.renderBuildAuthorMaybe()}
+      </div>
+    );
+  }
+
+  renderModulesBuilt() {
+    const {item} = this.props;
+
+    return (
+      <div className='repo-branch-card__details'>
+        <div className='repo-branch-card__modules-built'>
+          <span>
+            <span className='repo-branch-card__modules-built-count'>2 modules</span> built
+          </span>
+        </div>
+        <div className='repo-branch-card__modules-skipped'>
+          <span>
+            <span className='repo-branch-card__modules-skipped-count'>4 modules</span> skipped
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  renderStatus() {
+    const {item} = this.props;
+    const build = this.getBuildToDisplay();
+    const classWithModifier = `repo-branch-card__status-banner--${[BuildStates.FAILED, BuildStates.UNSTABLE].indexOf(build.get('state')) !== -1 ? 'FAILED' : 'SUCCESS'}`;
+
+    return (
+      <div className='repo-branch-card__status'>
+        <div className={classWithModifier}>
+          <span />
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const {item} = this.props;
     const build = item.get('inProgressBuild') !== undefined ? item.get('inProgressBuild') : item.get('lastBuild');
     const gitInfo = item.get('gitInfo');
 
+    console.log(item.toJS());
+
     return (
       <div className={this.getClassNames()}>
         <div onClick={this.props.onClick} className='card-stack__card-main'>
-          <div className='repo-branch-card__repo-and-branch'>
-            <span className='card-stack__card-repo'>
-              {this.renderRepoLink()}
-            </span>
-            <span className='repo-branch-card__branch'>
-              {gitInfo.get('branch')}
-            </span>
-          </div>
-          <div className='repo-branch-card__build-number'>
-            <span>{this.renderBuildNumberLink()}</span>
-          </div>
-          <div className='repo-branch-card__timestamp'>
-            <span>{moment(build.get('startTimestamp')).fromNow()}</span>
-          </div>
+          {this.renderInfo()}
+          {this.renderLastBuild()}
+          {this.renderModulesBuilt()}
+          {this.renderStatus()}
         </div>
-        {this.renderDetails()}
       </div>
     );
   }
