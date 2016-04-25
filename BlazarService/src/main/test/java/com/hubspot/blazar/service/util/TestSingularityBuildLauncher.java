@@ -1,43 +1,43 @@
-package com.hubspot.blazar.util;
+package com.hubspot.blazar.service.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.resources.ModuleBuildResource;
+import com.hubspot.blazar.util.SingularityBuildLauncher;
 import com.hubspot.singularity.client.SingularityClient;
 
 public class TestSingularityBuildLauncher extends SingularityBuildLauncher {
   private static final Logger LOG = LoggerFactory.getLogger(TestSingularityBuildLauncher.class);
-  private final EventBus eventBus;
+  private final ModuleBuildService moduleBuildService;
   private final ModuleBuildResource moduleBuildResource;
+
 
   @Inject
   public TestSingularityBuildLauncher(SingularityClient singularityClient,
                                       BlazarConfiguration blazarConfiguration,
-                                      EventBus eventBus,
+                                      ModuleBuildService moduleBuildService,
                                       ModuleBuildResource moduleBuildResource) {
     super(singularityClient, blazarConfiguration);
-    this.eventBus = eventBus;
+    this.moduleBuildService = moduleBuildService;
     this.moduleBuildResource = moduleBuildResource;
   }
 
 
   @Override
   public synchronized void launchBuild(ModuleBuild build) throws Exception {
-    while (build.getState().isWaiting()) {
-      build = moduleBuildResource.get(build.getId().get()).get();
-      LOG.info("{} is waiting for upstream build", build);
-      eventBus.post(build);
+    build = moduleBuildService.get(build.getId().get()).get();
+    if (build.getState().isWaiting()) {
       return;
     }
-    LOG.debug("Pretending to launch {} calling start", build);
+    LOG.info("Pretending to launch {} calling start", build);
     ModuleBuild inProgress = moduleBuildResource.start(build.getId().get(), Optional.of(build.toString()));
-    LOG.debug("Build {} now in progress, publishing success", inProgress);
+    LOG.info("Build {} now in progress, publishing success", inProgress);
     ModuleBuild success = moduleBuildResource.completeSuccess(inProgress.getId().get());
     LOG.info("Build {} succeed", success);
   }

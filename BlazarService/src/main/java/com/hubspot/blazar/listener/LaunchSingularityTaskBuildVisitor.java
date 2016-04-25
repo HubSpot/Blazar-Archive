@@ -1,13 +1,14 @@
 package com.hubspot.blazar.listener;
 
-import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
+import com.hubspot.blazar.util.SingularityBuildLauncher;
 
 @Singleton
 public class LaunchSingularityTaskBuildVisitor extends AbstractModuleBuildVisitor {
@@ -26,7 +27,7 @@ public class LaunchSingularityTaskBuildVisitor extends AbstractModuleBuildVisito
    */
   @Override
   protected void visitQueued(ModuleBuild build) throws Exception {
-    LOG.info("About to launch Singularity task for build {}", build.getId().get());
+    LOG.info("About to launch Singularity task for build {}", build);
     singularityBuildLauncher.launchBuild(build);
   }
 }

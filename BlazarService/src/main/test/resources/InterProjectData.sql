@@ -1,6 +1,18 @@
 --liquibase formatted sql
+-- changeset InterProjectTestInsertBranches:0 runAlways:true
+TRUNCATE TABLE `inter_project_build_mappings`;
+TRUNCATE TABLE `inter_project_builds`;
+TRUNCATE TABLE `branches`;
+TRUNCATE TABLE `modules`;
+TRUNCATE TABLE `module_depends`;
+TRUNCATE TABLE `module_provides`;
+TRUNCATE TABLE `repo_builds`;
+TRUNCATE TABLE `module_builds`;
+TRUNCATE TABLE `malformed_files`;
+TRUNCATE TABLE `instant_message_configs`;
+
 -- Insert Repo Branches
---changeset InterProjectTestInsertBranches:100 dbms:h2 runAlways:true
+--changeset InterProjectTestInsertBranches:1 runAlways:true
 INSERT INTO `branches` (`id`, `host`, `organization`, `repository`, `repositoryId`, `branch`, `active`, `pendingBuildId`, `inProgressBuildId`, `lastBuildId`, `createdTimestamp`, `updatedTimestamp`) VALUES
   (1,'git.example.com','test','Repo1',1,'master',1,NULL,NULL,NULL,'2016-04-06 13:16:09','2016-04-06 13:16:09'),
   (2,'git.example.com','test','Repo2',2,'master',1,NULL,NULL,NULL,'2016-04-06 13:16:26','2016-04-06 13:16:26'),
@@ -9,7 +21,7 @@ INSERT INTO `branches` (`id`, `host`, `organization`, `repository`, `repositoryI
   (5,'git.example.com','test','Repo5',5,'master',1,NULL,NULL,NULL,'2016-04-06 13:16:26','2016-04-06 13:16:26');
 
 -- insert modules
---changeset InterProjectTestInsertModules:101 dbms:h2 runAlways:true
+--changeset InterProjectTestInsertModules:2 runAlways:true
 INSERT INTO `modules` (`id`, `branchId`, `name`, `type`, `path`, `glob`, `active`, `pendingBuildId`, `inProgressBuildId`, `lastBuildId`, `createdTimestamp`, `updatedTimestamp`, `buildpack`) VALUES
 -- Repo1 modules
   (1,1,'Module1','config','/Module1','/Module1/*',1,NULL,NULL,NULL,'2016-04-06 13:17:09','2016-04-06 13:17:09',NULL),
@@ -33,7 +45,7 @@ INSERT INTO `modules` (`id`, `branchId`, `name`, `type`, `path`, `glob`, `active
   (15,5,'Module3','config','/Module3','/Module3/*',1,NULL,NULL,NULL,'2016-04-06 13:17:49','2016-04-06 13:17:49',NULL);
 
 -- insert providers
---changeset InterProjectTestInsertProviders:102 dbms:h2 runAlways:true
+--changeset InterProjectTestInsertProviders:3 runAlways:true
 INSERT INTO `module_depends` (`moduleId`, `name`) VALUES
 /*
   1.1(1)  1.2(2)--+     1.3(3)<-+
@@ -70,7 +82,7 @@ INSERT INTO `module_depends` (`moduleId`, `name`) VALUES
   (14, 'Repo1-Module3');
 
 -- insert dependencies
---changeset InterProjectTestInsertDependencies:103 dbms:h2 runAlways:true
+--changeset InterProjectTestInsertDependencies:4 runAlways:true
 INSERT INTO `module_provides` (`moduleId`, `name`) VALUES
 -- Repo1
   ( 1, 'Repo1-Module1'),

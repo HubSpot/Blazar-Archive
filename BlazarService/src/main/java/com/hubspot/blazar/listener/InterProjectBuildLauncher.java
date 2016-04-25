@@ -22,8 +22,8 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.visitor.AbstractInterProjectBuildVisitor;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
+import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
-import com.hubspot.blazar.data.service.InterProjectRepositoryBuildMappingService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 
@@ -33,7 +33,7 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
   private ModuleService moduleService;
   private BranchService branchService;
   private RepositoryBuildService repositoryBuildService;
-  private InterProjectRepositoryBuildMappingService interProjectRepositoryBuildMappingService;
+  private InterProjectBuildMappingService interProjectBuildMappingService;
   private InterProjectBuildService interProjectBuildService;
 
   @Inject
@@ -41,13 +41,13 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
                                    ModuleService moduleService,
                                    BranchService branchService,
                                    RepositoryBuildService repositoryBuildService,
-                                   InterProjectRepositoryBuildMappingService interProjectRepositoryBuildMappingService,
+                                   InterProjectBuildMappingService interProjectBuildMappingService,
                                    InterProjectBuildService interProjectBuildService){
     this.dependenciesService = dependenciesService;
     this.moduleService = moduleService;
     this.branchService = branchService;
     this.repositoryBuildService = repositoryBuildService;
-    this.interProjectRepositoryBuildMappingService = interProjectRepositoryBuildMappingService;
+    this.interProjectBuildMappingService = interProjectBuildMappingService;
     this.interProjectBuildService = interProjectBuildService;
   }
 
@@ -68,8 +68,8 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
   @Override
   protected void visitRunning(InterProjectBuild build) throws Exception {
     DependencyGraph d = build.getDependencyGraph().get();
-    Set<InterProjectBuildMapping> repoBuildsTriggered = interProjectRepositoryBuildMappingService.getMappingsForInterProjectBuild(build);
-    if (!(repoBuildsTriggered.size() == 0)) {
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForBuild(build);
+    if (!(mappings.size() == 0)) {
       LOG.warn("Running InterProjectBuild was launched and build mappings created outside of intended flow, Ignoring Event");
       return;
     }
@@ -84,11 +84,15 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
     }
 
     for (Map.Entry<Integer, Set<Integer>> entry : Multimaps.asMap(launchable).entrySet()) {
+      Set<Integer> moduleIds = entry.getValue();
       GitInfo gitInfo = branchService.get(entry.getKey()).get();
       BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(gitInfo);
       BuildOptions buildOptions = new BuildOptions(entry.getValue(), BuildOptions.BuildDownstreams.NONE, false);
       long buildId = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
-      interProjectRepositoryBuildMappingService.addMapping(new InterProjectBuildMapping(build.getId().get(), entry.getKey(), Optional.of(buildId)));
+
+      for (int moduleId : moduleIds) {
+        interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(build.getId().get(), gitInfo.getId().get(), Optional.of(buildId), moduleId));
+      }
       LOG.info("Queued repo build {} as part of InterProjectBuild {}", buildId, build.getId().get());
     }
   }

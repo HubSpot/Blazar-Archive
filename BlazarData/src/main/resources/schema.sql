@@ -136,7 +136,7 @@ TRUNCATE TABLE `module_builds`;
 
 TRUNCATE TABLE `malformed_files`;
 
---changeset jgoodwin:5 dbms:h2
+--changeset jgoodwin:5 runAlways:false
 CREATE TABLE `instant_message_configs` (
   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `branchId` BIGINT(20) UNSIGNED NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE `instant_message_configs` (
   INDEX (`channelName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---changeset jgoodwin:6 dbms:h2
+--changeset jgoodwin:6 runAlways:false
 CREATE TABLE inter_project_builds (
   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `state` VARCHAR(40) NOT NULL,
@@ -165,18 +165,17 @@ CREATE TABLE inter_project_builds (
   INDEX(`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE inter_project_module_build_mappings (
+CREATE TABLE inter_project_build_mappings (
+  `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `interProjectBuildId` BIGINT(20),
+  `repoId` INT(11),
+  `repoBuildId` BIGINT(20),
   `moduleId` INT(11),
   `moduleBuildId` BIGINT(20),
-  PRIMARY KEY (`interProjectBuildId`, `moduleId`, `moduleBuildId`),
-  INDEX(`interProjectBuildId`, `moduleId`, `moduleBuildId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE inter_project_repo_build_mappings (
-  `interProjectBuildId` BIGINT(20),
-  `branchId` INT(11),
-  `repoBuildId` BIGINT(20),
-  PRIMARY KEY (`interProjectBuildId`, `branchId`, `repoBuildId`),
-  INDEX(`interProjectBuildId`, `branchId`, `repoBuildId`)
+  PRIMARY KEY (`id`)  -- primary key is tricky here :(
+  -- not sure what to index
+  -- INDEX(`interProjectBuildId`, `repoBuildId`),
+  -- INDEX(`interProjectBuildId`, `moduleBuildId`),
+  -- INDEX(`interProjectBuildId`, `moduleId`),
+  -- INDEX(`interProjectBuildId`, `repoId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

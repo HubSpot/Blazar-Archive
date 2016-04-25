@@ -67,19 +67,16 @@ public class BuildEventDispatcher {
     try {
       for (RepositoryBuildVisitor visitor : repositoryVisitors) {
         try {
-
           visitor.visit(build);
         } catch (Exception e) {
           e.printStackTrace();
-          LOG.info("Bad happened");
+          throw e;
         }
       }
-    } finally {
+    } catch (NonRetryableBuildException e) {
+      LOG.warn("Failing build {}", build.getId().get(), e);
+      repositoryBuildService.fail(build);
     }
-    //} catch (NonRetryableBuildException e) {
-    //  LOG.warn("Failing build {}", build.getId().get(), e);
-    //  repositoryBuildService.fail(build);J
-    //}
   }
 
   @Subscribe
@@ -98,15 +95,13 @@ public class BuildEventDispatcher {
           visitor.visit(build);
         } catch (Exception e) {
           e.printStackTrace();
-          LOG.info("Bad happened");
+          throw e;
         }
       }
-    } finally {
+    } catch (NonRetryableBuildException e) {
+      LOG.warn("Failing build {}", build.getId().get(), e);
+      moduleBuildService.fail(build);
     }
-    // } catch (NonRetryableBuildException e) {
-    //   LOG.warn("Failing build {}", build.getId().get(), e);
-    //   moduleBuildService.fail(build);
-    // }
   }
 
   private boolean matchingState(ModuleBuild.State current, ModuleBuild.State other) {
@@ -131,7 +126,12 @@ public class BuildEventDispatcher {
 
     try {
       for (InterProjectBuildVisitor visitor : interProjectBuildVisitors) {
-        visitor.visit(build);
+        try {
+          visitor.visit(build);
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw e;
+        }
       }
     } catch (NonRetryableBuildException e) {
       LOG.warn("Got non Retryable Exception in InterProjectBuild {}, marking as Finished", build.getId().get());

@@ -9,7 +9,7 @@ import com.google.common.base.Optional;
 import com.hubspot.rosetta.annotations.StoredAsJson;
 
 public class InterProjectBuild {
-  private final Optional<Integer> id;
+  private final Optional<Long> id;
   private final State state;
   @StoredAsJson
   private Set<Integer> moduleIds;
@@ -37,7 +37,7 @@ public class InterProjectBuild {
   }
 
   @JsonCreator
-  public InterProjectBuild(@JsonProperty("id") Optional<Integer> id,
+  public InterProjectBuild(@JsonProperty("id") Optional<Long> id,
                            @JsonProperty("state") State state,
                            @JsonProperty("moduleIds") Set<Integer> moduleIds,
                            @JsonProperty("buildTrigger") BuildTrigger buildTrigger,
@@ -54,19 +54,23 @@ public class InterProjectBuild {
   }
 
   public static InterProjectBuild getQueuedBuild(Set<Integer> moduleIds, BuildTrigger buildTrigger) {
-    return new InterProjectBuild(Optional.<Integer>absent(), State.CALCULATING, moduleIds, buildTrigger, Optional.<Long>absent(), Optional.<Long>absent(),Optional.<DependencyGraph>absent());
+    return new InterProjectBuild(Optional.<Long>absent(), State.CALCULATING, moduleIds, buildTrigger, Optional.<Long>absent(), Optional.<Long>absent(),Optional.<DependencyGraph>absent());
   }
 
   public static InterProjectBuild withDependencyGraph(InterProjectBuild old, DependencyGraph d){
     return new InterProjectBuild(old.getId(), old.getState(), old.getModuleIds(), old.getBuildTrigger(), old.getStartTimestamp(), old.getEndTimestamp(), Optional.of(d));
   }
 
-  public static InterProjectBuild getStarted( InterProjectBuild build) {
+  public static InterProjectBuild getStarted(InterProjectBuild build) {
     return new InterProjectBuild(build.getId(), State.RUNNING, build.getModuleIds(), build.getBuildTrigger(), build.getStartTimestamp(), build.getEndTimestamp(), build.getDependencyGraph());
   }
 
+  public static InterProjectBuild getFinishedBuild(InterProjectBuild old) {
+    return new InterProjectBuild(old.getId(), State.FINISHED, old.getModuleIds(), old.getBuildTrigger(), old.getStartTimestamp(), Optional.of(System.currentTimeMillis()), old.getDependencyGraph());
+  }
 
-  public Optional<Integer> getId() {
+
+  public Optional<Long> getId() {
     return id;
   }
 

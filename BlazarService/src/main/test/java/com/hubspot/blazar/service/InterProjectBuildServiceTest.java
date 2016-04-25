@@ -1,4 +1,4 @@
-package com.hubspot.blazar.service.interproject;
+package com.hubspot.blazar.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,19 +27,14 @@ import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
+import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
-import com.hubspot.blazar.data.service.InterProjectModuleBuildMappingService;
-import com.hubspot.blazar.data.service.InterProjectRepositoryBuildMappingService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.listener.BuildEventDispatcher;
-import com.hubspot.blazar.service.BlazarServiceTestBase;
-import com.hubspot.blazar.service.BlazarServiceTestModule;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -63,9 +58,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   @Inject
   private InterProjectBuildService interProjectBuildService;
   @Inject
-  private InterProjectRepositoryBuildMappingService iPRepositoryBuildMappingService;
-  @Inject
-  private InterProjectModuleBuildMappingService iPModuleBuildMappingService;
+  private InterProjectBuildMappingService interProjectBuildMappingService;
   @Inject
   private RepositoryBuildService repositoryBuildService;
   @Inject
@@ -88,12 +81,19 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   public void testInterBuildDependencyTree() {
     Optional<Module> module1 = moduleService.get(1);
     DependencyGraph graph = dependenciesService.buildInterProjectDependencyGraph(Sets.newHashSet(module1.get()));
-    assertThat(Arrays.asList(1, 4, 7, 8, 10, 9, 13)).isEqualTo(graph.getTopologicalSort());
+    assertThat(Arrays.asList(1, 4, 7, 8, 10, 11, 9, 13)).isEqualTo(graph.getTopologicalSort());
   }
 
   @Test
-  public void testInterProjectBuildEnqueue(SingularityBuildLauncher singularityBuildLauncher,
-                                           BlazarConfiguration blazarConfiguration) throws Exception {
+  public void testInterProjectMappings() {
+    InterProjectBuildMapping mapping = InterProjectBuildMapping.makeNewMapping(1, 2, Optional.of(3L), 4);
+    long mappingId = interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(1, 2, Optional.of(3L), 4));
+    InterProjectBuildMapping createdMapping = interProjectBuildMappingService.getById(mappingId).get();
+    assertThat(new InterProjectBuildMapping(Optional.of(mappingId), 123, 123, Optional.of(3L), 123, Optional.<Long>absent())).isEqualTo(createdMapping);
+  }
+
+  @Test
+  public void testInterProjectBuildEnqueue() throws Exception {
     List<Integer> branchIds = Lists.newArrayList(1,2,3,4,5);
     List<RepositoryBuild> buildSeedList = new ArrayList<>();
     for (int i : branchIds) {
@@ -128,9 +128,11 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     InterProjectBuild testableBuild = maybeQueued.get();
     assertThat(Sets.newHashSet(1)).isEqualTo(testableBuild.getModuleIds());
     assertThat(InterProjectBuild.State.FINISHED).isEqualTo(testableBuild.getState());
-    assertThat(Arrays.asList(1, 4, 7, 8, 10, 9, 13)).isEqualTo(interProjectBuildService.getWithId(1).get().getDependencyGraph().get().getTopologicalSort());
-    Set<InterProjectBuildMapping> repoBuildsMappings = iPRepositoryBuildMappingService.getMappingsForInterProjectBuild(testableBuild);
-    Set<InterProjectBuildMapping> moduleBuildMappings = iPModuleBuildMappingService.getMappingsForBuild(testableBuild);
+    assertThat(Arrays.asList(1, 4, 7, 8, 10, 11, 9, 13)).isEqualTo(interProjectBuildService.getWithId(1).get().getDependencyGraph().get().getTopologicalSort());
+
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForBuild(interProjectBuildService.getWithId(1).get());
+
+
   }
 
   private void postSingularityEvents(ModuleBuild build) {

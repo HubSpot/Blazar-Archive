@@ -16,15 +16,18 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.listener.BuildVisitorModule;
+import com.hubspot.blazar.service.listener.TestBuildLauncher;
+import com.hubspot.blazar.service.util.TestSingularityBuildLauncher;
 import com.hubspot.blazar.test.base.service.BlazarTestModule;
 import com.hubspot.blazar.util.SingularityBuildLauncher;
-import com.hubspot.blazar.util.TestSingularityBuildLauncher;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.singularity.client.SingularityClient;
 
@@ -46,6 +49,8 @@ public class BlazarServiceTestModule extends AbstractModule {
     bind(SingularityBuildLauncher.class).to(TestSingularityBuildLauncher.class);
     bind(SlackClient.class).toInstance(mock(SlackClient.class));
     bind(AsyncHttpClient.class).toInstance(mock(AsyncHttpClient.class));
+    Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
+    moduleBuildVisitors.addBinding().to(TestBuildLauncher.class);
     bindGitHubMap(); // does its own binding
   }
 

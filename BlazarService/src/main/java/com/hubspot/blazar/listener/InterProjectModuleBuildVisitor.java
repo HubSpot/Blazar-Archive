@@ -21,9 +21,9 @@ import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
 import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
-import com.hubspot.blazar.data.service.InterProjectModuleBuildMappingService;
-import com.hubspot.blazar.data.service.InterProjectRepositoryBuildMappingService;
+import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
@@ -32,51 +32,82 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(InterProjectModuleBuildVisitor.class);
   private final ModuleService moduleService;
   private BranchService branchService;
+  private ModuleBuildService moduleBuildService;
   private RepositoryBuildService repositoryBuildService;
   private final InterProjectBuildService interProjectBuildService;
-  private InterProjectRepositoryBuildMappingService interProjectRepositoryBuildMappingService;
-  private final InterProjectModuleBuildMappingService interProjectModuleBuildMappingService;
+  private final InterProjectBuildMappingService interProjectBuildMappingService;
 
   @Inject
   public InterProjectModuleBuildVisitor(ModuleService moduleService,
                                         BranchService branchService,
+                                        ModuleBuildService moduleBuildService,
                                         RepositoryBuildService repositoryBuildService,
                                         InterProjectBuildService interProjectBuildService,
-                                        InterProjectRepositoryBuildMappingService interProjectRepositoryBuildMappingService,
-                                        InterProjectModuleBuildMappingService interProjectModuleBuildMappingService) {
+                                        InterProjectBuildMappingService interProjectBuildMappingService) {
     this.moduleService = moduleService;
     this.branchService = branchService;
+    this.moduleBuildService = moduleBuildService;
     this.repositoryBuildService = repositoryBuildService;
     this.interProjectBuildService = interProjectBuildService;
-    this.interProjectRepositoryBuildMappingService = interProjectRepositoryBuildMappingService;
-    this.interProjectModuleBuildMappingService = interProjectModuleBuildMappingService;
+    this.interProjectBuildMappingService = interProjectBuildMappingService;
   }
 
   @Override
   protected void visitSucceeded(ModuleBuild build) throws Exception {
-    Optional<InterProjectBuildMapping> mapping = interProjectModuleBuildMappingService.findByBuildId(build.getId().get());
-    if (!mapping.isPresent()) {
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
+    if (mappings.isEmpty()) {
       return;
     }
-    LOG.info("Found mapping {} corresponding to moduleBuild {}", mapping.get(), build.getId());
-    Optional<InterProjectBuild> maybeInterProjectBuild = interProjectBuildService.getWithId(mapping.get().getInterProjectBuildId());
-    if(!maybeInterProjectBuild.isPresent()) {
-      throw new NonRetryableBuildException(String.format("Found a InterProjectBuildMapping %s with no related InterProjectBuild", mapping.get().toString()));
-    }
-    InterProjectBuild interProjectBuild = maybeInterProjectBuild.get();
+    LOG.info("Found {} mappings corresponding to moduleBuild {}", mappings.size(), build.getId());
+    InterProjectBuild interProjectBuild = interProjectBuildService.getBuildAssociatedWithMappings(mappings);
+
     DependencyGraph graph = interProjectBuild.getDependencyGraph().get();
-    SetMultimap<Integer, Integer> launchable = HashMultimap.create();
+    Set<InterProjectBuildMapping> moduleBuildMappings = interProjectBuildMappingService.getMappingsForBuild(interProjectBuild);
+
+    SetMultimap<Integer, Integer> launchableBranchToModuleMap = HashMultimap.create();
     for (int moduleId : graph.outgoingVertices(build.getModuleId())) {
-      launchable.put(moduleService.getBranchIdFromModuleId(moduleId), moduleId);
+      if (upstreamsComplete(graph.incomingVertices(moduleId), moduleBuildMappings) && noCurrentBuildFor(moduleId, interProjectBuild.getId().get())) {
+        launchableBranchToModuleMap.put(moduleService.getBranchIdFromModuleId(moduleId), moduleId);
+      } else {
+        LOG.debug("Upstreams not complete for module {} not launching InterRepoBuild yet.", moduleId);
+      }
     }
-    for (Map.Entry<Integer, Set<Integer>> entry : Multimaps.asMap(launchable).entrySet()) {
+
+    for (Map.Entry<Integer, Set<Integer>> entry : Multimaps.asMap(launchableBranchToModuleMap).entrySet()) {
+      Set<Integer> launchableModules = entry.getValue();
       GitInfo gitInfo = branchService.get(entry.getKey()).get();
       BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(gitInfo);
-      BuildOptions buildOptions = new BuildOptions(entry.getValue(), BuildOptions.BuildDownstreams.NONE, false);
+      BuildOptions buildOptions = new BuildOptions(launchableModules, BuildOptions.BuildDownstreams.NONE, false);
       long buildId = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
-      interProjectRepositoryBuildMappingService.addMapping(new InterProjectBuildMapping(interProjectBuild.getId().get(), entry.getKey(), Optional.of(buildId)));
+      for (Integer moduleId : launchableModules) {
+        interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(interProjectBuild.getId().get(), gitInfo.getId().get(), Optional.of(buildId), moduleId));
+      }
       LOG.info("Queued repo build {} as part of InterProjectBuild {}", buildId, interProjectBuild.getId().get());
     }
+  }
+
+  private boolean noCurrentBuildFor(int moduleId, Long interProjectBuildId) {
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForModule(interProjectBuildId, moduleId);
+    return mappings.isEmpty();
+  }
+
+  private boolean upstreamsComplete(Set<Integer> upstreamModuleIds, Set<InterProjectBuildMapping> mappings) {
+    for (Integer upstreamModuleId : upstreamModuleIds) {
+      for (InterProjectBuildMapping mapping : mappings) {
+        if (!(mapping.getModuleId() == upstreamModuleId)) {
+          continue;
+        }
+        if (!mapping.getModuleBuildId().isPresent()) {
+          return false;
+        }
+        ModuleBuild moduleBuild = moduleBuildService.get(mapping.getModuleBuildId().get()).get();
+        ModuleBuild.State state = moduleBuild.getState();
+        if (!state.equals(ModuleBuild.State.SUCCEEDED)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   @Override
@@ -89,27 +120,22 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     cancelTree(build);
   }
 
+
+
   private void cancelTree(ModuleBuild build) throws NonRetryableBuildException {
-    Optional<InterProjectBuildMapping> mapping = interProjectModuleBuildMappingService.findByBuildId(build.getId().get());
-    if (!mapping.isPresent()) {
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
+    if (mappings.isEmpty()) {
       return;
     }
-    Optional<InterProjectBuild> maybeInterProjectBuild = interProjectBuildService.getWithId(mapping.get().getInterProjectBuildId());
-    if(!maybeInterProjectBuild.isPresent()) {
-      throw new NonRetryableBuildException(String.format("Found a InterProjectBuildMapping %s with no related InterProjectBuild", mapping.get().toString()));
-    }
-    InterProjectBuild interProjectBuild = maybeInterProjectBuild.get();
+    LOG.info("Found {} mappings corresponding to moduleBuild {}", mappings.size(), build.getId());
+    InterProjectBuild interProjectBuild = interProjectBuildService.getBuildAssociatedWithMappings(mappings);
     DependencyGraph graph = interProjectBuild.getDependencyGraph().get();
     Stack<Integer> s = new Stack<>();
     s.addAll(graph.outgoingVertices(build.getModuleId()));
     while (!s.empty()) {
       int moduleId = s.pop();
-      s.addAll(getChildren(graph, moduleId));
-      interProjectModuleBuildMappingService.addMapping(new InterProjectBuildMapping(interProjectBuild.getId().get(), moduleId, Optional.<Long>absent()));
+      interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(interProjectBuild.getId().get(), moduleService.getBranchIdFromModuleId(moduleId), Optional.<Long>absent(), moduleId));
+      s.addAll(graph.outgoingVertices(moduleId));
     }
-  }
-
-  private static Set<Integer> getChildren(DependencyGraph graph, Integer moduleId) {
-    return graph.outgoingVertices(moduleId);
   }
 }
