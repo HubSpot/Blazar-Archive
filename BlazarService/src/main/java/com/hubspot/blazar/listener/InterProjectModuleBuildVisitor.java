@@ -54,12 +54,12 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
 
   @Override
   protected void visitSucceeded(ModuleBuild build) throws Exception {
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
-    if (mappings.isEmpty()) {
+    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
+    if (mapping.isPresent()) {
       return;
     }
-    LOG.info("Found {} mappings corresponding to moduleBuild {}", mappings.size(), build.getId());
-    InterProjectBuild interProjectBuild = interProjectBuildService.getBuildAssociatedWithMappings(mappings);
+    LOG.info("Found mapping {} corresponding to moduleBuild {}", mapping, build.getId());
+    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.get().getInterProjectBuildId()).get();
 
     DependencyGraph graph = interProjectBuild.getDependencyGraph().get();
     Set<InterProjectBuildMapping> moduleBuildMappings = interProjectBuildMappingService.getMappingsForBuild(interProjectBuild);
@@ -123,12 +123,12 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
 
 
   private void cancelTree(ModuleBuild build) throws NonRetryableBuildException {
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
-    if (mappings.isEmpty()) {
+    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
+    if (mapping.isPresent()) {
       return;
     }
-    LOG.info("Found {} mappings corresponding to moduleBuild {}", mappings.size(), build.getId());
-    InterProjectBuild interProjectBuild = interProjectBuildService.getBuildAssociatedWithMappings(mappings);
+    LOG.info("Found mapping {} corresponding to moduleBuild {}", mapping, build.getId());
+    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.get().getInterProjectBuildId()).get();
     DependencyGraph graph = interProjectBuild.getDependencyGraph().get();
     Stack<Integer> s = new Stack<>();
     s.addAll(graph.outgoingVertices(build.getModuleId()));

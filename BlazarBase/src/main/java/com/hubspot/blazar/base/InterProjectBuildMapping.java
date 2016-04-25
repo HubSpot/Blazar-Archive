@@ -14,6 +14,7 @@ public class InterProjectBuildMapping {
   private Optional<Long> repoBuildId;
   private final int moduleId;
   private final Optional<Long> moduleBuildId;
+  private InterProjectBuild.State state;
 
   @JsonCreator
   public InterProjectBuildMapping(@JsonProperty("id") Optional<Long> id,
@@ -21,21 +22,27 @@ public class InterProjectBuildMapping {
                                   @JsonProperty("repoId") int repoId,
                                   @JsonProperty("repoBuildId") Optional<Long> repoBuildId,
                                   @JsonProperty("moduleId") int moduleId,
-                                  @JsonProperty("moduleBuildId") Optional<Long> moduleBuildId) {
+                                  @JsonProperty("moduleBuildId") Optional<Long> moduleBuildId,
+                                  @JsonProperty("state") InterProjectBuild.State state) {
     this.id = id;
     this.interProjectBuildId = interProjectBuildId;
     this.repoId = repoId;
     this.repoBuildId = repoBuildId;
     this.moduleId = moduleId;
     this.moduleBuildId = moduleBuildId;
+    this.state = state;
   }
 
   public static InterProjectBuildMapping makeNewMapping(long interProjectBuildId, int repoId, Optional<Long> repoBuildId, int moduleId) {
-    return new InterProjectBuildMapping(Optional.<Long>absent(), interProjectBuildId, repoId, repoBuildId, moduleId, Optional.<Long>absent());
+    return new InterProjectBuildMapping(Optional.<Long>absent(), interProjectBuildId, repoId, repoBuildId, moduleId, Optional.<Long>absent(), InterProjectBuild.State.CALCULATING);
   }
 
   public InterProjectBuildMapping withModuleBuildId(Long moduleBuildId) {
-    return new InterProjectBuildMapping(id, interProjectBuildId, repoId, repoBuildId, moduleId, Optional.of(moduleBuildId));
+    return new InterProjectBuildMapping(id, interProjectBuildId, repoId, repoBuildId, moduleId, Optional.of(moduleBuildId), state);
+  }
+
+  public InterProjectBuildMapping withModuleBuildId(InterProjectBuild.State state) {
+    return new InterProjectBuildMapping(id, interProjectBuildId, repoId, repoBuildId, moduleId, moduleBuildId, state);
   }
 
   public Optional<Long> getId() {
@@ -62,6 +69,10 @@ public class InterProjectBuildMapping {
     return moduleBuildId;
   }
 
+  public InterProjectBuild.State getState() {
+    return state;
+  }
+
   @Override
   public String toString() {
     return com.google.common.base.Objects.toStringHelper(this)
@@ -71,6 +82,7 @@ public class InterProjectBuildMapping {
         .add("repoBuildId", repoBuildId)
         .add("moduleId", moduleId)
         .add("moduleBuildId", moduleBuildId)
+        .add("state", state)
         .toString();
   }
 
@@ -85,16 +97,11 @@ public class InterProjectBuildMapping {
     }
 
     InterProjectBuildMapping m = (InterProjectBuildMapping) o;
-    return // Objects.equals(interProjectBuildId, m.interProjectBuildId) &&
-        Objects.equals(id, m.id);
-        // Objects.equals(repoId, m.repoId) &&
-        // Objects.equals(repoBuildId, m.repoBuildId) &&
-        // Objects.equals(moduleId, m.moduleId) &&
-        // Objects.equals(moduleBuildId, m.moduleBuildId);
+    return Objects.equals(id, m.id) && Objects.equals(state, m.state);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, interProjectBuildId, repoId, repoBuildId, moduleId, moduleBuildId);
+    return Objects.hash(id, interProjectBuildId, repoId, repoBuildId, moduleId, moduleBuildId, state);
   }
 }

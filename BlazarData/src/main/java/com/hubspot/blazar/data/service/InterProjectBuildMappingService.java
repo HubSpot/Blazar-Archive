@@ -35,7 +35,7 @@ public class InterProjectBuildMappingService {
     return dao.getByRepoBuildId(repoBuildId);
   }
 
-  public Set<InterProjectBuildMapping> getByModuleBuildId(long moduleBuildId) {
+  public Optional<InterProjectBuildMapping> getByModuleBuildId(long moduleBuildId) {
     return dao.getByModuleBuildId(moduleBuildId);
   }
 

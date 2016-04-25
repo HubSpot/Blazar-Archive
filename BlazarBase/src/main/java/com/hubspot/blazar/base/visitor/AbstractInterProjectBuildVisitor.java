@@ -12,7 +12,13 @@ public class AbstractInterProjectBuildVisitor implements InterProjectBuildVisito
       case RUNNING:
         visitRunning(build);
         break;
-      case FINISHED:
+      case FAILED:
+        visitFinished(build);
+        break;
+      case CANCELLED:
+        visitFinished(build);
+        break;
+      case SUCCEEDED:
         visitFinished(build);
         break;
       default:

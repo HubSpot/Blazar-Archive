@@ -27,8 +27,9 @@ public interface InterProjectBuildMappingDao {
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE repoBuildId = :repoBuildId")
   Set<InterProjectBuildMapping> getByRepoBuildId(@Bind("repoBuildId") long repoBuildId);
 
+  @SingleValueResult
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE moduleBuildId = :moduleBuildId")
-  Set<InterProjectBuildMapping> getByModuleBuildId(@Bind("moduleBuildId") long moduleBuildId);
+  Optional<InterProjectBuildMapping> getByModuleBuildId(@Bind("moduleBuildId") long moduleBuildId);
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE id = :id")

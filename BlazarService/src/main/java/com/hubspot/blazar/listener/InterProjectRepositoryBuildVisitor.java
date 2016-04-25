@@ -21,16 +21,13 @@ import com.hubspot.blazar.data.service.RepositoryBuildService;
 public class InterProjectRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(InterProjectRepositoryBuildVisitor.class);
   private final ModuleBuildService moduleBuildService;
-  private final RepositoryBuildService repoBuildService;
   private final InterProjectBuildService interProjectBuildService;
   private final InterProjectBuildMappingService interProjectBuildMappingService;
 
   @Inject
   public InterProjectRepositoryBuildVisitor(ModuleBuildService moduleBuildService,
-                                            RepositoryBuildService repoBuildService,
                                             InterProjectBuildService interProjectBuildService,
                                             InterProjectBuildMappingService interProjectBuildMappingService) {
-    this.repoBuildService = repoBuildService;
     this.moduleBuildService = moduleBuildService;
     this.interProjectBuildService = interProjectBuildService;
     this.interProjectBuildMappingService = interProjectBuildMappingService;
@@ -54,37 +51,26 @@ public class InterProjectRepositoryBuildVisitor extends AbstractRepositoryBuildV
 
   @Override
   protected void visitSucceeded(RepositoryBuild build) throws Exception {
-    Set<InterProjectBuild> builds = new HashSet<>();
-
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(build.getId().get());
-    for (InterProjectBuildMapping mapping : mappings) {
-      Optional<InterProjectBuild> interProjectBuild = interProjectBuildService.getWithId(mapping.getInterProjectBuildId());
-      if (!interProjectBuild.isPresent()) {
-        throw new IllegalStateException(String.format("Cannot have InterProject build mapping %s that points to non-existent InterProject build", mapping));
-      }
-      if (!checkComplete(interProjectBuild.get())) {
-        return;
-      }
-      builds.add(interProjectBuild.get());
+    Set<InterProjectBuildMapping> repoBuildMappings = interProjectBuildMappingService.getByRepoBuildId(build.getId().get());
+    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(repoBuildMappings.iterator().next().getInterProjectBuildId()).get();
+    InterProjectBuild.State complete = checkComplete(interProjectBuild);
+    if (!complete.isFinished()) {
+      return;
     }
-
-    if (builds.size() > 1) {
-      throw new IllegalStateException(String.format("Cannot have multiple inter project builds owning a given repo build %s", build));
-    }
-    interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(builds.iterator().next()));
+    interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(interProjectBuild, complete));
   }
 
-
-  private boolean checkComplete(InterProjectBuild build) {
+  private InterProjectBuild.State checkComplete(InterProjectBuild build) {
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForBuild(build);
+    InterProjectBuild.State state = InterProjectBuild.State.SUCCEEDED;
     for (InterProjectBuildMapping mapping: mappings) {
-      Optional<RepositoryBuild> repoBuild = repoBuildService.get(mapping.getRepoBuildId().get());
-      if (repoBuild.isPresent() && !repoBuild.get().getState().isComplete()) {
-        return false;
+      if (!mapping.getState().isFinished()) {
+        return InterProjectBuild.State.RUNNING;
+      }
+      if (!mapping.getState().equals(InterProjectBuild.State.SUCCEEDED)) {
+        state = mapping.getState();
       }
     }
-    return true;
+    return state;
   }
-
-
 }

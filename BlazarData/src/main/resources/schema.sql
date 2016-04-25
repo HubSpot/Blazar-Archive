@@ -172,7 +172,9 @@ CREATE TABLE inter_project_build_mappings (
   `repoBuildId` BIGINT(20),
   `moduleId` INT(11),
   `moduleBuildId` BIGINT(20),
-  PRIMARY KEY (`id`)  -- primary key is tricky here :(
+  `state` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX (`moduleBuildId`)
   -- not sure what to index
   -- INDEX(`interProjectBuildId`, `repoBuildId`),
   -- INDEX(`interProjectBuildId`, `moduleBuildId`),

@@ -23,7 +23,9 @@ public class InterProjectBuild {
   public enum State {
     CALCULATING(false),
     RUNNING(false),
-    FINISHED(true);
+    CANCELLED(true),
+    FAILED(true),
+    SUCCEEDED(true);
 
     private final boolean completed;
 
@@ -65,8 +67,8 @@ public class InterProjectBuild {
     return new InterProjectBuild(build.getId(), State.RUNNING, build.getModuleIds(), build.getBuildTrigger(), build.getStartTimestamp(), build.getEndTimestamp(), build.getDependencyGraph());
   }
 
-  public static InterProjectBuild getFinishedBuild(InterProjectBuild old) {
-    return new InterProjectBuild(old.getId(), State.FINISHED, old.getModuleIds(), old.getBuildTrigger(), old.getStartTimestamp(), Optional.of(System.currentTimeMillis()), old.getDependencyGraph());
+  public static InterProjectBuild getFinishedBuild(InterProjectBuild old, State state) {
+    return new InterProjectBuild(old.getId(), state, old.getModuleIds(), old.getBuildTrigger(), old.getStartTimestamp(), Optional.of(System.currentTimeMillis()), old.getDependencyGraph());
   }
 
 
