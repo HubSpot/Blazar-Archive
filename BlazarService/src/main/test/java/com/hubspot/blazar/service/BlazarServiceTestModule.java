@@ -41,7 +41,7 @@ public class BlazarServiceTestModule extends AbstractModule {
     EventBus eventBus = buildEventBus();
     install(new BlazarTestModule());
     install(new BlazarDataModule());
-    install(new BuildVisitorModule());
+    install(new BuildVisitorModule(buildBlazarConfiguration()));
     install(new DiscoveryModule());
     bind(EventBus.class).toInstance(eventBus);
     bind(BlazarConfiguration.class).toInstance(buildBlazarConfiguration());

@@ -1,21 +1,5 @@
 package com.hubspot.blazar.data.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -29,6 +13,21 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleDependency;
 import com.hubspot.blazar.data.dao.DependenciesDao;
 import com.hubspot.blazar.data.util.GraphUtils;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class DependenciesService {

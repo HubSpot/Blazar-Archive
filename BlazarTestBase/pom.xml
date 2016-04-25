@@ -5,11 +5,7 @@
   <parent>
     <artifactId>Blazar</artifactId>
     <groupId>com.hubspot</groupId>
-<<<<<<< HEAD
     <version>0.4-SNAPSHOT</version>
-=======
-    <version>1.0-SNAPSHOT</version>
->>>>>>> 3f47bf6... created new module to house the main testing logic
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -52,7 +48,6 @@
       <artifactId>metrics-core</artifactId>
     </dependency>
     <dependency>
-<<<<<<< HEAD
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
     </dependency>
@@ -64,25 +59,9 @@
       <groupId>org.kohsuke</groupId>
       <artifactId>github-api</artifactId>
     </dependency>
-  </dependencies>
-</project>
-
-=======
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.mattbertolini</groupId>
-      <artifactId>liquibase-slf4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jukito</groupId>
-      <artifactId>jukito</artifactId>
-    </dependency>
   </dependencies>
 </project>
->>>>>>> 3f47bf6... created new module to house the main testing logic

@@ -1,17 +1,16 @@
 package com.hubspot.blazar.data.dao;
 
-import java.util.Set;
-
+import com.google.common.base.Optional;
+import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.rosetta.jdbi.BindWithRosetta;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.rosetta.jdbi.BindWithRosetta;
+import java.util.Set;
 
 public interface ModuleDao {
 

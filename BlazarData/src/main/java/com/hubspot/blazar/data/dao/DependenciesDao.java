@@ -1,17 +1,17 @@
 package com.hubspot.blazar.data.dao;
 
-import java.util.Collection;
-import java.util.Set;
-
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.ModuleDependency;
+import com.hubspot.rosetta.jdbi.BindWithRosetta;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlBatch;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.stringtemplate.UseStringTemplate3StatementLocator;
 import org.skife.jdbi.v2.unstable.BindIn;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.ModuleDependency;
-import com.hubspot.rosetta.jdbi.BindWithRosetta;
+
+import java.util.Collection;
+import java.util.Set;
 
 @UseStringTemplate3StatementLocator
 public interface DependenciesDao {
