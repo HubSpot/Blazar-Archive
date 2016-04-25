@@ -4,12 +4,12 @@
 .card-stack
   width 100%
   min-width 1000px
-  max-width 1100px
+  max-width 1300px
   padding 50px 0
   font-family HelveticaNeue
   
   & *
-    transition height $transition-duration, margin $transition-duration, padding $transition-duration, background $bg-transition-duration
+    transition height $transition-duration, margin $transition-duration, padding $transition-duration, opacity $transition-duration, background $bg-transition-duration
   
 .card-stack__wrapper
   padding 0 20px
@@ -17,12 +17,11 @@
 
 // Individual card and variations
 .card-stack__card
-  height $initial-height
   border $border
   border-bottom 0
+  background-color #eaf0f6
     
 .card-stack__card--expanded
-  height $initial-height + 130px
   margin -10px -20px 0 -20px
   border-bottom $border
   
@@ -43,6 +42,9 @@
 
 .card-stack__card--last
   border-bottom $border
+  
+  & .card-stack__card-main
+    border-bottom $border
     
   &:hover
     border-bottom $border
@@ -53,6 +55,7 @@
   padding 10px 20px
   height $initial-height
   cursor pointer
+  background-color white
   
   &:hover
     background-color $card-bg-color-hover
@@ -64,5 +67,4 @@
 // Detailed card content
 .card-stack__card-details
   width 100%
-  background-color white
   padding 15px

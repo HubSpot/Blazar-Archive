@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { Link } from 'react-router';
 import { buildResultIcon } from '../Helpers';
 import moment from 'moment';
+import humanizeDuration from 'humanize-duration';
 
 import Card from './Card.jsx';
 import Icon from '../shared/Icon.jsx';
@@ -80,7 +81,7 @@ class RepoBranchCard extends Card {
   }
 
   renderDetails() {
-    const {moduleBuilds} = this.props;
+    const {moduleBuildsList} = this.props;
 
     if (!this.props.expanded) {
       return;
@@ -94,13 +95,91 @@ class RepoBranchCard extends Card {
       );
     }
 
-    const failingModuleBuilds = moduleBuilds.filter((build) => {
+    const failingModuleBuilds = moduleBuildsList.filter((build) => {
       return build.state === BuildStates.FAILED;
     });
 
     return (
       <div className='card-stack__card-details'>
         {this.renderFailedModules(failingModuleBuilds)}
+      </div>
+    );
+  }
+
+  renderModuleRow(module, i) {
+    const state = module.state;
+    let statusText;
+    let durationText;
+    let statusClass;
+
+    if (state === BuildStates.IN_PROGRESS) {
+      statusText = 'is building ...';
+      durationText = `Started ${moment(startTimestamp).fromNow()}`;
+      statusClass = 'repo-branch-card__expanded-status-symbol--IN-PROGRESS';
+    }
+
+    else if (state === BuildStates.SUCCEEDED) {
+      statusText = 'built successfully.';
+      durationText = `Finished in ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
+      statusClass = 'repo-branch-card__expanded-status-symbol--SUCCEEDED';
+    }
+
+    else if (state === BuildStates.FAILED) {
+      statusText = 'build failed.';
+      durationText = `Finished in ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
+      statusClass = 'repo-branch-card__expanded-status-symbol--FAILED';
+    }
+
+    else if (state === BuildStates.SKIPPED) {
+      statusText = 'was skipped.';
+      statusClass = 'repo-branch-card__expanded-status-symbol--SKIPPED';
+    }
+
+    return (
+      <div key={i} className='repo-branch-card__expanded-module-row'>
+        <span className='repo-branch-card__expanded-status'>
+          <span className={statusClass} /> {module.name} {statusText}
+        </span>
+        <span className='repo-branch-card__expanded-timestamp'>
+          {durationText}
+        </span>
+      </div>
+    );
+  }
+
+  renderDetailsV2() {
+    const {item, moduleBuildsList, expanded, loading} = this.props;
+    const build = this.getBuildToDisplay();
+
+    if (!expanded) {
+      return (
+        <div className='card-stack__expanded hidden'>
+          <div className='card-stack__expanded-module-rows hidden' />
+        </div>
+      );
+    }
+
+    else if (loading) {
+      return (
+        <div className='card-stack__expanded'>
+          <Loader align='center' roomy={true} />
+          <div className='card-stack__expanded-module-rows hidden' />
+        </div>
+      );
+    }
+
+    console.log(moduleBuildsList);
+
+    const moduleRowNodes = moduleBuildsList.map(this.renderModuleRow);
+
+    return (
+      <div className='card-stack__expanded'>
+        <div className='card-stack__expanded-header'>
+          <span>Build #{build.get('buildNumber')} was started manually</span>
+        </div>
+        <div className='card-stack__expanded-module-rows'>
+          {moduleRowNodes}
+        </div>
       </div>
     );
   }
@@ -200,6 +279,7 @@ class RepoBranchCard extends Card {
           {this.renderModulesBuilt()}
           {this.renderStatus()}
         </div>
+        {this.renderDetailsV2()}
       </div>
     );
   }
@@ -207,7 +287,8 @@ class RepoBranchCard extends Card {
 
 RepoBranchCard.propTypes = {
   item: PropTypes.object.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  moduleBuildsList: PropTypes.array
 };
 
 export default RepoBranchCard;

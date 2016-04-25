@@ -121,3 +121,57 @@
     
     &:before
       content 'Build errors'
+      
+.card-stack__expanded
+  padding 20px
+  width 100%
+  height auto
+  
+  &.hidden
+    height 0
+  
+   & div
+    display block
+
+.card-stack__expanded-header
+  font-family HelveticaNeue-light
+  font-size 18px
+  color #425b76
+  display block
+  
+.card-stack__expanded-module-rows
+  padding-top 20px
+  
+  &.hidden
+    height 0
+
+.repo-branch-card__expanded-module-row
+  background-color white
+  border 1px solid #eaf0f6
+  height 40px
+  padding 10px
+  color #425b76
+  
+.repo-branch-card__expanded-status
+  float left
+
+.repo-branch-card__expanded-timestamp
+  float right
+  
+.repo-branch-card__expanded-status-symbol--SUCCEEDED, .repo-branch-card__expanded-status-symbol--FAILED
+  padding-right 5px
+    
+.repo-branch-card__expanded-status-symbol--SUCCEEDED:before
+  color #00bda5
+  font-family FontAwesome
+  content '\f00c'
+  
+.repo-branch-card__expanded-status-symbol--FAILED:before
+  color #f2545b
+  font-family FontAwesome
+  content '\f111'
+  
+.repo-branch-card__expanded-status-symbol--IN-PROGRESS:before
+  color #008da3
+  font-family FontAwesome
+  content '\f110'
