@@ -19,7 +19,7 @@ let initialState = {
   expandedCard: -1,
   loading: false,
   repoBuild: {},
-  moduleBuilds: []
+  moduleBuildsList: []
 };
 
 class Dashboard extends Component {
