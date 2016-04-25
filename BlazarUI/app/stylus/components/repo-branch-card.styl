@@ -1,5 +1,43 @@
 @import './card-variables.styl'
 
+.repo-branch-card__header
+  height 50px
+  background-color #f9fbfd
+  border 1px solid #eaf0f6
+  border-bottom 0
+  padding 15px 20px
+  color #425b76
+  font-family HelveticaNeue-medium
+  
+  & div
+    display inline-block
+  
+.repo-branch-card__header-info
+  width 37%
+  
+  &:before
+    content 'INFO'
+    
+.repo-branch-card__header-last-built
+  width 23%
+  
+  &:before
+    content 'LAST BUILT'
+    
+.repo-branch-card__header-details
+  width 27%
+  
+  &:before
+    content 'DETAILS'
+    
+.repo-branch-card__header-status
+  width 13%
+  
+  &:before
+    content 'STATUS'
+    
+
+
 .repo-branch-card__info
   width 35%
   height 100%
@@ -17,6 +55,10 @@
   color #425b76
   background-color #eceef1
   padding 3px 7px
+  
+  &:before
+    font-family 'octicons'
+    content '\f020  '
   
 .repo-branch-card__build-number
   font-family HelveticaNeue-bold
@@ -43,7 +85,7 @@
   font-family HelveticaNeue-bold
   
 .repo-branch-card__modules-skipped-count
-  font-family HelveticaNeue
+  font-family HelveticaNeue-medium
   
 .repo-branch-card__modules-built
   color #425b76
@@ -59,6 +101,7 @@
   float right
   padding-left 2%
   padding-top 17px
+  font-family HelveticaNeue-medium
   
 .repo-branch-card__status-banner--SUCCESS, .repo-branch-card__status-banner--FAILED
   padding 3px 7px

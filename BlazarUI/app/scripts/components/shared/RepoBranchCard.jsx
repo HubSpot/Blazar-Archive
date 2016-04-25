@@ -192,8 +192,6 @@ class RepoBranchCard extends Card {
     const build = item.get('inProgressBuild') !== undefined ? item.get('inProgressBuild') : item.get('lastBuild');
     const gitInfo = item.get('gitInfo');
 
-    console.log(item.toJS());
-
     return (
       <div className={this.getClassNames()}>
         <div onClick={this.props.onClick} className='card-stack__card-main'>

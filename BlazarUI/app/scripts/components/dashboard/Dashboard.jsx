@@ -6,6 +6,7 @@ import { bindAll } from 'underscore';
 
 import CardStack from '../shared/CardStack.jsx';
 import RepoBranchCard from '../shared/RepoBranchCard.jsx';
+import RepoBranchCardStackHeader from '../shared/RepoBranchCardStackHeader.jsx';
 
 import Headline from '../shared/headline/Headline.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -94,6 +95,12 @@ class Dashboard extends Component {
     })
   }
 
+  renderHeader() {
+    return (
+      <RepoBranchCardStackHeader />
+    );
+  }
+
   render() {
     return (
       <UIGrid>                
@@ -103,6 +110,7 @@ class Dashboard extends Component {
           </Headline>
           <CardStack 
             onClick={this.maybeCloseCards}
+            header={this.renderHeader()}
             loading={this.props.loadingBuilds || this.props.loadingStars}>
             {this.renderCards()}
           </CardStack>

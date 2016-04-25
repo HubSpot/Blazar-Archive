@@ -32,6 +32,7 @@ class CardStack extends Component {
     return (
       <div className='card-stack'>
         <div className='card-stack__wrapper'>
+          {this.props.header}
           {this.props.children}
         </div>
       </div>
@@ -41,6 +42,7 @@ class CardStack extends Component {
 
 CardStack.propTypes = {
   loading: PropTypes.bool.isRequired,
+  header: PropTypes.node,
   children: PropTypes.node,
   onClick: PropTypes.func
 };
