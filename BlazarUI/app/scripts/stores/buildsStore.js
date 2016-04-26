@@ -55,8 +55,6 @@ const BuildsStore = Reflux.createStore({
 
   onLoadBuildsForDashboard() {
     BuildsApi.fetchBuildsForDashboard((err, resp) => {
-      console.log(resp);
-      
       this.trigger({
         dashboardBuilds: resp,
         loadingDashboardBuilds: false

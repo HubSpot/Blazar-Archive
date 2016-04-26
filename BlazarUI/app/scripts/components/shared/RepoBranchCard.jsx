@@ -86,9 +86,11 @@ class RepoBranchCard extends Card {
     let durationText;
     let statusClass;
 
+    console.log(module);
+
     if (state === BuildStates.IN_PROGRESS) {
       statusText = 'is building ...';
-      durationText = `Started ${moment(startTimestamp).fromNow()}`;
+      durationText = `Started ${moment(module.startTimestamp).fromNow()}`;
       statusClass = 'repo-branch-card__expanded-status-symbol--IN-PROGRESS';
     }
 
