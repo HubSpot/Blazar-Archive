@@ -1,7 +1,5 @@
 package org.kohsuke.github;
 
-import org.kohsuke.github.GHCommit;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

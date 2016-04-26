@@ -1,7 +1,5 @@
 package org.kohsuke.github;
 
-import org.kohsuke.github.GHCompare;
-
 public class BlazarGHCompare extends GHCompare {
 
   private Commit[] commits;

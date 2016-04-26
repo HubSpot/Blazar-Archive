@@ -18,8 +18,6 @@ import liquibase.resource.ResourceAccessor;
 public abstract class BlazarTestBase {
   protected static final AtomicReference<Injector> injector = new AtomicReference<>();
 
-
-
   protected <T> T getFromGuice(Class<T> type) {
     return injector.get().getInstance(type);
   }

@@ -2,8 +2,6 @@ package org.kohsuke.github;
 
 import java.io.IOException;
 
-import org.kohsuke.github.GHUser;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
