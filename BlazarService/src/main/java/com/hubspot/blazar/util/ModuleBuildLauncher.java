@@ -2,6 +2,7 @@ package com.hubspot.blazar.util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,8 +110,14 @@ public class ModuleBuildLauncher {
     Map<String, StepActivationCriteria> stepActivation = new LinkedHashMap<>();
     stepActivation.putAll(secondary.getStepActivation());
     stepActivation.putAll(primary.getStepActivation());
-    Set<String> depends = primary.getDepends().isEmpty() ? secondary.getDepends() : primary.getDepends();
-    Set<String> provides = primary.getProvides().isEmpty() ? secondary.getProvides() : primary.getProvides();
+
+    Set<String> depends = new HashSet<>();
+    depends.addAll(primary.getDepends());
+    depends.addAll(secondary.getDepends());
+
+    Set<String> provides = new HashSet<>();
+    provides.addAll(primary.getDepends());
+    provides.addAll(secondary.getDepends());
 
     return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
   }
