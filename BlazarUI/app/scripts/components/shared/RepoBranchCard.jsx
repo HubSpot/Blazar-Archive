@@ -80,32 +80,6 @@ class RepoBranchCard extends Card {
     );
   }
 
-  renderDetails() {
-    const {moduleBuildsList} = this.props;
-
-    if (!this.props.expanded) {
-      return;
-    }
-
-    else if (this.props.loading) {
-      return (
-        <div className='card-stack__card-details'>
-          <Loader align='center' roomy={true} />
-        </div>
-      );
-    }
-
-    const failingModuleBuilds = moduleBuildsList.filter((build) => {
-      return build.state === BuildStates.FAILED;
-    });
-
-    return (
-      <div className='card-stack__card-details'>
-        {this.renderFailedModules(failingModuleBuilds)}
-      </div>
-    );
-  }
-
   renderModuleRow(module, i) {
     const state = module.state;
     let statusText;
@@ -135,14 +109,30 @@ class RepoBranchCard extends Card {
       statusClass = 'repo-branch-card__expanded-status-symbol--SKIPPED';
     }
 
-    return (
-      <div key={i} className='repo-branch-card__expanded-module-row'>
+    const innerContent = (
+      <div className='repo-branch-card__expanded-module-row'>
         <span className='repo-branch-card__expanded-status'>
           <span className={statusClass} /> {module.name} {statusText}
         </span>
         <span className='repo-branch-card__expanded-timestamp'>
           {durationText}
         </span>
+      </div>
+    );
+
+    if (state === BuildStates.SKIPPED) {
+      return (
+        <div key={i}>
+          {innerContent}
+        </div>
+      );
+    }
+
+    return (
+      <div key={i}>
+        <Link to={module.blazarPath}>
+          {innerContent}
+        </Link>
       </div>
     );
   }
@@ -158,10 +148,6 @@ class RepoBranchCard extends Card {
         </div>
       );
     }
-
-    //TODO: show loader without expanding
-
-    console.log(moduleBuildsList);
 
     const moduleRowNodes = moduleBuildsList.map(this.renderModuleRow);
 
@@ -226,20 +212,23 @@ class RepoBranchCard extends Card {
     );
   }
 
-  renderModulesBuilt() {
+  renderTriggeredBy() {
     const {item} = this.props;
+    const build = this.getBuildToDisplay();
+    let buildTriggerMessage;
+
+    if (build.get('buildTrigger').get('type') === 'MANUAL') {
+      buildTriggerMessage = 'Triggered by user';
+    }
+
+    else {
+      buildTriggerMessage = 'Triggered by code push';
+    }
 
     return (
       <div className='repo-branch-card__details'>
-        <div className='repo-branch-card__modules-built'>
-          <span>
-            <span className='repo-branch-card__modules-built-count'>2 modules</span> built
-          </span>
-        </div>
-        <div className='repo-branch-card__modules-skipped'>
-          <span>
-            <span className='repo-branch-card__modules-skipped-count'>4 modules</span> skipped
-          </span>
+        <div className='repo-branch-card__triggered-by'>
+          <span>{buildTriggerMessage}</span>
         </div>
       </div>
     );
@@ -261,7 +250,7 @@ class RepoBranchCard extends Card {
 
   render() {
     const {item} = this.props;
-    const build = item.get('inProgressBuild') !== undefined ? item.get('inProgressBuild') : item.get('lastBuild');
+    const build = this.getBuildToDisplay();
     const gitInfo = item.get('gitInfo');
 
     return (
@@ -269,7 +258,7 @@ class RepoBranchCard extends Card {
         <div onClick={this.props.onClick} className='card-stack__card-main'>
           {this.renderInfo()}
           {this.renderLastBuild()}
-          {this.renderModulesBuilt()}
+          {this.renderTriggeredBy()}
           {this.renderStatus()}
         </div>
         {this.renderDetailsV2()}

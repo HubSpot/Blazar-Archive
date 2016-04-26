@@ -5,6 +5,7 @@ import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
 import BuildsStore from '../../stores/buildsStore';
+import BuildsActions from '../../actions/buildsActions';
 
 import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
@@ -20,10 +21,10 @@ class DashboardContainer extends Component {
 
     this.state = {
       stars: Immutable.List.of(),
-      builds: Immutable.List.of(),
+      dashboardBuilds: Immutable.List.of(),
       starredBuilds: [],
       loadingStars: true,
-      loading: true
+      loadingDashboardBuilds: true
     }
   }
 
@@ -32,6 +33,7 @@ class DashboardContainer extends Component {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
 
     StarActions.loadStars();
+    BuildsActions.loadBuildsForDashboard();
   }
 
   componentWillUnmount() {
@@ -44,8 +46,8 @@ class DashboardContainer extends Component {
       return;
     }
 
-    if (this.state.builds.all) {
-      const starredBuilds = this.state.builds.all.filter((build) => {
+    if (this.state.dashboardBuilds.all) {
+      const starredBuilds = this.state.dashboardBuilds.all.filter((build) => {
         return contains(this.state.stars, build.gitInfo.id)
           && build.gitInfo.active;
       });
@@ -65,7 +67,7 @@ class DashboardContainer extends Component {
         <Dashboard 
           starredBuilds={fromJS(sortBranchesByTimestamp(this.state.starredBuilds, false))}
           loadingStars={this.state.loadingStars}
-          loadingBuilds={this.state.loading}
+          loadingBuilds={this.state.loadingDashboardBuilds}
           params={this.props.params}
         />
       </PageContainer>

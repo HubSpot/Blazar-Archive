@@ -91,6 +91,29 @@ function fetchBuilds(cb) {
   });
 }
 
+function fetchBuildsForDashboard(cb) {
+  
+  if (this.buildsPoller) {
+    this.buildsPoller.disconnect();
+    this.buildsPoller = undefined;
+  }
+
+  this.buildsPoller = new PollingProvider({
+    url: `${config.apiRoot}/branches/state`,
+    type: 'GET',
+    dataType: 'json'
+  });
+
+  this.buildsPoller.poll((err, resp) => {
+    if (err) {
+      cb(err);
+      return;
+    }
+
+    cb(err, _groupBuilds(_parse(resp)));
+  });
+}
+
 
 function stopPolling() {
   if (!this.buildsPoller) {
@@ -106,5 +129,6 @@ function fetchBuild(id) {
 
 export default {
   fetchBuilds: fetchBuilds,
-  fetchBuild: fetchBuild
+  fetchBuild: fetchBuild,
+  fetchBuildsForDashboard: fetchBuildsForDashboard
 };

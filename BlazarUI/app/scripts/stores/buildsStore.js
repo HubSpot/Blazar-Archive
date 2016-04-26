@@ -51,6 +51,17 @@ const BuildsStore = Reflux.createStore({
         changingBuildsType: false
       });
     });
+  },
+
+  onLoadBuildsForDashboard() {
+    BuildsApi.fetchBuildsForDashboard((err, resp) => {
+      console.log(resp);
+      
+      this.trigger({
+        dashboardBuilds: resp,
+        loadingDashboardBuilds: false
+      });
+    });
   }
 
 });
