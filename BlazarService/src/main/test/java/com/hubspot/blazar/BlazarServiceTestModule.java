@@ -1,4 +1,4 @@
-package com.hubspot.blazar.service;
+package com.hubspot.blazar;
 
 import java.io.IOException;
 import java.util.List;
@@ -6,7 +6,9 @@ import java.util.Map;
 
 import org.kohsuke.github.BlazarGHRepository;
 import org.kohsuke.github.BlazarGitHub;
-import org.kohsuke.github.BlazarGitTestConfiguration;
+
+import com.hubspot.blazar.listener.TestBuildLauncher;
+import com.hubspot.blazar.test.base.service.BlazarGitTestConfiguration;
 import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +26,9 @@ import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.listener.BuildVisitorModule;
-import com.hubspot.blazar.listener.TestBuildLauncher;
-import com.hubspot.blazar.util.TestSingularityBuildLauncher;
 import com.hubspot.blazar.test.base.service.BlazarTestModule;
 import com.hubspot.blazar.util.SingularityBuildLauncher;
+import com.hubspot.blazar.util.TestSingularityBuildLauncher;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.singularity.client.SingularityClient;
 

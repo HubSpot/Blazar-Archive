@@ -1,4 +1,4 @@
-package com.hubspot.blazar.service.util;
+package com.hubspot.blazar.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

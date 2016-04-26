@@ -1,4 +1,4 @@
-package com.hubspot.blazar.service.listener;
+package com.hubspot.blazar.listener;
 
 import javax.inject.Inject;
 
