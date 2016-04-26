@@ -90,6 +90,12 @@ class RepoBranchCard extends Card {
       extraClass = ' repo-branch-card__expanded-module-row--no-log';
     }
 
+    else if (state === BuildStates.UNSTABLE) {
+      statusText = 'build is unstable.';
+      statusClass = 'repo-branch-card__expanded-status-symbol--UNSTABLE';
+      extraClass = ' repo-branch-card__expanded-module-row--no-log';
+    }
+
     const rowClassName = `repo-branch-card__expanded-module-row${extraClass}`;
 
     const innerContent = (
