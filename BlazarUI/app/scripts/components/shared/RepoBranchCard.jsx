@@ -52,34 +52,6 @@ class RepoBranchCard extends Card {
     );
   }
 
-  renderFailedModules(moduleBuilds) {
-    if (moduleBuilds.length === 0) {
-      return (
-        <div>No failing modules!</div>
-      );
-    }
-
-    const failedModuleNodes = moduleBuilds.map((build, key) => {
-      return (
-        <div key={key} className='repo-branch-card__failed-module'>
-          <Link to={build.blazarPath}>
-            {build.name}
-          </Link>
-        </div>
-      );
-    });
-
-    return (
-      <div className='repo-branch-card__failed-modules-wrapper'>
-        <span className='repo-branch-card__failed-modules-title'>
-          These modules failed:
-        </span>
-        <br />
-        {failedModuleNodes}
-      </div>
-    );
-  }
-
   renderModuleRow(module, i) {
     const state = module.state;
     let statusText;
@@ -193,15 +165,17 @@ class RepoBranchCard extends Card {
 
   renderBuildAuthorMaybe() {
     const {item} = this.props;
-    const someCheck = false;
+    const trigger = this.getBuildToDisplay().get('buildTrigger');
+    const author = trigger.get('id');
+    console.log(item.toJS());
 
-    if (!someCheck) {
+    if (trigger.get('type') !== 'MANUAL' || author === 'unknown') {
       return null;
     }
 
     return (
       <span>
-        by <span>AUTHOR</span>
+        &nbsp;by <span className='repo-branch-card__author'>{author}</span>
       </span>
     );
   }
