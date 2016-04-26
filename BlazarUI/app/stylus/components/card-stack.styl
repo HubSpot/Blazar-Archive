@@ -8,9 +8,6 @@
   padding 50px 0
   font-family HelveticaNeue
   
-  & *
-    transition height $transition-duration, margin $transition-duration, padding $transition-duration, opacity $transition-duration, background $bg-transition-duration
-  
 .card-stack__wrapper
   padding 0 20px
 
@@ -20,6 +17,8 @@
   border $border
   border-bottom 0
   background-color #eaf0f6
+  max-height 2000px
+  transition margin $transition-duration
     
 .card-stack__card--expanded
   margin -10px -20px 0 -20px
@@ -35,6 +34,7 @@
 .card-stack__card--below-expanded
   border-top 0
   height $initial-height - 10
+  transition max-height 0s
   
   & .card-stack__card-main
     padding-top 0
@@ -56,6 +56,7 @@
   height $initial-height
   cursor pointer
   background-color white
+  transition background $bg-transition-duration
   
   &:hover
     background-color $card-bg-color-hover
@@ -68,3 +69,16 @@
 .card-stack__card-details
   width 100%
   padding 15px
+  
+.card-stack__expanded
+  padding 20px
+  width 100%
+  max-height 2000px
+  overflow-y hidden
+  
+  &.hiddenn
+    max-height 0
+    padding 0
+  
+   & div
+    display block

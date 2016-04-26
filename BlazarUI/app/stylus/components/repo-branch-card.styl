@@ -121,17 +121,6 @@
     
     &:before
       content 'Build errors'
-      
-.card-stack__expanded
-  padding 20px
-  width 100%
-  height auto
-  
-  &.hidden
-    height 0
-  
-   & div
-    display block
 
 .card-stack__expanded-header
   font-family HelveticaNeue-light
@@ -141,9 +130,11 @@
   
 .card-stack__expanded-module-rows
   padding-top 20px
+  max-height 2000px
+  transition max-height $transition-duration
   
-  &.hidden
-    height 0
+  &.hiddenn
+    max-height 0
 
 .repo-branch-card__expanded-module-row
   background-color white
@@ -158,7 +149,7 @@
 .repo-branch-card__expanded-timestamp
   float right
   
-.repo-branch-card__expanded-status-symbol--SUCCEEDED, .repo-branch-card__expanded-status-symbol--FAILED
+.repo-branch-card__expanded-status-symbol--SUCCEEDED, .repo-branch-card__expanded-status-symbol--FAILED, .repo-branch-card__expanded-status-symbol--SKIPPED, .repo-branch-card__expanded-status-symbol--IN-PROGRESS:before
   padding-right 5px
     
 .repo-branch-card__expanded-status-symbol--SUCCEEDED:before
@@ -175,3 +166,8 @@
   color #008da3
   font-family FontAwesome
   content '\f110'
+  
+.repo-branch-card__expanded-status-symbol--SKIPPED:before
+  color #008da3
+  font-family FontAwesome
+  content '\f0c8'

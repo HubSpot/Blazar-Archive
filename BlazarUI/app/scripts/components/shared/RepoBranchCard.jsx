@@ -151,22 +151,15 @@ class RepoBranchCard extends Card {
     const {item, moduleBuildsList, expanded, loading} = this.props;
     const build = this.getBuildToDisplay();
 
-    if (!expanded) {
+    if (!expanded || loading) {
       return (
-        <div className='card-stack__expanded hidden'>
-          <div className='card-stack__expanded-module-rows hidden' />
+        <div className='card-stack__expanded hiddenn'>
+          <div className='card-stack__expanded-module-rows hiddenn' />
         </div>
       );
     }
 
-    else if (loading) {
-      return (
-        <div className='card-stack__expanded'>
-          <Loader align='center' roomy={true} />
-          <div className='card-stack__expanded-module-rows hidden' />
-        </div>
-      );
-    }
+    //TODO: show loader without expanding
 
     console.log(moduleBuildsList);
 
