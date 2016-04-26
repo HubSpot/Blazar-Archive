@@ -34,6 +34,10 @@ public class ModuleService {
     return moduleDao.getByBranch(branchId);
   }
 
+  public int getBranchIdFromModuleId(int moduleId) {
+    return moduleDao.getBranchIdFromModuleId(moduleId);
+  }
+
   @Transactional
   public Set<Module> setModules(GitInfo gitInfo, Set<DiscoveredModule> updatedModules) {
     Set<Module> oldModules = getByBranch(gitInfo.getId().get());

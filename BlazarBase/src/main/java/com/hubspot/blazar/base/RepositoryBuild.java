@@ -157,6 +157,15 @@ public class RepositoryBuild {
   }
 
   @Override
+  public String toString() {
+    return com.google.common.base.Objects.toStringHelper(this)
+        .add("id", id)
+        .add("branchId", branchId)
+        .add("buildNumber", buildNumber)
+        .add("state", state).toString();
+  }
+
+  @Override
   public int hashCode() {
     return Objects.hash(branchId, buildNumber);
   }

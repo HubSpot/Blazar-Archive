@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.hubspot.blazar.base.StepActivationCriteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +24,7 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.base.StepActivationCriteria;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
@@ -66,7 +67,7 @@ public class ModuleBuildLauncher {
         .withBuildConfig(buildConfig)
         .withResolvedConfig(resolvedConfig);
 
-    LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
+    LOG.info("Updating status of Module Build {} to {}", launching.getId().get(), launching.getState());
     moduleBuildService.begin(launching);
   }
 
@@ -108,8 +109,10 @@ public class ModuleBuildLauncher {
     Map<String, StepActivationCriteria> stepActivation = new LinkedHashMap<>();
     stepActivation.putAll(secondary.getStepActivation());
     stepActivation.putAll(primary.getStepActivation());
+    Set<String> depends = primary.getDepends().isEmpty() ? secondary.getDepends() : primary.getDepends();
+    Set<String> provides = primary.getProvides().isEmpty() ? secondary.getProvides() : primary.getProvides();
 
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation);
+    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
   }
 
   private BuildConfig configAtSha(GitInfo gitInfo, Module module) throws IOException, NonRetryableBuildException {

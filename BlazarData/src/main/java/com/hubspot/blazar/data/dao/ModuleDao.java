@@ -21,6 +21,9 @@ public interface ModuleDao {
   @SqlQuery("SELECT * FROM modules WHERE branchId = :branchId")
   Set<Module> getByBranch(@Bind("branchId") int branchId);
 
+  @SqlQuery("SELECT branchId FROM modules WHERE id = :moduleId")
+  int getBranchIdFromModuleId(@Bind("moduleId") int moduleId);
+
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO modules (branchId, name, type, path, glob, active, buildpack) VALUES (:branchId, :name, :type, :path, :glob, :active, :buildpack)")
   int insert(@Bind("branchId") int branchId, @BindWithRosetta Module module);

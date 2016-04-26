@@ -46,10 +46,6 @@
     </dependency>
     <dependency>
       <groupId>io.dropwizard</groupId>
-      <artifactId>dropwizard-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-jdbi</artifactId>
     </dependency>
     <dependency>
@@ -84,6 +80,11 @@
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>stringtemplate</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -124,6 +125,11 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.hubspot</groupId>
+      <artifactId>BlazarTestBase</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
