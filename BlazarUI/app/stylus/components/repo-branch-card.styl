@@ -149,7 +149,7 @@
 .repo-branch-card__expanded-timestamp
   float right
   
-.repo-branch-card__expanded-status-symbol--SUCCEEDED, .repo-branch-card__expanded-status-symbol--FAILED, .repo-branch-card__expanded-status-symbol--SKIPPED, .repo-branch-card__expanded-status-symbol--IN-PROGRESS:before
+.repo-branch-card__expanded-status-symbol--SUCCEEDED, .repo-branch-card__expanded-status-symbol--FAILED, .repo-branch-card__expanded-status-symbol--SKIPPED, .repo-branch-card__expanded-status-symbol--IN-PROGRESS:before, .repo-branch-card__expanded-status-symbol--UNSTABLE, .repo-branch-card__expanded-status-symbol--CANCELLED
   padding-right 5px
     
 .repo-branch-card__expanded-status-symbol--SUCCEEDED:before
@@ -157,7 +157,7 @@
   font-family FontAwesome
   content '\f00c'
   
-.repo-branch-card__expanded-status-symbol--FAILED:before
+.repo-branch-card__expanded-status-symbol--FAILED:before, .repo-branch-card__expanded-status-symbol--UNSTABLE:before
   color #f2545b
   font-family FontAwesome
   content '\f111'
@@ -169,7 +169,12 @@
   transition transform 0.8s
   transform rotate(360deg)
   
-.repo-branch-card__expanded-status-symbol--SKIPPED:before
-  color #008da3
+.repo-branch-card__expanded-status-symbol--CANCELLED:before
+  color #f0ad4e
   font-family FontAwesome
   content '\f0c8'
+
+.repo-branch-card__expanded-status-symbol--SKIPPED:before
+  color #607d8b
+  font-family FontAwesome
+  content '\f056'

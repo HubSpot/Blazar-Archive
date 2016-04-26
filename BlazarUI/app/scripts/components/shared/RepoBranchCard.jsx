@@ -106,6 +106,12 @@ class RepoBranchCard extends Card {
       statusClass = 'repo-branch-card__expanded-status-symbol--FAILED';
     }
 
+    else if (state === BuildStates.CANCELLED) {
+      statusText = 'was cancelled.';
+      durationText = `Cancelled after ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
+      statusClass = 'repo-branch-card__expanded-status-symbol--CANCELLED';
+    }
+
     else if (state === BuildStates.SKIPPED) {
       statusText = 'was skipped.';
       statusClass = 'repo-branch-card__expanded-status-symbol--SKIPPED';
@@ -122,7 +128,7 @@ class RepoBranchCard extends Card {
       </div>
     );
 
-    if (state === BuildStates.SKIPPED) {
+    if (state === BuildStates.SKIPPED || state === BuildStates.CANCELLED) {
       return (
         <div key={i}>
           {innerContent}
