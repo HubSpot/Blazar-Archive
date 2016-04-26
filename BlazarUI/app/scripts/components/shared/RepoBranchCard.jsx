@@ -57,8 +57,7 @@ class RepoBranchCard extends Card {
     let statusText;
     let durationText;
     let statusClass;
-
-    console.log(module);
+    let extraClass = '';
 
     if (state === BuildStates.IN_PROGRESS) {
       statusText = 'is building ...';
@@ -82,15 +81,19 @@ class RepoBranchCard extends Card {
       statusText = 'was cancelled.';
       durationText = `Cancelled after ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
       statusClass = 'repo-branch-card__expanded-status-symbol--CANCELLED';
+      extraClass = ' repo-branch-card__expanded-module-row--no-log';
     }
 
     else if (state === BuildStates.SKIPPED) {
       statusText = 'was skipped.';
       statusClass = 'repo-branch-card__expanded-status-symbol--SKIPPED';
+      extraClass = ' repo-branch-card__expanded-module-row--no-log';
     }
 
+    const rowClassName = `repo-branch-card__expanded-module-row${extraClass}`;
+
     const innerContent = (
-      <div className='repo-branch-card__expanded-module-row'>
+      <div className={rowClassName}>
         <span className='repo-branch-card__expanded-status'>
           <span className={statusClass} /> {module.name} {statusText}
         </span>

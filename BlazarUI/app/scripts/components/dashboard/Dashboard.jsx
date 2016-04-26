@@ -28,7 +28,6 @@ class Dashboard extends Component {
     super(props);
 
     this.state = initialState;
-    bindAll(this, 'maybeCloseCards');
   }
 
   componentDidMount() {
@@ -48,14 +47,6 @@ class Dashboard extends Component {
       expandedCard: -1,
       build: undefined
     });
-  }
-
-  maybeCloseCards(event) {
-    const targetClass = $(event.target).attr('class') || '';
-
-    if (targetClass.indexOf('card-stack__') === -1 && targetClass.indexOf('repo-branch-card__') === -1) {
-      this.resetSelectedCard();
-    }
   }
 
   onCardClick(key, build) {
@@ -108,8 +99,7 @@ class Dashboard extends Component {
           <Headline>
             Starred Branches
           </Headline>
-          <CardStack 
-            onClick={this.maybeCloseCards}
+          <CardStack
             header={this.renderHeader()}
             loading={this.props.loadingBuilds || this.props.loadingStars}>
             {this.renderCards()}

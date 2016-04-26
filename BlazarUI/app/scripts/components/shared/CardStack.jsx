@@ -8,18 +8,6 @@ class CardStack extends Component {
     super(props);
   }
 
-  componentDidMount() {
-    if (this.props.onClick) {
-      $(window).click(this.props.onClick);
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.onClick) {
-      $(window).unbind('click');
-    }
-  }
-
   render() {
     if (this.props.loading) {
       return (
@@ -43,8 +31,7 @@ class CardStack extends Component {
 CardStack.propTypes = {
   loading: PropTypes.bool.isRequired,
   header: PropTypes.node,
-  children: PropTypes.node,
-  onClick: PropTypes.func
+  children: PropTypes.node
 };
 
 export default CardStack;

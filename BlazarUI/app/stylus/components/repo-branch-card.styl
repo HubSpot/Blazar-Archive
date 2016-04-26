@@ -59,7 +59,7 @@
     content '\f020  '
   
 .repo-branch-card__build-number
-  font-family HelveticaNeue-bold
+  font-family HelveticaNeue-medium
   color #7c98b6
   
 .repo-branch-card__last-build
@@ -142,6 +142,12 @@
   padding 10px
   color #425b76
   transition background $bg-transition-duration
+  
+  &:hover
+    background-color #ccedf2
+    
+.repo-branch-card__expanded-module-row--no-log:hover
+  background-color white
   
 .repo-branch-card__author
   color #425b76
