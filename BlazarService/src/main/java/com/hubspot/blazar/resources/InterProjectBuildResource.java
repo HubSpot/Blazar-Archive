@@ -76,7 +76,7 @@ public class InterProjectBuildResource {
 
     for (InterProjectBuildMapping mapping : mappings) {
       Module module = getModuleWithCache(moduleMap, mapping.getModuleId());
-      GitInfo gitInfo = getGitInfoWithCache(gitInfoMap, mapping.getRepoId());
+      GitInfo gitInfo = getGitInfoWithCache(gitInfoMap, mapping.getBranchId());
       String source = String.format("%s-%s", gitInfo.getRepository(), module.getName());
       D3GraphNode node = new D3GraphNode(source, module.getId().get(), 100, 100, mapping.getState());
       nodes.add(node);
