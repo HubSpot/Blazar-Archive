@@ -91,6 +91,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(RepositoryBuildResource.class);
     binder.bind(BuildHistoryResource.class);
     binder.bind(InstantMessageResource.class);
+    binder.bind(InterProjectBuildResource.class);
 
     if (getConfiguration().getSlackConfiguration().isPresent()) {
       binder.bind(SlackClient.class);
