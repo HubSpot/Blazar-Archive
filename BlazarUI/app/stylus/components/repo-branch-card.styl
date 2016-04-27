@@ -2,41 +2,41 @@
 
 .repo-branch-card__header
   height 50px
-  background-color #eaf0f6
+  background-color #F9FBFD
   border $border
   border-bottom 0
   color #425b76
   font-family HelveticaNeue-medium
-  
+
   & > div
     padding-left 100px
-  
+
   & div
     display inline-block
     height 100%
     line-height 50px
-  
+
 .repo-branch-card__header-info
   width calc(100% / 3)
-  
+
   &:before
     content 'INFO'
-    
+
 .repo-branch-card__header-last-built
   width calc(100% / 3)
-  
+
   &:before
     content 'LAST BUILT'
-    
+
 .repo-branch-card__header-details
   width calc(100% / 3)
-  
+
   &:before
     content 'DETAILS'
-    
+
 .repo-branch-card__header-status
   width 13%
-  
+
   &:before
     content 'STATUS'
 
@@ -48,9 +48,19 @@
   display inline-block
   width 100%
 
+.card-stack__card--repo-branch
+  transition all $transition-duration
+
+  &:hover
+    position relative
+    top -2px
+    z-index 999
+    box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
+
 .repo-branch-card__repo
-  padding-top 6px  
-  
+  padding-top 6px
+  font-size 16px
+
 .repo-branch-card__build-and-status
   width 80px
   height $initial-height
@@ -59,16 +69,16 @@
   text-align center
   font-size 18px
   cursor pointer
-  
+
   & span
     color #425b76
-    
+
 .card-stack__card--below-expanded .repo-branch-card__build-and-status
   line-height $initial-height - 10px
-  
+
 .repo-branch-card__build-and-status--SUCCEEDED
   background-color #ccf2ed
-  
+
 .repo-branch-card__build-and-status--FAILED, .repo-branch-card__build-and-status--UNSTABLE
   background-color #fddbdc
 
@@ -76,28 +86,28 @@
   padding-top 4px
   font-family HelveticaNeue-Light
   color #7c98b6
-  
+
 .repo-branch-card__branch
   font-family HelveticaNeue
   color #425b76
   background-color #eceef1
   padding 3px 7px
-  
+
   &:before
     font-family 'octicons'
     content '\f020  '
-  
+
 .repo-branch-card__build-number
-  font-family HelveticaNeue-medium
+  font-family HelveticaNeue-light
   color #7c98b6
-  
+
 .repo-branch-card__last-build
   width calc(100% / 3)
   height 100%
   vertical-align middle
   padding-left 1%
   line-height 40px
-  
+
 .repo-branch-card__last-build-time
   color #425b76
   font-family HelveticaNeue-bold
@@ -108,14 +118,14 @@
   vertical-align middle
   padding-left 2%
   line-height 40px
-  
+
 .repo-branch-card__triggered-by
   font-family HelveticaNeue-light
   color #425b76
-  
+
 .repo-branch-card__modules-built
   color #425b76
-  
+
 .repo-branch-card__modules-skipped
   color #7c98b6
   font-family HelveticaNeue-light
@@ -128,16 +138,16 @@
   padding-left 2%
   padding-top 17px
   font-family HelveticaNeue-medium
-  
+
 .repo-branch-card__status-banner--SUCCESS, .repo-branch-card__status-banner--FAILED
   padding 3px 7px
 
 .repo-branch-card__status-banner--SUCCESS
   background-color #e8faf4
-  
+
   & span
     color #21d596
-    
+
     &:before
       content 'No build errors'
 
@@ -146,7 +156,7 @@
 
   & span
     color #f2545b
-    
+
     &:before
       content 'Build errors'
 
@@ -155,19 +165,19 @@
   font-size 18px
   color #425b76
   display block
-  
+
 .card-stack__expanded-author
   font-size 14px
   color #2965a8
   font-family HelveticaNeue
   padding-left 20px
-  
+
 .card-stack__expanded-module-rows
   margin-top 20px
   max-height 2000px
   transition max-height $transition-duration
   box-shadow 0 3px 3px 0 rgba(0, 0, 0, 0.2)
-  
+
   &.hiddenn
     max-height 0
 
@@ -178,36 +188,36 @@
   padding 10px
   color #425b76
   transition background $bg-transition-duration
-  
+
   &:hover
     background-color #ccedf2
-    
+
 .repo-branch-card__expanded-module-row--no-log:hover
   background-color white
-  
+
 .repo-branch-card__author
   color #425b76
   font-family HelveticaNeue-bold
-  
+
 .repo-branch-card__expanded-status
   float left
 
 .repo-branch-card__expanded-timestamp
   float right
-  
+
 .repo-branch-card__expanded-status-symbol--SUCCEEDED, .repo-branch-card__expanded-status-symbol--FAILED, .repo-branch-card__expanded-status-symbol--SKIPPED, .repo-branch-card__expanded-status-symbol--IN-PROGRESS:before, .repo-branch-card__expanded-status-symbol--UNSTABLE, .repo-branch-card__expanded-status-symbol--CANCELLED
   padding-right 5px
-    
+
 .repo-branch-card__expanded-status-symbol--SUCCEEDED:before
   color #00bda5
   font-family FontAwesome
   content '\f00c'
-  
+
 .repo-branch-card__expanded-status-symbol--FAILED:before, .repo-branch-card__expanded-status-symbol--UNSTABLE:before
   color #f2545b
   font-family FontAwesome
   content '\f111'
-  
+
 .repo-branch-card__expanded-status-symbol--IN-PROGRESS:before
   color #008da3
   display inline-block
@@ -215,7 +225,7 @@
   content '\f110'
   transition transform 0.8s
   transform rotate(360deg)
-  
+
 .repo-branch-card__expanded-status-symbol--CANCELLED:before
   color #f0ad4e
   font-family FontAwesome
