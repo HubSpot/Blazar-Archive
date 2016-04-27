@@ -165,8 +165,6 @@ class RepoBranchCard extends Card {
           <span className='repo-branch-card__branch'>
             {gitInfo.get('branch')}
           </span>
-          <span> is on build </span>
-          {this.renderBuildNumberLink()}
         </div>
       </div>
     );
@@ -239,6 +237,18 @@ class RepoBranchCard extends Card {
     );
   }
 
+  renderBuildAndStatus() {
+    const {item} = this.props;
+    const build = this.getBuildToDisplay();
+    const colorClass = `repo-branch-card__build-and-status repo-branch-card__build-and-status--${build.get('state')}`;
+
+    return (
+      <div className={colorClass}>
+        {this.renderBuildNumberLink()}
+      </div>
+    );
+  }
+
   render() {
     const {item} = this.props;
     const build = this.getBuildToDisplay();
@@ -246,11 +256,13 @@ class RepoBranchCard extends Card {
 
     return (
       <div className={this.getClassNames()}>
-        <div onClick={this.props.onClick} className='card-stack__card-main'>
-          {this.renderInfo()}
-          {this.renderLastBuild()}
-          {this.renderTriggeredBy()}
-          {this.renderStatus()}
+        <div className='repo-branch-card__inner-wrapper' onClick={this.props.onClick}>
+          {this.renderBuildAndStatus()}
+          <div className='card-stack__card-main'>
+            {this.renderInfo()}
+            {this.renderLastBuild()}
+            {this.renderTriggeredBy()}
+          </div>
         </div>
         {this.renderDetailsV2()}
       </div>

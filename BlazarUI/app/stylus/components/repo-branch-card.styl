@@ -5,27 +5,31 @@
   background-color #eaf0f6
   border $border
   border-bottom 0
-  padding 15px 20px
   color #425b76
   font-family HelveticaNeue-medium
   
+  & > div
+    padding-left 100px
+  
   & div
     display inline-block
+    height 100%
+    line-height 50px
   
 .repo-branch-card__header-info
-  width 37%
+  width calc(100% / 3)
   
   &:before
     content 'INFO'
     
 .repo-branch-card__header-last-built
-  width 23%
+  width calc(100% / 3)
   
   &:before
     content 'LAST BUILT'
     
 .repo-branch-card__header-details
-  width 27%
+  width calc(100% / 3)
   
   &:before
     content 'DETAILS'
@@ -37,11 +41,36 @@
     content 'STATUS'
 
 .repo-branch-card__info
-  width 35%
+  width calc(100% / 3)
   height 100%
+
+.repo-branch-card__inner-wrapper
+  display inline-block
+  width 100%
 
 .repo-branch-card__repo
   padding-top 6px  
+  
+.repo-branch-card__build-and-status
+  width 80px
+  height $initial-height
+  float left
+  line-height $initial-height
+  text-align center
+  font-size 18px
+  cursor pointer
+  
+  & span
+    color #425b76
+    
+.card-stack__card--below-expanded .repo-branch-card__build-and-status
+  line-height $initial-height - 10px
+  
+.repo-branch-card__build-and-status--SUCCEEDED
+  background-color #ccf2ed
+  
+.repo-branch-card__build-and-status--FAILED, .repo-branch-card__build-and-status--UNSTABLE
+  background-color #fddbdc
 
 .repo-branch-card__branch-and-build
   padding-top 4px
@@ -63,22 +92,22 @@
   color #7c98b6
   
 .repo-branch-card__last-build
-  width 23%
+  width calc(100% / 3)
   height 100%
   vertical-align middle
-  padding-top 8px
-  padding-left 2%
+  padding-left 1%
+  line-height 40px
   
 .repo-branch-card__last-build-time
   color #425b76
   font-family HelveticaNeue-bold
 
 .repo-branch-card__details
-  width 18%
+  width calc(100% / 3)
   height 100%
   vertical-align middle
   padding-left 2%
-  padding-top 8px
+  line-height 40px
   
 .repo-branch-card__triggered-by
   font-family HelveticaNeue-light
@@ -131,7 +160,7 @@
   margin-top 20px
   max-height 2000px
   transition max-height $transition-duration
-  box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
+  box-shadow 0 3px 3px 0 rgba(0, 0, 0, 0.2)
   
   &.hiddenn
     max-height 0
@@ -175,6 +204,7 @@
   
 .repo-branch-card__expanded-status-symbol--IN-PROGRESS:before
   color #008da3
+  display inline-block
   font-family FontAwesome
   content '\f110'
   transition transform 0.8s

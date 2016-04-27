@@ -25,14 +25,14 @@
   margin -10px -20px 0 -20px
   border-bottom $border
   box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
-  z-index 100
+  z-index 2
   
   & .card-stack__card-main
-    background-color $card-bg-color
+    //background-color $card-bg-color
     border-bottom $border
     
     &:hover
-      background-color $card-bg-color
+      //background-color $card-bg-color
     
 .card-stack__card--below-expanded
   border-top 0
@@ -54,6 +54,8 @@
   cursor pointer
   background-color white
   transition background $bg-transition-duration
+  width calc(100% - 80px)
+  display inline-block
   
   & > div
     display inline-block
