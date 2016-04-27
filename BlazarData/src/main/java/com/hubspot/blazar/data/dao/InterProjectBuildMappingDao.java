@@ -16,7 +16,7 @@ import com.hubspot.rosetta.jdbi.BindWithRosetta;
 public interface InterProjectBuildMappingDao {
 
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :id")
-  Set<InterProjectBuildMapping> getMappingsForBuild(@BindWithRosetta InterProjectBuild interProjectBuild);
+  Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(@BindWithRosetta InterProjectBuild interProjectBuild);
 
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :interProjectBuildId and repoId = :repoId")
   Set<InterProjectBuildMapping> getMappingsForRepo(@Bind("interProjectBuildId") long interProjectBuildId, @Bind("repoId") int repoId);
@@ -33,13 +33,13 @@ public interface InterProjectBuildMappingDao {
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE id = :id")
-  Optional<InterProjectBuildMapping> getById(@Bind("id") long id);
+  Optional<InterProjectBuildMapping> getByMappingId(@Bind("id") long id);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO inter_project_build_mappings (interProjectBuildId, repoId, repoBuildId, moduleId, moduleBuildId) " +
-             "VALUES (:interProjectBuildId, :repoId, :repoBuildId, :moduleId, :moduleBuildId)")
+  @SqlUpdate("INSERT INTO inter_project_build_mappings (interProjectBuildId, repoId, repoBuildId, moduleId, moduleBuildId, state) " +
+             "VALUES (:interProjectBuildId, :repoId, :repoBuildId, :moduleId, :moduleBuildId, :state)")
   long insert(@BindWithRosetta InterProjectBuildMapping interProjectBuildMapping);
 
-  @SqlUpdate("UPDATE inter_project_build_mappings SET repoBuildId = :repoBuildId, moduleBuildId = :moduleBuildId where id = :id")
+  @SqlUpdate("UPDATE inter_project_build_mappings SET repoBuildId = :repoBuildId, moduleBuildId = :moduleBuildId, state = :state where id = :id")
   int updateBuilds(@BindWithRosetta InterProjectBuildMapping mapping);
 }

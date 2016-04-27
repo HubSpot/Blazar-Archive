@@ -19,8 +19,8 @@ public class InterProjectBuildMappingService {
     this.dao = dao;
   }
 
-  public Set<InterProjectBuildMapping> getMappingsForBuild(InterProjectBuild interProjectBuild) {
-    return dao.getMappingsForBuild(interProjectBuild);
+  public Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(InterProjectBuild interProjectBuild) {
+    return dao.getMappingsForInterProjectBuild(interProjectBuild);
   }
 
   public Set<InterProjectBuildMapping> getMappingsForRepo(long interProjectBuildId, int repoId) {
@@ -39,8 +39,8 @@ public class InterProjectBuildMappingService {
     return dao.getByModuleBuildId(moduleBuildId);
   }
 
-  public Optional<InterProjectBuildMapping> getById(long id) {
-    return dao.getById(id);
+  public Optional<InterProjectBuildMapping> getByMappingId(long id) {
+    return dao.getByMappingId(id);
   }
 
   @Transactional

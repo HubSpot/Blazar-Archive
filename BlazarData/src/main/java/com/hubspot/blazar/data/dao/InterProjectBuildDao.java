@@ -17,12 +17,11 @@ public interface InterProjectBuildDao {
   Optional<InterProjectBuild> getWithId(@Bind("id") long id);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO inter_project_builds (state, moduleIds, buildTrigger) VALUES (:state, :moduleIds, :buildTrigger)")
+  @SqlUpdate("INSERT INTO inter_project_builds (state, moduleIds, startTimestamp, buildTrigger) VALUES (:state, :moduleIds, :startTimestamp, :buildTrigger)")
   int enqueue(@BindWithRosetta InterProjectBuild interProjectBuild);
 
   @SqlUpdate("UPDATE inter_project_builds SET " +
              "state = :state, " +
-             "startTimestamp = :startTimestamp, " +
              "dependencyGraph = :dependencyGraph " +
              "WHERE id = :id and state in ('CALCULATING')")
   void start(@BindWithRosetta InterProjectBuild interProjectBuild);

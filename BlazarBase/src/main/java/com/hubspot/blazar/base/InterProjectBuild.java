@@ -56,7 +56,7 @@ public class InterProjectBuild {
   }
 
   public static InterProjectBuild getQueuedBuild(Set<Integer> moduleIds, BuildTrigger buildTrigger) {
-    return new InterProjectBuild(Optional.<Long>absent(), State.CALCULATING, moduleIds, buildTrigger, Optional.<Long>absent(), Optional.<Long>absent(),Optional.<DependencyGraph>absent());
+    return new InterProjectBuild(Optional.<Long>absent(), State.CALCULATING, moduleIds, buildTrigger, Optional.of(System.currentTimeMillis()), Optional.<Long>absent(),Optional.<DependencyGraph>absent());
   }
 
   public static InterProjectBuild withDependencyGraph(InterProjectBuild old, DependencyGraph d){
