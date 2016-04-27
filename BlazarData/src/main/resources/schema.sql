@@ -168,7 +168,7 @@ CREATE TABLE inter_project_builds (
 CREATE TABLE inter_project_build_mappings (
   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `interProjectBuildId` BIGINT(20),
-  `repoId` INT(11),
+  `branchId` INT(11),
   `repoBuildId` BIGINT(20),
   `moduleId` INT(11),
   `moduleBuildId` BIGINT(20),

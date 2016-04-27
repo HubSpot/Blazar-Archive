@@ -18,8 +18,8 @@ public interface InterProjectBuildMappingDao {
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :id")
   Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(@BindWithRosetta InterProjectBuild interProjectBuild);
 
-  @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :interProjectBuildId and repoId = :repoId")
-  Set<InterProjectBuildMapping> getMappingsForRepo(@Bind("interProjectBuildId") long interProjectBuildId, @Bind("repoId") int repoId);
+  @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :interProjectBuildId and branchId = :branchId")
+  Set<InterProjectBuildMapping> getMappingsForRepo(@Bind("interProjectBuildId") long interProjectBuildId, @Bind("branchId") int branchId);
 
    @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :interProjectBuildId and moduleId = :moduleId")
   Set<InterProjectBuildMapping> getMappingsForModule(@Bind("interProjectBuildId") long interProjectBuildId, @Bind("moduleId") int moduleId);
@@ -36,8 +36,8 @@ public interface InterProjectBuildMappingDao {
   Optional<InterProjectBuildMapping> getByMappingId(@Bind("id") long id);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO inter_project_build_mappings (interProjectBuildId, repoId, repoBuildId, moduleId, moduleBuildId, state) " +
-             "VALUES (:interProjectBuildId, :repoId, :repoBuildId, :moduleId, :moduleBuildId, :state)")
+  @SqlUpdate("INSERT INTO inter_project_build_mappings (interProjectBuildId, branchId, repoBuildId, moduleId, moduleBuildId, state) " +
+             "VALUES (:interProjectBuildId, :branchId, :repoBuildId, :moduleId, :moduleBuildId, :state)")
   long insert(@BindWithRosetta InterProjectBuildMapping interProjectBuildMapping);
 
   @SqlUpdate("UPDATE inter_project_build_mappings SET repoBuildId = :repoBuildId, moduleBuildId = :moduleBuildId, state = :state where id = :id")

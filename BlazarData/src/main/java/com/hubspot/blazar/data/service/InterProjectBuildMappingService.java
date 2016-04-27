@@ -23,8 +23,8 @@ public class InterProjectBuildMappingService {
     return dao.getMappingsForInterProjectBuild(interProjectBuild);
   }
 
-  public Set<InterProjectBuildMapping> getMappingsForRepo(long interProjectBuildId, int repoId) {
-    return dao.getMappingsForRepo(interProjectBuildId, repoId);
+  public Set<InterProjectBuildMapping> getMappingsForRepo(long interProjectBuildId, int branchId) {
+    return dao.getMappingsForRepo(interProjectBuildId, branchId);
   }
 
   public Set<InterProjectBuildMapping> getMappingsForModule(long interProjectBuildId, int moduleId) {
