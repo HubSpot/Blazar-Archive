@@ -74,14 +74,15 @@ class Dashboard extends Component {
     return this.props.starredBuilds.map((build, key) => {
       return (
         <RepoBranchCard
+          {...this.state}
           onClick={this.onCardClick.bind(this, key, build)}
           key={key}
           expanded={key === this.state.expandedCard} 
           belowExpanded={key === this.state.expandedCard + 1 && this.state.expandedCard !== -1}
           first={key === 0}
           last={key === numberOfBuilds - 1}
-          item={build} 
-          {...this.state} />
+          item={build}
+          loading={this.props.loadingBuilds || this.props.loadingStars || this.state.loading} />
       );
     })
   }

@@ -52,6 +52,14 @@ class RepoBranchCard extends Card {
     );
   }
 
+  buildCompareLink() {
+    const commitInfo = this.getBuildToDisplay().get('commitInfo');
+    const previousCommit = commitInfo.get('previous');
+    const currentCommit = commitInfo.get('current');
+
+    return previousCommit.get('url').replace('/commit/', '/compare/') + '...' + currentCommit.get('id');
+  }
+
   renderModuleRow(module, i) {
     const state = module.state;
     let statusText;
@@ -139,11 +147,31 @@ class RepoBranchCard extends Card {
     }
 
     const moduleRowNodes = moduleBuildsList.map(this.renderModuleRow);
+    let buildTriggerMessage;
+    let detailedTriggerMessage;
+    console.log(build.toJS());
+
+    if (build.get('buildTrigger').get('type') === 'MANUAL') {
+      buildTriggerMessage = 'manually';
+      const buildTime = moment(build.get('startTimestamp')).fromNow();
+      const author = build.get('buildTrigger').get('id');
+      detailedTriggerMessage = `Triggered ${buildTime}${author === 'unknown' ? '' : ` by ${author}`}`;
+    }
+
+    else {
+      buildTriggerMessage = 'automatically by a code push';
+      detailedTriggerMessage = (
+        <Link to={this.buildCompareLink()}>
+          compare
+        </Link>
+      );
+    }
 
     return (
       <div className='card-stack__expanded'>
         <div className='card-stack__expanded-header'>
-          <span>Build #{build.get('buildNumber')} was started manually</span>
+          <span>Build #{build.get('buildNumber')} was started {buildTriggerMessage}</span>
+          <span className='card-stack__expanded-author'>{detailedTriggerMessage}</span>
         </div>
         <div className='card-stack__expanded-module-rows'>
           {moduleRowNodes}
