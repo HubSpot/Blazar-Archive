@@ -1,12 +1,10 @@
 package com.hubspot.blazar.listener;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
@@ -16,7 +14,6 @@ import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
-import com.hubspot.blazar.data.service.RepositoryBuildService;
 
 public class InterProjectRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(InterProjectRepositoryBuildVisitor.class);
@@ -51,7 +48,24 @@ public class InterProjectRepositoryBuildVisitor extends AbstractRepositoryBuildV
 
   @Override
   protected void visitSucceeded(RepositoryBuild build) throws Exception {
+    checkDone(build);
+  }
+
+  @Override
+  protected void visitFailed(RepositoryBuild build) {
+    checkDone(build);
+  }
+
+  @Override
+  protected void visitCancelled(RepositoryBuild build) throws Exception {
+    checkDone(build);
+  }
+
+  private void checkDone(RepositoryBuild build) {
     Set<InterProjectBuildMapping> repoBuildMappings = interProjectBuildMappingService.getByRepoBuildId(build.getId().get());
+    if (repoBuildMappings.isEmpty()) {
+      return;
+    }
     InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(repoBuildMappings.iterator().next().getInterProjectBuildId()).get();
     InterProjectBuild.State complete = checkComplete(interProjectBuild);
     if (!complete.isFinished()) {
@@ -61,13 +75,15 @@ public class InterProjectRepositoryBuildVisitor extends AbstractRepositoryBuildV
   }
 
   private InterProjectBuild.State checkComplete(InterProjectBuild build) {
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForBuild(build);
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
     InterProjectBuild.State state = InterProjectBuild.State.SUCCEEDED;
     for (InterProjectBuildMapping mapping: mappings) {
       if (!mapping.getState().isFinished()) {
         return InterProjectBuild.State.RUNNING;
       }
-      if (!mapping.getState().equals(InterProjectBuild.State.SUCCEEDED)) {
+
+      // if there is a failure mark as failed, regardless of any CANCELLED modules
+      if (!mapping.getState().equals(InterProjectBuild.State.SUCCEEDED) && !state.equals(InterProjectBuild.State.FAILED)) {
         state = mapping.getState();
       }
     }

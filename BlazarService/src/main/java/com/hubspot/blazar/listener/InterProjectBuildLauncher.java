@@ -68,7 +68,7 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
   @Override
   protected void visitRunning(InterProjectBuild build) throws Exception {
     DependencyGraph d = build.getDependencyGraph().get();
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForBuild(build);
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
     if (!(mappings.size() == 0)) {
       LOG.warn("Running InterProjectBuild was launched and build mappings created outside of intended flow, Ignoring Event");
       return;

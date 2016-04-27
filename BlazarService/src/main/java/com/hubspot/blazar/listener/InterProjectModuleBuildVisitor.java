@@ -55,14 +55,15 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
   @Override
   protected void visitSucceeded(ModuleBuild build) throws Exception {
     Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
-    if (mapping.isPresent()) {
+    if (!mapping.isPresent()) {
       return;
     }
+    markBuildMappingAs(mapping.get(), InterProjectBuild.State.SUCCEEDED);
     LOG.info("Found mapping {} corresponding to moduleBuild {}", mapping, build.getId());
     InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.get().getInterProjectBuildId()).get();
 
     DependencyGraph graph = interProjectBuild.getDependencyGraph().get();
-    Set<InterProjectBuildMapping> moduleBuildMappings = interProjectBuildMappingService.getMappingsForBuild(interProjectBuild);
+    Set<InterProjectBuildMapping> moduleBuildMappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuild);
 
     SetMultimap<Integer, Integer> launchableBranchToModuleMap = HashMultimap.create();
     for (int moduleId : graph.outgoingVertices(build.getModuleId())) {
@@ -84,6 +85,30 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
       }
       LOG.info("Queued repo build {} as part of InterProjectBuild {}", buildId, interProjectBuild.getId().get());
     }
+  }
+
+  @Override
+  protected void visitCancelled(ModuleBuild build) throws Exception {
+    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
+    if (!mapping.isPresent()) {
+      return;
+    }
+    markBuildMappingAs(mapping.get(), InterProjectBuild.State.CANCELLED);
+    cancelTree(build);
+  }
+
+  @Override
+  protected void visitFailed(ModuleBuild build) throws Exception {
+    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
+    if (!mapping.isPresent()) {
+      return;
+    }
+    markBuildMappingAs(mapping.get(), InterProjectBuild.State.FAILED);
+    cancelTree(build);
+  }
+
+  private void markBuildMappingAs(InterProjectBuildMapping mapping, InterProjectBuild.State state) {
+    interProjectBuildMappingService.updateBuilds(mapping.withModuleBuildId(state));
   }
 
   private boolean noCurrentBuildFor(int moduleId, Long interProjectBuildId) {
@@ -110,31 +135,16 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     return true;
   }
 
-  @Override
-  protected void visitCancelled(ModuleBuild build) throws Exception {
-    cancelTree(build);
-  }
-
-  @Override
-  protected void visitFailed(ModuleBuild build) throws Exception {
-    cancelTree(build);
-  }
-
-
-
   private void cancelTree(ModuleBuild build) throws NonRetryableBuildException {
-    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
-    if (mapping.isPresent()) {
-      return;
-    }
+    InterProjectBuildMapping mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get()).get();
     LOG.info("Found mapping {} corresponding to moduleBuild {}", mapping, build.getId());
-    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.get().getInterProjectBuildId()).get();
+    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.getInterProjectBuildId()).get();
     DependencyGraph graph = interProjectBuild.getDependencyGraph().get();
     Stack<Integer> s = new Stack<>();
     s.addAll(graph.outgoingVertices(build.getModuleId()));
     while (!s.empty()) {
       int moduleId = s.pop();
-      interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(interProjectBuild.getId().get(), moduleService.getBranchIdFromModuleId(moduleId), Optional.<Long>absent(), moduleId));
+      interProjectBuildMappingService.insert(new InterProjectBuildMapping(Optional.<Long>absent(), interProjectBuild.getId().get(), moduleService.getBranchIdFromModuleId(moduleId), Optional.<Long>absent(), moduleId, Optional.<Long>absent(), InterProjectBuild.State.CANCELLED));
       s.addAll(graph.outgoingVertices(moduleId));
     }
   }
