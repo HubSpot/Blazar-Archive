@@ -2,7 +2,6 @@ package com.hubspot.blazar.data.service;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
@@ -10,7 +9,7 @@ import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.base.ModuleDependency;
+import com.hubspot.blazar.base.graph.Edge;
 import com.hubspot.blazar.data.dao.DependenciesDao;
 import com.hubspot.blazar.data.util.GraphUtils;
 
@@ -21,10 +20,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,44 +41,46 @@ public class DependenciesService {
 
   public DependencyGraph buildInterProjectDependencyGraph(Set<Module> modulesTriggered) {
     long start = System.currentTimeMillis();
-    SetMultimap<Integer, Integer> edges = HashMultimap.create();
+    SetMultimap<Integer, Integer> graph = HashMultimap.create();
 
-    // Turn triggered modules into ModuleDependencies
-    Set<ModuleDependency> moduleDependenciesTriggered = new HashSet<>();
-    for (Module m : modulesTriggered ) {
-      LOG.info("InterProjectBuild has been triggered for module {}({})", m.getName(), m.getId().get());
-      moduleDependenciesTriggered.addAll(getProvides(ImmutableSet.of(m.getId().get())));
-    }
-
-    Stack<ModuleDependency> stack = new Stack<>();
-    stack.addAll(moduleDependenciesTriggered);
-    Set<ModuleDependency> seen = new HashSet<>();
+    Set<Integer> seenModules = new HashSet<>();
+    Queue<Integer> moduleQueue = new LinkedList<>();
     List<Long> queryTimes = new ArrayList<>();
-    while (!stack.empty()) {
-      ModuleDependency m = stack.pop();
-      seen.add(m);
-      LOG.debug("Found Node {}", m);
-      while(stack.remove(m)) {
-        LOG.debug("Removed copy of {} from stack", m);
-      }
-      long s = System.currentTimeMillis();
-      Set<ModuleDependency> newItems = getProvidesFromModuleDepends(m);
-      queryTimes.add(System.currentTimeMillis() - s);
-      for (ModuleDependency newItem : newItems) {
-        LOG.debug("Added {} <- {}", m, newItem);
-        edges.put(m.getModuleId(), newItem.getModuleId());
-      }
-      newItems.removeAll(seen);
-      stack.addAll(newItems);
+
+    for (Module module : modulesTriggered) {
+      moduleQueue.add(module.getId().get());
     }
+
+    while (true) {
+      Set<Integer> modulesToProcess = new HashSet<>(moduleQueue);
+      modulesToProcess.removeAll(seenModules);
+      moduleQueue.clear();
+
+      if (modulesToProcess.isEmpty()) {
+        break;
+      }
+
+      long queryStart = System.currentTimeMillis();
+      Set<Edge> edges = dependenciesDao.getEdges(modulesToProcess);
+      long queryEnd = System.currentTimeMillis();
+      queryTimes.add(queryEnd - queryStart);
+
+      for (Edge edge : edges) {
+        graph.put(edge.getSource(), edge.getTarget());
+        moduleQueue.add(edge.getTarget());
+      }
+
+      seenModules.addAll(modulesToProcess);
+    }
+
     long startGraph = System.currentTimeMillis();
-    SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(edges);
+    SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(graph);
     LOG.info("Transitive reduction calculation took {}", System.currentTimeMillis()-startGraph);
     long startSort = System.currentTimeMillis();
-    List<Integer> topologicalSort = GraphUtils.INSTANCE.topologicalSort(edges);
+    List<Integer> topologicalSort = GraphUtils.INSTANCE.topologicalSort(graph);
     LOG.info("Topological sort calculation took {}", System.currentTimeMillis()-startSort);
     Map<Integer, Set<Integer>> transitiveReductionMap = new HashMap<>(Multimaps.asMap(transitiveReduction));
-    DependencyGraph graph = new DependencyGraph(transitiveReductionMap, topologicalSort);
+    DependencyGraph dependencyGraph = new DependencyGraph(transitiveReductionMap, topologicalSort);
     long sum = 0;
     long max = 0;
     long min = Long.MAX_VALUE;
@@ -94,20 +96,18 @@ public class DependenciesService {
     long average = queryTimes.size() == 0 ? sum : sum/queryTimes.size();
     LOG.info("MysqlQueries max: {} min: {} ct: {} each: {} total: {}", max, min, queryTimes.size(), average, sum);
     LOG.info("Building graph took {}", System.currentTimeMillis() - start);
-    return graph;
+    return dependencyGraph;
   }
 
   public DependencyGraph buildDependencyGraph(GitInfo gitInfo, Set<Module> allModules) {
-    Map<String, Integer> providerMap = asMap(getProvides(gitInfo));
+    Set<Edge> edges = dependenciesDao.getEdges(gitInfo);
 
-    SetMultimap<Integer, Integer> edges = HashMultimap.create();
-    for (ModuleDependency dependency : getDepends(gitInfo)) {
-      if (providerMap.containsKey(dependency.getName())) {
-        edges.put(providerMap.get(dependency.getName()), dependency.getModuleId());
-      }
+    SetMultimap<Integer, Integer> graph = HashMultimap.create();
+    for (Edge edge : edges) {
+      graph.put(edge.getSource(), edge.getTarget());
     }
 
-    SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(edges);
+    SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(graph);
     List<Integer> topologicalSort = GraphUtils.INSTANCE.topologicalSort(transitiveReduction);
     List<Integer> missingModules = findMissingModules(topologicalSort, allModules);
     Map<Integer, Set<Integer>> transitiveReductionMap = new HashMap<>(Multimaps.asMap(transitiveReduction));
@@ -136,25 +136,6 @@ public class DependenciesService {
     dependenciesDao.deleteDepends(moduleId);
   }
 
-  private Set<ModuleDependency> getProvides(Set<Integer> moduleIds) {
-    if (moduleIds.size() > 0) {
-      return dependenciesDao.getProvides(moduleIds);
-    }
-    return new HashSet<>();
-  }
-
-  private Set<ModuleDependency> getProvidesFromModuleDepends(ModuleDependency moduleDependency) {
-    return dependenciesDao.getProvidesFromModuleDepends(moduleDependency);
-  }
-
-  private Set<ModuleDependency> getProvides(GitInfo gitInfo) {
-    return dependenciesDao.getProvides(gitInfo);
-  }
-
-  private Set<ModuleDependency> getDepends(GitInfo gitInfo) {
-    return dependenciesDao.getDepends(gitInfo);
-  }
-
   private void updateProvides(DiscoveredModule module) {
     dependenciesDao.deleteProvides(module.getId().get());
     dependenciesDao.insertProvides(module.getProvides());
@@ -179,14 +160,5 @@ public class DependenciesService {
 
   private static List<Integer> concat(List<Integer> list1, List<Integer> list2) {
     return ImmutableList.copyOf(Iterables.concat(list1, list2));
-  }
-
-  private static Map<String, Integer> asMap(Set<ModuleDependency> dependencies) {
-    Map<String, Integer> dependencyMap = new HashMap<>();
-    for (ModuleDependency dependency : dependencies) {
-      dependencyMap.put(dependency.getName(), dependency.getModuleId());
-    }
-
-    return dependencyMap;
   }
 }
