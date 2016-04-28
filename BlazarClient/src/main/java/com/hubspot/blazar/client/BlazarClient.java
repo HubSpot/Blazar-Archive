@@ -2,9 +2,11 @@ package com.hubspot.blazar.client;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -15,8 +17,10 @@ import com.hubspot.horizon.HttpRequest.Method;
 import com.hubspot.horizon.HttpResponse;
 
 public class BlazarClient {
+  private static final String GET_ALL_GIT_INFO_PATH = "/branches";
   private static final String GET_GIT_INFO_PATH = "/branches/%s";
 
+  private static final String TRIGGER_REPOSITORY_BUILD_PATH = "/branches/builds/branch/%s";
   private static final String GET_REPOSITORY_BUILD_PATH = "/branches/builds/%s";
 
   private static final String MODULE_BUILD_PATH = "/modules/builds";
@@ -33,6 +37,18 @@ public class BlazarClient {
   BlazarClient(HttpClient httpClient, String baseUrl) {
     this.httpClient = httpClient;
     this.baseUrl = baseUrl;
+  }
+
+  public Set<GitInfo> getAllGitInfo() {
+    String url = baseUrl + GET_ALL_GIT_INFO_PATH;
+    HttpRequest request = HttpRequest.newBuilder().setMethod(Method.GET).setUrl(url).build();
+
+    HttpResponse response = httpClient.execute(request);
+    if (response.getStatusCode() == 200) {
+      return response.getAs(new TypeReference<Set<GitInfo>>() {});
+    } else {
+      throw toException(response);
+    }
   }
 
   public Optional<GitInfo> getGitInfo(long branchId) {
@@ -71,6 +87,24 @@ public class BlazarClient {
       }
     }
     throw new RuntimeException(String.format("Module id not found %d", moduleId));  // todo better exception type
+  }
+
+  public RepositoryBuild triggerRepositoryBuild(int branchId, BuildOptions buildOptions, String username) {
+    String url = String.format(baseUrl + TRIGGER_REPOSITORY_BUILD_PATH, branchId);
+
+    HttpRequest request = HttpRequest.newBuilder()
+        .setMethod(Method.POST)
+        .setUrl(url)
+        .setBody(buildOptions)
+        .setQueryParam("username").to(username)
+        .build();
+
+    HttpResponse response = httpClient.execute(request);
+    if (response.getStatusCode() == 200) {
+      return response.getAs(RepositoryBuild.class);
+    } else {
+      throw toException(response);
+    }
   }
 
   public Optional<RepositoryBuild> getRepositoryBuild(long repositoryBuildId) {
