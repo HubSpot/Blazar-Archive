@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -31,15 +32,16 @@ public class TestSingularityBuildLauncher extends SingularityBuildLauncher {
     super(singularityClient, blazarConfiguration);
     this.moduleBuildService = moduleBuildService;
     this.moduleBuildResource = moduleBuildResource;
-    this.failingModules = new HashSet<>();
+    this.failingModules = ImmutableSet.of();
   }
 
+
   public void clearModulesToFail() {
-    failingModules = new HashSet<>();
+    failingModules = ImmutableSet.of();
   }
 
   public void setModulesToFail(Set<Integer> modules) {
-    failingModules = modules;
+    failingModules = ImmutableSet.copyOf(modules);
   }
 
   @Override

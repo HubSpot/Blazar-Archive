@@ -77,13 +77,6 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void checkTableSetup() {
-    Optional<GitInfo> branch = branchService.get(1);
-    assertThat(branch.isPresent()).isTrue();
-    assertThat(branch.get().getBranch()).isEqualTo("master");
-  }
-
-  @Test
   public void testInterBuildDependencyTree() {
     Optional<Module> module1 = moduleService.get(1);
     DependencyGraph graph = dependenciesService.buildInterProjectDependencyGraph(Sets.newHashSet(module1.get()));
@@ -92,14 +85,14 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
   @Test
   public void testInterProjectMappings() {
-    InterProjectBuildMapping mapping = InterProjectBuildMapping.makeNewMapping(1, 2, Optional.of(3L), 4);
     long mappingId = interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(1, 2, Optional.of(3L), 4));
     InterProjectBuildMapping createdMapping = interProjectBuildMappingService.getByMappingId(mappingId).get();
-    assertThat(new InterProjectBuildMapping(Optional.of(mappingId), 123, 123, Optional.of(3L), 123, Optional.<Long>absent(), InterProjectBuild.State.SUCCEEDED)).isEqualTo(createdMapping);
+    assertThat(new InterProjectBuildMapping(Optional.of(mappingId), 123, 123, Optional.of(3L), 123, Optional.<Long>absent(), InterProjectBuild.State.CALCULATING)).isEqualTo(createdMapping);
   }
 
   @Test
   public void testSuccessfulInterProjectBuild() throws Exception {
+    ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
     runInitialBuilds();
     LOG.info("Initial builds are now in the database\n\n\n");
     // Trigger interProjectBuild
@@ -122,9 +115,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     Set<Integer> expectedCancel = Sets.newHashSet(8, 9, 10, 11, 13);
 
     LOG.info("Initial builds are now in the db\n\n\n");
-    TestSingularityBuildLauncher testSingularityBuildLauncher = (TestSingularityBuildLauncher) singularityBuildLauncher;
-    testSingularityBuildLauncher.clearModulesToFail();
-    testSingularityBuildLauncher.setModulesToFail(expectedFailures);
+    ((TestSingularityBuildLauncher) singularityBuildLauncher).setModulesToFail(expectedFailures);
     // Cause module #10 to fail, causing 13 to be cancelled
 
     InterProjectBuild testableBuild = runInterProjectBuild(1);
