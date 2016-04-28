@@ -1,5 +1,5 @@
 --liquibase formatted sql
--- changeset InterProjectTestInsertBranches:0 runAlways:true
+-- changeset InterProjectTestTruncateTables:0 runAlways:true
 TRUNCATE TABLE `inter_project_build_mappings`;
 TRUNCATE TABLE `inter_project_builds`;
 TRUNCATE TABLE `branches`;
