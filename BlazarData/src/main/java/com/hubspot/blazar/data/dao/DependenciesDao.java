@@ -20,7 +20,7 @@ public interface DependenciesDao {
       "FROM module_provides " +
       "INNER JOIN module_depends ON (module_provides.name = module_depends.name) " +
       "INNER JOIN modules provides ON (module_provides.moduleId = provides.id) " +
-      "INNER JOIN modules depends ON (module_provides.moduleId = depends.id) " +
+      "INNER JOIN modules depends ON (module_depends.moduleId = depends.id) " +
       "WHERE provides.branchId = :id AND depends.branchId = :id")
   Set<Edge> getEdges(@BindWithRosetta GitInfo gitInfo);
 
