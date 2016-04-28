@@ -2,6 +2,7 @@ package com.hubspot.blazar.data.dao;
 
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleDependency;
+import com.hubspot.blazar.base.graph.Edge;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlBatch;
@@ -10,34 +11,28 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.stringtemplate.UseStringTemplate3StatementLocator;
 import org.skife.jdbi.v2.unstable.BindIn;
 
-import java.util.Collection;
 import java.util.Set;
 
 @UseStringTemplate3StatementLocator
 public interface DependenciesDao {
 
-  @SqlQuery("SELECT module_provides.* " +
-            "FROM module_provides " +
-            "INNER JOIN modules ON (module_provides.moduleId = modules.id) " +
-            "WHERE modules.branchId = :id")
-  Set<ModuleDependency> getProvides(@BindWithRosetta GitInfo gitInfo);
+  @SqlQuery("SELECT module_provides.moduleId AS source, module_depends.moduleId AS target " +
+      "FROM module_provides " +
+      "INNER JOIN module_depends ON (module_provides.name = module_depends.name) " +
+      "INNER JOIN modules provides ON (module_provides.moduleId = provides.id) " +
+      "INNER JOIN modules depends ON (module_provides.moduleId = depends.id) " +
+      "WHERE provides.branchId = :id AND depends.branchId = :id")
+  Set<Edge> getEdges(@BindWithRosetta GitInfo gitInfo);
 
-  @SqlQuery("SELECT * FROM module_provides WHERE moduleId in (<idList>)")
-  Set<ModuleDependency> getProvides(@BindIn("idList") Collection<Integer> idList);
-
-  @SqlQuery("SELECT module_depends.* " +
-            "FROM module_depends " +
-            "INNER JOIN modules ON (module_depends.moduleId = modules.id) " +
-            "WHERE modules.branchId = :id")
-  Set<ModuleDependency> getDepends(@BindWithRosetta GitInfo gitInfo);
-
-  @SqlQuery("SELECT module_provides.name, module_provides.moduleId FROM module_provides "+
-            "JOIN module_depends ON (module_provides.moduleId = module_depends.moduleId) "+
-            "JOIN modules ON (module_depends.moduleId = modules.id) "+
-            "JOIN branches ON (modules.branchId = branches.id) "+
-            "WHERE module_depends.name = :name "+
-            "and branches.active = 1")
-  Set<ModuleDependency> getProvidesFromModuleDepends(@BindWithRosetta ModuleDependency moduleDependency);
+  @SqlQuery("SELECT module_provides.moduleId AS source, module_depends.moduleId AS target " +
+      "FROM module_provides " +
+      "INNER JOIN module_depends ON (module_provides.name = module_depends.name) " +
+      "INNER JOIN modules ON (module_depends.moduleId = modules.id) " +
+      "INNER JOIN branches ON (modules.branchId = branches.id) " +
+      "WHERE module_provides.moduleId IN (<moduleIds>) " +
+      "AND modules.active = 1 " +
+      "AND branches.active = 1")
+  Set<Edge> getEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
 
   @SqlBatch("INSERT INTO module_provides (moduleId, name) VALUES (:moduleId, :name)")
   void insertProvides(@BindWithRosetta Set<ModuleDependency> dependencies);
