@@ -1,8 +1,8 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
-import Immutable from 'immutable'
+import Immutable, { fromJS } from 'immutable'
 import $ from 'jquery';
-import { bindAll } from 'underscore';
+import { bindAll, where } from 'underscore';
 
 import CardStack from '../shared/CardStack.jsx';
 import RepoBranchCard from '../shared/RepoBranchCard.jsx';
@@ -38,6 +38,27 @@ class Dashboard extends Component {
     this.unsubscribeFromRepo();
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.state.expandedCard !== -1) {
+      const starredBuilds = nextProps.starredBuilds.toJS();
+      let newIndex;
+
+      for (var i = 0; i < starredBuilds.length; i++) {
+        if (starredBuilds[i].gitInfo.id === this.state.branchId) {
+          newIndex = i;
+        }
+      }
+
+      if (newIndex === this.state.expandedCard) {
+        return;
+      }
+
+      this.setState({
+        expandedCard: i
+      });
+    }
+  }
+
   onStatusChange(state) {
     this.setState(state);
   }
@@ -49,6 +70,21 @@ class Dashboard extends Component {
     });
   }
 
+  pollWithLatestBuild() {
+    const {branchId} = this.state;
+    const build = fromJS(this.props.starredBuilds.toJS().filter((starredBuild) => {
+      return starredBuild.gitInfo.id === branchId;
+    })[0]);
+
+    const repoBuildId = build.has('inProgressBuild') ? build.get('inProgressBuild').get('id') : build.get('lastBuild').get('id');
+    const buildNumber = build.has('inProgressBuild') ? build.get('inProgressBuild').get('buildNumber') : build.get('lastBuild').get('buildNumber');
+
+    RepoBuildActions.loadRepoBuildById(repoBuildId);
+    RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
+
+    setTimeout(this.pollWithLatestBuild.bind(this), 5000);
+  }
+
   onCardClick(key, build) {
     if (key === this.state.expandedCard) {
       this.resetSelectedCard();
@@ -57,15 +93,21 @@ class Dashboard extends Component {
 
     this.setState({
       expandedCard: key,
-      build: build,
+      branchId: build.get('gitInfo').get('id'),
       loading: true
     });
 
-    const repoBuildId = build.has('inProgressBuild') ? build.get('inProgressBuild').get('id') : build.get('lastBuild').get('id');
-    const buildNumber = build.has('inProgressBuild') ? build.get('inProgressBuild').get('buildNumber') : build.get('lastBuild').get('buildNumber');
-    const branchId = build.get('gitInfo').get('id');
+    const newBuild = fromJS(this.props.starredBuilds.toJS().filter((starredBuild) => {
+      return starredBuild.gitInfo.id === build.get('gitInfo').get('id');
+    })[0]);
+
+    const repoBuildId = newBuild.has('inProgressBuild') ? newBuild.get('inProgressBuild').get('id') : newBuild.get('lastBuild').get('id');
+    const buildNumber = newBuild.has('inProgressBuild') ? newBuild.get('inProgressBuild').get('buildNumber') : newBuild.get('lastBuild').get('buildNumber');
+    const branchId = newBuild.get('gitInfo').get('id');
     RepoBuildActions.loadRepoBuildById(repoBuildId);
     RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
+
+    setTimeout(this.pollWithLatestBuild.bind(this), 5000);
   }
 
   renderCards() {

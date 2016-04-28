@@ -37,6 +37,7 @@ class DashboardContainer extends Component {
   }
 
   componentWillUnmount() {
+    BuildsActions.stopPollingBuilds();
     this.unsubscribeFromBuilds();
     this.unsubscribeFromStars();
   }

@@ -6,7 +6,7 @@ import moment from 'moment';
 import humanizeDuration from 'humanize-duration';
 
 import Card from './Card.jsx';
-import Icon from '../shared/Icon.jsx';
+import ModuleRow from './ModuleRow.jsx';
 import BuildStates from '../../constants/BuildStates';
 import Loader from '../shared/Loader.jsx';
 
@@ -60,73 +60,14 @@ class RepoBranchCard extends Card {
     return previousCommit.get('url').replace('/commit/', '/compare/') + '...' + currentCommit.get('id');
   }
 
-  renderModuleRow(module, i) {
-    const state = module.state;
-    let statusText;
-    let durationText;
-    let extraClass = '';
-
-    if (state === BuildStates.IN_PROGRESS) {
-      statusText = 'is building ...';
-      durationText = `Started ${moment(module.startTimestamp).fromNow()}`;
-    }
-
-    else if (state === BuildStates.SUCCEEDED) {
-      statusText = 'built successfully.';
-      durationText = `Finished in ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
-    }
-
-    else if (state === BuildStates.FAILED) {
-      statusText = 'build failed.';
-      durationText = `Finished in ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
-    }
-
-    else if (state === BuildStates.CANCELLED) {
-      statusText = 'was cancelled.';
-      durationText = `Cancelled after ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
-      extraClass = ' repo-branch-card__expanded-module-row--no-log';
-    }
-
-    else if (state === BuildStates.SKIPPED) {
-      statusText = 'was skipped.';
-      extraClass = ' repo-branch-card__expanded-module-row--no-log';
-    }
-
-    else if (state === BuildStates.UNSTABLE) {
-      statusText = 'build is unstable.';
-      extraClass = ' repo-branch-card__expanded-module-row--no-log';
-    }
-
-    const rowClassName = `repo-branch-card__expanded-module-row${extraClass}`;
-
-    const innerContent = (
-      <div className={rowClassName}>
-        <span className='repo-branch-card__expanded-status'>
-          <div className='repo-branch-card__building-icon-link'>
-            {buildResultIcon(state)}
-          </div> {module.name} {statusText}
-        </span>
-        <span className='repo-branch-card__expanded-timestamp'>
-          {durationText}
-        </span>
-      </div>
-    );
-
-    if (state === BuildStates.SKIPPED || state === BuildStates.CANCELLED) {
+  renderModuleRows(modules) {
+    return modules.map((module, i) => {
       return (
-        <div key={i}>
-          {innerContent}
-        </div>
+        <ModuleRow
+          module={module}
+          key={i} />
       );
-    }
-
-    return (
-      <div key={i}>
-        <Link to={module.blazarPath}>
-          {innerContent}
-        </Link>
-      </div>
-    );
+    });
   }
 
   renderDetailsV2() {
@@ -141,10 +82,8 @@ class RepoBranchCard extends Card {
       );
     }
 
-    const moduleRowNodes = moduleBuildsList.map(this.renderModuleRow);
     let buildTriggerMessage;
     let detailedTriggerMessage;
-    console.log(build.toJS());
 
     if (build.get('buildTrigger').get('type') === 'MANUAL') {
       buildTriggerMessage = 'manually';
@@ -169,7 +108,7 @@ class RepoBranchCard extends Card {
           <span className='card-stack__expanded-author'>{detailedTriggerMessage}</span>
         </div>
         <div className='card-stack__expanded-module-rows'>
-          {moduleRowNodes}
+          {this.renderModuleRows(moduleBuildsList)}
         </div>
       </div>
     );
@@ -197,7 +136,6 @@ class RepoBranchCard extends Card {
     const {item} = this.props;
     const trigger = this.getBuildToDisplay().get('buildTrigger');
     const author = trigger.get('id');
-    console.log(item.toJS());
 
     if (trigger.get('type') !== 'MANUAL' || author === 'unknown') {
       return null;
@@ -213,11 +151,20 @@ class RepoBranchCard extends Card {
   renderLastBuild() {
     const {item} = this.props;
     const build = this.getBuildToDisplay();
+    let timestamp;
+
+    if (build.get('state') === BuildStates.IN_PROGRESS) {
+      timestamp = 'In progress';
+    }
+
+    else {
+      timestamp = moment(build.get('startTimestamp')).fromNow()
+    }
 
     return (
       <div className='repo-branch-card__last-build'>
         <span className='repo-branch-card__last-build-time'>
-          {moment(build.get('startTimestamp')).fromNow()}
+          {timestamp}
         </span>
         {this.renderBuildAuthorMaybe()}
       </div>
