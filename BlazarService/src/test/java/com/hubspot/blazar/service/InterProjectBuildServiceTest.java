@@ -69,7 +69,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   @Before
   public void before() throws Exception {
     // set up the data for these inter-project build tests
-    runSql("interProjectData.sql");
+    runSql("InterProjectData.sql");
   }
 
   @Test
@@ -93,10 +93,11 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     LOG.info("Initial builds are now in the database\n\n\n");
     // Trigger interProjectBuild
     InterProjectBuild testableBuild = runInterProjectBuild(1);
+    long buildId = testableBuild.getId().get();
     assertThat(Sets.newHashSet(1)).isEqualTo(testableBuild.getModuleIds());
     assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(testableBuild.getState());
-    assertThat(Arrays.asList(1, 4, 7, 8, 10, 11, 9, 13)).isEqualTo(interProjectBuildService.getWithId(1).get().getDependencyGraph().get().getTopologicalSort());
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuildService.getWithId(1).get());
+    assertThat(Arrays.asList(1, 4, 7, 8, 10, 11, 9, 13)).isEqualTo(interProjectBuildService.getWithId(buildId).get().getDependencyGraph().get().getTopologicalSort());
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuildService.getWithId(buildId).get());
     for (InterProjectBuildMapping mapping : mappings) {
       assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(mapping.getState());
     }
