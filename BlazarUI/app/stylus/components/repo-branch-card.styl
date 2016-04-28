@@ -62,6 +62,10 @@
 .repo-branch-card__repo
   padding-top 6px
   font-size 16px
+  overflow hidden
+  white-space nowrap
+  text-overflow ellipsis
+  max-width calc(100% - 10px)
 
 .repo-branch-card__build-and-status
   width 80px
@@ -88,6 +92,12 @@
   padding-top 4px
   font-family HelveticaNeue-Light
   color #7c98b6
+  display inline-block
+  height 25px
+  overflow hidden
+  white-space nowrap
+  text-overflow ellipsis
+  max-width calc(100% - 10px)
 
 .repo-branch-card__branch
   font-family HelveticaNeue
@@ -107,7 +117,7 @@
   width calc(100% / 3)
   height 100%
   vertical-align middle
-  line-height 40px
+  line-height 25px
 
 .repo-branch-card__last-build-time
   color #425b76
@@ -117,7 +127,7 @@
   width calc(100% / 3)
   height 100%
   vertical-align middle
-  line-height 40px
+  line-height 25px
 
 .repo-branch-card__triggered-by
   font-family HelveticaNeue-light
