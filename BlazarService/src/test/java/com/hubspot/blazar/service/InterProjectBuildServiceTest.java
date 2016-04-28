@@ -19,14 +19,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.hubspot.blazar.BlazarServiceTestBase;
 import com.hubspot.blazar.BlazarServiceTestModule;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.DependencyGraph;
-import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
@@ -49,8 +47,6 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
   private static final Logger LOG = LoggerFactory.getLogger(InterProjectBuildServiceTest.class);
 
-  @Inject
-  private EventBus eventBus;
   @Inject
   private BuildEventDispatcher buildEventDispatcher;
   @Inject
