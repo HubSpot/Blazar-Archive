@@ -1,6 +1,5 @@
 package com.hubspot.blazar.util;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
