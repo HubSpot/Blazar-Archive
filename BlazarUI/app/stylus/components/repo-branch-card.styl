@@ -81,12 +81,25 @@
 
 .card-stack__card--below-expanded .repo-branch-card__build-and-status
   line-height $initial-height - 10px
+/*
+.card-stack__card--below-expanded:hover 
+  height 70px
+
+  & .card-stack__card-main
+    position relative
+    height 75px
+    
+  & .repo-branch-card__build-and-status
+    height 75px*/
 
 .repo-branch-card__build-and-status--SUCCEEDED
   background-color #ccf2ed
 
 .repo-branch-card__build-and-status--FAILED, .repo-branch-card__build-and-status--UNSTABLE
   background-color #fddbdc
+  
+.repo-branch-card__build-and-status--IN_PROGRESS
+  background-color #C5EFFD
 
 .repo-branch-card__branch-and-build
   padding-top 4px
@@ -149,27 +162,6 @@
   padding-top 17px
   font-family HelveticaNeue-medium
 
-.repo-branch-card__status-banner--SUCCESS, .repo-branch-card__status-banner--FAILED
-  padding 3px 7px
-
-.repo-branch-card__status-banner--SUCCESS
-  background-color #e8faf4
-
-  & span
-    color #21d596
-
-    &:before
-      content 'No build errors'
-
-.repo-branch-card__status-banner--FAILED
-  background-color #fdedee
-
-  & span
-    color #f2545b
-
-    &:before
-      content 'Build errors'
-
 .card-stack__expanded-header
   font-family HelveticaNeue-light
   font-size 18px
@@ -210,38 +202,8 @@
   font-family HelveticaNeue-bold
 
 .repo-branch-card__expanded-status
+  padding-left 25px
   float left
 
 .repo-branch-card__expanded-timestamp
   float right
-
-.repo-branch-card__expanded-status-symbol--SUCCEEDED, .repo-branch-card__expanded-status-symbol--FAILED, .repo-branch-card__expanded-status-symbol--SKIPPED, .repo-branch-card__expanded-status-symbol--IN-PROGRESS:before, .repo-branch-card__expanded-status-symbol--UNSTABLE, .repo-branch-card__expanded-status-symbol--CANCELLED
-  padding-right 5px
-
-.repo-branch-card__expanded-status-symbol--SUCCEEDED:before
-  color #00bda5
-  font-family FontAwesome
-  content '\f00c'
-
-.repo-branch-card__expanded-status-symbol--FAILED:before, .repo-branch-card__expanded-status-symbol--UNSTABLE:before
-  color #f2545b
-  font-family FontAwesome
-  content '\f111'
-
-.repo-branch-card__expanded-status-symbol--IN-PROGRESS:before
-  color #008da3
-  display inline-block
-  font-family FontAwesome
-  content '\f110'
-  transition transform 0.8s
-  transform rotate(360deg)
-
-.repo-branch-card__expanded-status-symbol--CANCELLED:before
-  color #f0ad4e
-  font-family FontAwesome
-  content '\f0c8'
-
-.repo-branch-card__expanded-status-symbol--SKIPPED:before
-  color #607d8b
-  font-family FontAwesome
-  content '\f056'

@@ -64,43 +64,36 @@ class RepoBranchCard extends Card {
     const state = module.state;
     let statusText;
     let durationText;
-    let statusClass;
     let extraClass = '';
 
     if (state === BuildStates.IN_PROGRESS) {
       statusText = 'is building ...';
       durationText = `Started ${moment(module.startTimestamp).fromNow()}`;
-      statusClass = 'repo-branch-card__expanded-status-symbol--IN-PROGRESS';
     }
 
     else if (state === BuildStates.SUCCEEDED) {
       statusText = 'built successfully.';
       durationText = `Finished in ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
-      statusClass = 'repo-branch-card__expanded-status-symbol--SUCCEEDED';
     }
 
     else if (state === BuildStates.FAILED) {
       statusText = 'build failed.';
       durationText = `Finished in ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
-      statusClass = 'repo-branch-card__expanded-status-symbol--FAILED';
     }
 
     else if (state === BuildStates.CANCELLED) {
       statusText = 'was cancelled.';
       durationText = `Cancelled after ${humanizeDuration(module.endTimestamp - module.startTimestamp, {round: true})}`;
-      statusClass = 'repo-branch-card__expanded-status-symbol--CANCELLED';
       extraClass = ' repo-branch-card__expanded-module-row--no-log';
     }
 
     else if (state === BuildStates.SKIPPED) {
       statusText = 'was skipped.';
-      statusClass = 'repo-branch-card__expanded-status-symbol--SKIPPED';
       extraClass = ' repo-branch-card__expanded-module-row--no-log';
     }
 
     else if (state === BuildStates.UNSTABLE) {
       statusText = 'build is unstable.';
-      statusClass = 'repo-branch-card__expanded-status-symbol--UNSTABLE';
       extraClass = ' repo-branch-card__expanded-module-row--no-log';
     }
 
@@ -109,7 +102,9 @@ class RepoBranchCard extends Card {
     const innerContent = (
       <div className={rowClassName}>
         <span className='repo-branch-card__expanded-status'>
-          <span className={statusClass} /> {module.name} {statusText}
+          <div className='repo-branch-card__building-icon-link'>
+            {buildResultIcon(state)}
+          </div> {module.name} {statusText}
         </span>
         <span className='repo-branch-card__expanded-timestamp'>
           {durationText}

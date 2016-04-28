@@ -59,18 +59,12 @@ function fetchBuilds(cb) {
 
   const exclusionOpts = {
     property: [
-      '!pendingBuild.commitInfo',
-      '!inProgressBuild.commitInfo',
-      '!lastBuild.commitInfo',
       '!pendingBuild.dependencyGraph',
       '!inProgressBuild.dependencyGraph',
       '!lastBuild.dependencyGraph',
       '!pendingBuild.buildOptions',
       '!inProgressBuild.buildOptions',
-      '!lastBuild.buildOptions',
-      '!pendingBuild.buildTrigger',
-      '!inProgressBuild.buildTrigger',
-      '!lastBuild.buildTrigger'
+      '!lastBuild.buildOptions'
     ]
   };
 
@@ -91,30 +85,6 @@ function fetchBuilds(cb) {
   });
 }
 
-function fetchBuildsForDashboard(cb) {
-  
-  if (this.buildsPoller) {
-    this.buildsPoller.disconnect();
-    this.buildsPoller = undefined;
-  }
-
-  this.buildsPoller = new PollingProvider({
-    url: `${config.apiRoot}/branches/state`,
-    type: 'GET',
-    dataType: 'json'
-  });
-
-  this.buildsPoller.poll((err, resp) => {
-    if (err) {
-      cb(err);
-      return;
-    }
-
-    cb(err, _groupBuilds(_parse(resp)));
-  });
-}
-
-
 function stopPolling() {
   if (!this.buildsPoller) {
     return;
@@ -129,6 +99,5 @@ function fetchBuild(id) {
 
 export default {
   fetchBuilds: fetchBuilds,
-  fetchBuild: fetchBuild,
-  fetchBuildsForDashboard: fetchBuildsForDashboard
+  fetchBuild: fetchBuild
 };
