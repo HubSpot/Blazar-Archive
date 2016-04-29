@@ -22,21 +22,21 @@ steps:
     description: "Publishing to the CDN"
     activeByDefault: false
     commands:
-      - ./node_modules/.bin/bender-deps cdn-publish BlazarUIv2@1.$BUILD_NUMBER dist
+      - ./node_modules/.bin/bender-deps cdn-publish BlazarUIBeta@1.$BUILD_NUMBER dist
   - name: publish
     description: "Notifying deploy service"
     activeByDefault: false
     commands:
-      - command: CI_ENVIRONMENT=PROD publish-build-success --project BlazarUIv2 --version static-1.$BUILD_NUMBER
+      - command: CI_ENVIRONMENT=PROD publish-build-success --project BlazarUIBeta --version static-1.$BUILD_NUMBER
         env:
           BOOTSTRAP_PROPERTIES_PATH: /usr/share/hubspot/internal/hubspot.bootstrap.properties      
           
 stepActivation:
   publish:
-    branches: [master]
+    branches: [build-history-stars]
 
 buildpack:
   host: git.hubteam.com
   organization: HubSpot
   repository: blazar-ui-buildpack
-  branch: master
+  branch: build-history-stars
