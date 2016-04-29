@@ -21,6 +21,16 @@ class NotificationsChannels extends Component {
     bindAll(this, 'handleSlackChannelPicked');
   }
 
+  componentWillUnmount() {
+    if (this.channelTimeout) {
+      clearTimeout(this.channelTimeout);
+    }
+
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+  }
+
   handleSlackChannelPicked(channelName) {
     if (this.channelAlreadyHasNotification(channelName) || channelName === '') {
       return;
@@ -48,7 +58,7 @@ class NotificationsChannels extends Component {
       moment: moment()
     });
 
-    setTimeout(() => {
+    this.channelTimeout = setTimeout(() => {
       if (moment() - this.state.moment < 5250) {
         return;
       }
@@ -58,7 +68,7 @@ class NotificationsChannels extends Component {
       });
     }, 5250);
 
-    setTimeout(() => {
+    this.toastTimeout = setTimeout(() => {
       if (moment() - this.state.moment < 5000) {
         return;
       }
@@ -97,7 +107,7 @@ class NotificationsChannels extends Component {
 
     return (
       <div className='notifications__new-channel-hashtag'>
-      #
+      <span>#</span>
       <Select
         placeholder="Choose a channel"
         className='slack-channel-input'
