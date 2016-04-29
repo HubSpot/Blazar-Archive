@@ -39,4 +39,4 @@ buildpack:
   host: git.hubteam.com
   organization: HubSpot
   repository: blazar-ui-buildpack
-  branch: master
+  branch: build-history-stars
