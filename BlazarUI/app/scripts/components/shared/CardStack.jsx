@@ -9,10 +9,23 @@ class CardStack extends Component {
   }
 
   render() {
+
+    let innerContent;
+
     if (this.props.loading) {
       return (
         <div className='card-stack'>
           <Loader align='center' roomy={true} />
+        </div>
+      );
+    }
+    
+    else if (this.props.children.size === 0) {
+      return (
+        <div className='card-stack'>
+          <div className='card-stack__wrapper'>
+            {this.props.zeroState}
+          </div>
         </div>
       );
     }
@@ -31,6 +44,7 @@ class CardStack extends Component {
 CardStack.propTypes = {
   loading: PropTypes.bool.isRequired,
   header: PropTypes.node,
+  zeroState: PropTypes.node,
   children: PropTypes.node
 };
 

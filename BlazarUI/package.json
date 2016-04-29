@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "UI for Blazar",
   "main": "index.html",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/HubSpot/Blazar.git"
+  },
   "scripts": {
     "start": "gulp",
     "test": "jest",
@@ -63,7 +67,7 @@
     "react-dom": "^0.14.7",
     "react-router": "^2.0.0",
     "react-select": "^0.9.1",
-    "react-toggle": "^2.0.1",
+    "react-toggle": "~2.0.1",
     "react-tools": "^0.13.1",
     "react-tooltip": "^1.1.4",
     "reflux": "^0.2.7",

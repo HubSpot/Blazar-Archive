@@ -98,8 +98,8 @@ class RepoBranchCard extends Card {
 
     if (!expanded) {
       return (
-        <div className='card-stack__expanded hiddenn'>
-          <div className='card-stack__expanded-module-rows hiddenn' />
+        <div className='card-stack__expanded collapsed'>
+          <div className='card-stack__expanded-module-rows collapsed' />
         </div>
       );
     }
@@ -125,19 +125,19 @@ class RepoBranchCard extends Card {
     else {
       buildTriggerMessage = 'automatically by a code push';
       detailedTriggerMessage = (
-        <Link to={this.buildCompareLink()}>
+        <a href={this.buildCompareLink()}>
           compare
-        </Link>
+        </a>
       );
     }
 
     return (
       <div className='card-stack__expanded'>
-        <div className='card-stack__expanded-header'>
+        <div className='repo-branch-card__expanded-header'>
           <span>Build {this.renderBuildNumberLink()} was started {buildTriggerMessage}</span>
-          <span className='card-stack__expanded-author'>{detailedTriggerMessage}</span>
+          <span className='repo-branch-card__expanded-author'>{detailedTriggerMessage}</span>
         </div>
-        <div className='card-stack__expanded-module-rows'>
+        <div className='repo-branch-card__expanded-module-rows'>
           {this.renderModuleRows(this.sortModules(moduleBuildsList))}
         </div>
       </div>
@@ -186,7 +186,7 @@ class RepoBranchCard extends Card {
     let timestamp;
 
     if (build.get('state') === BuildStates.IN_PROGRESS) {
-      timestamp = 'In progress';
+      timestamp = 'In Progress';
     }
 
     else {

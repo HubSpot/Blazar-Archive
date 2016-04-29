@@ -70,17 +70,17 @@
   & span
     color #425b76
 
-.card-stack__card--below-expanded .repo-branch-card__build-and-status
-  line-height $initial-height - 10px
-
 .repo-branch-card__build-and-status--SUCCEEDED
   background-color #ccf2ed
 
 .repo-branch-card__build-and-status--FAILED, .repo-branch-card__build-and-status--UNSTABLE
   background-color #fddbdc
   
-.repo-branch-card__build-and-status--IN_PROGRESS
+.repo-branch-card__build-and-status--IN_PROGRESS, .repo-branch-card__build-and-status--QUEUED, .repo-branch-card__build-and-status--LAUNCHING, .repo-branch-card__build-and-status--WAITING_FOR_UPSTREAM_BUILD, .repo-branch-card__build-and-status--WAITING_FOR_BUILD_SLOT
   background-color #C5EFFD
+  
+.repo-branch-card__build-and-status--CANCELLED
+  background-color #fefec8
 
 .repo-branch-card__branch-and-build
   padding-top 4px
@@ -154,7 +154,7 @@
   padding-top 17px
   font-family HelveticaNeue-medium
 
-.card-stack__expanded-header
+.repo-branch-card__expanded-header
   font-family HelveticaNeue-light
   font-size 18px
   color #425b76
@@ -164,20 +164,15 @@
     color #425b76
     font-family HelveticaNeue
 
-.card-stack__expanded-author
+.repo-branch-card__expanded-author
   font-size 14px
   color #2965a8
   font-family HelveticaNeue
   padding-left 20px
 
-.card-stack__expanded-module-rows
+.repo-branch-card__expanded-module-rows
   margin-top 20px
-  max-height 2000px
-  transition max-height $transition-duration
   box-shadow 0 3px 3px 0 rgba(0, 0, 0, 0.2)
-
-  &.hiddenn
-    max-height 0
 
 .repo-branch-card__expanded-module-row
   background-color white

@@ -9,6 +9,7 @@ import BuildStates from '../../constants/BuildStates';
 import CardStack from '../shared/CardStack.jsx';
 import RepoBranchCard from '../shared/RepoBranchCard.jsx';
 import RepoBranchCardStackHeader from '../shared/RepoBranchCardStackHeader.jsx';
+import RepoBranchCardStackZeroState from '../shared/RepoBranchCardStackZeroState.jsx';
 
 import Headline from '../shared/headline/Headline.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -39,6 +40,10 @@ class Dashboard extends Component {
 
   componentWillUnmount() {
     this.unsubscribeFromRepo();
+    
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -102,7 +107,7 @@ class Dashboard extends Component {
       this.triggerRepoBuildReload(build, branchId);
     }
 
-    setTimeout(this.pollWithLatestBuild, config.activeBuildModuleRefresh);
+    this.timeout = setTimeout(this.pollWithLatestBuild, config.activeBuildModuleRefresh);
   }
 
   onCardClick(key, build) {
@@ -148,6 +153,12 @@ class Dashboard extends Component {
     );
   }
 
+  renderRepoBranchCardStackZeroState() {
+    return (
+      <RepoBranchCardStackZeroState />
+    );
+  }
+
   render() {
     return (
       <UIGrid>                
@@ -157,6 +168,7 @@ class Dashboard extends Component {
           </Headline>
           <CardStack
             header={this.renderHeader()}
+            zeroState={this.renderRepoBranchCardStackZeroState()}
             loading={this.props.loadingBuilds || this.props.loadingStars}>
             {this.renderCards()}
           </CardStack>

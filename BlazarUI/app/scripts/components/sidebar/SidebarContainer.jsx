@@ -108,6 +108,11 @@ class SidebarContainer extends Component {
     if (loading) {
       return (
         <Sidebar>
+          <Link to='/'>
+            <div className='sidebar__logo'>
+              <Logo crumb={false} />
+            </div>
+          </Link>
           <Loader align='top-center'/>
         </Sidebar>
       );
@@ -116,6 +121,11 @@ class SidebarContainer extends Component {
     if (error) {
       return (
         <Sidebar>
+          <Link to='/'>
+            <div className='sidebar__logo'>
+              <Logo crumb={false} />
+            </div>
+          </Link>
           <AjaxErrorAlert error={error} fixed={true} />
         </Sidebar>
       );

@@ -37,7 +37,7 @@
   max-height 9999px
   
   & *
-    transition max-height 3s
+    transition max-height 3s ease-out
   
   &:hover
     top 0
@@ -77,9 +77,18 @@
   overflow-y hidden
   background-color #F9FBFD
 
-  &.hiddenn
+  &.collapsed
     max-height 0
     padding 0
 
    & div
     display block
+
+.card-stack__zero-state
+  height 200px
+  padding 20px
+  font-family HelveticaNeue-light
+  
+  & h1
+    margin 0 0 20px 0
+    font-size 18px
