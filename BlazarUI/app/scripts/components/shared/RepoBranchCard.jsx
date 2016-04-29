@@ -92,14 +92,22 @@ class RepoBranchCard extends Card {
     });
   }
 
-  renderDetailsV2() {
+  renderDetails() {
     const {item, moduleBuildsList, expanded, loading} = this.props;
     const build = this.getBuildToDisplay();
 
-    if (!expanded || loading) {
+    if (!expanded) {
       return (
         <div className='card-stack__expanded hiddenn'>
           <div className='card-stack__expanded-module-rows hiddenn' />
+        </div>
+      );
+    }
+
+    else if (loading) {
+      return (
+        <div className='card-stack__expanded'>
+          <Loader align='center' />
         </div>
       );
     }
@@ -262,7 +270,7 @@ class RepoBranchCard extends Card {
             {this.renderTriggeredBy()}
           </div>
         </div>
-        {this.renderDetailsV2()}
+        {this.renderDetails()}
       </div>
     );
   }
