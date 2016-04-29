@@ -1,8 +1,5 @@
 package com.hubspot.blazar.listener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -10,11 +7,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
@@ -25,11 +20,10 @@ import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.externalservice.slack.SlackAttachment;
-import com.hubspot.blazar.externalservice.slack.SlackAttachmentField;
-import com.hubspot.blazar.externalservice.slack.SlackMessage;
-import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.util.BlazarUrlHelper;
+import com.hubspot.blazar.util.SlackUtils;
+import com.ullink.slack.simpleslackapi.SlackChannel;
+import com.ullink.slack.simpleslackapi.SlackSession;
 
 @Singleton
 public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, ModuleBuildVisitor {
@@ -37,30 +31,26 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   private static final Logger LOG = LoggerFactory.getLogger(SlackRoomNotificationVisitor.class);
   private static final Set<RepositoryBuild.State> FAILED_REPO_STATES = ImmutableSet.of(RepositoryBuild.State.CANCELLED, RepositoryBuild.State.FAILED, RepositoryBuild.State.UNSTABLE);
   private static final Set<ModuleBuild.State> FAILED_MODULE_STATES = ImmutableSet.of(ModuleBuild.State.CANCELLED, ModuleBuild.State.FAILED);
-  private static final Optional<String> ABSENT_STRING = Optional.absent();
 
   private InstantMessageConfigurationService instantMessageConfigurationService;
   private final BranchService branchService;
-  private ModuleService moduleService;
   private final ModuleBuildService moduleBuildService;
-  private final BlazarUrlHelper blazarUrlHelper;
-  private final SlackClient slackClient;
+  private final SlackSession slackSession;
+  private final SlackUtils slackUtils;
   private final RepositoryBuildService repositoryBuildService;
 
   @Inject
   public SlackRoomNotificationVisitor(InstantMessageConfigurationService instantMessageConfigurationService,
                                       BranchService branchService,
-                                      ModuleService moduleService,
                                       ModuleBuildService moduleBuildService,
-                                      BlazarUrlHelper blazarUrlHelper,
-                                      SlackClient slackClient,
+                                      SlackSession slackSession,
+                                      SlackUtils slackUtils,
                                       RepositoryBuildService repositoryBuildService) {
     this.instantMessageConfigurationService = instantMessageConfigurationService;
     this.branchService = branchService;
-    this.moduleService = moduleService;
     this.moduleBuildService = moduleBuildService;
-    this.blazarUrlHelper = blazarUrlHelper;
-    this.slackClient = slackClient;
+    this.slackSession = slackSession;
+    this.slackUtils = slackUtils;
     this.repositoryBuildService = repositoryBuildService;
   }
 
@@ -73,8 +63,7 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSend(instantMessageConfiguration, build.getState(), previous)) {
-        GitInfo gitInfo = branchService.get(build.getBranchId()).get();
-        sendSlackMessage(instantMessageConfiguration, build, gitInfo);
+        sendSlackMessage(instantMessageConfiguration, build);
       }
     }
   }
@@ -101,52 +90,9 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     return false;
   }
 
-  private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build, GitInfo gitInfo) {
-    String fallback = String.format("Repository Build %s-%s#%d finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), build.getBuildNumber(), build.getState().toString().toLowerCase());
-    List<SlackAttachmentField> fields = new ArrayList<>();
-    Optional<String> attachmentText = Optional.absent();
-    if (build.getState().equals(RepositoryBuild.State.FAILED)) {
-      attachmentText = Optional.of("The failing modules are:");
-      Set<ModuleBuild> builtModules = moduleBuildService.getByRepositoryBuild(build.getId().get());
-      for (ModuleBuild b : builtModules) {
-        // If a build fails, SUCCEEDED & Skipped & CANCELLED are common, and unnecessary to include
-        if (!b.getState().equals(ModuleBuild.State.SUCCEEDED) && !b.getState().equals(ModuleBuild.State.CANCELLED) && !b.getState().equals(ModuleBuild.State.SKIPPED)) {
-          Module m = moduleService.get(b.getModuleId()).get();
-          fields.add(new SlackAttachmentField(m.getName(), b.getState().name().toLowerCase(), true));
-        }
-      }
-    }
-
-    Optional<String> color = ABSENT_STRING;
-    switch (build.getState()) {
-      case SUCCEEDED:
-        color = Optional.of("good");
-        break;
-      case CANCELLED:
-        color = Optional.of("warning");
-        break;
-      case UNSTABLE:
-        color = Optional.of("danger");
-        break;
-      case FAILED:
-        color = Optional.of("danger");
-        break;
-    }
-
-    Optional<String> title = Optional.of(fallback);
-    Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
-
-    SlackAttachment.Builder ab = SlackAttachment.newBuilder();
-    ab.setFallback(fallback);
-    ab.setColor(color);
-    ab.setTitle(title);
-    ab.setTitleLink(link);
-
-    SlackMessage.Builder b = SlackMessage.newBuilder();
-    b.setChannel(instantMessageConfiguration.getChannelName());
-    b.setAttachments(Lists.newArrayList(ab.build()));
-
-    slackClient.sendMessage(b.build());
+  private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build) {
+    SlackChannel slackChannel = slackSession.findChannelByName(instantMessageConfiguration.getChannelName());
+    slackSession.sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
   }
 
 
@@ -159,47 +105,15 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSend(instantMessageConfiguration, build.getState(), previous, build)) {
-        Optional<GitInfo> gitInfo = branchService.get(repositoryBuildService.get(build.getRepoBuildId()).get().getBranchId());
-        if (!gitInfo.isPresent()) {
-          throw new IllegalArgumentException(String.format("Tried to send IM for moduleBuild %s with no associated branch", build.getId().get()));
-        }
-        sendSlackMessage(instantMessageConfiguration, build, gitInfo.get());
+        GitInfo gitInfo = branchService.get(repositoryBuildService.get(build.getRepoBuildId()).get().getBranchId()).get();
+        sendSlackMessage(instantMessageConfiguration, build);
       }
     }
   }
 
-  private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild build, GitInfo gitInfo) {
-    Module module = moduleService.get(build.getModuleId()).get();
-    String fallback = String.format("Module Build %s-%s-%s#%d finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), module.getName(), build.getBuildNumber(), build.getState().toString().toLowerCase());
-    Optional<String> color = ABSENT_STRING;
-    switch (build.getState()) {
-      case SUCCEEDED:
-        color = Optional.of("good");
-        break;
-      case SKIPPED:
-        color = Optional.of("warning");
-        break;
-      case CANCELLED:
-        color = Optional.of("warning");
-        break;
-      case FAILED:
-        color = Optional.of("danger");
-        break;
-    }
-    Optional<String> title = Optional.of(fallback);
-    Optional<String> link = Optional.of(blazarUrlHelper.getBlazarUiLink(build));
-
-    SlackAttachment.Builder ab = SlackAttachment.newBuilder();
-    ab.setFallback(fallback);
-    ab.setColor(color);
-    ab.setTitle(title);
-    ab.setTitleLink(link);
-
-    SlackMessage.Builder b = SlackMessage.newBuilder();
-    b.setChannel(instantMessageConfiguration.getChannelName());
-    b.setAttachments(Lists.newArrayList(ab.build()));
-
-    slackClient.sendMessage(b.build());
+  private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild build) {
+    SlackChannel slackChannel = slackSession.findChannelByName(instantMessageConfiguration.getChannelName());
+    slackSession.sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
   }
 
   private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild.State state, Optional<ModuleBuild> previous, ModuleBuild thisBuild) {

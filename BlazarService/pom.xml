@@ -186,6 +186,10 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.takari.slack</groupId>
+      <artifactId>simple-slack-api</artifactId>
+    </dependency>
   </dependencies>
 
   <profiles>

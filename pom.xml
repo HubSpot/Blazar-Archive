@@ -170,9 +170,9 @@
         <version>4.4.1</version>
       </dependency>
       <dependency>
-        <groupId>in.ashwanthkumar</groupId>
-        <artifactId>slack-java-webhook</artifactId>
-        <version>0.0.4</version>
+        <groupId>io.takari.slack</groupId>
+        <artifactId>simple-slack-api</artifactId>
+        <version>0.5.1</version>
       </dependency>
       <dependency>
         <groupId>com.codahale.metrics</groupId>

@@ -12,6 +12,9 @@ import javax.inject.Singleton;
 import com.hubspot.blazar.cctray.CCTrayProjectFactory;
 import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
 import com.hubspot.blazar.exception.IllegalStateExceptionMapper;
+import com.hubspot.blazar.listener.SlackImNotificationVisitor;
+import com.hubspot.blazar.listener.SlackRoomNotificationVisitor;
+import com.hubspot.blazar.util.SlackUtils;
 import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
@@ -30,7 +33,6 @@ import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
-import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BranchStateResource;
@@ -57,6 +59,9 @@ import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.horizon.ning.NingHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.ullink.slack.simpleslackapi.SlackSession;
+import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
+
 import io.dropwizard.db.DataSourceFactory;
 import org.kohsuke.github.RateLimitHandler;
 
@@ -92,8 +97,8 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(InstantMessageResource.class);
 
     if (getConfiguration().getSlackConfiguration().isPresent()) {
-      binder.bind(SlackClient.class);
       binder.bind(UserFeedbackResource.class);
+      binder.bind(SlackUtils.class);
     }
 
     binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());
@@ -116,6 +121,16 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
     }
   }
+
+  @Provides
+  @Singleton
+  public SlackSession get(BlazarConfiguration configuration) throws IOException {
+    String token = configuration.getSlackConfiguration().get().getSlackApiToken();
+    SlackSession session = SlackSessionFactory.createWebSocketSlackSession(token);
+    session.connect();
+    return session;
+  }
+
 
   @Provides
   @Singleton
