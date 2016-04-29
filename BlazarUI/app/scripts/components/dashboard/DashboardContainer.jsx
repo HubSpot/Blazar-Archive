@@ -25,7 +25,7 @@ class DashboardContainer extends Component {
       starredBuilds: [],
       loadingStars: true,
       loading: true
-    }
+    };
   }
 
   componentDidMount() {
@@ -33,7 +33,7 @@ class DashboardContainer extends Component {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
 
     StarActions.loadStars();
-    BuildsActions.loadBuilds();
+    BuildsActions.loadBuilds(this.props.params);
   }
 
   componentWillUnmount() {
