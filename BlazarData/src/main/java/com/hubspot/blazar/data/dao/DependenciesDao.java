@@ -30,7 +30,6 @@ public interface DependenciesDao {
       "INNER JOIN modules ON (module_depends.moduleId = modules.id) " +
       "INNER JOIN branches ON (modules.branchId = branches.id) " +
       "WHERE module_provides.moduleId IN (<moduleIds>) " +
-      "AND modules.active = 1 " +
       "AND branches.active = 1")
   Set<Edge> getEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
 
