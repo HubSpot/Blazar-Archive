@@ -155,7 +155,9 @@ class RepoBranchCard extends Card {
         </div>
         <div className='repo-branch-card__branch-and-build'>
           <span className='repo-branch-card__branch'>
-            {gitInfo.get('branch')}
+            <Link to={gitInfo.get('blazarBranchPath')}>
+              {gitInfo.get('branch')}
+            </Link>
           </span>
         </div>
       </div>
