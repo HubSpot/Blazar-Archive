@@ -16,7 +16,8 @@ public interface StateDao {
       "FROM branches AS gitInfo " +
       "LEFT OUTER JOIN repo_builds AS lastBuild ON (gitInfo.lastBuildId = lastBuild.id) " +
       "LEFT OUTER JOIN repo_builds AS inProgressBuild ON (gitInfo.inProgressBuildId = inProgressBuild.id) " +
-      "LEFT OUTER JOIN repo_builds AS pendingBuild ON (gitInfo.pendingBuildId = pendingBuild.id)")
+      "LEFT OUTER JOIN repo_builds AS pendingBuild ON (gitInfo.pendingBuildId = pendingBuild.id) " +
+      "WHERE gitInfo.active = 1")
   Set<RepositoryState> getAllRepositoryStates();
 
   @SingleValueResult
