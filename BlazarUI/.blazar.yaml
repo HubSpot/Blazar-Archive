@@ -33,7 +33,7 @@ steps:
           
 stepActivation:
   publish:
-    branches: [build-history-stars]
+    branches: [master, build-history-stars]
 
 buildpack:
   host: git.hubteam.com
