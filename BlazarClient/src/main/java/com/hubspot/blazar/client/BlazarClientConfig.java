@@ -1,5 +1,6 @@
 package com.hubspot.blazar.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.base.Optional;
@@ -60,7 +61,9 @@ public class BlazarClientConfig {
       if (this.objectMapper.isPresent()) {
         objectMapper = this.objectMapper.get();
       } else {
-        objectMapper = new ObjectMapper().registerModule(new GuavaModule()).registerModule(new ProtobufModule());
+        objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .registerModule(new ProtobufModule())
+            .registerModule(new GuavaModule());
       }
 
       return new NingHttpClient(HttpConfig.newBuilder().setObjectMapper(objectMapper).build());
