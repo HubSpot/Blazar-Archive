@@ -143,7 +143,7 @@ class RepoBranchCard extends Card {
 
     return (
       <span>
-        &nbsp;by <span className='repo-branch-card__author'>{author}</span>
+        Triggered by <span className='repo-branch-card__author'>{author}</span>
       </span>
     );
   }
@@ -166,7 +166,6 @@ class RepoBranchCard extends Card {
         <span className='repo-branch-card__last-build-time'>
           {timestamp}
         </span>
-        {this.renderBuildAuthorMaybe()}
       </div>
     );
   }
@@ -177,7 +176,14 @@ class RepoBranchCard extends Card {
     let buildTriggerMessage;
 
     if (build.get('buildTrigger').get('type') === 'MANUAL') {
-      buildTriggerMessage = 'Triggered by user';
+      const buildAuthor = this.renderBuildAuthorMaybe();
+      if (!buildAuthor) {
+        buildTriggerMessage = 'Triggered by user';
+      }
+
+      else {
+        buildTriggerMessage = buildAuthor;
+      }
     }
 
     else {

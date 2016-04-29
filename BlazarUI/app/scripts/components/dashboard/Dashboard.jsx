@@ -4,6 +4,8 @@ import Immutable, { fromJS } from 'immutable'
 import $ from 'jquery';
 import { bindAll, where } from 'underscore';
 
+import BuildStates from '../../constants/BuildStates';
+
 import CardStack from '../shared/CardStack.jsx';
 import RepoBranchCard from '../shared/RepoBranchCard.jsx';
 import RepoBranchCardStackHeader from '../shared/RepoBranchCardStackHeader.jsx';
@@ -75,14 +77,17 @@ class Dashboard extends Component {
     const build = fromJS(this.props.starredBuilds.toJS().filter((starredBuild) => {
       return starredBuild.gitInfo.id === branchId;
     })[0]);
+    const buildToUse = build.has('inProgressBuild') ? build.get('inProgressBuild') : build.get('lastBuild');
 
-    const repoBuildId = build.has('inProgressBuild') ? build.get('inProgressBuild').get('id') : build.get('lastBuild').get('id');
-    const buildNumber = build.has('inProgressBuild') ? build.get('inProgressBuild').get('buildNumber') : build.get('lastBuild').get('buildNumber');
+    if (buildToUse.get('state') === BuildStates.IN_PROGRESS) {
+      const repoBuildId = buildToUse.get('id');
+      const buildNumber = buildToUse.get('buildNumber');
 
-    RepoBuildActions.loadRepoBuildById(repoBuildId);
-    RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
+      RepoBuildActions.loadRepoBuildById(repoBuildId);
+      RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
+    }
 
-    setTimeout(this.pollWithLatestBuild.bind(this), 5000);
+    setTimeout(this.pollWithLatestBuild.bind(this), 1000);
   }
 
   onCardClick(key, build) {
@@ -101,8 +106,9 @@ class Dashboard extends Component {
       return starredBuild.gitInfo.id === build.get('gitInfo').get('id');
     })[0]);
 
-    const repoBuildId = newBuild.has('inProgressBuild') ? newBuild.get('inProgressBuild').get('id') : newBuild.get('lastBuild').get('id');
-    const buildNumber = newBuild.has('inProgressBuild') ? newBuild.get('inProgressBuild').get('buildNumber') : newBuild.get('lastBuild').get('buildNumber');
+    const buildToUse = newBuild.has('inProgressBuild') ? newBuild.get('inProgressBuild') : newBuild.get('lastBuild');
+    const repoBuildId = buildToUse.get('id');
+    const buildNumber = buildToUse.get('buildNumber');
     const branchId = newBuild.get('gitInfo').get('id');
     RepoBuildActions.loadRepoBuildById(repoBuildId);
     RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
