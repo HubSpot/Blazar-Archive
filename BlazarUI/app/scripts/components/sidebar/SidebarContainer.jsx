@@ -63,7 +63,7 @@ class SidebarContainer extends Component {
   }
   
   componentWillUnmount() {
-    BuildsActions.stopListening();
+    BuildsActions.stopPollingBuilds();
     this.unsubscribeFromBuilds();
     window.removeEventListener('resize', this.handleResizeDebounced);
   }

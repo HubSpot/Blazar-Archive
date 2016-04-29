@@ -33,9 +33,11 @@ class DashboardContainer extends Component {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
 
     StarActions.loadStars();
+    BuildsActions.loadBuilds(this.props.params);
   }
 
   componentWillUnmount() {
+    BuildsActions.stopPollingBuilds();
     this.unsubscribeFromBuilds();
     this.unsubscribeFromStars();
   }
