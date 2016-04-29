@@ -21,29 +21,25 @@
   max-height 2000px
   transition margin $transition-duration
   position relative
+  transition all $transition-duration
+
+  &:hover
+    top -2px
+    z-index 2
+    box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
 
 .card-stack__card--expanded
   margin -10px -20px -10px -20px
   border-bottom $border
   border $border-dark
   box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
-  z-index 2
+  z-index 3
+  
+  &:hover
+    top 0
 
   & .card-stack__card-main
-    //background-color $card-bg-color
     border-bottom $border
-
-    &:hover
-      //background-color $card-bg-color
-
-/*.card-stack__card--below-expanded
-  border-top 0
-  height $initial-height
-  transition max-height 0s
-
-  & .card-stack__card-main
-    padding-top 0
-    height $initial-height - 10*/
 
 .card-stack__card--last
   & .card-stack__card-main

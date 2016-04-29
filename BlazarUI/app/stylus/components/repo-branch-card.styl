@@ -50,15 +50,6 @@
   display inline-block
   width 100%
 
-.card-stack__card--repo-branch
-  transition all $transition-duration
-
-  &:hover
-    position relative
-    top -2px
-    z-index 5
-    box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
-
 .repo-branch-card__repo
   padding-top 6px
   font-size 16px
@@ -81,16 +72,6 @@
 
 .card-stack__card--below-expanded .repo-branch-card__build-and-status
   line-height $initial-height - 10px
-/*
-.card-stack__card--below-expanded:hover 
-  height 70px
-
-  & .card-stack__card-main
-    position relative
-    height 75px
-    
-  & .repo-branch-card__build-and-status
-    height 75px*/
 
 .repo-branch-card__build-and-status--SUCCEEDED
   background-color #ccf2ed
