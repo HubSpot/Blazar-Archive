@@ -56,7 +56,7 @@ class Dashboard extends Component {
       }
 
       this.setState({
-        expandedCard: i
+        expandedCard: newIndex
       });
     }
   }

@@ -104,7 +104,7 @@ class RepoBranchCard extends Card {
     return (
       <div className='card-stack__expanded'>
         <div className='card-stack__expanded-header'>
-          <span>Build #{build.get('buildNumber')} was started {buildTriggerMessage}</span>
+          <span>Build {this.renderBuildNumberLink()} was started {buildTriggerMessage}</span>
           <span className='card-stack__expanded-author'>{detailedTriggerMessage}</span>
         </div>
         <div className='card-stack__expanded-module-rows'>
