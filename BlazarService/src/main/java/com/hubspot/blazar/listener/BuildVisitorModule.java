@@ -35,7 +35,8 @@ public class BuildVisitorModule implements Module {
 
     if (configuration.getSlackConfiguration().isPresent()) {
       // send Slack notifications
-      repositoryBuildVisitors.addBinding().to(SlackNotificationVisitor.class);
+      repositoryBuildVisitors.addBinding().to(SlackImNotificationVisitor.class);
+      repositoryBuildVisitors.addBinding().to(SlackRoomNotificationVisitor.class);
 
     }
 
@@ -58,7 +59,7 @@ public class BuildVisitorModule implements Module {
 
     if (configuration.getSlackConfiguration().isPresent()) {
       // send Slack notifications
-      moduleBuildVisitors.addBinding().to(SlackNotificationVisitor.class);
+      moduleBuildVisitors.addBinding().to(SlackRoomNotificationVisitor.class);
     }
   }
 }

@@ -47,6 +47,7 @@
     <singularity.version>0.4.11</singularity.version>
     <mesos.version>0.23.0</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
+    <dep.guava.version>18.0</dep.guava.version>
   </properties>
 
   <modules>
@@ -170,9 +171,9 @@
         <version>4.4.1</version>
       </dependency>
       <dependency>
-        <groupId>in.ashwanthkumar</groupId>
-        <artifactId>slack-java-webhook</artifactId>
-        <version>0.0.4</version>
+        <groupId>io.takari.slack</groupId>
+        <artifactId>simple-slack-api</artifactId>
+        <version>0.5.1</version>
       </dependency>
       <dependency>
         <groupId>com.codahale.metrics</groupId>
