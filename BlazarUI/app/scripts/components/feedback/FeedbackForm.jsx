@@ -38,6 +38,10 @@ class FeedbackForm extends Component {
   }
 
   toggleShow() {
+    if (this.state.visible && this.state.submitted) {
+      this.resetForm();
+    }
+
     this.setState({
       visible: !this.state.visible,
       submitted: false
