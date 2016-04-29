@@ -2,6 +2,7 @@ package com.hubspot.blazar.resources;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,6 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
@@ -40,8 +42,19 @@ public class BranchStateResource {
 
   @GET
   @PropertyFiltering
-  public Set<RepositoryState> getAll() {
-    return stateService.getAllRepositoryStates();
+  public Set<RepositoryState> get(@QueryParam("branchId") Set<Integer> branchIds) {
+    if (branchIds.isEmpty()) {
+      return stateService.getAllRepositoryStates();
+    } else {
+      Set<RepositoryState> states = new HashSet<>();
+      for (Integer branchId : branchIds) {
+        Optional<RepositoryState> state = stateService.getRepositoryState(branchId);
+        if (state.isPresent()) {
+          states.add(state.get());
+        }
+      }
+      return states;
+    }
   }
 
   @GET
@@ -49,7 +62,7 @@ public class BranchStateResource {
   @Produces(MediaType.APPLICATION_XML)
   public CCTrayWrapper getCCTrayXml() {
     Set<CCTrayProject> projects = new HashSet<>();
-    for (RepositoryState repositoryState : getAll()) {
+    for (RepositoryState repositoryState : get(Collections.<Integer>emptySet())) {
       Optional<CCTrayProject> maybeProject = ccTrayProjectFactory.apply(repositoryState);
       if (maybeProject != null && maybeProject.isPresent()) {
         projects.add(maybeProject.get());
