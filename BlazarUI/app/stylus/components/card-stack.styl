@@ -18,10 +18,11 @@
   border $border
   border-bottom 0
   background-color #eaf0f6
-  max-height 2000px
+  max-height $initial-height
   position relative
   transition all $transition-duration
-
+  overflow-y hidden
+  
   &:hover
     top -2px
     z-index 2
@@ -33,6 +34,10 @@
   border $border-dark
   box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
   z-index 3
+  max-height 9999px
+  
+  & *
+    transition max-height 3s
   
   &:hover
     top 0
