@@ -19,6 +19,28 @@ class RepoBranchCard extends Card {
     ]);
   }
 
+  sortModules() {
+    const {moduleBuildsList} = this.props;
+    const build = this.getBuildToDisplay().toJS();
+
+    if (!build || !build.dependencyGraph || !build.dependencyGraph.topologicalSort) {
+      return moduleBuildsList;
+    }
+
+    const topologicalSort = build.dependencyGraph.topologicalSort;
+
+    return moduleBuildsList.sort((a, b) => {
+      let indexA = topologicalSort.indexOf(a.moduleId);
+      let indexB = topologicalSort.indexOf(b.moduleId);
+
+      if (indexA < indexB) {
+        return -1;
+      }
+
+      return 1;
+    });
+  }
+
   getBuildToDisplay() {
     const {item} = this.props;
 
@@ -108,7 +130,7 @@ class RepoBranchCard extends Card {
           <span className='card-stack__expanded-author'>{detailedTriggerMessage}</span>
         </div>
         <div className='card-stack__expanded-module-rows'>
-          {this.renderModuleRows(moduleBuildsList)}
+          {this.renderModuleRows(this.sortModules(moduleBuildsList))}
         </div>
       </div>
     );

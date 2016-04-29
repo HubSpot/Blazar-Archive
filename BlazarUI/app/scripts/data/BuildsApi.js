@@ -59,9 +59,6 @@ function fetchBuilds(cb) {
 
   const exclusionOpts = {
     property: [
-      '!pendingBuild.dependencyGraph',
-      '!inProgressBuild.dependencyGraph',
-      '!lastBuild.dependencyGraph',
       '!pendingBuild.buildOptions',
       '!inProgressBuild.buildOptions',
       '!lastBuild.buildOptions'
