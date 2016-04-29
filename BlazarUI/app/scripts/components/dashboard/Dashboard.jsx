@@ -2,7 +2,7 @@
 import React, {Component, PropTypes} from 'react';
 import Immutable, { fromJS } from 'immutable'
 import $ from 'jquery';
-import { bindAll, where } from 'underscore';
+import { bindAll } from 'underscore';
 
 import BuildStates from '../../constants/BuildStates';
 
@@ -30,6 +30,7 @@ class Dashboard extends Component {
     super(props);
 
     this.state = initialState;
+    bindAll(this, 'pollWithLatestBuild');
   }
 
   componentDidMount() {
@@ -72,22 +73,36 @@ class Dashboard extends Component {
     });
   }
 
-  pollWithLatestBuild() {
-    const {branchId} = this.state;
-    const build = fromJS(this.props.starredBuilds.toJS().filter((starredBuild) => {
+  triggerRepoBuildReload(build, branchId) {
+    const repoBuildId = build.get('id');
+    const buildNumber = build.get('buildNumber');
+
+    RepoBuildActions.loadRepoBuildById(repoBuildId);
+    RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
+  }
+
+  getBuildByBranchId(branchId) {
+    const {starredBuilds} = this.props;
+
+    const build = this.props.starredBuilds.toJS().filter((starredBuild) => {
       return starredBuild.gitInfo.id === branchId;
-    })[0]);
-    const buildToUse = build.has('inProgressBuild') ? build.get('inProgressBuild') : build.get('lastBuild');
+    })[0];
 
-    if (buildToUse.get('state') === BuildStates.IN_PROGRESS) {
-      const repoBuildId = buildToUse.get('id');
-      const buildNumber = buildToUse.get('buildNumber');
+    return fromJS(build.inProgressBuild || build.lastBuild);
+  }
 
-      RepoBuildActions.loadRepoBuildById(repoBuildId);
-      RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
+  pollWithLatestBuild(branchId) {
+    if (branchId === undefined) {
+      branchId = this.state.branchId;
     }
 
-    setTimeout(this.pollWithLatestBuild.bind(this), 1000);
+    const build = this.getBuildByBranchId(branchId);
+
+    if (build.get('state') === BuildStates.IN_PROGRESS) {
+      this.triggerRepoBuildReload(build, branchId);
+    }
+
+    setTimeout(this.pollWithLatestBuild, config.activeBuildModuleRefresh);
   }
 
   onCardClick(key, build) {
@@ -96,24 +111,16 @@ class Dashboard extends Component {
       return;
     }
 
+    const branchId = build.get('gitInfo').get('id');
+
     this.setState({
       expandedCard: key,
-      branchId: build.get('gitInfo').get('id'),
+      branchId: branchId,
       loading: true
     });
 
-    const newBuild = fromJS(this.props.starredBuilds.toJS().filter((starredBuild) => {
-      return starredBuild.gitInfo.id === build.get('gitInfo').get('id');
-    })[0]);
-
-    const buildToUse = newBuild.has('inProgressBuild') ? newBuild.get('inProgressBuild') : newBuild.get('lastBuild');
-    const repoBuildId = buildToUse.get('id');
-    const buildNumber = buildToUse.get('buildNumber');
-    const branchId = newBuild.get('gitInfo').get('id');
-    RepoBuildActions.loadRepoBuildById(repoBuildId);
-    RepoBuildActions.loadModuleBuildsById(branchId, repoBuildId, buildNumber);
-
-    setTimeout(this.pollWithLatestBuild.bind(this), 5000);
+    this.triggerRepoBuildReload(this.getBuildByBranchId(branchId), branchId);
+    this.pollWithLatestBuild(branchId);
   }
 
   renderCards() {
