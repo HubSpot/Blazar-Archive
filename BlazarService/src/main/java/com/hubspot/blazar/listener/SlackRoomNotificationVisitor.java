@@ -18,9 +18,7 @@ import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
-import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.util.BlazarUrlHelper;
 import com.hubspot.blazar.util.SlackUtils;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
@@ -62,36 +60,39 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Set<InstantMessageConfiguration> configurationSet = instantMessageConfigurationService.getAllWithBranchId(build.getBranchId());
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
-      if (shouldSend(instantMessageConfiguration, build.getState(), previous)) {
+      if (shouldSend(instantMessageConfiguration, build.getState(), previous, build)) {
         sendSlackMessage(instantMessageConfiguration, build);
       }
     }
   }
 
-  private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild.State state, Optional<RepositoryBuild> previous) {
+  private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild.State state, Optional<RepositoryBuild> previous, RepositoryBuild build) {
+    boolean shouldSend = false;
+    final String logBase = String.format("Will send slack notification: RepoBuild %s,", String.valueOf(build.getId()));
     // OnChange
-    boolean changedState = previous.isPresent() && previous.get().getState() != state;
-    if (instantMessageConfiguration.getOnChange() && changedState) {
-      return true;
+    if (instantMessageConfiguration.getOnChange() && previous.isPresent() && previous.get().getState() != state) {
+      LOG.info("{} OnChange {}, changedState {}", logBase, instantMessageConfiguration.getOnChange(), previous.get().getState() == state);
+      shouldSend = true;
     }
-    // OnFinish
-    if (instantMessageConfiguration.getOnFinish()) {
-      return true;
-    }
-    // OnRecovery
-    boolean previousFailed = previous.isPresent() && previous.get().getState() != RepositoryBuild.State.SUCCEEDED;
-    if (instantMessageConfiguration.getOnRecover() && previousFailed && state == RepositoryBuild.State.SUCCEEDED) {
-      return true;
+    // OnSuccess
+    if (instantMessageConfiguration.getOnFinish() && state.equals(RepositoryBuild.State.SUCCEEDED)) {
+      LOG.info("{} OnSuccess {}", logBase, instantMessageConfiguration.getOnFinish());
+      shouldSend = true;
     }
     // OnFailure
     if (instantMessageConfiguration.getOnFail() && FAILED_REPO_STATES.contains(state)) {
-      return true;
+      LOG.info("{} OnFail {}, thisFailed {}", logBase, instantMessageConfiguration.getOnFail(), FAILED_REPO_STATES.contains(state));
+      shouldSend = true;
     }
-    return false;
+    if (!shouldSend) {
+      LOG.debug("Not sending slack message for RepoBuild {} should send: {}", build.getId(), shouldSend);
+    }
+    return shouldSend;
   }
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build) {
     SlackChannel slackChannel = slackSession.findChannelByName(instantMessageConfiguration.getChannelName());
+    slackSession.joinChannel(instantMessageConfiguration.getChannelName());
     slackSession.sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
   }
 
@@ -113,34 +114,31 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild build) {
     SlackChannel slackChannel = slackSession.findChannelByName(instantMessageConfiguration.getChannelName());
+    slackSession.joinChannel(instantMessageConfiguration.getChannelName());
     slackSession.sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
   }
 
   private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild.State state, Optional<ModuleBuild> previous, ModuleBuild thisBuild) {
-    final String logBase = String.format("Not sending Slack notification: ModuleBuild %s,", String.valueOf(thisBuild.getId()));
+    final String logBase = String.format("Will send slack notification: ModuleBuild %s,", String.valueOf(thisBuild.getId()));
+    boolean shouldSend = false;
     // OnChange
-    boolean changedState = previous.isPresent() && previous.get().getState() != state;
-    if (instantMessageConfiguration.getOnChange() && changedState) {
-      return true;
+    if (instantMessageConfiguration.getOnChange() && previous.isPresent() && previous.get().getState() != state) {
+      LOG.info("{} OnChange {}, changedState {}", logBase, instantMessageConfiguration.getOnChange(), previous.get().getState() != state);
+      shouldSend = true;
     }
-    LOG.info("{} OnChange {}, changedState {}", logBase, instantMessageConfiguration.getOnChange(), changedState);
     // OnFinish
     if (instantMessageConfiguration.getOnFinish()) {
-      return true;
+      LOG.info("{} OnFinish {}", logBase, instantMessageConfiguration.getOnFinish());
+      shouldSend = true;
     }
-    LOG.info("{} OnFinish {}", logBase, instantMessageConfiguration.getOnFinish());
-    // OnRecovery
-    boolean previousFailed = previous.isPresent() && previous.get().getState() != ModuleBuild.State.SUCCEEDED;
-    if (instantMessageConfiguration.getOnRecover() && previousFailed && state == ModuleBuild.State.SUCCEEDED) {
-      return true;
-    }
-    LOG.info("{} OnRecover {}, previousFailed {}, thisFailed {}", logBase, instantMessageConfiguration.getOnRecover(), previousFailed, state == ModuleBuild.State.SUCCEEDED);
     // OnFailure
     if (instantMessageConfiguration.getOnFail() && FAILED_MODULE_STATES.contains(state)) {
-      return true;
+      LOG.info("{} onFail {}, thisFailed {}", logBase, instantMessageConfiguration.getOnFail(), FAILED_MODULE_STATES.contains(state));
+      shouldSend = true;
     }
-    LOG.info("{} onFail {}, thisFailed {}", logBase, instantMessageConfiguration.getOnFail(), FAILED_MODULE_STATES.contains(state));
-
-    return false;
+    if (!shouldSend) {
+      LOG.debug("Not sending slack message for ModuleBuild {} shouldSend: {}", thisBuild.getId(), shouldSend);
+    }
+    return shouldSend;
   }
 }
