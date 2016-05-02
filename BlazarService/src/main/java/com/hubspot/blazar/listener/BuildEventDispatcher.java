@@ -64,12 +64,7 @@ public class BuildEventDispatcher {
 
     try {
       for (RepositoryBuildVisitor visitor : repositoryVisitors) {
-        try {
-          visitor.visit(build);
-        } catch (Exception e) {
-          e.printStackTrace();
-          throw e;
-        }
+        visitor.visit(build);
       }
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", build.getId().get(), e);
@@ -89,12 +84,7 @@ public class BuildEventDispatcher {
 
     try {
       for (ModuleBuildVisitor visitor : moduleVisitors) {
-        try {
-          visitor.visit(build);
-        } catch (Exception e) {
-          e.printStackTrace();
-          throw e;
-        }
+        visitor.visit(build);
       }
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", build.getId().get(), e);
@@ -124,12 +114,7 @@ public class BuildEventDispatcher {
 
     try {
       for (InterProjectBuildVisitor visitor : interProjectBuildVisitors) {
-        try {
-          visitor.visit(build);
-        } catch (Exception e) {
-          e.printStackTrace();
-          throw e;
-        }
+        visitor.visit(build);
       }
     } catch (NonRetryableBuildException e) {
       LOG.warn("Got non Retryable Exception in InterProjectBuild {}, marking as Finished", build.getId().get());
