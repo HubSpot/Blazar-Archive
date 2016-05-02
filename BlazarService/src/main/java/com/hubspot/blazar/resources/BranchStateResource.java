@@ -23,6 +23,7 @@ import com.hubspot.blazar.base.RepositoryState;
 import com.hubspot.blazar.cctray.CCTrayProject;
 import com.hubspot.blazar.cctray.CCTrayProjectFactory;
 import com.hubspot.blazar.cctray.CCTrayWrapper;
+import com.hubspot.blazar.data.cache.StateCache;
 import com.hubspot.blazar.data.service.StateService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
@@ -30,18 +31,22 @@ import com.hubspot.jackson.jaxrs.PropertyFiltering;
 @Produces(MediaType.APPLICATION_JSON)
 public class BranchStateResource {
   private final StateService stateService;
+  private final StateCache stateCache;
   private final CCTrayProjectFactory ccTrayProjectFactory;
 
   @Inject
-  public BranchStateResource(StateService stateService, CCTrayProjectFactory ccTrayProjectFactory) {
+  public BranchStateResource(StateService stateService,
+                             StateCache stateCache,
+                             CCTrayProjectFactory ccTrayProjectFactory) {
     this.stateService = stateService;
+    this.stateCache = stateCache;
     this.ccTrayProjectFactory = ccTrayProjectFactory;
   }
 
   @GET
   @PropertyFiltering
   public Set<RepositoryState> getAll() {
-    return stateService.getAllRepositoryStates();
+    return stateCache.getAllRepositoryStates();
   }
 
   @GET

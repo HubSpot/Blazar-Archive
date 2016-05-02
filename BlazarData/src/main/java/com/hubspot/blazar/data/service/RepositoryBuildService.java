@@ -130,6 +130,8 @@ public class RepositoryBuildService {
       checkAffectedRowCount(branchDao.updateLastBuild(build));
     } else {
       checkAffectedRowCount(repositoryBuildDao.update(build));
+      // touch the updatedTimestamp on the branch so the cache knows it changed
+      checkAffectedRowCount(branchDao.touch(build.getBranchId()));
     }
 
     eventBus.post(build);

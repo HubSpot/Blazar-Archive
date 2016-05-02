@@ -1,6 +1,7 @@
 package com.hubspot.blazar.data;
 
 import com.google.inject.AbstractModule;
+import com.hubspot.blazar.data.cache.StateCache;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.MalformedFileService;
@@ -20,6 +21,7 @@ public class BlazarDataModule extends AbstractModule {
     bind(BranchService.class);
     bind(ModuleService.class);
     bind(StateService.class);
+    bind(StateCache.class);
     bind(RepositoryBuildService.class);
     bind(ModuleBuildService.class);
     bind(DependenciesService.class);

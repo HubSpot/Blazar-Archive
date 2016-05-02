@@ -20,6 +20,15 @@ public interface StateDao {
       "WHERE gitInfo.active = 1")
   Set<RepositoryState> getAllRepositoryStates();
 
+  @SqlQuery("" +
+      "SELECT gitInfo.*, lastBuild.*, inProgressBuild.*, pendingBuild.* " +
+      "FROM branches AS gitInfo " +
+      "LEFT OUTER JOIN repo_builds AS lastBuild ON (gitInfo.lastBuildId = lastBuild.id) " +
+      "LEFT OUTER JOIN repo_builds AS inProgressBuild ON (gitInfo.inProgressBuildId = inProgressBuild.id) " +
+      "LEFT OUTER JOIN repo_builds AS pendingBuild ON (gitInfo.pendingBuildId = pendingBuild.id) " +
+      "WHERE gitInfo.updatedTimestamp >= FROM_UNIXTIME(:since / 1000)")
+  Set<RepositoryState> getChangedRepositoryStates(@Bind("since") long since);
+
   @SingleValueResult
   @SqlQuery("" +
       "SELECT gitInfo.*, lastBuild.*, inProgressBuild.*, pendingBuild.* " +
