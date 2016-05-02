@@ -36,6 +36,10 @@
       <name>Kevin Moses</name>
       <email>kmoses@hubspot.com</email>
     </developer>
+    <developer>
+      <name>Zack Hickman</name>
+      <email>zhickman@hubspot.com</email>
+    </developer>
   </developers>
 
   <properties>
