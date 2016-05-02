@@ -6,7 +6,7 @@ const appConfig = {
 
   // active build module polling frequency in ms
   activeBuildModuleRefresh: process.env.ACTIVE_BUILD_MODULE_REFRESH || 1000,
-  
+
   // active build polling frequency in ms
   activeBuildRefresh: process.env.ACTIVE_BUILD_REFRESH || 2500,
 
@@ -23,7 +23,9 @@ const appConfig = {
 
   staticRoot: process.env.BLAZAR_STATIC_ROOT || '',
 
-  usernameCookie: process.env.BLAZAR_USERNAME_COOKIE || ''
+  usernameCookie: process.env.BLAZAR_USERNAME_COOKIE || '',
+
+  slackBotName: process.env.SLACK_BOT_NAME || ''
 }
 
 module.exports = appConfig;

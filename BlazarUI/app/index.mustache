@@ -41,6 +41,7 @@
         {{#apiRoot}}apiRoot: "{{{apiRoot}}}",{{/apiRoot}}
         {{^apiRoot}}apiRoot: localStorage.getItem("apiRootOverride"),{{/apiRoot}}
         {{#usernameCookie}}usernameCookie: "{{{usernameCookie}}}",{{/usernameCookie}}
+        {{#slackBotName}}slackBotName: "{{{slackBotName}}}",{{/slackBotName}}
       }
     </script>
     <script src="{{{ staticRoot }}}/js/main.js"></script>
