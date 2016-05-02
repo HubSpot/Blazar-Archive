@@ -1,13 +1,14 @@
-package com.hubspot.blazar.data;
-
-import com.google.common.base.Objects;
-import org.h2.tools.TriggerAdapter;
+package com.hubspot.blazar.test.base.data;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+
+import org.h2.tools.TriggerAdapter;
+
+import com.google.common.base.Objects;
 
 public class UpdateTimestampTrigger extends TriggerAdapter {
 

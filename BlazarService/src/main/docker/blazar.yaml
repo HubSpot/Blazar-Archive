@@ -1,8 +1,0 @@
-server:
-  type: simple
-  applicationContextPath: /blazar/v1
-  connector:
-    type: http
-
-database:
-  driverClass: com.mysql.jdbc.Driver

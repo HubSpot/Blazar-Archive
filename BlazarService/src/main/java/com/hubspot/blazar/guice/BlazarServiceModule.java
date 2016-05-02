@@ -9,15 +9,9 @@ import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.hubspot.blazar.cctray.CCTrayProjectFactory;
-import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
-import com.hubspot.blazar.exception.IllegalStateExceptionMapper;
-import com.hubspot.blazar.listener.SlackImNotificationVisitor;
-import com.hubspot.blazar.listener.SlackRoomNotificationVisitor;
-import com.hubspot.blazar.util.SlackUtils;
-import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.RateLimitHandler;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,19 +23,23 @@ import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.GitHubNamingFilter;
+import com.hubspot.blazar.cctray.CCTrayProjectFactory;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
+import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
+import com.hubspot.blazar.exception.IllegalStateExceptionMapper;
 import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BranchStateResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
-import com.hubspot.blazar.resources.UserFeedbackResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
+import com.hubspot.blazar.resources.InstantMessageResource;
+import com.hubspot.blazar.resources.InterProjectBuildResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
-import com.hubspot.blazar.resources.InstantMessageResource;
+import com.hubspot.blazar.resources.UserFeedbackResource;
 import com.hubspot.blazar.util.BlazarUrlHelper;
 import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
@@ -49,6 +47,8 @@ import com.hubspot.blazar.util.LoggingHandler;
 import com.hubspot.blazar.util.ModuleBuildLauncher;
 import com.hubspot.blazar.util.RepositoryBuildLauncher;
 import com.hubspot.blazar.util.SingularityBuildLauncher;
+import com.hubspot.blazar.util.SlackUtils;
+import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpClient;
 import com.hubspot.horizon.HttpConfig;
@@ -63,7 +63,6 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 
 import io.dropwizard.db.DataSourceFactory;
-import org.kohsuke.github.RateLimitHandler;
 
 public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfiguration> {
 
@@ -95,6 +94,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(RepositoryBuildResource.class);
     binder.bind(BuildHistoryResource.class);
     binder.bind(InstantMessageResource.class);
+    binder.bind(InterProjectBuildResource.class);
 
     if (getConfiguration().getSlackConfiguration().isPresent()) {
       binder.bind(UserFeedbackResource.class);
