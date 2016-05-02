@@ -92,7 +92,6 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build) {
     SlackChannel slackChannel = slackSession.findChannelByName(instantMessageConfiguration.getChannelName());
-    slackSession.joinChannel(instantMessageConfiguration.getChannelName());
     slackSession.sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
   }
 
@@ -114,7 +113,6 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild build) {
     SlackChannel slackChannel = slackSession.findChannelByName(instantMessageConfiguration.getChannelName());
-    slackSession.joinChannel(instantMessageConfiguration.getChannelName());
     slackSession.sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
   }
 
