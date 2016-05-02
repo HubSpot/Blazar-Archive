@@ -26,7 +26,7 @@ public class LaunchSingularityTaskBuildVisitor extends AbstractModuleBuildVisito
    */
   @Override
   protected void visitQueued(ModuleBuild build) throws Exception {
-    LOG.info("About to launch Singularity task for build {}", build.getId().get());
+    LOG.info("About to launch Singularity task for build {}", build);
     singularityBuildLauncher.launchBuild(build);
   }
 }

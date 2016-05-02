@@ -1,0 +1,42 @@
+---
+github:
+  git.example.com:
+    oauthToken: "super-secret-token"
+    organizations:
+      - "HubSpot"
+
+singularity:
+  host: singularity.example.com
+  path: /singularity/v2/api
+  request: "some-singularity-request-name"
+  credentials:
+    headerName: "X-My-Secret-Header"
+    token: "secret-key"
+
+executor:
+  defaultBuildUser: hs-build
+
+zookeeper:
+  quorum: localhost
+  namespace: "blazarv2"
+  sessionTimeoutMillis: 60000
+  connectTimeoutMillis: 5000
+
+# database:
+#   driverClass: com.mysql.jdbc.Driver
+#   user: username
+#   password: password
+#   url: jdbc:mysql://my-mysql-host:3306/BlazarV2
+
+ui:
+  baseUrl: https://test.com/base/ui/url
+
+buildResolution:
+  prod:
+    strategy: LATEST_BUILD
+
+# slack_blazar:
+#    feedbackRoom: some-room-name
+#    slackApiBaseUrl: https://slack.com/api
+#    slackApiToken: xoxb-15972715984-2nhZTJLEDRbRXE1BxISovVfA
+#    username: blazar-bot
