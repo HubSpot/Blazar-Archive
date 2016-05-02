@@ -36,6 +36,7 @@ import com.hubspot.blazar.resources.BranchStateResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
 import com.hubspot.blazar.resources.GitHubWebhookResource;
 import com.hubspot.blazar.resources.InstantMessageResource;
+import com.hubspot.blazar.resources.InterProjectBuildResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
 import com.hubspot.blazar.resources.UserFeedbackResource;

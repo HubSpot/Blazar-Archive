@@ -25,7 +25,6 @@ import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
-import com.hubspot.blazar.integration.slack.SlackClient;
 import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.listener.TestBuildLauncher;
 import com.hubspot.blazar.test.base.service.BlazarGitTestConfiguration;
@@ -34,6 +33,7 @@ import com.hubspot.blazar.util.SingularityBuildLauncher;
 import com.hubspot.blazar.util.TestSingularityBuildLauncher;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.singularity.client.SingularityClient;
+import com.ullink.slack.simpleslackapi.SlackSession;
 
 public class BlazarServiceTestModule extends AbstractModule {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceTestModule.class);
@@ -48,7 +48,7 @@ public class BlazarServiceTestModule extends AbstractModule {
     bind(EventBus.class).toInstance(eventBus);
     bind(BlazarConfiguration.class).toInstance(buildBlazarConfiguration());
     bind(SingularityClient.class).toInstance(mock(SingularityClient.class));
-    bind(SlackClient.class).toInstance(mock(SlackClient.class));
+    bind(SlackSession.class).toInstance(mock(SlackSession.class));
     bind(AsyncHttpClient.class).toInstance(mock(AsyncHttpClient.class));
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
     moduleBuildVisitors.addBinding().to(TestBuildLauncher.class);
