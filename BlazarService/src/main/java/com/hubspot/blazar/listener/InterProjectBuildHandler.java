@@ -19,6 +19,7 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.AbstractInterProjectBuildVisitor;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
@@ -27,8 +28,8 @@ import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 
-public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor {
-  private static final Logger LOG = LoggerFactory.getLogger(InterProjectBuildLauncher.class);
+public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
+  private static final Logger LOG = LoggerFactory.getLogger(InterProjectBuildHandler.class);
   private DependenciesService dependenciesService;
   private ModuleService moduleService;
   private BranchService branchService;
@@ -37,12 +38,12 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
   private InterProjectBuildService interProjectBuildService;
 
   @Inject
-  public InterProjectBuildLauncher(DependenciesService dependenciesService,
-                                   ModuleService moduleService,
-                                   BranchService branchService,
-                                   RepositoryBuildService repositoryBuildService,
-                                   InterProjectBuildMappingService interProjectBuildMappingService,
-                                   InterProjectBuildService interProjectBuildService){
+  public InterProjectBuildHandler(DependenciesService dependenciesService,
+                                  ModuleService moduleService,
+                                  BranchService branchService,
+                                  RepositoryBuildService repositoryBuildService,
+                                  InterProjectBuildMappingService interProjectBuildMappingService,
+                                  InterProjectBuildService interProjectBuildService){
     this.dependenciesService = dependenciesService;
     this.moduleService = moduleService;
     this.branchService = branchService;
@@ -94,6 +95,18 @@ public class InterProjectBuildLauncher extends AbstractInterProjectBuildVisitor 
         interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(build.getId().get(), gitInfo.getId().get(), Optional.of(buildId), moduleId));
       }
       LOG.info("Queued repo build {} as part of InterProjectBuild {}", buildId, build.getId().get());
+    }
+  }
+
+  @Override
+  protected void visitCancelled(InterProjectBuild build) throws Exception {
+    // Cancelling in-progress repository Builds will cause the cancellation of modules which will cancel the rest of the tree in InterProjectModuleBuildVisitor
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
+    for (InterProjectBuildMapping mapping : mappings) {
+      if (!mapping.getState().isFinished()) {
+        RepositoryBuild repositoryBuild = repositoryBuildService.get(mapping.getRepoBuildId().get()).get();
+        repositoryBuildService.cancel(repositoryBuild);
+      }
     }
   }
 }

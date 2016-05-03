@@ -41,12 +41,6 @@ public class RepositoryBuildResource {
 
   @POST
   @Path("/branch/{id}")
-  public RepositoryBuild trigger(@PathParam("id") int branchId) {
-    return triggerWithOptions(branchId, BuildOptions.defaultOptions(), Optional.<String>absent());
-  }
-
-  @POST
-  @Path("/branch/{id}")
   @Consumes(MediaType.APPLICATION_JSON)
   public RepositoryBuild triggerWithOptions(@PathParam("id") int branchId, BuildOptions buildOptions, @QueryParam("username") Optional<String> username) {
     Optional<GitInfo> gitInfo = branchService.get(branchId);

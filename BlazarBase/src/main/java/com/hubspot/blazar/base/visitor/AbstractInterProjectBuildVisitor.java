@@ -1,25 +1,27 @@
 package com.hubspot.blazar.base.visitor;
 
+import java.util.Iterator;
+
 import com.hubspot.blazar.base.InterProjectBuild;
 
 public class AbstractInterProjectBuildVisitor implements InterProjectBuildVisitor {
   @Override
   public final void visit(InterProjectBuild build) throws Exception {
     switch (build.getState()) {
-      case CALCULATING:
+      case QUEUED:
         visitQueued(build);
         break;
-      case RUNNING:
+      case IN_PROGRESS:
         visitRunning(build);
         break;
       case FAILED:
-        visitFinished(build);
+        visitFailed(build);
         break;
       case CANCELLED:
-        visitFinished(build);
+        visitCancelled(build);
         break;
       case SUCCEEDED:
-        visitFinished(build);
+        visitSucceeded(build);
         break;
       default:
         throw new IllegalStateException("Unexpected build state: " + build.getState());
@@ -27,8 +29,10 @@ public class AbstractInterProjectBuildVisitor implements InterProjectBuildVisito
 
   }
 
-  protected void visitRunning(InterProjectBuild build) throws Exception {}
-  protected void visitFinished(InterProjectBuild build) throws Exception {}
   protected void visitQueued(InterProjectBuild build) throws Exception {}
+  protected void visitRunning(InterProjectBuild build) throws Exception {}
+  protected void visitCancelled(InterProjectBuild build) throws Exception {}
+  protected void visitFailed(InterProjectBuild build) throws Exception {}
+  protected void visitSucceeded(InterProjectBuild build) throws Exception {}
 
 }
