@@ -11,8 +11,8 @@ class RepoBranchCardStackZeroState extends Component {
       <div className='card-stack__zero-state'>
         <Image src={starImagePath} />
         <h1>You haven't starred any branches yet</h1>
-        <p>Branches that you’ve starred will normally show up here. Use the navigation on 
-the left to find a branch.</p>
+        <p>Branches that you’ve starred will normally show up here.</p>
+        <p>Use the navigation on the left to find a branch.</p>
       </div>
     );
   }
