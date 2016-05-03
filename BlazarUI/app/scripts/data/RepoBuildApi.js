@@ -21,6 +21,15 @@ function _fetchModuleNames(params) {
   return moduleNamesPromise;
 }
 
+function _fetchModuleNamesById(branchId) {
+  const moduleNamesPromise = new Resource({
+    url: `${config.apiRoot}/branches/${branchId}/modules`,
+    type: 'GET'
+  }).send();
+
+  return moduleNamesPromise;
+}
+
 function _fetchBranchBuildHistory(params) {
   const branchBuildHistoryPromise = new Resource({
     url: `${config.apiRoot}/builds/history/branch/${params.branchId}`,
@@ -41,6 +50,17 @@ function fetchRepoBuild(params, cb) {
     return repoBuildPromise.then((resp) => {
       return cb(_parse(resp));
     });
+  });
+}
+
+function fetchRepoBuildById(repoBuildId, cb) {
+  const repoBuildPromise = new Resource({
+    url: `${config.apiRoot}/branches/builds/${repoBuildId}`,
+    type: 'GET'
+  }).send();
+
+  return repoBuildPromise.then((resp) => {
+    return cb(_parse(resp));
   });
 }
 
@@ -70,6 +90,29 @@ function fetchModuleBuilds(params, cb) {
   });
 }
 
+function fetchModuleBuildsById(branchId, repoBuildId, buildNumber, cb) {
+  const moduleBuildsPromise = new Resource({
+    url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
+    type: 'GET'
+  }).send();
+  const moduleInfoPromise = _fetchModuleNamesById(branchId);
+
+  Q.spread([moduleInfoPromise, moduleBuildsPromise],
+    (moduleInfos, moduleBuilds) => {
+      const moduleBuildsWithNames = map(moduleBuilds, (build) => {
+        const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
+        const moduleInfoExtended = {
+          name: moduleInfo.name,
+          blazarPath: `/builds/branch/${branchId}/build/${buildNumber}/module/${moduleInfo.name}`
+        };
+
+        return extend(build, moduleInfoExtended);
+      });
+
+      cb(moduleBuildsWithNames);
+    });
+}
+
 function cancelBuild(params) {
   return _fetchBranchBuildHistory(params).then((resp) => {
     const repoBuild = findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
@@ -86,6 +129,8 @@ function cancelBuild(params) {
 
 export default {
   fetchRepoBuild: fetchRepoBuild,
+  fetchRepoBuildById: fetchRepoBuildById,
   fetchModuleBuilds: fetchModuleBuilds,
+  fetchModuleBuildsById: fetchModuleBuildsById,
   cancelBuild: cancelBuild
 };

@@ -58,12 +58,12 @@ class SidebarContainer extends Component {
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStoreChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStarChange);
-    BuildsActions.loadBuilds();
+    BuildsActions.loadBuilds(this.props.params);
     window.addEventListener('resize', this.handleResizeDebounced);
   }
   
   componentWillUnmount() {
-    BuildsActions.stopListening();
+    BuildsActions.stopPollingBuilds();
     this.unsubscribeFromBuilds();
     window.removeEventListener('resize', this.handleResizeDebounced);
   }
@@ -80,7 +80,7 @@ class SidebarContainer extends Component {
   
   onStarChange(state) {
     if (this.state.toggleFilterState === 'starred') {
-      BuildsActions.loadBuilds();
+      BuildsActions.loadBuilds(this.props.params);
     }
   }
 

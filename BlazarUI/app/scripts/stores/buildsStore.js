@@ -6,7 +6,7 @@ import BuildsActions from '../actions/buildsActions';
 import {sortBuilds} from '../utils/buildsHelpers';
 import BuildsApi from '../data/BuildsApi';
 import Immutable from 'immutable';
-// import StarStore from '../stores/starStore';
+import {isEmpty} from 'underscore';
 
 const BuildsStore = Reflux.createStore({
 
@@ -28,8 +28,9 @@ const BuildsStore = Reflux.createStore({
     BuildsApi.stopPolling;
   },
 
-  onLoadBuilds() {
-    BuildsApi.fetchBuilds((err, resp) => {
+  onLoadBuilds(params) {
+    const extraData = isEmpty(params);
+    BuildsApi.fetchBuilds(extraData, (err, resp) => {
       if (err) {
         this.trigger({
           loading: false,

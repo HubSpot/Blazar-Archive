@@ -58,7 +58,7 @@ class App extends Component {
     return (
       <div>
         <div className="page-wrapper">
-          <SidebarContainer/>
+          <SidebarContainer params={this.props.params} />
           {this.props.children}
         </div>
         <FeedbackForm/>

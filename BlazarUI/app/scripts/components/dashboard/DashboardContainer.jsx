@@ -5,6 +5,7 @@ import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
 import BuildsStore from '../../stores/buildsStore';
+import BuildsActions from '../../actions/buildsActions';
 
 import StarActions from '../../actions/starActions';
 import StarStore from '../../stores/starStore';
@@ -24,7 +25,7 @@ class DashboardContainer extends Component {
       starredBuilds: [],
       loadingStars: true,
       loading: true
-    }
+    };
   }
 
   componentDidMount() {
@@ -32,9 +33,11 @@ class DashboardContainer extends Component {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
 
     StarActions.loadStars();
+    BuildsActions.loadBuilds(this.props.params);
   }
 
   componentWillUnmount() {
+    BuildsActions.stopPollingBuilds();
     this.unsubscribeFromBuilds();
     this.unsubscribeFromStars();
   }
@@ -46,7 +49,8 @@ class DashboardContainer extends Component {
 
     if (this.state.builds.all) {
       const starredBuilds = this.state.builds.all.filter((build) => {
-        return contains(this.state.stars, build.gitInfo.id);
+        return contains(this.state.stars, build.gitInfo.id)
+          && build.gitInfo.active;
       });
 
       this.setState({ starredBuilds: starredBuilds });
