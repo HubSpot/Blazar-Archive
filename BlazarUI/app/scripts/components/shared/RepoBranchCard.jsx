@@ -9,6 +9,7 @@ import Card from './Card.jsx';
 import ModuleRow from './ModuleRow.jsx';
 import BuildStates from '../../constants/BuildStates';
 import Loader from '../shared/Loader.jsx';
+import Sha from '../shared/Sha.jsx';
 
 class RepoBranchCard extends Card {
 
@@ -222,6 +223,7 @@ class RepoBranchCard extends Card {
     const {item} = this.props;
     const build = this.getBuildToDisplay();
     let buildTriggerMessage;
+    let sha;
 
     if (build.get('buildTrigger') && build.get('buildTrigger').get('type') === 'MANUAL') {
       const buildAuthor = this.renderBuildAuthorMaybe();
@@ -236,12 +238,23 @@ class RepoBranchCard extends Card {
 
     else {
       buildTriggerMessage = 'Triggered by code push';
+      const commitInfo = build.get('commitInfo');
+
+      if (build.get('sha') && commitInfo) {
+        const gitInfo = {
+          host: commitInfo.get('host'),
+          organization: commitInfo.get('organization'),
+          repository: commitInfo.get('repository')
+        };
+
+        sha = (<Sha gitInfo={gitInfo} build={build.toJS()} />);
+      }
     }
 
     return (
       <div className='repo-branch-card__details'>
         <div className='repo-branch-card__triggered-by'>
-          <span>{buildTriggerMessage}</span>
+          <span>{buildTriggerMessage} {sha ? '(' : ''}{sha}{sha ? ')' : ''}</span>
         </div>
       </div>
     );
