@@ -87,13 +87,19 @@ class RepoBranchCard extends Card {
   buildCompareLink() {
     const commitInfo = this.getBuildToDisplay().get('commitInfo');
     const previousCommit = commitInfo.get('previous');
-    const currentCommit = commitInfo.get('current');
 
     if (!previousCommit) {
       return null;
     }
 
-    return previousCommit.get('url').replace('/commit/', '/compare/') + '...' + currentCommit.get('id');
+    const currentCommit = commitInfo.get('current');
+    const commitUrl = previousCommit.get('url').replace('/commit/', '/compare/') + '...' + currentCommit.get('id');
+
+    return (
+      <a href={commitUrl}>
+        compare
+      </a>
+    );
   }
 
   renderModuleRows(modules) {
@@ -138,11 +144,7 @@ class RepoBranchCard extends Card {
 
     else {
       buildTriggerMessage = 'automatically by a code push';
-      detailedTriggerMessage = (
-        <a href={this.buildCompareLink()}>
-          compare
-        </a>
-      );
+      detailedTriggerMessage = this.buildCompareLink();
     }
 
     return (
