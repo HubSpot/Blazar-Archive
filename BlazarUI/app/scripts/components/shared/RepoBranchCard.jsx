@@ -41,6 +41,16 @@ class RepoBranchCard extends Card {
     });
   }
 
+  getBuildTime(startTimestamp) {
+    const timestampText = moment(startTimestamp).fromNow();
+
+    if (timestampText === 'a day ago') {
+      return 'yesterday';
+    }
+
+    return timestampText;
+  }
+
   getBuildToDisplay() {
     const {item} = this.props;
 
@@ -78,6 +88,10 @@ class RepoBranchCard extends Card {
     const commitInfo = this.getBuildToDisplay().get('commitInfo');
     const previousCommit = commitInfo.get('previous');
     const currentCommit = commitInfo.get('current');
+
+    if (!previousCommit) {
+      return null;
+    }
 
     return previousCommit.get('url').replace('/commit/', '/compare/') + '...' + currentCommit.get('id');
   }
@@ -117,7 +131,7 @@ class RepoBranchCard extends Card {
 
     if (build.get('buildTrigger').get('type') === 'MANUAL') {
       buildTriggerMessage = 'manually';
-      const buildTime = moment(build.get('startTimestamp')).fromNow();
+      const buildTime = this.getBuildTime(build.get('startTimestamp'));
       const author = build.get('buildTrigger').get('id');
       detailedTriggerMessage = `Triggered ${buildTime}${author === 'unknown' ? '' : ` by ${author}`}`;
     }
@@ -190,7 +204,7 @@ class RepoBranchCard extends Card {
     }
 
     else {
-      timestamp = moment(build.get('startTimestamp')).fromNow()
+      timestamp = this.getBuildTime(build.get('startTimestamp'));
     }
 
     return (
