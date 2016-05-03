@@ -5,6 +5,7 @@ import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
+import Loader from '../shared/Loader.jsx';
 
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
@@ -28,6 +29,7 @@ let initialState = {
   malformedFiles: [],
   loadingMalformedFiles: true,
   loadingModuleBuilds: true,
+  loadingRepoBuild: true,
   loadingStars: true,
   branchInfo: {}
 };
@@ -82,6 +84,15 @@ class RepoBuildContainer extends Component {
     RepoBuildActions.cancelBuild(this.props.params);
   }
 
+  isLoading() {
+    const {loadingStars, loadingModuleBuilds, loadingRepoBuild, moduleBuilds} = this.state;
+
+    return loadingStars
+      || loadingModuleBuilds
+      || loadingRepoBuild
+      || !moduleBuilds;
+  }
+
   renderSectionContent() {
     if (this.state.error) {
       return this.renderError();
@@ -130,7 +141,7 @@ class RepoBuildContainer extends Component {
               {...this.props}
               {...this.state}
               branchInfo={this.state.branchInfo}
-              loading={this.state.loadingStars || this.state.loadingModuleBuilds}
+              loading={this.isLoading()}
             />
           </UIGridItem>
         </UIGrid>
@@ -138,15 +149,14 @@ class RepoBuildContainer extends Component {
           <RepoBuildDetail 
             {...this.props}
             {...this.state}
-            loading={this.state.loadingStars || this.state.loadingModuleBuilds}
+            loading={this.isLoading()}
             triggerCancelBuild={this.triggerCancelBuild}
           />
           <RepoBuildModulesTable
             params={this.props.params}
-            data={this.state.moduleBuilds}
+            data={this.state.moduleBuilds || []}
             currentRepoBuild={this.state.currentRepoBuild}
-            loading={this.state.loadingStars || this.state.loadingModuleBuilds}
-            {...this.state}
+            loading={this.isLoading()}
           />
         </UIGridItem>
       </div>
