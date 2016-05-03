@@ -9,34 +9,24 @@ class CardStack extends Component {
   }
 
   render() {
-    let innerContent;
-
     if (this.props.loading) {
-      innerContent = (
-         <Loader align='center' roomy={true} />
+      return (
+        <div className='card-stack'>
+          <Loader align='center' roomy={true} />
+        </div>
       );
     }
     
     else if (this.props.children.size === 0) {
-      innerContent = (
-        <div className='card-stack__wrapper'>
-          {this.props.zeroState}
-        </div>
-      );
-    }
-
-    else {
-      innerContent = (
-        <div className='card-stack__wrapper'>
-          {this.props.header}
-          {this.props.children}
-        </div>
-      );
+      return this.props.zeroState;
     }
 
     return (
       <div className='card-stack'>
-        {innerContent}
+        <div className='card-stack__wrapper'>
+          {this.props.header}
+          {this.props.children}
+        </div>
       </div>
     );
   }
