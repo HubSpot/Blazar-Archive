@@ -27,7 +27,7 @@ steps:
     description: "Notifying deploy service"
     activeByDefault: false
     commands:
-      - command: CI_ENVIRONMENT=PROD publish-build-success --project BlazarUIBeta --version static-1.$BUILD_NUMBER
+      - command: CI_ENVIRONMENT=PROD publish-build-success --project BlazarUIV2 --version static-1.$BUILD_NUMBER
         env:
           BOOTSTRAP_PROPERTIES_PATH: /usr/share/hubspot/internal/hubspot.bootstrap.properties      
           
