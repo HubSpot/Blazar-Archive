@@ -180,6 +180,11 @@
   padding 10px
   color #425b76
   transition background $bg-transition-duration
+  
+  & span
+    overflow-y hidden
+    text-overflow ellipsis
+    white-space nowrap
 
   &:hover
     background-color #eaf1f7
@@ -194,6 +199,9 @@
 .repo-branch-card__expanded-status
   padding-left 25px
   float left
+  max-width 70%
 
 .repo-branch-card__expanded-timestamp
   float right
+  max-width 30%
+
