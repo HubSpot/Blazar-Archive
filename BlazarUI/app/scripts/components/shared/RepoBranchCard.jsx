@@ -135,7 +135,7 @@ class RepoBranchCard extends Card {
     let buildTriggerMessage;
     let detailedTriggerMessage;
 
-    if (build.get('buildTrigger').get('type') === 'MANUAL') {
+    if (build.get('buildTrigger') && build.get('buildTrigger').get('type') === 'MANUAL') {
       buildTriggerMessage = 'manually';
       const buildTime = this.getBuildTime(build.get('startTimestamp'));
       const author = build.get('buildTrigger').get('id');
@@ -185,7 +185,7 @@ class RepoBranchCard extends Card {
     const trigger = this.getBuildToDisplay().get('buildTrigger');
     const author = trigger.get('id');
 
-    if (trigger.get('type') !== 'MANUAL' || author === 'unknown') {
+    if (trigger && trigger.get('type') !== 'MANUAL' || author === 'unknown') {
       return null;
     }
 
@@ -223,7 +223,7 @@ class RepoBranchCard extends Card {
     const build = this.getBuildToDisplay();
     let buildTriggerMessage;
 
-    if (build.get('buildTrigger').get('type') === 'MANUAL') {
+    if (build.get('buildTrigger') && build.get('buildTrigger').get('type') === 'MANUAL') {
       const buildAuthor = this.renderBuildAuthorMaybe();
       if (!buildAuthor) {
         buildTriggerMessage = 'Triggered by user';
