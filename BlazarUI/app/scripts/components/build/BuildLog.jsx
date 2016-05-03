@@ -341,7 +341,7 @@ class BuildLog extends Component {
       <pre id='log' 
         ref='log'
         className={this.getContainerClassNames()}
-        heap-ignore='1'
+        data-heap-ignore='1'
       >
         {this.renderError()}
         {this.renderFetchPreviousSpinner()}

@@ -13,7 +13,7 @@ class BuildLogLine extends Component {
   render() {
     const offset = `offset-${this.props.offset}`;
     return (
-      <p id={offset} className={this.getClassNames()}>{this.props.text}</p>
+      <p id={offset} data-heap-ignore='1' className={this.getClassNames()}>{this.props.text}</p>
     );
   }
 }
