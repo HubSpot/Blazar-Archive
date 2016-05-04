@@ -31,8 +31,8 @@ public class BuildTrigger {
     return new BuildTrigger(Type.BRANCH_CREATION, branch);
   }
 
-  public static BuildTrigger forInterProjectBuild(GitInfo gitInfo) {
-    String rootRepoBranch = String.format("%s-%s-%s-%s", gitInfo.getHost(), gitInfo.getOrganization(), gitInfo.getRepository(), gitInfo.getBranch());
+  public static BuildTrigger forInterProjectBuild(InterProjectBuild build) {
+    String rootRepoBranch = String.format("%d", build.getId().get());
     return new BuildTrigger(Type.INTER_PROJECT, rootRepoBranch);
   }
 
