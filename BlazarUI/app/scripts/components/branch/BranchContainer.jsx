@@ -23,6 +23,8 @@ import StarActions from '../../actions/starActions';
 
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
+import InterProjectStore from '../../stores/interProjectStore';
+import InterProjectActions from '../../actions/interProjectActions';
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
 
@@ -41,6 +43,7 @@ let initialState = {
   modules: [],
   selectedModules: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
+  triggerInterProjectBuild: false,
   resetCache: false,
   branchId: 0,
   branchInfo: {},
@@ -53,7 +56,7 @@ class BranchContainer extends Component {
   constructor() {
     this.state = initialState;
 
-    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'triggerBuild');
+    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'triggerBuild');
   }
 
   componentDidMount() {
@@ -158,8 +161,19 @@ class BranchContainer extends Component {
     })
   }
 
+  updateTriggerInterProjectBuild() {
+    this.setState({
+      triggerInterProjectBuild: !this.state.triggerInterProjectBuild
+    })
+  }
+
+
   triggerBuild() {
-    BranchActions.triggerBuild(this.props.params, this.state);
+    if (this.state.triggerInterProjectBuild) {
+      InterProjectActions.triggerInterProjectBuild(this.props.params, this.state);
+    } else {
+      BranchActions.triggerBuild(this.props.params, this.state);
+    }
   }
 
   isLoading() {
@@ -268,6 +282,7 @@ class BranchContainer extends Component {
               onSelectUpdate={this.updateSelectedModules}
               onCheckboxUpdate={this.updateDownstreamModules}
               onResetCacheUpdate={this.updateResetCache}
+              onTriggerInterProjectBuild={this.updateTriggerInterProjectBuild}
               modules={this.state.modules}
             />
             {this.renderBuildSettingsButton()}
