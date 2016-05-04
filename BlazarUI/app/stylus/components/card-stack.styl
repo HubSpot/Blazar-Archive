@@ -10,7 +10,7 @@
 
 .card-stack__wrapper
   margin 0 20px
-  box-shadow 0 3px 3px 0 rgba(0, 0, 0, 0.2)
+  box-shadow $shadow-depth-1
 
 
 // Individual card and variations
@@ -20,31 +20,31 @@
   background-color #eaf0f6
   max-height $initial-height
   position relative
-  transition all $transition-duration
+  transition all $transition-duration $transition-timing-func
   overflow-y hidden
-  
+
   &:hover
-    top -2px
+    box-shadow $shadow-depth-2
     z-index 2
-    box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
 
 .card-stack__card--expanded
   margin -10px -20px -10px -20px
   border-bottom $border
   border $border-dark
-  box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
+  box-shadow $shadow-depth-3
   z-index 3
   max-height 9999px
-  
+
   & *
     transition max-height 3s ease-out
-  
+
   &:hover
     top 0
+    box-shadow $shadow-depth-3
 
   & .card-stack__card-main
     border-bottom $border
-    
+
 .card-stack__card--below-expanded:hover
   z-index 1
 
@@ -90,15 +90,17 @@
   font-family HelveticaNeue-light
   color #425b76
   text-align center
-  font-size 16px
-  
-  & p
-    margin 0
-  
+  max-width 600px
+  margin auto
+
   & img
     padding-bottom 30px
-  
+
   & h1
     margin 0 0 20px 0
-    font-size 18px
+    font-size 20px
     font-family HelveticaNeue-medium
+
+  & p
+    font-size 16px
+    line-height 24px
