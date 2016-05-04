@@ -34,7 +34,7 @@ public class InterProjectBuildMapping {
   }
 
   public static InterProjectBuildMapping makeNewMapping(long interProjectBuildId, int branchId, Optional<Long> repoBuildId, int moduleId) {
-    return new InterProjectBuildMapping(Optional.<Long>absent(), interProjectBuildId, branchId, repoBuildId, moduleId, Optional.<Long>absent(), InterProjectBuild.State.CALCULATING);
+    return new InterProjectBuildMapping(Optional.<Long>absent(), interProjectBuildId, branchId, repoBuildId, moduleId, Optional.<Long>absent(), InterProjectBuild.State.QUEUED);
   }
 
   public InterProjectBuildMapping withModuleBuildId(Long moduleBuildId) {

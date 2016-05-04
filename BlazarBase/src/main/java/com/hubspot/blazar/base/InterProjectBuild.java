@@ -21,8 +21,8 @@ public class InterProjectBuild {
   private final Optional<DependencyGraph> dependencyGraph;
 
   public enum State {
-    CALCULATING(false),
-    RUNNING(false),
+    QUEUED(false),
+    IN_PROGRESS(false),
     CANCELLED(true),
     FAILED(true),
     SUCCEEDED(true);
@@ -56,7 +56,7 @@ public class InterProjectBuild {
   }
 
   public static InterProjectBuild getQueuedBuild(Set<Integer> moduleIds, BuildTrigger buildTrigger) {
-    return new InterProjectBuild(Optional.<Long>absent(), State.CALCULATING, moduleIds, buildTrigger, Optional.of(System.currentTimeMillis()), Optional.<Long>absent(),Optional.<DependencyGraph>absent());
+    return new InterProjectBuild(Optional.<Long>absent(), State.QUEUED, moduleIds, buildTrigger, Optional.of(System.currentTimeMillis()), Optional.<Long>absent(),Optional.<DependencyGraph>absent());
   }
 
   public static InterProjectBuild withDependencyGraph(InterProjectBuild old, DependencyGraph d){
@@ -64,7 +64,7 @@ public class InterProjectBuild {
   }
 
   public static InterProjectBuild getStarted(InterProjectBuild build) {
-    return new InterProjectBuild(build.getId(), State.RUNNING, build.getModuleIds(), build.getBuildTrigger(), build.getStartTimestamp(), build.getEndTimestamp(), build.getDependencyGraph());
+    return new InterProjectBuild(build.getId(), State.IN_PROGRESS, build.getModuleIds(), build.getBuildTrigger(), build.getStartTimestamp(), build.getEndTimestamp(), build.getDependencyGraph());
   }
 
   public static InterProjectBuild getFinishedBuild(InterProjectBuild old, State state) {

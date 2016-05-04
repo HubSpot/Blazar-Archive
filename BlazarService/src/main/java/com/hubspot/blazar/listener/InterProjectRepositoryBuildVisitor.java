@@ -79,7 +79,7 @@ public class InterProjectRepositoryBuildVisitor extends AbstractRepositoryBuildV
     InterProjectBuild.State state = InterProjectBuild.State.SUCCEEDED;
     for (InterProjectBuildMapping mapping: mappings) {
       if (!mapping.getState().isFinished()) {
-        return InterProjectBuild.State.RUNNING;
+        return InterProjectBuild.State.IN_PROGRESS;
       }
 
       // if there is a failure mark as failed, regardless of any CANCELLED modules

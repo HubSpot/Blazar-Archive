@@ -26,8 +26,8 @@ public class InterProjectBuildService {
   }
 
   public long enqueue(InterProjectBuild interProjectBuild) {
-    if (!(interProjectBuild.getState() == InterProjectBuild.State.CALCULATING)) {
-      throw new IllegalArgumentException("Cannot Queue Build with state that has progressed further than CALCULATING");
+    if (!(interProjectBuild.getState() == InterProjectBuild.State.QUEUED)) {
+      throw new IllegalArgumentException("Cannot Queue Build with state that has progressed further than QUEUED");
     }
     long id = interProjectBuildDao.enqueue(interProjectBuild);
     InterProjectBuild build = interProjectBuildDao.getWithId(id).get();
@@ -44,5 +44,18 @@ public class InterProjectBuildService {
 
   public void finish(InterProjectBuild build) {
     interProjectBuildDao.finish(build);
+  }
+
+  public void cancel(InterProjectBuild build) {
+    InterProjectBuild cancelled = new InterProjectBuild(
+        build.getId(),
+        InterProjectBuild.State.CANCELLED,
+        build.getModuleIds(),
+        build.getBuildTrigger(),
+        build.getStartTimestamp(),
+        Optional.of(System.currentTimeMillis()),
+        build.getDependencyGraph());
+    interProjectBuildDao.finish(cancelled);
+    eventBus.post(cancelled);
   }
 }

@@ -23,12 +23,12 @@ public interface InterProjectBuildDao {
   @SqlUpdate("UPDATE inter_project_builds SET " +
              "state = :state, " +
              "dependencyGraph = :dependencyGraph " +
-             "WHERE id = :id and state in ('CALCULATING')")
+             "WHERE id = :id and state in ('QUEUED')")
   void start(@BindWithRosetta InterProjectBuild interProjectBuild);
 
   @SqlUpdate("UPDATE inter_project_builds SET " +
              "state = :state, " +
              "endTimestamp = :endTimestamp " +
-             "WHERE id = :id and state in ('RUNNING')")
+             "WHERE id = :id and state in ('IN_PROGRESS')")
   void finish(@BindWithRosetta InterProjectBuild interProjectBuild);
 }
