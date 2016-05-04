@@ -47,6 +47,11 @@ class BranchHeadline extends Component {
   }
 
   onBranchSelect(selected) {
+    if (selected === '') {
+      this.forceRender();
+      return;
+    }
+
     const branchLink = `/builds/branch/${selected}`;
     this.context.router.push(branchLink);
   }
