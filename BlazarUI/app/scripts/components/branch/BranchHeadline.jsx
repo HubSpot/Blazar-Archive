@@ -48,7 +48,7 @@ class BranchHeadline extends Component {
 
   onBranchSelect(selected) {
     if (selected === '') {
-      this.forceRender();
+      setTimeout(this.updateMoment.bind(this), 1);
       return;
     }
 
