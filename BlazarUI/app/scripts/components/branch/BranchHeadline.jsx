@@ -111,7 +111,8 @@ class BranchHeadline extends Component {
             value={this.props.branchInfo.branch}
             options={this.getFilteredBranches()}
             onChange={this.onBranchSelect.bind(this)}
-            searchable={false}
+            onBlurResetsInput={true}
+            searchable={true}
             clearable={false}
           />
           {this.renderShield()}
