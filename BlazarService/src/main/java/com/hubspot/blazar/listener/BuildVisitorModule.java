@@ -68,6 +68,6 @@ public class BuildVisitorModule implements Module {
 
     Multibinder<InterProjectBuildVisitor> interProjectBuildVisitors = Multibinder.newSetBinder(binder, InterProjectBuildVisitor.class);
 
-    interProjectBuildVisitors.addBinding().to(InterProjectBuildLauncher.class);
+    interProjectBuildVisitors.addBinding().to(InterProjectBuildHandler.class);
   }
 }
