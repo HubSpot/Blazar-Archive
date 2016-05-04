@@ -19,7 +19,7 @@ class ModuleModal extends Component {
   constructor(props) {
     super(props);
 
-    bindAll(this, 'updateDownstreamModules', 'updateResetCache', 'updateSelectedModules', 'getModuleIdsAndBuild', 'maybeStartBuild');
+    bindAll(this, 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'updateSelectedModules', 'getModuleIdsAndBuild', 'maybeStartBuild');
   }
 
   getModuleIdsAndBuild() {
@@ -34,6 +34,10 @@ class ModuleModal extends Component {
 
   updateResetCache() {
     this.props.onResetCacheUpdate();
+  }
+
+  updateTriggerInterProjectBuild() {
+    this.props.onTriggerInterProjectBuild();
   }
 
   updateDownstreamModules(isChecked) {
@@ -73,6 +77,31 @@ class ModuleModal extends Component {
         </ReactTooltip>
       </div>
     );
+  }
+  renderInterProjectToggle() {
+    return (
+      <div className="interProject-checkbox-wrapper">
+        <Checkbox
+        label=' Trigger Inter Project Build'
+        name='triggerInterProjectBuild-checkbox'
+        checked={false}
+        onCheckboxUpdate={this.updateTriggerInterProjectBuild}
+        />
+        <a data-tip data-for='triggerInterProjectBuild-checkbox'>
+          <Icon
+            type='fa'
+            name='question-circle'
+            classNames='checkbox-tooltip'
+          />
+        </a>
+        <ReactTooltip>
+        place='bottom'
+        type='dark'
+        effect='solid'>
+        Trigger Inter-Repository build of all dependent modules.
+        </ReactTooltip>
+      </div>
+      )
   }
 
   renderResetCache() {
@@ -134,6 +163,7 @@ class ModuleModal extends Component {
           <div className='checkbox-wrapper'>
             {this.renderDownstreamToggle()}
             {this.renderResetCache()}
+            {this.renderInterProjectToggle()}
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -159,6 +189,7 @@ ModuleModal.propTypes = {
   onSelectUpdate: PropTypes.func.isRequired,
   onCheckboxUpdate: PropTypes.func.isRequired,
   onResetCacheUpdate: PropTypes.func.isRequired,
+  onTriggerInterProjectBuild:  PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
   loadingModules: PropTypes.bool,
   modules: PropTypes.array.isRequired
