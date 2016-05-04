@@ -47,11 +47,6 @@ class BranchHeadline extends Component {
   }
 
   onBranchSelect(selected) {
-    if (selected === '') {
-      setTimeout(this.updateMoment.bind(this), 1);
-      return;
-    }
-
     const branchLink = `/builds/branch/${selected}`;
     this.context.router.push(branchLink);
   }
@@ -116,8 +111,7 @@ class BranchHeadline extends Component {
             value={this.props.branchInfo.branch}
             options={this.getFilteredBranches()}
             onChange={this.onBranchSelect.bind(this)}
-            onBlurResetsInput={true}
-            searchable={true}
+            searchable={false}
             clearable={false}
           />
           {this.renderShield()}
