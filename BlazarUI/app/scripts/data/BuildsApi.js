@@ -50,29 +50,38 @@ function _parse(data) {
   return parsed;
 }
 
-function fetchBuilds(cb) {
-  
+function fetchBuilds(extraData, cb) {
   if (this.buildsPoller) {
     this.buildsPoller.disconnect();
     this.buildsPoller = undefined;
   }
 
-  const exclusionOpts = {
+  let exclusionOpts = {
     property: [
-      '!pendingBuild.commitInfo',
-      '!inProgressBuild.commitInfo',
-      '!lastBuild.commitInfo',
-      '!pendingBuild.dependencyGraph',
-      '!inProgressBuild.dependencyGraph',
-      '!lastBuild.dependencyGraph',
       '!pendingBuild.buildOptions',
       '!inProgressBuild.buildOptions',
-      '!lastBuild.buildOptions',
-      '!pendingBuild.buildTrigger',
-      '!inProgressBuild.buildTrigger',
-      '!lastBuild.buildTrigger'
+      '!lastBuild.buildOptions'
     ]
   };
+
+  if (!extraData) {
+    exclusionOpts = {
+      property: [
+       '!pendingBuild.commitInfo',
+       '!inProgressBuild.commitInfo',
+       '!lastBuild.commitInfo',
+       '!pendingBuild.dependencyGraph',
+       '!inProgressBuild.dependencyGraph',
+       '!lastBuild.dependencyGraph',
+       '!pendingBuild.buildTrigger',
+       '!inProgressBuild.buildTrigger',
+       '!lastBuild.buildTrigger',
+       '!pendingBuild.buildOptions',
+       '!inProgressBuild.buildOptions',
+       '!lastBuild.buildOptions'
+      ]
+    };
+  }
 
   this.buildsPoller = new PollingProvider({
     url: `${config.apiRoot}/branches/state`,
@@ -90,7 +99,6 @@ function fetchBuilds(cb) {
     cb(err, _groupBuilds(_parse(resp)));
   });
 }
-
 
 function stopPolling() {
   if (!this.buildsPoller) {

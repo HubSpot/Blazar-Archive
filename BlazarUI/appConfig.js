@@ -25,7 +25,9 @@ const appConfig = {
 
   usernameCookie: process.env.BLAZAR_USERNAME_COOKIE || '',
 
-  slackBotName: process.env.SLACK_BOT_NAME || ''
+  slackBotName: process.env.SLACK_BOT_NAME || '',
+
+  heapToken: process.env.HEAP_TOKEN || false
 }
 
 module.exports = appConfig;

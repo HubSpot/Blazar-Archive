@@ -14,6 +14,7 @@ const RepoBuildStore = Reflux.createStore({
     this.repoBuild = {};
     this.moduleBuilds = [];
     this.shouldPoll = true;
+    this.moduleBuildsList = [];
   },
 
   onLoadRepoBuild(params) {
@@ -33,6 +34,15 @@ const RepoBuildStore = Reflux.createStore({
     });
   },
 
+  onLoadRepoBuildById(repoBuildId) {
+    RepoBuildApi.fetchRepoBuildById(repoBuildId, (resp) => {
+      this.trigger({
+        repoBuild: resp,
+        loading: false
+      });
+    });
+  },
+
   onLoadModuleBuilds(params) {
     this.params = params;
 
@@ -42,6 +52,17 @@ const RepoBuildStore = Reflux.createStore({
       this.trigger({
         moduleBuilds: this.moduleBuilds,
         loadingModuleBuilds: false
+      });
+    });
+  },
+
+  onLoadModuleBuildsById(branchId, repoBuildId, buildNumber) {
+    RepoBuildApi.fetchModuleBuildsById(branchId, repoBuildId, buildNumber, (resp) => {
+      this.moduleBuildsList = resp;
+
+      this.trigger({
+        moduleBuildsList: this.moduleBuildsList,
+        loading: false
       });
     });
   },

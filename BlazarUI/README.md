@@ -8,6 +8,10 @@ Makes use of:
  - [React Router](https://github.com/rackt/react-router)
  - [Reflux](https://github.com/spoike/refluxjs)
 
+## Heap		
+		
+Blazar uses [Heap](https://www.heapanalytics.com/) to record usage statistics for an internal instance of the app. If you'd like to integrate your own Heap account when running your own instance of Blazar, set your Heap token in `process.env.HEAP_TOKEN` (see `appConfig.js`).
+
 ## Installation
 
 Install dependencies.

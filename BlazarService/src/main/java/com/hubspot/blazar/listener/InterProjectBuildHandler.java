@@ -86,9 +86,9 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
 
     for (Map.Entry<Integer, Set<Integer>> entry : Multimaps.asMap(launchable).entrySet()) {
       Set<Integer> moduleIds = entry.getValue();
-      GitInfo gitInfo = branchService.get(entry.getKey()).get();
-      BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(gitInfo);
+      BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(build);
       BuildOptions buildOptions = new BuildOptions(entry.getValue(), BuildOptions.BuildDownstreams.NONE, false);
+      GitInfo gitInfo = branchService.get(entry.getKey()).get();
       long buildId = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
 
       for (int moduleId : moduleIds) {

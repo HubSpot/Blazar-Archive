@@ -1,0 +1,106 @@
+@import './card-variables.styl'
+
+// Outer classes
+.card-stack
+  width 100%
+  //min-width 800px
+  max-width 1350px
+  padding 50px 20px
+  font-family HelveticaNeue
+
+.card-stack__wrapper
+  margin 0 20px
+  box-shadow $shadow-depth-1
+
+
+// Individual card and variations
+.card-stack__card
+  border $border
+  border-bottom 0
+  background-color #eaf0f6
+  max-height $initial-height
+  position relative
+  transition all $transition-duration $transition-timing-func
+  overflow-y hidden
+
+  &:hover
+    box-shadow $shadow-depth-2
+    z-index 2
+
+.card-stack__card--expanded
+  margin -10px -20px -10px -20px
+  border-bottom $border
+  border $border-dark
+  box-shadow $shadow-depth-3
+  z-index 3
+  max-height 9999px
+
+  & *
+    transition max-height 3s ease-out
+
+  &:hover
+    top 0
+    box-shadow $shadow-depth-3
+
+  & .card-stack__card-main
+    border-bottom $border
+
+.card-stack__card--below-expanded:hover
+  z-index 1
+
+.card-stack__card--last
+  & .card-stack__card-main
+    border-bottom $border
+
+// Top card content
+.card-stack__card-main
+  padding 10px 20px
+  height $initial-height
+  cursor pointer
+  background-color white
+  transition background $bg-transition-duration
+  width calc(100% - 80px)
+  display inline-block
+
+  & > div
+    display inline-block
+
+// Detailed card content
+.card-stack__card-details
+  width 100%
+  padding 15px
+
+.card-stack__expanded
+  padding 20px
+  width 100%
+  max-height 2000px
+  overflow-y hidden
+  background-color #F9FBFD
+
+  &.collapsed
+    max-height 0
+    padding 0
+
+   & div
+    display block
+
+.card-stack__zero-state
+  height 200px
+  padding 50px 20px
+  font-family HelveticaNeue-light
+  color #425b76
+  text-align center
+  max-width 600px
+  margin auto
+
+  & img
+    padding-bottom 30px
+
+  & h1
+    margin 0 0 20px 0
+    font-size 20px
+    font-family HelveticaNeue-medium
+
+  & p
+    font-size 16px
+    line-height 24px

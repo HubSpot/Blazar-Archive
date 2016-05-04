@@ -1,0 +1,207 @@
+@import './card-variables.styl'
+
+.repo-branch-card__header
+  height 50px
+  background-color #F9FBFD
+  border $border
+  border-bottom 0
+  color #425b76
+  font-family HelveticaNeue-medium
+  padding-left 80px
+
+  & > div
+    width 100%
+    padding 0 20px
+
+  & div
+    display inline-block
+    height 100%
+    line-height 50px
+
+.repo-branch-card__header-info
+  width calc(100% / 3)
+
+  &:before
+    content 'BRANCH'
+
+.repo-branch-card__header-last-built
+  width calc(100% / 3)
+
+  &:before
+    content 'LAST BUILT'
+
+.repo-branch-card__header-details
+  width calc(100% / 3)
+
+  &:before
+    content 'DETAILS'
+
+.repo-branch-card__header-status
+  width 13%
+
+  &:before
+    content 'STATUS'
+
+.repo-branch-card__info
+  width calc(100% / 3)
+  height 100%
+
+.repo-branch-card__inner-wrapper
+  display inline-block
+  width 100%
+
+.repo-branch-card__repo
+  padding-top 6px
+  font-size 16px
+  overflow hidden
+  white-space nowrap
+  text-overflow ellipsis
+  max-width calc(100% - 10px)
+
+.repo-branch-card__build-and-status
+  width 80px
+  height $initial-height
+  float left
+  line-height $initial-height
+  text-align center
+  font-size 18px
+  cursor pointer
+
+  & span
+    color #425b76
+
+.repo-branch-card__build-and-status--SUCCEEDED
+  background-color #ccf2ed
+
+.repo-branch-card__build-and-status--FAILED, .repo-branch-card__build-and-status--UNSTABLE
+  background-color #fddbdc
+  
+.repo-branch-card__build-and-status--IN_PROGRESS, .repo-branch-card__build-and-status--QUEUED, .repo-branch-card__build-and-status--LAUNCHING, .repo-branch-card__build-and-status--WAITING_FOR_UPSTREAM_BUILD, .repo-branch-card__build-and-status--WAITING_FOR_BUILD_SLOT
+  background-color #C5EFFD
+  
+.repo-branch-card__build-and-status--CANCELLED
+  background-color #FAE0B5
+
+.repo-branch-card__branch-and-build
+  padding-top 4px
+  font-family HelveticaNeue-Light
+  color #7c98b6
+  display inline-block
+  height 25px
+  overflow hidden
+  white-space nowrap
+  text-overflow ellipsis
+  max-width calc(100% - 15px)
+
+.repo-branch-card__branch
+  font-family HelveticaNeue
+  color #425b76
+  background-color #eceef1
+  padding 3px 7px
+  
+  & a
+    color #425b76
+
+  &:before
+    font-family 'octicons'
+    content '\f020  '
+
+.repo-branch-card__build-number
+  font-family HelveticaNeue-light
+  color #425b76
+
+.repo-branch-card__last-build
+  width calc(100% / 3)
+  height 100%
+  vertical-align middle
+  line-height 20px
+  overflow hidden
+  white-space nowrap
+  text-overflow ellipsis
+  max-width calc(100% - 15px)
+
+.repo-branch-card__last-build-time
+  color #425b76
+  font-family HelveticaNeue-bold
+
+.repo-branch-card__details
+  width calc(100% / 3)
+  height 100%
+  vertical-align middle
+  line-height 20px
+
+.repo-branch-card__triggered-by
+  font-family HelveticaNeue-light
+  color #425b76
+  overflow hidden
+  white-space nowrap
+  text-overflow ellipsis
+  max-width calc(100% - 10px)
+
+.repo-branch-card__modules-built
+  color #425b76
+
+.repo-branch-card__modules-skipped
+  color #7c98b6
+  font-family HelveticaNeue-light
+
+.repo-branch-card__status
+  max-width 18%
+  height 100%
+  vertical-align middle
+  float right
+  padding-left 2%
+  padding-top 17px
+  font-family HelveticaNeue-medium
+
+.repo-branch-card__expanded-header
+  font-family HelveticaNeue-light
+  font-size 18px
+  color #425b76
+  display block
+  
+  & .repo-branch-card__build-number
+    font-family HelveticaNeue
+
+.repo-branch-card__expanded-author
+  font-size 14px
+  color #2965a8
+  font-family HelveticaNeue
+  padding-left 20px
+
+.repo-branch-card__expanded-module-rows
+  margin-top 20px
+  box-shadow 0 3px 3px 0 rgba(0, 0, 0, 0.2)
+
+.repo-branch-card__expanded-module-row
+  background-color white
+  border 1px solid #eaf0f6
+  height 40px
+  padding 10px
+  color #425b76
+  transition background $bg-transition-duration
+  
+  & span
+    overflow-y hidden
+    text-overflow ellipsis
+    white-space nowrap
+
+  &:hover
+    background-color #eaf1f7
+
+.repo-branch-card__expanded-module-row--no-log:hover
+  background-color white
+
+.repo-branch-card__author
+  color #425b76
+  font-family HelveticaNeue-medium
+
+.repo-branch-card__expanded-status
+  padding-left 25px
+  float left
+  max-width 70%
+
+.repo-branch-card__expanded-timestamp
+  float right
+  max-width 30%
+

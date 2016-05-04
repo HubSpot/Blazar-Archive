@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "UI for Blazar",
   "main": "index.html",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/HubSpot/Blazar.git"
+  },
   "scripts": {
     "start": "gulp",
     "test": "jest",

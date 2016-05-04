@@ -132,7 +132,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
   private InterProjectBuild runInterProjectBuild(int rootModuleId) throws InterruptedException {
     LOG.info("Starting inter-project-build for id {}", rootModuleId);
-    InterProjectBuild build = InterProjectBuild.getQueuedBuild(Sets.newHashSet(rootModuleId), BuildTrigger.forInterProjectBuild(branchService.get(moduleService.getBranchIdFromModuleId(rootModuleId)).get()));
+    InterProjectBuild build = InterProjectBuild.getQueuedBuild(Sets.newHashSet(rootModuleId), new BuildTrigger(BuildTrigger.Type.INTER_PROJECT, String.format("Test inter-project build root: %d", rootModuleId)));
     long id = interProjectBuildService.enqueue(build);
     Optional<InterProjectBuild> maybeQueued = interProjectBuildService.getWithId(id);
     int count = 0;

@@ -34,8 +34,10 @@ class StoredBuilds {
   }
 
   _onStoreChange(resp) {
-    this.builds = resp.builds.all;
-    this._afterInitialFetch();
+    if (resp.builds) {
+      this.builds = resp.builds.all;
+      this._afterInitialFetch();
+    }
   }
 
   //
