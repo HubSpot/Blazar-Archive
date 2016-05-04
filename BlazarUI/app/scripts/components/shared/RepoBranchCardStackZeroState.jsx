@@ -1,3 +1,4 @@
+/*global config*/
 import React, { Component, PropTypes } from 'react';
 import Image from '../shared/Image.jsx'
 
