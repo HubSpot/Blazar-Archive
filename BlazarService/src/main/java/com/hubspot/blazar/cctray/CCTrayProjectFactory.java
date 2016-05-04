@@ -27,7 +27,6 @@ public class CCTrayProjectFactory implements Function<RepositoryState, Optional<
     this.urlHelper = urlHelper;
   }
 
-
   @Override
   public Optional<CCTrayProject> apply(@Nullable RepositoryState repositoryState) {
     if (repositoryState == null || !repositoryState.getGitInfo().isActive() || !repositoryState.getLastBuild().isPresent()) {

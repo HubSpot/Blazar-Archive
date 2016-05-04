@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class BuildTrigger {
   public enum Type {
-    PUSH, MANUAL, BRANCH_CREATION
+    PUSH, MANUAL, BRANCH_CREATION, INTER_PROJECT
   }
 
   private final Type type;
@@ -29,6 +29,11 @@ public class BuildTrigger {
 
   public static BuildTrigger forBranchCreation(String branch) {
     return new BuildTrigger(Type.BRANCH_CREATION, branch);
+  }
+
+  public static BuildTrigger forInterProjectBuild(GitInfo gitInfo) {
+    String rootRepoBranch = String.format("%s-%s-%s-%s", gitInfo.getHost(), gitInfo.getOrganization(), gitInfo.getRepository(), gitInfo.getBranch());
+    return new BuildTrigger(Type.INTER_PROJECT, rootRepoBranch);
   }
 
   public Type getType() {

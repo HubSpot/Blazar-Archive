@@ -3,6 +3,7 @@ package com.hubspot.blazar.listener;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
+import com.hubspot.blazar.base.visitor.InterProjectBuildVisitor;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
@@ -32,10 +33,13 @@ public class BuildVisitorModule implements Module {
     repositoryBuildVisitors.addBinding().to(GitHubStatusVisitor.class);
     // monitor repo build state changes
     repositoryBuildVisitors.addBinding().to(MetricBuildVisitor.class);
+    // Make note of launched module Builds for IPR builds
+    repositoryBuildVisitors.addBinding().to(InterProjectRepositoryBuildVisitor.class);
 
     if (configuration.getSlackConfiguration().isPresent()) {
       // send Slack notifications
-      repositoryBuildVisitors.addBinding().to(SlackNotificationVisitor.class);
+      repositoryBuildVisitors.addBinding().to(SlackImNotificationVisitor.class);
+      repositoryBuildVisitors.addBinding().to(SlackRoomNotificationVisitor.class);
 
     }
 
@@ -55,10 +59,15 @@ public class BuildVisitorModule implements Module {
     moduleBuildVisitors.addBinding().to(RepositoryBuildCompleter.class);
     // monitor module build state changes
     moduleBuildVisitors.addBinding().to(MetricBuildVisitor.class);
-
+    // launch interProjectChildren for completed Modules
+    moduleBuildVisitors.addBinding().to(InterProjectModuleBuildVisitor.class);
     if (configuration.getSlackConfiguration().isPresent()) {
       // send Slack notifications
-      moduleBuildVisitors.addBinding().to(SlackNotificationVisitor.class);
+      moduleBuildVisitors.addBinding().to(SlackRoomNotificationVisitor.class);
     }
+
+    Multibinder<InterProjectBuildVisitor> interProjectBuildVisitors = Multibinder.newSetBinder(binder, InterProjectBuildVisitor.class);
+
+    interProjectBuildVisitors.addBinding().to(InterProjectBuildLauncher.class);
   }
 }

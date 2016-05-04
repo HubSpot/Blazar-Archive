@@ -88,7 +88,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
       if (canBuild(buildConfig)) {
         String moduleName = moduleName(gitInfo, blazarConfig);
         String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
-        modules.add(new DiscoveredModule(moduleName, "config", blazarConfig, glob, buildConfig.getBuildpack(), DependencyInfo.unknown()));
+        modules.add(new DiscoveredModule(moduleName, "config", blazarConfig, glob, buildConfig.getBuildpack(), new DependencyInfo(buildConfig.getDepends(), buildConfig.getProvides())));
       }
     }
 

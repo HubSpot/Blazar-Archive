@@ -11,6 +11,15 @@ if (!config.apiRoot) {
   console.warn('e.g. localStorage["apiRootOverride"] = "https://path.to-api.com/v1/api"');
 }
 
+if (config.heapToken) {
+  const username = getUsernameFromCookie();
+  heap.identify(`${username}-blazar`);
+  heap.addUserProperties({
+    'Name': username,
+    'App': 'blazar'
+  });
+}
+
 const browserHistory = useRouterHistory(createHistory) ({
   basename: config.appRoot
 });

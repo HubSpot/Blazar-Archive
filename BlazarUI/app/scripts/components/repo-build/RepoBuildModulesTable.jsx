@@ -29,7 +29,7 @@ class RepoBuildModulesTable extends Component {
     if (this.props.loading) {
       return null;
     }
-
+    
     if (this.props.data.length === 0) {
       return (
         <EmptyMessage> There's no information available for this build right now. </EmptyMessage>

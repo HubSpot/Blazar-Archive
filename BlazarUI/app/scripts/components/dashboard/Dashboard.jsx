@@ -76,6 +76,10 @@ class Dashboard extends Component {
       expandedCard: -1,
       build: undefined
     });
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
   }
 
   triggerRepoBuildReload(build, branchId) {

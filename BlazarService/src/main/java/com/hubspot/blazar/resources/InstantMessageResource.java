@@ -1,7 +1,9 @@
 package com.hubspot.blazar.resources;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,27 +17,38 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
+import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.externalservice.slack.SlackChannel;
-import com.hubspot.blazar.integration.slack.SlackClient;
+import com.hubspot.blazar.listener.SlackImNotificationVisitor;
+import com.hubspot.blazar.listener.SlackRoomNotificationVisitor;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
+import com.ullink.slack.simpleslackapi.SlackSession;
 
 @Path("/instant-message")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class InstantMessageResource {
 
+  private static final Logger LOG = LoggerFactory.getLogger(InstantMessageResource.class);
   @Inject(optional = true)
-  private SlackClient slackClient;
-
   private final InstantMessageConfigurationService instantMessageConfigurationService;
+  private SlackSession slackSession;
 
   @Inject
-  public InstantMessageResource(InstantMessageConfigurationService instantMessageConfigurationService) {
+  public InstantMessageResource(InstantMessageConfigurationService instantMessageConfigurationService,
+                                SlackSession slackSession) {
     this.instantMessageConfigurationService = instantMessageConfigurationService;
+    this.slackSession = slackSession;
   }
 
   @GET
@@ -79,7 +92,12 @@ public class InstantMessageResource {
 
   @GET
   @Path("/slack/list-channels")
-  public List<SlackChannel> getChannels() throws IOException {
-    return slackClient == null ? Collections.<SlackChannel>emptyList() : slackClient.getSlackChannels();
+  public Set<SlackChannel> getChannels() throws IOException {
+    Collection<com.ullink.slack.simpleslackapi.SlackChannel> channels = slackSession.getChannels();
+    Set<SlackChannel> ourChannels = new HashSet<>();
+    for (com.ullink.slack.simpleslackapi.SlackChannel channel : channels) {
+      ourChannels.add(new SlackChannel(channel.getId(), channel.getName()));
+    }
+    return ourChannels;
   }
 }

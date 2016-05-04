@@ -1,5 +1,8 @@
 package com.hubspot.blazar.config;
 
+import java.util.List;
+import java.util.Set;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,17 +17,20 @@ public class BlazarSlackConfiguration {
   private final String slackApiBaseUrl;
   private final String slackApiToken;
   private final Optional<String> feedbackRoom;
+  private Set<String> imWhitelist;
   private String username;
 
   @Inject
   public BlazarSlackConfiguration(@JsonProperty("slackApiBaseUrl") String slackApiBaseUrl,
                                   @JsonProperty("slackApiToken") String slackApiToken,
                                   @JsonProperty("username") String username,
-                                  @JsonProperty("feedbackRoom") Optional<String> feedbackRoom) {
+                                  @JsonProperty("feedbackRoom") Optional<String> feedbackRoom,
+                                  @JsonProperty("imWhitelist") Set<String> imWhitelist) {
     this.slackApiBaseUrl = slackApiBaseUrl;
     this.slackApiToken = slackApiToken;
     this.username = username;
     this.feedbackRoom = feedbackRoom;
+    this.imWhitelist = imWhitelist;
   }
 
   public String getSlackApiBaseUrl() {
@@ -41,5 +47,9 @@ public class BlazarSlackConfiguration {
 
   public Optional<String> getFeedbackRoom() {
     return feedbackRoom;
+  }
+
+  public Set<String> getImWhitelist() {
+    return imWhitelist;
   }
 }

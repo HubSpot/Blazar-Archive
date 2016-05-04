@@ -36,6 +36,10 @@
       <name>Kevin Moses</name>
       <email>kmoses@hubspot.com</email>
     </developer>
+    <developer>
+      <name>Zack Hickman</name>
+      <email>zhickman@hubspot.com</email>
+    </developer>
   </developers>
 
   <properties>
@@ -47,10 +51,12 @@
     <singularity.version>0.4.11</singularity.version>
     <mesos.version>0.23.0</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
+    <dep.guava.version>18.0</dep.guava.version>
   </properties>
 
   <modules>
     <module>BlazarBase</module>
+    <module>BlazarTestBase</module>
     <module>BlazarService</module>
     <module>BlazarData</module>
     <module>BlazarClient</module>
@@ -71,6 +77,11 @@
       <dependency>
         <groupId>com.hubspot</groupId>
         <artifactId>BlazarService</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.hubspot</groupId>
+        <artifactId>BlazarTestBase</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -170,14 +181,19 @@
         <version>4.4.1</version>
       </dependency>
       <dependency>
-        <groupId>in.ashwanthkumar</groupId>
-        <artifactId>slack-java-webhook</artifactId>
-        <version>0.0.4</version>
+        <groupId>io.takari.slack</groupId>
+        <artifactId>simple-slack-api</artifactId>
+        <version>0.5.1</version>
       </dependency>
       <dependency>
         <groupId>com.codahale.metrics</groupId>
         <artifactId>metrics-jdbi</artifactId>
         <version>${dep.metrics.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>stringtemplate</artifactId>
+        <version>3.2</version>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
@@ -188,6 +204,21 @@
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-core</artifactId>
         <version>3.4.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>1.10.19</version>
+      </dependency>
+      <dependency>
+        <groupId>com.mattbertolini</groupId>
+        <artifactId>liquibase-slf4j</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jukito</groupId>
+        <artifactId>jukito</artifactId>
+        <version>1.4.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

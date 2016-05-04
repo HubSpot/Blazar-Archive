@@ -4,7 +4,6 @@ import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryState;
 import com.hubspot.blazar.data.dao.StateDao;
-import org.skife.jdbi.v2.sqlobject.Bind;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,11 +22,15 @@ public class StateService {
     return stateDao.getAllRepositoryStates();
   }
 
-  public Optional<RepositoryState> getRepositoryState(@Bind("branchId") int branchId) {
+  public Set<RepositoryState> getChangedRepositoryStates(long since) {
+    return stateDao.getChangedRepositoryStates(since);
+  }
+
+  public Optional<RepositoryState> getRepositoryState(int branchId) {
     return stateDao.getRepositoryState(branchId);
   }
 
-  public Set<ModuleState> getModuleStatesByBranch(@Bind("branchId") int branchId) {
+  public Set<ModuleState> getModuleStatesByBranch(int branchId) {
     return stateDao.getModuleStatesByBranch(branchId);
   }
 }
