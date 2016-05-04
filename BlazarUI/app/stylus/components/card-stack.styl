@@ -22,7 +22,7 @@
   position relative
   transition all $transition-duration
   overflow-y hidden
-  
+
   &:hover
     top -2px
     z-index 2
@@ -35,16 +35,16 @@
   box-shadow 0 6px 6px 0 rgba(0, 0, 0, 0.2)
   z-index 3
   max-height 9999px
-  
+
   & *
     transition max-height 3s ease-out
-  
+
   &:hover
     top 0
 
   & .card-stack__card-main
     border-bottom $border
-    
+
 .card-stack__card--below-expanded:hover
   z-index 1
 
@@ -90,11 +90,17 @@
   font-family HelveticaNeue-light
   color #425b76
   text-align center
-  
+  max-width 600px
+  margin auto
+
   & img
     padding-bottom 30px
-  
+
   & h1
     margin 0 0 20px 0
-    font-size 18px
+    font-size 20px
     font-family HelveticaNeue-medium
+
+  & p
+    font-size 16px
+    line-height 24px
