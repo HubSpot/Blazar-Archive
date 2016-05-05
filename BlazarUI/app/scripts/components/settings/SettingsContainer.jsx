@@ -12,6 +12,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 import Icon from '../shared/Icon.jsx';
 import Loader from '../shared/Loader.jsx';
+import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
 
 import SettingsActions from '../../actions/settingsActions';
 import SettingsStore from '../../stores/settingsStore';
@@ -61,13 +62,13 @@ class SettingsContainer extends Component {
     const branchUrl = `/builds/branch/${this.props.params.branchId}`;
 
     return (
-      <Headline className='notifications__page-headline'>
-        <Icon type="fa" name="wrench" classNames="headline-icon" />
-        <span>Settings</span>
-        <HeadlineDetail>
-          <Link style={{cursor: 'pointer'}} to={branchUrl}>Back to {this.state.branchInfo.branch}</Link>
-        </HeadlineDetail>
-      </Headline>
+      <div>
+        <SimpleBreadcrumbs repo={true} branch={true} {...this.props} {...this.state} />
+        <Headline className='notifications__page-headline'>
+          <Icon type="fa" name="wrench" classNames="headline-icon" />
+          <span>Settings</span>
+        </Headline>
+      </div>
     );
   }
 
