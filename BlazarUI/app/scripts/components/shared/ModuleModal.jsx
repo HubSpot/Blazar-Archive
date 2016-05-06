@@ -59,7 +59,7 @@ class ModuleModal extends Component {
           label=' Build Downstream Modules'
           name='downstream-checkbox'
           checked={true}
-          onCheckboxUpdate={this.updateDownstreamModules} 
+          onCheckboxUpdate={this.updateDownstreamModules}
         />
         <a data-tip data-for='downstreamTooltip'>
           <Icon
@@ -80,25 +80,26 @@ class ModuleModal extends Component {
   }
   renderInterProjectToggle() {
     return (
-      <div className="interProject-checkbox-wrapper">
+      <div className="inter-project-checkbox-wrapper">
         <Checkbox
-        label=' Trigger Inter Project Build'
+        label=' Trigger Inter-Project Build'
         name='triggerInterProjectBuild-checkbox'
         checked={false}
         onCheckboxUpdate={this.updateTriggerInterProjectBuild}
         />
-        <a data-tip data-for='triggerInterProjectBuild-checkbox'>
-          <Icon
-            type='fa'
-            name='question-circle'
-            classNames='checkbox-tooltip'
-          />
-        </a>
-        <ReactTooltip>
+      <a data-tip data-for='interProjectTooltip'>
+        <Icon
+          type='fa'
+          name='question-circle'
+          classNames='checkbox-tooltip'
+        />
+      </a>
+      <ReactTooltip
+        id='interProjectTooltip'
         place='bottom'
         type='dark'
         effect='solid'>
-        Trigger Inter-Repository build of all dependent modules.
+        Trigger Inter-Repository build of all dependent modules
         </ReactTooltip>
       </div>
       )
@@ -111,7 +112,7 @@ class ModuleModal extends Component {
           label=' Reset Cache'
           name='cache-checkbox'
           checked={false}
-          onCheckboxUpdate={this.updateResetCache} 
+          onCheckboxUpdate={this.updateResetCache}
         />
         <div className='tooltip-wrapper'>
           <a data-tip data-for='cache-tooltip'>

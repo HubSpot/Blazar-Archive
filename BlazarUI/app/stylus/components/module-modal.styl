@@ -32,18 +32,18 @@
         border 1px solid #e5e5e5
         padding-right 30px
 
-  & .downstream-checkbox-wrapper, & .cache-checkbox-wrapper
+  & .downstream-checkbox-wrapper, & .cache-checkbox-wrapper, & .inter-project-checkbox-wrapper
     padding 5px 0
     width 49%
     position relative
-    
+
     & .__react_component_tooltip
       width 200px
-    
-    
+
+
   & .downstream-checkbox-wrapper
     float left
-    
+
     & .__react_component_tooltip
       position absolute
       left 100px !important
@@ -51,19 +51,27 @@
 
   & .cache-checkbox-wrapper
     float right
-    
+
     & .__react_component_tooltip
       position absolute
       left -89px !important
       top 18px !important
-    
+
+  & .inter-project-checkbox-wrapper
+    float left
+
+    & .__react_component_tooltip
+      position absolute
+      left 87px !important
+      top 25px !important
+
   & .checkbox-wrapper
     padding 20px
-    positon relative
-    
+    display inline-block
+
   & .checkbox-tooltip
     padding-left 5px
-    
+
   & .tooltip-wrapper
     position relative
     display inline
