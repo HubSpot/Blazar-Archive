@@ -1,4 +1,5 @@
 import fuzzy from 'fuzzy';
+import { uniq } from 'underscore';
 
 export default class Search {
 
@@ -6,19 +7,33 @@ export default class Search {
     this.records = options.records;
   }
 
-  getOptions() {
+  getRepoOptions() {
     return {
       extract: function(el) {
-        return `${el.gitInfo.repository} ${el.gitInfo.branch}`;
+        return `${el.gitInfo.repository}`;
+      }
+    };
+  }
+
+  getBranchOptions() {
+    return {
+      extract: function(el) {
+        return `${el.gitInfo.branch}`;
       }
     };
   }
 
   match(term) {
-    const results = fuzzy.filter(term, this.records, this.getOptions());
-    return results.map(function(el) {
-      return el.original;
-    });
+    const repoResults = fuzzy.filter(term, this.records, this.getRepoOptions())
+      .map((el) => {
+        return el.original;
+      });
+    const branchResults = fuzzy.filter(term, this.records, this.getBranchOptions())
+      .map((el) => {
+        return el.original;
+      });
+
+    return uniq([...repoResults, ...branchResults]);
   }
 
 }
