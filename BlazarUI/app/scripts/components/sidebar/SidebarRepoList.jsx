@@ -23,17 +23,26 @@ class SidebarRepoList extends Component {
   }
 
   renderBuildsList(builds) {
-    return Object.keys(builds).sort().map((repo, i) => {
+
+    let buildKeys = Object.keys(builds);
+
+    if (this.props.filterText === '') {
+      buildKeys = buildKeys.sort();
+    }
+
+    return buildKeys.map((repo, i) => {
       const branchesMap = builds[repo];
 
-      const sortedBuilds = 
-        sortBuildsByRepoAndBranch(
-          filterInactiveBuilds(
-            Object.keys(branchesMap).map((branch, i) => {
-              return branchesMap[branch];
-            })
-          )
+      let sortedBuilds =
+        filterInactiveBuilds(
+          Object.keys(branchesMap).map((branch, i) => {
+            return branchesMap[branch];
+          })
         );
+
+      if (this.props.filterText === '') {
+        sortedBuilds = sortBuildsByRepoAndBranch(sortedBuilds);
+      }
 
       if (sortedBuilds.length === 0) {
         return (<span key={i} />);
@@ -58,7 +67,7 @@ class SidebarRepoList extends Component {
     if (loading) {
       return null;
     }
-    
+
     if (changingBuildsType) {
       return (
         <Loader align='top-center' className='sidebar-loader' />
