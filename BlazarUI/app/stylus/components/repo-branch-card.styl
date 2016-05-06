@@ -1,5 +1,9 @@
 @import './card-variables.styl'
 
+$info-width = 25%
+$last-build-width = 20%
+$details-width = 55%
+
 .repo-branch-card__header
   height 50px
   background-color #F9FBFD
@@ -19,31 +23,25 @@
     line-height 50px
 
 .repo-branch-card__header-info
-  width 30%
+  width $info-width
 
   &:before
     content 'BRANCH'
 
 .repo-branch-card__header-last-built
-  width 20%
+  width $last-build-width
 
   &:before
     content 'LAST BUILT'
 
 .repo-branch-card__header-details
-  width 50%
+  width $details-width
 
   &:before
     content 'DETAILS'
 
-.repo-branch-card__header-status
-  width 13%
-
-  &:before
-    content 'STATUS'
-
 .repo-branch-card__info
-  width 30%
+  width $info-width
   height 100%
 
 .repo-branch-card__inner-wrapper
@@ -111,7 +109,7 @@
   color #425b76
 
 .repo-branch-card__last-build
-  width 20%
+  width $last-build-width
   height 100%
   vertical-align middle
   line-height 20px
@@ -125,7 +123,7 @@
   font-family HelveticaNeue-bold
 
 .repo-branch-card__details
-  width 50%
+  width $details-width
   height 100%
   vertical-align middle
   line-height 20px
