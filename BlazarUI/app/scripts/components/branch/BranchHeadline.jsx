@@ -47,6 +47,12 @@ class BranchHeadline extends Component {
   }
 
   onBranchSelect(selected) {
+
+    if (selected === '') {
+      setTimeout(this.forceUpdate.bind(this), 1); // is a hack
+      return;
+    }
+
     const branchLink = `/builds/branch/${selected}`;
     this.context.router.push(branchLink);
   }
@@ -70,10 +76,6 @@ class BranchHeadline extends Component {
   }
 
   renderShield() {
-    if (this.props.loading) {
-      return null;
-    }
-
     const imgPath = `${config.apiRoot}/branches/state/${this.props.params.branchId}/shield?${this.state.moment}`;
 
     return (
@@ -82,7 +84,7 @@ class BranchHeadline extends Component {
       </div>
     );
   }
-    
+
   render() {
     if (this.props.loading) {
       return null;
@@ -93,7 +95,7 @@ class BranchHeadline extends Component {
 
     return (
       <div>
-        <SimpleBreadcrumbs 
+        <SimpleBreadcrumbs
           repo={true}
           {...this.props} />
         <Headline className='headline branch-headline'>
@@ -103,7 +105,6 @@ class BranchHeadline extends Component {
             id={branchId}
           />
           <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-          {this.props.branchInfo.repository} - 
           <Select
             className='branch-select-input'
             name='branchSelect'
@@ -111,8 +112,9 @@ class BranchHeadline extends Component {
             value={this.props.branchInfo.branch}
             options={this.getFilteredBranches()}
             onChange={this.onBranchSelect.bind(this)}
-            searchable={false}
+            searchable={true}
             clearable={false}
+            openOnFocus={true}
           />
           {this.renderShield()}
         </Headline>
