@@ -14,9 +14,15 @@ import Sha from '../shared/Sha.jsx';
 class RepoBranchCard extends Card {
 
   getClassNames() {
+    const build = this.getBuildToDisplay();
+    const isFailingBuild = build.get('state') === BuildStates.FAILED
+      || build.get('state') === BuildStates.UNSTABLE;
+
     return classNames([
       this.getBaseClassNames(),
-      'card-stack__card--repo-branch'
+      'card-stack__card--repo-branch', {
+        'repo-branch-card--failed': isFailingBuild
+      }
     ]);
   }
 
@@ -77,7 +83,7 @@ class RepoBranchCard extends Card {
     const {item} = this.props;
     const build = this.getBuildToDisplay();
     const gitInfo = item.get('gitInfo');
-    
+
     return (
       <Link className='repo-branch-card__build-number' to={build.get('blazarPath')}>
         #{build.get('buildNumber')}
