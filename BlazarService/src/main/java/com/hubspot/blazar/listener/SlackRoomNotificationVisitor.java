@@ -91,8 +91,12 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   }
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build) {
-    SlackChannel slackChannel = slackSession.findChannelByName(instantMessageConfiguration.getChannelName());
-    slackSession.sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
+    Optional<SlackChannel> slackChannel = Optional.fromNullable(slackSession.findChannelByName(instantMessageConfiguration.getChannelName()));
+    if (slackChannel.isPresent()) {
+      slackSession.sendMessage(slackChannel.get(), "", slackUtils.buildSlackAttachment(build));
+    } else {
+      LOG.warn("No slack channel found for name {}", instantMessageConfiguration.getChannelName());
+    }
   }
 
 
