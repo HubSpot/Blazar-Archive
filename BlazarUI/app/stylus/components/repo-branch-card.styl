@@ -19,19 +19,19 @@
     line-height 50px
 
 .repo-branch-card__header-info
-  width calc(100% / 3)
+  width 30%
 
   &:before
     content 'BRANCH'
 
 .repo-branch-card__header-last-built
-  width calc(100% / 3)
+  width 20%
 
   &:before
     content 'LAST BUILT'
 
 .repo-branch-card__header-details
-  width calc(100% / 3)
+  width 50%
 
   &:before
     content 'DETAILS'
@@ -43,7 +43,7 @@
     content 'STATUS'
 
 .repo-branch-card__info
-  width calc(100% / 3)
+  width 30%
   height 100%
 
 .repo-branch-card__inner-wrapper
@@ -75,10 +75,10 @@
 
 .repo-branch-card__build-and-status--FAILED, .repo-branch-card__build-and-status--UNSTABLE
   background-color #fddbdc
-  
+
 .repo-branch-card__build-and-status--IN_PROGRESS, .repo-branch-card__build-and-status--QUEUED, .repo-branch-card__build-and-status--LAUNCHING, .repo-branch-card__build-and-status--WAITING_FOR_UPSTREAM_BUILD, .repo-branch-card__build-and-status--WAITING_FOR_BUILD_SLOT
   background-color #C5EFFD
-  
+
 .repo-branch-card__build-and-status--CANCELLED
   background-color #FAE0B5
 
@@ -98,7 +98,7 @@
   color #425b76
   background-color #eceef1
   padding 3px 7px
-  
+
   & a
     color #425b76
 
@@ -111,7 +111,7 @@
   color #425b76
 
 .repo-branch-card__last-build
-  width calc(100% / 3)
+  width 20%
   height 100%
   vertical-align middle
   line-height 20px
@@ -125,7 +125,7 @@
   font-family HelveticaNeue-bold
 
 .repo-branch-card__details
-  width calc(100% / 3)
+  width 50%
   height 100%
   vertical-align middle
   line-height 20px
@@ -159,7 +159,7 @@
   font-size 18px
   color #425b76
   display block
-  
+
   & .repo-branch-card__build-number
     font-family HelveticaNeue
 
@@ -180,7 +180,7 @@
   padding 10px
   color #425b76
   transition background $bg-transition-duration
-  
+
   & span
     overflow-y hidden
     text-overflow ellipsis
@@ -204,4 +204,3 @@
 .repo-branch-card__expanded-timestamp
   float right
   max-width 30%
-
