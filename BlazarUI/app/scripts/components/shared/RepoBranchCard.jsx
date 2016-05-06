@@ -67,7 +67,7 @@ class RepoBranchCard extends Card {
     const gitInfo = item.get('gitInfo');
 
     return (
-      <Link to={gitInfo.get('blazarBranchPath')}>
+      <Link to={gitInfo.get('blazarRepositoryPath')}>
         {gitInfo.get('repository')}
       </Link>
     );
