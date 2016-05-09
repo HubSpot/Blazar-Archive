@@ -94,8 +94,8 @@ public class BlazarServiceTestModule extends AbstractModule {
     return new EventBus() {
       @Override
       public void post(Object event) {
-        super.post(event);
         LOG.info("Got event {}", event);
+        super.post(event);
       }
     };
   }

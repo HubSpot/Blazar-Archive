@@ -3,6 +3,7 @@ package com.hubspot.blazar.data;
 import com.google.inject.AbstractModule;
 import com.hubspot.blazar.data.cache.StateCache;
 import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.BranchSettingsService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
@@ -32,5 +33,6 @@ public class BlazarDataModule extends AbstractModule {
     bind(InstantMessageConfigurationService.class);
     bind(InterProjectBuildService.class);
     bind(InterProjectBuildMappingService.class);
+    bind(BranchSettingsService.class);
   }
 }

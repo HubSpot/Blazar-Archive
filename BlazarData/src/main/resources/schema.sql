@@ -181,3 +181,10 @@ CREATE TABLE inter_project_build_mappings (
   -- INDEX(`interProjectBuildId`, `moduleId`),
   -- INDEX(`interProjectBuildId`, `repoId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--changeset jgoodwin:7 runAlwasy:false
+CREATE TABLE branch_settings (
+  `branchId` INT(11),
+  `triggerInterProjectBuilds` TINYINT(1),
+  PRIMARY KEY (`branchId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

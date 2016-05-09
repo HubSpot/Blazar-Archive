@@ -22,6 +22,7 @@ public interface InterProjectBuildDao {
 
   @SqlUpdate("UPDATE inter_project_builds SET " +
              "state = :state, " +
+             "moduleIds = :moduleIds, " +
              "dependencyGraph = :dependencyGraph " +
              "WHERE id = :id and state in ('QUEUED')")
   void start(@BindWithRosetta InterProjectBuild interProjectBuild);

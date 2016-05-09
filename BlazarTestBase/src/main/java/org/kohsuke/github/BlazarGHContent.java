@@ -25,6 +25,9 @@ public class BlazarGHContent extends GHContent {
   // lets us specify content w/o making extra yaml keys for a single field object
   public static BlazarGHContent fromString(String path) {
     try {
+      if (path.equals("/no-content")) {
+        return new BlazarGHContent("");
+      }
       return new BlazarGHContent(Resources.toString(Resources.getResource(path), Charsets.UTF_8));
     } catch (IOException e) {
       throw new RuntimeException(e);

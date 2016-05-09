@@ -9,11 +9,10 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.ModuleBuild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildOptions.BuildDownstreams;
@@ -21,6 +20,7 @@ import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;

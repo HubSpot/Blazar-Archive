@@ -14,7 +14,7 @@ public class BuildOptions {
   private final boolean resetCaches;
 
   public enum BuildDownstreams {
-    NONE, WITHIN_REPOSITORY;
+    NONE, WITHIN_REPOSITORY, INTER_PROJECT;
   }
 
   public static BuildOptions defaultOptions() {
