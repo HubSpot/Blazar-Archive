@@ -104,6 +104,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     InterProjectBuild testableBuild = runInterProjectBuild(rootModuleId, Optional.of(trigger));
     // commit 11111111* affects modules 1, 2, 3
     assertThat(Sets.newHashSet(1, 2, 3)).isEqualTo(testableBuild.getModuleIds());
+    assertThat(Arrays.asList(1, 2, 4, 5, 7, 6, 8, 10, 11, 9, 13)).isEqualTo(testableBuild.getDependencyGraph().get().getTopologicalSort());
   }
 
   @Test
@@ -114,7 +115,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     BuildTrigger trigger = new BuildTrigger(BuildTrigger.Type.PUSH, String.format("%d_%s", repoId, sha));
     InterProjectBuild testableBuild = runInterProjectBuild(rootModuleId, Optional.of(trigger));
     assertThat(Sets.newHashSet(1, 2, 3)).isEqualTo(testableBuild.getModuleIds());
-    assertThat(Arrays.asList(1, 4, 7, 8, 10, 11, 9, 13)).isEqualTo(testableBuild.getDependencyGraph().get().getTopologicalSort());
+    assertThat(Arrays.asList(1, 2, 4, 5, 7, 6, 8, 10, 11, 9, 13)).isEqualTo(testableBuild.getDependencyGraph().get().getTopologicalSort());
   }
 
 
