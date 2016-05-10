@@ -77,7 +77,6 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
   protected void visitRunning(InterProjectBuild build) throws Exception {
     DependencyGraph d = build.getDependencyGraph().get();
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
-
     if (mappings.size() != 0 && build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
       LOG.info("InterProjectBuild was triggered by push, no need to launch builds, mappings exist");
       return;
@@ -124,5 +123,4 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
       }
     }
   }
-
 }

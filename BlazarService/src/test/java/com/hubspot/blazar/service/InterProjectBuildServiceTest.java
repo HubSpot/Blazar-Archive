@@ -122,6 +122,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
     assertThat(Sets.newHashSet(1, 2, 3)).isEqualTo(interProjectBuild.get().getModuleIds());
     assertThat(Arrays.asList(1, 2, 4, 5, 7, 6, 8, 10, 11, 9, 13)).isEqualTo(interProjectBuild.get().getDependencyGraph().get().getTopologicalSort());
+    assertThat(interProjectBuild.get().getState()).isEqualTo(InterProjectBuild.State.SUCCEEDED);
   }
 
   @Test
