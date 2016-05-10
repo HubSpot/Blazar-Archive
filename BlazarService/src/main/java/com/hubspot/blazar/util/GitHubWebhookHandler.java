@@ -9,8 +9,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.kohsuke.github.GHEventPayload;
 import org.kohsuke.github.GHRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
@@ -19,10 +20,7 @@ import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.BranchSetting;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
-import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.InterProjectBuild;
-import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
@@ -32,8 +30,6 @@ import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 public class GitHubWebhookHandler {
@@ -112,8 +108,8 @@ public class GitHubWebhookHandler {
       gitInfo = branchService.upsert(gitInfo);
       Optional<BranchSetting> branchSetting = branchSettingsService.getByBranchId(gitInfo.getId().get());
       if (branchSetting.isPresent() && branchSetting.get().isTriggerInterProjectBuilds()) {
-        InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.<Integer>of(), new BuildTrigger(BuildTrigger.Type.PUSH, String.format("%d_%s", gitInfo.getId().get(), pushEvent.getBefore())));
-        interProjectBuildService.enqueue(ipb);
+        BuildOptions options = new BuildOptions(ImmutableSet.<Integer>of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), options);
       } else {
         repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), BuildOptions.defaultOptions());
       }

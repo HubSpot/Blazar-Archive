@@ -19,11 +19,16 @@ import com.hubspot.blazar.base.BuildOptions.BuildDownstreams;
 import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
+import com.hubspot.blazar.base.InterProjectBuild;
+import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;
+import com.hubspot.blazar.data.service.DependenciesService;
+import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
+import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
@@ -35,17 +40,26 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
+  private InterProjectBuildService interProjectBuildService;
+  private InterProjectBuildMappingService interProjectBuildMappingService;
   private final ModuleService moduleService;
+  private DependenciesService dependenciesService;
   private final GitHubHelper gitHubHelper;
 
   @Inject
   public LaunchingRepositoryBuildVisitor(RepositoryBuildService repositoryBuildService,
                                          ModuleBuildService moduleBuildService,
+                                         InterProjectBuildService interProjectBuildService,
+                                         InterProjectBuildMappingService interProjectBuildMappingService,
                                          ModuleService moduleService,
+                                         DependenciesService dependenciesService,
                                          GitHubHelper gitHubHelper) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
+    this.interProjectBuildService = interProjectBuildService;
+    this.interProjectBuildMappingService = interProjectBuildMappingService;
     this.moduleService = moduleService;
+    this.dependenciesService = dependenciesService;
     this.gitHubHelper = gitHubHelper;
   }
 
@@ -57,18 +71,41 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     Set<Module> toBuild = findModulesToBuild(build, modules);
     Set<Module> skipped = Sets.difference(modules, toBuild);
 
+    Optional<Long> interProjectBuildId = Optional.absent();
+    if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
+      Set<Integer> toBuildIds = getIds(toBuild);
+      Set<Integer> allModuleIds = getIds(modules);
+      Set<Integer> realToBuildIds = new HashSet<>();
+      DependencyGraph interProjectGraph = dependenciesService.buildInterProjectDependencyGraph(toBuild);
+      for (int i : toBuildIds)  {
+        Set<Integer> upstream = interProjectGraph.getAllUpstreamNodes(i);
+        // this module has no incoming modules outside this repo, so we're building it in this repoBuild
+        if (allModuleIds.containsAll(upstream)) {
+          realToBuildIds.add(i);
+        }
+      }
+      toBuild = new HashSet<>();
+      for (int i : realToBuildIds) {
+        toBuild.add(moduleService.get(i).get());
+      }
+
+      InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.copyOf(realToBuildIds), build.getBuildTrigger());
+      interProjectBuildId = Optional.of(interProjectBuildService.enqueue(ipb));
+    }
+
     if (modules.isEmpty()) {
       LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
       repositoryBuildService.update(build.withState(State.SUCCEEDED).withEndTimestamp(System.currentTimeMillis()));
     } else {
       for (Module module : toBuild) {
         moduleBuildService.enqueue(build, module);
+        if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
+          interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(interProjectBuildId.get(), build.getBranchId(), build.getId(), module.getId().get()));
+        }
       }
-
       for (Module module : skipped) {
         moduleBuildService.skip(build, module);
       }
-
       repositoryBuildService.update(build.withState(State.IN_PROGRESS));
     }
   }
@@ -126,6 +163,14 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
   private boolean lastBuildSucceeded(Module module) {
     Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(module);
     return previous.isPresent() && previous.get().getState() == ModuleBuild.State.SUCCEEDED;
+  }
+
+  private static Set<Integer> getIds(Set<Module> modules) {
+    Set<Integer> ints = new HashSet<>();
+    for (Module m : modules) {
+      ints.add(m.getId().get());
+    }
+    return ints;
   }
 
   private static Set<Module> filterActive(Set<Module> modules) {

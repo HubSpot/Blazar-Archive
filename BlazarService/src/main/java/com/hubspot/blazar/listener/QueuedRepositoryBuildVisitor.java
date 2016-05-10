@@ -1,16 +1,17 @@
 package com.hubspot.blazar.listener;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.blazar.util.RepositoryBuildLauncher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class QueuedRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor {
