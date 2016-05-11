@@ -1,7 +1,7 @@
 /*global config*/
 import Resource from '../services/ResourceProvider';
 import Q from 'q';
-import { findWhere, map, extend } from 'underscore';
+import { findWhere, map, extend, max } from 'underscore';
 import humanizeDuration from 'humanize-duration';
 
 function _parse(resp) {
@@ -39,9 +39,19 @@ function _fetchBranchBuildHistory(params) {
   return branchBuildHistoryPromise;
 }
 
+function _getRepoBuildByParam(params, resp) {
+  if (params.buildNumber === 'latest') {
+    return max(resp, (build) => {
+      return build.buildNumber;
+    });
+  }
+
+  return findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
+}
+
 function fetchRepoBuild(params, cb) {
   return _fetchBranchBuildHistory(params).then((resp) => {
-    const repoBuild = findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
+    const repoBuild = _getRepoBuildByParam(params, resp);
     const repoBuildPromise = new Resource({
       url: `${config.apiRoot}/branches/builds/${repoBuild.id}`,
       type: 'GET'
@@ -66,7 +76,7 @@ function fetchRepoBuildById(repoBuildId, cb) {
 
 function fetchModuleBuilds(params, cb) {
   return _fetchBranchBuildHistory(params).then((resp) => {
-    const repoBuild = findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
+    const repoBuild = _getRepoBuildByParam(params, resp);
     const moduleBuildsPromise = new Resource({
       url: `${config.apiRoot}/branches/builds/${repoBuild.id}/modules`,
       type: 'GET'
@@ -79,7 +89,7 @@ function fetchModuleBuilds(params, cb) {
           const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
           const moduleInfoExtended = {
             name: moduleInfo.name,
-            blazarPath: `/builds/branch/${params.branchId}/build/${params.buildNumber}/module/${moduleInfo.name}`
+            blazarPath: `/builds/branch/${params.branchId}/build/${repoBuild.buildNumber}/module/${moduleInfo.name}`
           };
 
           return extend(build, moduleInfoExtended);
@@ -124,7 +134,7 @@ function cancelBuild(params) {
     cancelPromise.error((error) => {
       console.warn(error); // TODO: be better
     });
-  }); 
+  });
 }
 
 export default {
