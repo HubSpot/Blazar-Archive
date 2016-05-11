@@ -9,6 +9,16 @@ class SimpleBreadcrumbs extends Component {
     super(props);
   }
 
+	getBuildNumber() {
+		const {params, data} = this.props;
+
+		if (params.buildNumber !== 'latest') {
+			return params.buildNumber;
+		}
+
+		return data.build.buildNumber;
+	}
+
   renderRepoCrumb() {
     const {params, repo, branchInfo} = this.props;
 
@@ -49,12 +59,13 @@ class SimpleBreadcrumbs extends Component {
       return null;
     }
 
-    const buildLink = `/builds/branch/${params.branchId}/build/${params.buildNumber}`;
+		const buildNumber = this.getBuildNumber();
+    const buildLink = `/builds/branch/${params.branchId}/build/${buildNumber}`;
 
     return (
       <span className='simple-breadcrumbs__build'>
         <Icon type='fa' name='angle-right' />
-        <Link to={buildLink}>#{params.buildNumber}</Link>
+        <Link to={buildLink}>#{buildNumber}</Link>
       </span>
     );
   }
