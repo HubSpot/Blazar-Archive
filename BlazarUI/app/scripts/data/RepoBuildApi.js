@@ -89,7 +89,7 @@ function fetchModuleBuilds(params, cb) {
           const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
           const moduleInfoExtended = {
             name: moduleInfo.name,
-            blazarPath: `/builds/branch/${params.branchId}/build/${params.buildNumber}/module/${moduleInfo.name}`
+            blazarPath: `/builds/branch/${params.branchId}/build/${repoBuild.buildNumber}/module/${moduleInfo.name}`
           };
 
           return extend(build, moduleInfoExtended);
