@@ -54,7 +54,7 @@ class SimpleBreadcrumbs extends Component {
     return (
       <span className='simple-breadcrumbs__build'>
         <Icon type='fa' name='angle-right' />
-        <Link to={buildLink}>{params.buildNumber !== 'latest' ? '#' : ''}{params.buildNumber}</Link>
+        <Link to={buildLink}>#{params.buildNumber}</Link>
       </span>
     );
   }
