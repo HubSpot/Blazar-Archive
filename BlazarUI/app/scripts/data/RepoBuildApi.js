@@ -39,18 +39,19 @@ function _fetchBranchBuildHistory(params) {
   return branchBuildHistoryPromise;
 }
 
+function _getRepoBuildByParam(params, resp) {
+  if (params.buildNumber === 'latest') {
+    return max(resp, (build) => {
+      return build.buildNumber;
+    });
+  }
+
+  return findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
+}
+
 function fetchRepoBuild(params, cb) {
   return _fetchBranchBuildHistory(params).then((resp) => {
-    let repoBuild;
-
-    if (params.buildNumber === 'latest') {
-      repoBuild = max(resp, (build) => { return build.buildNumber; });
-    }
-
-    else {
-      repoBuild = findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
-    }
-
+    const repoBuild = _getRepoBuildByParam(params, resp);
     const repoBuildPromise = new Resource({
       url: `${config.apiRoot}/branches/builds/${repoBuild.id}`,
       type: 'GET'
@@ -75,16 +76,7 @@ function fetchRepoBuildById(repoBuildId, cb) {
 
 function fetchModuleBuilds(params, cb) {
   return _fetchBranchBuildHistory(params).then((resp) => {
-    let repoBuild;
-
-    if (params.buildNumber === 'latest') {
-      repoBuild = max(resp, (build) => { return build.buildNumber; });
-    }
-
-    else {
-      repoBuild = findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
-    }
-
+    const repoBuild = _getRepoBuildByParam(params, resp);
     const moduleBuildsPromise = new Resource({
       url: `${config.apiRoot}/branches/builds/${repoBuild.id}/modules`,
       type: 'GET'
