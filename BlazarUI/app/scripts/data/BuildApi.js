@@ -1,6 +1,6 @@
 /*global config*/
 import Reflux from 'reflux';
-import {extend, findWhere} from 'underscore';
+import {extend, findWhere, contains} from 'underscore';
 import BuildStates from '../constants/BuildStates';
 import {buildIsOnDeck} from '../components/Helpers';
 
@@ -267,10 +267,11 @@ class BuildApi {
             return module.module.id === repoBuildModule.id;
           })[0];
 
-          const repoBuildId = findWhere(resp, {buildNumber: parseInt(moduleBuild.lastBuild.buildNumber)}).id;
+          const buildToUse = this._getBuildToUse(moduleBuild);
+          const repoBuildId = findWhere(resp, {buildNumber: parseInt(buildToUse.buildNumber)}).id;
 
           this.build.model = new Build({
-            id: moduleBuild.lastBuild.id,
+            id: buildToUse.id,
             repoBuildId: repoBuildId
           });
 
@@ -281,6 +282,16 @@ class BuildApi {
     }, (error) => {
       this.cb(error);
     });
+  }
+
+  _getBuildToUse(moduleBuild) {
+    let inProgressBuild = moduleBuild.inProgressBuild;
+
+    if (inProgressBuild && contains(['QUEUED', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED', 'UNSTABLE'], inProgressBuild.state)) {
+      return inProgressBuild;
+    }
+
+    return moduleBuild.lastBuild;
   }
 
   _getLog() {
