@@ -1,7 +1,7 @@
 /*global config*/
 import Resource from '../services/ResourceProvider';
 import Q from 'q';
-import { findWhere, map, extend, max } from 'underscore';
+import { findWhere, map, extend, max, contains } from 'underscore';
 import humanizeDuration from 'humanize-duration';
 
 function _parse(resp) {
@@ -41,6 +41,9 @@ function _fetchBranchBuildHistory(params) {
 
 function _getRepoBuildByParam(params, resp) {
   if (params.buildNumber === 'latest') {
+    resp = resp.filter((build) => {
+      return !contains(['QUEUED', 'LAUNCHING', 'WAITING_FOR_BUILD_SLOT', 'WAITING_FOR_UPSTREAM_BUILD'], build.state);
+    });
     return max(resp, (build) => {
       return build.buildNumber;
     });
