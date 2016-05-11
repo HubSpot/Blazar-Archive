@@ -1,9 +1,7 @@
 package com.hubspot.blazar.data.dao;
 
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.ModuleDependency;
-import com.hubspot.blazar.base.graph.Edge;
-import com.hubspot.rosetta.jdbi.BindWithRosetta;
+import java.util.Set;
+
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlBatch;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
@@ -11,7 +9,10 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.stringtemplate.UseStringTemplate3StatementLocator;
 import org.skife.jdbi.v2.unstable.BindIn;
 
-import java.util.Set;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.ModuleDependency;
+import com.hubspot.blazar.base.graph.Edge;
+import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
 @UseStringTemplate3StatementLocator
 public interface DependenciesDao {
@@ -29,8 +30,10 @@ public interface DependenciesDao {
       "INNER JOIN module_depends ON (module_provides.name = module_depends.name) " +
       "INNER JOIN modules ON (module_depends.moduleId = modules.id) " +
       "INNER JOIN branches ON (modules.branchId = branches.id) " +
+      "LEFT JOIN branch_settings on (branches.id = branch_settings.branchId) " +
       "WHERE module_provides.moduleId IN (<moduleIds>) " +
-      "AND branches.active = 1")
+      "AND branches.active = 1 " +
+      "AND (branches.branch = 'master' OR branch_settings.interProjectBuildOptIn = 1)")
   Set<Edge> getEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
 
   @SqlBatch("INSERT INTO module_provides (moduleId, name) VALUES (:moduleId, :name)")

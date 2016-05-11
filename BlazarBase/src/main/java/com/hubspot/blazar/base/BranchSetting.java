@@ -7,16 +7,19 @@ public class BranchSetting {
 
   private final long branchId;
   private final boolean triggerInterProjectBuilds;
+  private final boolean interProjectBuildOptIn;
 
   @JsonCreator
   public BranchSetting(@JsonProperty("branchId") long branchId,
-                       @JsonProperty("triggerInterProjectBuilds") boolean triggerInterProjectBuilds) {
+                       @JsonProperty("triggerInterProjectBuilds") boolean triggerInterProjectBuilds,
+                       @JsonProperty("interProjectBuildOptIn") boolean interProjectBuildOptIn) {
     this.branchId = branchId;
     this.triggerInterProjectBuilds = triggerInterProjectBuilds;
+    this.interProjectBuildOptIn = interProjectBuildOptIn;
   }
 
   public static BranchSetting getWithDefaultSettings(long branchId) {
-    return new BranchSetting(branchId, false);
+    return new BranchSetting(branchId, false, false);
   }
 
   public long getBranchId() {
@@ -25,5 +28,9 @@ public class BranchSetting {
 
   public boolean isTriggerInterProjectBuilds() {
     return triggerInterProjectBuilds;
+  }
+
+  public boolean isInterProjectBuildOptIn() {
+    return interProjectBuildOptIn;
   }
 }

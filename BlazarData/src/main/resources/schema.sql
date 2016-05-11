@@ -186,5 +186,6 @@ CREATE TABLE inter_project_build_mappings (
 CREATE TABLE branch_settings (
   `branchId` INT(11),
   `triggerInterProjectBuilds` TINYINT(1),
+  `interProjectBuildOptIn` TINYINT(1),
   PRIMARY KEY (`branchId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

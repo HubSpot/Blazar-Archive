@@ -47,6 +47,7 @@ public class DependencyGraph {
 
   public Set<Integer> getAllUpstreamNodes(int moduleId) {
     Stack<Integer> stack = new Stack<>();
+    stack.push(moduleId);
     Set<Integer> seen = new HashSet<>();
     Set<Integer> allIncoming = new HashSet<>();
     while (!stack.empty()) {

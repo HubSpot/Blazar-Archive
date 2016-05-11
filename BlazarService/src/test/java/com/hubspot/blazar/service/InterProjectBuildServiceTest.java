@@ -146,7 +146,6 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
         assertThat(mapping.getState().equals(InterProjectBuild.State.SUCCEEDED));
       }
     }
+    ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
   }
-
-
 }

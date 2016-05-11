@@ -16,10 +16,11 @@ public interface BranchSettingsDao {
   Optional<BranchSetting> getByBranchId(@Bind("branchId") int branchId);
 
 
-  @SqlUpdate("INSERT INTO branch_settings (branchId, triggerInterProjectBuilds) VALUES (:branchId, :triggerInterProjectBuilds)")
+  @SqlUpdate("INSERT INTO branch_settings (branchId, triggerInterProjectBuilds, interProjectBuildOptIn) VALUES (:branchId, :triggerInterProjectBuilds, :interProjectBuildOptIn)")
   int insert(@BindWithRosetta BranchSetting branchSetting);
 
-  @SqlUpdate("UPDATE branch_settings set triggerInterProjectBuilds = :triggerInterProjectBuilds where branchId = :branchId")
+  @SqlUpdate("UPDATE branch_settings SET triggerInterProjectBuilds = :triggerInterProjectBuilds, " +
+                                        "interProjectBuildOptIn = :interProjectBuildOptIn " +
+             "WHERE branchId = :branchId")
   int update(@BindWithRosetta BranchSetting branchSetting);
-
 }

@@ -119,9 +119,9 @@ public class BranchResource {
   public void updateSetting(@PathParam("id") int branchId, BranchSetting branchSetting) {
     Optional<BranchSetting> maybeBranchSetting = branchSettingsService.getByBranchId(branchId);
     if (maybeBranchSetting.isPresent()) {
-      branchSettingsService.update(new BranchSetting(branchId, branchSetting.isTriggerInterProjectBuilds()));
+      branchSettingsService.update(new BranchSetting(branchId, branchSetting.isTriggerInterProjectBuilds(), branchSetting.isInterProjectBuildOptIn()));
     } else {
-      branchSettingsService.insert(new BranchSetting(branchId, branchSetting.isTriggerInterProjectBuilds()));
+      branchSettingsService.insert(new BranchSetting(branchId, branchSetting.isTriggerInterProjectBuilds(), branchSetting.isInterProjectBuildOptIn()));
     }
   }
 }
