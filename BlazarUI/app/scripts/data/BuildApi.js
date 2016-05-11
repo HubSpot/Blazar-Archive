@@ -1,6 +1,6 @@
 /*global config*/
 import Reflux from 'reflux';
-import {extend, findWhere} from 'underscore'; 
+import {extend, findWhere} from 'underscore';
 import BuildStates from '../constants/BuildStates';
 import {buildIsOnDeck} from '../components/Helpers';
 
@@ -10,12 +10,12 @@ import LogSize from '../models/LogSize';
 import Resource from '../services/ResourceProvider';
 
 class BuildApi {
-  
+
   constructor(params) {
     this.params = params;
     this.build = {};
   }
-  
+
   _buildError(error) {
     this.cb(error);
   }
@@ -41,14 +41,14 @@ class BuildApi {
       }
 
       if (startOfLogLoaded) {
-        this._triggerUpdate({positionChange: position});  
+        this._triggerUpdate({positionChange: position});
       }
-      
+
       else {
         this._resetLogViaNavigation(position);
       }
     }
-  
+
     // navigated to the bottom
     else if (position === 'bottom') {
 
@@ -62,18 +62,18 @@ class BuildApi {
 
       else {
         this._resetLogViaNavigation(position);
-      }      
+      }
     }
 
   }
 
   fetchPrevious(cb) {
     if (cb) {
-      this.cb = cb;  
+      this.cb = cb;
     }
 
     const log = this.build.logCollection;
-  
+
     if (log.minOffsetLoaded === 0) {
       this._triggerUpdate();
     }
@@ -82,16 +82,16 @@ class BuildApi {
       log.fetchPrevious().done(this._triggerUpdate.bind(this));
     }
   }
-  
+
   fetchNext(cb) {
     if (cb) {
-      this.cb = cb;  
+      this.cb = cb;
     }
 
     if (this.build.logCollection.requestOffset === -1) {
       return;
     }
-    
+
     this.build.logCollection
       .fetchNext()
       .done(this._triggerUpdate.bind(this));
@@ -105,7 +105,7 @@ class BuildApi {
     if (this.build.logCollection) {
       this.build.logCollection.shouldPoll = state;
       // if we stopped polling and are starting up again,
-      // fetch the latest log size, last offset, 
+      // fetch the latest log size, last offset,
       // and start polling again
       if (state) {
         this._getLog().done(this._pollLog.bind(this));
@@ -120,20 +120,20 @@ class BuildApi {
       size: logSize,
       position: position
     }).fetch();
-    
+
     logPromise.done(() => {
       this._triggerUpdate({positionChange: position});
     });
   }
 
   _fetchBuild() {
-    const buildPromise = this.build.model.fetch();    
-    
+    const buildPromise = this.build.model.fetch();
+
     buildPromise.fail((jqXHR) => {
         this._buildError(`Error retrieving build #${this.params.buildNumber}. See your console for more detail.`);
         console.warn(jqXHR);
       });
-      
+
       return buildPromise;
   }
 
@@ -152,17 +152,17 @@ class BuildApi {
 
     return logPromise;
   }
-  
+
   _pollLog() {
     if (!this.build.logCollection) {
       return;
     }
-  
+
     if (this.build.logCollection.shouldPoll && this.build.model.data.state === BuildStates.IN_PROGRESS) {
       this._fetchLog().done((data, textStatus, jqxhr) => {
         this._triggerUpdate();
         this.build.logCollection.requestOffset = data.nextOffset;
-        
+
         setTimeout(() => {
           this._pollLog();
         }, config.activeBuildLogRefresh);
@@ -170,7 +170,7 @@ class BuildApi {
     }
 
   }
-  
+
   _pollBuild() {
     if (!this.build.model) {
       return;
@@ -190,7 +190,7 @@ class BuildApi {
       });
     }
   }
-  
+
   // If cancelled build, fetch twice to see if the build
   // is still processing or if it is actually complete.
   _processCancelledBuild() {
@@ -209,24 +209,22 @@ class BuildApi {
   }
 
   _processBuildOnDeck() {
-    this._triggerUpdate();  
+    this._triggerUpdate();
   }
 
-  _processActiveBuild() { 
+  _processActiveBuild() {
     this._pollLog();
     this._pollBuild();
   }
 
   _getBuild() {
-    const branchHistoryPromise = new Resource({ 
+    const branchHistoryPromise = new Resource({
       url: `${config.apiRoot}/builds/history/branch/${this.params.branchId}`,
       type: 'GET'
     }).send();
-    
+
     return branchHistoryPromise.then((resp) => {
-      
-      const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
-      
+
       // now get modules so we can get the moduleId by the module name
       const repoBuildModules = new Resource({
         url: `${config.apiRoot}/branches/${this.params.branchId}/modules`,
@@ -237,23 +235,47 @@ class BuildApi {
 
         const repoBuildModule = findWhere(modules, {name: this.params.moduleName, active: true});
 
-        // last get module build based on module id
-        const buildModules = new Resource({
-          url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
+        let buildModules;
+
+        if (this.params.buildNumber !== 'latest') {
+          const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
+          // last get module build based on module id
+          buildModules = new Resource({
+            url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
+            type: 'GET'
+          }).send();
+
+          return buildModules.then((modules) => {
+            const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});
+
+            this.build.model = new Build({
+              id: moduleBuild.id,
+              repoBuildId: moduleBuild.repoBuildId
+            });
+
+            return this._fetchBuild();
+          });
+        }
+
+        buildModules = new Resource({
+          url: `${config.apiRoot}/branches/state/${this.params.branchId}/modules`,
           type: 'GET'
         }).send();
 
         return buildModules.then((modules) => {
-          const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});
+          const moduleBuild = modules.filter((module) => {
+            return module.module.id === repoBuildModule.id;
+          })[0];
+
+          const repoBuildId = findWhere(resp, {buildNumber: parseInt(moduleBuild.lastBuild.buildNumber)}).id;
 
           this.build.model = new Build({
-            id: moduleBuild.id,
-            repoBuildId: moduleBuild.repoBuildId
+            id: moduleBuild.lastBuild.id,
+            repoBuildId: repoBuildId
           });
 
           return this._fetchBuild();
         });
-
       });
 
     }, (error) => {
@@ -263,7 +285,7 @@ class BuildApi {
 
   _getLog() {
     const logSizePromise = this._getLogSize();
-    
+
     if (!logSizePromise || !this.build.model) {
       return;
     }
@@ -273,17 +295,17 @@ class BuildApi {
         buildId: this.build.model.data.id,
         size: resp.size,
         buildState: this.build.model.data.state
-      });    
+      });
     });
-      
+
     return logSizePromise;
   }
-  
+
   _getLogSize() {
     if (!this.build.model) {
       return;
     }
-  
+
     if (buildIsOnDeck(this.build.model.data.state)) {
       return;
     }
@@ -301,10 +323,10 @@ class BuildApi {
 
     return sizePromise;
   }
-  
+
   _updateLogSize() {
     const logSizePromise = this._getLogSize();
-    
+
     if (!logSizePromise) {
       return;
     }
@@ -312,7 +334,7 @@ class BuildApi {
     logSizePromise.done((resp) => {
       this.build.logCollection.options.size = resp.size;
     });
-      
+
     return logSizePromise;
   }
 
@@ -326,17 +348,17 @@ class BuildApi {
       case BuildStates.LAUNCHING:
         this._processBuildOnDeck();
         break;
-    
+
       case BuildStates.IN_PROGRESS:
         this._processActiveBuild();
         break;
-    
+
       case BuildStates.SUCCEEDED:
-      case BuildStates.FAILED: 
+      case BuildStates.FAILED:
       case BuildStates.UNSTABLE:
         this._processFinishedBuild();
         break;
-      
+
       case BuildStates.CANCELLED:
         this._processCancelledBuild();
         break;
