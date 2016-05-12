@@ -80,10 +80,36 @@ function deleteNotification(params, notificationId, cb) {
   });
 }
 
+function getSettings(params, cb) {
+  const settingsPromise = new Resource({
+    url: `${config.apiRoot}/branches/${params.branchId}/settings`,
+    type: 'GET',
+    contentType: 'application/json',
+  }).send();
+  settingsPromise.then((resp) => {
+    cb(resp);
+  });
+}
+
+function updateSettings(params, data, cb) {
+  const settingsPromise = new Resource({
+    url: `${config.apiRoot}/branches/${params.branchId}/settings`,
+    type: 'PUT',
+    contentType: 'application/json',
+    data: JSON.stringify(data)
+  }).send();
+
+  settingsPromise.then(() => {
+    return this.getSettings(params, cb);
+  });
+}
+
 export default {
   fetchNotifications: fetchNotifications,
   updateNotification: updateNotification,
   fetchSlackChannels: fetchSlackChannels,
   addNotification: addNotification,
-  deleteNotification: deleteNotification
+  deleteNotification: deleteNotification,
+  getSettings: getSettings,
+  updateSettings: updateSettings
 };

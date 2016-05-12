@@ -16,6 +16,7 @@ import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
 
 import SettingsActions from '../../actions/settingsActions';
 import SettingsStore from '../../stores/settingsStore';
+import BranchSettings from './BranchSettings.jsx';
 
 import BranchActions from '../../actions/branchActions';
 import BranchStore from '../../stores/branchStore';
@@ -24,16 +25,18 @@ let initialState = {
   notifications: [],
   slackChannels: [],
   branchInfo: {},
+  triggerInterProjectBuilds: false,
+  interProjectBuildOptIn: false,
   loading: true,
-  loadingBranchInfo: true
+  loadingBranchInfo: true,
+  loadingSettings: true
 };
 
 class SettingsContainer extends Component {
 
   constructor() {
     this.state = initialState;
-
-    bindAll(this, 'onStatusChange');
+    bindAll(this, 'onStatusChange', 'onTriggerInterProjectBuilds', 'onInterProjectBuildOptIn');
   }
 
   componentDidMount() {
@@ -41,12 +44,14 @@ class SettingsContainer extends Component {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     BranchActions.loadBranchInfo(this.props.params);
     SettingsActions.loadNotifications(this.props.params);
+    SettingsActions.loadSettings(this.props.params);
     SettingsActions.loadSlackChannels();
   }
 
   componentWillReceiveProps(nextprops) {
     this.setState(initialState);
     SettingsActions.loadNotifications(nextProps.params);
+    SettingsActions.loadSettings(this.props.params);
   }
 
   componentWillUnmount() {
@@ -64,6 +69,14 @@ class SettingsContainer extends Component {
     return 'Settings' + (branchInfo ? ' | ' + branchInfo.repository + ' - ' + branchInfo.branch : '');
   }
 
+  onTriggerInterProjectBuilds() {
+    SettingsActions.triggerInterProjectBuilds(this.props.params);
+  }
+
+  onInterProjectBuildOptIn() {
+    SettingsActions.interProjectBuildOptIn(this.props.params);
+  }
+
   renderHeadline() {
     const branchUrl = `/builds/branch/${this.props.params.branchId}`;
 
@@ -79,19 +92,25 @@ class SettingsContainer extends Component {
   }
 
   renderContent() {
-    if (this.state.loading || this.state.loadingBranchInfo) {
+    if (this.state.loading || this.state.loadingBranchInfo || this.state.loadingSettings) {
       return (
         <Loader align='left' />
       )
     }
-
     return (
       <UIGrid>
-        <UIGridItem size={12}>
+          <UIGridItem size={12}>
           {this.renderHeadline()}
+          <BranchSettings
+            triggerInterProjectBuilds={this.state.triggerInterProjectBuilds}
+            interProjectBuildOptIn={this.state.interProjectBuildOptIn}
+            onTriggerInterProjectBuilds={this.onTriggerInterProjectBuilds}
+            onInterProjectBuildOptIn={this.onInterProjectBuildOptIn}
+          />
           <Notifications
             notifications={this.state.notifications}
-            slackChannels={this.state.slackChannels} />
+            slackChannels={this.state.slackChannels}
+          />
         </UIGridItem>
       </UIGrid>
     );
