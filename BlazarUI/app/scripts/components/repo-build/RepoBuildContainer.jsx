@@ -96,7 +96,7 @@ class RepoBuildContainer extends Component {
   buildDocumentTitle() {
     const {branchInfo} = this.state;
     const titlePrefix = `#${this.props.params.buildNumber}`;
-    const titleInfo = branchInfo ? ' | ' + branchInfo.branch + ' - ' + branchInfo.repository : '';
+    const titleInfo = branchInfo ? ' | ' + branchInfo.repository  + ' - ' + branchInfo.branch : '';
 
     return titlePrefix + titleInfo;
   }
