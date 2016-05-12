@@ -64,8 +64,8 @@ class DashboardContainer extends Component {
 
   render() {
     return (
-      <PageContainer classNames='page-dashboard'>
-        <Dashboard 
+      <PageContainer documentTitle='Dashboard' classNames='page-dashboard'>
+        <Dashboard
           starredBuilds={fromJS(sortBranchesByTimestamp(this.state.starredBuilds, false))}
           loadingStars={this.state.loadingStars}
           loadingBuilds={this.state.loading}

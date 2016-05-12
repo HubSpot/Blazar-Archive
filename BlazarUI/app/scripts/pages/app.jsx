@@ -57,7 +57,7 @@ class App extends Component {
     const modal = this.apiModal();
 
     return (
-      <DocumentTitle title='Dashboard | Blazar'>
+      <DocumentTitle title='Blazar'>
         <div>
           <div className="page-wrapper">
             <SidebarContainer params={this.props.params} />
