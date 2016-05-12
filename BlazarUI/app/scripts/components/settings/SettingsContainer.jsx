@@ -58,6 +58,12 @@ class SettingsContainer extends Component {
     this.setState(state);
   }
 
+  buildDocumentTitle() {
+    const {branchInfo} = this.state;
+
+    return branchInfo ? branchInfo.repository + ' - ' + branchInfo.branch : 'Branch Settings';
+  }
+
   renderHeadline() {
     const branchUrl = `/builds/branch/${this.props.params.branchId}`;
 
@@ -72,25 +78,29 @@ class SettingsContainer extends Component {
     );
   }
 
-  render() {
+  renderContent() {
     if (this.state.loading || this.state.loadingBranchInfo) {
       return (
         <Loader align='left' />
       )
     }
 
-    const documentTitle = this.state.branchInfo ? this.state.branchInfo.repository + ' - ' + this.state.branchInfo.branch : 'Branch Settings';
-
     return (
-      <PageContainer documentTitle={documentTitle}>
-        <UIGrid>
-          <UIGridItem size={12}>
-            {this.renderHeadline()}
-            <Notifications
-              notifications={this.state.notifications}
-              slackChannels={this.state.slackChannels} />
-          </UIGridItem>
-        </UIGrid>
+      <UIGrid>
+        <UIGridItem size={12}>
+          {this.renderHeadline()}
+          <Notifications
+            notifications={this.state.notifications}
+            slackChannels={this.state.slackChannels} />
+        </UIGridItem>
+      </UIGrid>
+    );
+  }
+
+  render() {
+    return (
+      <PageContainer documentTitle={this.buildDocumentTitle()}>
+        {this.renderContent()}
       </PageContainer>
     );
   }

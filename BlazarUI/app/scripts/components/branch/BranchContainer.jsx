@@ -169,6 +169,12 @@ class BranchContainer extends Component {
       || this.state.loadingRepo;
   }
 
+  buildDocumentTitle() {
+    const {branchInfo} = this.state;
+    
+    return branchInfo ? branchInfo.repository + ' - ' + branchInfo.branch : 'Branch Build History';
+  }
+
   renderTable() {
     if (this.state.error) {
       return (
@@ -240,10 +246,8 @@ class BranchContainer extends Component {
   }
 
   render() {
-    const documentTitle = this.state.branchInfo ? this.state.branchInfo.repository + ' - ' + this.state.branchInfo.branch : 'Branch';
-
     return (
-      <PageContainer documentTitle={documentTitle} classNames={this.getClassNames()}>
+      <PageContainer documentTitle={this.buildDocumentTitle()} classNames={this.getClassNames()}>
         {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={7}>
