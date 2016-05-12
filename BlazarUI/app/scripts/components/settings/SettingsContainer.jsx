@@ -61,7 +61,7 @@ class SettingsContainer extends Component {
   buildDocumentTitle() {
     const {branchInfo} = this.state;
 
-    return branchInfo ? branchInfo.repository + ' - ' + branchInfo.branch : 'Branch Settings';
+    return 'Settings' + branchInfo ? ' | ' + branchInfo.repository + ' - ' + branchInfo.branch : '';
   }
 
   renderHeadline() {
