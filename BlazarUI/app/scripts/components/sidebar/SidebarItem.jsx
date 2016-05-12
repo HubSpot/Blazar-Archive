@@ -83,11 +83,11 @@ class SidebarItem extends Component {
       </div>
     );
   }
-  
+
   renderRepoLink() {
     const {repository} = this.props;
     const blazarRepositoryPath = `/builds/repo/${repository}`;
-    
+
     return (
       <div className='sidebar-item__repo-link'>
         <Icon type='octicon' name='repo' classNames='repo-octicon'/>{ '   ' }
@@ -144,6 +144,11 @@ class SidebarItem extends Component {
 
   renderBranchRow(build, key) {
     const {gitInfo, lastBuild} = build;
+
+    if (!build.inProgressBuild && !lastBuild) {
+      return null;
+    }
+
     let buildState = build.inProgressBuild !== undefined ? build.inProgressBuild.state : lastBuild.state;
 
     return (
@@ -166,11 +171,11 @@ class SidebarItem extends Component {
 
       return (
         <div>
-          {splicedBuilds.map((build, i) => {return this.renderBranchRow(build, i);})}       
+          {splicedBuilds.map((build, i) => {return this.renderBranchRow(build, i);})}
           {this.renderExpandText(numberRemaining)}
         </div>
       );
-    } 
+    }
 
     else {
       return (
