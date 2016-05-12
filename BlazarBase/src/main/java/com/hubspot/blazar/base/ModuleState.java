@@ -1,22 +1,22 @@
 package com.hubspot.blazar.base;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 
-import java.util.Objects;
-
 public class ModuleState {
   private final Module module;
-  private final Optional<RepositoryBuild> lastBuild;
-  private final Optional<RepositoryBuild> inProgressBuild;
-  private final Optional<RepositoryBuild> pendingBuild;
+  private final Optional<ModuleBuild> lastBuild;
+  private final Optional<ModuleBuild> inProgressBuild;
+  private final Optional<ModuleBuild> pendingBuild;
 
   @JsonCreator
   public ModuleState(@JsonProperty("module") Module module,
-                     @JsonProperty("lastBuild") Optional<RepositoryBuild> lastBuild,
-                     @JsonProperty("inProgressBuild") Optional<RepositoryBuild> inProgressBuild,
-                     @JsonProperty("pendingBuild") Optional<RepositoryBuild> pendingBuild) {
+                     @JsonProperty("lastBuild") Optional<ModuleBuild> lastBuild,
+                     @JsonProperty("inProgressBuild") Optional<ModuleBuild> inProgressBuild,
+                     @JsonProperty("pendingBuild") Optional<ModuleBuild> pendingBuild) {
     this.module = module;
 
     if (lastBuild.isPresent() && !lastBuild.get().getId().isPresent()) {
@@ -42,15 +42,15 @@ public class ModuleState {
     return module;
   }
 
-  public Optional<RepositoryBuild> getLastBuild() {
+  public Optional<ModuleBuild> getLastBuild() {
     return lastBuild;
   }
 
-  public Optional<RepositoryBuild> getInProgressBuild() {
+  public Optional<ModuleBuild> getInProgressBuild() {
     return inProgressBuild;
   }
 
-  public Optional<RepositoryBuild> getPendingBuild() {
+  public Optional<ModuleBuild> getPendingBuild() {
     return pendingBuild;
   }
 

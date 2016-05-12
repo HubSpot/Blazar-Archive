@@ -21,7 +21,7 @@ class OrgContainer extends Component {
       loading: true,
       filterValue: ''
     };
-    
+
     this.handleFilterChange = this.handleFilterChange.bind(this);
   }
 
@@ -43,14 +43,14 @@ class OrgContainer extends Component {
   onStatusChange(state) {
     this.setState(state);
   }
-  
+
   handleFilterChange(newValue) {
     this.setState({
       filterValue: newValue
     });
   }
-  
-  getFilterOptions() {    
+
+  getFilterOptions() {
     return this.state.repos.toJS().map((item) => {
       return {
         value: item.repository,
@@ -58,7 +58,7 @@ class OrgContainer extends Component {
       }
     });
   }
-  
+
   getFilteredRepos() {
     const {repos, filterValue} = this.state;
 
@@ -69,12 +69,12 @@ class OrgContainer extends Component {
     return repos.filter((item) => {
       return item.get('repository') === filterValue;
     });
-    
+
   }
 
   render() {
     return (
-      <PageContainer>
+      <PageContainer documentTitle={this.props.params.org}>
         <UIGrid>
           <UIGridItem size={12}>
             <Headline>
