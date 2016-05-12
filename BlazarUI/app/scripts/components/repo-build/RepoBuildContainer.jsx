@@ -42,7 +42,7 @@ class RepoBuildContainer extends Component {
 
     bindAll(this, 'onStatusChange', 'triggerCancelBuild')
   }
-  
+
   componentDidMount() {
     this.setup(this.props.params);
   }
@@ -56,8 +56,8 @@ class RepoBuildContainer extends Component {
   componentWillUnmount() {
     this.tearDown()
   }
-  
-  setup(params) { 
+
+  setup(params) {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
@@ -75,11 +75,11 @@ class RepoBuildContainer extends Component {
     this.unsubscribeFromRepoBuild();
     this.unsubscribeFromBranch();
   }
-  
+
   onStatusChange(state) {
     this.setState(state);
   }
-  
+
   triggerCancelBuild() {
     RepoBuildActions.cancelBuild(this.props.params);
   }
@@ -93,6 +93,14 @@ class RepoBuildContainer extends Component {
       || !moduleBuilds;
   }
 
+  buildDocumentTitle() {
+    const {branchInfo} = this.state;
+    const titlePrefix = `#${this.props.params.buildNumber}`;
+    const titleInfo = branchInfo ? ' | ' + branchInfo.branch + ' - ' + branchInfo.repository : '';
+
+    return titlePrefix + titleInfo;
+  }
+
   renderSectionContent() {
     if (this.state.error) {
       return this.renderError();
@@ -102,7 +110,7 @@ class RepoBuildContainer extends Component {
       return this.renderPage();
     }
   }
-  
+
   renderError() {
     return (
       <UIGrid>
@@ -130,7 +138,7 @@ class RepoBuildContainer extends Component {
       </UIGrid>
     );
   }
-  
+
   renderPage() {
     return (
       <div>
@@ -146,7 +154,7 @@ class RepoBuildContainer extends Component {
           </UIGridItem>
         </UIGrid>
         <UIGridItem size={12}>
-          <RepoBuildDetail 
+          <RepoBuildDetail
             {...this.props}
             {...this.state}
             loading={this.isLoading()}
@@ -164,8 +172,10 @@ class RepoBuildContainer extends Component {
   }
 
   render() {
+    const documentTitle = this.buildDocumentTitle();
+
     return (
-      <PageContainer>
+      <PageContainer documentTitle={documentTitle}>
         {this.renderSectionContent()}
       </PageContainer>
     );

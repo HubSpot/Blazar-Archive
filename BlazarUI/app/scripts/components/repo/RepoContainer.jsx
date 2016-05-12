@@ -60,12 +60,12 @@ class RepoContainer extends Component {
     this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
     RepoActions.loadBranchesAndBuilds(params);
   }
-  
+
   tearDown() {
     RepoActions.stopPolling();
     this.unsubscribeFromRepo();
   }
-  
+
   updateFilters(newFilters) {
     this.setState({
       filters: newFilters,
@@ -74,7 +74,7 @@ class RepoContainer extends Component {
 
   render() {
     return (
-      <PageContainer>
+      <PageContainer documentTitle={this.props.params.repo}>
         <UIGrid>
           <UIGridItem size={12}>
             <Headline>
@@ -92,7 +92,7 @@ class RepoContainer extends Component {
               updateFilters={this.updateFilters}
               {...this.state}
             />
-            <BranchesTable 
+            <BranchesTable
               hide={this.state.error}
               {...this.state}
               branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.branches))}

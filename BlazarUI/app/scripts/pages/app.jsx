@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import DocumentTitle from 'react-document-title';
 import SidebarContainer from '../components/sidebar/SidebarContainer.jsx';
 import FeedbackForm from '../components/feedback/FeedbackForm.jsx';
 import Modal from 'react-bootstrap/lib/Modal';
@@ -56,14 +57,16 @@ class App extends Component {
     const modal = this.apiModal();
 
     return (
-      <div>
-        <div className="page-wrapper">
-          <SidebarContainer params={this.props.params} />
-          {this.props.children}
+      <DocumentTitle title='Dashboard | Blazar'>
+        <div>
+          <div className="page-wrapper">
+            <SidebarContainer params={this.props.params} />
+            {this.props.children}
+          </div>
+          <FeedbackForm/>
+          {modal}
         </div>
-        <FeedbackForm/>
-        {modal}
-      </div>
+      </DocumentTitle>
     );
   }
 }

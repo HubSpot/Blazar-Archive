@@ -79,8 +79,10 @@ class SettingsContainer extends Component {
       )
     }
 
+    const documentTitle = this.state.branchInfo ? this.state.branchInfo.repository + ' - ' + this.state.branchInfo.branch : 'Branch Settings';
+
     return (
-      <PageContainer>
+      <PageContainer documentTitle={documentTitle}>
         <UIGrid>
           <UIGridItem size={12}>
             {this.renderHeadline()}
