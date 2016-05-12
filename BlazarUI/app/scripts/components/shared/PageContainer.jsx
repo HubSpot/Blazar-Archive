@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import DocumentTitle from 'react-document-title';
 import classnames from 'classnames';
 
 class PageContainer extends Component {
@@ -23,17 +24,29 @@ class PageContainer extends Component {
   }
 
   render() {
-    return (
+    const innerContent = (
       <div className={this.getClassNames()}>
         {this.getHeadline()}
         {this.props.children}
       </div>
     );
+
+    if (this.props.documentTitle) {
+      const formattedTitle = `${this.props.documentTitle} | Blazar`;
+      return (
+        <DocumentTitle title={formattedTitle}>
+          {innerContent}
+        </DocumentTitle>
+      );
+    }
+
+    return innerContent;
   }
 }
 
 PageContainer.propTypes = {
   headline: PropTypes.string,
+  documentTitle: PropTypes.string,
   classNames: PropTypes.string,
   children: PropTypes.node
 };

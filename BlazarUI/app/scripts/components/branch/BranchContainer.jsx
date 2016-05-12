@@ -73,7 +73,7 @@ class BranchContainer extends Component {
   onStatusChange(state) {
     this.setState(state);
   }
-    
+
   setup(params) {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
@@ -87,7 +87,7 @@ class BranchContainer extends Component {
     this.tryLoadBranches();
     this.setScrollListener();
   }
-  
+
   tearDown() {
     BranchActions.stopPolling();
     this.unsubscribeFromStars();
@@ -168,7 +168,13 @@ class BranchContainer extends Component {
       || this.state.loadingModules
       || this.state.loadingRepo;
   }
-  
+
+  buildDocumentTitle() {
+    const {branchInfo} = this.state;
+    
+    return branchInfo ? branchInfo.repository + ' - ' + branchInfo.branch : 'Branch Build History';
+  }
+
   renderTable() {
     if (this.state.error) {
       return (
@@ -177,7 +183,7 @@ class BranchContainer extends Component {
         />
       );
     }
-    
+
     else {
       if (this.state.builds) {
         this.props.params.prevBuildState = getPreviousBuildState(this.state.builds);
@@ -192,7 +198,7 @@ class BranchContainer extends Component {
         />
       );
     }
-    
+
   }
 
   renderMalformedFileAlert() {
@@ -229,7 +235,7 @@ class BranchContainer extends Component {
 
   renderLoader() {
     const showedAllRows = this.state.builds === null || this.state.maxRows >= this.state.builds.size;
-    
+
     if (this.isLoading() || showedAllRows) {
       return;
     }
@@ -241,7 +247,7 @@ class BranchContainer extends Component {
 
   render() {
     return (
-      <PageContainer classNames={this.getClassNames()}>
+      <PageContainer documentTitle={this.buildDocumentTitle()} classNames={this.getClassNames()}>
         {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={7}>
@@ -255,7 +261,7 @@ class BranchContainer extends Component {
             />
           </UIGridItem>
           <UIGridItem style={{'paddingTop': '32px'}} size={5} align='RIGHT'>
-            <BuildButton 
+            <BuildButton
               openModuleModal={this.openModuleModal}
               loading={this.isLoading()}
               error={this.state.error}

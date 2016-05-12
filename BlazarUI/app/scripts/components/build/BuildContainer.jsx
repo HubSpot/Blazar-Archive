@@ -68,11 +68,11 @@ class BuildContainer extends Component {
   fetchNext() {
     BuildActions.fetchNext();
   }
-  
+
   fetchPrevious() {
     BuildActions.fetchPrevious();
   }
-  
+
   requestNavigationChange(position) {
     BuildActions.navigationChange(position);
   }
@@ -90,10 +90,10 @@ class BuildContainer extends Component {
       }, 2000);
     }
   }
-  
+
   getHeaderClasses() {
     const buildState = this.state.data.build.state;
-    
+
     if (buildState) {
       return classNames([
         'build-header',
@@ -103,19 +103,29 @@ class BuildContainer extends Component {
     return null;
   }
 
+  buildDocumentTitle() {
+    const {branchInfo} = this.state;
+    const {moduleName, buildNumber} = this.props.params;
+
+    const titlePrefix = `${moduleName} #${buildNumber}`;
+    const titleInfo = branchInfo ? ' | ' + `${branchInfo.repository} - ${branchInfo.branch}` : '';
+
+    return titlePrefix + titleInfo;
+  }
+
   render() {
     return (
-      <PageContainer classNames='build-container'>
+      <PageContainer documentTitle={this.buildDocumentTitle()} classNames='build-container'>
         <div className={this.getHeaderClasses()}>
           <UIGrid containerClassName='build-header__name-and-buttons'>
             <UIGridItem size={8}>
-              <BuildHeadline 
+              <BuildHeadline
                 {...this.props}
                 {...this.state}
               />
             </UIGridItem>
             <UIGridItem size={4} style={{'paddingTop': '15px'}}>
-              <BuildLogNavigation 
+              <BuildLogNavigation
                 build={this.state.data.build}
                 requestNavigationChange={this.requestNavigationChange}
                 {...this.state}
@@ -123,7 +133,7 @@ class BuildContainer extends Component {
             </UIGridItem>
           </UIGrid>
         </div>
-        <div className='build-body'>  
+        <div className='build-body'>
           <BuildLog
             build={this.state.data.build}
             log={this.state.data.log}
