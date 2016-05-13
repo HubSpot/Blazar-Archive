@@ -108,8 +108,12 @@ public class BranchResource {
   @PropertyFiltering
   public BranchSetting getBranchSettings(@PathParam("id") int branchId) {
     Optional<BranchSetting> maybeBranchSetting = branchSettingsService.getByBranchId(branchId);
+    Optional<GitInfo> gitInfo = branchService.get(branchId);
     if (maybeBranchSetting.isPresent()) {
       return maybeBranchSetting.get();
+    }
+    if (gitInfo.isPresent() && gitInfo.get().getBranch().equals("master")) {
+      return BranchSetting.getWithDefaultSettingsForMaster(branchId);
     }
     return BranchSetting.getWithDefaultSettings(branchId);
   }

@@ -22,6 +22,10 @@ public class BranchSetting {
     return new BranchSetting(branchId, false, false);
   }
 
+  public static BranchSetting getWithDefaultSettingsForMaster(long branchId) {
+    return new BranchSetting(branchId, false, true);
+  }
+
   public long getBranchId() {
     return branchId;
   }
