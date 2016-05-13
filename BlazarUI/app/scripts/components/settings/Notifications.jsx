@@ -124,7 +124,7 @@ class Notifications extends Component {
             </div>
           </UIGridItem>
         </UIGrid>
-        <UIGrid className='notifications__grid'>
+        <UIGrid className='notifications__grid settings__grid'>
           <UIGridItem size={4} className='notifications__channel-list'>
             <NotificationsChannels
               selectedChannel={this.state.selectedChannel}
