@@ -33,7 +33,7 @@ public interface DependenciesDao {
       "LEFT JOIN branch_settings on (branches.id = branch_settings.branchId) " +
       "WHERE module_provides.moduleId IN (<moduleIds>) " +
       "AND branches.active = 1 " +
-      "AND (branches.branch = 'master' OR branch_settings.interProjectBuildOptIn = 1)")
+      "AND (branch_settings.interProjectBuildOptIn = 1 OR (branches.branch = 'master' and branch_settings.interProjectBuildOptIn is NULL))")
   Set<Edge> getEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
 
   @SqlBatch("INSERT INTO module_provides (moduleId, name) VALUES (:moduleId, :name)")

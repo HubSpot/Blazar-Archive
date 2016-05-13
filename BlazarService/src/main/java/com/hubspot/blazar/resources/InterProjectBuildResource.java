@@ -66,7 +66,7 @@ public class InterProjectBuildResource {
   }
 
   @GET
-  @Path("/test/{id}")
+  @Path("/graph/{id}")
   public DependencyGraph dependencyGraph(@PathParam("id") int id) {
     return dependenciesService.buildInterProjectDependencyGraph(Sets.newHashSet(moduleService.get(id).get()));
   }
