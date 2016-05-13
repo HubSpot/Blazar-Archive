@@ -169,10 +169,18 @@ class BranchContainer extends Component {
 
 
   triggerBuild() {
+    let newState = this.state;
+
+    if (this.state.selectedModules.length === 0) {
+      newState.selectedModules = this.state.modules.map((module) => {
+        return module.id;
+      });
+    }
+
     if (this.state.triggerInterProjectBuild) {
-      InterProjectActions.triggerInterProjectBuild(this.props.params, this.state);
+      InterProjectActions.triggerInterProjectBuild(this.props.params, newState);
     } else {
-      BranchActions.triggerBuild(this.props.params, this.state);
+      BranchActions.triggerBuild(this.props.params, newState);
     }
   }
 
@@ -185,7 +193,7 @@ class BranchContainer extends Component {
 
   buildDocumentTitle() {
     const {branchInfo} = this.state;
-    
+
     return branchInfo ? branchInfo.repository + ' - ' + branchInfo.branch : 'Branch Build History';
   }
 
