@@ -1,5 +1,23 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -12,22 +30,6 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.graph.Edge;
 import com.hubspot.blazar.data.dao.DependenciesDao;
 import com.hubspot.blazar.data.util.GraphUtils;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 public class DependenciesService {
@@ -63,6 +65,7 @@ public class DependenciesService {
       long queryStart = System.currentTimeMillis();
       Set<Edge> edges = dependenciesDao.getEdges(modulesToProcess);
       long queryEnd = System.currentTimeMillis();
+      LOG.info("Query for {} took {}", modulesToProcess, queryEnd - queryStart);
       queryTimes.add(queryEnd - queryStart);
 
       for (Edge edge : edges) {
@@ -74,11 +77,24 @@ public class DependenciesService {
     }
 
     long startGraph = System.currentTimeMillis();
+    Set<Integer> s = new HashSet<>();
+    for (Map.Entry<Integer, Integer> i : graph.entries()) {
+      s.add(i.getKey());
+      s.add(i.getValue());
+    }
+    LOG.info("graph is of size {}", s.size());
+    int maxWidth = 0;
+    for (Map.Entry<Integer, Collection<Integer>> entry  : graph.asMap().entrySet()) {
+      if ( maxWidth < entry.getValue().size()) {
+        maxWidth = entry.getValue().size();
+      }
+    }
+
+    LOG.info("Graph is {} at its widest", maxWidth);
+
     SetMultimap<Integer, Integer> transitiveReduction = GraphUtils.INSTANCE.transitiveReduction(graph);
     LOG.info("Transitive reduction calculation took {}", System.currentTimeMillis()-startGraph);
-    long startSort = System.currentTimeMillis();
     List<Integer> topologicalSort = GraphUtils.INSTANCE.topologicalSort(graph);
-    LOG.info("Topological sort calculation took {}", System.currentTimeMillis()-startSort);
     Map<Integer, Set<Integer>> transitiveReductionMap = new HashMap<>(Multimaps.asMap(transitiveReduction));
     DependencyGraph dependencyGraph = new DependencyGraph(transitiveReductionMap, topologicalSort);
     long sum = 0;

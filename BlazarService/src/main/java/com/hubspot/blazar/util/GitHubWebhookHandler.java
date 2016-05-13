@@ -10,21 +10,26 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.kohsuke.github.GHRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.hubspot.blazar.base.BranchSetting;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.BranchSettingsService;
+import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
+import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
 import com.hubspot.blazar.github.GitHubProtos.PushEvent;
 import com.hubspot.blazar.github.GitHubProtos.Repository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 public class GitHubWebhookHandler {
@@ -32,17 +37,26 @@ public class GitHubWebhookHandler {
 
   private final BranchService branchService;
   private final RepositoryBuildService repositoryBuildService;
+  private final InterProjectBuildService interProjectBuildService;
+  private final InterProjectBuildMappingService interProjectBuildMappingService;
+  private final BranchSettingsService branchSettingsService;
   private final GitHubHelper gitHubHelper;
   private final Set<String> whitelist;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
                               RepositoryBuildService repositoryBuildService,
+                              InterProjectBuildService interProjectBuildService,
+                              InterProjectBuildMappingService interProjectBuildMappingService,
+                              BranchSettingsService branchSettingsService,
                               GitHubHelper gitHubHelper,
                               @Named("whitelist") Set<String> whitelist,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.repositoryBuildService = repositoryBuildService;
+    this.interProjectBuildService = interProjectBuildService;
+    this.interProjectBuildMappingService = interProjectBuildMappingService;
+    this.branchSettingsService = branchSettingsService;
     this.gitHubHelper = gitHubHelper;
     this.whitelist = whitelist;
 
@@ -85,8 +99,18 @@ public class GitHubWebhookHandler {
       if (!gitInfo.isActive()) {
         String message = "Ignoring push event for inactive branch {}-{}@{}";
         LOG.warn(message, gitInfo.getFullRepositoryName(), gitInfo.getBranch(), pushEvent.getAfter());
-      } else if (isOptedIn(gitInfo)) {
-        gitInfo = branchService.upsert(gitInfo);
+        return;
+      }
+      if (!isOptedIn(gitInfo)) {
+        LOG.debug("Not {}#{} is not opted in to Blazar", gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+        return;
+      }
+      gitInfo = branchService.upsert(gitInfo);
+      Optional<BranchSetting> branchSetting = branchSettingsService.getByBranchId(gitInfo.getId().get());
+      if (branchSetting.isPresent() && branchSetting.get().isTriggerInterProjectBuilds()) {
+        BuildOptions options = new BuildOptions(ImmutableSet.<Integer>of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
+        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), options);
+      } else {
         repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), BuildOptions.defaultOptions());
       }
     }

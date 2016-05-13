@@ -25,29 +25,37 @@ import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
+import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.hubspot.blazar.util.GitHubHelper;
 
 public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(InterProjectBuildHandler.class);
   private DependenciesService dependenciesService;
   private ModuleService moduleService;
+  private ModuleBuildService moduleBuildService;
   private BranchService branchService;
   private RepositoryBuildService repositoryBuildService;
+  private GitHubHelper gitHubHelper;
   private InterProjectBuildMappingService interProjectBuildMappingService;
   private InterProjectBuildService interProjectBuildService;
 
   @Inject
   public InterProjectBuildHandler(DependenciesService dependenciesService,
                                   ModuleService moduleService,
+                                  ModuleBuildService moduleBuildService,
                                   BranchService branchService,
                                   RepositoryBuildService repositoryBuildService,
+                                  GitHubHelper gitHubHelper,
                                   InterProjectBuildMappingService interProjectBuildMappingService,
                                   InterProjectBuildService interProjectBuildService){
     this.dependenciesService = dependenciesService;
     this.moduleService = moduleService;
+    this.moduleBuildService = moduleBuildService;
     this.branchService = branchService;
     this.repositoryBuildService = repositoryBuildService;
+    this.gitHubHelper = gitHubHelper;
     this.interProjectBuildMappingService = interProjectBuildMappingService;
     this.interProjectBuildService = interProjectBuildService;
   }
@@ -62,15 +70,21 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
     }
     DependencyGraph d = dependenciesService.buildInterProjectDependencyGraph(s);
     LOG.debug("Built graph for InterProjectBuild {} in {}", build.getId().get(), System.currentTimeMillis()-start);
-    interProjectBuildService.start(InterProjectBuild.withDependencyGraph(build, d));
+    interProjectBuildService.start(build.withDependencyGraph(d));
   }
-
 
   @Override
   protected void visitRunning(InterProjectBuild build) throws Exception {
     DependencyGraph d = build.getDependencyGraph().get();
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
-    if (!(mappings.size() == 0)) {
+    if (mappings.size() != 0 && build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
+      LOG.info("InterProjectBuild was triggered by push, no need to launch builds, mappings exist");
+      return;
+    } else if (mappings.size() == 0 && build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
+      LOG.info("InterProjectBuild was triggered by push, with no child builds triggered, marking as success");
+      interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(build, InterProjectBuild.State.SUCCEEDED));
+      return;
+    } else if (mappings.size() != 0) {
       LOG.warn("Running InterProjectBuild was launched and build mappings created outside of intended flow, Ignoring Event");
       return;
     }

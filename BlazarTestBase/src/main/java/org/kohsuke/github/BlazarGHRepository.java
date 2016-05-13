@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 
 public class BlazarGHRepository extends GHRepository {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarGHRepository.class);
@@ -89,7 +92,19 @@ public class BlazarGHRepository extends GHRepository {
 
   @Override
   public GHCompare getCompare(String id1, String id2) throws IOException {
-    return new BlazarGHCompare(new GHCompare.Commit[0]);
+    List<String> shas = new ArrayList<>();
+    for (BlazarGHCommit commit : commits) {
+      shas.add(commit.getSHA1());
+    }
+    int index1 = shas.indexOf(id1);
+    int index2 = shas.indexOf(id2);
+    List<BlazarGHCommit> compareListWrongType = commits.subList(index1, index2 + 1);
+    List<BlazarGHCompare.Commit> compareList = new ArrayList<>();
+    for (BlazarGHCommit commit : compareListWrongType) {
+      compareList.add(BlazarGHCompare.makeCommit(commit));
+    }
+    BlazarGHCompare.Commit commitArray[] = new BlazarGHCompare.Commit[compareList.size()];
+    return new BlazarGHCompare(compareList.toArray(commitArray));
   }
 
   @Override
@@ -136,4 +151,9 @@ public class BlazarGHRepository extends GHRepository {
     this.host = host;
   }
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("name", fullName).toString();
+  }
 }

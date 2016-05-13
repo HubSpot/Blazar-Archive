@@ -17,6 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.D3GraphData;
@@ -64,6 +65,13 @@ public class InterProjectBuildResource {
     return interProjectBuildService.getWithId(id).get();
   }
 
+  @GET
+  @Path("/test/{id}")
+  public DependencyGraph dependencyGraph(@PathParam("id") int id) {
+    return dependenciesService.buildInterProjectDependencyGraph(Sets.newHashSet(moduleService.get(id).get()));
+  }
+
+
   @POST
   @Path("/cancel/{id}")
   public void cancel(@PathParam("id") long interProjectBuildId) {
@@ -86,8 +94,11 @@ public class InterProjectBuildResource {
       }
     }
     DependencyGraph graph = dependenciesService.buildInterProjectDependencyGraph(modules);
-    for (int i : graph.getTopologicalSort()) {
-      moduleIdToState.put(i, InterProjectBuild.State.QUEUED);
+    for (Map.Entry<Integer, Set<Integer>> entry : graph.getTransitiveReduction().entrySet()) {
+      moduleIdToState.put(entry.getKey(), InterProjectBuild.State.QUEUED);
+      for (int i : entry.getValue()) {
+        moduleIdToState.put(i, InterProjectBuild.State.QUEUED);
+      }
     }
     List<D3GraphNode> nodes = getNodes(graph, moduleIdToState);
     List<D3GraphLink> links = drawLinks(nodes, graph);
@@ -103,9 +114,14 @@ public class InterProjectBuildResource {
     for (InterProjectBuildMapping mapping : mappings) {
       moduleIdToState.put(mapping.getModuleId(), mapping.getState());
     }
-    for (int i : build.getDependencyGraph().get().getTopologicalSort()) {
-      if (!moduleIdToState.containsKey(i)) {
-        moduleIdToState.put(i, InterProjectBuild.State.QUEUED);
+    for (Map.Entry<Integer, Set<Integer>> entry : build.getDependencyGraph().get().getTransitiveReduction().entrySet()) {
+      if (!moduleIdToState.containsKey(entry.getKey())) {
+        moduleIdToState.put(entry.getKey(), InterProjectBuild.State.QUEUED);
+      }
+      for (int i : entry.getValue()) {
+        if (!moduleIdToState.containsKey(i)) {
+          moduleIdToState.put(i, InterProjectBuild.State.QUEUED);
+        }
       }
     }
     List<D3GraphNode> nodes = getNodes(build.getDependencyGraph().get(), moduleIdToState);

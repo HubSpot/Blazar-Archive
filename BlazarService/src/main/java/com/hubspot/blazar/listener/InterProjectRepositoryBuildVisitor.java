@@ -57,6 +57,11 @@ public class InterProjectRepositoryBuildVisitor extends AbstractRepositoryBuildV
   }
 
   @Override
+  protected void visitUnstable(RepositoryBuild build) throws Exception {
+    checkDone(build);
+  }
+
+  @Override
   protected void visitCancelled(RepositoryBuild build) throws Exception {
     checkDone(build);
   }
@@ -82,8 +87,8 @@ public class InterProjectRepositoryBuildVisitor extends AbstractRepositoryBuildV
         return InterProjectBuild.State.IN_PROGRESS;
       }
 
-      // if there is a failure mark as failed, regardless of any CANCELLED modules
-      if (!mapping.getState().equals(InterProjectBuild.State.SUCCEEDED) && !state.equals(InterProjectBuild.State.FAILED)) {
+      // if there is a failure mark as failed
+      if (mapping.getState() == InterProjectBuild.State.FAILED) {
         state = mapping.getState();
       }
     }

@@ -18,12 +18,47 @@
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module3/.blazar.yaml"
               content: "git/example/com/Repo1/Module3/.blazar.yaml"
+            - sha: "1000000000000000000000000000000000000001"
+              path: "/test2.yaml"
+              content: "/no-content"
+            - sha: "0000000000000000000000000000000000000000"
+              path: "/test.yaml"
+              content: "/no-content"
+
         commits:
+          - sha1: "0000000000000000000000000000000000000000"
+            files:
+              - fileName: "/test.yaml"
+                status: "added"
+            commitShortInfo:
+              message: "commit message"
+              commiter:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+              author:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+          - sha1: "1000000000000000000000000000000000000001"
+            files:
+              - fileName: "/test2.yaml"
+                status: "added"
+            commitShortInfo:
+              message: "commit message"
+              commiter:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
+              author:
+                login: "testy"
+                email: "testy@example.com"
+                timestamp: 1460497106000
           - sha1: "1111111111111111111111111111111111111111"
             files:
               - fileName: "/Module1/.blazar.yaml"
                 status: "added"
-              - fileName: "/Module3/.blazar.yaml"
+              - fileName: "/Module2/.blazar.yaml"
                 status: "added"
               - fileName: "/Module3/.blazar.yaml"
                 status: "added"
@@ -37,6 +72,7 @@
                 login: "testy"
                 email: "testy@example.com"
                 timestamp: 1460497106000
+
         branches:
           master:    # branches _actually_ contain commit objects, we fake that to reduce complexity/duplication, this sha must reference a sha provided in the repo commits list
             name: "master"

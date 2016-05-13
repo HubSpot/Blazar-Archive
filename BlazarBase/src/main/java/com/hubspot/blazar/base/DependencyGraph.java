@@ -1,15 +1,16 @@
 package com.hubspot.blazar.base;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Stack;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Objects;
 
 public class DependencyGraph {
   private final Map<Integer, Set<Integer>> transitiveReduction;
@@ -42,6 +43,29 @@ public class DependencyGraph {
     }
 
     return incomingVertices;
+  }
+
+  public Set<Integer> getAllUpstreamNodes(int moduleId) {
+    Stack<Integer> stack = new Stack<>();
+    stack.push(moduleId);
+    Set<Integer> seen = new HashSet<>();
+    Set<Integer> allIncoming = new HashSet<>();
+    while (!stack.empty()) {
+      int i = stack.pop();
+      if (seen.contains(i)) {
+        continue;
+      }
+      seen.add(i);
+      Set<Integer> incoming = incomingVertices(i);
+      allIncoming.addAll(incoming);
+      for (int each : incoming) {
+        if (seen.contains(i)) {
+          continue;
+        }
+        stack.add(each);
+      }
+    }
+    return allIncoming;
   }
 
   public Set<Integer> reachableVertices(int moduleId) {

@@ -1,11 +1,9 @@
 package com.hubspot.blazar.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Fail.fail;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import org.jukito.JukitoRunner;
@@ -17,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.hubspot.blazar.BlazarServiceTestBase;
@@ -25,10 +23,10 @@ import com.hubspot.blazar.BlazarServiceTestModule;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.DependencyGraph;
+import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
@@ -65,6 +63,8 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   private ModuleBuildService moduleBuildService;
   @Inject
   private SingularityBuildLauncher singularityBuildLauncher;
+  @Inject
+  private TestUtils testUtils;
 
   @Before
   public void before() throws Exception {
@@ -89,10 +89,8 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   @Test
   public void testSuccessfulInterProjectBuild() throws Exception {
     ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
-    runInitialBuilds();
-    LOG.info("Initial builds are now in the database\n\n\n");
     // Trigger interProjectBuild
-    InterProjectBuild testableBuild = runInterProjectBuild(1);
+    InterProjectBuild testableBuild = testUtils.runInterProjectBuild(1, Optional.<BuildTrigger>absent());
     long buildId = testableBuild.getId().get();
     assertThat(Sets.newHashSet(1)).isEqualTo(testableBuild.getModuleIds());
     assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(testableBuild.getState());
@@ -104,18 +102,38 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void testInterProjectBuildWithFailures() throws Exception {
-    runInitialBuilds();
+  public void testInterProjectBuildFromPush() throws Exception {
+    int repoId = 1;
+    String sha = "0000000000000000000000000000000000000000";
+    branchService.get(1);
+    GitInfo gitInfo = branchService.get(repoId).get();
+    BuildTrigger buildTrigger = BuildTrigger.forCommit(sha);
+    BuildOptions buildOptions = new BuildOptions(ImmutableSet.<Integer>of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
+    RepositoryBuild repositoryBuild = testUtils.runAndWaitForRepositoryBuild(gitInfo, buildTrigger, buildOptions);
+    Set<InterProjectBuildMapping> interProjectBuildMappings = interProjectBuildMappingService.getByRepoBuildId(repositoryBuild.getId().get());
+    if (interProjectBuildMappings.isEmpty()) {
+      fail(String.format("Expected to have mappings for repo build %s", repositoryBuild));
+    }
 
+    Optional<InterProjectBuild> interProjectBuild = interProjectBuildService.getWithId(interProjectBuildMappings.iterator().next().getInterProjectBuildId());
+    if (!interProjectBuild.isPresent()) {
+      fail(String.format("InterProjectBuild for mapping %s should be present", interProjectBuildMappings.iterator().next()));
+    }
+
+    assertThat(Sets.newHashSet(1, 2, 3)).isEqualTo(interProjectBuild.get().getModuleIds());
+    assertThat(Arrays.asList(1, 2, 4, 5, 7, 6, 8, 10, 11, 9, 13)).isEqualTo(interProjectBuild.get().getDependencyGraph().get().getTopologicalSort());
+    assertThat(interProjectBuild.get().getState()).isEqualTo(InterProjectBuild.State.SUCCEEDED);
+  }
+
+  @Test
+  public void testInterProjectBuildWithFailures() throws Exception {
     Set<Integer> expectedFailures = Sets.newHashSet(7);
     Set<Integer> expectedSuccess  = Sets.newHashSet(1, 4);
     Set<Integer> expectedCancel = Sets.newHashSet(8, 9, 10, 11, 13);
-
-    LOG.info("Initial builds are now in the db\n\n\n");
     ((TestSingularityBuildLauncher) singularityBuildLauncher).setModulesToFail(expectedFailures);
     // Cause module #10 to fail, causing 13 to be cancelled
 
-    InterProjectBuild testableBuild = runInterProjectBuild(1);
+    InterProjectBuild testableBuild = testUtils.runInterProjectBuild(1, Optional.<BuildTrigger>absent());
     InterProjectBuild buildRun = interProjectBuildService.getWithId(testableBuild.getId().get()).get();
     assertThat(buildRun.getState()).isEqualTo(InterProjectBuild.State.FAILED);
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(buildRun);
@@ -128,46 +146,6 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
         assertThat(mapping.getState().equals(InterProjectBuild.State.SUCCEEDED));
       }
     }
-  }
-
-  private InterProjectBuild runInterProjectBuild(int rootModuleId) throws InterruptedException {
-    LOG.info("Starting inter-project-build for id {}", rootModuleId);
-    InterProjectBuild build = InterProjectBuild.getQueuedBuild(Sets.newHashSet(rootModuleId), new BuildTrigger(BuildTrigger.Type.INTER_PROJECT, String.format("Test inter-project build root: %d", rootModuleId)));
-    long id = interProjectBuildService.enqueue(build);
-    Optional<InterProjectBuild> maybeQueued = interProjectBuildService.getWithId(id);
-    int count = 0;
-    // wait 1s for build to finish
-    while (!maybeQueued.isPresent() && !maybeQueued.get().getState().isFinished()) {
-      if (count > 1) {
-        fail("InterProject did not finish in 10s");
-      }
-      count++;
-      Thread.sleep(1000);
-      maybeQueued = interProjectBuildService.getWithId(id);
-    }
-    return maybeQueued.get();
-  }
-
-  private void runInitialBuilds() {
-    List<Integer> branchIds = Lists.newArrayList(1, 2, 3, 4, 5);
-    List<RepositoryBuild> buildSeedList = new ArrayList<>();
-    for (int i : branchIds) {
-      LOG.debug("Launching Repository Build to seed db with successes for all modules on {branchId=1}");
-      buildSeedList.add(makeRepoBuild(i));
-    }
-    LOG.info("All branch builds launched");
-    for (RepositoryBuild r : buildSeedList) {
-      Set<ModuleBuild> moduleBuilds = moduleBuildService.getByRepositoryBuild(r.getId().get());
-      for (ModuleBuild b : moduleBuilds) {
-        assertThat(b.getState().isComplete()).isTrue();
-        assertThat(b.getState()).isEqualTo(ModuleBuild.State.SUCCEEDED);
-      }
-    }
-    LOG.info("All seed builds succeeded");
-  }
-
-  private RepositoryBuild makeRepoBuild(int branchId) {
-    long id = repositoryBuildService.enqueue(branchService.get(branchId).get(), BuildTrigger.forBranchCreation("master"), BuildOptions.defaultOptions());
-    return repositoryBuildService.get(id).get();
+    ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
   }
 }
