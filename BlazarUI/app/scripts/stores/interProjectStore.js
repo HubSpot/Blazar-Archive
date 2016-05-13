@@ -3,6 +3,8 @@ import Reflux from 'reflux';
 import InterProjectActions from '../actions/interProjectActions';
 import InterProjectApi from '../data/InterProjectApi';
 
+import BranchActions from '../actions/branchActions';
+
 const InterProjectStore = Reflux.createStore({
 
   listenables: InterProjectActions,
@@ -16,6 +18,8 @@ const InterProjectStore = Reflux.createStore({
         this.error = error;
         return this.triggerErrorUpdate();
       }
+
+      BranchActions.loadBranchBuildHistory(params);
     });
   }
 });
