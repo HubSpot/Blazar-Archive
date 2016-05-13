@@ -12,11 +12,6 @@ class BranchSettings extends Component {
 
   constructor(props) {
     super(props);
-    var initialState = {
-      triggerInterProjectBuilds: this.props.triggerInterProjectBuilds,
-      interProjectBuildOptIn: this.props.interProjectBuildOptIn
-    }
-    this.state = initialState;
     bindAll(this, 'updateInterProjectBuildOptIn' ,'updateTriggerInterProjectBuilds');
   }
 
@@ -47,7 +42,7 @@ class BranchSettings extends Component {
             <Toggle
               id='onFail'
               onChange={this.updateInterProjectBuildOptIn}
-              checked={this.state.interProjectBuildOptIn}
+              checked={this.props.interProjectBuildOptIn}
             />
           </div>
         </div>
@@ -66,7 +61,7 @@ class BranchSettings extends Component {
             <Toggle
               id='onFail'
               onChange={this.updateTriggerInterProjectBuilds}
-              checked={this.state.triggerInterProjectBuilds}
+              checked={this.props.triggerInterProjectBuilds}
             />
           </div>
         </div>
