@@ -70,6 +70,9 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
     }
     DependencyGraph d = dependenciesService.buildInterProjectDependencyGraph(s);
     LOG.debug("Built graph for InterProjectBuild {} in {}", build.getId().get(), System.currentTimeMillis()-start);
+    if (s.isEmpty()) {
+      interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(build, InterProjectBuild.State.SUCCEEDED));
+    }
     interProjectBuildService.start(build.withDependencyGraph(d));
   }
 
