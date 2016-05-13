@@ -3,7 +3,10 @@ import {bindAll} from 'underscore';
 import Checkbox from '../shared/Checkbox.jsx';
 import Icon from '../shared/Icon.jsx';
 import ReactTooltip from 'react-tooltip';
+import Toggle from 'react-toggle';
 import SettingsActions from '../../actions/settingsActions';
+import UIGridItem from '../shared/grid/UIGridItem.jsx';
+
 
 class BranchSettings extends Component {
 
@@ -28,52 +31,46 @@ class BranchSettings extends Component {
 
   render() {
     return (
-      <div>
-        <div className="interProjectBuildOptIn-checkbox-wrapper">
-          <Checkbox
-            label='Build as inter project downstream'
-            name='interProjectBuildOptIn-checkbox'
-            checked={this.state.interProjectBuildOptIn}
-            onCheckboxUpdate={this.updateInterProjectBuildOptIn}
-          />
-          <a data-tip data-for='interProjectBuildOptInTooltip'>
-            <Icon
-              type='fa'
-              name='question-circle'
-              classNames='checkbox-tooltip'
+      <UIGridItem size={12} className='settings__grid'>
+        <div className='notifications__setting'>
+          <div className='notifications__setting-title'>
+            <span>
+              Trigger from upstream builds
+            </span>
+          </div>
+          <div className='notifications__setting-description'>
+            <span>
+              Opt in all moudles on this branch to being built by their dependencies
+            </span>
+          </div>
+          <div className='notifications__setting-toggle'>
+            <Toggle
+              id='onFail'
+              onChange={this.updateInterProjectBuildOptIn}
+              checked={this.state.interProjectBuildOptIn}
             />
-          </a>
-          <ReactTooltip
-            id='interProjectBuildOptInTooltip'
-            place='bottom'
-            type='dark'
-            effect='solid'>
-            Opt in all moudles on this branch to being built by their dependencies
-          </ReactTooltip>
+          </div>
         </div>
-        <div className="triggerInterProjectBuilds-checkbox-wrapper">
-          <Checkbox
-            label='Pushes build all downstream modules'
-            name='triggerInterProjectBuilds-checkbox'
-            checked={this.state.triggerInterProjectBuilds}
-            onCheckboxUpdate={this.updateTriggerInterProjectBuilds}
-          />
-          <a data-tip data-for='triggerInterProjectBuildsTooltip'>
-            <Icon
-              type='fa'
-              name='question-circle'
-              classNames='checkbox-tooltip'
+        <div className='notifications__setting'>
+          <div className='notifications__setting-title'>
+            <span>
+              Auto build downstream modules
+            </span>
+          </div>
+          <div className='notifications__setting-description'>
+            <span>
+              Pushes to this branch trigger builds of all modules that depend on modules in this branch
+            </span>
+          </div>
+          <div className='notifications__setting-toggle'>
+            <Toggle
+              id='onFail'
+              onChange={this.updateTriggerInterProjectBuilds}
+              checked={this.state.triggerInterProjectBuilds}
             />
-          </a>
-          <ReactTooltip
-            id='triggerInterProjectBuildsTooltip'
-            place='bottom'
-            type='dark'
-            effect='solid'>
-            Pushes to this branch trigger builds of all modules that depend on modules in this branch
-          </ReactTooltip>
+          </div>
         </div>
-      </div>
+      </UIGridItem>
     );
   }
 }
