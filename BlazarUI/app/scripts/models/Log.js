@@ -11,7 +11,7 @@ class Log extends Model {
     this.init(options);
     super(options);
   }
-  
+
   init(options) {
     this.logLines = [];
     this.fetchCount = 0;
@@ -24,7 +24,7 @@ class Log extends Model {
     this.maxOffsetLoaded = options.size;
     this.minOffsetLoaded = this.requestOffset;
   }
-  
+
   updateLogForNavigationChange(options) {
     this.init(options);
     this.requestOffset = options.position === 'top' ? 0 : this.getMaxOffset(options.size);
@@ -45,7 +45,7 @@ class Log extends Model {
   getMaxOffset(size) {
     return Math.max(size - this.baseRequestLength, 0);
   }
-  
+
   parseInactiveBuild() {
     // First fetch or navigated 'To Bottom'
     if (!this.fetchAction || this.fetchAction === 'bottom') {
@@ -82,7 +82,7 @@ class Log extends Model {
       if (this.fetchCount === 1) {
         this.handleFirstActiveFetch();
       }
-      
+
       else {
         this.handleMoreActiveFetch();
       }
@@ -106,14 +106,14 @@ class Log extends Model {
 
     else {
       this.parseInactiveBuild();
-    }  
+    }
   }
-  
+
   // active build helpers
   handleFirstActiveFetch() {
     // we already have at least 1 offset
     if (this.requestOffset > 0) {
-      // save and remove incomplete first line so we can append it to the 
+      // save and remove incomplete first line so we can append it to the
       // incomplete last line of the next fetch if we continue to scroll up
       this.firstLine = first(this.newLogLines);
       this.newLogLines = rest(this.newLogLines);
@@ -132,7 +132,7 @@ class Log extends Model {
   handleMoreActiveFetch() {
     // if we are tailing/actively polling
     if (this.shouldPoll) {
-      // if our next offset is offsetLength, we need to 
+      // if our next offset is offsetLength, we need to
       // do some chopping as we may have incomplete lines
       if (this.data.nextOffset - this.data.offset >= this.baseRequestLength) {
         // cutoff last line and save it
@@ -149,7 +149,7 @@ class Log extends Model {
       this.parseNextFetch();
     }
   }
-    
+
   handleEndOfLogFetch() {
     // we already have at least 1 offset
     if (this.requestOffset > 0) {
@@ -160,7 +160,7 @@ class Log extends Model {
     }
 
     if (this.options.buildState === BuildStates.IN_PROGRESS) {
-      
+
     }
 
     this.logLines = [...this.logLines, ...this.newLogLines];
@@ -175,7 +175,7 @@ class Log extends Model {
       removeFirstLine: this.requestOffset > 0
     });
   }
-  
+
   handleToTopFetch() {
     // save and remove incomplete last line so we can prepend it to
     // the incomplete last line of the next fetch if we scroll up
@@ -191,11 +191,11 @@ class Log extends Model {
     const tempLast = last(this.newLogLines);
     // chop off last incomplete line, as long as we have more to fetch
     if (!this.endOfLogLoaded) {
-      this.newLogLines = initial(this.newLogLines);  
+      this.newLogLines = initial(this.newLogLines);
     }
     // prepend the rest of the first line that was cutoff last fetch
     if (this.lastLine) {
-      this.newLogLines[0].text = this.lastLine.text + this.newLogLines[0].text;  
+      this.newLogLines[0].text = this.lastLine.text + this.newLogLines[0].text;
     }
     this.lastLine = tempLast;
     this.logLines = [...this.logLines, ...this.newLogLines];
@@ -204,7 +204,7 @@ class Log extends Model {
   // Helper for parse, used to manage incomplete lines when scrolling down
   parsePreviousFetch(options = {}) {
     let {removeFirstLine} = options;
-    // save incomplete first line so we can append it to the 
+    // save incomplete first line so we can append it to the
     // incomplete last line of the next fetch if we continue to scroll up
     const tempFirst = first(this.newLogLines);
     // remove the first line which may be incomplete
@@ -230,7 +230,7 @@ class Log extends Model {
     }
     return this.fetch();
   }
-  
+
   fetchNext() {
     this.fetchAction = 'next';
     this.requestOffset = this.data.nextOffset;
@@ -245,7 +245,7 @@ class Log extends Model {
     if (logData.match(WHITE_SPACE)) {
       return [];
     }
-    
+
     if (logData.length === 0) {
       return [];
     }
@@ -253,7 +253,7 @@ class Log extends Model {
     let offsetRunningTotal = this.requestOffset;
 
     const splitLines = logData.split(NEW_LINE);
-    
+
     const formattedLogLines = splitLines.map((line, i) => {
       // store second line because we may chop off the first
       if (i === 1) {
@@ -269,10 +269,19 @@ class Log extends Model {
         return false;
       }
 
+      try {
+        line = utf8.decode(line);
+      }
+
+      catch (err) {
+        // doesn't matter
+      }
+
       return {
-        text:  utf8.decode(line),
+        text: line,
         offset: offsetRunningTotal += getByteLength(line)
       };
+
     });
 
     return compact(formattedLogLines);
