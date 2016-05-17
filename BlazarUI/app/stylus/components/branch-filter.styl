@@ -29,10 +29,71 @@
 
 .branch-select-input
   position absolute
-  left 60px
+  left 50px
   top 23px
   width 100%
 
   & .Select-menu-outer
-    font-size 14px
+    font-size 16px
     overflow-x hidden
+    transition all 0.1s ease-in-out
+
+  & .Select-control
+    border 0px solid #fff
+    transition all 0.1s ease-in-out
+
+    & .Select-placeholder
+      color $link-color
+      padding-left 0
+      transition all 0.1s ease-in-out
+
+    & .Select-placeholder:after
+      font-family "FontAwesome"
+      font-size smaller
+      padding-left 10px
+      content ""
+
+    & .Select-input
+      padding-left 0
+
+    & .Select-arrow-zone
+      display none
+
+      & .Select-arrow
+        border-top-color $link-color
+
+  & .Select-control:hover
+    box-shadow none
+    cursor pointer
+
+    & .Select-placeholder
+      opacity 0.75
+
+    & .Select-arrow-zone
+      display none
+
+      & .Select-arrow
+        opacity 0.75
+
+.branch-select-input.is-focused
+
+  & .Select-control
+    border-color #d9d9d9 #ccc #b3b3b3
+    border-radius 4px
+    border 1px solid #ccc
+
+    & .Select-placeholder
+      padding-left 5px
+      color $blue-gray-light
+
+    & .Select-placeholder:after
+      content ""
+
+    & .Select-input
+      padding-left 5px
+
+    & .Select-arrow-zone
+      display none
+
+  & .Select-control:hover
+    cursor text
