@@ -23,8 +23,6 @@ import StarActions from '../../actions/starActions';
 
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
-import InterProjectStore from '../../stores/interProjectStore';
-import InterProjectActions from '../../actions/interProjectActions';
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
 
@@ -43,7 +41,6 @@ let initialState = {
   modules: [],
   selectedModules: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
-  triggerInterProjectBuild: false,
   resetCache: false,
   branchId: 0,
   branchInfo: {},
@@ -56,7 +53,7 @@ class BranchContainer extends Component {
   constructor() {
     this.state = initialState;
 
-    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'triggerBuild');
+    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'triggerBuild');
   }
 
   componentDidMount() {
@@ -161,27 +158,8 @@ class BranchContainer extends Component {
     })
   }
 
-  updateTriggerInterProjectBuild() {
-    this.setState({
-      triggerInterProjectBuild: !this.state.triggerInterProjectBuild
-    })
-  }
-
-
   triggerBuild() {
-    let newState = this.state;
-
-    if (this.state.selectedModules.length === 0) {
-      newState.selectedModules = this.state.modules.map((module) => {
-        return module.id;
-      });
-    }
-
-    if (this.state.triggerInterProjectBuild) {
-      InterProjectActions.triggerInterProjectBuild(this.props.params, newState);
-    } else {
-      BranchActions.triggerBuild(this.props.params, newState);
-    }
+    BranchActions.triggerBuild(this.props.params, this.state);
   }
 
   isLoading() {
@@ -193,7 +171,7 @@ class BranchContainer extends Component {
 
   buildDocumentTitle() {
     const {branchInfo} = this.state;
-
+    
     return branchInfo ? branchInfo.repository + ' - ' + branchInfo.branch : 'Branch Build History';
   }
 
@@ -296,7 +274,6 @@ class BranchContainer extends Component {
               onSelectUpdate={this.updateSelectedModules}
               onCheckboxUpdate={this.updateDownstreamModules}
               onResetCacheUpdate={this.updateResetCache}
-              onTriggerInterProjectBuild={this.updateTriggerInterProjectBuild}
               modules={this.state.modules}
             />
             {this.renderBuildSettingsButton()}

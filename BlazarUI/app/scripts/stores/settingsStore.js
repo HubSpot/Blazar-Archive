@@ -6,10 +6,8 @@ const SettingsStore = Reflux.createStore({
 
   listenables: SettingsActions,
 
-  init() {
+  init() {  
     this.notifications = [];
-    this.triggerInterProjectBuilds = false;
-    this.interProjectBuildOptIn = false;
   },
 
   onLoadNotifications(params) {
@@ -21,20 +19,6 @@ const SettingsStore = Reflux.createStore({
       this.trigger({
         notifications: this.notifications,
         loading: false
-      });
-    });
-  },
-
-  onLoadSettings(params) {
-    this.params = params;
-
-    SettingsApi.getSettings(params, (resp) => {
-      this.triggerInterProjectBuilds = resp.triggerInterProjectBuilds;
-      this.interProjectBuildOptIn = resp.interProjectBuildOptIn;
-      this.trigger({
-        triggerInterProjectBuilds: this.triggerInterProjectBuilds,
-        interProjectBuildOptIn: this.interProjectBuildOptIn,
-        loadingSettings: false
       });
     });
   },
@@ -74,50 +58,14 @@ const SettingsStore = Reflux.createStore({
   onDeleteNotification(notificationId) {
     SettingsApi.deleteNotification(this.params, notificationId, (resp) => {
       this.notifications = resp;
+
       this.trigger({
         notifications: this.notifications,
         loading: false
       });
     });
-  },
-
-  onTriggerInterProjectBuilds(params) {
-    this.triggerInterProjectBuilds = !this.triggerInterProjectBuilds;
-    const data = {
-      branchId: params.branchId,
-      triggerInterProjectBuilds: this.triggerInterProjectBuilds,
-      interProjectBuildOptIn: this.interProjectBuildOptIn
-    };
-
-    SettingsApi.updateSettings(params, data, (resp) => {
-      this.triggerInterProjectBuilds = resp.triggerInterProjectBuilds;
-      this.interProjectBuildOptIn = resp.interProjectBuildOptIn;
-      this.trigger({
-        triggerInterProjectBuilds: this.triggerInterProjectBuilds,
-        interProjectBuildOptIn: this.interProjectBuildOptIn,
-        loadingSettings: false
-      });
-    });
-  },
-
-  onInterProjectBuildOptIn(params) {
-    this.interProjectBuildOptIn = !this.interProjectBuildOptIn;
-    const data = {
-      branchId: params.branchId,
-      triggerInterProjectBuilds: this.triggerInterProjectBuilds,
-      interProjectBuildOptIn: this.interProjectBuildOptIn
-    };
-
-    SettingsApi.updateSettings(params, data, (resp) => {
-      this.triggerInterProjectBuilds = resp.triggerInterProjectBuilds;
-      this.interProjectBuildOptIn = resp.interProjectBuildOptIn;
-      this.trigger({
-        triggerInterProjectBuilds: this.triggerInterProjectBuilds,
-        interProjectBuildOptIn: this.interProjectBuildOptIn,
-        loadingSettings: false
-      });
-    });
   }
+
 });
 
 export default SettingsStore;

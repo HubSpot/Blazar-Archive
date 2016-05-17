@@ -1,7 +1,7 @@
 @import 'variables'
 @import 'mixins'
 
-.sidebar
+.sidebar 
   .sidebar-loader
     margin-top 15px
 
@@ -17,19 +17,19 @@
   width 100%
   border-top 1px solid $gray
   top 0px
-
+  
   & div
     height 50px
     background white
     border-bottom 1px solid $gray
-
+    
 .sidebar__filter-selector
   height 3px
   width 33.3%
   background-color #FD8E5E
   -webkit-transition margin-left .15s
   transition margin-left .15s
-
+  
   &.all
     margin-left 0
   &.starred
@@ -50,9 +50,9 @@
   background $offwhite
   padding 11px 10px 10px 10px
   font-size 14px
-  font-weight $font-medium
+  font-weight $font-medium 
   z-index 2
-
+  
   &:last-child
     border-right none
   &:hover
@@ -62,7 +62,7 @@
     outline none
   &.active
     transition height 1s
-
+  
 .sidebar__list>div
   &::-webkit-scrollbar
     width .35rem
@@ -70,10 +70,10 @@
   &::-webkit-scrollbar-track
     background-color $gray-lighter
     border-radius $radius-scrollbar
-
+      
   &::-webkit-scrollbar:vertical
     width 12px
-
+    
   &::-webkit-scrollbar:horizontal
     height 0
 
@@ -93,7 +93,7 @@
   box-shadow: none
   font-size 14px
   font-weight $font-light
-  height 24px
+  height 24px  
   border-radius 5px
   position absolute
   left 30px
@@ -108,19 +108,14 @@
 
 .sidebar__star
   margin-right 5px
-
+  
 .sidebar__logo
   height 45px
   width 100%
   position relative
   border-bottom 1px solid $gray
   text-align center
-
+  
   & .logo
     padding 8px 15px
-
-    &:after
-      content 'beta'
-      font-size 12px
-      color black
-      padding-left 2px
+    
