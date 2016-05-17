@@ -6,7 +6,11 @@ const SettingsActions = Reflux.createActions([
   'updateNotification',
   'addNotification',
   'loadSlackChannels',
-  'deleteNotification'
+  'deleteNotification',
+  // blazar branch settings
+  'interProjectBuildOptIn',
+  'triggerInterProjectBuilds',
+  'loadSettings'
 ]);
 
 export default SettingsActions;

@@ -19,7 +19,7 @@ class ModuleModal extends Component {
   constructor(props) {
     super(props);
 
-    bindAll(this, 'updateDownstreamModules', 'updateResetCache', 'updateSelectedModules', 'getModuleIdsAndBuild', 'maybeStartBuild');
+    bindAll(this, 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'updateSelectedModules', 'getModuleIdsAndBuild', 'maybeStartBuild');
   }
 
   getModuleIdsAndBuild() {
@@ -34,6 +34,10 @@ class ModuleModal extends Component {
 
   updateResetCache() {
     this.props.onResetCacheUpdate();
+  }
+
+  updateTriggerInterProjectBuild() {
+    this.props.onTriggerInterProjectBuild();
   }
 
   updateDownstreamModules(isChecked) {
@@ -55,7 +59,7 @@ class ModuleModal extends Component {
           label=' Build Downstream Modules'
           name='downstream-checkbox'
           checked={true}
-          onCheckboxUpdate={this.updateDownstreamModules} 
+          onCheckboxUpdate={this.updateDownstreamModules}
         />
         <a data-tip data-for='downstreamTooltip'>
           <Icon
@@ -74,6 +78,32 @@ class ModuleModal extends Component {
       </div>
     );
   }
+  renderInterProjectToggle() {
+    return (
+      <div className="inter-project-checkbox-wrapper">
+        <Checkbox
+        label=' Trigger Inter-Project Build'
+        name='triggerInterProjectBuild-checkbox'
+        checked={false}
+        onCheckboxUpdate={this.updateTriggerInterProjectBuild}
+        />
+      <a data-tip data-for='interProjectTooltip'>
+        <Icon
+          type='fa'
+          name='question-circle'
+          classNames='checkbox-tooltip'
+        />
+      </a>
+      <ReactTooltip
+        id='interProjectTooltip'
+        place='bottom'
+        type='dark'
+        effect='solid'>
+        Trigger Inter-Repository build of all dependent modules
+        </ReactTooltip>
+      </div>
+      )
+  }
 
   renderResetCache() {
     return (
@@ -82,7 +112,7 @@ class ModuleModal extends Component {
           label=' Reset Cache'
           name='cache-checkbox'
           checked={false}
-          onCheckboxUpdate={this.updateResetCache} 
+          onCheckboxUpdate={this.updateResetCache}
         />
         <div className='tooltip-wrapper'>
           <a data-tip data-for='cache-tooltip'>
@@ -134,6 +164,7 @@ class ModuleModal extends Component {
           <div className='checkbox-wrapper'>
             {this.renderDownstreamToggle()}
             {this.renderResetCache()}
+            {this.renderInterProjectToggle()}
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -159,6 +190,7 @@ ModuleModal.propTypes = {
   onSelectUpdate: PropTypes.func.isRequired,
   onCheckboxUpdate: PropTypes.func.isRequired,
   onResetCacheUpdate: PropTypes.func.isRequired,
+  onTriggerInterProjectBuild:  PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
   loadingModules: PropTypes.bool,
   modules: PropTypes.array.isRequired
