@@ -274,7 +274,7 @@ class Log extends Model {
       }
 
       catch (err) {
-        // doesn't matter
+        console.warn("We couldn't decode some UTF-8, so we're displaying this log line undecoded:\n", line);
       }
 
       return {
