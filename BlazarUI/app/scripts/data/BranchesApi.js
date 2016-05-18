@@ -8,7 +8,7 @@ class BranchesApi extends StoredBuilds {
     const {params} = this.options;
 
     const branches = this.builds.filter((branch) => {
-      return branch.gitInfo.repository === params.repo;
+      return branch.gitInfo.repository.toLowerCase() === params.repo.toLowerCase();
     });
 
     this.cb(branches);
