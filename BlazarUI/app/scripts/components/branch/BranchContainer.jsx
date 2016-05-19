@@ -181,6 +181,7 @@ class BranchContainer extends Component {
       InterProjectActions.triggerInterProjectBuild(this.props.params, newState);
     } else {
       BranchActions.triggerBuild(this.props.params, newState);
+    }
   }
 
   isLoading() {
