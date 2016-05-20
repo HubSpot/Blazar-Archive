@@ -26,7 +26,7 @@ class BranchSettings extends Component {
 
   render() {
     return (
-      <UIGridItem size={12} className='settings__grid'>
+      <UIGridItem size={12} className='settings__grid main-settings'>
         <div className='notifications__setting'>
           <div className='notifications__setting-title'>
             <span>
@@ -35,7 +35,7 @@ class BranchSettings extends Component {
           </div>
           <div className='notifications__setting-description'>
             <span>
-              Opt in all moudles on this branch to being built by their dependencies
+              Opt in all modules on this branch to being built by their dependencies
             </span>
           </div>
           <div className='notifications__setting-toggle'>
