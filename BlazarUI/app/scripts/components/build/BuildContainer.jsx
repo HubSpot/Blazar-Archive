@@ -104,10 +104,10 @@ class BuildContainer extends Component {
   }
 
   buildDocumentTitle() {
-    const {branchInfo} = this.state;
+    const {branchInfo, data} = this.state;
     const {moduleName, buildNumber} = this.props.params;
 
-    const titlePrefix = `${moduleName} #${buildNumber}`;
+    const titlePrefix = `${moduleName} #` + (data.build.buildNumber || buildNumber);
     const titleInfo = branchInfo ? ' | ' + `${branchInfo.repository} - ${branchInfo.branch}` : '';
 
     return titlePrefix + titleInfo;
