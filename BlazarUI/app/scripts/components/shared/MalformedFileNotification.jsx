@@ -12,7 +12,7 @@ let initialState = {
 }
 
 class MalformedFileNotification extends Component {
-	
+
   constructor() {
     this.state = initialState;
 
@@ -52,7 +52,7 @@ class MalformedFileNotification extends Component {
     const numberOfFiles = this.props.malformedFiles.length;
 
     return (
-      <Modal show={this.state.showModal} onHide={this.closeModal}>
+      <Modal className='malformed-file-modal' show={this.state.showModal} onHide={this.closeModal}>
         <Modal.Header closeButton>
           <Modal.Title>
             Malformed Configuration Files - Action Required
