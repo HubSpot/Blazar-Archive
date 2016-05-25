@@ -13,7 +13,7 @@ export const LABELS = {
 export const iconStatus = {
   'SUCCEEDED': 'check',
   'FAILED': 'close',
-  'UNSTABLE': 'close',
+  'UNSTABLE': 'exclamation-triangle',
   'CANCELLED': 'stop',
   'SKIPPED': 'minus',
   'IN_PROGRESS': 'circle-o-notch fa-spin',
