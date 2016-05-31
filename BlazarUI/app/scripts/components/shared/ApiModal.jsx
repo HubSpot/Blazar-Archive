@@ -7,12 +7,17 @@ class ApiModal extends Component {
 
   constructor() {
     super();
+    this.state = {apiRootUrl: ''};
+    this.onChange = this.onChange.bind(this);
     this.setUrl = this.setUrl.bind(this);
   }
 
+  onChange(e) {
+    this.setState({apiRootUrl: e.target.value});
+  }
+
   setUrl() {
-    const url = document.getElementById('apiInput').value;
-    localStorage.apiRootOverride = url;
+    localStorage.apiRootOverride = this.state.apiRootUrl;
     this.props.onHide();
     location.reload();
   }
@@ -29,7 +34,8 @@ class ApiModal extends Component {
             type='text'
             placeholder='https://path.to-api.com/v1/api'
             label='Enter API root URL to use:'
-            id='apiInput'
+            value={this.state.apiRootUrl}
+            onChange={this.onChange}
           />
         </Modal.Body>
         <Modal.Footer>
