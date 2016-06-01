@@ -8,16 +8,17 @@ import javax.ws.rs.core.MediaType;
 import com.google.inject.Inject;
 import com.hubspot.blazar.config.BlazarConfiguration;
 
+import io.dropwizard.server.SimpleServerFactory;
 import io.dropwizard.views.View;
 
 @Path("/")
 @Produces(MediaType.TEXT_HTML)
 public class UiResource {
-    private final BlazarConfiguration configuration;
+    private final String basePath;
 
     @Inject
     public UiResource(BlazarConfiguration configuration) {
-        this.configuration = configuration;
+        this.basePath = ((SimpleServerFactory) configuration.getServerFactory()).getApplicationContextPath();
     }
 
     @Path("/{uiPath:.*}")
@@ -26,7 +27,6 @@ public class UiResource {
         return new IndexView();
     }
 
-    @Path("/")
     @GET
     public IndexView getUiRoot() {
         return new IndexView();
@@ -38,15 +38,15 @@ public class UiResource {
         }
 
         public String getStaticRoot() {
-            return "/blazar/static";
+            return basePath + "/static";
         }
 
         public String getAppRoot() {
-            return "/blazar";
+            return basePath;
         }
 
         public String getApiRoot() {
-            return "/blazar";
+            return basePath;
         }
     }
 }
