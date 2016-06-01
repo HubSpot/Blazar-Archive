@@ -17,6 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
@@ -64,6 +65,23 @@ public class InterProjectBuildResource {
     long id = interProjectBuildService.enqueue(build);
     return interProjectBuildService.getWithId(id).get();
   }
+
+  @GET
+  @Path("/{id}")
+  public Optional<InterProjectBuild> getInterProjectBuild(@PathParam("id") long id) {
+    return interProjectBuildService.getWithId(id);
+  }
+
+  @GET
+  @Path("/{id}/mappings")
+  public Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(@PathParam("id") long id) {
+    Optional<InterProjectBuild> build = interProjectBuildService.getWithId(id);
+    if (build.isPresent()) {
+      return interProjectBuildMappingService.getMappingsForInterProjectBuild(build.get());
+    }
+    return ImmutableSet.of();
+  }
+
 
   @GET
   @Path("/graph/{id}")
