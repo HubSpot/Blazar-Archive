@@ -16,6 +16,5 @@ to discover the buildable units within a repository and to define how to do the 
 
 ## Getting Started ##
 
-To run locally, use 
-`mvn clean pre-integration-test -Dblazar.port=7199` 
-and then go to `http://DOCKER_IP:7199/blazar/v1` in your browser.
+To run Blazar locally, run 
+`mvn clean pre-integration-test -DskipTests -Dblazar.port=7199` to launch Blazar and its dependencies (Singularity, Mesos, and MySQL) in Docker containers. Then go to `http://DOCKER_IP:7199/blazar/` in your browser. When you're done, run `mvn docker:stop` to shut down the containers.
