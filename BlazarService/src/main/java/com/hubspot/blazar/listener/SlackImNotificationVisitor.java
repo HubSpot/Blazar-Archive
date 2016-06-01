@@ -1,5 +1,7 @@
 package com.hubspot.blazar.listener;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +20,11 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(SlackImNotificationVisitor.class);
   private final BlazarSlackConfiguration blazarSlackConfig;
 
-  private SlackSession slackSession;
+  private Optional<SlackSession> slackSession;
   private SlackUtils slackUtils;
 
   @Inject
-  public SlackImNotificationVisitor (SlackSession slackSession,
+  public SlackImNotificationVisitor (Optional<SlackSession> slackSession,
                                      BlazarConfiguration blazarConfiguration,
                                      SlackUtils slackUtils) {
     this.slackSession = slackSession;
@@ -47,9 +49,11 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
       LOG.info("Not sending notifications for builds in non-terminal states or on success / cancellation");
       return;
     }
-    LOG.info("Sending slack notification for repo build {}", build.getId().get());
-    CommitInfo commitInfo = build.getCommitInfo().get();
-    SlackUser user = slackSession.findUserByEmail(commitInfo.getCurrent().getAuthor().getEmail());
-    slackSession.sendMessageToUser(user, "", slackUtils.buildSlackAttachment(build));
+    if (slackSession.isPresent()) {
+      LOG.info("Sending slack notification for repo build {}", build.getId().get());
+      CommitInfo commitInfo = build.getCommitInfo().get();
+      SlackUser user = slackSession.get().findUserByEmail(commitInfo.getCurrent().getAuthor().getEmail());
+      slackSession.get().sendMessageToUser(user, "", slackUtils.buildSlackAttachment(build));
+    }
   }
 }

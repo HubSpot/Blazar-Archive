@@ -3,6 +3,7 @@ package com.hubspot.blazar.guice;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -39,6 +40,7 @@ import com.hubspot.blazar.resources.InstantMessageResource;
 import com.hubspot.blazar.resources.InterProjectBuildResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
+import com.hubspot.blazar.resources.UiResource;
 import com.hubspot.blazar.resources.UserFeedbackResource;
 import com.hubspot.blazar.util.BlazarUrlHelper;
 import com.hubspot.blazar.util.GitHubHelper;
@@ -95,6 +97,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(BuildHistoryResource.class);
     binder.bind(InstantMessageResource.class);
     binder.bind(InterProjectBuildResource.class);
+    binder.bind(UiResource.class);
 
     if (getConfiguration().getSlackConfiguration().isPresent()) {
       binder.bind(UserFeedbackResource.class);
@@ -124,11 +127,15 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
   @Provides
   @Singleton
-  public SlackSession get(BlazarConfiguration configuration) throws IOException {
-    String token = configuration.getSlackConfiguration().get().getSlackApiToken();
-    SlackSession session = SlackSessionFactory.createWebSocketSlackSession(token);
-    session.connect();
-    return session;
+  public Optional<SlackSession> get(BlazarConfiguration configuration) throws IOException {
+    if (configuration.getSlackConfiguration().isPresent()) {
+      String token = configuration.getSlackConfiguration().get().getSlackApiToken();
+      SlackSession session = SlackSessionFactory.createWebSocketSlackSession(token);
+      session.connect();
+      return Optional.of(session);
+    } else {
+      return Optional.empty();
+    }
   }
 
 

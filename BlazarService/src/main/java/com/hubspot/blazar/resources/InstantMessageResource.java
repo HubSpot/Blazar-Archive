@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
@@ -20,17 +20,10 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
-import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
-import com.hubspot.blazar.data.service.ModuleBuildService;
-import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.externalservice.slack.SlackChannel;
-import com.hubspot.blazar.listener.SlackImNotificationVisitor;
-import com.hubspot.blazar.listener.SlackRoomNotificationVisitor;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 import com.ullink.slack.simpleslackapi.SlackSession;
 
@@ -42,11 +35,11 @@ public class InstantMessageResource {
   private static final Logger LOG = LoggerFactory.getLogger(InstantMessageResource.class);
   @Inject(optional = true)
   private final InstantMessageConfigurationService instantMessageConfigurationService;
-  private SlackSession slackSession;
+  private Optional<SlackSession> slackSession;
 
   @Inject
   public InstantMessageResource(InstantMessageConfigurationService instantMessageConfigurationService,
-                                SlackSession slackSession) {
+                                Optional<SlackSession> slackSession) {
     this.instantMessageConfigurationService = instantMessageConfigurationService;
     this.slackSession = slackSession;
   }
@@ -93,11 +86,15 @@ public class InstantMessageResource {
   @GET
   @Path("/slack/list-channels")
   public Set<SlackChannel> getChannels() throws IOException {
-    Collection<com.ullink.slack.simpleslackapi.SlackChannel> channels = slackSession.getChannels();
-    Set<SlackChannel> ourChannels = new HashSet<>();
-    for (com.ullink.slack.simpleslackapi.SlackChannel channel : channels) {
-      ourChannels.add(new SlackChannel(channel.getId(), channel.getName()));
+    if (slackSession.isPresent()) {
+      Collection<com.ullink.slack.simpleslackapi.SlackChannel> channels = slackSession.get().getChannels();
+      Set<SlackChannel> ourChannels = new HashSet<>();
+      for (com.ullink.slack.simpleslackapi.SlackChannel channel : channels) {
+        ourChannels.add(new SlackChannel(channel.getId(), channel.getName()));
+      }
+      return ourChannels;
+    } else {
+      return Collections.emptySet();
     }
-    return ourChannels;
   }
 }
