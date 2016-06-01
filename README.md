@@ -2,7 +2,7 @@
 
 ## Overview ##
 
-Blazar is a continuous integration tool designed to integrate with GitHub Enterprise 
+Blazar is a continuous integration tool designed to integrate with GitHub (and/or GitHub Enterprise) 
 and [Singularity](https://github.com/HubSpot/Singularity). It uses GitHub organization webhooks
 so that new repositories are automatically discovered, and the builds happen as one-off tasks in
 Singularity so you can reuse your existing cluster rather than running dedicated build servers. 
