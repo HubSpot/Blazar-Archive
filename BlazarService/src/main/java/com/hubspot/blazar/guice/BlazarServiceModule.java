@@ -3,7 +3,6 @@ package com.hubspot.blazar.guice;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -14,6 +13,7 @@ import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.RateLimitHandler;
 
+import com.google.common.base.Optional;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
@@ -134,7 +134,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       session.connect();
       return Optional.of(session);
     } else {
-      return Optional.empty();
+      return Optional.absent();
     }
   }
 

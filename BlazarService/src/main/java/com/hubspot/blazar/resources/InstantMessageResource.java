@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
@@ -20,6 +19,7 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
