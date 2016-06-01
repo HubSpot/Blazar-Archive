@@ -163,3 +163,8 @@ gulp.task('default', ['build', 'serve', 'watch']);
 gulp.task('build', ['clean'], function(){
   gulp.start(['images', 'html', 'fonts', 'lint', 'scripts', 'vendorStyles', 'styles', 'sourcemap']);
 });
+
+gulp.task('build-jar', function() {
+    dist = 'dist/static/';
+    gulp.start(['build']);
+})

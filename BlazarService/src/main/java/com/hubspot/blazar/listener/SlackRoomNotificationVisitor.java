@@ -33,7 +33,7 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   private InstantMessageConfigurationService instantMessageConfigurationService;
   private final BranchService branchService;
   private final ModuleBuildService moduleBuildService;
-  private final SlackSession slackSession;
+  private final Optional<SlackSession> slackSession;
   private final SlackUtils slackUtils;
   private final RepositoryBuildService repositoryBuildService;
 
@@ -41,7 +41,7 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   public SlackRoomNotificationVisitor(InstantMessageConfigurationService instantMessageConfigurationService,
                                       BranchService branchService,
                                       ModuleBuildService moduleBuildService,
-                                      SlackSession slackSession,
+                                      Optional<SlackSession> slackSession,
                                       SlackUtils slackUtils,
                                       RepositoryBuildService repositoryBuildService) {
     this.instantMessageConfigurationService = instantMessageConfigurationService;
@@ -91,11 +91,13 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   }
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build) {
-    Optional<SlackChannel> slackChannel = Optional.fromNullable(slackSession.findChannelByName(instantMessageConfiguration.getChannelName()));
-    if (slackChannel.isPresent()) {
-      slackSession.sendMessage(slackChannel.get(), "", slackUtils.buildSlackAttachment(build));
-    } else {
-      LOG.warn("No slack channel found for name {}", instantMessageConfiguration.getChannelName());
+    if (slackSession.isPresent()) {
+      Optional<SlackChannel> slackChannel = Optional.fromNullable(slackSession.get().findChannelByName(instantMessageConfiguration.getChannelName()));
+      if (slackChannel.isPresent()) {
+        slackSession.get().sendMessage(slackChannel.get(), "", slackUtils.buildSlackAttachment(build));
+      } else {
+        LOG.warn("No slack channel found for name {}", instantMessageConfiguration.getChannelName());
+      }
     }
   }
 
@@ -116,8 +118,10 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   }
 
   private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild build) {
-    SlackChannel slackChannel = slackSession.findChannelByName(instantMessageConfiguration.getChannelName());
-    slackSession.sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
+    if (slackSession.isPresent()) {
+      SlackChannel slackChannel = slackSession.get().findChannelByName(instantMessageConfiguration.getChannelName());
+      slackSession.get().sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
+    }
   }
 
   private boolean shouldSend(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild.State state, Optional<ModuleBuild> previous, ModuleBuild thisBuild) {

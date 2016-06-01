@@ -1,0 +1,23 @@
+server:
+  type: simple
+  applicationContextPath: /blazar
+  connector:
+    type: http
+
+zookeeper:
+  quorum: localhost:2181
+  namespace: blazar
+  sessionTimeoutMillis: 60000
+  connectTimeoutMillis: 5000
+
+github:
+  github.com:
+    organizations: []
+
+ui:
+  baseUrl: https://localhost:8099/blazar
+
+singularity:
+  host: localhost:7099
+  path: /singularity/api
+  request: BlazarExecutor
