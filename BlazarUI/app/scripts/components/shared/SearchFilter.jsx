@@ -1,14 +1,16 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll, debounce} from 'underscore';
+import {bindAll, debounce, contains} from 'underscore';
 import Icon from '../shared/Icon.jsx';
 
 import SidebarFilterStore from '../../stores/sidebarFilterStore';
+
+const FOCUS_SEARCH_BAR_SHORTCUTS = [83, 84] // s, t
 
 // To do: Typeahead in input box
 class SearchFilter extends Component {
 
   constructor() {
-    bindAll(this, 'handleChange', 'onStoreChange');
+    bindAll(this, 'handleChange', 'onStoreChange', 'handleKeyup');
     this.state = {
       searchValue: ''
     };
@@ -19,7 +21,7 @@ class SearchFilter extends Component {
       this.props.onChange(this.refs.searchFilterInput.value);
     }, 250);
   }
-    
+
   componentDidMount() {
     window.addEventListener('keyup', this.handleKeyup);
     this.unsubscribeFromSidebarFilter = SidebarFilterStore.listen(this.onStoreChange);
@@ -40,14 +42,23 @@ class SearchFilter extends Component {
     this.refs.searchFilterInput.focus();
   }
 
-  handleChange() {    
+  handleChange() {
     this.setState({
       searchValue: this.refs.searchFilterInput.value
     });
     this.handleSearchDebounced();
   }
 
-  render() {    
+  handleKeyup(e) {
+    const notFocusedOnInputElement = e.target === document.body || e.target.tagName === 'A';
+    const modifierKey = e.metaKey || e.shiftKey || event.ctrlKey;
+    const shortcutPressed = contains(FOCUS_SEARCH_BAR_SHORTCUTS, e.which);
+    if (shortcutPressed && !modifierKey && notFocusedOnInputElement) {
+       this.focusInput();
+    }
+  }
+
+  render() {
     return (
       <div>
         <Icon name='search' classNames='search-filter__icon' />
