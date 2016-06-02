@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll, debounce} from 'underscore';
+import {bindAll, debounce, contains} from 'underscore';
 import Icon from '../shared/Icon.jsx';
 
 import SidebarFilterStore from '../../stores/sidebarFilterStore';
@@ -52,7 +52,7 @@ class SearchFilter extends Component {
   handleKeyup(e) {
     const notFocusedOnInputElement = e.target === document.body || e.target.tagName === 'A';
     const modifierKey = e.metaKey || e.shiftKey || event.ctrlKey;
-    const shortcutPressed = FOCUS_SEARCH_BAR_SHORTCUTS.includes(e.which);
+    const shortcutPressed = contains(FOCUS_SEARCH_BAR_SHORTCUTS, e.which);
     if (shortcutPressed && !modifierKey && notFocusedOnInputElement) {
        this.focusInput();
     }
