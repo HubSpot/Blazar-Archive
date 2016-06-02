@@ -3,6 +3,14 @@ import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import { getUsernameFromCookie } from '../components/Helpers.js';
 
+function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) {
+  return JSON.stringify({
+    moduleIds: moduleIds,
+    buildDownstreams: downstreamModules,
+    resetCaches: resetCache
+  });
+}
+
 function triggerInterProjectBuild(moduleIds, resetCache, cb) {
   if (moduleIds === null) {
     moduleIds = [];
@@ -23,15 +31,32 @@ function triggerInterProjectBuild(moduleIds, resetCache, cb) {
   });
 }
 
+function getInterProjectBuild(interProjectBuildId, cb) {
+  const interProjectBuildPromise = new Resource({
+    url: `${config.apiRoot}/inter-project-builds/${interProjectBuildId}`,
+    type: 'GET',
+    contentType: 'application/json',
+  }).send();
 
-function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) {
-  return JSON.stringify({
-    moduleIds: moduleIds, 
-    buildDownstreams: downstreamModules,
-    resetCaches: resetCache
+  interProjectBuildPromise.then((resp) => {
+    cb(resp);
+  });
+}
+
+function getInterProjectBuildMappings(interProjectBuildId, cb) {
+  const interProjectBuildMappingsPromise = new Resource({
+    url: `${config.apiRoot}/inter-project-builds/${interProjectBuildId}/mappings`,
+    type: 'GET',
+    contentType: 'application/json',
+  }).send();
+
+  interProjectBuildMappingsPromise.then((resp) => {
+    cb(resp);
   });
 }
 
 export default {
-  triggerInterProjectBuild: triggerInterProjectBuild
+  triggerInterProjectBuild: triggerInterProjectBuild,
+  getInterProjectBuild: getInterProjectBuild,
+  getInterProjectBuildMappings: getInterProjectBuildMappings
 };
