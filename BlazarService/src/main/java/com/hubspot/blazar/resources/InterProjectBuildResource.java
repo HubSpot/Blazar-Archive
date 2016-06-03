@@ -82,6 +82,11 @@ public class InterProjectBuildResource {
     return ImmutableSet.of();
   }
 
+  @GET
+  @Path("/repository-build/{id}/mappings")
+  public Set<InterProjectBuildMapping> getMappingsForRepoBuild(@PathParam("id") long repoBuildId) {
+    return interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
+  }
 
   @GET
   @Path("/graph/{id}")
