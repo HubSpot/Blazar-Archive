@@ -102,13 +102,15 @@ public class InterProjectBuildResource {
     Set<Integer> upstreamModuleIds = new HashSet<>();
 
     // filter out mappings that are from this repo build
+    Set<InterProjectBuildMapping> toRemove = new HashSet<>();
     for (InterProjectBuildMapping m : mappings) {
-      if (m.getRepoBuildId().isPresent() && m.getRepoBuildId().get().equals(repoBuild.get().getId().get())) {
-        mappings.remove(m);
+      if (m.getRepoBuildId().isPresent() && m.getRepoBuildId().get().equals(repoBuildId)) {
+        toRemove.add(m);
+        downstreamModuleIds.addAll(build.get().getDependencyGraph().get().outgoingVertices(m.getModuleId()));
+        upstreamModuleIds.addAll(build.get().getDependencyGraph().get().incomingVertices(m.getModuleId()));
       }
-      downstreamModuleIds.addAll(build.get().getDependencyGraph().get().outgoingVertices(m.getModuleId()));
-      upstreamModuleIds.addAll(build.get().getDependencyGraph().get().incomingVertices(m.getModuleId()));
     }
+    mappings.removeAll(toRemove);
     // find downstream, upstream and cancelled nodes
     Set<Long> downstreamRepoBuilds = getRepoBuildIdsFromModuleIds(downstreamModuleIds, mappings);
     Set<Long> upstreamRepoBuilds = getRepoBuildIdsFromModuleIds(upstreamModuleIds, mappings);
