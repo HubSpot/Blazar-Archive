@@ -17,6 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildOptions;
@@ -81,7 +82,7 @@ public class InterProjectBuildResource {
   @GET
   @Path("/repository-build/{repoBuildId}/up-and-downstreams")
   public InterProjectBuildDependencies getMappingsForRepoBuild(@PathParam("repoBuildId") long repoBuildId) {
-    InterProjectBuildDependencies empty = new InterProjectBuildDependencies(repoBuildId, ImmutableSet.<Long>of(), ImmutableSet.<Long>of(), ImmutableSet.<Module>of());
+    InterProjectBuildDependencies empty = new InterProjectBuildDependencies(repoBuildId, ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableSet.<Module>of());
     Optional<RepositoryBuild> repoBuild = repositoryBuildService.get(repoBuildId);
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
 
@@ -113,8 +114,8 @@ public class InterProjectBuildResource {
     }
     mappings.removeAll(toRemove);
     // find downstream, upstream and cancelled nodes
-    Set<Long> downstreamRepoBuilds = getRepoBuildIdsFromModuleIds(downstreamModuleIds, mappings);
-    Set<Long> upstreamRepoBuilds = getRepoBuildIdsFromModuleIds(upstreamModuleIds, mappings);
+    Map<Long, String> downstreamRepoBuilds = getRepoBuildIdsFromModuleIds(downstreamModuleIds, mappings);
+    Map<Long, String> upstreamRepoBuilds = getRepoBuildIdsFromModuleIds(upstreamModuleIds, mappings);
     Set<Module> cancelled = new HashSet<>();
     for (InterProjectBuildMapping m : mappings) {
       if (m.getState().equals(InterProjectBuild.State.CANCELLED) && downstreamModuleIds.contains(m.getModuleId())) {
@@ -229,12 +230,18 @@ public class InterProjectBuildResource {
     throw new IllegalStateException(String.format("No node with moduleId %d", moduleId));
   }
 
-  private Set<Long> getRepoBuildIdsFromModuleIds(Set<Integer> moduleIds, Set<InterProjectBuildMapping> mappings) {
-    Set<Long> repoBuildIds = new HashSet<>();
+  private Map<Long, String> getRepoBuildIdsFromModuleIds(Set<Integer> moduleIds, Set<InterProjectBuildMapping> mappings) {
+    Map<Long, String> repoBuildIds = new HashMap<>();
     for (int i : moduleIds) {
       for (InterProjectBuildMapping m : mappings) {
         if (m.getModuleId() == i && m.getRepoBuildId().isPresent()) {
-          repoBuildIds.add(m.getRepoBuildId().get());
+          GitInfo branch = branchService.get(m.getBranchId()).get();
+          String name = String.format("%s-%s-%s-%s",
+              branch.getHost(),
+              branch.getOrganization(),
+              branch.getRepository(),
+              branch.getBranch());
+          repoBuildIds.put(m.getRepoBuildId().get(), name);
         }
       }
     }
