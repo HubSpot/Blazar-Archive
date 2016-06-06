@@ -10,17 +10,17 @@ public class InterProjectBuildDependencies {
   private final long repoBuildId;
   private final Set<Long> upstreams;
   private final Set<Long> downstreams;
-  private Set<Module> modules;
+  private Set<Module> cancelledDownstreamModules;
 
   @JsonCreator
   public InterProjectBuildDependencies(@JsonProperty("repoBuildId") long repoBuildId,
                                        @JsonProperty("upstreams") Set<Long> upstreams,
                                        @JsonProperty("downstreams") Set<Long> downstreams,
-                                       @JsonProperty("cancelledDownstreamModules") Set<Module> modules) {
+                                       @JsonProperty("cancelledDownstreamModules") Set<Module> cancelledDownstreamModules) {
     this.repoBuildId = repoBuildId;
     this.upstreams = upstreams;
     this.downstreams = downstreams;
-    this.modules = modules;
+    this.cancelledDownstreamModules = cancelledDownstreamModules;
   }
 
   public long getRepoBuildId() {
@@ -35,7 +35,7 @@ public class InterProjectBuildDependencies {
     return downstreams;
   }
 
-  public Set<Module> getModules() {
-    return modules;
+  public Set<Module> getCancelledDownstreamModules() {
+    return cancelledDownstreamModules;
   }
 }

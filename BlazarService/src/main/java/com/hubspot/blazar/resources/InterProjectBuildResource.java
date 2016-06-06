@@ -106,7 +106,8 @@ public class InterProjectBuildResource {
     for (InterProjectBuildMapping m : mappings) {
       if (m.getRepoBuildId().isPresent() && m.getRepoBuildId().get().equals(repoBuildId)) {
         toRemove.add(m);
-        downstreamModuleIds.addAll(build.get().getDependencyGraph().get().outgoingVertices(m.getModuleId()));
+        Set<Integer> outgoing = build.get().getDependencyGraph().get().outgoingVertices(m.getModuleId());
+        downstreamModuleIds.addAll(outgoing);
         upstreamModuleIds.addAll(build.get().getDependencyGraph().get().incomingVertices(m.getModuleId()));
       }
     }
@@ -116,7 +117,7 @@ public class InterProjectBuildResource {
     Set<Long> upstreamRepoBuilds = getRepoBuildIdsFromModuleIds(upstreamModuleIds, mappings);
     Set<Module> cancelled = new HashSet<>();
     for (InterProjectBuildMapping m : mappings) {
-      if (m.getState().equals(InterProjectBuild.State.CANCELLED)) {
+      if (m.getState().equals(InterProjectBuild.State.CANCELLED) && downstreamModuleIds.contains(m.getModuleId())) {
         cancelled.add(moduleService.get(m.getModuleId()).get());
       }
     }
