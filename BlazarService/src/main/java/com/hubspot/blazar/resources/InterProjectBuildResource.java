@@ -27,13 +27,16 @@ import com.hubspot.blazar.base.D3GraphNode;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
+import com.hubspot.blazar.base.InterProjectBuildDependencies;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.sun.jersey.api.NotFoundException;
 
 @Path("/inter-project-builds")
@@ -44,13 +47,16 @@ public class InterProjectBuildResource {
   private InterProjectBuildMappingService interProjectBuildMappingService;
   private BranchService branchService;
   private final ModuleService moduleService;
+  private RepositoryBuildService repositoryBuildService;
 
   @Inject
   public InterProjectBuildResource(DependenciesService dependenciesService,
                                    InterProjectBuildService interProjectBuildService,
                                    InterProjectBuildMappingService interProjectBuildMappingService,
+                                   RepositoryBuildService repositoryBuildService,
                                    BranchService branchService,
                                    ModuleService moduleService) {
+    this.repositoryBuildService = repositoryBuildService;
     this.dependenciesService = dependenciesService;
     this.interProjectBuildService = interProjectBuildService;
     this.interProjectBuildMappingService = interProjectBuildMappingService;
@@ -73,19 +79,49 @@ public class InterProjectBuildResource {
   }
 
   @GET
-  @Path("/{id}/mappings")
-  public Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(@PathParam("id") long id) {
-    Optional<InterProjectBuild> build = interProjectBuildService.getWithId(id);
-    if (build.isPresent()) {
-      return interProjectBuildMappingService.getMappingsForInterProjectBuild(build.get());
-    }
-    return ImmutableSet.of();
-  }
+  @Path("/repository-build/{repoBuildId}/up-and-downstreams")
+  public InterProjectBuildDependencies getMappingsForRepoBuild(@PathParam("repoBuildId") long repoBuildId) {
+    InterProjectBuildDependencies empty = new InterProjectBuildDependencies(repoBuildId, ImmutableSet.<Long>of(), ImmutableSet.<Long>of(), ImmutableSet.<Module>of());
+    Optional<RepositoryBuild> repoBuild = repositoryBuildService.get(repoBuildId);
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
 
-  @GET
-  @Path("/repository-build/{id}/mappings")
-  public Set<InterProjectBuildMapping> getMappingsForRepoBuild(@PathParam("id") long repoBuildId) {
-    return interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
+    if (mappings.isEmpty() || !repoBuild.isPresent()) {
+      return empty;
+    }
+
+    InterProjectBuildMapping mapping = mappings.iterator().next();
+    Optional<InterProjectBuild> build = interProjectBuildService.getWithId(mapping.getInterProjectBuildId());
+
+    if (!build.isPresent()) {
+      return empty;
+    }
+
+    mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build.get());
+
+    Set<Integer> downstreamModuleIds = new HashSet<>();
+    Set<Integer> upstreamModuleIds = new HashSet<>();
+
+    // filter out mappings that are from this repo build
+    Set<InterProjectBuildMapping> toRemove = new HashSet<>();
+    for (InterProjectBuildMapping m : mappings) {
+      if (m.getRepoBuildId().isPresent() && m.getRepoBuildId().get().equals(repoBuildId)) {
+        toRemove.add(m);
+        Set<Integer> outgoing = build.get().getDependencyGraph().get().outgoingVertices(m.getModuleId());
+        downstreamModuleIds.addAll(outgoing);
+        upstreamModuleIds.addAll(build.get().getDependencyGraph().get().incomingVertices(m.getModuleId()));
+      }
+    }
+    mappings.removeAll(toRemove);
+    // find downstream, upstream and cancelled nodes
+    Set<Long> downstreamRepoBuilds = getRepoBuildIdsFromModuleIds(downstreamModuleIds, mappings);
+    Set<Long> upstreamRepoBuilds = getRepoBuildIdsFromModuleIds(upstreamModuleIds, mappings);
+    Set<Module> cancelled = new HashSet<>();
+    for (InterProjectBuildMapping m : mappings) {
+      if (m.getState().equals(InterProjectBuild.State.CANCELLED) && downstreamModuleIds.contains(m.getModuleId())) {
+        cancelled.add(moduleService.get(m.getModuleId()).get());
+      }
+    }
+    return new InterProjectBuildDependencies(repoBuildId, upstreamRepoBuilds, downstreamRepoBuilds, cancelled);
   }
 
   @GET
@@ -93,7 +129,6 @@ public class InterProjectBuildResource {
   public DependencyGraph dependencyGraph(@PathParam("id") int id) {
     return dependenciesService.buildInterProjectDependencyGraph(Sets.newHashSet(moduleService.get(id).get()));
   }
-
 
   @POST
   @Path("/cancel/{id}")
@@ -192,5 +227,17 @@ public class InterProjectBuildResource {
       pos++;
     }
     throw new IllegalStateException(String.format("No node with moduleId %d", moduleId));
+  }
+
+  private Set<Long> getRepoBuildIdsFromModuleIds(Set<Integer> moduleIds, Set<InterProjectBuildMapping> mappings) {
+    Set<Long> repoBuildIds = new HashSet<>();
+    for (int i : moduleIds) {
+      for (InterProjectBuildMapping m : mappings) {
+        if (m.getModuleId() == i && m.getRepoBuildId().isPresent()) {
+          repoBuildIds.add(m.getRepoBuildId().get());
+        }
+      }
+    }
+    return repoBuildIds;
   }
 }
