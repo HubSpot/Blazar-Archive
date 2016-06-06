@@ -8,18 +8,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class InterProjectBuildDependencies {
 
   private final long repoBuildId;
-  private final Set<Long> upstreams;
-  private final Set<Long> downstreams;
+  private final Set<Long> upstreamRepoBuilds;
+  private final Set<Long> downstreamRepoBuilds;
   private Set<Module> cancelledDownstreamModules;
 
   @JsonCreator
   public InterProjectBuildDependencies(@JsonProperty("repoBuildId") long repoBuildId,
-                                       @JsonProperty("upstreams") Set<Long> upstreams,
-                                       @JsonProperty("downstreams") Set<Long> downstreams,
+                                       @JsonProperty("upstreamRepoBuilds") Set<Long> upstreamRepoBuilds,
+                                       @JsonProperty("downstreamRepoBuilds") Set<Long> downstreamRepoBuilds,
                                        @JsonProperty("cancelledDownstreamModules") Set<Module> cancelledDownstreamModules) {
     this.repoBuildId = repoBuildId;
-    this.upstreams = upstreams;
-    this.downstreams = downstreams;
+    this.upstreamRepoBuilds = upstreamRepoBuilds;
+    this.downstreamRepoBuilds = downstreamRepoBuilds;
     this.cancelledDownstreamModules = cancelledDownstreamModules;
   }
 
@@ -27,12 +27,12 @@ public class InterProjectBuildDependencies {
     return repoBuildId;
   }
 
-  public Set<Long> getUpstreams() {
-    return upstreams;
+  public Set<Long> getUpstreamRepoBuilds() {
+    return upstreamRepoBuilds;
   }
 
-  public Set<Long> getDownstreams() {
-    return downstreams;
+  public Set<Long> getDownstreamRepoBuilds() {
+    return downstreamRepoBuilds;
   }
 
   public Set<Module> getCancelledDownstreamModules() {
