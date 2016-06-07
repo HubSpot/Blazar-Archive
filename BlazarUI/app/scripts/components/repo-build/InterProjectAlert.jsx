@@ -25,13 +25,13 @@ class InterProjectAlert extends Component {
   renderBuildLinks(repoBuilds) {
     let renderedLinks = [];
 
-    console.log(repoBuilds);
-
     Object.keys(repoBuilds).map((value, key) => {
       renderedLinks.push(
-        <Link key={key} to={`/builds/repo-build/${value}`}>
-          {repoBuilds[value]}
-        </Link>
+        <li key={key}>
+          <Link to={`/builds/repo-build/${value}`}>
+            {repoBuilds[value]}
+          </Link>
+        </li>
       );
     });
 
@@ -47,8 +47,8 @@ class InterProjectAlert extends Component {
 
     return (
       <div className="upstream-builds">
-        <h4>Upstream builds triggered:</h4>
-        {this.renderBuildLinks(upstreamRepoBuilds)}
+        <h4>Upstream builds:</h4>
+        <ul>{this.renderBuildLinks(upstreamRepoBuilds)}</ul>
       </div>
     );
   }
@@ -62,8 +62,31 @@ class InterProjectAlert extends Component {
 
     return (
       <div className="downstream-builds">
-        <h4>Downstream builds triggered:</h4>
-        {this.renderBuildLinks(downstreamRepoBuilds)}
+        <h4>Downstream builds:</h4>
+        <ul>{this.renderBuildLinks(downstreamRepoBuilds)}</ul>
+      </div>
+    );
+  }
+
+  renderCancelledModules() {
+    const {cancelledDownstreamModules} = this.props.upAndDownstreamModules;
+
+    if (cancelledDownstreamModules.length === 0) {
+      return null;
+    }
+
+    const renderedCancelledModules = cancelledDownstreamModules.map((module, key) => {
+      return (
+        <li key={key}>
+          <span>{module.name}</span>
+        </li>
+      );
+    });
+
+    return (
+      <div className="cancelled-modules">
+        <h4>Cancelled Module Builds</h4>
+        {renderCancelledModules}
       </div>
     );
   }
@@ -73,14 +96,13 @@ class InterProjectAlert extends Component {
       <div className="inter-project-details">
         {this.renderUpstreamBuildDetails()}
         {this.renderDownstreamBuildDetails()}
+        {this.renderCancelledModules()}
       </div>
     );
   }
 
   renderTriggerCount() {
     const {upstreamRepoBuilds, downstreamRepoBuilds} = this.props.upAndDownstreamModules;
-
-    console.log(upstreamRepoBuilds);
 
     const numUpstreamRepoBuilds = Object.keys(upstreamRepoBuilds).length;
     const pluralUpstream = numUpstreamRepoBuilds !== 1 ? 's' : '';
@@ -91,11 +113,11 @@ class InterProjectAlert extends Component {
     let downstreamText = '';
 
     if (numUpstreamRepoBuilds) {
-      upstreamText = `was triggered by ${numUpstreamRepoBuilds} build${pluralUpstream}`;
+      upstreamText = `was triggered by ${numUpstreamRepoBuilds} upstream build${pluralUpstream}`;
     }
 
     if (numDownstreamRepoBuilds) {
-      downstreamText = `triggered ${numDownstreamRepoBuilds} build${pluralDownstream}`;
+      downstreamText = `triggered ${numDownstreamRepoBuilds} downstream build${pluralDownstream}`;
     }
 
     return `This inter-project build ${upstreamText}${numUpstreamRepoBuilds && numDownstreamRepoBuilds ? ' and ' : ''}${downstreamText}.`;
@@ -110,7 +132,7 @@ class InterProjectAlert extends Component {
 
     const {upstreamRepoBuilds, downstreamRepoBuilds} = upAndDownstreamModules;
 
-    if (upstreamRepoBuilds.length === 0 && downstreamRepoBuilds.length === 0) {
+    if (Object.keys(upstreamRepoBuilds).length === 0 && Object.keys(downstreamRepoBuilds).length === 0) {
       return null;
     }
 
