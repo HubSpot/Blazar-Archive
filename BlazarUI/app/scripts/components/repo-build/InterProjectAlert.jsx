@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react';
 import {isEmpty, bindAll} from 'underscore';
 import {Link} from 'react-router';
 import Alert from 'react-bootstrap/lib/Alert';
+import {contains} from 'underscore';
 
 const initialState = {
   expanded: false
@@ -14,6 +15,24 @@ class InterProjectAlert extends Component {
 
     this.state = initialState;
     bindAll(this, 'onClickAlert');
+  }
+
+  getAlertClass() {
+    const {state} = this.props.upAndDownstreamModules;
+
+    if (contains(['QUEUED', 'IN_PROGRESS'], state)) {
+      return 'info';
+    }
+
+    else if (state === 'CANCELLED') {
+      return 'warning';
+    }
+
+    else if (state === 'FAILED') {
+      return 'danger';
+    }
+
+    return 'success';
   }
 
   onClickAlert() {
@@ -120,6 +139,14 @@ class InterProjectAlert extends Component {
     return `This inter-project build ${upstreamText}${numUpstreamRepoBuilds && numDownstreamRepoBuilds ? ' and ' : ''}${downstreamText}.`;
   }
 
+  renderStatus() {
+    const {state} = this.props.upAndDownstreamModules;
+
+    return (
+      <span>{state}</span>
+    );
+  }
+
   render() {
     const {upAndDownstreamModules} = this.props;
 
@@ -133,20 +160,23 @@ class InterProjectAlert extends Component {
       return null;
     }
 
+    let triggerCount;
     let innerContent;
 
     if (!this.state.expanded) {
+      triggerCount = null;
       innerContent = 'Click this alert for details.';
     }
 
     else {
+      triggerCount = this.renderTriggerCount();
       innerContent = this.renderDetails();
     }
 
     return (
-      <Alert onClick={this.onClickAlert} bsStyle="info" className="inter-project-alert">
-        <h3>Inter-Project Build</h3>
-        <p>{this.renderTriggerCount()}</p>
+      <Alert onClick={this.onClickAlert} bsStyle={this.getAlertClass()} className="inter-project-alert">
+        <h3>Inter-Project Build: {this.renderStatus()}</h3>
+        <p>{triggerCount}</p>
         {innerContent}
       </Alert>
     );
