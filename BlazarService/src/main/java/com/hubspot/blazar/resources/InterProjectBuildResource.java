@@ -28,7 +28,7 @@ import com.hubspot.blazar.base.D3GraphNode;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
-import com.hubspot.blazar.base.InterProjectBuildDependencies;
+import com.hubspot.blazar.base.InterProjectBuildStatus;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -81,8 +81,8 @@ public class InterProjectBuildResource {
 
   @GET
   @Path("/repository-build/{repoBuildId}/up-and-downstreams")
-  public InterProjectBuildDependencies getMappingsForRepoBuild(@PathParam("repoBuildId") long repoBuildId) {
-    InterProjectBuildDependencies empty = new InterProjectBuildDependencies(repoBuildId, ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableSet.<Module>of());
+  public InterProjectBuildStatus getMappingsForRepoBuild(@PathParam("repoBuildId") long repoBuildId) {
+    InterProjectBuildStatus empty = new InterProjectBuildStatus(repoBuildId, Optional.<InterProjectBuild.State>absent(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableSet.<Module>of());
     Optional<RepositoryBuild> repoBuild = repositoryBuildService.get(repoBuildId);
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
 
@@ -122,7 +122,7 @@ public class InterProjectBuildResource {
         cancelled.add(moduleService.get(m.getModuleId()).get());
       }
     }
-    return new InterProjectBuildDependencies(repoBuildId, upstreamRepoBuilds, downstreamRepoBuilds, cancelled);
+    return new InterProjectBuildStatus(repoBuildId, Optional.of(build.get().getState()), upstreamRepoBuilds, downstreamRepoBuilds, cancelled);
   }
 
   @GET

@@ -5,20 +5,24 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Optional;
 
-public class InterProjectBuildDependencies {
+public class InterProjectBuildStatus {
 
   private final long repoBuildId;
+  private Optional<InterProjectBuild.State> state;
   private final Map<Long, String> upstreamRepoBuilds;
   private final Map<Long, String> downstreamRepoBuilds;
   private Set<Module> cancelledDownstreamModules;
 
   @JsonCreator
-  public InterProjectBuildDependencies(@JsonProperty("repoBuildId") long repoBuildId,
-                                       @JsonProperty("upstreamRepoBuilds") Map<Long, String> upstreamRepoBuilds,
-                                       @JsonProperty("downstreamRepoBuilds") Map<Long, String> downstreamRepoBuilds,
-                                       @JsonProperty("cancelledDownstreamModules") Set<Module> cancelledDownstreamModules) {
+  public InterProjectBuildStatus(@JsonProperty("repoBuildId") long repoBuildId,
+                                 @JsonProperty("state") Optional<InterProjectBuild.State> state,
+                                 @JsonProperty("upstreamRepoBuilds") Map<Long, String> upstreamRepoBuilds,
+                                 @JsonProperty("downstreamRepoBuilds") Map<Long, String> downstreamRepoBuilds,
+                                 @JsonProperty("cancelledDownstreamModules") Set<Module> cancelledDownstreamModules) {
     this.repoBuildId = repoBuildId;
+    this.state = state;
     this.upstreamRepoBuilds = upstreamRepoBuilds;
     this.downstreamRepoBuilds = downstreamRepoBuilds;
     this.cancelledDownstreamModules = cancelledDownstreamModules;
@@ -26,6 +30,10 @@ public class InterProjectBuildDependencies {
 
   public long getRepoBuildId() {
     return repoBuildId;
+  }
+
+  public Optional<InterProjectBuild.State> getState() {
+    return state;
   }
 
   public Map<Long, String> getUpstreamRepoBuilds() {
