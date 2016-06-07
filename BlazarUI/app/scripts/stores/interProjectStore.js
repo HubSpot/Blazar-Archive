@@ -10,8 +10,10 @@ const InterProjectStore = Reflux.createStore({
   listenables: InterProjectActions,
 
   init() {
-    this.interProjectBuild = {},
-    this.interProjectMappings = []
+    this.interProjectBuild = {};
+    this.interProjectBuildMappings = [];
+    this.interProjectBuildMappingByRepoBuildId = [];
+    this.upAndDownstreamModules = {};
   },
 
   onTriggerInterProjectBuild(params, state) {
@@ -36,12 +38,32 @@ const InterProjectStore = Reflux.createStore({
     });
   },
 
+  onGetInterProjectBuildMappingsByRepoBuildId(repoBuildId) {
+    InterProjectApi.getInterProjectBuildMappingsByRepoBuildId(repoBuildId, (resp) => {
+      this.interProjectBuildMappingByRepoBuildId = resp;
+
+      this.trigger({
+        interProjectBuildMappingByRepoBuildId: this.interProjectBuildMappingByRepoBuildId
+      });
+    });
+  },
+
   onGetInterProjectBuildMappings(interProjectBuildId) {
     InterProjectApi.getInterProjectBuildMappings(interProjectBuildId, (resp) => {
       this.interProjectBuildMappings = resp;
 
       this.trigger({
         interProjectBuildMappings: this.interProjectBuildMappings
+      });
+    });
+  },
+
+  onGetUpAndDownstreamModules(repoBuildId) {
+    InterProjectApi.getUpAndDownstreamModules(repoBuildId, (resp) => {
+      this.upAndDownstreamModules = resp;
+
+      this.trigger({
+        upAndDownstreamModules: this.upAndDownstreamModules
       });
     });
   }

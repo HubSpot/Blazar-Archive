@@ -16,10 +16,14 @@ import RepoBuildActions from '../../actions/repoBuildActions';
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 
+import InterProjectStore from '../../stores/interProjectStore';
+import InterProjectActions from '../../actions/interProjectActions';
+
 import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
 import RepoBuildDetail from './RepoBuildDetail.jsx';
 
+import InterProjectAlert from './InterProjectAlert.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 
 
@@ -31,7 +35,8 @@ let initialState = {
   loadingModuleBuilds: true,
   loadingRepoBuild: true,
   loadingStars: true,
-  branchInfo: {}
+  branchInfo: {},
+  upAndDownstreamModules: {}
 };
 
 class RepoBuildContainer extends Component {
@@ -40,7 +45,7 @@ class RepoBuildContainer extends Component {
     super(props);
     this.state = initialState;
 
-    bindAll(this, 'onStatusChange', 'triggerCancelBuild')
+    bindAll(this, 'onStatusChange', 'triggerCancelBuild');
   }
 
   componentDidMount() {
@@ -48,25 +53,38 @@ class RepoBuildContainer extends Component {
   }
 
   componentWillReceiveProps(nextprops) {
-    this.tearDown()
+    this.tearDown();
     this.setup(nextprops.params);
     this.setState(initialState);
   }
 
   componentWillUnmount() {
-    this.tearDown()
+    this.tearDown();
   }
 
   setup(params) {
     this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
+    this.unsubscribeFromInterProject = InterProjectStore.listen(this.onStatusChange);
     StarActions.loadStars('repoBuildContainer');
     RepoBuildActions.loadModuleBuilds(params);
     RepoBuildActions.loadRepoBuild(params);
     RepoBuildActions.startPolling(params);
     BranchActions.loadBranchInfo(params);
     BranchActions.loadMalformedFiles(params);
+    this.tryLoadInterProjectBuildMapping();
+  }
+
+  tryLoadInterProjectBuildMapping() {
+    const {currentRepoBuild} = this.state;
+
+    if (!currentRepoBuild) {
+      setTimeout(this.tryLoadInterProjectBuildMapping.bind(this), 100);
+      return;
+    }
+
+    InterProjectActions.getUpAndDownstreamModules(currentRepoBuild.id);
   }
 
   tearDown() {
@@ -74,6 +92,7 @@ class RepoBuildContainer extends Component {
     this.unsubscribeFromStars();
     this.unsubscribeFromRepoBuild();
     this.unsubscribeFromBranch();
+    this.unsubscribeFromInterProject();
   }
 
   onStatusChange(state) {
@@ -106,9 +125,7 @@ class RepoBuildContainer extends Component {
       return this.renderError();
     }
 
-    else {
-      return this.renderPage();
-    }
+    return this.renderPage();
   }
 
   renderError() {
@@ -154,6 +171,9 @@ class RepoBuildContainer extends Component {
           </UIGridItem>
         </UIGrid>
         <UIGridItem size={12}>
+          <InterProjectAlert
+            upAndDownstreamModules={this.state.upAndDownstreamModules}
+          />
           <RepoBuildDetail
             {...this.props}
             {...this.state}
@@ -172,6 +192,7 @@ class RepoBuildContainer extends Component {
   }
 
   render() {
+    console.log(this.state.upAndDownstreamModules);
     const documentTitle = this.buildDocumentTitle();
 
     return (

@@ -35,10 +35,22 @@ function getInterProjectBuild(interProjectBuildId, cb) {
   const interProjectBuildPromise = new Resource({
     url: `${config.apiRoot}/inter-project-builds/${interProjectBuildId}`,
     type: 'GET',
-    contentType: 'application/json',
+    contentType: 'application/json'
   }).send();
 
   interProjectBuildPromise.then((resp) => {
+    cb(resp);
+  });
+}
+
+function getInterProjectBuildMappingsByRepoBuildId(repoBuildId, cb) {
+  const interProjectBuildMappingsPromise = new Resource({
+    url: `${config.apiRoot}/inter-project-builds/repository-build/${repoBuildId}/mappings`,
+    type: 'GET',
+    contentType: 'application/json'
+  }).send();
+
+  interProjectBuildMappingsPromise.then((resp) => {
     cb(resp);
   });
 }
@@ -47,7 +59,7 @@ function getInterProjectBuildMappings(interProjectBuildId, cb) {
   const interProjectBuildMappingsPromise = new Resource({
     url: `${config.apiRoot}/inter-project-builds/${interProjectBuildId}/mappings`,
     type: 'GET',
-    contentType: 'application/json',
+    contentType: 'application/json'
   }).send();
 
   interProjectBuildMappingsPromise.then((resp) => {
@@ -55,8 +67,22 @@ function getInterProjectBuildMappings(interProjectBuildId, cb) {
   });
 }
 
+function getUpAndDownstreamModules(repoBuildId, cb) {
+  const upAndDownstreamModulesPromise = new Resource({
+    url: `${config.apiRoot}/inter-project-builds/repository-build/${repoBuildId}/up-and-downstreams`,
+    type: 'GET',
+    contentType: 'application/json'
+  }).send();
+
+  upAndDownstreamModulesPromise.then((resp) => {
+    cb(resp);
+  });
+}
+
 export default {
-  triggerInterProjectBuild: triggerInterProjectBuild,
-  getInterProjectBuild: getInterProjectBuild,
-  getInterProjectBuildMappings: getInterProjectBuildMappings
+  triggerInterProjectBuild,
+  getInterProjectBuild,
+  getInterProjectBuildMappings,
+  getInterProjectBuildMappingsByRepoBuildId,
+  getUpAndDownstreamModules
 };
