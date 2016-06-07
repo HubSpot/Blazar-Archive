@@ -31,42 +31,6 @@ function triggerInterProjectBuild(moduleIds, resetCache, cb) {
   });
 }
 
-function getInterProjectBuild(interProjectBuildId, cb) {
-  const interProjectBuildPromise = new Resource({
-    url: `${config.apiRoot}/inter-project-builds/${interProjectBuildId}`,
-    type: 'GET',
-    contentType: 'application/json'
-  }).send();
-
-  interProjectBuildPromise.then((resp) => {
-    cb(resp);
-  });
-}
-
-function getInterProjectBuildMappingsByRepoBuildId(repoBuildId, cb) {
-  const interProjectBuildMappingsPromise = new Resource({
-    url: `${config.apiRoot}/inter-project-builds/repository-build/${repoBuildId}/mappings`,
-    type: 'GET',
-    contentType: 'application/json'
-  }).send();
-
-  interProjectBuildMappingsPromise.then((resp) => {
-    cb(resp);
-  });
-}
-
-function getInterProjectBuildMappings(interProjectBuildId, cb) {
-  const interProjectBuildMappingsPromise = new Resource({
-    url: `${config.apiRoot}/inter-project-builds/${interProjectBuildId}/mappings`,
-    type: 'GET',
-    contentType: 'application/json'
-  }).send();
-
-  interProjectBuildMappingsPromise.then((resp) => {
-    cb(resp);
-  });
-}
-
 function getUpAndDownstreamModules(repoBuildId, cb) {
   const upAndDownstreamModulesPromise = new Resource({
     url: `${config.apiRoot}/inter-project-builds/repository-build/${repoBuildId}/up-and-downstreams`,
@@ -81,8 +45,5 @@ function getUpAndDownstreamModules(repoBuildId, cb) {
 
 export default {
   triggerInterProjectBuild,
-  getInterProjectBuild,
-  getInterProjectBuildMappings,
-  getInterProjectBuildMappingsByRepoBuildId,
   getUpAndDownstreamModules
 };

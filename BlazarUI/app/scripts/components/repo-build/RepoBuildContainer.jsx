@@ -45,7 +45,7 @@ class RepoBuildContainer extends Component {
     super(props);
     this.state = initialState;
 
-    bindAll(this, 'onStatusChange', 'triggerCancelBuild');
+    bindAll(this, 'onStatusChange', 'triggerCancelBuild', 'tryLoadInterProjectBuildMapping');
   }
 
   componentDidMount() {
@@ -80,7 +80,7 @@ class RepoBuildContainer extends Component {
     const {currentRepoBuild} = this.state;
 
     if (!currentRepoBuild) {
-      setTimeout(this.tryLoadInterProjectBuildMapping.bind(this), 100);
+      setTimeout(this.tryLoadInterProjectBuildMapping, 100);
       return;
     }
 
@@ -192,7 +192,6 @@ class RepoBuildContainer extends Component {
   }
 
   render() {
-    console.log(this.state.upAndDownstreamModules);
     const documentTitle = this.buildDocumentTitle();
 
     return (

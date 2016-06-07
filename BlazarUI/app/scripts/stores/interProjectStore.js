@@ -28,36 +28,6 @@ const InterProjectStore = Reflux.createStore({
     });
   },
 
-  onGetInterProjectBuild(interProjectBuildId) {
-    InterProjectApi.getInterProjectBuild(interProjectBuildId, (resp) => {
-      this.interProjectBuild = resp;
-
-      this.trigger({
-        interProjectBuild: this.interProjectBuild
-      });
-    });
-  },
-
-  onGetInterProjectBuildMappingsByRepoBuildId(repoBuildId) {
-    InterProjectApi.getInterProjectBuildMappingsByRepoBuildId(repoBuildId, (resp) => {
-      this.interProjectBuildMappingByRepoBuildId = resp;
-
-      this.trigger({
-        interProjectBuildMappingByRepoBuildId: this.interProjectBuildMappingByRepoBuildId
-      });
-    });
-  },
-
-  onGetInterProjectBuildMappings(interProjectBuildId) {
-    InterProjectApi.getInterProjectBuildMappings(interProjectBuildId, (resp) => {
-      this.interProjectBuildMappings = resp;
-
-      this.trigger({
-        interProjectBuildMappings: this.interProjectBuildMappings
-      });
-    });
-  },
-
   onGetUpAndDownstreamModules(repoBuildId) {
     InterProjectApi.getUpAndDownstreamModules(repoBuildId, (resp) => {
       this.upAndDownstreamModules = resp;
