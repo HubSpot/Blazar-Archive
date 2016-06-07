@@ -10,9 +10,6 @@ const InterProjectStore = Reflux.createStore({
   listenables: InterProjectActions,
 
   init() {
-    this.interProjectBuild = {};
-    this.interProjectBuildMappings = [];
-    this.interProjectBuildMappingByRepoBuildId = [];
     this.upAndDownstreamModules = {};
   },
 
