@@ -23,10 +23,8 @@ class InterProjectAlert extends Component {
   }
 
   renderBuildLinks(repoBuilds) {
-    let renderedLinks = [];
-
-    Object.keys(repoBuilds).map((value, key) => {
-      renderedLinks.push(
+    return Object.keys(repoBuilds).map((value, key) => {
+      return (
         <li key={key}>
           <Link to={`/builds/repo-build/${value}`}>
             {repoBuilds[value]}
@@ -34,8 +32,6 @@ class InterProjectAlert extends Component {
         </li>
       );
     });
-
-    return renderedLinks;
   }
 
   renderUpstreamBuildDetails() {
@@ -46,7 +42,7 @@ class InterProjectAlert extends Component {
     }
 
     return (
-      <div className="upstream-builds">
+      <div className="inter-project-alert__upstream">
         <h4>Upstream builds:</h4>
         <ul>{this.renderBuildLinks(upstreamRepoBuilds)}</ul>
       </div>
@@ -61,7 +57,7 @@ class InterProjectAlert extends Component {
     }
 
     return (
-      <div className="downstream-builds">
+      <div className="inter-project-alert__downstream">
         <h4>Downstream builds:</h4>
         <ul>{this.renderBuildLinks(downstreamRepoBuilds)}</ul>
       </div>
@@ -84,7 +80,7 @@ class InterProjectAlert extends Component {
     });
 
     return (
-      <div className="cancelled-modules">
+      <div className="inter-project-alert__cancelled">
         <h4>Cancelled Module Builds</h4>
         {renderCancelledModules}
       </div>
@@ -93,7 +89,7 @@ class InterProjectAlert extends Component {
 
   renderDetails() {
     return (
-      <div className="inter-project-details">
+      <div className="inter-project-alert__details">
         {this.renderUpstreamBuildDetails()}
         {this.renderDownstreamBuildDetails()}
         {this.renderCancelledModules()}
@@ -136,21 +132,21 @@ class InterProjectAlert extends Component {
       return null;
     }
 
+    let innerContent;
+
     if (!this.state.expanded) {
-      return (
-        <Alert onClick={this.onClickAlert} bsStyle="info" className="inter-project-alert">
-          <h3>Inter-Project Build</h3>
-          {this.renderTriggerCount()}<br />
-          Click this alert for details.
-        </Alert>
-      );
+      innerContent = 'Click this alert for details.';
+    }
+
+    else {
+      innerContent = this.renderDetails();
     }
 
     return (
       <Alert onClick={this.onClickAlert} bsStyle="info" className="inter-project-alert">
         <h3>Inter-Project Build</h3>
-        {this.renderTriggerCount()}<br /><br />
-        {this.renderDetails()}
+        <p>{this.renderTriggerCount()}</p>
+        {innerContent}
       </Alert>
     );
   }
