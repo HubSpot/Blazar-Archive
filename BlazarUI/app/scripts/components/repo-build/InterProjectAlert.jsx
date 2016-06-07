@@ -72,6 +72,7 @@ class InterProjectAlert extends Component {
     }
 
     const renderedCancelledModules = cancelledDownstreamModules.map((module, key) => {
+      console.log(module);
       return (
         <li key={key}>
           <span>{module.name}</span>
@@ -82,7 +83,7 @@ class InterProjectAlert extends Component {
     return (
       <div className="inter-project-alert__cancelled">
         <h4>Cancelled Module Builds</h4>
-        {renderCancelledModules}
+        <ul>{renderedCancelledModules}</ul>
       </div>
     );
   }

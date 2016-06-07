@@ -25,7 +25,7 @@ function redirectRepoBuildShortlink(nextState, replace, callback) {
     replace(`/builds/branch/${resp.branchId}/build/${resp.buildNumber}`);
     callback();
   }, (error) => {
-    replace('/');
+    replace('/not-found');
     callback();
   });
 }
