@@ -117,28 +117,6 @@ class InterProjectAlert extends Component {
     );
   }
 
-  renderTriggerCount() {
-    const {upstreamRepoBuilds, downstreamRepoBuilds} = this.props.upAndDownstreamModules;
-
-    const numUpstreamRepoBuilds = Object.keys(upstreamRepoBuilds).length;
-    const pluralUpstream = numUpstreamRepoBuilds !== 1 ? 's' : '';
-    const numDownstreamRepoBuilds = Object.keys(downstreamRepoBuilds).length;
-    const pluralDownstream = numDownstreamRepoBuilds !== 1 ? 's' : '';
-
-    let upstreamText = '';
-    let downstreamText = '';
-
-    if (numUpstreamRepoBuilds) {
-      upstreamText = `was triggered by ${numUpstreamRepoBuilds} upstream build${pluralUpstream}`;
-    }
-
-    if (numDownstreamRepoBuilds) {
-      downstreamText = `triggered ${numDownstreamRepoBuilds} downstream build${pluralDownstream}`;
-    }
-
-    return `This inter-project build ${upstreamText}${numUpstreamRepoBuilds && numDownstreamRepoBuilds ? ' and ' : ''}${downstreamText}.`;
-  }
-
   renderStatus() {
     const {state} = this.props.upAndDownstreamModules;
 
@@ -160,24 +138,10 @@ class InterProjectAlert extends Component {
       return null;
     }
 
-    let triggerCount;
-    let innerContent;
-
-    if (!this.state.expanded) {
-      triggerCount = null;
-      innerContent = 'Click this alert for details.';
-    }
-
-    else {
-      triggerCount = this.renderTriggerCount();
-      innerContent = this.renderDetails();
-    }
-
     return (
       <Alert onClick={this.onClickAlert} bsStyle={this.getAlertClass()} className="inter-project-alert">
-        <h3>Inter-Project Build: {this.renderStatus()}</h3>
-        <p>{triggerCount}</p>
-        {innerContent}
+        <h3>Inter-Project Build: {this.renderStatus()} (click for details)</h3>
+        {this.state.expanded ? this.renderDetails() : null}
       </Alert>
     );
   }

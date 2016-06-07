@@ -36,7 +36,8 @@ let initialState = {
   loadingRepoBuild: true,
   loadingStars: true,
   branchInfo: {},
-  upAndDownstreamModules: {}
+  upAndDownstreamModules: {},
+  currentRepoBuild: undefined
 };
 
 class RepoBuildContainer extends Component {
@@ -54,8 +55,9 @@ class RepoBuildContainer extends Component {
 
   componentWillReceiveProps(nextprops) {
     this.tearDown();
-    this.setup(nextprops.params);
-    this.setState(initialState);
+    this.setState(initialState, () => {
+      this.setup(nextprops.params);
+    });
   }
 
   componentWillUnmount() {
@@ -73,10 +75,10 @@ class RepoBuildContainer extends Component {
     RepoBuildActions.startPolling(params);
     BranchActions.loadBranchInfo(params);
     BranchActions.loadMalformedFiles(params);
-    this.tryLoadInterProjectBuildMapping();
+    this.tryLoadInterProjectBuildMapping(params);
   }
 
-  tryLoadInterProjectBuildMapping() {
+  tryLoadInterProjectBuildMapping(params) {
     const {currentRepoBuild} = this.state;
 
     if (!currentRepoBuild) {
