@@ -3,6 +3,7 @@ import {isEmpty, bindAll} from 'underscore';
 import {Link} from 'react-router';
 import Alert from 'react-bootstrap/lib/Alert';
 import {contains} from 'underscore';
+import classNames from 'classnames';
 
 const initialState = {
   expanded: false
@@ -15,6 +16,14 @@ class InterProjectAlert extends Component {
 
     this.state = initialState;
     bindAll(this, 'onClickAlert');
+  }
+
+  getClassNames() {
+    return classNames([
+      'inter-project-alert', {
+        'expanded': this.state.expanded
+      }
+    ]);
   }
 
   getAlertClass() {
@@ -139,7 +148,7 @@ class InterProjectAlert extends Component {
     }
 
     return (
-      <Alert onClick={this.onClickAlert} bsStyle={this.getAlertClass()} className="inter-project-alert">
+      <Alert onClick={this.onClickAlert} bsStyle={this.getAlertClass()} className={this.getClassNames()}>
         <h3>Inter-Project Build: {this.renderStatus()} (click for details)</h3>
         {this.state.expanded ? this.renderDetails() : null}
       </Alert>

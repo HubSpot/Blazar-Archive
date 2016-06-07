@@ -75,10 +75,10 @@ class RepoBuildContainer extends Component {
     RepoBuildActions.startPolling(params);
     BranchActions.loadBranchInfo(params);
     BranchActions.loadMalformedFiles(params);
-    this.tryLoadInterProjectBuildMapping(params);
+    this.tryLoadInterProjectBuildMapping();
   }
 
-  tryLoadInterProjectBuildMapping(params) {
+  tryLoadInterProjectBuildMapping() {
     const {currentRepoBuild} = this.state;
 
     if (!currentRepoBuild) {

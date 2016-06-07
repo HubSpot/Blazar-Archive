@@ -1,5 +1,10 @@
 .inter-project-alert
-  transition height 1s
+  transition max-height 1s
+  max-height 52px
+  overflow hidden
+
+  &.expanded
+    max-height 2000px
 
   &:hover
     cursor pointer
