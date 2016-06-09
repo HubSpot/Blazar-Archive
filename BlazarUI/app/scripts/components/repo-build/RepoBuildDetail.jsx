@@ -31,7 +31,7 @@ class RepoBuildDetail extends Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
   }
-  
+
   getWrapperClassNames(build) {
     return classNames([
       'build-detail',
@@ -39,7 +39,7 @@ class RepoBuildDetail extends Component {
       `alert-${LABELS[build.state]}`
     ]);
   }
-  
+
   handleResize(e) {
     this.setState({
       windowWidth: window.innerWidth
@@ -50,7 +50,7 @@ class RepoBuildDetail extends Component {
     this.setState({
       showCommits: !this.state.showCommits
     });
-  }  
+  }
 
   renderCommits() {
     const {currentRepoBuild} = this.props;
@@ -74,14 +74,28 @@ class RepoBuildDetail extends Component {
         flipShowCommits={this.flipShowCommits.bind(this)} />
     );
   }
-  
+
+  renderUnstableMessage() {
+    const {currentRepoBuild} = this.props;
+
+    if (currentRepoBuild.state !== BuildStates.UNSTABLE) {
+      return null;
+    }
+
+    return (
+      <span className="build-detail-header__unstable-message">
+        This build succeeded, but one or more modules in previous builds have failed and need to be rebuilt.
+      </span>
+    );
+  }
+
   render() {
     const {currentRepoBuild} = this.props;
 
     if (this.props.error) {
       return null;
     }
-  
+
     else if (this.props.loading) {
       return (
         <div className='build-detail'>
@@ -89,7 +103,7 @@ class RepoBuildDetail extends Component {
         </div>
       );
     }
-    
+
     const build = this.props.currentRepoBuild;
 
     const gitInfo = {
@@ -99,20 +113,20 @@ class RepoBuildDetail extends Component {
     }
 
     let endtime, duration;
-      
+
     let buildDetail = {
       endtime: '',
       duration: '',
       durationPrefix: '',
       buildResult: humanizeText(build.state)
     }
-  
+
     if (contains(FINAL_BUILD_STATES, build.state)) {
       buildDetail.endtime = timestampFormatted(build.endTimestamp)
       const conjunction = build.state === BuildStates.CANCELLED ? 'after' : 'in';
 
       buildDetail.duration = `${conjunction} ${build.duration}`;
-    } 
+    }
 
     else if (build.state === BuildStates.IN_PROGRESS) {
       buildDetail.duration = `started ${timestampFormatted(build.startTimestamp)}`;
@@ -122,10 +136,11 @@ class RepoBuildDetail extends Component {
       <div>
         <div className={this.getWrapperClassNames(build)}>
           <p className='build-detail-header__build-state'>
-            Build {buildDetail.buildResult} 
+            Build {buildDetail.buildResult}
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
+            {this.renderUnstableMessage()}
           </p>
-          <RepoBuildCancelButton 
+          <RepoBuildCancelButton
             params={this.props.params}
             triggerCancelBuild={this.props.triggerCancelBuild}
             build={build}

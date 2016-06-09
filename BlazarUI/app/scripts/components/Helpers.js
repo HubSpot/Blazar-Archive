@@ -90,45 +90,45 @@ export const uniqueBranches = function(branches) {
 };
 
 export const tableRowBuildState = function(state) {
-  if (state === BuildStates.FAILED || state === BuildStates.UNSTABLE) {
+  if (state === BuildStates.FAILED) {
     return 'bgc-danger';
   }
-  else if (state === BuildStates.CANCELLED) {
+  else if (state === BuildStates.CANCELLED || state === BuildStates.UNSTABLE) {
     return 'bgc-warning';
   }
 };
 
 export const getFilteredBranches = function(filters, branches) {
-  
+
   const branchFilters = filters.branch;
 
   const filteredBranches = branches.filter((b) => {
     let passGo = false;
-  
+
     // not filtering
     if (branchFilters.length === 0) {
       return true;
     }
-  
+
     if (branchFilters.length > 0) {
       let branchMatch = false;
-  
+
       branchFilters.some((branch) => {
         if (branch.value === b.gitInfo.branch) {
           branchMatch = true;
         }
       });
-      
+
       return branchMatch;
     }
-  
+
     return passGo;
   });
-  
+
   //finally sort by branch and bodule name
   return filteredBranches.sort((a, b) => {
     return cmp(a.gitInfo.branch, b.gitInfo.branch);
-  });  
+  });
 };
 
 export const buildIsOnDeck = function(buildState) {
@@ -174,7 +174,7 @@ export const buildResultIcon = function(result, prevBuildState='') {
 
   return (
     <div className="table-icon-container">
-      <IconStack 
+      <IconStack
         iconStackBase="circle"
         iconNames={iconNames}
         classNames={classNames}

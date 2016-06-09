@@ -13,22 +13,22 @@ buildStatus(color)
 .building-icon-inner--small
   width 10px
   height 10px
-  
+
 .building-icon--QUEUED, .building-icon--LAUNCHING, .building-icon--WAITING_FOR_UPSTREAM_BUILD, .building-icon--WAITING_FOR_BUILD_SLOT
   buildStatus($default)
 
 .building-icon--IN_PROGRESS
   buildStatus($info)
 
-.building-icon--CANCELLED
+.building-icon--CANCELLED, .building-icon--UNSTABLE
   buildStatus($warning)
 
 .building-icon--SUCCEEDED
   buildStatus($success)
 
-.building-icon--FAILED, .building-icon--UNSTABLE
+.building-icon--FAILED
   buildStatus($danger)
-  
+
 .building-icon--SKIPPED
   buildStatus($skipped)
 
