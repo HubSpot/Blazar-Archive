@@ -9,7 +9,7 @@ export const INTER_PROJECT_STATES = [
 ];
 
 const INTER_PROJECT_STATE_TO_CLASS_NAMES = {
-  BuildStatesSUCCESS: 'success',
+  SUCCESS: 'success',
   FAILED: 'danger',
   CANCELLED: 'warning',
   IN_PROGRESS: '',
