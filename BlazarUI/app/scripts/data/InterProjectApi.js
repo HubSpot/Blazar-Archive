@@ -19,7 +19,6 @@ function triggerInterProjectBuild(moduleIds, resetCache, cb) {
   const buildPromise = new Resource({
     url: `${config.apiRoot}/inter-project-builds?${username}`,
     type: 'POST',
-    contentType: 'application/json',
     data: _generateBuildModuleJsonBody(moduleIds, 'NONE', resetCache)
   }).send();
 
@@ -33,9 +32,7 @@ function triggerInterProjectBuild(moduleIds, resetCache, cb) {
 
 function getUpAndDownstreamModules(repoBuildId, cb) {
   const upAndDownstreamModulesPromise = new Resource({
-    url: `${config.apiRoot}/inter-project-builds/repository-build/${repoBuildId}/up-and-downstreams`,
-    type: 'GET',
-    contentType: 'application/json'
+    url: `${config.apiRoot}/inter-project-builds/repository-build/${repoBuildId}/up-and-downstreams`
   }).send();
 
   upAndDownstreamModulesPromise.then((resp) => {

@@ -37,7 +37,7 @@ let initialState = {
   loadingStars: true,
   branchInfo: {},
   upAndDownstreamModules: {},
-  currentRepoBuild: undefined
+  currentRepoBuild: null
 };
 
 class RepoBuildContainer extends Component {

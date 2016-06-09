@@ -7,25 +7,24 @@ import classNames from 'classnames';
 
 import {getInterProjectClassName} from '../../constants/InterProjectConstants';
 
-const initialState = {
-  expanded: false
-};
-
 class InterProjectAlert extends Component {
 
   constructor(props) {
     super(props);
 
-    this.state = initialState;
+    this.state = {
+      expanded: false
+    };
+    
     bindAll(this, 'onClickAlert');
   }
 
   getClassNames() {
-    return classNames([
+    return classNames(
       'inter-project-alert', {
         'expanded': this.state.expanded
       }
-    ]);
+    );
   }
 
   getStatusColorClassName() {

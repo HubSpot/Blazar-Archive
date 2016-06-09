@@ -6,7 +6,7 @@ import $ from 'jquery';
 import {extend} from 'underscore';
 
 class ResourceProvider {
-  
+
   constructor(settings) {
     this.settings = settings;
     return this;
@@ -14,7 +14,9 @@ class ResourceProvider {
 
   defaultSettings() {
     return {
-      dataType: 'json'
+      dataType: 'json',
+      type: 'GET',
+      contentType: 'application/json'
     };
   }
 
