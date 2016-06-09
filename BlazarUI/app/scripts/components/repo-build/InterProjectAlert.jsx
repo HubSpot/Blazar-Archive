@@ -5,6 +5,8 @@ import Alert from 'react-bootstrap/lib/Alert';
 import {contains} from 'underscore';
 import classNames from 'classnames';
 
+import {getInterProjectClassName} from '../../constants/InterProjectConstants';
+
 const initialState = {
   expanded: false
 };
@@ -26,22 +28,17 @@ class InterProjectAlert extends Component {
     ]);
   }
 
-  getAlertClass() {
+  getStatusColorClassName() {
     const {state} = this.props.upAndDownstreamModules;
 
-    if (contains(['QUEUED', 'IN_PROGRESS'], state)) {
-      return 'info';
-    }
+    return getInterProjectClassName(state);
+  }
 
-    else if (state === 'CANCELLED') {
-      return 'warning';
-    }
-
-    else if (state === 'FAILED') {
-      return 'danger';
-    }
-
-    return 'success';
+  getStatusClassNames() {
+    return classNames(
+      'inter-project-alert__status',
+      this.getStatusColorClassName()
+    );
   }
 
   onClickAlert() {
@@ -100,7 +97,6 @@ class InterProjectAlert extends Component {
     }
 
     const renderedCancelledModules = cancelledDownstreamModules.map((module, key) => {
-      console.log(module);
       return (
         <li key={key}>
           <span>{module.name}</span>
@@ -130,7 +126,15 @@ class InterProjectAlert extends Component {
     const {state} = this.props.upAndDownstreamModules;
 
     return (
-      <span>{state}</span>
+      <span className={this.getStatusClassNames()}>{state}</span>
+    );
+  }
+
+  renderExpandText() {
+    return (
+      <span className='inter-project-alert__expand'>
+        (click to {this.state.expanded ? 'hide' : 'show'} details)
+      </span>
     );
   }
 
@@ -148,8 +152,8 @@ class InterProjectAlert extends Component {
     }
 
     return (
-      <Alert onClick={this.onClickAlert} bsStyle={this.getAlertClass()} className={this.getClassNames()}>
-        <h3>Inter-Project Build: {this.renderStatus()} (click for details)</h3>
+      <Alert onClick={this.onClickAlert} bsStyle='info' className={this.getClassNames()}>
+        <h3>Inter-Project Build: {this.renderStatus()} {this.renderExpandText()}</h3>
         {this.state.expanded ? this.renderDetails() : null}
       </Alert>
     );
