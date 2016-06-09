@@ -1,0 +1,43 @@
+.inter-project-alert
+  transition max-height 1s
+  max-height 52px
+  overflow hidden
+
+  &.expanded
+    max-height 2000px
+
+  &:hover
+    cursor pointer
+
+    .inter-project-alert__expand
+      text-decoration: underline
+
+  h3
+    margin 0
+    font-size 14px
+    font-weight 400
+    display inline-block
+
+    .inter-project-alert__status
+      font-weight: 600
+
+      &.success
+        color: #3c763d
+
+      &.warning
+        color: #8a6d3b
+
+      &.danger
+        color: #a94442
+
+  .inter-project-alert__details
+    margin-top 20px
+
+    .inter-project-alert__upstream, .inter-project-alert__downstream, .inter-project-alert__cancelled
+      margin 10px 10px 20px 10px
+
+      ul
+        margin-left 10px
+
+        li
+          font-weight 300

@@ -9,7 +9,9 @@ const InterProjectStore = Reflux.createStore({
 
   listenables: InterProjectActions,
 
-  init() {},
+  init() {
+    this.upAndDownstreamModules = {};
+  },
 
   onTriggerInterProjectBuild(params, state) {
     const {selectedModules, buildDownstreamModules, resetCache} = state;
@@ -20,6 +22,16 @@ const InterProjectStore = Reflux.createStore({
       }
 
       BranchActions.loadBranchBuildHistory(params);
+    });
+  },
+
+  onGetUpAndDownstreamModules(repoBuildId) {
+    InterProjectApi.getUpAndDownstreamModules(repoBuildId, (resp) => {
+      this.upAndDownstreamModules = resp;
+
+      this.trigger({
+        upAndDownstreamModules: this.upAndDownstreamModules
+      });
     });
   }
 });

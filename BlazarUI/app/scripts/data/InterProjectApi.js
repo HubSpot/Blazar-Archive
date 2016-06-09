@@ -3,6 +3,14 @@ import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import { getUsernameFromCookie } from '../components/Helpers.js';
 
+function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) {
+  return JSON.stringify({
+    moduleIds: moduleIds,
+    buildDownstreams: downstreamModules,
+    resetCaches: resetCache
+  });
+}
+
 function triggerInterProjectBuild(moduleIds, resetCache, cb) {
   if (moduleIds === null) {
     moduleIds = [];
@@ -11,7 +19,6 @@ function triggerInterProjectBuild(moduleIds, resetCache, cb) {
   const buildPromise = new Resource({
     url: `${config.apiRoot}/inter-project-builds?${username}`,
     type: 'POST',
-    contentType: 'application/json',
     data: _generateBuildModuleJsonBody(moduleIds, 'NONE', resetCache)
   }).send();
 
@@ -23,15 +30,17 @@ function triggerInterProjectBuild(moduleIds, resetCache, cb) {
   });
 }
 
+function getUpAndDownstreamModules(repoBuildId, cb) {
+  const upAndDownstreamModulesPromise = new Resource({
+    url: `${config.apiRoot}/inter-project-builds/repository-build/${repoBuildId}/up-and-downstreams`
+  }).send();
 
-function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) {
-  return JSON.stringify({
-    moduleIds: moduleIds, 
-    buildDownstreams: downstreamModules,
-    resetCaches: resetCache
+  upAndDownstreamModulesPromise.then((resp) => {
+    cb(resp);
   });
 }
 
 export default {
-  triggerInterProjectBuild: triggerInterProjectBuild
+  triggerInterProjectBuild,
+  getUpAndDownstreamModules
 };
