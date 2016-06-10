@@ -1,7 +1,7 @@
 export const LABELS = {
   'SUCCEEDED': 'success',
   'FAILED': 'danger',
-  'UNSTABLE': 'danger',
+  'UNSTABLE': 'warning',
   'CANCELLED': 'warning',
   'QUEUED': 'info',
   'LAUNCHING': 'info',
