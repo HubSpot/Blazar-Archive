@@ -40,7 +40,6 @@ public class GitHubConfiguration {
     return setCommitStatus;
   }
 
-
   public Optional<String> getOauthToken() {
     return oauthToken;
   }
@@ -48,5 +47,4 @@ public class GitHubConfiguration {
   public List<String> getOrganizations() {
     return organizations;
   }
-
 }
