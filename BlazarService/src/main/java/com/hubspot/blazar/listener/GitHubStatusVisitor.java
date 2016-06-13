@@ -2,6 +2,7 @@ package com.hubspot.blazar.listener;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
 
 import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHRepository;
@@ -13,6 +14,7 @@ import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
+import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.util.BlazarUrlHelper;
 import com.hubspot.blazar.util.GitHubHelper;
@@ -22,14 +24,17 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(GitHubStatusVisitor.class);
 
   private final BranchService branchService;
+  private Map<String, GitHubConfiguration> gitHubConfigurationMap;
   private final GitHubHelper gitHubHelper;
   private final BlazarUrlHelper blazarUrlHelper;
 
   @Inject
   public GitHubStatusVisitor(BranchService branchService,
+                             Map<String, GitHubConfiguration> gitHubConfigurationMap,
                              GitHubHelper gitHubHelper,
                              BlazarUrlHelper blazarUrlHelper) {
     this.branchService = branchService;
+    this.gitHubConfigurationMap = gitHubConfigurationMap;
     this.gitHubHelper = gitHubHelper;
     this.blazarUrlHelper = blazarUrlHelper;
   }
@@ -42,6 +47,11 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
     }
 
     GitInfo gitInfo = branchService.get(build.getBranchId()).get();
+    if (!gitHubConfigurationMap.get(gitInfo.getHost()).getSetCommitStatus()) {
+      LOG.info("Git Hub Host {} has setCommitStatus set to false not sending message", gitInfo.getHost());
+      return;
+    }
+
     String url = blazarUrlHelper.getBlazarUiLink(build);
 
     GHCommitState state = toGHCommitState(build.getState());
