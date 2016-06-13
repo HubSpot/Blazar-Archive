@@ -26,6 +26,7 @@ import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.listener.BuildVisitorModule;
+import com.hubspot.blazar.listener.GitHubStatusVisitor;
 import com.hubspot.blazar.listener.TestBuildLauncher;
 import com.hubspot.blazar.test.base.service.BlazarGitTestConfiguration;
 import com.hubspot.blazar.test.base.service.BlazarTestModule;
@@ -45,6 +46,7 @@ public class BlazarServiceTestModule extends AbstractModule {
     install(new BlazarDataModule());
     install(new BuildVisitorModule(buildBlazarConfiguration()));
     install(new DiscoveryModule());
+    bind(GitHubStatusVisitor.class).toInstance(mock(GitHubStatusVisitor.class));
     bind(EventBus.class).toInstance(eventBus);
     bind(BlazarConfiguration.class).toInstance(buildBlazarConfiguration());
     bind(SingularityClient.class).toInstance(mock(SingularityClient.class));
