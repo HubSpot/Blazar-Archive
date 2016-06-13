@@ -14,6 +14,7 @@ import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
+import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.util.BlazarUrlHelper;
@@ -30,11 +31,11 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
 
   @Inject
   public GitHubStatusVisitor(BranchService branchService,
-                             Map<String, GitHubConfiguration> gitHubConfigurationMap,
+                             BlazarConfiguration blazarConfiguration,
                              GitHubHelper gitHubHelper,
                              BlazarUrlHelper blazarUrlHelper) {
     this.branchService = branchService;
-    this.gitHubConfigurationMap = gitHubConfigurationMap;
+    this.gitHubConfigurationMap = blazarConfiguration.getGitHubConfiguration();
     this.gitHubHelper = gitHubHelper;
     this.blazarUrlHelper = blazarUrlHelper;
   }
