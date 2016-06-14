@@ -114,7 +114,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     CommitInfo commitInfo = build.getCommitInfo().get();
 
     final Set<Module> toBuild = new HashSet<>();
-    if (build.getBuildTrigger().getType() == Type.PUSH) {
+    if (build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
       if (commitInfo.isTruncated()) {
         toBuild.addAll(allModules);
       } else {

@@ -66,8 +66,9 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     Set<InterProjectBuildMapping> moduleBuildMappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuild);
 
     SetMultimap<Integer, Integer> launchableBranchToModuleMap = HashMultimap.create();
-    for (int moduleId : graph.outgoingVertices(build.getModuleId())) {
-      if (upstreamsComplete(graph.incomingVertices(moduleId), moduleBuildMappings) && noCurrentBuildFor(moduleId, interProjectBuild.getId().get())) {
+
+    for (int moduleId : graph.reachableVertices(build.getModuleId())) {
+      if (shouldBuild(moduleId, graph.incomingVertices(moduleId), moduleBuildMappings)) {
         launchableBranchToModuleMap.put(moduleService.getBranchIdFromModuleId(moduleId), moduleId);
       } else {
         LOG.debug("Upstreams not complete for module {} not launching InterRepoBuild yet.", moduleId);
@@ -111,28 +112,31 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     interProjectBuildMappingService.updateBuilds(mapping.withModuleBuildId(state));
   }
 
-  private boolean noCurrentBuildFor(int moduleId, Long interProjectBuildId) {
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForModule(interProjectBuildId, moduleId);
-    return mappings.isEmpty();
-  }
-
-  private boolean upstreamsComplete(Set<Integer> upstreamModuleIds, Set<InterProjectBuildMapping> mappings) {
+  private boolean shouldBuild(int moduleId, Set<Integer> upstreamModuleIds, Set<InterProjectBuildMapping> mappings) {
+    int branchId = moduleService.getBranchIdFromModuleId(moduleId);
+    boolean shouldBuild = true;
     for (Integer upstreamModuleId : upstreamModuleIds) {
+      Optional<InterProjectBuildMapping> mappingFound = Optional.absent();
+
+      // try to build things in same repo if possible
+      if (moduleService.getBranchIdFromModuleId(upstreamModuleId) == branchId) {
+        continue;
+      }
       for (InterProjectBuildMapping mapping : mappings) {
-        if (!(mapping.getModuleId() == upstreamModuleId)) {
-          continue;
-        }
-        if (!mapping.getModuleBuildId().isPresent()) {
-          return false;
-        }
-        ModuleBuild moduleBuild = moduleBuildService.get(mapping.getModuleBuildId().get()).get();
-        ModuleBuild.State state = moduleBuild.getState();
-        if (!state.equals(ModuleBuild.State.SUCCEEDED)) {
-          return false;
+        if (mapping.getModuleId() == upstreamModuleId) {
+          mappingFound = Optional.of(mapping);
         }
       }
+      //
+      if (!mappingFound.isPresent() || !mappingFound.get().getModuleBuildId().isPresent()) {
+        return false;
+      } else {
+        ModuleBuild moduleBuild = moduleBuildService.get(mappingFound.get().getModuleBuildId().get()).get();
+        ModuleBuild.State state = moduleBuild.getState();
+        shouldBuild = shouldBuild && state.equals(ModuleBuild.State.SUCCEEDED);
+      }
     }
-    return true;
+    return shouldBuild;
   }
 
   private void cancelTree(ModuleBuild build) throws NonRetryableBuildException {
