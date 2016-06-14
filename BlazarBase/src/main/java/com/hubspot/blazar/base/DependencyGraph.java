@@ -59,7 +59,7 @@ public class DependencyGraph {
       Set<Integer> incoming = incomingVertices(i);
       allIncoming.addAll(incoming);
       for (int each : incoming) {
-        if (seen.contains(i)) {
+        if (seen.contains(each)) {
           continue;
         }
         stack.add(each);

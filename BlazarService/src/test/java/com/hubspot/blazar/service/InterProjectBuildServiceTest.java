@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.jukito.JukitoRunner;
@@ -99,6 +100,15 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     for (InterProjectBuildMapping mapping : mappings) {
       assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(mapping.getState());
     }
+    // ensure there is 1
+    Set<Long> repoBuildIds = new HashSet<>();
+    Set<Integer> modulesInOneBuild = ImmutableSet.of(7,8,9);
+    for (InterProjectBuildMapping mapping : mappings) {
+      if (modulesInOneBuild.contains(mapping.getModuleId())) {
+        repoBuildIds.add(mapping.getRepoBuildId().get());
+      }
+    }
+    assertThat(repoBuildIds.size()).isEqualTo(1);
   }
 
   @Test
