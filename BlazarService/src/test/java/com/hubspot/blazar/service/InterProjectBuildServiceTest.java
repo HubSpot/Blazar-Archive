@@ -100,7 +100,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     for (InterProjectBuildMapping mapping : mappings) {
       assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(mapping.getState());
     }
-    // ensure there is 1
+    // ensure there is 1 repo build for these modules
     Set<Long> repoBuildIds = new HashSet<>();
     Set<Integer> modulesInOneBuild = ImmutableSet.of(7,8,9);
     for (InterProjectBuildMapping mapping : mappings) {
