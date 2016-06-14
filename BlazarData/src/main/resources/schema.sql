@@ -96,7 +96,7 @@ CREATE TABLE `malformed_files` (
 --changeset jhaber:2 dbms:mysql
 ALTER TABLE `branches` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
-ALTER TABLE `branches` MODIFY `branch` varchar(250) NOT NULL CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `branches` MODIFY `branch` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ALTER TABLE `branches` MODIFY `updatedTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
