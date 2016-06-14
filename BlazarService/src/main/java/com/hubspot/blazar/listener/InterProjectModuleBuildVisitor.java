@@ -68,8 +68,9 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     SetMultimap<Integer, Integer> launchableBranchToModuleMap = HashMultimap.create();
 
     for (int moduleId : graph.reachableVertices(build.getModuleId())) {
-      if (shouldBuild(moduleId, graph.incomingVertices(moduleId), moduleBuildMappings)) {
-        launchableBranchToModuleMap.put(moduleService.getBranchIdFromModuleId(moduleId), moduleId);
+      int branchId = moduleService.getBranchIdFromModuleId(moduleId);
+      if (shouldBuild(moduleId, branchId, graph.incomingVertices(moduleId), moduleBuildMappings)) {
+        launchableBranchToModuleMap.put(branchId, moduleId);
       } else {
         LOG.debug("Upstreams not complete for module {} not launching InterRepoBuild yet.", moduleId);
       }
@@ -112,8 +113,7 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     interProjectBuildMappingService.updateBuilds(mapping.withModuleBuildId(state));
   }
 
-  private boolean shouldBuild(int moduleId, Set<Integer> upstreamModuleIds, Set<InterProjectBuildMapping> mappings) {
-    int branchId = moduleService.getBranchIdFromModuleId(moduleId);
+  private boolean shouldBuild(int moduleId, int branchId, Set<Integer> upstreamModuleIds, Set<InterProjectBuildMapping> mappings) {
     boolean shouldBuild = true;
     for (Integer upstreamModuleId : upstreamModuleIds) {
       Optional<InterProjectBuildMapping> mappingFound = Optional.absent();
