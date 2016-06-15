@@ -5,6 +5,7 @@ import static org.assertj.core.api.Fail.fail;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.jukito.JukitoRunner;
@@ -12,10 +13,20 @@ import org.jukito.UseModules;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kohsuke.github.BlazarGHChange;
+import org.kohsuke.github.BlazarGHCommit;
+import org.kohsuke.github.BlazarGHCommitFile;
+import org.kohsuke.github.BlazarGHCommitShortInfo;
+import org.kohsuke.github.BlazarGHContent;
+import org.kohsuke.github.BlazarGHRepository;
+import org.kohsuke.github.BlazarGHTreeEntry;
+import org.kohsuke.github.BlazarGitUser;
+import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -66,6 +77,8 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   private SingularityBuildLauncher singularityBuildLauncher;
   @Inject
   private TestUtils testUtils;
+  @Inject
+  private Map<String, GitHub> gitHubMap;
 
   @Before
   public void before() throws Exception {
@@ -132,14 +145,31 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void testModuleGroupingOnPushToOneModule() throws InterruptedException {
+  public void testModuleGroupingOnPushToOneModule() throws Exception {
     int repoId = 3;
     String sha = "2222222222222222222222222222222222222222";
+    // ensure we have a previous build
     GitInfo gitInfo = branchService.get(repoId).get();
+    testUtils.runDefaultRepositoryBuild(gitInfo);
+
+    // "commit" a change
+    GitHub testhost = gitHubMap.get("git.example.com");
+    BlazarGHRepository repo = (BlazarGHRepository) testhost.getRepository("test/Repo3");
+    BlazarGHCommitFile file = new BlazarGHCommitFile("/Module1/.blazar.yaml", BlazarGHCommitFile.Status.modified);
+    BlazarGitUser user = new BlazarGitUser("testy", "testy@example.com", 1465954246782L);
+    BlazarGHCommitShortInfo info = new BlazarGHCommitShortInfo("change file", user, user);
+    BlazarGHTreeEntry entry = new BlazarGHTreeEntry(sha, BlazarGHContent.fromString("git/example/com/Repo3/Module1/.blazar2.yaml"), "/Module1/.blazar.yaml");
+    BlazarGHCommit commit = new BlazarGHCommit(sha, ImmutableList.of(file), info);
+    BlazarGHChange change = new BlazarGHChange(commit, ImmutableList.of(entry), "master");
+    repo.applyChange(change);
+
     BuildTrigger buildTrigger = BuildTrigger.forCommit(sha);
     BuildOptions buildOptions = new BuildOptions(ImmutableSet.<Integer>of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
     RepositoryBuild repositoryBuild = testUtils.runAndWaitForRepositoryBuild(gitInfo, buildTrigger, buildOptions);
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repositoryBuild.getId().get());
+    // Here the mappings we have are only for the 1 repo we triggered (and queried on), have to get them all before we can test.
+    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mappings.iterator().next().getInterProjectBuildId()).get();
+    mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuild);
     // ensure there is 1 repo build for these modules
     Set<Long> repoBuildIds = new HashSet<>();
     Set<Integer> modulesInOneBuild = ImmutableSet.of(7,8,9);
@@ -149,6 +179,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
       }
     }
     assertThat(repoBuildIds.size()).isEqualTo(1);
+    repo.revertLastChange();
   }
 
 
