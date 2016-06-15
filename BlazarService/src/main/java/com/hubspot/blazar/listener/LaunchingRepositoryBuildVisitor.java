@@ -69,7 +69,6 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
     Set<Module> modules = filterActive(moduleService.getByBranch(build.getBranchId()));
     Set<Module> toBuild = findModulesToBuild(build, modules);
-    Set<Module> skipped = Sets.difference(modules, toBuild);
 
     Optional<Long> interProjectBuildId = Optional.absent();
     if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
@@ -97,6 +96,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
       interProjectBuildId = Optional.of(interProjectBuildService.enqueue(ipb));
     }
     // Only calculate skipped modules after we know what modules will build
+    Set<Module> skipped = Sets.difference(modules, toBuild);
 
     if (modules.isEmpty()) {
       LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
