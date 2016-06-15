@@ -112,7 +112,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void testModuleGrouping() throws InterruptedException {
+  public void testModuleGroupingManualBuild() throws InterruptedException {
     ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
     // Trigger interProjectBuild
     InterProjectBuild testableBuild = testUtils.runInterProjectBuild(7, Optional.<BuildTrigger>absent());
@@ -131,12 +131,31 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     assertThat(repoBuildIds.size()).isEqualTo(1);
   }
 
+  @Test
+  public void testModuleGroupingOnPushToOneModule() throws InterruptedException {
+    int repoId = 3;
+    String sha = "2222222222222222222222222222222222222222";
+    GitInfo gitInfo = branchService.get(repoId).get();
+    BuildTrigger buildTrigger = BuildTrigger.forCommit(sha);
+    BuildOptions buildOptions = new BuildOptions(ImmutableSet.<Integer>of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
+    RepositoryBuild repositoryBuild = testUtils.runAndWaitForRepositoryBuild(gitInfo, buildTrigger, buildOptions);
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repositoryBuild.getId().get());
+    // ensure there is 1 repo build for these modules
+    Set<Long> repoBuildIds = new HashSet<>();
+    Set<Integer> modulesInOneBuild = ImmutableSet.of(7,8,9);
+    for (InterProjectBuildMapping mapping : mappings) {
+      if (modulesInOneBuild.contains(mapping.getModuleId())) {
+        repoBuildIds.add(mapping.getRepoBuildId().get());
+      }
+    }
+    assertThat(repoBuildIds.size()).isEqualTo(1);
+  }
+
 
   @Test
   public void testInterProjectBuildFromPush() throws Exception {
     int repoId = 1;
     String sha = "0000000000000000000000000000000000000000";
-    branchService.get(1);
     GitInfo gitInfo = branchService.get(repoId).get();
     BuildTrigger buildTrigger = BuildTrigger.forCommit(sha);
     BuildOptions buildOptions = new BuildOptions(ImmutableSet.<Integer>of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
