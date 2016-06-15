@@ -112,6 +112,27 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   }
 
   @Test
+  public void testModuleGrouping() throws InterruptedException {
+    ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
+    // Trigger interProjectBuild
+    InterProjectBuild testableBuild = testUtils.runInterProjectBuild(7, Optional.<BuildTrigger>absent());
+    long buildId = testableBuild.getId().get();
+    assertThat(Sets.newHashSet(7)).isEqualTo(testableBuild.getModuleIds());
+    assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(testableBuild.getState());
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuildService.getWithId(buildId).get());
+    // ensure there is 1 repo build for these modules
+    Set<Long> repoBuildIds = new HashSet<>();
+    Set<Integer> modulesInOneBuild = ImmutableSet.of(7,8,9);
+    for (InterProjectBuildMapping mapping : mappings) {
+      if (modulesInOneBuild.contains(mapping.getModuleId())) {
+        repoBuildIds.add(mapping.getRepoBuildId().get());
+      }
+    }
+    assertThat(repoBuildIds.size()).isEqualTo(1);
+  }
+
+
+  @Test
   public void testInterProjectBuildFromPush() throws Exception {
     int repoId = 1;
     String sha = "0000000000000000000000000000000000000000";
