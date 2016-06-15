@@ -99,7 +99,7 @@
             files:
               - fileName: "/Module1/.blazar.yaml"
                 status: "added"
-              - fileName: "/Module3/.blazar.yaml"
+              - fileName: "/Module2/.blazar.yaml"
                 status: "added"
               - fileName: "/Module3/.blazar.yaml"
                 status: "added"
@@ -139,7 +139,7 @@
             files:
               - fileName: "/Module1/.blazar.yaml"
                 status: "added"
-              - fileName: "/Module3/.blazar.yaml"
+              - fileName: "/Module2/.blazar.yaml"
                 status: "added"
               - fileName: "/Module3/.blazar.yaml"
                 status: "added"
@@ -157,6 +157,7 @@
           master:    # branches _actually_ contain commit objects, we fake that to reduce complexity/duplication, this sha must reference a sha provided in the repo commits list
             name: "master"
             sha: "1111111111111111111111111111111111111111"
+
       - name: "Repo4"   # Git Repo in git.example.com
         owner:          # specifies which org
           name: "test"
@@ -179,7 +180,7 @@
             files:
               - fileName: "/Module1/.blazar.yaml"
                 status: "added"
-              - fileName: "/Module3/.blazar.yaml"
+              - fileName: "/Module2/.blazar.yaml"
                 status: "added"
               - fileName: "/Module3/.blazar.yaml"
                 status: "added"
@@ -219,7 +220,7 @@
             files:
               - fileName: "/Module1/.blazar.yaml"
                 status: "added"
-              - fileName: "/Module3/.blazar.yaml"
+              - fileName: "/Module2/.blazar.yaml"
                 status: "added"
               - fileName: "/Module3/.blazar.yaml"
                 status: "added"

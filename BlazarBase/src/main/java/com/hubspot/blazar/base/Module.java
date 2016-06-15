@@ -1,15 +1,16 @@
 package com.hubspot.blazar.base;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Optional;
-import com.hubspot.rosetta.annotations.StoredAsJson;
-
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.hubspot.rosetta.annotations.StoredAsJson;
 
 public class Module {
   private final Optional<Integer> id;
@@ -38,7 +39,7 @@ public class Module {
     this.name = name;
     this.type = type;
     this.path = path;
-    this.glob = glob;
+    this.glob = Preconditions.checkNotNull(glob);
     this.matcher = FileSystems.getDefault().getPathMatcher("glob:" + glob);
     this.active = active;
     this.createdTimestamp = createdTimestamp;

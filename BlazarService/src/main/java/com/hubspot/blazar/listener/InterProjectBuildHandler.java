@@ -92,12 +92,19 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
       return;
     }
 
+    // This is only for Initiating the build tree, every iteration after this is handled in InterProjectModuleBuildVisitor#visitSuccess()
     SetMultimap<Integer, Integer> launchable = HashMultimap.create();
-
     for (int moduleId : build.getModuleIds()) {
-      Set<Integer> parents = d.incomingVertices(moduleId);
-      if (parents.size() == 0) {
-        launchable.put(moduleService.getBranchIdFromModuleId(moduleId), moduleId);
+      int branchId = moduleService.getBranchIdFromModuleId(moduleId);
+
+      if (shouldBuild(branchId, moduleId, d)) {
+        launchable.put(branchId, moduleId);
+      }
+      // check if should launch any children pro-actively
+      for (int child : d.reachableVertices(moduleId)) {
+        if (shouldBuild(branchId, child, d)) {
+          launchable.put(branchId, child);
+        }
       }
     }
 
@@ -125,5 +132,20 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
         repositoryBuildService.cancel(repositoryBuild);
       }
     }
+  }
+
+  private boolean shouldBuild(int branchId, int moduleId, DependencyGraph graph) {
+    Set<Integer> parents = graph.incomingVertices(moduleId);
+    if (parents.size() == 0) {
+      return true;
+    }
+    // check all parents are in the the specified branch
+    for (int parent : parents) {
+      if (branchId != moduleService.getBranchIdFromModuleId(parent)) {
+        return false;
+      }
+    }
+    // check that this module is in the specified branch (used by child builds)
+    return branchId == moduleService.getBranchIdFromModuleId(moduleId);
   }
 }

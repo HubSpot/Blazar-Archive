@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,17 +15,19 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 public class BlazarGHRepository extends GHRepository {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarGHRepository.class);
   private final String name;
   private final String fullName;
-  private final Map<String, ? extends GHBranch> branches;
+  private Map<String, ? extends GHBranch> branches;
   private final BlazarGHUser owner;
-  private final List<BlazarGHCommit> commits;
+  private List<BlazarGHCommit> commits;
   private final BlazarGHTree tree;
   private String host;
+  private List<BlazarGHChange> history;
 
   @JsonCreator
   public BlazarGHRepository(@JsonProperty("name") String name,
@@ -44,6 +47,7 @@ public class BlazarGHRepository extends GHRepository {
     this.branches = branches;
     this.tree = tree;
     this.fullName = String.format("%s/%s", owner.getLogin(), name);
+    this.history = new ArrayList<>();
   }
 
   @Override
@@ -96,9 +100,11 @@ public class BlazarGHRepository extends GHRepository {
     for (BlazarGHCommit commit : commits) {
       shas.add(commit.getSHA1());
     }
+    // because the "newer" sha (id2) will be first in the shas list
+    // we flip the indicies in the sublist call, to ensure the sublist isn't backwards
     int index1 = shas.indexOf(id1);
     int index2 = shas.indexOf(id2);
-    List<BlazarGHCommit> compareListWrongType = commits.subList(index1, index2 + 1);
+    List<BlazarGHCommit> compareListWrongType = commits.subList(index2, index1);
     List<BlazarGHCompare.Commit> compareList = new ArrayList<>();
     for (BlazarGHCommit commit : compareListWrongType) {
       compareList.add(BlazarGHCompare.makeCommit(commit));
@@ -155,5 +161,45 @@ public class BlazarGHRepository extends GHRepository {
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .add("name", fullName).toString();
+  }
+
+  public void applyChange(BlazarGHChange change) throws IOException {
+    history.add(0, change);
+    commits.add(0, change.getCommit());
+    commits.get(0).setRepository(this);
+    change.setOldCommitSha1(Optional.of(tree.getSha()));
+    change.setOldEntries(Optional.<List<BlazarGHTreeEntry>>of(ImmutableList.copyOf(tree.getSubclassTree())));
+
+    // point branch HEAD to new commit
+    Map<String, BlazarGHBranch> newBranches = new HashMap<>();
+    newBranches.putAll((Map<String, BlazarGHBranch>) branches);
+    newBranches.put(change.getBranch(), new BlazarGHBranch(change.getBranch(), change.getCommit().getSHA1()));
+    branches = newBranches;
+
+    // mutate tree
+    List<BlazarGHTreeEntry> newEntries = new ArrayList<>();
+    newEntries.addAll(change.getEntries());
+    newEntries.addAll(tree.getSubclassTree());
+    newBranches.get(change.getBranch()).setRepository(this);
+    this.tree.set(change.getCommit().getSHA1(), newEntries);
+  }
+
+  public void revertLastChange() throws IOException {
+    if (history.size() <= 0)  {
+      throw new UnsupportedOperationException("Cannot pop commit from empty history");
+    }
+    BlazarGHChange change = history.remove(0);
+    if (!change.getOldEntries().isPresent() || !change.getOldCommitSha1().isPresent()) {
+      throw new IllegalStateException("Change found in repo history with no old data to restore to");
+    }
+    commits.remove(0);
+    tree.set(change.getOldCommitSha1().get(), change.getOldEntries().get());
+
+    // change head back
+    Map<String, BlazarGHBranch> newBranches = new HashMap<>();
+    newBranches.putAll((Map<String, BlazarGHBranch>) branches);
+    newBranches.put(change.getBranch(), new BlazarGHBranch(change.getBranch(), change.getOldCommitSha1().get()));
+    newBranches.get(change.getBranch()).setRepository(this);
+    branches = newBranches;
   }
 }

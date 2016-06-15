@@ -1,5 +1,7 @@
 package com.hubspot.blazar;
 
+import static org.assertj.core.api.Assertions.fail;
+
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -24,5 +26,8 @@ public class BlazarServiceTestBase extends BlazarTestBase {
   @After
   public void cleanup() throws Exception {
     runSql("schema.sql");
+    if (BlazarServiceTestModule.EVENT_BUS_EXCEPTION_COUNT.size() > 0) {
+      fail(String.format("Event bus exception count was %d (> 0), check log for stack traces.", BlazarServiceTestModule.EVENT_BUS_EXCEPTION_COUNT.size()));
+    }
   }
 }

@@ -69,29 +69,34 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
     Set<Module> modules = filterActive(moduleService.getByBranch(build.getBranchId()));
     Set<Module> toBuild = findModulesToBuild(build, modules);
-    Set<Module> skipped = Sets.difference(modules, toBuild);
 
     Optional<Long> interProjectBuildId = Optional.absent();
     if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
-      Set<Integer> toBuildIds = getIds(toBuild);
       Set<Integer> allModuleIds = getIds(modules);
-      Set<Integer> realToBuildIds = new HashSet<>();
+      Set<Module> realToBuildModules = new HashSet<>();
       DependencyGraph interProjectGraph = dependenciesService.buildInterProjectDependencyGraph(toBuild);
-      for (int i : toBuildIds)  {
-        Set<Integer> upstream = interProjectGraph.getAllUpstreamNodes(i);
+      for (Module rootModule : toBuild)  {
+        Set<Integer> upstreams = interProjectGraph.getAllUpstreamNodes(rootModule.getId().get());
         // this module has no incoming modules outside this repo, so we're building it in this repoBuild
-        if (allModuleIds.containsAll(upstream)) {
-          realToBuildIds.add(i);
+        if (allModuleIds.containsAll(upstreams)) {
+          realToBuildModules.add(rootModule);
+        }
+        // find all downstream this root module would trigger
+        // if they (and their upstreams) are in this repo we can also build them now
+        for (int downstream : interProjectGraph.reachableVertices(rootModule.getId().get())) {
+          boolean sameBranch = moduleService.getBranchIdFromModuleId(downstream) == build.getBranchId();
+          boolean noExternalUpstreams = allModuleIds.containsAll(interProjectGraph.getAllUpstreamNodes(downstream));
+          if (sameBranch && noExternalUpstreams) {
+            realToBuildModules.add(moduleService.get(downstream).get());
+          }
         }
       }
-      toBuild = new HashSet<>();
-      for (int i : realToBuildIds) {
-        toBuild.add(moduleService.get(i).get());
-      }
-
-      InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.copyOf(realToBuildIds), build.getBuildTrigger());
+      toBuild = realToBuildModules;
+      InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.copyOf(getIds(realToBuildModules)), build.getBuildTrigger());
       interProjectBuildId = Optional.of(interProjectBuildService.enqueue(ipb));
     }
+    // Only calculate skipped modules after we know what modules will build
+    Set<Module> skipped = Sets.difference(modules, toBuild);
 
     if (modules.isEmpty()) {
       LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());

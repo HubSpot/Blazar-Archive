@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableList;
 
 public class BlazarGHTree extends GHTree {
   private String sha;
-  private final List<BlazarGHTreeEntry> tree;
+  private List<BlazarGHTreeEntry> tree;
   private final boolean truncated;
 
   @JsonCreator
@@ -37,5 +37,10 @@ public class BlazarGHTree extends GHTree {
   public boolean isTruncated() {
     return this.truncated;
   }
-}
 
+  public void set(String sha1, List<BlazarGHTreeEntry> entries) {
+    sha = sha1;
+    tree = entries;
+
+  }
+}

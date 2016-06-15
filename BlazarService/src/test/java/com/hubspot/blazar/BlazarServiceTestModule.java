@@ -1,8 +1,9 @@
 package com.hubspot.blazar;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,12 +15,15 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.SubscriberExceptionContext;
+import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
@@ -37,7 +41,7 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 
 public class BlazarServiceTestModule extends AbstractModule {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceTestModule.class);
-
+  public static List<Throwable> EVENT_BUS_EXCEPTION_COUNT = new ArrayList<>();
   @Override
   public void configure() {
     EventBus eventBus = buildEventBus();
@@ -50,6 +54,7 @@ public class BlazarServiceTestModule extends AbstractModule {
     bind(SingularityClient.class).toInstance(mock(SingularityClient.class));
     bind(SlackSession.class).toInstance(mock(SlackSession.class));
     bind(AsyncHttpClient.class).toInstance(mock(AsyncHttpClient.class));
+    bind(Integer.class).annotatedWith(Names.named("")).toInstance(0);
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
     moduleBuildVisitors.addBinding().to(TestBuildLauncher.class);
     bindGitHubMap(); // does its own binding
@@ -91,7 +96,7 @@ public class BlazarServiceTestModule extends AbstractModule {
   }
 
   private EventBus buildEventBus() {
-    return new EventBus() {
+    return new EventBus(makeSubscriberExceptionHandler(LOG)) {
       @Override
       public void post(Object event) {
         LOG.info("Got event {}", event);
@@ -99,4 +104,15 @@ public class BlazarServiceTestModule extends AbstractModule {
       }
     };
   }
+
+  private static SubscriberExceptionHandler makeSubscriberExceptionHandler(final Logger logger) {
+    return new SubscriberExceptionHandler() {
+      @Override
+      public void handleException(Throwable exception, SubscriberExceptionContext context) {
+        logger.error("Got error while processing event", exception);
+        EVENT_BUS_EXCEPTION_COUNT.add(exception);
+      }
+    };
+  }
 }
+
