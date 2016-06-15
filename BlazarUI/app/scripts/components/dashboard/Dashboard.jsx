@@ -6,7 +6,7 @@ import { bindAll } from 'underscore';
 
 import BuildStates from '../../constants/BuildStates';
 
-import CardStack from '../shared/CardStack.jsx';
+import {CardStack} from 'card-stack-test';
 import RepoBranchCard from '../shared/RepoBranchCard.jsx';
 import RepoBranchCardStackHeader from '../shared/RepoBranchCardStackHeader.jsx';
 import RepoBranchCardStackZeroState from '../shared/RepoBranchCardStackZeroState.jsx';
@@ -40,7 +40,7 @@ class Dashboard extends Component {
 
   componentWillUnmount() {
     this.unsubscribeFromRepo();
-    
+
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
@@ -141,7 +141,7 @@ class Dashboard extends Component {
           {...this.state}
           onClick={this.onCardClick.bind(this, key, build)}
           key={key}
-          expanded={key === this.state.expandedCard} 
+          expanded={key === this.state.expandedCard}
           belowExpanded={key === this.state.expandedCard + 1 && this.state.expandedCard !== -1}
           first={key === 0}
           last={key === numberOfBuilds - 1}
@@ -163,9 +163,10 @@ class Dashboard extends Component {
     );
   }
 
+
   render() {
     return (
-      <UIGrid>                
+      <UIGrid>
         <UIGridItem size={12} className='dashboard-unit'>
           <Headline>
             Starred Branches

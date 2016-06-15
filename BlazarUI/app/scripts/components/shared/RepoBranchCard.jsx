@@ -5,7 +5,7 @@ import { buildResultIcon } from '../Helpers';
 import moment from 'moment';
 import humanizeDuration from 'humanize-duration';
 
-import Card from './Card.jsx';
+import {Card} from 'card-stack-test';
 import ModuleRow from './ModuleRow.jsx';
 import BuildStates from '../../constants/BuildStates';
 import Loader from '../shared/Loader.jsx';

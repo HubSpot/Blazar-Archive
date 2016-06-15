@@ -72,7 +72,8 @@ gulp.task('vendorStyles', function () {
     './node_modules/bootstrap/dist/css/bootstrap.css',
     './node_modules/font-awesome/css/font-awesome.css',
     './node_modules/react-select/dist/default.css',
-    './node_modules/react-select/dist/react-select.css'
+    './node_modules/react-select/dist/react-select.css',
+    './node_modules/card-stack-test/lib/css/style.css'
   ];
   return gulp.src(files)
     .pipe(concatCss('vendor.css'))
@@ -81,12 +82,15 @@ gulp.task('vendorStyles', function () {
 
 gulp.task('styles',function(cb) {
   // convert stylus to css
-  return gulp.src(app + 'stylus/main.styl')
+  return gulp.src([
+    app + 'stylus/main.styl'
+  ])
     .pipe($.stylus({
       // only compress if we are in production
       compress: isProduction,
       // include 'normal' css into main.css
-      'include css' : true
+      'include css' : true,
+      include: ['./node_modules/card-stack-test/src/css/card-variables.styl']
     }))
     .pipe($.autoprefixer({browsers: autoprefixerBrowsers}))
     .pipe(gulp.dest(dist + 'css/'))
