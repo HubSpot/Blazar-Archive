@@ -15,7 +15,7 @@ class InterProjectAlert extends Component {
     this.state = {
       expanded: false
     };
-    
+
     bindAll(this, 'onClickAlert');
   }
 
@@ -131,9 +131,9 @@ class InterProjectAlert extends Component {
 
   renderExpandText() {
     return (
-      <span className='inter-project-alert__expand'>
-        (click to {this.state.expanded ? 'hide' : 'show'} details)
-      </span>
+      <a className='inter-project-alert__expand'>
+        {this.state.expanded ? 'hide' : 'show'} details
+      </a>
     );
   }
 
