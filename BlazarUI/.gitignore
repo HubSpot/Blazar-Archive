@@ -5,3 +5,4 @@ dist
 app/mock.json
 app/scripts/fixtures
 node
+.DS_Store

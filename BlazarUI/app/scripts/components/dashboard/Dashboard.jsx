@@ -6,10 +6,7 @@ import { bindAll } from 'underscore';
 
 import BuildStates from '../../constants/BuildStates';
 
-import {CardStack} from 'card-stack-test';
-import RepoBranchCard from '../shared/RepoBranchCard.jsx';
-import RepoBranchCardStackHeader from '../shared/RepoBranchCardStackHeader.jsx';
-import RepoBranchCardStackZeroState from '../shared/RepoBranchCardStackZeroState.jsx';
+import RepoBranchCardStack from '../shared/RepoBranchCardStack.jsx';
 
 import Headline from '../shared/headline/Headline.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -31,7 +28,7 @@ class Dashboard extends Component {
     super(props);
 
     this.state = initialState;
-    bindAll(this, 'pollWithLatestBuild');
+    bindAll(this, 'pollWithLatestBuild', 'onCardClick');
   }
 
   componentDidMount() {
@@ -132,38 +129,6 @@ class Dashboard extends Component {
     this.pollWithLatestBuild(branchId);
   }
 
-  renderCards() {
-    const numberOfBuilds = this.props.starredBuilds.size;
-
-    return this.props.starredBuilds.map((build, key) => {
-      return (
-        <RepoBranchCard
-          {...this.state}
-          onClick={this.onCardClick.bind(this, key, build)}
-          key={key}
-          expanded={key === this.state.expandedCard}
-          belowExpanded={key === this.state.expandedCard + 1 && this.state.expandedCard !== -1}
-          first={key === 0}
-          last={key === numberOfBuilds - 1}
-          item={build}
-          loading={this.props.loadingBuilds || this.props.loadingStars || this.state.loading} />
-      );
-    })
-  }
-
-  renderHeader() {
-    return (
-      <RepoBranchCardStackHeader />
-    );
-  }
-
-  renderRepoBranchCardStackZeroState() {
-    return (
-      <RepoBranchCardStackZeroState />
-    );
-  }
-
-
   render() {
     return (
       <UIGrid>
@@ -171,12 +136,13 @@ class Dashboard extends Component {
           <Headline>
             Starred Branches
           </Headline>
-          <CardStack
-            header={this.renderHeader()}
-            zeroState={this.renderRepoBranchCardStackZeroState()}
-            loading={this.props.loadingBuilds || this.props.loadingStars}>
-            {this.renderCards()}
-          </CardStack>
+          <RepoBranchCardStack
+            onClick={this.onCardClick}
+            starredBuilds={this.props.starredBuilds}
+            expandedCard={this.state.expandedCard}
+            moduleBuildsList={this.state.moduleBuildsList}
+            loading={this.props.loadingBuilds || this.props.loadingStars}
+          />
         </UIGridItem>
       </UIGrid>
     );
