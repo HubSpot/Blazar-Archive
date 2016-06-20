@@ -4,10 +4,29 @@ import {Card} from 'card-stack-test';
 import RepoBranchCardSummary from '../shared/RepoBranchCardSummary.jsx';
 import RepoBranchCardDetails from '../shared/RepoBranchCardDetails.jsx';
 
-function RepoBranchCard(props) {
-  const RenderedCard = Card(RepoBranchCardSummary, RepoBranchCardDetails);
+function RepoBranchCard({item, moduleBuildsList, expanded, belowExpanded, onClick}) {
+  const summary = (
+    <RepoBranchCardSummary
+      item={item}
+    />
+  );
 
-  return <RenderedCard {...props} />;
+  const details = (
+    <RepoBranchCardDetails
+      item={item}
+      moduleBuildsList={moduleBuildsList}
+    />
+  );
+
+  return (
+    <Card
+      summary={summary}
+      details={details}
+      expanded={expanded}
+      belowExpanded={belowExpanded}
+      onClick={onClick}
+    />
+  );
 }
 
 export default RepoBranchCard;

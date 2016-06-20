@@ -2,10 +2,11 @@ import React, {Component, PropTypes} from 'react';
 import Immutable from 'immutable';
 import {CardStack} from 'card-stack-test';
 
-
 import RepoBranchCard from './RepoBranchCard.jsx';
 import RepoBranchCardStackHeader from './RepoBranchCardStackHeader.jsx';
 import RepoBranchCardStackZeroState from './RepoBranchCardStackZeroState.jsx';
+
+import Loader from './Loader.jsx';
 
 class RepoBranchCardStack extends Component {
 
@@ -16,40 +17,33 @@ class RepoBranchCardStack extends Component {
   }
 
   renderCards() {
-    const numberOfBuilds = this.props.starredBuilds.size;
-
     return this.props.starredBuilds.map((build, key) => {
       return (
         <RepoBranchCard
+          key={key}
           moduleBuildsList={this.props.moduleBuildsList}
           onClick={() => this.props.onClick(key, build)}
-          key={key}
           expanded={key === this.props.expandedCard}
           belowExpanded={key === this.props.expandedCard + 1 && this.props.expandedCard !== -1}
           item={build}
-          loading={this.props.loading} />
+        />
       );
     });
   }
 
-  renderHeader() {
-    return (
-      <RepoBranchCardStackHeader />
-    );
-  }
-
-  renderRepoBranchCardStackZeroState() {
-    return (
-      <RepoBranchCardStackZeroState />
-    );
-  }
-
   render() {
+    if (this.props.loading) {
+      return <Loader />;
+    }
+
+    else if (this.props.starredBuilds.size === 0) {
+      return <RepoBranchCardStackZeroState />;
+    }
+
     return (
       <CardStack
-        header={this.renderHeader()}
-        zeroState={this.renderRepoBranchCardStackZeroState()}
-        loading={this.props.loading}>
+        header={<RepoBranchCardStackHeader />}
+      >
         {this.renderCards()}
       </CardStack>
     );
