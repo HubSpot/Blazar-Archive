@@ -57,9 +57,16 @@ public class SlackUtils {
     Set<ModuleBuild> builtModules = moduleBuildService.getByRepositoryBuild(build.getId().get());
     for (ModuleBuild b : builtModules) {
       // If a build fails, SUCCEEDED & Skipped & CANCELLED are common, and unnecessary to include
-      if (!b.getState().equals(ModuleBuild.State.SUCCEEDED) && !b.getState().equals(ModuleBuild.State.CANCELLED) && !b.getState().equals(ModuleBuild.State.SKIPPED)) {
-        Module m = moduleService.get(b.getModuleId()).get();
+      Module m = moduleService.get(b.getModuleId()).get();
+      if (b.getState().equals(ModuleBuild.State.FAILED) || build.getState().equals(RepositoryBuild.State.CANCELLED) && b.getState().equals(ModuleBuild.State.CANCELLED)) {
         attachment.addField(m.getName(), b.getState().name().toLowerCase(), true);
+      } else if (b.getState().equals(ModuleBuild.State.SKIPPED) && build.getState().equals(RepositoryBuild.State.UNSTABLE)) {
+        Optional<ModuleBuild> maybePrevious = moduleBuildService.getPreviousBuild(b);
+        if (maybePrevious.isPresent() && (maybePrevious.get().getState().equals(ModuleBuild.State.CANCELLED) || maybePrevious.get().getState().equals(ModuleBuild.State.FAILED))) {
+          attachment.addField(m.getName(), String.format("Unstable, last attempted build was in branch build #%d", maybePrevious.get().getBuildNumber()), false);
+        } else if (!maybePrevious.isPresent()) {
+          attachment.addField(m.getName(), "This module has never built.", true);
+        }
       }
     }
     return attachment;
