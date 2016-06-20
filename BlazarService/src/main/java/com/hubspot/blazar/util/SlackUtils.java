@@ -56,14 +56,23 @@ public class SlackUtils {
 
     Set<ModuleBuild> builtModules = moduleBuildService.getByRepositoryBuild(build.getId().get());
     for (ModuleBuild b : builtModules) {
+      if (b.getState().equals(ModuleBuild.State.SUCCEEDED)) {
+        continue;
+      }
       // If a build fails, SUCCEEDED & Skipped & CANCELLED are common, and unnecessary to include
       Module m = moduleService.get(b.getModuleId()).get();
-      if (b.getState().equals(ModuleBuild.State.FAILED) || build.getState().equals(RepositoryBuild.State.CANCELLED) && b.getState().equals(ModuleBuild.State.CANCELLED)) {
+      boolean failedButNotUnstable = b.getState().equals(ModuleBuild.State.FAILED)
+          || (build.getState().equals(RepositoryBuild.State.CANCELLED) && b.getState().equals(ModuleBuild.State.CANCELLED));
+      boolean unstable = b.getState().equals(ModuleBuild.State.SKIPPED) && build.getState().equals(RepositoryBuild.State.UNSTABLE);
+
+      if (failedButNotUnstable) {
         attachment.addField(m.getName(), b.getState().name().toLowerCase(), true);
-      } else if (b.getState().equals(ModuleBuild.State.SKIPPED) && build.getState().equals(RepositoryBuild.State.UNSTABLE)) {
+      } else if (unstable) {
         Optional<ModuleBuild> maybePrevious = moduleBuildService.getPreviousBuild(b);
-        if (maybePrevious.isPresent() && (maybePrevious.get().getState().equals(ModuleBuild.State.CANCELLED) || maybePrevious.get().getState().equals(ModuleBuild.State.FAILED))) {
-          attachment.addField(m.getName(), String.format("Unstable, last attempted build was in branch build #%d", maybePrevious.get().getBuildNumber()), false);
+        boolean previousBuildCancelledOrFailed = maybePrevious.isPresent() && (maybePrevious.get().getState().equals(ModuleBuild.State.CANCELLED) || maybePrevious.get().getState().equals(ModuleBuild.State.FAILED));
+        if (previousBuildCancelledOrFailed) {
+          String unstableMessage = String.format("Unstable, last attempted build was in branch build #%d", maybePrevious.get().getBuildNumber());
+          attachment.addField(m.getName(), unstableMessage, false);
         } else if (!maybePrevious.isPresent()) {
           attachment.addField(m.getName(), "This module has never built.", true);
         }
