@@ -24,7 +24,6 @@ class RepoBranchCardStack extends Component {
           moduleBuildsList={this.props.moduleBuildsList}
           onClick={() => this.props.onClick(key, build)}
           expanded={key === this.props.expandedCard}
-          belowExpanded={key === this.props.expandedCard + 1 && this.props.expandedCard !== -1}
           item={build}
         />
       );

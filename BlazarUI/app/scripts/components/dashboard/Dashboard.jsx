@@ -16,7 +16,7 @@ import RepoBuildActions from '../../actions/repoBuildActions';
 import RepoBuildStore from '../../stores/repoBuildStore';
 
 let initialState = {
-  expandedCard: -1,
+  expandedCard: null,
   loading: false,
   repoBuild: {},
   moduleBuildsList: []
@@ -44,7 +44,7 @@ class Dashboard extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.expandedCard !== -1) {
+    if (this.state.expandedCard) {
       const starredBuilds = nextProps.starredBuilds.toJS();
       let newIndex;
 
@@ -70,8 +70,8 @@ class Dashboard extends Component {
 
   resetSelectedCard() {
     this.setState({
-      expandedCard: -1,
-      build: undefined
+      expandedCard: null,
+      build: null
     });
 
     if (this.timeout) {

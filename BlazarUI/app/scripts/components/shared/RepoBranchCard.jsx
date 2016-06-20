@@ -4,7 +4,7 @@ import {Card} from 'card-stack-test';
 import RepoBranchCardSummary from '../shared/RepoBranchCardSummary.jsx';
 import RepoBranchCardDetails from '../shared/RepoBranchCardDetails.jsx';
 
-function RepoBranchCard({item, moduleBuildsList, expanded, belowExpanded, onClick}) {
+function RepoBranchCard({item, moduleBuildsList, expanded, onClick}) {
   const summary = (
     <RepoBranchCardSummary
       item={item}
@@ -23,7 +23,6 @@ function RepoBranchCard({item, moduleBuildsList, expanded, belowExpanded, onClic
       summary={summary}
       details={details}
       expanded={expanded}
-      belowExpanded={belowExpanded}
       onClick={onClick}
     />
   );
