@@ -82,7 +82,7 @@ public class InterProjectBuildResource {
   @GET
   @Path("/repository-build/{repoBuildId}/up-and-downstreams")
   public InterProjectBuildStatus getMappingsForRepoBuild(@PathParam("repoBuildId") long repoBuildId) {
-    InterProjectBuildStatus empty = new InterProjectBuildStatus(repoBuildId, Optional.<InterProjectBuild.State>absent(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableSet.<Module>of());
+    InterProjectBuildStatus empty = new InterProjectBuildStatus(repoBuildId, Optional.<Long>absent(), Optional.<InterProjectBuild.State>absent(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableSet.<Module>of());
     Optional<RepositoryBuild> repoBuild = repositoryBuildService.get(repoBuildId);
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
 
@@ -101,6 +101,7 @@ public class InterProjectBuildResource {
 
     Set<Integer> downstreamModuleIds = new HashSet<>();
     Set<Integer> upstreamModuleIds = new HashSet<>();
+    Set<Integer> failedModules = new HashSet<>();
 
     // filter out mappings that are from this repo build
     Set<InterProjectBuildMapping> toRemove = new HashSet<>();
@@ -111,18 +112,22 @@ public class InterProjectBuildResource {
         downstreamModuleIds.addAll(outgoing);
         upstreamModuleIds.addAll(build.get().getDependencyGraph().get().incomingVertices(m.getModuleId()));
       }
+      if (m.getState().equals(InterProjectBuild.State.FAILED)) {
+          failedModules.add(m.getModuleId());
+      }
     }
     mappings.removeAll(toRemove);
     // find downstream, upstream and cancelled nodes
     Map<Long, String> downstreamRepoBuilds = getRepoBuildIdsFromModuleIds(downstreamModuleIds, mappings);
     Map<Long, String> upstreamRepoBuilds = getRepoBuildIdsFromModuleIds(upstreamModuleIds, mappings);
+    Map<Long, String> failedRepoBuilds = getRepoBuildIdsFromModuleIds(failedModules, mappings);
     Set<Module> cancelled = new HashSet<>();
     for (InterProjectBuildMapping m : mappings) {
       if (m.getState().equals(InterProjectBuild.State.CANCELLED) && downstreamModuleIds.contains(m.getModuleId())) {
         cancelled.add(moduleService.get(m.getModuleId()).get());
       }
     }
-    return new InterProjectBuildStatus(repoBuildId, Optional.of(build.get().getState()), upstreamRepoBuilds, downstreamRepoBuilds, cancelled);
+    return new InterProjectBuildStatus(repoBuildId, build.get().getId(), Optional.of(build.get().getState()), upstreamRepoBuilds, downstreamRepoBuilds, failedRepoBuilds, cancelled);
   }
 
   @GET
