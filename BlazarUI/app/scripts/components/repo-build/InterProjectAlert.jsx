@@ -47,7 +47,7 @@ class InterProjectAlert extends Component {
   }
 
   renderBuildLinks(repoBuilds) {
-    return Object.keys(repoBuilds).map((value, key) => {
+    const listItemNodes = Object.keys(repoBuilds).map((value, key) => {
       return (
         <li key={key}>
           <Link to={`/builds/repo-build/${value}`}>
@@ -56,6 +56,23 @@ class InterProjectAlert extends Component {
         </li>
       );
     });
+
+    return <ul>{listItemNodes}</ul>;
+  }
+
+  renderFailedBuildDetails() {
+    const {failedRepoBuilds} = this.props.upAndDownstreamModules;
+
+    if (Object.keys(failedRepoBuilds).length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="inter-project-alert__failed">
+        <h4>Failed Builds:</h4>
+        {this.renderBuildLinks(failedRepoBuilds)}
+      </div>
+    );
   }
 
   renderUpstreamBuildDetails() {
@@ -68,7 +85,7 @@ class InterProjectAlert extends Component {
     return (
       <div className="inter-project-alert__upstream">
         <h4>Upstream builds:</h4>
-        <ul>{this.renderBuildLinks(upstreamRepoBuilds)}</ul>
+        {this.renderBuildLinks(upstreamRepoBuilds)}
       </div>
     );
   }
@@ -83,7 +100,7 @@ class InterProjectAlert extends Component {
     return (
       <div className="inter-project-alert__downstream">
         <h4>Downstream builds:</h4>
-        <ul>{this.renderBuildLinks(downstreamRepoBuilds)}</ul>
+        {this.renderBuildLinks(downstreamRepoBuilds)}
       </div>
     );
   }
@@ -114,6 +131,7 @@ class InterProjectAlert extends Component {
   renderDetails() {
     return (
       <div className="inter-project-alert__details">
+        {this.renderFailedBuildDetails()}
         {this.renderUpstreamBuildDetails()}
         {this.renderDownstreamBuildDetails()}
         {this.renderCancelledModules()}
@@ -144,7 +162,7 @@ class InterProjectAlert extends Component {
       return null;
     }
 
-    const {upstreamRepoBuilds, downstreamRepoBuilds} = upAndDownstreamModules;
+    const {upstreamRepoBuilds, downstreamRepoBuilds, interProjectBuildId} = upAndDownstreamModules;
 
     if (Object.keys(upstreamRepoBuilds).length === 0 && Object.keys(downstreamRepoBuilds).length === 0) {
       return null;
@@ -152,7 +170,7 @@ class InterProjectAlert extends Component {
 
     return (
       <Alert onClick={this.onClickAlert} bsStyle='info' className={this.getClassNames()}>
-        <h3>Inter-Project Build: {this.renderStatus()} {this.renderExpandText()}</h3>
+        <h3>Inter-Project Build {interProjectBuildId}: {this.renderStatus()} {this.renderExpandText()}</h3>
         {this.state.expanded ? this.renderDetails() : null}
       </Alert>
     );
