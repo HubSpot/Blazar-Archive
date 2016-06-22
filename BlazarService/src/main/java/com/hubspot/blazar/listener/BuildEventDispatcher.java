@@ -1,5 +1,13 @@
 package com.hubspot.blazar.listener;
 
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -13,12 +21,6 @@ import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Set;
 
 @Singleton
 public class BuildEventDispatcher {
@@ -118,7 +120,7 @@ public class BuildEventDispatcher {
       }
     } catch (NonRetryableBuildException e) {
       LOG.warn("Got non Retryable Exception in InterProjectBuild {}, marking as Finished", build.getId().get());
-      interProjectBuildService.finish(build);
+      interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(build, InterProjectBuild.State.FAILED));
     }
   }
 }
