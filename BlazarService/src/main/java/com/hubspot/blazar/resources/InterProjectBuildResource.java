@@ -82,7 +82,7 @@ public class InterProjectBuildResource {
   @GET
   @Path("/repository-build/{repoBuildId}/up-and-downstreams")
   public InterProjectBuildStatus getMappingsForRepoBuild(@PathParam("repoBuildId") long repoBuildId) {
-    InterProjectBuildStatus empty = new InterProjectBuildStatus(repoBuildId, Optional.<Long>absent(), Optional.<InterProjectBuild.State>absent(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableSet.<Module>of());
+    InterProjectBuildStatus empty = new InterProjectBuildStatus(repoBuildId, Optional.<Long>absent(), Optional.<InterProjectBuild.State>absent(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableSet.<Module>of());
     Optional<RepositoryBuild> repoBuild = repositoryBuildService.get(repoBuildId);
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
 
@@ -99,6 +99,7 @@ public class InterProjectBuildResource {
 
     mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build.get());
 
+    Set<Integer> rootBuildModuleIds = build.get().getModuleIds();
     Set<Integer> downstreamModuleIds = new HashSet<>();
     Set<Integer> upstreamModuleIds = new HashSet<>();
     Set<Integer> failedModules = new HashSet<>();
@@ -118,6 +119,7 @@ public class InterProjectBuildResource {
     }
     mappings.removeAll(toRemove);
     // find downstream, upstream and cancelled nodes
+    Map<Long, String> rootRepoBuilds = getRepoBuildIdsFromModuleIds(rootBuildModuleIds, mappings);
     Map<Long, String> downstreamRepoBuilds = getRepoBuildIdsFromModuleIds(downstreamModuleIds, mappings);
     Map<Long, String> upstreamRepoBuilds = getRepoBuildIdsFromModuleIds(upstreamModuleIds, mappings);
     Map<Long, String> failedRepoBuilds = getRepoBuildIdsFromModuleIds(failedModules, mappings);
@@ -127,7 +129,7 @@ public class InterProjectBuildResource {
         cancelled.add(moduleService.get(m.getModuleId()).get());
       }
     }
-    return new InterProjectBuildStatus(repoBuildId, build.get().getId(), Optional.of(build.get().getState()), upstreamRepoBuilds, downstreamRepoBuilds, failedRepoBuilds, cancelled);
+    return new InterProjectBuildStatus(repoBuildId, build.get().getId(), Optional.of(build.get().getState()), rootRepoBuilds, upstreamRepoBuilds, downstreamRepoBuilds, failedRepoBuilds, cancelled);
   }
 
   @GET
