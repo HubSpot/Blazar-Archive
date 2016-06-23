@@ -11,7 +11,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Queue;
+import java.util.Objects;
 import java.util.Set;
 
 public enum GraphUtils {
@@ -48,6 +48,7 @@ public enum GraphUtils {
     SetMultimap<V, V> reduced = HashMultimap.create();
     SetMultimap<V, V> inverted = HashMultimap.create();
     Deque<Edge<V>> queue = new ArrayDeque<>();
+    Set<Edge<V>> processed = new HashSet<>();
 
     for (Entry<V, V> entry : graph.entries()) {
       inverted.put(entry.getValue(), entry.getKey());
@@ -58,11 +59,15 @@ public enum GraphUtils {
 
     while (!queue.isEmpty()) {
       Edge<V> edge = queue.removeFirst();
+      processed.add(edge);
       if (vertices.contains(edge.getSource())) {
         reduced.put(edge.getSource(), edge.getTarget());
       } else {
         for (V parent : inverted.get(edge.getSource())) {
-          queue.addLast(new Edge<>(parent, edge.getTarget()));
+          Edge<V> newEdge = new Edge<>(parent, edge.getTarget());
+          if (!processed.contains(newEdge)) {
+            queue.addLast(newEdge);
+          }
         }
       }
     }
@@ -140,6 +145,25 @@ public enum GraphUtils {
 
     public T getTarget() {
       return target;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+
+      Edge edge = (Edge) o;
+      return Objects.equals(source, edge.source) && Objects.equals(target, edge.target);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(source, target);
     }
   }
 }
