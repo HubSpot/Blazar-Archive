@@ -32,7 +32,6 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(InterProjectModuleBuildVisitor.class);
   private final ModuleService moduleService;
   private BranchService branchService;
-  private ModuleBuildService moduleBuildService;
   private RepositoryBuildService repositoryBuildService;
   private final InterProjectBuildService interProjectBuildService;
   private final InterProjectBuildMappingService interProjectBuildMappingService;
@@ -46,7 +45,6 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
                                         InterProjectBuildMappingService interProjectBuildMappingService) {
     this.moduleService = moduleService;
     this.branchService = branchService;
-    this.moduleBuildService = moduleBuildService;
     this.repositoryBuildService = repositoryBuildService;
     this.interProjectBuildService = interProjectBuildService;
     this.interProjectBuildMappingService = interProjectBuildMappingService;
@@ -58,10 +56,37 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     if (!mapping.isPresent()) {
       return;
     }
-    markBuildMappingAs(mapping.get(), InterProjectBuild.State.SUCCEEDED);
     LOG.info("Found mapping {} corresponding to moduleBuild {}", mapping, build.getId());
-    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.get().getInterProjectBuildId()).get();
+    interProjectBuildMappingService.updateBuilds(mapping.get().withModuleBuildId(InterProjectBuild.State.SUCCEEDED));
+    buildChildren(build, mapping.get());
+    checkAndCompleteInterProjectBuild(build, mapping.get().getInterProjectBuildId());
+  }
 
+  @Override
+  protected void visitCancelled(ModuleBuild build) throws Exception {
+    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
+    if (!mapping.isPresent()) {
+      return;
+    }
+    interProjectBuildMappingService.updateBuilds(mapping.get().withModuleBuildId(InterProjectBuild.State.CANCELLED));
+    cancelSubTree(build);
+    checkAndCompleteInterProjectBuild(build, mapping.get().getInterProjectBuildId());
+  }
+
+  @Override
+  protected void visitFailed(ModuleBuild build) throws Exception {
+    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
+    if (!mapping.isPresent()) {
+      return;
+    }
+    interProjectBuildMappingService.updateBuilds(mapping.get().withModuleBuildId(InterProjectBuild.State.FAILED));
+    cancelSubTree(build);
+    checkAndCompleteInterProjectBuild(build, mapping.get().getInterProjectBuildId());
+  }
+
+  // Building
+  private void buildChildren(ModuleBuild build, InterProjectBuildMapping mapping) {
+    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.getInterProjectBuildId()).get();
     DependencyGraph graph = interProjectBuild.getDependencyGraph().get();
     Set<InterProjectBuildMapping> moduleBuildMappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuild);
 
@@ -89,43 +114,9 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     }
   }
 
-  @Override
-  protected void visitCancelled(ModuleBuild build) throws Exception {
-    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
-    if (!mapping.isPresent()) {
-      return;
-    }
-    markBuildMappingAs(mapping.get(), InterProjectBuild.State.CANCELLED);
-    cancelTree(build);
-  }
-
-  @Override
-  protected void visitFailed(ModuleBuild build) throws Exception {
-    Optional<InterProjectBuildMapping> mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get());
-    if (!mapping.isPresent()) {
-      return;
-    }
-    markBuildMappingAs(mapping.get(), InterProjectBuild.State.FAILED);
-    cancelTree(build);
-  }
-
-  private void markBuildMappingAs(InterProjectBuildMapping mapping, InterProjectBuild.State state) {
-    interProjectBuildMappingService.updateBuilds(mapping.withModuleBuildId(state));
-  }
-
-
-  private Optional<InterProjectBuildMapping> getMapping(int moduleId, Set<InterProjectBuildMapping> mappings) {
-    for (InterProjectBuildMapping mapping : mappings) {
-      if (mapping.getModuleId() == moduleId) {
-        return Optional.of(mapping);
-      }
-    }
-    return Optional.absent();
-  }
-
   private boolean shouldBuild(int moduleId, int branchId, DependencyGraph graph, Set<InterProjectBuildMapping> mappings) {
     // don't start builds of modules previously triggered
-    if (getMapping(moduleId, mappings).isPresent()) {
+    if (mappings.stream().filter((InterProjectBuildMapping m) -> m.getModuleId() == moduleId).findFirst().isPresent()) {
       return false;
     }
     for (Integer upstream: graph.getAllUpstreamNodes(moduleId)) {
@@ -151,8 +142,8 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     return mappingFound.isPresent() && mappingFound.get().getState().equals(InterProjectBuild.State.SUCCEEDED);
   }
 
-
-  private void cancelTree(ModuleBuild build) throws NonRetryableBuildException {
+  // Canceling
+  private void cancelSubTree(ModuleBuild build) throws NonRetryableBuildException {
     InterProjectBuildMapping mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get()).get();
     LOG.info("Found mapping {} corresponding to moduleBuild {}", mapping, build.getId());
     InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.getInterProjectBuildId()).get();
@@ -165,4 +156,49 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
       s.addAll(graph.outgoingVertices(moduleId));
     }
   }
+
+  // Completing IPB
+  private void checkAndCompleteInterProjectBuild(ModuleBuild build, long interProjectBuildId) {
+    InterProjectBuild ipb = interProjectBuildService.getWithId(interProjectBuildId).get();
+    if (!isLastModuleBuildInGraph(ipb)) {
+      LOG.debug("Module build {} of module {} finished but the associated inter-project-build {} is not done yet", build.getId().get(), build.getModuleId(), ipb.getId().get());
+      return;
+    }
+    interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(ipb, getStateForBuild(ipb)));
+  }
+
+  private boolean isLastModuleBuildInGraph(InterProjectBuild build) {
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
+    // ensure that all _other_ modules are done, so remove this one
+    for (int i : build.getDependencyGraph().get().getTopologicalSort()) {
+      Optional<InterProjectBuild.State> state = Optional.absent();
+      for (InterProjectBuildMapping mapping : mappings ){
+        if (mapping.getModuleId() == i) {
+          state = Optional.of(mapping.getState());
+        }
+      }
+      // state not present implies no build has been started for this yet.
+      if ((state.isPresent() && !state.get().isFinished()) || !state.isPresent()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private InterProjectBuild.State getStateForBuild(InterProjectBuild build) {
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
+    InterProjectBuild.State state = InterProjectBuild.State.SUCCEEDED;
+    for (InterProjectBuildMapping mapping: mappings) {
+      // if there is a failure mark as failed
+      if (mapping.getState() == InterProjectBuild.State.FAILED) {
+        state = mapping.getState();
+      }
+      // if the state is not failed,
+      if (!state.equals(InterProjectBuild.State.FAILED) && mapping.getState() == InterProjectBuild.State.CANCELLED) {
+        state = InterProjectBuild.State.CANCELLED;
+      }
+    }
+    return state;
+  }
+
 }

@@ -52,6 +52,7 @@
     <mesos.version>0.23.0</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
     <dep.guava.version>18.0</dep.guava.version>
+    <project.build.targetJdk>1.8</project.build.targetJdk>
   </properties>
 
   <modules>
