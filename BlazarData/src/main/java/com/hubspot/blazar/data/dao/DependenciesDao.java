@@ -9,7 +9,6 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.stringtemplate.UseStringTemplate3StatementLocator;
 import org.skife.jdbi.v2.unstable.BindIn;
 
-import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleDependency;
 import com.hubspot.blazar.base.graph.Edge;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
@@ -20,10 +19,11 @@ public interface DependenciesDao {
   @SqlQuery("SELECT module_provides.moduleId AS source, module_depends.moduleId AS target " +
       "FROM module_provides " +
       "INNER JOIN module_depends ON (module_provides.name = module_depends.name) " +
-      "INNER JOIN modules provides ON (module_provides.moduleId = provides.id) " +
-      "INNER JOIN modules depends ON (module_depends.moduleId = depends.id) " +
-      "WHERE provides.branchId = :id AND depends.branchId = :id")
-  Set<Edge> getEdges(@BindWithRosetta GitInfo gitInfo);
+      "INNER JOIN modules ON (module_depends.moduleId = modules.id) " +
+      "INNER JOIN branches ON (modules.branchId = branches.id) " +
+      "WHERE module_provides.moduleId IN (<moduleIds>) " +
+      "AND branches.active = 1")
+  Set<Edge> getEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
 
   @SqlQuery("SELECT module_provides.moduleId AS source, module_depends.moduleId AS target " +
       "FROM module_provides " +
@@ -34,7 +34,7 @@ public interface DependenciesDao {
       "WHERE module_provides.moduleId IN (<moduleIds>) " +
       "AND branches.active = 1 " +
       "AND (branch_settings.interProjectBuildOptIn = 1 OR (branches.branch = 'master' and branch_settings.interProjectBuildOptIn is NULL))")
-  Set<Edge> getEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
+  Set<Edge> getInterProjectEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
 
   @SqlBatch("INSERT INTO module_provides (moduleId, name) VALUES (:moduleId, :name)")
   void insertProvides(@BindWithRosetta Set<ModuleDependency> dependencies);
