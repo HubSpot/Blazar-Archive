@@ -11,7 +11,6 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 
 public enum GraphUtils {
@@ -41,33 +40,6 @@ public enum GraphUtils {
     }
 
     return sorted;
-  }
-
-  // working from the bottom of the graph should be a lot faster
-  public <V> SetMultimap<V, V> retain(SetMultimap<V, V> graph, Set<V> vertices) {
-    SetMultimap<V, V> reduced = HashMultimap.create();
-    SetMultimap<V, V> inverted = HashMultimap.create();
-    Deque<Edge<V>> queue = new ArrayDeque<>();
-
-    for (Entry<V, V> entry : graph.entries()) {
-      inverted.put(entry.getValue(), entry.getKey());
-      if (vertices.contains(entry.getValue())) {
-        queue.add(new Edge<>(entry.getKey(), entry.getValue()));
-      }
-    }
-
-    while (!queue.isEmpty()) {
-      Edge<V> edge = queue.removeFirst();
-      if (vertices.contains(edge.getSource())) {
-        reduced.put(edge.getSource(), edge.getTarget());
-      } else {
-        for (V parent : inverted.get(edge.getSource())) {
-          queue.addLast(new Edge<>(parent, edge.getTarget()));
-        }
-      }
-    }
-
-    return reduced;
   }
 
   public <V> SetMultimap<V, V> transitiveReduction(SetMultimap<V, V> edges) {
@@ -123,23 +95,5 @@ public enum GraphUtils {
 
   private <V> Set<V> vertices(SetMultimap<V, V> graph) {
     return ImmutableSet.<V>builder().addAll(graph.keySet()).addAll(graph.values()).build();
-  }
-
-  private static class Edge<T> {
-    private final T source;
-    private final T target;
-
-    public Edge(T source, T target) {
-      this.source = source;
-      this.target = target;
-    }
-
-    public T getSource() {
-      return source;
-    }
-
-    public T getTarget() {
-      return target;
-    }
   }
 }
