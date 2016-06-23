@@ -12,6 +12,7 @@ public class InterProjectBuildStatus {
   private final long repoBuildId;
   private final Optional<Long> interProjectBuildId;
   private Optional<InterProjectBuild.State> state;
+  private Map<Long, String> rootRepoBuilds;
   private final Map<Long, String> upstreamRepoBuilds;
   private final Map<Long, String> downstreamRepoBuilds;
   private final Map<Long, String> failedRepoBuilds;
@@ -21,6 +22,7 @@ public class InterProjectBuildStatus {
   public InterProjectBuildStatus(@JsonProperty("repoBuildId") long repoBuildId,
                                  @JsonProperty("interProjectBuildId") Optional<Long> interProjectBuildId,
                                  @JsonProperty("state") Optional<InterProjectBuild.State> state,
+                                 @JsonProperty("rootRepoBuilds") Map<Long, String> rootRepoBuilds,
                                  @JsonProperty("upstreamRepoBuilds") Map<Long, String> upstreamRepoBuilds,
                                  @JsonProperty("downstreamRepoBuilds") Map<Long, String> downstreamRepoBuilds,
                                  @JsonProperty("failedRepoBuilds") Map<Long, String> failedRepoBuilds,
@@ -28,6 +30,7 @@ public class InterProjectBuildStatus {
     this.repoBuildId = repoBuildId;
     this.interProjectBuildId = interProjectBuildId;
     this.state = state;
+    this.rootRepoBuilds = rootRepoBuilds;
     this.upstreamRepoBuilds = upstreamRepoBuilds;
     this.downstreamRepoBuilds = downstreamRepoBuilds;
     this.failedRepoBuilds = failedRepoBuilds;
@@ -44,6 +47,10 @@ public class InterProjectBuildStatus {
 
   public Optional<InterProjectBuild.State> getState() {
     return state;
+  }
+
+  public Map<Long, String> getRootRepoBuilds() {
+    return rootRepoBuilds;
   }
 
   public Map<Long, String> getUpstreamRepoBuilds() {
