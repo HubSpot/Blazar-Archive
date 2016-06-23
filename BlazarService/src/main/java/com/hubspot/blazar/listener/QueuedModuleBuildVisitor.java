@@ -57,7 +57,7 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
     } else {
       Set<ModuleBuild> moduleBuilds = moduleBuildService.getByRepositoryBuild(build.getRepoBuildId());
       Set<Integer> buildingModules = extractModuleIds(filterSucceeded(moduleBuilds));
-      Set<Integer> upstreamModules = dependencyGraph.getAllUpstreamNodes(build.getModuleId());
+      Set<Integer> upstreamModules = dependencyGraph.incomingVertices(build.getModuleId());
 
       return Sets.intersection(buildingModules, upstreamModules).isEmpty();
     }

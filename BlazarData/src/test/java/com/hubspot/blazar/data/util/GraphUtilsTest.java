@@ -1,6 +1,5 @@
 package com.hubspot.blazar.data.util;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
 import org.junit.Test;
@@ -28,10 +27,6 @@ public class GraphUtilsTest {
       .put(5, 2)
       .build();
 
-  private static final SetMultimap<Integer, Integer> RETAINED = ImmutableSetMultimap.<Integer, Integer>builder()
-      .put(1, 5)
-      .build();
-
   private static final SetMultimap<Integer, Integer> BLAZAR = ImmutableSetMultimap.<Integer, Integer>builder()
       .put(278, 280)
       .put(280, 277)
@@ -53,10 +48,5 @@ public class GraphUtilsTest {
   @Test
   public void testBlazarTopologicalSort() {
     assertThat(GraphUtils.INSTANCE.topologicalSort(BLAZAR)).isEqualTo(Arrays.asList(278, 280, 277, 279, 281, 276));
-  }
-
-  @Test
-  public void testRetain() {
-    assertThat(GraphUtils.INSTANCE.retain(EDGES, ImmutableSet.of(1, 5)).asMap()).isEqualTo(RETAINED.asMap());
   }
 }
