@@ -118,6 +118,7 @@ public class InterProjectBuildResource {
       }
     }
     mappings.removeAll(toRemove);
+    upstreamModuleIds.removeAll(rootBuildModuleIds);
     // find downstream, upstream and cancelled nodes
     Map<Long, String> rootRepoBuilds = getRepoBuildIdsFromModuleIds(rootBuildModuleIds, mappings);
     Map<Long, String> downstreamRepoBuilds = getRepoBuildIdsFromModuleIds(downstreamModuleIds, mappings);
