@@ -62,7 +62,7 @@ public class RepositoryBuildLauncher {
     RepositoryBuild launching = queued.withStartTimestamp(System.currentTimeMillis())
         .withState(State.LAUNCHING)
         .withCommitInfo(commitInfo)
-        .withDependencyGraph(dependenciesService.buildDependencyGraph(gitInfo, modules));
+        .withDependencyGraph(dependenciesService.buildDependencyGraph(modules));
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     repositoryBuildService.begin(launching);
   }
