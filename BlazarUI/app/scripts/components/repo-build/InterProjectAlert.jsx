@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {isEmpty, bindAll} from 'underscore';
+import {isEmpty, bindAll, map} from 'underscore';
 import {Link} from 'react-router';
 import Alert from 'react-bootstrap/lib/Alert';
 import {contains} from 'underscore';
@@ -47,7 +47,7 @@ class InterProjectAlert extends Component {
   }
 
   renderBuildLinks(repoBuilds, isRootBuild = false) {
-    return Object.keys(repoBuilds).map((value, key) => {
+    return map((key, value) => {
       return (
         <li key={key}>
           <Link to={`/builds/repo-build/${value}`}>
@@ -61,7 +61,7 @@ class InterProjectAlert extends Component {
   renderFailedBuildDetails() {
     const {failedRepoBuilds} = this.props.upAndDownstreamModules;
 
-    if (Object.keys(failedRepoBuilds).length === 0) {
+    if (!Object.keys(failedRepoBuilds).length) {
       return null;
     }
 
@@ -94,7 +94,7 @@ class InterProjectAlert extends Component {
   renderDownstreamBuildDetails() {
     const {downstreamRepoBuilds}  = this.props.upAndDownstreamModules;
 
-    if (Object.keys(downstreamRepoBuilds).length === 0) {
+    if (!Object.keys(downstreamRepoBuilds).length) {
       return null;
     }
 
@@ -109,7 +109,7 @@ class InterProjectAlert extends Component {
   renderCancelledModules() {
     const {cancelledDownstreamModules} = this.props.upAndDownstreamModules;
 
-    if (cancelledDownstreamModules.length === 0) {
+    if (!cancelledDownstreamModules.length) {
       return null;
     }
 
