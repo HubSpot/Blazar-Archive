@@ -9,19 +9,19 @@ import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
 
 class RepoBuildHeadline extends Component {
-    
+
   render() {
     if (this.props.loading || this.props.currentRepoBuild === undefined) {
       return null;
     }
-    
+
     const {stars, params, currentRepoBuild, branchInfo} = this.props;
     const branchId = parseInt(params.branchId, 10);
 
     return (
       <div>
-        <SimpleBreadcrumbs 
-          repo={true} 
+        <SimpleBreadcrumbs
+          repo={true}
           branch={true}
           {...this.props} />
         <Headline className='repobuild-headline'>
