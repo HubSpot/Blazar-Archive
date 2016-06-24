@@ -46,24 +46,12 @@ class InterProjectAlert extends Component {
     });
   }
 
-  renderBuildLinks(repoBuilds) {
+  renderBuildLinks(repoBuilds, isRootBuild = false) {
     return Object.keys(repoBuilds).map((value, key) => {
       return (
         <li key={key}>
           <Link to={`/builds/repo-build/${value}`}>
-            {repoBuilds[value]}
-          </Link>
-        </li>
-      );
-    });
-  }
-
-  renderRootBuildLinks(repoBuilds) {
-    return Object.keys(repoBuilds).map((value, key) => {
-      return (
-        <li key={key}>
-          <Link to={`/builds/repo-build/${value}`}>
-            {repoBuilds[value]} <b>(root build)</b>
+            {repoBuilds[value]} {isRootBuild ? <b>(root build)</b> : null}
           </Link>
         </li>
       );
@@ -96,7 +84,7 @@ class InterProjectAlert extends Component {
       <div className="inter-project-alert__upstream">
         <h4>Upstream builds:</h4>
         <ul>
-          {this.renderRootBuildLinks(rootRepoBuilds)}
+          {this.renderBuildLinks(rootRepoBuilds, true)}
           {this.renderBuildLinks(upstreamRepoBuilds)}
         </ul>
       </div>
