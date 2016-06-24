@@ -21,20 +21,15 @@ public interface DependenciesDao {
       "INNER JOIN module_depends ON (module_provides.name = module_depends.name) " +
       "INNER JOIN modules ON (module_depends.moduleId = modules.id) " +
       "INNER JOIN branches ON (modules.branchId = branches.id) " +
-      "WHERE module_provides.moduleId IN (<moduleIds>) " +
-      "AND branches.active = 1")
-  Set<Edge> getEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
-
-  @SqlQuery("SELECT module_provides.moduleId AS source, module_depends.moduleId AS target " +
-      "FROM module_provides " +
-      "INNER JOIN module_depends ON (module_provides.name = module_depends.name) " +
-      "INNER JOIN modules ON (module_depends.moduleId = modules.id) " +
-      "INNER JOIN branches ON (modules.branchId = branches.id) " +
       "LEFT JOIN branch_settings on (branches.id = branch_settings.branchId) " +
       "WHERE module_provides.moduleId IN (<moduleIds>) " +
       "AND branches.active = 1 " +
-      "AND (branch_settings.interProjectBuildOptIn = 1 OR (branches.branch = 'master' and branch_settings.interProjectBuildOptIn is NULL))")
-  Set<Edge> getInterProjectEdges(@BindIn("moduleIds") Set<Integer> moduleIds);
+      "AND (" +
+      "  branch_settings.interProjectBuildOptIn = 1 " +
+      "  OR (branches.branch = 'master' AND branch_settings.interProjectBuildOptIn IS NULL) " +
+      "  OR branches.id = :branchId" +
+      ")")
+  Set<Edge> getEdges(@Bind("branchId") int branchId, @BindIn("moduleIds") Set<Integer> moduleIds);
 
   @SqlBatch("INSERT INTO module_provides (moduleId, name) VALUES (:moduleId, :name)")
   void insertProvides(@BindWithRosetta Set<ModuleDependency> dependencies);

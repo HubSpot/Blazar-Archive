@@ -18,7 +18,6 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -26,6 +25,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.DiscoveredModule;
+import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.graph.Edge;
 import com.hubspot.blazar.data.dao.DependenciesDao;
@@ -43,13 +43,7 @@ public class DependenciesService {
 
   public DependencyGraph buildInterProjectDependencyGraph(Set<Module> modulesTriggered) {
     long start = System.currentTimeMillis();
-    SetMultimap<Integer, Integer> graph = computeGraphFromRootModules(modulesTriggered, new Function<Set<Integer>, Set<Edge>>() {
-
-      @Override
-      public Set<Edge> apply(Set<Integer> moduleIds) {
-        return dependenciesDao.getInterProjectEdges(moduleIds);
-      }
-    });
+    SetMultimap<Integer, Integer> graph = computeGraphFromRootModules(-1, modulesTriggered);
 
     long startGraph = System.currentTimeMillis();
     Set<Integer> s = new HashSet<>();
@@ -76,7 +70,7 @@ public class DependenciesService {
     return dependencyGraph;
   }
 
-  public DependencyGraph buildDependencyGraph(Set<Module> allModules) {
+  public DependencyGraph buildDependencyGraph(GitInfo gitInfo, Set<Module> allModules) {
     // one module can't have any deps
     if (allModules.size() == 1) {
       int moduleId = allModules.iterator().next().getId().get();
@@ -85,13 +79,7 @@ public class DependenciesService {
 
       return new DependencyGraph(transitiveReduction, topologicalSort);
     } else {
-      SetMultimap<Integer, Integer> fullGraph = computeGraphFromRootModules(allModules, new Function<Set<Integer>, Set<Edge>>() {
-
-        @Override
-        public Set<Edge> apply(Set<Integer> moduleIds) {
-          return dependenciesDao.getEdges(moduleIds);
-        }
-      });
+      SetMultimap<Integer, Integer> fullGraph = computeGraphFromRootModules(gitInfo.getId().get(), allModules);
 
       Set<Integer> moduleIds = new HashSet<>();
       for (Module module : allModules) {
@@ -111,8 +99,7 @@ public class DependenciesService {
     }
   }
 
-  private SetMultimap<Integer, Integer> computeGraphFromRootModules(Set<Module> rootModules,
-                                                                    Function<Set<Integer>, Set<Edge>> edgeFetcher) {
+  private SetMultimap<Integer, Integer> computeGraphFromRootModules(int branchId, Set<Module> rootModules) {
     SetMultimap<Integer, Integer> graph = HashMultimap.create();
 
     Set<Integer> seenModules = new HashSet<>();
@@ -133,7 +120,7 @@ public class DependenciesService {
       }
 
       long queryStart = System.currentTimeMillis();
-      Set<Edge> edges = edgeFetcher.apply(modulesToProcess);
+      Set<Edge> edges = dependenciesDao.getEdges(branchId, modulesToProcess);
       long queryEnd = System.currentTimeMillis();
       LOG.info("Query for {} took {}", modulesToProcess, queryEnd - queryStart);
       queryTimes.add(queryEnd - queryStart);
