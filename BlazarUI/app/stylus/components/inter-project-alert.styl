@@ -10,7 +10,7 @@
     cursor pointer
 
     .inter-project-alert__expand
-      text-decoration: underline
+      text-decoration underline
 
   p
     font-weight: 600
@@ -22,17 +22,20 @@
     font-weight 400
     display block
 
-    .inter-project-alert__status
-      font-weight: 600
+  h4
+    text-transform capitalize
 
-      &.success
-        color: #3c763d
+  .inter-project-alert__status
+    font-weight: 600
 
-      &.warning
-        color: #8a6d3b
+    &.success
+      color: #3c763d
 
-      &.danger
-        color: #a94442
+    &.warning
+      color: #8a6d3b
+
+    &.danger
+      color: #a94442
 
   .inter-project-alert__expand
     float: right
