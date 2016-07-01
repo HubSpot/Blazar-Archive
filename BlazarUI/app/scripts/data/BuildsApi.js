@@ -8,13 +8,13 @@ import StarProvider from '../services/starProvider';
 
 function _groupBuilds(builds) {
   const stars = StarProvider.getStars();
-  
+
   let groupedBuilds = { all: builds };
-  
+
   groupedBuilds.building = builds.filter((build) => {
     return has(build, 'inProgressBuild');
   });
-  
+
   groupedBuilds.starred = builds.filter((build) => {
     return contains(stars, build.gitInfo.id);
   }) || [];
@@ -114,5 +114,6 @@ function fetchBuild(id) {
 
 export default {
   fetchBuilds: fetchBuilds,
-  fetchBuild: fetchBuild
+  fetchBuild: fetchBuild,
+  stopPolling: stopPolling
 };

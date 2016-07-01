@@ -28,12 +28,14 @@ class SidebarContainer extends Component {
 
   constructor(props) {
     super(props);
-    
-    bindAll(this, 
+
+    bindAll(this,
       'onStoreChange',
-      'onStarChange', 
-      'updateResults', 
-      'setToggleState'
+      'onStarChange',
+      'updateResults',
+      'setToggleState',
+      'startPollingBuilds',
+      'stopPollingBuilds'
     );
 
     this.state = {
@@ -43,7 +45,8 @@ class SidebarContainer extends Component {
       filterText: '',
       toggleFilterState: sidebarTabProvider.getSidebarTab(),
       sidebarHeight: this.getSidebarHeight(),
-      dontDisplay: true
+      dontDisplay: true,
+      shouldPollBuilds: true
     };
   }
 
@@ -58,16 +61,28 @@ class SidebarContainer extends Component {
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStoreChange);
     this.unsubscribeFromStars = StarStore.listen(this.onStarChange);
-    BuildsActions.loadBuilds(this.props.params);
+    this.startPollingBuilds();
     window.addEventListener('resize', this.handleResizeDebounced);
+    window.addEventListener('blur', this.stopPollingBuilds);
+    window.addEventListener('focus', this.startPollingBuilds);
   }
-  
+
   componentWillUnmount() {
     BuildsActions.stopPollingBuilds();
     this.unsubscribeFromBuilds();
     window.removeEventListener('resize', this.handleResizeDebounced);
+    window.removeEventListener('blur', this.stopPollingBuilds);
+    window.removeEventListener('focus', this.startPollingBuilds);
   }
-  
+
+  startPollingBuilds() {
+    BuildsActions.loadBuilds(this.props.params);
+  }
+
+  stopPollingBuilds() {
+    BuildsActions.stopPollingBuilds();
+  }
+
   getSidebarHeight() {
     let filterHeight = $('.sidebar__filter').height() || defaultSidebarFilterHeight;
     let logoHeight = $('.sidebar__logo').height() || 45;
@@ -77,7 +92,7 @@ class SidebarContainer extends Component {
   onStoreChange(state) {
     this.setState(state);
   }
-  
+
   onStarChange(state) {
     if (this.state.toggleFilterState === 'starred') {
       BuildsActions.loadBuilds(this.props.params);
@@ -117,7 +132,7 @@ class SidebarContainer extends Component {
         </Sidebar>
       );
     }
-    
+
     if (error) {
       return (
         <Sidebar>
@@ -151,7 +166,7 @@ class SidebarContainer extends Component {
           />
         </div>
         <div className='sidebar__list'>
-          <SidebarRepoList 
+          <SidebarRepoList
             filteredBuilds={matches}
             {...this.state}
             {...this.props}
