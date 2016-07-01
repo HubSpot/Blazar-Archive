@@ -12,7 +12,7 @@ const BuildsStore = Reflux.createStore({
 
   listenables: BuildsActions,
 
-  init() {  
+  init() {
     this.builds = {
       all: {},
       building: {},
@@ -20,12 +20,12 @@ const BuildsStore = Reflux.createStore({
     };
   },
 
-  getBuilds() {    
+  getBuilds() {
     return this.builds;
   },
-  
+
   onStopPollingBuilds() {
-    BuildsApi.stopPolling;
+    BuildsApi.stopPolling();
   },
 
   onLoadBuilds(params) {
