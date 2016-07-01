@@ -2,7 +2,7 @@
 
 const appConfig = {
   // sidebar polling frequency in ms
-  buildsRefresh: process.env.GLOBAL_REFRESH || 5000,
+  buildsRefresh: process.env.GLOBAL_REFRESH || 10000,
 
   // active build module polling frequency in ms
   activeBuildModuleRefresh: process.env.ACTIVE_BUILD_MODULE_REFRESH || 1000,
