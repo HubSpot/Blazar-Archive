@@ -45,8 +45,7 @@ class SidebarContainer extends Component {
       filterText: '',
       toggleFilterState: sidebarTabProvider.getSidebarTab(),
       sidebarHeight: this.getSidebarHeight(),
-      dontDisplay: true,
-      shouldPollBuilds: true
+      dontDisplay: true
     };
   }
 
