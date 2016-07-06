@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import ReactDOM from 'react-dom';
 import {isEmpty, bindAll, map} from 'underscore';
 import {Link} from 'react-router';
 import Alert from 'react-bootstrap/lib/Alert';
@@ -44,6 +45,11 @@ class InterProjectAlert extends Component {
     this.setState({
       expanded: !this.state.expanded
     });
+
+    if (this.state.expanded) {
+      const node = ReactDOM.findDOMNode(this);
+      node.scrollTop = 0;
+    }
   }
 
   renderBuildLinks(repoBuilds) {
