@@ -1,10 +1,23 @@
+span.inter-project-tag
+  font-family: AvenirNext-DemiBold
+  font-size: 12px
+  color: #6a78d1
+  background-color: #e1e4f6
+  padding: 2px 5px
+  margin: 5px 0 20px
+  display: inline-block
+
 .inter-project-alert
-  transition max-height 1s
+  transition max-height 0.5s
   max-height 52px
   overflow hidden
+  margin-bottom 15px
+  background-color #e1e4f6
+  border none
 
   &.expanded
-    max-height 2000px
+    max-height 300px
+    overflow-y scroll
 
   &:hover
     cursor pointer
@@ -17,28 +30,42 @@
     margin: 20px 10px
 
   h3
-    margin 0
+    margin 0 0 25px 0
     font-size 14px
-    font-weight 400
+    font-weight 500
     display block
 
   h4
     text-transform capitalize
 
+  .inter-project-build-number
+    color #7c98b6
+    background-color #eaf0f6
+    padding 2px 5px
+    font-family AvenirNext-DemiBold
+    margin 0 5px 0 10px
+
   .inter-project-alert__status
     font-weight: 600
+    padding: 2px 5px 2px 0
+    text-transform capitalize
+    font-family AvenirNext-DemiBold
+    margin 0 5px
 
     &.success
-      color: #3c763d
+      color: #00bda5
+      background-color: #ccf2ed
 
     &.warning
       color: #8a6d3b
 
     &.danger
-      color: #a94442
+      color: #f2545b
+      background-color: #fddbdc
 
   .inter-project-alert__expand
     float: right
+    color: #428bca
 
   .inter-project-alert__details
     margin-top 20px
@@ -52,3 +79,24 @@
 
       li
         font-weight 300
+
+    .inter-project-alert__failed
+      ul
+        list-style-type none
+        margin 0
+        padding 0
+
+        li
+          display block
+          width 100%
+          background-color: #fcdde5
+          padding 10px 20px
+          border-radius 4px
+          border 1px solid #f2545b
+          margin-bottom 10px
+
+          &:before
+            content 'Build failed'
+            color #f2545b
+            font-weight 500
+            margin-right 20px

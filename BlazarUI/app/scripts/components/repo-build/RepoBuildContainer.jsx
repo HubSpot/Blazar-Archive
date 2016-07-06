@@ -23,9 +23,7 @@ import RepoBuildHeadline from './RepoBuildHeadline.jsx';
 import RepoBuildModulesTable from './RepoBuildModulesTable.jsx';
 import RepoBuildDetail from './RepoBuildDetail.jsx';
 
-import InterProjectAlert from './InterProjectAlert.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
-
 
 let initialState = {
   moduleBuilds: false,
@@ -37,7 +35,8 @@ let initialState = {
   loadingStars: true,
   branchInfo: {},
   upAndDownstreamModules: {},
-  currentRepoBuild: null
+  currentRepoBuild: null,
+  loadingUpAndDownstreamModules: true
 };
 
 class RepoBuildContainer extends Component {
@@ -106,12 +105,13 @@ class RepoBuildContainer extends Component {
   }
 
   isLoading() {
-    const {loadingStars, loadingModuleBuilds, loadingRepoBuild, moduleBuilds} = this.state;
+    const {loadingStars, loadingModuleBuilds, loadingRepoBuild, moduleBuilds, loadingUpAndDownstreamModules} = this.state;
 
     return loadingStars
       || loadingModuleBuilds
       || loadingRepoBuild
-      || !moduleBuilds;
+      || !moduleBuilds
+      || loadingUpAndDownstreamModules;
   }
 
   buildDocumentTitle() {
@@ -173,9 +173,6 @@ class RepoBuildContainer extends Component {
           </UIGridItem>
         </UIGrid>
         <UIGridItem size={12}>
-          <InterProjectAlert
-            upAndDownstreamModules={this.state.upAndDownstreamModules}
-          />
           <RepoBuildDetail
             {...this.props}
             {...this.state}

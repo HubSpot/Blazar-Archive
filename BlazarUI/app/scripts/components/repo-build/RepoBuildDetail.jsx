@@ -9,6 +9,7 @@ import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
 
 import Commits from './Commits.jsx';
+import InterProjectAlert from './InterProjectAlert.jsx';
 
 import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
@@ -146,6 +147,9 @@ class RepoBuildDetail extends Component {
             build={build}
           />
         </div>
+        <InterProjectAlert
+          upAndDownstreamModules={this.props.upAndDownstreamModules}
+        />
         {this.renderCommits()}
       </div>
     );

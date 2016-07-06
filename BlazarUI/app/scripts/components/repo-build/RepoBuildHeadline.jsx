@@ -1,6 +1,6 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
-import {contains} from 'underscore';
+import {contains, isEmpty} from 'underscore';
 import {Link} from 'react-router';
 import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';
@@ -10,8 +10,18 @@ import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
 
 class RepoBuildHeadline extends Component {
 
+  renderInterProjectBuildTag() {
+    const {upAndDownstreamModules} = this.props;
+
+    if (isEmpty(upAndDownstreamModules)) {
+      return null;
+    }
+
+    return <span className="inter-project-tag">Inter-project build</span>;
+  }
+
   render() {
-    if (this.props.loading || this.props.currentRepoBuild === undefined) {
+    if (this.props.loading || !this.props.currentRepoBuild) {
       return null;
     }
 
@@ -27,6 +37,7 @@ class RepoBuildHeadline extends Component {
         <Headline className='repobuild-headline'>
           <span>Build #{currentRepoBuild.buildNumber}</span>
         </Headline>
+        {this.renderInterProjectBuildTag()}
       </div>
     )
   }

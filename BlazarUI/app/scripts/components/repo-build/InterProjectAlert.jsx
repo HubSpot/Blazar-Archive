@@ -67,7 +67,7 @@ class InterProjectAlert extends Component {
 
     return (
       <div className={`inter-project-alert__${buildType}`}>
-        <h4>{buildType} builds:</h4>
+        {buildType !== 'failed' ? <h4>{buildType} builds:</h4> : null}
         {this.renderBuildLinks(repoBuilds)}
       </div>
     );
@@ -134,7 +134,7 @@ class InterProjectAlert extends Component {
     const {state} = this.props.upAndDownstreamModules;
 
     return (
-      <span className={this.getStatusClassNames()}>{state}</span>
+      <span className={this.getStatusClassNames()}>{' '}{state.toLowerCase()}</span>
     );
   }
 
@@ -161,7 +161,12 @@ class InterProjectAlert extends Component {
 
     return (
       <Alert onClick={this.onClickAlert} bsStyle='info' className={this.getClassNames()}>
-        <h3>Inter-Project Build {interProjectBuildId}: {this.renderStatus()} {this.renderExpandText()}</h3>
+        <h3>
+          Inter-project build details
+          <span className="inter-project-build-number">#{interProjectBuildId}</span>
+          {this.renderStatus()}
+          {this.renderExpandText()}
+         </h3>
         {this.renderDetails()}
       </Alert>
     );
