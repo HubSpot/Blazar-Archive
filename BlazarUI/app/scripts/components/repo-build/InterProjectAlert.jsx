@@ -7,7 +7,7 @@ import {contains} from 'underscore';
 import classNames from 'classnames';
 
 import BuildStates from '../../constants/BuildStates';
-import {getInterProjectClassName} from '../../constants/InterProjectConstants';
+import {getInterProjectClassName, InterProjectBuildTypes} from '../../constants/InterProjectConstants';
 
 class InterProjectAlert extends Component {
 
@@ -89,7 +89,7 @@ class InterProjectAlert extends Component {
 
     return (
       <div className={`inter-project-alert__${buildType.toLowerCase()}`}>
-        {buildType !== 'Failed' ? <h3>{buildType} builds</h3> : null}
+        {buildType !== InterProjectBuildTypes.FAILED ? <h3 className="inter-project-alert__builds-header">{buildType.toLowerCase()} builds</h3> : null}
         {this.renderBuildLinks(repoBuilds)}
       </div>
     );
@@ -133,9 +133,9 @@ class InterProjectAlert extends Component {
 
     return (
       <div className={detailsClassNames}>
-        {this.renderBuildDetails(failedRepoBuilds, 'Failed')}
-        {this.renderBuildDetails(upstreamRepoBuilds, 'Upstream')}
-        {this.renderBuildDetails(downstreamRepoBuilds, 'Downstream')}
+        {this.renderBuildDetails(failedRepoBuilds, InterProjectBuildTypes.FAILED)}
+        {this.renderBuildDetails(upstreamRepoBuilds, InterProjectBuildTypes.UPSTREAM)}
+        {this.renderBuildDetails(downstreamRepoBuilds, InterProjectBuildTypes.DOWNSTREAM)}
         {this.renderCancelledModules()}
       </div>
     );

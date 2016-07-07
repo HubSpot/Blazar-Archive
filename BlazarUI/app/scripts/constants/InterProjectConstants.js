@@ -1,5 +1,7 @@
 import BuildStates from './BuildStates';
 
+import keyMirror from 'keymirror';
+
 export const INTER_PROJECT_STATES = [
   BuildStates.SUCCEEDED,
   BuildStates.FAILED,
@@ -7,6 +9,12 @@ export const INTER_PROJECT_STATES = [
   BuildStates.IN_PROGRESS,
   BuildStates.QUEUED
 ];
+
+export const InterProjectBuildTypes = keyMirror({
+  UPSTREAM: null,
+  DOWNSTREAM: null,
+  FAILED: null
+});
 
 const INTER_PROJECT_STATE_TO_CLASS_NAMES = {
   SUCCEEDED: 'success',
