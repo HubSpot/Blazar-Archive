@@ -181,7 +181,7 @@ class InterProjectAlert extends Component {
 
     const {upstreamRepoBuilds, downstreamRepoBuilds, rootRepoBuilds, interProjectBuildId} = upAndDownstreamModules;
 
-    if (!(Object.keys(upstreamRepoBuilds).length + Object.keys(downstreamRepoBuilds).length  + Object.keys(rootRepoBuilds).length)) {
+    if (isEmpty(upstreamRepoBuilds) && isEmpty(downstreamRepoBuilds) && isEmpty(rootRepoBuilds)) {
       return null;
     }
 
