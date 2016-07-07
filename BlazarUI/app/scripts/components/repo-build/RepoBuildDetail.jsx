@@ -76,6 +76,20 @@ class RepoBuildDetail extends Component {
     );
   }
 
+  renderInterProjectBuildMessage() {
+    const {upAndDownstreamModules} = this.props;
+
+    if (!upAndDownstreamModules.interProjectBuildId) {
+      return null;
+    }
+
+    return (
+      <span className="build-detail-header__unstable-message">
+        This build was part of an <strong>inter-project build</strong>, triggered by an upstream module.
+      </span>
+    );
+  }
+
   renderUnstableMessage() {
     const {currentRepoBuild} = this.props;
 
@@ -139,6 +153,7 @@ class RepoBuildDetail extends Component {
           <p className='build-detail-header__build-state'>
             Build {buildDetail.buildResult}
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
+            {this.renderInterProjectBuildMessage()}
             {this.renderUnstableMessage()}
           </p>
           <RepoBuildCancelButton

@@ -1,6 +1,6 @@
 /*global config*/
 import React, {Component, PropTypes} from 'react';
-import {contains, isEmpty} from 'underscore';
+import {contains} from 'underscore';
 import {Link} from 'react-router';
 import {getIsStarredState} from '../Helpers.js';
 import {getPathname} from '../Helpers';
@@ -13,7 +13,7 @@ class RepoBuildHeadline extends Component {
   renderInterProjectBuildTag() {
     const {upAndDownstreamModules} = this.props;
 
-    if (isEmpty(upAndDownstreamModules)) {
+    if (!upAndDownstreamModules.interProjectBuildId) {
       return null;
     }
 
