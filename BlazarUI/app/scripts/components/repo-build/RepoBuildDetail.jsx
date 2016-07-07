@@ -148,6 +148,7 @@ class RepoBuildDetail extends Component {
           />
         </div>
         <InterProjectAlert
+          branchInfo={this.props.branchInfo}
           upAndDownstreamModules={this.props.upAndDownstreamModules}
         />
         {this.renderCommits()}

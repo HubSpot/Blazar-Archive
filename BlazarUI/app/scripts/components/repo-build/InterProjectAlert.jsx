@@ -17,7 +17,7 @@ class InterProjectAlert extends Component {
       expanded: false
     };
 
-    bindAll(this, 'onClickAlert');
+    bindAll(this, 'onClickAlert', 'filterHostAndOrg');
   }
 
   getClassNames() {
@@ -52,8 +52,23 @@ class InterProjectAlert extends Component {
     }
   }
 
+  filterHostAndOrg(name) {
+    const {branchInfo} = this.props;
+    let revisedName = name;
+
+    if (revisedName.startsWith(branchInfo.host)) {
+      revisedName = revisedName.substr(branchInfo.host.length + 1);
+    }
+
+    if (revisedName.startsWith(branchInfo.organization)) {
+      revisedName = revisedName.substr(branchInfo.organization.length + 1);
+    }
+
+    return revisedName;
+  }
+
   renderBuildLinks(repoBuilds) {
-    const repoBuildNodes = map(repoBuilds, (name, id) => {
+    const repoBuildNodes = map(map(repoBuilds, this.filterHostAndOrg), (name, id) => {
       return (
         <li key={id}>
           <Link to={`/builds/repo-build/${id}`}>
@@ -72,8 +87,8 @@ class InterProjectAlert extends Component {
     }
 
     return (
-      <div className={`inter-project-alert__${buildType}`}>
-        {buildType !== 'failed' ? <h4>{buildType} builds:</h4> : null}
+      <div className={`inter-project-alert__${buildType.toLowerCase()}`}>
+        {buildType !== 'Failed' ? <h3>{buildType} builds</h3> : null}
         {this.renderBuildLinks(repoBuilds)}
       </div>
     );
@@ -96,26 +111,17 @@ class InterProjectAlert extends Component {
 
     return (
       <div className="inter-project-alert__cancelled">
-        <h4>Cancelled Module Builds</h4>
+        <h3>Cancelled Module Builds</h3>
         <ul>{renderedCancelledModules}</ul>
       </div>
     );
-  }
-
-  renderRootBuildText() {
-    const {rootRepoBuilds} = this.props.upAndDownstreamModules;
-
-    if (isEmpty(rootRepoBuilds)) {
-      return <p>This is a root build of the inter-project build.</p>;
-    }
   }
 
   renderDetails() {
     const {
       upstreamRepoBuilds,
       downstreamRepoBuilds,
-      failedRepoBuilds,
-      rootRepoBuilds
+      failedRepoBuilds
     } = this.props.upAndDownstreamModules;
 
     const detailsClassNames = classNames(
@@ -126,11 +132,9 @@ class InterProjectAlert extends Component {
 
     return (
       <div className={detailsClassNames}>
-        {this.renderRootBuildText()}
-        {this.renderBuildDetails(failedRepoBuilds, 'failed')}
-        {this.renderBuildDetails(rootRepoBuilds, 'root')}
-        {this.renderBuildDetails(upstreamRepoBuilds, 'upstream')}
-        {this.renderBuildDetails(downstreamRepoBuilds, 'downstream')}
+        {this.renderBuildDetails(failedRepoBuilds, 'Failed')}
+        {this.renderBuildDetails(upstreamRepoBuilds, 'Upstream')}
+        {this.renderBuildDetails(downstreamRepoBuilds, 'Downstream')}
         {this.renderCancelledModules()}
       </div>
     );
@@ -152,6 +156,22 @@ class InterProjectAlert extends Component {
     );
   }
 
+  renderRootInfo() {
+    const {interProjectBuildId, rootRepoBuilds} = this.props.upAndDownstreamModules;
+
+    const rootRepoBuildId = Object.keys(rootRepoBuilds)[0];
+    const triggeredBy = rootRepoBuildId ? <Link to={`/builds/repo-build/${rootRepoBuildId}`}>{this.filterHostAndOrg(rootRepoBuilds[rootRepoBuildId])}</Link> : 'this build';
+
+    return (
+      <div className="inter-project-alert__root-info">
+        <span className="inter-project-alert__build-number">#{interProjectBuildId}</span>
+        <span className="inter-project-alert__triggered-by">
+          triggered by {triggeredBy}
+        </span>
+      </div>
+    );
+  }
+
   render() {
     const {upAndDownstreamModules} = this.props;
 
@@ -166,13 +186,16 @@ class InterProjectAlert extends Component {
     }
 
     return (
-      <Alert onClick={this.onClickAlert} bsStyle='info' className={this.getClassNames()}>
-        <h3>
-          Inter-project build details
-          <span className="inter-project-build-number">#{interProjectBuildId}</span>
-          {this.renderStatus()}
+      <Alert
+        onClick={this.onClickAlert}
+        bsStyle='info'
+        className={this.getClassNames()}
+      >
+        <div className="inter-project-alert__summary">
+          <h3>Inter-project build details {this.renderStatus()}</h3>
+          {this.renderRootInfo()}
           {this.renderExpandText()}
-         </h3>
+        </div>
         {this.renderDetails()}
       </Alert>
     );
@@ -180,7 +203,8 @@ class InterProjectAlert extends Component {
 }
 
 InterProjectAlert.propTypes = {
-  upAndDownstreamModules: PropTypes.object.isRequired
+  upAndDownstreamModules: PropTypes.object.isRequired,
+  branchInfo: PropTypes.object.isRequired
 };
 
 export default InterProjectAlert;
