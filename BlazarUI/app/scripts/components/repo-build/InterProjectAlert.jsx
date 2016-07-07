@@ -6,6 +6,7 @@ import Alert from 'react-bootstrap/lib/Alert';
 import {contains} from 'underscore';
 import classNames from 'classnames';
 
+import BuildStates from '../../constants/BuildStates';
 import {getInterProjectClassName} from '../../constants/InterProjectConstants';
 
 class InterProjectAlert extends Component {
@@ -17,7 +18,7 @@ class InterProjectAlert extends Component {
       expanded: false
     };
 
-    bindAll(this, 'onClickAlert', 'filterHostAndOrg');
+    bindAll(this, 'onClickAlert');
   }
 
   getClassNames() {
@@ -68,11 +69,11 @@ class InterProjectAlert extends Component {
   }
 
   renderBuildLinks(repoBuilds) {
-    const repoBuildNodes = map(map(repoBuilds, this.filterHostAndOrg), (name, id) => {
+    const repoBuildNodes = map(repoBuilds, (name, id) => {
       return (
         <li key={id}>
           <Link to={`/builds/repo-build/${id}`}>
-            {name}
+            {this.filterHostAndOrg(name)}
           </Link>
         </li>
       );
