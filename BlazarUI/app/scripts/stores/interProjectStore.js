@@ -11,6 +11,7 @@ const InterProjectStore = Reflux.createStore({
 
   init() {
     this.upAndDownstreamModules = {};
+    this.loadingUpAndDownstreamModules = true;
   },
 
   onTriggerInterProjectBuild(params, state) {
@@ -30,7 +31,8 @@ const InterProjectStore = Reflux.createStore({
       this.upAndDownstreamModules = resp;
 
       this.trigger({
-        upAndDownstreamModules: this.upAndDownstreamModules
+        upAndDownstreamModules: this.upAndDownstreamModules,
+        loadingUpAndDownstreamModules: false
       });
     });
   }
