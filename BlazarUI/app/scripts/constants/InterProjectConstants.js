@@ -1,7 +1,7 @@
 import BuildStates from './BuildStates';
 
 export const INTER_PROJECT_STATES = [
-  BuildStates.SUCCESS,
+  BuildStates.SUCCEEDED,
   BuildStates.FAILED,
   BuildStates.CANCELLED,
   BuildStates.IN_PROGRESS,
@@ -9,7 +9,7 @@ export const INTER_PROJECT_STATES = [
 ];
 
 const INTER_PROJECT_STATE_TO_CLASS_NAMES = {
-  SUCCESS: 'success',
+  SUCCEEDED: 'success',
   FAILED: 'danger',
   CANCELLED: 'warning',
   IN_PROGRESS: '',
