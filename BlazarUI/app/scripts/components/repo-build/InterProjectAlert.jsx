@@ -24,7 +24,8 @@ class InterProjectAlert extends Component {
   getClassNames() {
     return classNames(
       'inter-project-alert', {
-        'expanded': this.state.expanded
+        'expanded': this.state.expanded,
+        'has-details': this.hasDetails()
       }
     );
   }
@@ -43,6 +44,10 @@ class InterProjectAlert extends Component {
   }
 
   onClickAlert() {
+    if (!this.hasDetails()) {
+      return;
+    }
+
     this.setState({
       expanded: !this.state.expanded
     });
@@ -51,6 +56,20 @@ class InterProjectAlert extends Component {
       const node = ReactDOM.findDOMNode(this);
       node.scrollTop = 0;
     }
+  }
+
+  hasDetails() {
+    const {
+      upstreamRepoBuilds,
+      downstreamRepoBuilds,
+      failedRepoBuilds,
+      cancelledDownstreamModules
+    } = this.props.upAndDownstreamModules;
+
+    return !isEmpty(upstreamRepoBuilds)
+      || !isEmpty(downstreamRepoBuilds)
+      || !isEmpty(failedRepoBuilds)
+      || cancelledDownstreamModules.length;
   }
 
   filterHostAndOrg(name) {
@@ -145,11 +164,15 @@ class InterProjectAlert extends Component {
     const {state} = this.props.upAndDownstreamModules;
 
     return (
-      <span className={this.getStatusClassNames()}>{' '}{state.toLowerCase()}</span>
+      <span className={this.getStatusClassNames()}>{' '}{state.toLowerCase().replace(/_/g, ' ')}</span>
     );
   }
 
   renderExpandText() {
+    if (!this.hasDetails()) {
+      return null;
+    }
+
     return (
       <a className='inter-project-alert__expand'>
         {this.state.expanded ? 'hide' : 'show'} details
@@ -176,13 +199,7 @@ class InterProjectAlert extends Component {
   render() {
     const {upAndDownstreamModules} = this.props;
 
-    if (isEmpty(upAndDownstreamModules)) {
-      return null;
-    }
-
-    const {upstreamRepoBuilds, downstreamRepoBuilds, rootRepoBuilds, interProjectBuildId} = upAndDownstreamModules;
-
-    if (isEmpty(upstreamRepoBuilds) && isEmpty(downstreamRepoBuilds) && isEmpty(rootRepoBuilds)) {
+    if (!upAndDownstreamModules.interProjectBuildId) {
       return null;
     }
 

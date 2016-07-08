@@ -34,6 +34,9 @@
   li
     list-style-type none
 
+  &.has-details:hover
+    cursor pointer
+
   &.expanded
     max-height 2000px
     overflow-y scroll
@@ -46,9 +49,6 @@
       background-color rgba(0, 0, 0, .3)
       -webkit-box-shadow 0 0 1px rgba(255, 255, 255, .5)
       margin-right 5px
-
-  &:hover
-    cursor pointer
 
   .inter-project-alert__summary
     display block
@@ -79,6 +79,10 @@
       &.danger
         color #f2545b
         background-color #fddbdc
+
+      &.in-progress
+        color #6a78d1
+        background-color #f0f1fa
 
     .inter-project-alert__expand
       position absolute

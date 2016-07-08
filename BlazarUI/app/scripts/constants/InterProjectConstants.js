@@ -20,7 +20,7 @@ const INTER_PROJECT_STATE_TO_CLASS_NAMES = {
   SUCCEEDED: 'success',
   FAILED: 'danger',
   CANCELLED: 'warning',
-  IN_PROGRESS: '',
+  IN_PROGRESS: 'in-progress',
   QUEUED: ''
 };
 
