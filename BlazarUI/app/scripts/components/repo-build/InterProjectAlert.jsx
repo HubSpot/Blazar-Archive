@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import ReactDOM from 'react-dom';
-import {isEmpty, bindAll, map} from 'underscore';
+import {isEmpty, map} from 'underscore';
 import {Link} from 'react-router';
 import Alert from 'react-bootstrap/lib/Alert';
 import {contains} from 'underscore';
@@ -18,7 +17,7 @@ class InterProjectAlert extends Component {
       expanded: false
     };
 
-    bindAll(this, 'onClickAlert');
+    this.onClickExpand = this.onClickExpand.bind(this);
   }
 
   getClassNames() {
@@ -43,7 +42,7 @@ class InterProjectAlert extends Component {
     );
   }
 
-  onClickAlert() {
+  onClickExpand() {
     if (!this.hasDetails()) {
       return;
     }
@@ -51,11 +50,6 @@ class InterProjectAlert extends Component {
     this.setState({
       expanded: !this.state.expanded
     });
-
-    if (this.state.expanded) {
-      const node = ReactDOM.findDOMNode(this);
-      node.scrollTop = 0;
-    }
   }
 
   hasDetails() {
@@ -174,7 +168,7 @@ class InterProjectAlert extends Component {
     }
 
     return (
-      <a className='inter-project-alert__expand'>
+      <a onClick={this.onClickExpand} className='inter-project-alert__expand'>
         {this.state.expanded ? 'hide' : 'show'} details
       </a>
     );
@@ -205,7 +199,6 @@ class InterProjectAlert extends Component {
 
     return (
       <Alert
-        onClick={this.onClickAlert}
         bsStyle='info'
         className={this.getClassNames()}
       >

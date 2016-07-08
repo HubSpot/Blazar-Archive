@@ -1,5 +1,5 @@
 .inter-project-tag
-  font-family AvenirNext-DemiBold
+  font-weight 600
   font-size 12px
   color #6a78d1
   background-color #e1e4f6
@@ -34,12 +34,8 @@
   li
     list-style-type none
 
-  &.has-details:hover
-    cursor pointer
-
   &.expanded
     max-height 2000px
-    overflow-y scroll
 
     &::-webkit-scrollbar
       width 8px
@@ -58,14 +54,13 @@
       color #7c98b6
       background-color #eaf0f6
       padding 2px 5px
-      font-family AvenirNext-DemiBold
+      font-weight 600
       margin-right 10px
 
     .inter-project-alert__status
       font-weight 600
       padding 2px 5px
       text-transform capitalize
-      font-family AvenirNext-DemiBold
       margin 0 5px
 
       &.success
@@ -88,6 +83,7 @@
       position absolute
       right 20px
       top 25px
+      cursor pointer
 
   .inter-project-alert__failed
     ul
