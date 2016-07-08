@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {has, contains, bindAll} from 'underscore';
+import {has, contains, bindAll, isEmpty} from 'underscore';
 import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
 
@@ -83,9 +83,19 @@ class RepoBuildDetail extends Component {
       return null;
     }
 
+    let suffix;
+
+    if (isEmpty(upAndDownstreamModules.rootRepoBuilds)) {
+      suffix = ".";
+    }
+
+    else {
+      suffix = ", triggered by an upstream module.";
+    }
+
     return (
       <span className="build-detail-header__unstable-message">
-        This build was part of an <strong>inter-project build</strong>, triggered by an upstream module.
+        This build was part of an <strong>inter-project build</strong>{suffix}
       </span>
     );
   }
