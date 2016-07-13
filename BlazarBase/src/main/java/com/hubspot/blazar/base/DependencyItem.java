@@ -26,6 +26,11 @@ public class DependencyItem {
     return version;
   }
 
+  @JsonCreator
+  public DependencyItem fromString(String fromString) {
+    return new DependencyItem(fromString, "");
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(name, version);
