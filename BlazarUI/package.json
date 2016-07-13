@@ -68,7 +68,7 @@
     "react-dom": "15.0.1",
     "react-router": "^2.0.0",
     "react-select": "git://github.com/impleri/react-select.git#v0.9.x",
-    "react-toggle": "^2.1.0",
+    "react-toggle": "2.1.0",
     "react-tools": "^0.13.1",
     "react-tooltip": "^1.1.4",
     "reflux": "^0.4.1",
