@@ -53,8 +53,12 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
     if (slackSession.isPresent()) {
       LOG.info("Sending slack notification for repo build {}", build.getId().get());
       CommitInfo commitInfo = build.getCommitInfo().get();
-      SlackUser user = slackSession.get().findUserByEmail(commitInfo.getCurrent().getAuthor().getEmail());
-      slackSession.get().sendMessageToUser(user, "", slackUtils.buildSlackAttachment(build));
+      Optional<SlackUser> user = Optional.fromNullable(slackSession.get().findUserByEmail(commitInfo.getCurrent().getAuthor().getEmail()));
+      if (user.isPresent()) {
+        slackSession.get().sendMessageToUser(user.get(), "", slackUtils.buildSlackAttachment(build));
+      } else {
+        LOG.error("Could not find user {} for message about repo build {}", commitInfo.getCurrent().getAuthor().getEmail(), build.getId().get());
+      }
     }
   }
 }
