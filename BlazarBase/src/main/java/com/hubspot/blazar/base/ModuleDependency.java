@@ -1,18 +1,21 @@
 package com.hubspot.blazar.base;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Objects;
+import com.google.common.base.MoreObjects;
 
 public class ModuleDependency {
   private final int moduleId;
   private final String name;
+  private String version;
 
   @JsonCreator
-  public ModuleDependency(@JsonProperty("moduleId") int moduleId, @JsonProperty("name") String name) {
+  public ModuleDependency(@JsonProperty("moduleId") int moduleId, @JsonProperty("name") String name, @JsonProperty("version") String version) {
     this.moduleId = moduleId;
     this.name = name;
+    this.version = version;
   }
 
   public int getModuleId() {
@@ -23,9 +26,16 @@ public class ModuleDependency {
     return name;
   }
 
+  public String getVersion() {
+    return version;
+  }
+
   @Override
   public String toString() {
-    return String.format("%s(%d)", name, moduleId);
+    return MoreObjects.toStringHelper(this)
+        .add("moduleId", moduleId)
+        .add("name", name)
+        .add("version", version).toString();
   }
 
   @Override
@@ -39,11 +49,11 @@ public class ModuleDependency {
     }
 
     ModuleDependency that = (ModuleDependency) o;
-    return moduleId == that.moduleId && name.equalsIgnoreCase(that.name);
+    return moduleId == that.moduleId && name.equalsIgnoreCase(that.name) && version.equalsIgnoreCase(that.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(moduleId, name);
+    return Objects.hash(moduleId, name, version);
   }
 }
