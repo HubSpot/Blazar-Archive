@@ -27,7 +27,7 @@ public class DependencyItem {
   }
 
   @JsonCreator
-  public DependencyItem fromString(String fromString) {
+  public static DependencyItem fromString(String fromString) {
     return new DependencyItem(fromString, "");
   }
 
