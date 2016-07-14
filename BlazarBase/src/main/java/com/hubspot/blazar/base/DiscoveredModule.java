@@ -40,7 +40,7 @@ public class DiscoveredModule extends Module {
   @JsonIgnore
   public Set<ModuleDependency> getProvides() {
     Set<ModuleDependency> provides = new HashSet<>();
-    for (DependencyItem provided : dependencyInfo.getProvides()) {
+    for (Dependency provided : dependencyInfo.getProvides()) {
       provides.add(new ModuleDependency(getId().get(), provided.getName(), provided.getVersion()));
     }
 
@@ -50,7 +50,7 @@ public class DiscoveredModule extends Module {
   @JsonIgnore
   public Set<ModuleDependency> getDepends() {
     Set<ModuleDependency> dependencies = new HashSet<>();
-    for (DependencyItem dependency : dependencyInfo.getDepends()) {
+    for (Dependency dependency : dependencyInfo.getDepends()) {
       dependencies.add(new ModuleDependency(getId().get(), dependency.getName(), dependency.getVersion()));
     }
 

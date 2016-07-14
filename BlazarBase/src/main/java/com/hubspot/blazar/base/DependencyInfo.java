@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.Set;
 
 public class DependencyInfo {
-  private final Set<DependencyItem> depends;
-  private final Set<DependencyItem> provides;
+  private final Set<Dependency> depends;
+  private final Set<Dependency> provides;
 
-  public DependencyInfo(Set<DependencyItem> depends, Set<DependencyItem> provides) {
+  public DependencyInfo(Set<Dependency> depends, Set<Dependency> provides) {
     this.depends = depends;
     this.provides = provides;
   }
@@ -16,11 +16,11 @@ public class DependencyInfo {
     return new DependencyInfo(Collections.emptySet(), Collections.emptySet());
   }
 
-  public Set<DependencyItem> getDepends() {
+  public Set<Dependency> getDepends() {
     return depends;
   }
 
-  public Set<DependencyItem> getProvides() {
+  public Set<Dependency> getProvides() {
     return provides;
   }
 }

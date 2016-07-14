@@ -7,13 +7,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
-public class DependencyItem {
+public class Dependency {
   private final String name;
   private final String version;
 
   @JsonCreator
-  public DependencyItem (@JsonProperty("name") String name,
-                         @JsonProperty("version") String version) {
+  public Dependency(@JsonProperty("name") String name,
+                    @JsonProperty("version") String version) {
     this.name = name;
     this.version = version;
   }
@@ -27,8 +27,8 @@ public class DependencyItem {
   }
 
   @JsonCreator
-  public static DependencyItem fromString(String fromString) {
-    return new DependencyItem(fromString, "");
+  public static Dependency fromString(String fromString) {
+    return new Dependency(fromString, "");
   }
 
   @Override
@@ -46,7 +46,7 @@ public class DependencyItem {
       return false;
     }
 
-    DependencyItem that = (DependencyItem) o;
+    Dependency that = (Dependency) o;
     return Objects.equals(name, that.name) && Objects.equals(version, that.version);
   }
 
