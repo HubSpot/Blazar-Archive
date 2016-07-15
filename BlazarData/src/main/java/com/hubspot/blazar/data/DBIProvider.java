@@ -1,5 +1,10 @@
 package com.hubspot.blazar.data;
 
+import javax.inject.Provider;
+
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.StatementContext;
+
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.jdbi.InstrumentedTimingCollector;
 import com.codahale.metrics.jdbi.strategies.DelegatingStatementNameStrategy;
@@ -12,21 +17,18 @@ import com.google.inject.Inject;
 import com.hubspot.guice.transactional.TransactionalDataSource;
 import com.hubspot.rosetta.jdbi.RosettaMapperFactory;
 import com.hubspot.rosetta.jdbi.RosettaObjectMapperOverride;
+
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
 import io.dropwizard.jdbi.DBIHealthCheck;
+import io.dropwizard.jdbi.GuavaOptionalContainerFactory;
 import io.dropwizard.jdbi.ImmutableListContainerFactory;
 import io.dropwizard.jdbi.ImmutableSetContainerFactory;
-import io.dropwizard.jdbi.OptionalContainerFactory;
 import io.dropwizard.jdbi.args.JodaDateTimeArgumentFactory;
 import io.dropwizard.jdbi.args.JodaDateTimeMapper;
 import io.dropwizard.jdbi.args.OptionalArgumentFactory;
 import io.dropwizard.jdbi.logging.LogbackLog;
 import io.dropwizard.setup.Environment;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.StatementContext;
-
-import javax.inject.Provider;
 
 public class DBIProvider implements Provider<DBI> {
   private final TransactionalDataSource transactionalDataSource;
@@ -66,9 +68,9 @@ public class DBIProvider implements Provider<DBI> {
     dbi.registerArgumentFactory(new OptionalArgumentFactory(dataSourceFactory.getDriverClass()));
     dbi.registerContainerFactory(new ImmutableListContainerFactory());
     dbi.registerContainerFactory(new ImmutableSetContainerFactory());
-    dbi.registerContainerFactory(new OptionalContainerFactory());
+    dbi.registerContainerFactory(new GuavaOptionalContainerFactory());
     dbi.registerArgumentFactory(new JodaDateTimeArgumentFactory());
-    dbi.registerMapper(new JodaDateTimeMapper());
+    dbi.registerColumnMapper(new JodaDateTimeMapper());
     dbi.registerMapper(new RosettaMapperFactory());
 
     new RosettaObjectMapperOverride(objectMapper).override(dbi);
