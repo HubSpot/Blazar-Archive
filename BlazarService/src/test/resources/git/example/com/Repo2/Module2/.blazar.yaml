@@ -1,8 +1,10 @@
-steps:
-  - description: Provide steps so blazar will try to build this
-    commands:
-      - echo TESTING 123
-provides:
-  - Repo2-Module2
 depends:
-  - Repo1-Module2
+- name: Repo1-Module2
+  version: 1.0.0
+provides:
+- name: Repo2-Module2
+  version: 1.0.0
+steps:
+- commands:
+  - echo TESTING 123
+  description: Provide steps so blazar will try to build this

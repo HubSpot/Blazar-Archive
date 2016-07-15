@@ -188,3 +188,7 @@ CREATE TABLE branch_settings (
   "interProjectBuildOptIn" TINYINT(1),
   PRIMARY KEY ("branchId")
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--changeset jgoodwin:8
+ALTER TABLE module_provides ADD COLUMN "version" VARCHAR(190) AFTER "name";
+ALTER TABLE module_depends ADD COLUMN "version" VARCHAR(190) AFTER "name";

@@ -1,10 +1,12 @@
-steps:
-  - description: Provide steps so blazar will try to build this
-    commands:
-      - ls
-provides:
-  - Repo3-Module1
 depends:
-  - Repo2-Module1
-  # Transitive
-  - Repo1-Module1
+- name: Repo2-Module1
+  version: 1.0.0
+- name: Repo1-Module1
+  version: 1.0.0
+provides:
+- name: Repo3-Module1
+  version: 1.0.0
+steps:
+- commands:
+  - ls
+  description: Provide steps so blazar will try to build this
