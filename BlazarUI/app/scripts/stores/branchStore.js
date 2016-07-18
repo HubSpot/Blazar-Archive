@@ -7,16 +7,22 @@ const BranchStore = Reflux.createStore({
 
   listenables: BranchActions,
 
-  init() {  
+  init() {
     this.branchBuildHistory = [];
     this.shouldPoll = true;
+    this.buildHistoryRequest = null;
   },
 
   onLoadBranchBuildHistory(params) {
     this.params = params;
 
-    BranchApi.fetchBranchBuildHistory(params, (resp) => {
+    if (this.buildHistoryRequest) {
+      return;
+    }
+
+    this.buildHistoryRequest = BranchApi.fetchBranchBuildHistory(params, (resp) => {
       this.branchBuildHistory = resp;
+      this.buildHistoryRequest = null;
 
       this.trigger({
         builds: this.branchBuildHistory,
