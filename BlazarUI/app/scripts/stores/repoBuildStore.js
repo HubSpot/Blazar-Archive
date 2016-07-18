@@ -10,18 +10,25 @@ const RepoBuildStore = Reflux.createStore({
 
   listenables: RepoBuildActions,
 
-  init() {  
+  init() {
     this.repoBuild = {};
     this.moduleBuilds = [];
     this.shouldPoll = true;
     this.moduleBuildsList = [];
+    this.isRequestingRepoBuild = false;
+    this.isRequestingModuleBuilds = false;
   },
 
   onLoadRepoBuild(params) {
     this.params = params;
 
-    RepoBuildApi.fetchRepoBuild(params, (resp) => {
+    if (this.isRequestingRepoBuild) {
+      return;
+    }
+
+    this.isRequestingRepoBuild = RepoBuildApi.fetchRepoBuild(params, (resp) => {
       this.repoBuild = resp;
+      this.isRequestingRepoBuild = false;
 
       if (buildIsInactive(this.repoBuild.state)) {
         this.shouldPoll = false;
@@ -46,8 +53,13 @@ const RepoBuildStore = Reflux.createStore({
   onLoadModuleBuilds(params) {
     this.params = params;
 
-    RepoBuildApi.fetchModuleBuilds(params, (resp) => {
+    if (this.isRequestingModuleBuilds) {
+      return;
+    }
+
+    this.isRequestingModuleBuilds = RepoBuildApi.fetchModuleBuilds(params, (resp) => {
       this.moduleBuilds = resp;
+      this.isRequestingModuleBuilds = false;
 
       this.trigger({
         moduleBuilds: this.moduleBuilds,
