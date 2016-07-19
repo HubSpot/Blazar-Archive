@@ -37,8 +37,10 @@ class RepoContainer extends Component {
 
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
+    const builds = BuildsStore.getBuilds().all;
     this.setState({
-      builds: this.getFilteredBuilds(this.props, BuildsStore.getBuilds().all)
+      builds: this.getFilteredBuilds(this.props, builds),
+      loading: !builds.length
     });
   }
 
