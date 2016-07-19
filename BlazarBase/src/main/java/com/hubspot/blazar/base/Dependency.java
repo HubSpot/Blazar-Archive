@@ -9,7 +9,7 @@ import com.google.common.base.MoreObjects;
 
 public class Dependency {
   private final String name;
-  private final String version;
+  private String version;
 
   @JsonCreator
   public Dependency(@JsonProperty("name") String name,
@@ -24,6 +24,10 @@ public class Dependency {
 
   public String getVersion() {
     return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   @JsonCreator
