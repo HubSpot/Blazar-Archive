@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>15.4</version>
+    <version>15.5</version>
   </parent>
 
   <artifactId>Blazar</artifactId>
@@ -45,8 +45,7 @@
   <properties>
     <basepom.check.skip-findbugs>true</basepom.check.skip-findbugs>
     <dep.horizon.version>0.0.24</dep.horizon.version>
-    <dep.rosetta.version>3.10.8</dep.rosetta.version>
-    <dep.dropwizard.metrics.version>3.1.2</dep.dropwizard.metrics.version>
+    <dep.rosetta.version>3.11.0</dep.rosetta.version>
     <singularity.version>0.4.11</singularity.version>
     <mesos.version>0.23.0</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
@@ -95,12 +94,6 @@
         <version>${singularity.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.jdbi</groupId>
-        <artifactId>jdbi</artifactId>
-        <version>2.73</version>
-      </dependency>
-
-      <dependency>
         <groupId>javax.transaction</groupId>
         <artifactId>javax.transaction-api</artifactId>
         <version>1.2</version>
@@ -111,11 +104,6 @@
         <version>1.2</version>
       </dependency>
       <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>jsr311-api</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
         <groupId>com.hubspot.dropwizard</groupId>
         <artifactId>dropwizard-guicier</artifactId>
         <version>1.0.0.1</version>
@@ -123,7 +111,7 @@
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
         <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
-        <version>0.7.2</version>
+        <version>0.8.0</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
@@ -192,16 +180,6 @@
         <version>0.5.1</version>
       </dependency>
       <dependency>
-        <groupId>io.dropwizard.metrics</groupId>
-        <artifactId>metrics-jdbi</artifactId>
-        <version>${dep.dropwizard.metrics.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.dropwizard.metrics</groupId>
-        <artifactId>metrics-core</artifactId>
-        <version>${dep.dropwizard.metrics.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>stringtemplate</artifactId>
         <version>3.2</version>
@@ -212,25 +190,9 @@
         <version>1.4.190</version>
       </dependency>
       <dependency>
-        <groupId>org.liquibase</groupId>
-        <artifactId>liquibase-core</artifactId>
-        <version>3.5.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
         <version>1.10.19</version>
-      </dependency>
-      <dependency>
-        <groupId>com.mattbertolini</groupId>
-        <artifactId>liquibase-slf4j</artifactId>
-        <version>2.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.jukito</groupId>
