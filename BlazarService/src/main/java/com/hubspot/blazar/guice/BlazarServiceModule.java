@@ -8,16 +8,17 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.ws.rs.container.ContainerRequestFilter;
 
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.RateLimitHandler;
 
-import com.google.common.base.Optional;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.base.Optional;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
@@ -60,7 +61,6 @@ import com.hubspot.horizon.RetryStrategy;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.horizon.ning.NingHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 

@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,8 +29,8 @@ import com.hubspot.blazar.base.D3GraphNode;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
-import com.hubspot.blazar.base.InterProjectBuildStatus;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
+import com.hubspot.blazar.base.InterProjectBuildStatus;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
@@ -38,7 +39,6 @@ import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.sun.jersey.api.NotFoundException;
 
 @Path("/inter-project-builds")
 @Produces(MediaType.APPLICATION_JSON)

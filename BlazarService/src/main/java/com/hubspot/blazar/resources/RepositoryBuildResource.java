@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -21,7 +22,6 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.sun.jersey.api.NotFoundException;
 
 @Path("/branches/builds")
 @Produces(MediaType.APPLICATION_JSON)
