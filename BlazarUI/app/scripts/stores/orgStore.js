@@ -13,14 +13,6 @@ const RepoStore = Reflux.createStore({
         loading: false
       });
     });
-
-  },
-  
-  onStopPolling() {
-    if (this.branchesApi) {
-      this.branchesApi.stopPollingBuilds();  
-    }
-    
   }
 
 });

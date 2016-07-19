@@ -15,11 +15,11 @@ import EmptyMessage from '../shared/EmptyMessage.jsx';
 import {getFilteredBranches, filterInactiveBuilds, sortBranchesByTimestamp} from '../Helpers.js'
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
-import RepoStore from '../../stores/repoStore';
-import RepoActions from '../../actions/repoActions';
+import BuildsStore from '../../stores/buildsStore';
+import BuildsActions from '../../actions/buildsActions';
 
 let initialState = {
-  branches: [],
+  builds: [],
   loading: true,
   filters: {
     branch: [],
@@ -40,9 +40,13 @@ class RepoContainer extends Component {
   }
 
   componentWillReceiveProps(nextprops) {
-    this.setState(initialState);
-    this.tearDown();
-    this.setup(nextprops.params);
+    this.setState({
+      filters: {
+        branch: [],
+        repo: []
+      },
+      error: null
+    });
   }
 
   componentWillUnmount() {
@@ -53,17 +57,18 @@ class RepoContainer extends Component {
     if (state.error) {
       state.loading = false;
     }
+
+    state.builds = state.builds.all;
+
     this.setState(state);
   }
 
   setup(params) {
-    this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
-    RepoActions.loadBranchesAndBuilds(params);
+    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
   }
 
   tearDown() {
-    RepoActions.stopPolling();
-    this.unsubscribeFromRepo();
+    this.unsubscribeFromBuilds();
   }
 
   updateFilters(newFilters) {
@@ -72,7 +77,15 @@ class RepoContainer extends Component {
     });
   }
 
+  getFilteredBuilds() {
+    return this.state.builds.filter(build => {
+      return build.gitInfo.repository === this.props.params.repo;
+    });
+  }
+
   render() {
+    const filteredBuilds = this.getFilteredBuilds();
+
     return (
       <PageContainer documentTitle={this.props.params.repo}>
         <UIGrid>
@@ -91,11 +104,12 @@ class RepoContainer extends Component {
               hide={this.state.error}
               updateFilters={this.updateFilters}
               {...this.state}
+              branches={filteredBuilds}
             />
             <BranchesTable
               hide={this.state.error}
               {...this.state}
-              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.branches))}
+              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, filteredBuilds))}
             />
           </UIGridItem>
         </UIGrid>
