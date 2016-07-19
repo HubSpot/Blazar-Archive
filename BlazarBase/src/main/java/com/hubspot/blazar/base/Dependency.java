@@ -26,10 +26,6 @@ public class Dependency {
     return version;
   }
 
-  public void setVersion(String version) {
-    this.version = version;
-  }
-
   @JsonCreator
   public static Dependency fromString(String fromString) {
     return new Dependency(fromString, "");
