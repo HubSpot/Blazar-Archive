@@ -1,13 +1,14 @@
 package com.hubspot.blazar.data.dao;
 
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.ModuleState;
-import com.hubspot.blazar.base.RepositoryState;
+import java.util.Set;
+
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
-import java.util.Set;
+import com.google.common.base.Optional;
+import com.hubspot.blazar.base.ModuleState;
+import com.hubspot.blazar.base.RepositoryState;
 
 public interface StateDao {
 
@@ -19,6 +20,18 @@ public interface StateDao {
       "LEFT OUTER JOIN repo_builds AS pendingBuild ON (gitInfo.pendingBuildId = pendingBuild.id) " +
       "WHERE gitInfo.active = 1")
   Set<RepositoryState> getAllRepositoryStates();
+
+  @SqlQuery("" +
+      "SELECT gitInfo.*, lastBuild.*, inProgressBuild.*, pendingBuild.* " +
+      "FROM branches AS gitInfo " +
+      "LEFT OUTER JOIN repo_builds AS lastBuild ON (gitInfo.lastBuildId = lastBuild.id) " +
+      "LEFT OUTER JOIN repo_builds AS inProgressBuild ON (gitInfo.inProgressBuildId = inProgressBuild.id) " +
+      "LEFT OUTER JOIN repo_builds AS pendingBuild ON (gitInfo.pendingBuildId = pendingBuild.id) " +
+      "WHERE gitInfo.active = 1 AND "+
+      "gitInfo.host = :host AND " +
+      "gitInfo.organization = :org AND " +
+      "gitInfo.repository = :repo")
+  Set<RepositoryState> getStatesForRepoByNames(@Bind("host") String host, @Bind("org") String org, @Bind("repo") String repo);
 
   @SqlQuery("" +
       "SELECT gitInfo.*, lastBuild.*, inProgressBuild.*, pendingBuild.* " +
