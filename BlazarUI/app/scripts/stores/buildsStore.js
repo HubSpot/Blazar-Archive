@@ -14,9 +14,9 @@ const BuildsStore = Reflux.createStore({
 
   init() {
     this.builds = {
-      all: {},
-      building: {},
-      starred: {}
+      all: [],
+      building: [],
+      starred: []
     };
   },
 

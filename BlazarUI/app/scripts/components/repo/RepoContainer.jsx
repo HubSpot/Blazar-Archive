@@ -37,7 +37,9 @@ class RepoContainer extends Component {
 
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
-    BuildsActions.loadBuilds();
+    this.setState({
+      builds: this.getFilteredBuilds(this.props, BuildsStore.getBuilds().all)
+    });
   }
 
   componentWillReceiveProps(nextprops) {
@@ -46,7 +48,8 @@ class RepoContainer extends Component {
         branch: [],
         repo: []
       },
-      error: null
+      error: null,
+      builds: this.getFilteredBuilds(nextprops, BuildsStore.getBuilds().all)
     });
   }
 
@@ -59,7 +62,7 @@ class RepoContainer extends Component {
       state.loading = false;
     }
 
-    state.builds = state.builds.all;
+    state.builds = this.getFilteredBuilds(this.props, state.builds.all);
 
     this.setState(state);
   }
@@ -70,15 +73,13 @@ class RepoContainer extends Component {
     });
   }
 
-  getFilteredBuilds() {
-    return this.state.builds.filter(build => {
-      return build.gitInfo.repository === this.props.params.repo;
+  getFilteredBuilds(props, builds) {
+    return builds.filter(build => {
+      return build.gitInfo.repository === props.params.repo;
     });
   }
 
   render() {
-    const filteredBuilds = this.getFilteredBuilds();
-
     return (
       <PageContainer documentTitle={this.props.params.repo}>
         <UIGrid>
@@ -97,12 +98,12 @@ class RepoContainer extends Component {
               hide={this.state.error}
               updateFilters={this.updateFilters}
               {...this.state}
-              branches={filteredBuilds}
+              branches={this.state.builds}
             />
             <BranchesTable
               hide={this.state.error}
               {...this.state}
-              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, filteredBuilds))}
+              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.builds))}
             />
           </UIGridItem>
         </UIGrid>
