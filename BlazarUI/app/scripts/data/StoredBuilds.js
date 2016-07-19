@@ -1,7 +1,3 @@
-//
-// Super class for polling the builds store
-//  - extended by BranchBuildsApi
-//
 import {isEmpty} from 'underscore';
 import BuildsStore from '../stores/buildsStore';
 

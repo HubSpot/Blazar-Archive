@@ -36,7 +36,8 @@ class RepoContainer extends Component {
   }
 
   componentDidMount() {
-    this.setup(this.props.params);
+    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
+    BuildsActions.loadBuilds();
   }
 
   componentWillReceiveProps(nextprops) {
@@ -50,7 +51,7 @@ class RepoContainer extends Component {
   }
 
   componentWillUnmount() {
-    this.tearDown();
+    this.unsubscribeFromBuilds();
   }
 
   onStatusChange(state) {
@@ -61,14 +62,6 @@ class RepoContainer extends Component {
     state.builds = state.builds.all;
 
     this.setState(state);
-  }
-
-  setup(params) {
-    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
-  }
-
-  tearDown() {
-    this.unsubscribeFromBuilds();
   }
 
   updateFilters(newFilters) {
