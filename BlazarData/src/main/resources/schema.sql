@@ -190,10 +190,20 @@ CREATE TABLE branch_settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --changeset jgoodwin:8
-ALTER TABLE module_provides ADD COLUMN "version" VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE module_depends ADD COLUMN "version" VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE branch_settings ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
-ALTER TABLE instant_message_configs ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
-ALTER TABLE inter_project_build_mappings ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
-ALTER TABLE inter_project_builds ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
-ALTER TABLE malformed_files ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+ALTER TABLE "module_provides" ADD COLUMN "version" VARCHAR(190);
+ALTER TABLE "module_depends" ADD COLUMN "version" VARCHAR(190);
+
+--changeset jgoodwin:9 dbms:mysql
+ALTER TABLE "module_provides" MODIFY "version" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE "module_provides" MODIFY "name" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE "module_depends" MODIFY "version" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE "module_depends" MODIFY "name" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE "branch_settings" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+ALTER TABLE "instant_message_configs" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+ALTER TABLE "inter_project_build_mappings" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+ALTER TABLE "inter_project_builds" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+ALTER TABLE "malformed_files" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+
