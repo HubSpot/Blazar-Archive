@@ -1,5 +1,4 @@
 before:
   - description: "Downloading HubSpot custom module discovery"
     commands:
-      - mvn dependency:get -B -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-dep-versions-SNAPSHOT -Dtransitive=false
-      - mvn dependency:copy -B -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-dep-versions-SNAPSHOT -DoutputDirectory=target
+      - mvn dependency:get -B -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-dep-versions-SNAPSHOT -Ddest=$(pwd)/target
