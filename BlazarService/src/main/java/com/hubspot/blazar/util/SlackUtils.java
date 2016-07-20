@@ -156,7 +156,7 @@ public class SlackUtils {
   public static Retryer<Boolean> makeSlackMessageSendingRetryer() {
     return RetryerBuilder.<Boolean>newBuilder()
         .retryIfResult(Predicates.equalTo(Boolean.FALSE))
-        .withWaitStrategy(WaitStrategies.exponentialWait(3000, TimeUnit.MILLISECONDS))
+        .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
         .build();
   }
 }
