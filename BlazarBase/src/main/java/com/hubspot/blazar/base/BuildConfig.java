@@ -20,8 +20,8 @@ public class BuildConfig {
   private final Optional<GitInfo> buildpack;
   private final Optional<String> user;
   private final Map<String, StepActivationCriteria> stepActivation;
-  private final Set<String> depends;
-  private final Set<String> provides;
+  private final Set<Dependency> depends;
+  private final Set<Dependency> provides;
 
   @JsonCreator
   public BuildConfig(@JsonProperty("steps") List<BuildStep> steps,
@@ -33,8 +33,8 @@ public class BuildConfig {
                      @JsonProperty("buildpack") Optional<GitInfo> buildpack,
                      @JsonProperty("user") Optional<String> user,
                      @JsonProperty("stepActivation") Map<String, StepActivationCriteria> stepActivation,
-                     @JsonProperty("depends") Set<String> depends,
-                     @JsonProperty("provides") Set<String> provides) {
+                     @JsonProperty("depends") Set<Dependency> depends,
+                     @JsonProperty("provides") Set<Dependency> provides) {
     this.steps = Objects.firstNonNull(steps, Collections.<BuildStep>emptyList());
     this.before = Objects.firstNonNull(before, Collections.<BuildStep>emptyList());
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
@@ -44,8 +44,8 @@ public class BuildConfig {
     this.cache = Objects.firstNonNull(cache, Collections.<String>emptyList());
     this.user = Objects.firstNonNull(user, Optional.<String>absent());
     this.stepActivation = Objects.firstNonNull(stepActivation, Collections.<String, StepActivationCriteria>emptyMap());
-    this.depends = Objects.firstNonNull(depends, Collections.<String>emptySet());
-    this.provides = Objects.firstNonNull(provides, Collections.<String>emptySet());
+    this.depends = Objects.firstNonNull(depends, Collections.<Dependency>emptySet());
+    this.provides = Objects.firstNonNull(provides, Collections.<Dependency>emptySet());
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
@@ -88,11 +88,11 @@ public class BuildConfig {
     return stepActivation;
   }
 
-  public Set<String> getProvides() {
+  public Set<Dependency> getProvides() {
     return provides;
   }
 
-  public Set<String> getDepends() {
+  public Set<Dependency> getDepends() {
     return depends;
   }
 

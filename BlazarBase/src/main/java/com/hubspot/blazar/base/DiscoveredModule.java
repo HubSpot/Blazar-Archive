@@ -1,11 +1,11 @@
 package com.hubspot.blazar.base;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Optional;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Optional;
 
 public class DiscoveredModule extends Module {
   private final DependencyInfo dependencyInfo;
@@ -40,8 +40,8 @@ public class DiscoveredModule extends Module {
   @JsonIgnore
   public Set<ModuleDependency> getProvides() {
     Set<ModuleDependency> provides = new HashSet<>();
-    for (String provided : dependencyInfo.getProvides()) {
-      provides.add(new ModuleDependency(getId().get(), provided));
+    for (Dependency provided : dependencyInfo.getProvides()) {
+      provides.add(new ModuleDependency(getId().get(), provided.getName(), provided.getVersion()));
     }
 
     return provides;
@@ -50,8 +50,8 @@ public class DiscoveredModule extends Module {
   @JsonIgnore
   public Set<ModuleDependency> getDepends() {
     Set<ModuleDependency> dependencies = new HashSet<>();
-    for (String dependency : dependencyInfo.getDepends()) {
-      dependencies.add(new ModuleDependency(getId().get(), dependency));
+    for (Dependency dependency : dependencyInfo.getDepends()) {
+      dependencies.add(new ModuleDependency(getId().get(), dependency.getName(), dependency.getVersion()));
     }
 
     return dependencies;

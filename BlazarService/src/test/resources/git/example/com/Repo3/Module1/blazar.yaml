@@ -8,5 +8,5 @@ provides:
   version: 1.0.0
 steps:
 - commands:
-  - ls
+  - echo TESTING 123
   description: Provide steps so blazar will try to build this

@@ -9,6 +9,7 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.stringtemplate.UseStringTemplate3StatementLocator;
 import org.skife.jdbi.v2.unstable.BindIn;
 
+import com.hubspot.blazar.base.Dependency;
 import com.hubspot.blazar.base.ModuleDependency;
 import com.hubspot.blazar.base.graph.Edge;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
@@ -31,10 +32,16 @@ public interface DependenciesDao {
       ")")
   Set<Edge> getEdges(@Bind("branchId") int branchId, @BindIn("moduleIds") Set<Integer> moduleIds);
 
-  @SqlBatch("INSERT INTO module_provides (moduleId, name) VALUES (:moduleId, :name)")
+  @SqlQuery("SELECT * FROM module_provides WHERE moduleId = :moduleId")
+  Set<Dependency> getProvided(@Bind("moduleId") int moduleId);
+
+  @SqlQuery("SELECT * FROM module_depends WHERE moduleId = :moduleId")
+  Set<Dependency> getDependencies(@Bind("moduleId") int moduleId);
+
+  @SqlBatch("INSERT INTO module_provides (moduleId, name, version) VALUES (:moduleId, :name, :version)")
   void insertProvides(@BindWithRosetta Set<ModuleDependency> dependencies);
 
-  @SqlBatch("INSERT INTO module_depends (moduleId, name) VALUES (:moduleId, :name)")
+  @SqlBatch("INSERT INTO module_depends (moduleId, name, version) VALUES (:moduleId, :name, :version)")
   void insertDepends(@BindWithRosetta Set<ModuleDependency> dependencies);
 
   @SqlUpdate("DELETE FROM module_provides WHERE moduleId = :moduleId")

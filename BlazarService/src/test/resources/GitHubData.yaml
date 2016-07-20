@@ -11,13 +11,13 @@
           tree:
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module1/.blazar.yaml"
-              content: "git/example/com/Repo1/Module1/.blazar.yaml"
+              content: "git/example/com/Repo1/Module1/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module2/.blazar.yaml"
-              content: "git/example/com/Repo1/Module2/.blazar.yaml"
+              content: "git/example/com/Repo1/Module2/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module3/.blazar.yaml"
-              content: "git/example/com/Repo1/Module3/.blazar.yaml"
+              content: "git/example/com/Repo1/Module3/blazar.yaml"
             - sha: "1000000000000000000000000000000000000001"
               path: "/test2.yaml"
               content: "/no-content"
@@ -87,13 +87,13 @@
           tree:
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module1/.blazar.yaml"
-              content: "git/example/com/Repo2/Module1/.blazar.yaml"
+              content: "git/example/com/Repo2/Module1/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module2/.blazar.yaml"
-              content: "git/example/com/Repo2/Module2/.blazar.yaml"
+              content: "git/example/com/Repo2/Module2/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module3/.blazar.yaml"
-              content: "git/example/com/Repo2/Module3/.blazar.yaml"
+              content: "git/example/com/Repo2/Module3/blazar.yaml"
         commits:
           - sha1: "1111111111111111111111111111111111111111"
             files:
@@ -127,13 +127,13 @@
           tree:
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module1/.blazar.yaml"
-              content: "git/example/com/Repo3/Module1/.blazar.yaml"
+              content: "git/example/com/Repo3/Module1/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module2/.blazar.yaml"
-              content: "git/example/com/Repo3/Module2/.blazar.yaml"
+              content: "git/example/com/Repo3/Module2/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module3/.blazar.yaml"
-              content: "git/example/com/Repo3/Module3/.blazar.yaml"
+              content: "git/example/com/Repo3/Module3/blazar.yaml"
         commits:
           - sha1: "1111111111111111111111111111111111111111"
             files:
@@ -168,13 +168,13 @@
           tree:
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module1/.blazar.yaml"
-              content: "git/example/com/Repo4/Module1/.blazar.yaml"
+              content: "git/example/com/Repo4/Module1/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module2/.blazar.yaml"
-              content: "git/example/com/Repo4/Module2/.blazar.yaml"
+              content: "git/example/com/Repo4/Module2/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module3/.blazar.yaml"
-              content: "git/example/com/Repo4/Module3/.blazar.yaml"
+              content: "git/example/com/Repo4/Module3/blazar.yaml"
         commits:
           - sha1: "1111111111111111111111111111111111111111"
             files:
@@ -208,13 +208,13 @@
           tree:
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module1/.blazar.yaml"
-              content: "git/example/com/Repo5/Module1/.blazar.yaml"
+              content: "git/example/com/Repo5/Module1/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module2/.blazar.yaml"
-              content: "git/example/com/Repo5/Module2/.blazar.yaml"
+              content: "git/example/com/Repo5/Module2/blazar.yaml"
             - sha: "1111111111111111111111111111111111111111"
               path: "/Module3/.blazar.yaml"
-              content: "git/example/com/Repo5/Module3/.blazar.yaml"
+              content: "git/example/com/Repo5/Module3/blazar.yaml"
         commits:
           - sha1: "1111111111111111111111111111111111111111"
             files:

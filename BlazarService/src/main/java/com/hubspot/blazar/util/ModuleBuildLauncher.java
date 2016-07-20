@@ -20,6 +20,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildStep;
+import com.hubspot.blazar.base.Dependency;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -111,11 +112,11 @@ public class ModuleBuildLauncher {
     stepActivation.putAll(secondary.getStepActivation());
     stepActivation.putAll(primary.getStepActivation());
 
-    Set<String> depends = new HashSet<>();
+    Set<Dependency> depends = new HashSet<>();
     depends.addAll(primary.getDepends());
     depends.addAll(secondary.getDepends());
 
-    Set<String> provides = new HashSet<>();
+    Set<Dependency> provides = new HashSet<>();
     provides.addAll(primary.getDepends());
     provides.addAll(secondary.getDepends());
 
