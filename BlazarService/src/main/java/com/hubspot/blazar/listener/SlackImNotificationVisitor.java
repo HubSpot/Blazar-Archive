@@ -1,34 +1,42 @@
 package com.hubspot.blazar.listener;
 
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildTrigger;
-import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.BlazarSlackConfiguration;
 import com.hubspot.blazar.util.SlackUtils;
+import com.ullink.slack.simpleslackapi.SlackAttachment;
+import com.ullink.slack.simpleslackapi.SlackMessageHandle;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.SlackUser;
+import com.ullink.slack.simpleslackapi.replies.ParsedSlackReply;
+import com.ullink.slack.simpleslackapi.replies.SlackMessageReply;
 
 public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(SlackImNotificationVisitor.class);
   private final BlazarSlackConfiguration blazarSlackConfig;
 
   private Optional<SlackSession> slackSession;
+  private final MetricRegistry metricRegistry;
+  private final BlazarConfiguration blazarConfiguration;
   private SlackUtils slackUtils;
 
   @Inject
   public SlackImNotificationVisitor (Optional<SlackSession> slackSession,
+                                     MetricRegistry metricRegistry,
                                      BlazarConfiguration blazarConfiguration,
                                      SlackUtils slackUtils) {
     this.slackSession = slackSession;
+    this.metricRegistry = metricRegistry;
+    this.blazarConfiguration = blazarConfiguration;
     this.slackUtils = slackUtils;
     this.blazarSlackConfig = blazarConfiguration.getSlackConfiguration().get();
   }
@@ -50,15 +58,41 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
       LOG.info("Not sending notifications for builds in non-terminal states or on success / cancellation");
       return;
     }
-    if (slackSession.isPresent()) {
-      LOG.info("Sending slack notification for repo build {}", build.getId().get());
-      CommitInfo commitInfo = build.getCommitInfo().get();
-      Optional<SlackUser> user = Optional.fromNullable(slackSession.get().findUserByEmail(commitInfo.getCurrent().getAuthor().getEmail()));
-      if (user.isPresent()) {
-        slackSession.get().sendMessageToUser(user.get(), "", slackUtils.buildSlackAttachment(build));
+    sendSlackMessageWithRetries(build, slackUtils.buildSlackAttachment(build), 3);
+
+  }
+
+  private void sendSlackMessageWithRetries(RepositoryBuild build, SlackAttachment attachment, int tries) {
+    tries = tries - 1;
+    while (tries > 0) {
+      if (sendSlackMessage(build, attachment)) {
+        return;
       } else {
-        LOG.error("Could not find user {} for message about repo build {}", commitInfo.getCurrent().getAuthor().getEmail(), build.getId().get());
+        tries--;
       }
     }
+    metricRegistry.counter("failed-slack-dm-sends").inc();
+  }
+
+  private boolean sendSlackMessage(RepositoryBuild build, SlackAttachment attachment) {
+    String email = build.getCommitInfo().get().getCurrent().getAuthor().getEmail();
+    if (!slackSession.isPresent()) {
+      LOG.debug("No slack session present, not sending message {} to user {}", attachment.toString(), email);
+      return true;
+    }
+
+    Optional<SlackUser> user = Optional.fromNullable(slackSession.get().findUserByEmail(email));
+    if (!user.isPresent()) {
+      LOG.error("Could not find user {} for message about repo build {}", email, build.getId().get());
+      return false;
+    }
+
+    SlackMessageHandle<SlackMessageReply> result = slackSession.get().sendMessageToUser(user.get(), "", attachment);
+    // https://github.com/Ullink/simple-slack-api/commit/afa5a85f1a0cf96fcc69ddaa70b8761024dbd727
+    if (!((ParsedSlackReply) result.getReply()).isOk()) {
+      LOG.warn("Failed to send slack message to user: {} message: {}", email, attachment.toString());
+      return false;
+    }
+    return true;
   }
 }

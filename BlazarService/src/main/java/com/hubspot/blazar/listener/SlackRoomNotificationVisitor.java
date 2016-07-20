@@ -5,11 +5,11 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
@@ -20,8 +20,12 @@ import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.util.SlackUtils;
+import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
+import com.ullink.slack.simpleslackapi.SlackMessageHandle;
 import com.ullink.slack.simpleslackapi.SlackSession;
+import com.ullink.slack.simpleslackapi.replies.ParsedSlackReply;
+import com.ullink.slack.simpleslackapi.replies.SlackMessageReply;
 
 @Singleton
 public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, ModuleBuildVisitor {
@@ -31,6 +35,7 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   private static final Set<ModuleBuild.State> FAILED_MODULE_STATES = ImmutableSet.of(ModuleBuild.State.CANCELLED, ModuleBuild.State.FAILED);
 
   private InstantMessageConfigurationService instantMessageConfigurationService;
+  private MetricRegistry metricRegistry;
   private final BranchService branchService;
   private final ModuleBuildService moduleBuildService;
   private final Optional<SlackSession> slackSession;
@@ -39,12 +44,14 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
 
   @Inject
   public SlackRoomNotificationVisitor(InstantMessageConfigurationService instantMessageConfigurationService,
+                                      MetricRegistry metricRegistry,
                                       BranchService branchService,
                                       ModuleBuildService moduleBuildService,
                                       Optional<SlackSession> slackSession,
                                       SlackUtils slackUtils,
                                       RepositoryBuildService repositoryBuildService) {
     this.instantMessageConfigurationService = instantMessageConfigurationService;
+    this.metricRegistry = metricRegistry;
     this.branchService = branchService;
     this.moduleBuildService = moduleBuildService;
     this.slackSession = slackSession;
@@ -61,7 +68,7 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSend(instantMessageConfiguration, build.getState(), previous, build)) {
-        sendSlackMessage(instantMessageConfiguration, build);
+        sendSlackMessageWithRetries(instantMessageConfiguration, slackUtils.buildSlackAttachment(build), 3);
       }
     }
   }
@@ -90,18 +97,6 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     return shouldSend;
   }
 
-  private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, RepositoryBuild build) {
-    if (slackSession.isPresent()) {
-      Optional<SlackChannel> slackChannel = Optional.fromNullable(slackSession.get().findChannelByName(instantMessageConfiguration.getChannelName()));
-      if (slackChannel.isPresent()) {
-        slackSession.get().sendMessage(slackChannel.get(), "", slackUtils.buildSlackAttachment(build));
-      } else {
-        LOG.warn("No slack channel found for name {}", instantMessageConfiguration.getChannelName());
-      }
-    }
-  }
-
-
   @Override
   public void visit(ModuleBuild build) throws Exception {
     if (!(build.getState().isComplete())) {
@@ -111,16 +106,8 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSend(instantMessageConfiguration, build.getState(), previous, build)) {
-        GitInfo gitInfo = branchService.get(repositoryBuildService.get(build.getRepoBuildId()).get().getBranchId()).get();
-        sendSlackMessage(instantMessageConfiguration, build);
+        sendSlackMessageWithRetries(instantMessageConfiguration, slackUtils.buildSlackAttachment(build), 3);
       }
-    }
-  }
-
-  private void sendSlackMessage(InstantMessageConfiguration instantMessageConfiguration, ModuleBuild build) {
-    if (slackSession.isPresent()) {
-      SlackChannel slackChannel = slackSession.get().findChannelByName(instantMessageConfiguration.getChannelName());
-      slackSession.get().sendMessage(slackChannel, "", slackUtils.buildSlackAttachment(build));
     }
   }
 
@@ -147,4 +134,38 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     }
     return shouldSend;
   }
+
+  private void sendSlackMessageWithRetries(InstantMessageConfiguration configuration, SlackAttachment attachment, int tries) {
+    tries = tries - 1;
+    while (tries > 0) {
+      if (sendSlackMessage(configuration, attachment)) {
+        return;
+      } else {
+        tries--;
+      }
+    }
+    metricRegistry.counter("failed-slack-channel-sends").inc();
+  }
+
+  private boolean sendSlackMessage(InstantMessageConfiguration configuration, SlackAttachment attachment) {
+    if (!slackSession.isPresent()) {
+      LOG.debug("No slack session present, not sending message {} to channel {}", attachment.toString(), configuration.getChannelName());
+      return true;
+    }
+
+    Optional<SlackChannel> slackChannel = Optional.fromNullable(slackSession.get().findChannelByName(configuration.getChannelName()));
+    if (!slackChannel.isPresent()) {
+      LOG.warn("No slack channel found for name {}", configuration.getChannelName());
+      return false;
+    }
+
+    SlackMessageHandle<SlackMessageReply> result = slackSession.get().sendMessage(slackChannel.get(), "", attachment);
+    // https://github.com/Ullink/simple-slack-api/commit/afa5a85f1a0cf96fcc69ddaa70b8761024dbd727
+    if (!((ParsedSlackReply) result.getReply()).isOk()) {
+      LOG.warn("Failed to send slack message to channel: {} message: {}", configuration.getChannelName(), attachment.toString());
+      return false;
+    }
+    return true;
+  }
+
 }

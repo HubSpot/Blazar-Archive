@@ -147,4 +147,5 @@ public class SlackUtils {
   private static SlackAttachment makeAttachment(String title) {
     return new SlackAttachment(title, title, "", "");
   }
+
 }
