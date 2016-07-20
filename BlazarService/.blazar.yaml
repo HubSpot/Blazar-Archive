@@ -1,4 +1,5 @@
 before:
   - description: "Downloading HubSpot custom module discovery"
     commands:
-      - mvn dependency:get -B -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-dep-versions-SNAPSHOT -Ddest=$(pwd)/target
+      - mvn dependency:get -B -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-SNAPSHOT:pom -Dtransitive=false
+      - mvn -B -f ~/.m2/repository/com/hubspot/BlazarModuleDiscovery/1.0-SNAPSHOT/BlazarModuleDiscovery-1.0-SNAPSHOT.pom dependency:copy-dependencies -DoutputDirectory=$(pwd)/target
