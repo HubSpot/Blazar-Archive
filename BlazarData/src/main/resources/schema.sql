@@ -194,11 +194,12 @@ ALTER TABLE "module_provides" ADD COLUMN "version" VARCHAR(190);
 ALTER TABLE "module_depends" ADD COLUMN "version" VARCHAR(190);
 
 --changeset jgoodwin:9 dbms:mysql
-ALTER TABLE "module_provides" MODIFY "version" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE "module_provides" MODIFY "name" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `module_provides` MODIFY  `version` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `module_provides` MODIFY `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-ALTER TABLE "module_depends" MODIFY "version" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-ALTER TABLE "module_depends" MODIFY "name" CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `module_depends` MODIFY `version` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE `module_depends` MODIFY `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+;
 
 ALTER TABLE "branch_settings" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 ALTER TABLE "instant_message_configs" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
