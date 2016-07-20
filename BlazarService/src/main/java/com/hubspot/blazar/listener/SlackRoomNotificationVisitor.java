@@ -15,7 +15,6 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
-import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
@@ -36,7 +35,6 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
 
   private InstantMessageConfigurationService instantMessageConfigurationService;
   private MetricRegistry metricRegistry;
-  private final BranchService branchService;
   private final ModuleBuildService moduleBuildService;
   private final Optional<SlackSession> slackSession;
   private final SlackUtils slackUtils;
@@ -45,14 +43,12 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   @Inject
   public SlackRoomNotificationVisitor(InstantMessageConfigurationService instantMessageConfigurationService,
                                       MetricRegistry metricRegistry,
-                                      BranchService branchService,
                                       ModuleBuildService moduleBuildService,
                                       Optional<SlackSession> slackSession,
                                       SlackUtils slackUtils,
                                       RepositoryBuildService repositoryBuildService) {
     this.instantMessageConfigurationService = instantMessageConfigurationService;
     this.metricRegistry = metricRegistry;
-    this.branchService = branchService;
     this.moduleBuildService = moduleBuildService;
     this.slackSession = slackSession;
     this.slackUtils = slackUtils;
@@ -68,7 +64,7 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSend(instantMessageConfiguration, build.getState(), previous, build)) {
-        sendSlackMessageWithRetries(instantMessageConfiguration, slackUtils.buildSlackAttachment(build), 3);
+        sendSlackMessageWithRetries(instantMessageConfiguration, slackUtils.buildSlackAttachment(build));
       }
     }
   }
@@ -106,7 +102,7 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     Optional<ModuleBuild> previous = moduleBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSend(instantMessageConfiguration, build.getState(), previous, build)) {
-        sendSlackMessageWithRetries(instantMessageConfiguration, slackUtils.buildSlackAttachment(build), 3);
+        sendSlackMessageWithRetries(instantMessageConfiguration, slackUtils.buildSlackAttachment(build));
       }
     }
   }
@@ -135,16 +131,14 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     return shouldSend;
   }
 
-  private void sendSlackMessageWithRetries(InstantMessageConfiguration configuration, SlackAttachment attachment, int tries) {
-    tries = tries - 1;
-    while (tries > 0) {
-      if (sendSlackMessage(configuration, attachment)) {
-        return;
-      } else {
-        tries--;
-      }
+  private void sendSlackMessageWithRetries(InstantMessageConfiguration configuration, SlackAttachment attachment) {
+    try {
+      SlackUtils.makeSlackMessageSendingRetryer().call(() -> sendSlackMessage(configuration, attachment));
+      metricRegistry.counter("successful-slack-channel-sends").inc();
+    } catch (Exception e) {
+      metricRegistry.counter("failed-slack-channel-sends").inc();
+      LOG.error("Could not send slack message {}", attachment, e);
     }
-    metricRegistry.counter("failed-slack-channel-sends").inc();
   }
 
   private boolean sendSlackMessage(InstantMessageConfiguration configuration, SlackAttachment attachment) {

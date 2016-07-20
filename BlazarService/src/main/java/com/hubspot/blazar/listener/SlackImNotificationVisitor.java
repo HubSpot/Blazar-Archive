@@ -58,20 +58,18 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
       LOG.info("Not sending notifications for builds in non-terminal states or on success / cancellation");
       return;
     }
-    sendSlackMessageWithRetries(build, slackUtils.buildSlackAttachment(build), 3);
+    sendSlackMessageWithRetries(build, slackUtils.buildSlackAttachment(build));
 
   }
 
-  private void sendSlackMessageWithRetries(RepositoryBuild build, SlackAttachment attachment, int tries) {
-    tries = tries - 1;
-    while (tries > 0) {
-      if (sendSlackMessage(build, attachment)) {
-        return;
-      } else {
-        tries--;
-      }
+  private void sendSlackMessageWithRetries(RepositoryBuild build, SlackAttachment attachment) {
+    try {
+      SlackUtils.makeSlackMessageSendingRetryer().call(() -> sendSlackMessage(build, attachment));
+      metricRegistry.counter("successful-slack-dm-sends").inc();
+    } catch (Exception e){
+      LOG.error("Could not send slack message {}", attachment, e);
+      metricRegistry.counter("failed-slack-dm-sends").inc();
     }
-    metricRegistry.counter("failed-slack-dm-sends").inc();
   }
 
   private boolean sendSlackMessage(RepositoryBuild build, SlackAttachment attachment) {
