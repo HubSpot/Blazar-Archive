@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
@@ -157,6 +158,7 @@ public class SlackUtils {
     return RetryerBuilder.<Boolean>newBuilder()
         .retryIfResult(Predicates.equalTo(Boolean.FALSE))
         .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+        .withStopStrategy(StopStrategies.stopAfterAttempt(3))
         .build();
   }
 }
