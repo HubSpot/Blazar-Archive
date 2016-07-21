@@ -77,7 +77,7 @@ class RepoContainer extends Component {
 
   getFilteredBuilds(props, builds) {
     return builds.filter(build => {
-      return build.gitInfo.repository === props.params.repo;
+      return build.gitInfo.repository.toLowerCase() === props.params.repo.toLowerCase();
     });
   }
 
