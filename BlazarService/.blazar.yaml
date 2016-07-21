@@ -1,8 +1,8 @@
 before:
   - description: "Downloading HubSpot custom module discovery"
     commands:
-      - mvn -B dependency:get -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-dep-versions-SNAPSHOT:jar:shaded -Dtransitive=false
-      - mvn -B dependency:copy -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-dep-versions-SNAPSHOT:jar:shaded -DoutputDirectory=target
+      - mvn -B dependency:get -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-SNAPSHOT:jar:shaded -Dtransitive=false
+      - mvn -B dependency:copy -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-SNAPSHOT:jar:shaded -DoutputDirectory=target
 
 stepActivation:
   upload:
