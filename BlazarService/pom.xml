@@ -200,7 +200,7 @@
       <artifactId>joda-time</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.takari.slack</groupId>
+      <groupId>com.github.Ullink</groupId>
       <artifactId>simple-slack-api</artifactId>
     </dependency>
 

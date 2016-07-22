@@ -19,6 +19,13 @@
     <tag>HEAD</tag>
   </scm>
 
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
+
   <developers>
     <developer>
       <name>Jonathan Haber</name>
@@ -180,7 +187,7 @@
         <version>4.4.1</version>
       </dependency>
       <dependency>
-        <groupId>io.takari.slack</groupId>
+        <groupId>com.github.Ullink</groupId>
         <artifactId>simple-slack-api</artifactId>
         <version>0.5.1</version>
       </dependency>

@@ -17,17 +17,15 @@ import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackMessageHandle;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.SlackUser;
-import com.ullink.slack.simpleslackapi.replies.ParsedSlackReply;
 import com.ullink.slack.simpleslackapi.replies.SlackMessageReply;
 
 public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(SlackImNotificationVisitor.class);
   private final BlazarSlackConfiguration blazarSlackConfig;
 
-  private Optional<SlackSession> slackSession;
+  private final Optional<SlackSession> slackSession;
   private final MetricRegistry metricRegistry;
-  private final BlazarConfiguration blazarConfiguration;
-  private SlackUtils slackUtils;
+  private final SlackUtils slackUtils;
 
   @Inject
   public SlackImNotificationVisitor (Optional<SlackSession> slackSession,
@@ -36,7 +34,6 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
                                      SlackUtils slackUtils) {
     this.slackSession = slackSession;
     this.metricRegistry = metricRegistry;
-    this.blazarConfiguration = blazarConfiguration;
     this.slackUtils = slackUtils;
     this.blazarSlackConfig = blazarConfiguration.getSlackConfiguration().get();
   }
@@ -44,7 +41,7 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
   @Override
   public void visit(RepositoryBuild build) throws Exception {
     if (!build.getCommitInfo().isPresent() || !blazarSlackConfig.getImWhitelist().contains(build.getCommitInfo().get().getCurrent().getAuthor().getEmail())) {
-      LOG.info("No commitinfo present, or user is not in whitelist");
+      LOG.info("No commitInfo present, or user is not in whiteList");
       return;
     }
     boolean wasPush = build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH;
@@ -59,7 +56,6 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
       return;
     }
     sendSlackMessageWithRetries(build, slackUtils.buildSlackAttachment(build));
-
   }
 
   private void sendSlackMessageWithRetries(RepositoryBuild build, SlackAttachment attachment) {
@@ -86,9 +82,8 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
     }
 
     SlackMessageHandle<SlackMessageReply> result = slackSession.get().sendMessageToUser(user.get(), "", attachment);
-    // https://github.com/Ullink/simple-slack-api/commit/afa5a85f1a0cf96fcc69ddaa70b8761024dbd727
-    if (!((ParsedSlackReply) result.getReply()).isOk()) {
-      LOG.warn("Failed to send slack message to user: {} message: {}", email, attachment.toString());
+    if (!result.getReply().isOk()) {
+      LOG.warn("Failed to send slack message to user: {} message: {} error: {}", email, attachment.toString(), result.getReply().getErrorMessage());
       return false;
     }
     return true;
