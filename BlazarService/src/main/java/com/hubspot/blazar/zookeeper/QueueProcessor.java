@@ -120,7 +120,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   }
 
   private static String gaugeName() {
-    return "QueueProcessor.queuedItems.count";
+    return MetricRegistry.name(QueueProcessor.class, "queuedItems", "count");
   }
 
   private class ProcessItemRunnable implements Runnable {
