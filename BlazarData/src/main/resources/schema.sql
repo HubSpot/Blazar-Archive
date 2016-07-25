@@ -228,7 +228,7 @@ CREATE TABLE "queue_items" (
   "desiredExecutionTimestamp" TIMESTAMP NOT NULL,
   "completedTimestamp" TIMESTAMP,
   PRIMARY KEY ("id"),
-  UNIQUE INDEX ("completedTimestamp", "desiredExecutionTimestamp")
+  INDEX ("completedTimestamp", "desiredExecutionTimestamp")
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --changeset jhaber:13 dbms:mysql
