@@ -14,8 +14,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
-import org.skife.jdbi.v2.Transaction;
-import org.skife.jdbi.v2.TransactionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,14 +140,9 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
           queueItemDao.complete(queueItem);
         } else if (queueItem.getRetryCount() < 9) {
           LOG.warn("Queue item {} failed to process, retrying", queueItem.getId().get());
-          queueItemDao.inTransaction(new Transaction<Void, QueueItemDao>() {
-
-            @Override
-            public Void inTransaction(QueueItemDao transactional, TransactionStatus status) {
-              queueItemDao.complete(queueItem);
-              queueItemDao.insert(queueItem.forRetry());
-              return null;
-            }
+          queueItemDao.inTransaction((dao, status) -> {
+            dao.complete(queueItem);
+            return dao.insert(queueItem.forRetry());
           });
         } else {
           LOG.warn("Queue item {} failed to process 10 times, not retrying", queueItem.getId().get());
