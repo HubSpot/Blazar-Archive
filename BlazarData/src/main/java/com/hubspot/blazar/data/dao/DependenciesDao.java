@@ -10,6 +10,7 @@ import org.skife.jdbi.v2.sqlobject.stringtemplate.UseStringTemplate3StatementLoc
 import org.skife.jdbi.v2.unstable.BindIn;
 
 import com.hubspot.blazar.base.Dependency;
+import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleDependency;
 import com.hubspot.blazar.base.graph.Edge;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
@@ -37,6 +38,14 @@ public interface DependenciesDao {
 
   @SqlQuery("SELECT * FROM module_depends WHERE moduleId = :moduleId")
   Set<Dependency> getDependencies(@Bind("moduleId") int moduleId);
+
+  @SqlQuery("select branch.* " +
+            "    from modules as module " +
+            "        join branches as branch on (branch.id = module.branchId) " +
+            "        join module_provides as provides on (module.id = provides.moduleId) " +
+            "        join module_depends  as depends on (module.id = depends.moduleId) " +
+            "    where (provides.version is null or depends.version is null) and  branch.active = 1 group by branch.id")
+  Set<GitInfo> getBranchesWithNonVersionedDependencies();
 
   @SqlBatch("INSERT INTO module_provides (moduleId, name, version) VALUES (:moduleId, :name, :version)")
   void insertProvides(@BindWithRosetta Set<ModuleDependency> dependencies);
