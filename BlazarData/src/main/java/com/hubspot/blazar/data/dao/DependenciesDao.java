@@ -39,12 +39,13 @@ public interface DependenciesDao {
   @SqlQuery("SELECT * FROM module_depends WHERE moduleId = :moduleId")
   Set<Dependency> getDependencies(@Bind("moduleId") int moduleId);
 
-  @SqlQuery("select branch.* " +
-            "    from modules as module " +
-            "        join branches as branch on (branch.id = module.branchId) " +
-            "        join module_provides as provides on (module.id = provides.moduleId) " +
-            "        join module_depends  as depends on (module.id = depends.moduleId) " +
-            "    where (provides.version is null or depends.version is null) and  branch.active = 1 group by branch.id")
+  @SqlQuery("SELECT gitInfo.* " +
+            "FROM modules AS module " +
+            "    join branches AS gitInfo ON (gitInfo.id = module.branchId) " +
+            "    join module_provides AS provides ON (module.id = provides.moduleId) " +
+            "    join module_depends  AS depends ON (module.id = depends.moduleId) " +
+            "WHERE (provides.version IS NULL OR depends.version IS NULL) AND gitInfo.active = 1 " +
+            "GROUP BY gitInfo.id")
   Set<GitInfo> getBranchesWithNonVersionedDependencies();
 
   @SqlBatch("INSERT INTO module_provides (moduleId, name, version) VALUES (:moduleId, :name, :version)")

@@ -59,13 +59,11 @@ public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfiguratio
 
     Set<GitInfo> toBeReDiscovered = dependenciesService.getBranchesWithNonVersionedDependencies();
     Set<GitInfo> failed = new HashSet<>();
-    Set<GitInfo> successful = new HashSet<>();
     for (GitInfo branch : toBeReDiscovered) {
       LOG.info("Starting to process gitInfo {}", branch.toString());
       boolean canProcess = gitHubLimiterMap.get(branch.getHost()).tryAcquire(30, TimeUnit.SECONDS);
       if (canProcess && discover(branch, compositeModuleDiscovery, moduleDiscoveryService)) {
         LOG.info("Completed re-discovery of {}", branch.toString());
-        successful.add(branch);
       } else {
         LOG.info("Failed to process branch {}", branch.toString());
         failed.add(branch);
