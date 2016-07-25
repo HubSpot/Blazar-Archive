@@ -1,6 +1,5 @@
 package com.hubspot.blazar.guice;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -8,9 +7,9 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.jboss.netty.util.internal.ConcurrentIdentityHashMap;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Binder;
@@ -69,7 +68,7 @@ public class BlazarZooKeeperModule implements Module {
   @Provides
   @Singleton
   public Set<Object> erroredQueueItems() {
-    return Collections.newSetFromMap(new ConcurrentIdentityHashMap<Object, Boolean>());
+    return Sets.newConcurrentHashSet();
   }
 
   @Provides
