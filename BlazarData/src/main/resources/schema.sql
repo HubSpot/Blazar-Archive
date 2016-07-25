@@ -215,3 +215,4 @@ CREATE TABLE queue_items (
   PRIMARY KEY (id),
   INDEX (completedTimestamp, desiredExecutionTimestamp)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
