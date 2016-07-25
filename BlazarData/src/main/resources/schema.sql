@@ -138,7 +138,7 @@ TRUNCATE TABLE "module_builds";
 
 TRUNCATE TABLE "malformed_files";
 
---changeset jgoodwin:5 runAlways:false
+--changeset jgoodwin:5
 CREATE TABLE "instant_message_configs" (
   "id" BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   "branchId" BIGINT(20) UNSIGNED NOT NULL,
@@ -154,7 +154,7 @@ CREATE TABLE "instant_message_configs" (
   INDEX ("channelName")
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---changeset jgoodwin:6 runAlways:false
+--changeset jgoodwin:6
 CREATE TABLE inter_project_builds (
   "id" BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   "state" VARCHAR(40) NOT NULL,
@@ -181,7 +181,7 @@ CREATE TABLE inter_project_build_mappings (
   INDEX ("repoBuildId")
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---changeset jgoodwin:7 runAlwasy:false
+--changeset jgoodwin:7
 CREATE TABLE branch_settings (
   "branchId" INT(11),
   "triggerInterProjectBuilds" TINYINT(1),
@@ -213,7 +213,26 @@ ALTER TABLE "module_provides" DROP PRIMARY KEY;
 ALTER TABLE "module_depends" DROP PRIMARY KEY;
 ALTER TABLE "module_provides" ADD PRIMARY KEY("moduleId", "name", "version");
 ALTER TABLE "module_depends" ADD PRIMARY KEY("moduleId", "name", "version");
---changeset jgoodwin:10 dbms:mysql
+
+--changeset jgoodwin:11 dbms:mysql
 ALTER TABLE `module_provides` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 
+--changeset jhaber:12
+CREATE TABLE "queue_items" (
+  "id" bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  "type" varchar(250) NOT NULL,
+  "item" mediumtext NOT NULL,
+  "retryCount" int(11) unsigned NOT NULL,
+  "createdTimestamp" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "desiredExecutionTimestamp" TIMESTAMP NOT NULL,
+  "completedTimestamp" TIMESTAMP,
+  PRIMARY KEY ("id"),
+  UNIQUE INDEX ("completedTimestamp", "desiredExecutionTimestamp")
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--changeset jhaber:13 dbms:mysql
+ALTER TABLE "queue_items" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+--changeset jhaber:14 dbms:h2 runAlways:true
+TRUNCATE TABLE "queue_items";
