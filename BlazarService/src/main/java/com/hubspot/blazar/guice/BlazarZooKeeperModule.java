@@ -29,7 +29,7 @@ import com.hubspot.blazar.zookeeper.BlazarCuratorProvider;
 import com.hubspot.blazar.zookeeper.BlazarLeaderLatch;
 import com.hubspot.blazar.zookeeper.LeaderMetricManager;
 import com.hubspot.blazar.zookeeper.QueueProcessor;
-import com.hubspot.blazar.zookeeper.ZooKeeperEventBus;
+import com.hubspot.blazar.zookeeper.SqlEventBus;
 
 import io.dropwizard.jetty.HttpConnectorFactory;
 import io.dropwizard.server.SimpleServerFactory;
@@ -44,7 +44,7 @@ public class BlazarZooKeeperModule implements Module {
   @Override
   public void configure(Binder binder) {
     binder.bind(CuratorFramework.class).toProvider(BlazarCuratorProvider.class).in(Scopes.SINGLETON);
-    binder.bind(ZooKeeperEventBus.class);
+    binder.bind(SqlEventBus.class);
     Multibinder.newSetBinder(binder, ConnectionStateListener.class); // TODO
 
     if (!isWebhookOnly) {
@@ -55,15 +55,15 @@ public class BlazarZooKeeperModule implements Module {
       leaderLatchListeners.addBinding().to(LeaderMetricManager.class);
       binder.bind(ScheduledExecutorService.class)
           .annotatedWith(Names.named("QueueProcessor"))
-          .toProvider(new ManagedScheduledExecutorServiceProvider(10, "QueueProcessor"))
+          .toProvider(new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor"))
           .in(Scopes.SINGLETON);
     }
   }
 
   @Provides
   @Singleton
-  public EventBus providesEventBus(ZooKeeperEventBus zooKeeperEventBus) {
-    return zooKeeperEventBus;
+  public EventBus providesEventBus(SqlEventBus sqlEventBus) {
+    return sqlEventBus;
   }
 
   @Provides

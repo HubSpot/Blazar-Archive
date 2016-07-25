@@ -19,6 +19,7 @@ import com.hubspot.blazar.data.dao.MalformedFileDao;
 import com.hubspot.blazar.data.dao.MetricsDao;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
+import com.hubspot.blazar.data.dao.QueueItemDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
 import com.hubspot.blazar.data.dao.StateDao;
 import com.hubspot.guice.transactional.DataSourceLocator;
@@ -50,6 +51,7 @@ public class BlazarDaoModule extends AbstractModule {
     bindDao(binder(), InterProjectBuildMappingDao.class);
     bindDao(binder(), BranchSettingsDao.class);
     bindDao(binder(), MetricsDao.class);
+    bindDao(binder(), QueueItemDao.class);
   }
 
   private static <T> void bindDao(Binder binder, Class<T> type) {

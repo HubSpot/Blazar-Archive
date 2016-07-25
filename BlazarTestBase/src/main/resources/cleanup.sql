@@ -10,3 +10,4 @@ TRUNCATE TABLE `repo_builds`;
 TRUNCATE TABLE `module_builds`;
 TRUNCATE TABLE `malformed_files`;
 TRUNCATE TABLE `instant_message_configs`;
+TRUNCATE TABLE "queue_items";

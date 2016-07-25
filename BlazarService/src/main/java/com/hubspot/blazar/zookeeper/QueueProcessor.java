@@ -1,57 +1,56 @@
 package com.hubspot.blazar.zookeeper;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
-import org.apache.curator.utils.ZKPaths;
-import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.skife.jdbi.v2.Transaction;
+import org.skife.jdbi.v2.TransactionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
+import com.hubspot.blazar.data.dao.QueueItemDao;
+import com.hubspot.blazar.data.queue.QueueItem;
+import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 
 import io.dropwizard.lifecycle.Managed;
 
 @Singleton
-public class QueueProcessor implements LeaderLatchListener, Managed {
+public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(QueueProcessor.class);
 
   private final ScheduledExecutorService executorService;
-  private final CuratorFramework curatorFramework;
-  private final ZooKeeperEventBus eventBus;
-  private final ObjectMapper mapper;
+  private final Map<String, ScheduledExecutorService> queueExecutors;
+  private final QueueItemDao queueItemDao;
+  private final SqlEventBus eventBus;
   private final Set<Object> erroredItems;
+  private final Set<QueueItem> processingItems;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
 
   @Inject
   public QueueProcessor(@Named("QueueProcessor") ScheduledExecutorService executorService,
-                        CuratorFramework curatorFramework,
-                        ZooKeeperEventBus eventBus,
-                        ObjectMapper mapper,
+                        QueueItemDao queueItemDao,
+                        SqlEventBus eventBus,
                         Set<Object> erroredItems) {
     this.executorService = executorService;
-    this.curatorFramework = curatorFramework;
+    this.queueExecutors = new ConcurrentHashMap<>();
+    this.queueItemDao = queueItemDao;
     this.eventBus = eventBus;
-    this.mapper = mapper;
     this.erroredItems = erroredItems;
+    this.processingItems = Sets.newConcurrentHashSet();
 
     this.running = new AtomicBoolean();
     this.leader = new AtomicBoolean();
@@ -60,8 +59,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
   @Override
   public void start() {
     running.set(true);
-    executorService.scheduleAtFixedRate(new QueueManager(), 0, 10, TimeUnit.SECONDS);
-
+    executorService.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
   }
 
   @Override
@@ -81,83 +79,66 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
     leader.set(false);
   }
 
-  private class QueueManager implements Runnable {
-    private final Map<String, Future<?>> activeQueues = new ConcurrentHashMap<>();
+  @Override
+  public void run() {
+    try {
+      if (running.get() && leader.get()) {
+        List<QueueItem> queueItemsSorted = sort(queueItemDao.getItemsReadyToExecute());
+        queueItemsSorted.removeAll(processingItems);
+        processingItems.addAll(queueItemsSorted);
 
-    @Override
-    public void run() {
-      try {
-        if (running.get() && leader.get()) {
-          Set<String> queues = new HashSet<>(curatorFramework.getChildren().forPath("/queues"));
-          LOG.debug("Found queues to process: {}", queues);
-
-          for (String addedQueue : Sets.difference(queues, activeQueues.keySet())) {
-            Runnable processQueueRunnable = new ProcessQueueRunnable(addedQueue);
-            Future<?> future = executorService.scheduleAtFixedRate(processQueueRunnable, 0, 1, TimeUnit.SECONDS);
-            activeQueues.put(addedQueue, future);
-          }
-
-          for (String removedQueue : Sets.difference(activeQueues.keySet(), queues)) {
-            activeQueues.remove(removedQueue).cancel(false);
-          }
-        } else {
-          LOG.debug("Not checking for queues to process");
-          Set<String> queues = new HashSet<>(activeQueues.keySet());
-          for (String queue : queues) {
-            activeQueues.remove(queue).cancel(false);
-          }
+        for (QueueItem queueItem : queueItemsSorted) {
+          String queueName = queueItem.getType().getSimpleName();
+          queueExecutors.computeIfAbsent(queueName, k -> {
+            return new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor-" + queueName).get();
+          }).execute(new ProcessItemRunnable(queueItem));
         }
-      } catch (NoNodeException e) {
-        LOG.warn("No node found for path: {}", e.getPath());
-      } catch (Throwable t) {
-        LOG.error("Error checking for queues to process", t);
       }
+    } catch (Throwable t) {
+      LOG.error("Error processing queue", t);
     }
   }
 
-  private class ProcessQueueRunnable implements Runnable {
-    private final String queue;
+  private List<QueueItem> sort(Set<QueueItem> queueItems) {
+    return queueItems.stream()
+        .sorted(Comparator.comparing(item -> item.getId().get()))
+        .collect(Collectors.toList());
+  }
 
-    private ProcessQueueRunnable(String queue) {
-      this.queue = queue;
+  private class ProcessItemRunnable implements Runnable {
+    private final QueueItem queueItem;
+
+    public ProcessItemRunnable(QueueItem queueItem) {
+      this.queueItem = queueItem;
     }
 
     @Override
     public void run() {
       try {
-        List<String> items = curatorFramework.getChildren().forPath(ZKPaths.makePath("queues", queue));
-        LOG.debug("Found {} items in queue: {}", items.size(), queue);
+        if (!queueItemDao.isItemStillQueued(queueItem)) {
+          LOG.info("Queue item {} was already completed, skipping", queueItem.getId().get());
+        } else if (process(queueItem.getItem())) {
+          LOG.debug("Queue item {} was successfully processed, deleting", queueItem.getId().get());
+          queueItemDao.complete(queueItem);
+        } else if (queueItem.getRetryCount() < 9) {
+          LOG.warn("Queue item {} failed to process, retrying", queueItem.getId().get());
+          queueItemDao.inTransaction(new Transaction<Void, QueueItemDao>() {
 
-        for (String item : sort(items)) {
-          String path = ZKPaths.makePath("queues", queue, item);
-
-          if (process(path)) {
-            LOG.debug("Deleting successfully processed queue item: {}", path);
-            curatorFramework.delete().guaranteed().forPath(path);
-          } else {
-            LOG.info("Failed to process queue item, will retry: {}", path);
-          }
+            @Override
+            public Void inTransaction(QueueItemDao transactional, TransactionStatus status) {
+              queueItemDao.complete(queueItem);
+              queueItemDao.insert(queueItem.forRetry());
+              return null;
+            }
+          });
+        } else {
+          LOG.warn("Queue item {} failed to process 10 times, not retrying", queueItem.getId().get());
+          queueItemDao.complete(queueItem);
         }
       } catch (Throwable t) {
-        LOG.error("Error processing queue: {}", queue, t);
-      }
-    }
-
-    private boolean process(String path) throws Exception {
-      try {
-        byte[] data = curatorFramework.getData().forPath(path);
-        QueueItem item = mapper.readValue(data, QueueItem.class);
-        long age = System.currentTimeMillis() - item.getTimestamp();
-        if (age < 100) {
-          Thread.sleep(100 - age);
-        }
-        return process(item.getItem());
-      } catch (NoNodeException e) {
-        LOG.warn("No node found for path: {}", e.getPath());
-        return false;
-      } catch (Exception e) {
-        LOG.error("Error processing queue item: {}", path, e);
-        return false;
+        LOG.error("Unexpected error processing queue item: {}", queueItem.getId().get(), t);
+      } finally {
+        processingItems.remove(queueItem);
       }
     }
 
@@ -166,12 +147,5 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
 
       return !erroredItems.remove(event);
     }
-
-    private List<String> sort(Collection<String> unsorted) {
-      List<String> sorted = new ArrayList<>(unsorted);
-      Collections.sort(sorted);
-      return sorted;
-    }
   }
-
 }
