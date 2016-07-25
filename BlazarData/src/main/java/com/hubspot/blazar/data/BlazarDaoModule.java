@@ -70,4 +70,14 @@ public class BlazarDaoModule extends AbstractModule {
   public TransactionalDataSource providesTransactionalDataSource(ManagedDataSource managedDataSource) {
     return new TransactionalDataSource(managedDataSource);
   }
+
+  @Override
+  public boolean equals(Object o) {
+    return o != null && getClass().equals(o.getClass());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
 }
