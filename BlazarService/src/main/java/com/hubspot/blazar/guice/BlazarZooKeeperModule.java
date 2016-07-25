@@ -1,8 +1,6 @@
 package com.hubspot.blazar.guice;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -19,7 +17,6 @@ import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 import com.hubspot.blazar.zookeeper.BlazarCuratorProvider;
 import com.hubspot.blazar.zookeeper.BlazarLeaderLatch;
 import com.hubspot.blazar.zookeeper.QueueProcessor;
-import com.hubspot.blazar.zookeeper.SqlEventBus;
 import io.dropwizard.jetty.HttpConnectorFactory;
 import io.dropwizard.server.SimpleServerFactory;
 import org.apache.curator.framework.CuratorFramework;
@@ -27,42 +24,21 @@ import org.apache.curator.framework.recipes.leader.LeaderLatch;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
 
-import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class BlazarZooKeeperModule implements Module {
-  private final boolean isWebhookOnly;
-
-  public BlazarZooKeeperModule(BlazarConfiguration configuration) {
-    this.isWebhookOnly = configuration.isWebhookOnly();
-  }
 
   @Override
   public void configure(Binder binder) {
     binder.bind(CuratorFramework.class).toProvider(BlazarCuratorProvider.class).in(Scopes.SINGLETON);
-    binder.bind(SqlEventBus.class);
     Multibinder.newSetBinder(binder, ConnectionStateListener.class); // TODO
 
-    if (!isWebhookOnly) {
-      binder.bind(LeaderLatch.class).to(BlazarLeaderLatch.class);
-      Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(QueueProcessor.class);
-      binder.bind(ScheduledExecutorService.class)
-          .annotatedWith(Names.named("QueueProcessor"))
-          .toProvider(new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor"))
-          .in(Scopes.SINGLETON);
-    }
-  }
-
-  @Provides
-  @Singleton
-  public EventBus providesEventBus(SqlEventBus sqlEventBus) {
-    return sqlEventBus;
-  }
-
-  @Provides
-  @Singleton
-  public Set<Object> erroredQueueItems() {
-    return Sets.newConcurrentHashSet();
+    binder.bind(LeaderLatch.class).to(BlazarLeaderLatch.class);
+    Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(QueueProcessor.class);
+    binder.bind(ScheduledExecutorService.class)
+        .annotatedWith(Names.named("QueueProcessor"))
+        .toProvider(new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor"))
+        .in(Scopes.SINGLETON);
   }
 
   @Provides

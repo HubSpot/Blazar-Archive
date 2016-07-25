@@ -70,7 +70,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
   @Override
   public void configure(Binder binder) {
-    binder.install(new BlazarZooKeeperModule(getConfiguration()));
+    binder.install(new BlazarEventBusModule());
     binder.bind(GitHubWebhookResource.class);
     binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
     binder.bind(XmlFactory.class).toInstance(new XmlFactory());
@@ -82,6 +82,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       return;
     }
 
+    binder.install(new BlazarZooKeeperModule());
     binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule(getConfiguration()));
     binder.install(new BuildVisitorModule(getConfiguration()));
