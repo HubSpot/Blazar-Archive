@@ -2,8 +2,6 @@ package com.hubspot.blazar.guice;
 
 import java.util.Map;
 
-import net.sourceforge.argparse4j.inf.Namespace;
-
 import org.kohsuke.github.GitHub;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,14 +21,11 @@ import io.dropwizard.setup.Bootstrap;
 
 public class VersionBackFillCommandModule extends AbstractModule {
 
-  private Namespace namespace;
   private BlazarConfiguration configuration;
   private Bootstrap<BlazarConfiguration> bootstrap;
 
   public VersionBackFillCommandModule(Bootstrap<BlazarConfiguration> bootstrap,
-                                      Namespace namespace,
                                       BlazarConfiguration configuration) {
-    this.namespace = namespace;
     this.configuration = configuration;
     this.bootstrap = bootstrap;
   }
