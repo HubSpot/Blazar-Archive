@@ -63,6 +63,7 @@ public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfiguratio
     for (Map.Entry<GitInfo, Future<Boolean>> entry : futureMap.entrySet()) {
       handleResult(failed, entry.getKey(), entry.getValue());
     }
+    LOG.info("Failed to process the following branches {}", failed);
   }
 
   private class Task implements Callable<Boolean> {
@@ -94,21 +95,20 @@ public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfiguratio
   }
 
   private void handleResult(Set<GitInfo> failed, GitInfo branch, Future<Boolean> future) {
-      boolean success;
-      LOG.info("Collecting future for branch {}", branch.toString());
-      try {
-        success = future.get();
-      } catch (Exception e) {
-        success = false;
-        LOG.error("Exception while processing branch {}", branch, e);
-      }
+    boolean success;
+    LOG.info("Collecting future for branch {}", branch.toString());
+    try {
+      success = future.get();
+    } catch (Exception e) {
+      success = false;
+      LOG.error("Exception while processing branch {}", branch, e);
+    }
 
-      if (success) {
-        LOG.info("Completed re-discovery of {}", branch.toString());
-      } else {
-        LOG.info("Failed to process branch {}", branch.toString());
-        failed.add(branch);
-      }
-    LOG.info("Failed to process the following branches {}", failed);
+    if (success) {
+      LOG.info("Completed re-discovery of {}", branch.toString());
+    } else {
+      LOG.info("Failed to process branch {}", branch.toString());
+      failed.add(branch);
+    }
   }
 }
