@@ -38,7 +38,7 @@ public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfiguratio
   @Inject
   public VersionBackFillCommand() {
     super(COMMAND_NAME, COMMAND_DESC);
-    this.executorService = Executors.newFixedThreadPool(2);
+    this.executorService = Executors.newFixedThreadPool(10);
   }
 
   @Override
