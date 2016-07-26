@@ -45,25 +45,30 @@ public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfiguratio
   protected void run(Bootstrap<BlazarConfiguration> bootstrap,
                      Namespace namespace,
                      BlazarConfiguration configuration) throws Exception {
-
     Injector i = Guice.createInjector(new VersionBackFillCommandModule(bootstrap, configuration));
-    CompositeModuleDiscovery compositeModuleDiscovery = i.getInstance(CompositeModuleDiscovery.class);
-    DependenciesService dependenciesService = i.getInstance(DependenciesService.class);
-    ModuleDiscoveryService moduleDiscoveryService = i.getInstance(ModuleDiscoveryService.class);
 
-    Set<GitInfo> toBeReDiscovered = dependenciesService.getBranchesWithNonVersionedDependencies();
-    Set<GitInfo> failed = new HashSet<>();
-    Map<GitInfo, Future<Boolean>> futureMap = new HashMap<>();
-    for (GitInfo branch : toBeReDiscovered) {
-      Task task = new Task(branch, compositeModuleDiscovery, moduleDiscoveryService);
-      Future<Boolean> future = executorService.submit(task);
-      futureMap.put(branch, future);
-    }
+    try {
+      CompositeModuleDiscovery compositeModuleDiscovery = i.getInstance(CompositeModuleDiscovery.class);
+      DependenciesService dependenciesService = i.getInstance(DependenciesService.class);
+      ModuleDiscoveryService moduleDiscoveryService = i.getInstance(ModuleDiscoveryService.class);
 
-    for (Map.Entry<GitInfo, Future<Boolean>> entry : futureMap.entrySet()) {
-      handleResult(failed, entry.getKey(), entry.getValue());
+      Set<GitInfo> toBeReDiscovered = dependenciesService.getBranchesWithNonVersionedDependencies();
+      Set<GitInfo> failed = new HashSet<>();
+      Map<GitInfo, Future<Boolean>> futureMap = new HashMap<>();
+      for (GitInfo branch : toBeReDiscovered) {
+        Task task = new Task(branch, compositeModuleDiscovery, moduleDiscoveryService);
+        Future<Boolean> future = executorService.submit(task);
+        futureMap.put(branch, future);
+      }
+
+      for (Map.Entry<GitInfo, Future<Boolean>> entry : futureMap.entrySet()) {
+        handleResult(failed, entry.getKey(), entry.getValue());
+      }
+
+      LOG.info("Failed to process the following branches {}", failed);
+    } finally {
+      executorService.shutdownNow();
     }
-    LOG.info("Failed to process the following branches {}", failed);
   }
 
   private class Task implements Callable<Boolean> {
