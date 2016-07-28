@@ -199,7 +199,6 @@ ALTER TABLE `module_provides` MODIFY `name` VARCHAR(190) CHARACTER SET utf8mb4 C
 
 ALTER TABLE `module_depends` MODIFY `version` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE `module_depends` MODIFY `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-;
 
 ALTER TABLE "branch_settings" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 ALTER TABLE "instant_message_configs" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
@@ -207,4 +206,7 @@ ALTER TABLE "inter_project_build_mappings" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=
 ALTER TABLE "inter_project_builds" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 ALTER TABLE "malformed_files" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
+--changeset jgoodwin:10
+ALTER TABLE `module_provides` DROP PRIMARY KEY, ADD PRIMARY KEY(moduleId, name, version);
+ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(moduleId, name, version);
 
