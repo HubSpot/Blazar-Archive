@@ -206,7 +206,14 @@ ALTER TABLE "inter_project_build_mappings" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=
 ALTER TABLE "inter_project_builds" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 ALTER TABLE "malformed_files" ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
---changeset jgoodwin:10
-ALTER TABLE `module_provides` DROP PRIMARY KEY, ADD PRIMARY KEY(moduleId, name, version);
-ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(moduleId, name, version);
+--changeset jgoodwin:10 dbms:h2
+ALTER TABLE "module_provides" MODIFY "version" VARCHAR(190) NOT NULL;
+ALTER TABLE "module_depends" MODIFY "version" VARCHAR(190) NOT NULL;
+ALTER TABLE "module_provides" DROP PRIMARY KEY;
+ALTER TABLE "module_depends" DROP PRIMARY KEY;
+ALTER TABLE "module_provides" ADD PRIMARY KEY("moduleId", "name", "version");
+ALTER TABLE "module_depends" ADD PRIMARY KEY("moduleId", "name", "version");
+--changeset jgoodwin:10 dbms:mysql
+ALTER TABLE `module_provides` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
+ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 
