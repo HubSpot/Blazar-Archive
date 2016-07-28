@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.slf4j.Logger;
@@ -105,15 +104,6 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     }
   }
 
-  /**
-   * Not private and not in ProcessItemRunnable because @Transactional needs a method interceptor
-   */
-  @Transactional
-  void retry(QueueItem queueItem) {
-    queueItemDao.complete(queueItem);
-    queueItemDao.insert(queueItem.forRetry());
-  }
-
   private List<QueueItem> sort(Set<QueueItem> queueItems) {
     return queueItems.stream()
         .sorted(Comparator.comparing(item -> item.getId().get()))
@@ -147,13 +137,13 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
           LOG.info("Queue item {} was already completed, skipping", queueItem.getId().get());
         } else if (process(queueItem.getItem())) {
           LOG.debug("Queue item {} was successfully processed, deleting", queueItem.getId().get());
-          queueItemDao.complete(queueItem);
+          checkResult(queueItemDao.complete(queueItem), queueItem);
         } else if (queueItem.getRetryCount() < 9) {
           LOG.warn("Queue item {} failed to process, retrying", queueItem.getId().get());
-          retry(queueItem);
+          checkResult(queueItemDao.retry(queueItem), queueItem);
         } else {
           LOG.warn("Queue item {} failed to process 10 times, not retrying", queueItem.getId().get());
-          queueItemDao.complete(queueItem);
+          checkResult(queueItemDao.complete(queueItem), queueItem);
         }
       } catch (Throwable t) {
         LOG.error("Unexpected error processing queue item: {}", queueItem.getId().get(), t);
@@ -166,6 +156,12 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
       eventBus.dispatch(event);
 
       return !erroredItems.remove(event);
+    }
+
+    private void checkResult(int result, QueueItem queueItem) {
+      if (result != 1) {
+        LOG.warn("Could not find queue item with id {} to update", queueItem.getId().get());
+      }
     }
   }
 }

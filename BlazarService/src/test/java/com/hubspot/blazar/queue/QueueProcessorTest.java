@@ -19,7 +19,6 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Guice;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.BuildTrigger.Type;
-import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.guice.BlazarEventBusModule;
 import com.hubspot.blazar.guice.BlazarQueueProcessorModule;
 import com.hubspot.blazar.test.base.service.BlazarTestBase;
@@ -36,7 +35,6 @@ public class QueueProcessorTest extends BlazarTestBase {
         injector.set(
             Guice.createInjector(
                 new BlazarTestModule(),
-                new BlazarDataModule(),
                 new BlazarEventBusModule(),
                 new BlazarQueueProcessorModule()
             )
@@ -95,7 +93,7 @@ public class QueueProcessorTest extends BlazarTestBase {
     eventBus.post(event);
 
     waitForEvent();
-    waitForEvent(11200, TimeUnit.MILLISECONDS);
+    waitForEvent(12400, TimeUnit.MILLISECONDS);
     assertThat(received).containsExactly(event, event);
   }
 

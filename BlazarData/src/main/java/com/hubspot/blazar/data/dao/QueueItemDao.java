@@ -21,6 +21,9 @@ public interface QueueItemDao {
   @SqlUpdate("INSERT INTO queue_items (type, item, retryCount, desiredExecutionTimestamp) VALUES (:type, :item, :retryCount, TIMESTAMPADD(SECOND, :retryCount * 10, NOW()))")
   int insert(@BindWithRosetta QueueItem queueItem);
 
+  @SqlUpdate("UPDATE queue_items SET retryCount = retryCount + 1, desiredExecutionTimestamp = TIMESTAMPADD(SECOND, 10, NOW()) WHERE id = :id")
+  int retry(@BindWithRosetta QueueItem queueItem);
+
   @SqlUpdate("UPDATE queue_items SET completedTimestamp = NOW() WHERE id = :id")
-  void complete(@BindWithRosetta QueueItem queueItem);
+  int complete(@BindWithRosetta QueueItem queueItem);
 }
