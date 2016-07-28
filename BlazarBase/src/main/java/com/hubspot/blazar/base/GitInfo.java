@@ -1,13 +1,14 @@
 package com.hubspot.blazar.base;
 
+import java.util.List;
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
-
-import java.util.List;
-import java.util.Objects;
 
 public class GitInfo {
   private final Optional<Integer> id;
@@ -113,6 +114,17 @@ public class GitInfo {
   @Override
   public int hashCode() {
     return Objects.hash(id, host, organization, repository, repositoryId, branch, active);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("host", host)
+        .add("organization", organization)
+        .add("repository", repository)
+        .add("repositoryId", repositoryId)
+        .add("branch", branch)
+        .toString();
   }
 
   @JsonCreator

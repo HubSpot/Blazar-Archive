@@ -6,6 +6,6 @@ before:
 
 stepActivation:
   upload:
-    branches: [master, dep-versions]
+    branches: [master, VersionBackfillCommand]
   notify:
-    branches: [master, dep-versions]
+    branches: [master, VersionBackfillCommand]

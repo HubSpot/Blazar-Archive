@@ -178,6 +178,9 @@ public class DependenciesService {
     return dependenciesDao.getDependencies(moduleId);
   }
 
+  public Set<GitInfo> getBranchesWithNonVersionedDependencies() {
+    return dependenciesDao.getBranchesWithNonVersionedDependencies();
+  }
 
   private void updateProvides(DiscoveredModule module) {
     dependenciesDao.deleteProvides(module.getId().get());
