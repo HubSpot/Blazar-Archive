@@ -9,7 +9,7 @@ import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.hubspot.blazar.data.BlazarDaoModule;
-import com.hubspot.blazar.zookeeper.SqlEventBus;
+import com.hubspot.blazar.queue.SqlEventBus;
 
 public class BlazarEventBusModule implements Module {
 

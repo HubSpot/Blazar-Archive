@@ -5,20 +5,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Before;
+import org.jukito.JukitoRunner;
+import org.jukito.UseModules;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import com.google.inject.Inject;
 import com.hubspot.blazar.base.BranchSetting;
-import com.hubspot.blazar.data.BlazarDataTestBase;
+import com.hubspot.blazar.data.BlazarDataTestModule;
 import com.hubspot.blazar.data.queue.QueueItem;
+import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
 
-public class QueueItemDaoTest extends BlazarDataTestBase {
+@RunWith(JukitoRunner.class)
+@UseModules({BlazarDataTestModule.class})
+public class QueueItemDaoTest extends DatabaseBackedTest {
+  @Inject
   private QueueItemDao queueItemDao;
-
-  @Before
-  public void before() {
-    this.queueItemDao = getFromGuice(QueueItemDao.class);
-  }
 
   @Test
   public void testInsert() {

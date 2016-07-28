@@ -1,4 +1,4 @@
-package com.hubspot.blazar.zookeeper;
+package com.hubspot.blazar.queue;
 
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.transaction.Transactional;
 
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.slf4j.Logger;
@@ -97,6 +98,15 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     }
   }
 
+  /**
+   * Not private and not in ProcessItemRunnable because @Transactional needs a method interceptor
+   */
+  @Transactional
+  void retry(QueueItem queueItem) {
+    queueItemDao.complete(queueItem);
+    queueItemDao.insert(queueItem.forRetry());
+  }
+
   private List<QueueItem> sort(Set<QueueItem> queueItems) {
     return queueItems.stream()
         .sorted(Comparator.comparing(item -> item.getId().get()))
@@ -120,10 +130,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
           queueItemDao.complete(queueItem);
         } else if (queueItem.getRetryCount() < 9) {
           LOG.warn("Queue item {} failed to process, retrying", queueItem.getId().get());
-          queueItemDao.inTransaction((dao, status) -> {
-            dao.complete(queueItem);
-            return dao.insert(queueItem.forRetry());
-          });
+          retry(queueItem);
         } else {
           LOG.warn("Queue item {} failed to process 10 times, not retrying", queueItem.getId().get());
           queueItemDao.complete(queueItem);

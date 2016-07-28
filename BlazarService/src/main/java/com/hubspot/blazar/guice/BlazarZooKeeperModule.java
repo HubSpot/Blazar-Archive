@@ -15,14 +15,14 @@ import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.queue.QueueProcessor;
+import com.hubspot.blazar.queue.SqlEventBus;
 import com.hubspot.blazar.util.HostUtils;
 import com.hubspot.blazar.util.HostUtils.Host;
 import com.hubspot.blazar.util.HostUtils.Port;
 import com.hubspot.blazar.zookeeper.BlazarCuratorProvider;
 import com.hubspot.blazar.zookeeper.BlazarLeaderLatch;
 import com.hubspot.blazar.zookeeper.LeaderMetricManager;
-import com.hubspot.blazar.zookeeper.QueueProcessor;
-import com.hubspot.blazar.zookeeper.SqlEventBus;
 
 import io.dropwizard.jetty.HttpConnectorFactory;
 import io.dropwizard.server.SimpleServerFactory;
