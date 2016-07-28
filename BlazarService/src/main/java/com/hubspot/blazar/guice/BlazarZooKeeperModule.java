@@ -8,23 +8,17 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.util.HostUtils;
 import com.hubspot.blazar.util.HostUtils.Host;
 import com.hubspot.blazar.util.HostUtils.Port;
-import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 import com.hubspot.blazar.zookeeper.BlazarCuratorProvider;
 import com.hubspot.blazar.zookeeper.BlazarLeaderLatch;
-import com.hubspot.blazar.zookeeper.QueueProcessor;
 import io.dropwizard.jetty.HttpConnectorFactory;
 import io.dropwizard.server.SimpleServerFactory;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
-import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
-
-import java.util.concurrent.ScheduledExecutorService;
 
 public class BlazarZooKeeperModule implements Module {
 
@@ -34,11 +28,6 @@ public class BlazarZooKeeperModule implements Module {
     Multibinder.newSetBinder(binder, ConnectionStateListener.class); // TODO
 
     binder.bind(LeaderLatch.class).to(BlazarLeaderLatch.class);
-    Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(QueueProcessor.class);
-    binder.bind(ScheduledExecutorService.class)
-        .annotatedWith(Names.named("QueueProcessor"))
-        .toProvider(new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor"))
-        .in(Scopes.SINGLETON);
   }
 
   @Provides

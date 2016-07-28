@@ -83,6 +83,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       return;
     }
 
+    binder.install(new BlazarQueueProcessorModule());
     binder.install(new BlazarZooKeeperModule());
     binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule(getConfiguration()));
