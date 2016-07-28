@@ -3,6 +3,7 @@ before:
     commands:
       - mvn -B dependency:get -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-SNAPSHOT:jar:shaded -Dtransitive=false
       - mvn -B dependency:copy -Dartifact=com.hubspot:BlazarModuleDiscovery:1.0-SNAPSHOT:jar:shaded -DoutputDirectory=target
+      - rm -rf ~/.m2/repository
 
 stepActivation:
   upload:
