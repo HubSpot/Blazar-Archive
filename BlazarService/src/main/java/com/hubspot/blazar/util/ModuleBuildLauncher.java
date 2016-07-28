@@ -33,6 +33,7 @@ import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
+import com.hubspot.mesos.Resources;
 
 @Singleton
 public class ModuleBuildLauncher {
@@ -100,6 +101,14 @@ public class ModuleBuildLauncher {
     List<String> buildDeps = Lists.newArrayList(Iterables.concat(secondary.getBuildDeps(), primary.getBuildDeps()));
     List<String> webhooks = Lists.newArrayList(Iterables.concat(secondary.getWebhooks(), primary.getWebhooks()));
     List<String> cache = Lists.newArrayList(Iterables.concat(secondary.getCache(), primary.getCache()));
+    Optional<Resources> resources = Optional.absent();
+    if (!secondary.getBuildResources().isPresent()) {
+      resources = primary.getBuildResources();
+    }
+    if (primary.getBuildResources().isPresent()) {
+      resources = Optional.of(Resources.add(primary.getBuildResources().get(), secondary.getBuildResources().get()));
+    }
+
     final String user;
     if (primary.getUser().isPresent()) {
       user = primary.getUser().get();
@@ -120,7 +129,8 @@ public class ModuleBuildLauncher {
     provides.addAll(primary.getDepends());
     provides.addAll(secondary.getDepends());
 
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
+
+    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, resources, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
   }
 
   private BuildConfig configAtSha(GitInfo gitInfo, Module module) throws IOException, NonRetryableBuildException {
