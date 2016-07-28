@@ -23,15 +23,7 @@ public class QueueItem {
   private final int retryCount;
 
   public QueueItem(Object item) {
-    this(item, 0);
-  }
-
-  public QueueItem(Object item, int retryCount) {
-    this(item.getClass(), item, retryCount);
-  }
-
-  private QueueItem(Class<?> type, Object item, int retryCount) {
-    this(Optional.empty(), type, item, retryCount);
+    this(Optional.empty(), item.getClass(), item, 0);
   }
 
   private QueueItem(Optional<Long> id, Class<?> type, Object item, int retryCount) {
@@ -39,10 +31,6 @@ public class QueueItem {
     this.type = type;
     this.item = item;
     this.retryCount = retryCount;
-  }
-
-  public QueueItem forRetry() {
-    return new QueueItem(type, item, retryCount + 1);
   }
 
   public Optional<Long> getId() {
