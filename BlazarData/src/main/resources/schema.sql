@@ -223,9 +223,9 @@ CREATE TABLE "queue_items" (
   "id" bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   "type" varchar(250) NOT NULL,
   "item" mediumtext NOT NULL,
-  "retryCount" int(11) unsigned NOT NULL,
+  "retryCount" int(11) unsigned NOT NULL DEFAULT 0,
   "createdTimestamp" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "desiredExecutionTimestamp" TIMESTAMP NOT NULL,
+  "desiredExecutionTimestamp" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "completedTimestamp" TIMESTAMP,
   PRIMARY KEY ("id"),
   INDEX ("completedTimestamp", "desiredExecutionTimestamp")

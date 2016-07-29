@@ -18,7 +18,7 @@ public interface QueueItemDao {
   boolean isItemStillQueued(@BindWithRosetta QueueItem queueItem);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO queue_items (type, item, retryCount, desiredExecutionTimestamp) VALUES (:type, :item, :retryCount, TIMESTAMPADD(SECOND, :retryCount * 10, NOW()))")
+  @SqlUpdate("INSERT INTO queue_items (type, item) VALUES (:type, :item)")
   int insert(@BindWithRosetta QueueItem queueItem);
 
   @SqlUpdate("UPDATE queue_items SET retryCount = retryCount + 1, desiredExecutionTimestamp = TIMESTAMPADD(SECOND, 10, NOW()) WHERE id = :id")
