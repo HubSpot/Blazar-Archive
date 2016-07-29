@@ -14,6 +14,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
@@ -24,6 +27,7 @@ import com.hubspot.blazar.cctray.CCTrayProject;
 import com.hubspot.blazar.cctray.CCTrayProjectFactory;
 import com.hubspot.blazar.cctray.CCTrayWrapper;
 import com.hubspot.blazar.data.cache.StateCache;
+import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.StateService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
@@ -32,15 +36,31 @@ import com.hubspot.jackson.jaxrs.PropertyFiltering;
 public class BranchStateResource {
   private final StateService stateService;
   private final StateCache stateCache;
+  private BranchService branchService;
   private final CCTrayProjectFactory ccTrayProjectFactory;
+  private static final Logger LOG = LoggerFactory.getLogger(BranchStateResource.class);
 
   @Inject
   public BranchStateResource(StateService stateService,
                              StateCache stateCache,
+                             BranchService branchService,
                              CCTrayProjectFactory ccTrayProjectFactory) {
     this.stateService = stateService;
     this.stateCache = stateCache;
+    this.branchService = branchService;
     this.ccTrayProjectFactory = ccTrayProjectFactory;
+  }
+
+  @GET
+  @Path("/{host}/{org}/{repo}")
+  @PropertyFiltering
+  public Set<RepositoryState> getByNames(@PathParam("host") String host, @PathParam("org") String org, @PathParam("repo") String repo) {
+    long start = System.currentTimeMillis();
+    LOG.info("Starting {}", start);
+    Set<RepositoryState> states = stateService.getStatesForRepoByNames(host, org, repo);
+    long end  = System.currentTimeMillis();
+    LOG.info("finished {}, took {}", end, end-start);
+    return states;
   }
 
   @GET

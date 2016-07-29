@@ -1,13 +1,14 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryState;
 import com.hubspot.blazar.data.dao.StateDao;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Set;
 
 @Singleton
 public class StateService {
@@ -20,6 +21,10 @@ public class StateService {
 
   public Set<RepositoryState> getAllRepositoryStates() {
     return stateDao.getAllRepositoryStates();
+  }
+
+  public Set<RepositoryState> getStatesForRepoByNames(String host, String org, String repo) {
+    return stateDao.getStatesForRepoByNames(host, org, repo);
   }
 
   public Set<RepositoryState> getChangedRepositoryStates(long since) {
