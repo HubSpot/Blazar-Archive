@@ -93,7 +93,7 @@ public class QueueProcessorTest extends BlazarTestBase {
     eventBus.post(event);
 
     waitForEvent();
-    waitForEvent(12400, TimeUnit.MILLISECONDS);
+    waitForEvent(11200, TimeUnit.MILLISECONDS);
     assertThat(received).containsExactly(event, event);
   }
 
