@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.hubspot.mesos.Resources;
+import com.hubspot.blazar.base.externalservice.mesos.Resources;
 
 public class BuildConfig {
   private final List<BuildStep> steps;
