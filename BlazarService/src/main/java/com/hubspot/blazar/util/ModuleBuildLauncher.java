@@ -27,13 +27,13 @@ import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.StepActivationCriteria;
+import com.hubspot.blazar.base.externalservice.mesos.Resources;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
-import com.hubspot.mesos.Resources;
 
 @Singleton
 public class ModuleBuildLauncher {

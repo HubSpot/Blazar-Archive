@@ -7,6 +7,7 @@ import javax.inject.Singleton;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.externalservice.mesos.Resources;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.singularity.api.SingularityRunNowRequest;
@@ -30,12 +31,18 @@ public class SingularityBuildLauncher {
   private SingularityRunNowRequest buildRequest(ModuleBuild build) {
     String buildId = Long.toString(build.getId().get());
 
+    Optional<com.hubspot.mesos.Resources> mesosResources = Optional.absent();
+    Optional<Resources> blazarResources = build.getBuildConfig().get().getBuildResources();
+    if (blazarResources.isPresent()) {
+      mesosResources = Optional.of(blazarResources.get().toMesosResources());
+    }
+
     return new SingularityRunNowRequest(
         Optional.of("Running Blazar module build " + buildId),
         Optional.of(false),
         Optional.of(buildId),
         Optional.of(Arrays.asList("--buildId", buildId)),
-        build.getBuildConfig().get().getBuildResources()
+        mesosResources
     );
   }
 }
