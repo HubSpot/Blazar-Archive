@@ -1,33 +1,22 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll} from 'underscore';
-import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Alert from 'react-bootstrap/lib/Alert';
 import json2html from 'json-to-html';
+import classNames from 'classnames';
 
 import Icon from '../shared/Icon.jsx';
-
-let initialState = {
-  showModal: false
-}
 
 class MalformedFileNotification extends Component {
 
   constructor() {
-    this.state = initialState;
+    this.state = {expanded: false};
 
-    bindAll(this, 'openModal', 'closeModal');
+    this.toggleExpanded = this.toggleExpanded.bind(this);
   }
 
-  openModal() {
+  toggleExpanded() {
     this.setState({
-      showModal: true
-    });
-  }
-
-  closeModal() {
-    this.setState({
-      showModal: false
+      expanded: !this.state.expanded
     });
   }
 
@@ -48,34 +37,24 @@ class MalformedFileNotification extends Component {
     });
   }
 
-  renderModal() {
+  renderDetails() {
     const numberOfFiles = this.props.malformedFiles.length;
 
     return (
-      <Modal className='malformed-file-modal' show={this.state.showModal} onHide={this.closeModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            Malformed Configuration Files - Action Required
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          This branch contains {this.props.malformedFiles.length} malformed configuration file{numberOfFiles > 0 ? 's' : ''}. You'll need to correct these errors:
-          {this.renderConfigInfo()}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button bsStyle="primary" onClick={this.closeModal}>Okay</Button>
-        </Modal.Footer>
-      </Modal>
+      <div className="malformed-files__details">
+        This branch contains {numberOfFiles} malformed configuration file{numberOfFiles !== 1 && 's'}. You''ll need to correct these errors:
+        {this.renderConfigInfo()}
+      </div>
     );
   }
 
   renderAlert() {
     return (
-      <div onClick={this.openModal} className='malformed-files__alert-wrapper'>
-        <Alert bsStyle='danger' className='malformed-files__alert'>
-          One or more of your config files for this branch is malformed. Click for more details.
-        </Alert>
-      </div>
+      <Alert bsStyle='danger' className={classNames('malformed-files__alert', {expanded: this.state.expanded})}>
+        One or more of your config files for this branch is malformed.
+        <a onClick={this.toggleExpanded} className="pull-right">{this.state.expanded ? 'hide' : 'show'} details</a>
+        {this.state.expanded && this.renderDetails()}
+      </Alert>
     );
   }
 
@@ -89,7 +68,6 @@ class MalformedFileNotification extends Component {
     return (
       <div className="malformed-files">
         {this.renderAlert()}
-        {this.renderModal()}
       </div>
     );
   }
@@ -98,6 +76,6 @@ class MalformedFileNotification extends Component {
 MalformedFileNotification.propTypes = {
   malformedFiles: PropTypes.array.isRequired,
   loading: PropTypes.bool.isRequired
-}
+};
 
 export default MalformedFileNotification;

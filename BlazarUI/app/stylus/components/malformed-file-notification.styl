@@ -1,15 +1,18 @@
-.malformed-files__alert-wrapper
-  margin-top 8px
-
 .malformed-files__alert
-  cursor pointer
-  
-  &:hover
-    color darkred
-    
+  margin-top 8px
+  max-height 52px
+  transition max-height 1s ease
+  overflow hidden
+
+  &.expanded
+    max-height 999px
+
+.malformed-files__details
+  margin-top 20px
+
 .malformed-files__file
   padding 10px
-  
+
 .malformed-files__file-contents
   margin-top 5px
   max-height 300px
