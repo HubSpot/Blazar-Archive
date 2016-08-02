@@ -34,7 +34,7 @@ public class SingularityBuildLauncher {
     Optional<com.hubspot.mesos.Resources> mesosResources = Optional.absent();
     Optional<Resources> blazarResources = build.getBuildConfig().get().getBuildResources();
     if (blazarResources.isPresent()) {
-      mesosResources = Optional.of(blazarResources.get().toMesosResources());
+      mesosResources = Optional.of(Resources.toMesosResources(blazarResources.get()));
     }
 
     return new SingularityRunNowRequest(

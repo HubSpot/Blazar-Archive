@@ -39,8 +39,4 @@ public class Resources {
   public double getMemoryMb() {
     return memoryMb;
   }
-
-  public com.hubspot.mesos.Resources toMesosResources() {
-    return toMesosResources(this);
-  }
 }
