@@ -161,7 +161,6 @@ class RepoBuildContainer extends Component {
   renderPage() {
     return (
       <div>
-        {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={11}>
             <RepoBuildHeadline
@@ -172,6 +171,7 @@ class RepoBuildContainer extends Component {
             />
           </UIGridItem>
         </UIGrid>
+        {this.renderMalformedFileAlert()}
         <UIGridItem size={12}>
           <RepoBuildDetail
             {...this.props}

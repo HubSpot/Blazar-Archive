@@ -270,7 +270,6 @@ class BranchContainer extends Component {
   render() {
     return (
       <PageContainer documentTitle={this.buildDocumentTitle()} classNames={this.getClassNames()}>
-        {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={7}>
             <BranchHeadline
@@ -302,6 +301,7 @@ class BranchContainer extends Component {
             {this.renderBuildSettingsButton()}
           </UIGridItem>
         </UIGrid>
+        {this.renderMalformedFileAlert()}
         <UIGrid>
           <UIGridItem size={12}>
             {this.renderTable()}
