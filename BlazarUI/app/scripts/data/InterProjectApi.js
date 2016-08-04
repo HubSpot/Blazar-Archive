@@ -1,11 +1,11 @@
-/*global config*/
+/* global config*/
 import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import { getUsernameFromCookie } from '../components/Helpers.js';
 
 function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) {
   return JSON.stringify({
-    moduleIds: moduleIds,
+    moduleIds,
     buildDownstreams: downstreamModules,
     resetCaches: resetCache
   });

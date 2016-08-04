@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Reflux from 'reflux';
 import InterProjectActions from '../actions/interProjectActions';
 import InterProjectApi from '../data/InterProjectApi';

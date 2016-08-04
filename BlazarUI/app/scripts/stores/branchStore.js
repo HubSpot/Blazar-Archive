@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Reflux from 'reflux';
 import BranchActions from '../actions/branchActions';
 import BranchApi from '../data/BranchApi';
@@ -7,7 +7,7 @@ const BranchStore = Reflux.createStore({
 
   listenables: BranchActions,
 
-  init() {  
+  init() {
     this.branchBuildHistory = [];
     this.shouldPoll = true;
   },

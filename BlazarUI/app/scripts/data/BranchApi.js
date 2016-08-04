@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import humanizeDuration from 'humanize-duration';
@@ -12,7 +12,7 @@ function _parse(params, resp) {
     }
     return build;
   });
-  
+
   return fromJS(builds);
 }
 
@@ -68,7 +68,7 @@ function fetchMalformedFiles(params, cb) {
 
 function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) {
   return JSON.stringify({
-    moduleIds: moduleIds, 
+    moduleIds,
     buildDownstreams: downstreamModules,
     resetCaches: resetCache
   });
@@ -95,9 +95,9 @@ function triggerBuild(params, moduleIds, downstreamModules, resetCache, cb) {
 }
 
 export default {
-  fetchBranchBuildHistory: fetchBranchBuildHistory,
-  fetchBranchInfo: fetchBranchInfo,
-  fetchBranchModules: fetchBranchModules,
-  fetchMalformedFiles: fetchMalformedFiles,
-  triggerBuild: triggerBuild
+  fetchBranchBuildHistory,
+  fetchBranchInfo,
+  fetchBranchModules,
+  fetchMalformedFiles,
+  triggerBuild
 };

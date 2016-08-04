@@ -51,11 +51,10 @@ function _durations(history) {
   });
   // Remove invalid values
   durations = filter(durations, (d) => {
-    return  d !== undefined && d > 0;
+    return d !== undefined && d > 0;
   });
 
   return durations;
-
 }
 
 

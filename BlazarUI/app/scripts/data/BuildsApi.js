@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import $ from 'jquery';
 import { fromJS } from 'immutable';
 import {has, contains} from 'underscore';
@@ -24,7 +24,6 @@ function _groupBuilds(builds) {
 
 function _parse(data) {
   const parsed = data.map((item) => {
-
     const {
       gitInfo,
       lastBuild,
@@ -67,18 +66,18 @@ function fetchBuilds(extraData, cb) {
   if (!extraData) {
     exclusionOpts = {
       property: [
-       '!pendingBuild.commitInfo',
-       '!inProgressBuild.commitInfo',
-       '!lastBuild.commitInfo',
-       '!pendingBuild.dependencyGraph',
-       '!inProgressBuild.dependencyGraph',
-       '!lastBuild.dependencyGraph',
-       '!pendingBuild.buildTrigger',
-       '!inProgressBuild.buildTrigger',
-       '!lastBuild.buildTrigger',
-       '!pendingBuild.buildOptions',
-       '!inProgressBuild.buildOptions',
-       '!lastBuild.buildOptions'
+        '!pendingBuild.commitInfo',
+        '!inProgressBuild.commitInfo',
+        '!lastBuild.commitInfo',
+        '!pendingBuild.dependencyGraph',
+        '!inProgressBuild.dependencyGraph',
+        '!lastBuild.dependencyGraph',
+        '!pendingBuild.buildTrigger',
+        '!inProgressBuild.buildTrigger',
+        '!lastBuild.buildTrigger',
+        '!pendingBuild.buildOptions',
+        '!inProgressBuild.buildOptions',
+        '!lastBuild.buildOptions'
       ]
     };
   }
@@ -113,7 +112,7 @@ function fetchBuild(id) {
 }
 
 export default {
-  fetchBuilds: fetchBuilds,
-  fetchBuild: fetchBuild,
-  stopPolling: stopPolling
+  fetchBuilds,
+  fetchBuild,
+  stopPolling
 };

@@ -1,8 +1,8 @@
 export const getStarredModules = (stars, modules) => {
   const starredModules = [];
 
-  modules.forEach( (module) => {
-    stars.forEach( (star) => {
+  modules.forEach((module) => {
+    stars.forEach((star) => {
       if (star.moduleId === module.module.id) {
         starredModules.push(module);
         return;
@@ -14,9 +14,9 @@ export const getStarredModules = (stars, modules) => {
 };
 
 export const markStarredModules = (modules, stars) => {
-  modules.map( (module) => {
+  modules.map((module) => {
     module.module.isStarred = false;
-    stars.forEach( (star) => {
+    stars.forEach((star) => {
       if (star.moduleId === module.module.id) {
         module.module.isStarred = true;
         return;

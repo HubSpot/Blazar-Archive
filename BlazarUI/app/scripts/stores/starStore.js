@@ -9,7 +9,7 @@ const RepoStore = Reflux.createStore({
     this.stars = [];
     this.source = null;
   },
-  
+
   setSource(source) {
     this.source = source;
   },
@@ -26,7 +26,7 @@ const RepoStore = Reflux.createStore({
 
   loadStarsError(error) {
     this.trigger({
-      error: error,
+      error,
       loadingStars: false
     });
   }

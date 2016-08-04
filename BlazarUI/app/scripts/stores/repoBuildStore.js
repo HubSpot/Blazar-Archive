@@ -10,7 +10,7 @@ const RepoBuildStore = Reflux.createStore({
 
   listenables: RepoBuildActions,
 
-  init() {  
+  init() {
     this.repoBuild = {};
     this.moduleBuilds = [];
     this.shouldPoll = true;

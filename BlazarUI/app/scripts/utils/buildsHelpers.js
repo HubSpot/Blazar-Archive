@@ -7,7 +7,7 @@ export const getFilterMatches = (builds, filterText) => {
   if (builds.length === 0) {
     return [];
   }
-  
+
   if (filterText.length === 0) {
     return builds;
   }
@@ -29,25 +29,24 @@ export const sortBuilds = (builds, type) => {
       return sortBy(builds, function(b) {
         return -b.inProgressBuild.startTimestamp;
       });
-    break;
-    
+      break;
+
     // change to module name..
     case 'abc':
       return sortBy(builds, function(b) {
         return b.module.name;
       });
-    break;
-    
+      break;
+
     case 'repo':
       return sortBy(builds, function(b) {
         return b.repo;
       });
-    break;
+      break;
 
     default:
       return builds;
   }
-
 };
 
 export const sidebarCombine = (builds) => {

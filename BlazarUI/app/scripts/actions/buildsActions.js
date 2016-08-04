@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Reflux from 'reflux';
 
 const BuildsActions = Reflux.createActions([

@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import BaseCollection from './BaseCollection';
 
 class BuildHistory extends BaseCollection {

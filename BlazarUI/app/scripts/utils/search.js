@@ -9,7 +9,7 @@ export default class Search {
 
   getRepoOptions() {
     return {
-      extract: function(el) {
+      extract(el) {
         return `${el.gitInfo.repository}`;
       }
     };
@@ -17,7 +17,7 @@ export default class Search {
 
   getBranchOptions() {
     return {
-      extract: function(el) {
+      extract(el) {
         return `${el.gitInfo.branch}`;
       }
     };

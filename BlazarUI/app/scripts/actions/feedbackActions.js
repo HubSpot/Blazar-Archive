@@ -2,14 +2,14 @@ import Reflux from 'reflux';
 import Feedback from '../models/Feedback';
 
 const FeedbackActions = Reflux.createActions([
-  { 'sendFeedback': {children: ['completed','failed']} }
+  { 'sendFeedback': {children: ['completed', 'failed']} }
 ]);
 
-FeedbackActions.sendFeedback.listen( function(payload) {
+FeedbackActions.sendFeedback.listen(function(payload) {
   const feedback = new Feedback(payload);
   // to do: implement reflux catch method, waiting on an issue response.
   feedback.submit()
-    .done(() => { 
+    .done(() => {
       this.completed();
     })
     .fail((jqXHR, textStatus, errorThrown) => {

@@ -5,20 +5,20 @@ const sidebarTabProvider = {
   haveSynced: false,
   tab: 'favorites',
 
-  checkStorage: function() {
+  checkStorage() {
     if (!this.haveSynced) {
       this.getSidebarTab();
       this.haveSynced = true;
     }
   },
 
-  changeTab: function(tab) {
+  changeTab(tab) {
     this.checkStorage();
-    store.set('sidebarTab', tab);    
+    store.set('sidebarTab', tab);
   },
 
 
-  getSidebarTab: function() {
+  getSidebarTab() {
     if (this.haveSynced) {
       return this.tab;
     }

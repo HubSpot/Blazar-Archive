@@ -6,7 +6,7 @@ import {isEmpty} from 'underscore';
 import BuildsStore from '../stores/buildsStore';
 
 class StoredBuilds {
-  
+
   constructor(options) {
     this.options = options;
     this.shouldPoll = true;
@@ -19,13 +19,12 @@ class StoredBuilds {
     if (!this.builds.size) {
       return;
     }
-    
+
     this._afterInitialFetch();
-    
   }
-  
+
   _afterInitialFetch() {
-    this._parse();  
+    this._parse();
   }
 
   // used by subclasses
@@ -46,14 +45,14 @@ class StoredBuilds {
   fetchBuilds(cb) {
     this._unsubscribeFromBuilds = BuildsStore.listen(this._onStoreChange.bind(this));
     this.cb = cb;
-    this.getInitialBuilds();  
+    this.getInitialBuilds();
   }
-  
+
   stopPollingBuilds() {
     this.shouldPoll = false;
     this._unsubscribeFromBuilds();
   }
-  
+
 }
 
 export default StoredBuilds;

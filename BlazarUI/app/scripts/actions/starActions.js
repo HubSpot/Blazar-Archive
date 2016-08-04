@@ -15,7 +15,7 @@ StarActions.loadStars.preEmit = function(source = '') {
 
 StarActions.toggleStar = function(repoId) {
   StarProvider.toggleStar(repoId, (stars) => {
-    StarActions.loadStarsSuccess(stars);  
+    StarActions.loadStarsSuccess(stars);
   });
 };
 

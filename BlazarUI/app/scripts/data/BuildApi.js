@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Reflux from 'reflux';
 import {extend, findWhere, contains} from 'underscore';
 import BuildStates from '../constants/BuildStates';
@@ -35,7 +35,6 @@ class BuildApi {
 
     // navigated to the top
     if (position === 'top') {
-
       if (buildInProgress) {
         this.setLogPollingState(false);
       }
@@ -51,7 +50,6 @@ class BuildApi {
 
     // navigated to the bottom
     else if (position === 'bottom') {
-
       if (buildInProgress) {
         this.setLogPollingState(true);
       }
@@ -64,7 +62,6 @@ class BuildApi {
         this._resetLogViaNavigation(position);
       }
     }
-
   }
 
   fetchPrevious(cb) {
@@ -118,7 +115,7 @@ class BuildApi {
 
     const logPromise = this.build.logCollection.updateLogForNavigationChange({
       size: logSize,
-      position: position
+      position
     }).fetch();
 
     logPromise.done(() => {
@@ -130,11 +127,11 @@ class BuildApi {
     const buildPromise = this.build.model.fetch();
 
     buildPromise.fail((jqXHR) => {
-        this._buildError(`Error retrieving build #${this.params.buildNumber}. See your console for more detail.`);
-        console.warn(jqXHR);
-      });
+      this._buildError(`Error retrieving build #${this.params.buildNumber}. See your console for more detail.`);
+      console.warn(jqXHR);
+    });
 
-      return buildPromise;
+    return buildPromise;
   }
 
   _fetchLog() {
@@ -168,7 +165,6 @@ class BuildApi {
         }, config.activeBuildLogRefresh);
       });
     }
-
   }
 
   _pollBuild() {
@@ -224,7 +220,6 @@ class BuildApi {
     }).send();
 
     return branchHistoryPromise.then((resp) => {
-
       // now get modules so we can get the moduleId by the module name
       const repoBuildModules = new Resource({
         url: `${config.apiRoot}/branches/${this.params.branchId}/modules`,
@@ -232,7 +227,6 @@ class BuildApi {
       }).send();
 
       return repoBuildModules.then((modules) => {
-
         const repoBuildModule = findWhere(modules, {name: this.params.moduleName, active: true});
 
         let buildModules;
@@ -272,13 +266,12 @@ class BuildApi {
 
           this.build.model = new Build({
             id: buildToUse.id,
-            repoBuildId: repoBuildId
+            repoBuildId
           });
 
           return this._fetchBuild();
         });
       });
-
     }, (error) => {
       this.cb(error);
     });
@@ -374,7 +367,6 @@ class BuildApi {
         this._processCancelledBuild();
         break;
     }
-
   }
 
   _triggerUpdate(additional = {}) {

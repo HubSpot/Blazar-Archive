@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Model from './Model';
 
 class LogSize extends Model {

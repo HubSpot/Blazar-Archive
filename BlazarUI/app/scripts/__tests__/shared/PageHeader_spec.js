@@ -12,7 +12,6 @@ function renderedOutput(elt) {
 }
 
 describe('<PageHeader />', () => {
-
   let pageHeader;
 
   beforeEach(() => {
@@ -30,5 +29,4 @@ describe('<PageHeader />', () => {
   it('should render all the children', () => {
     expect(pageHeader.props.children).toBe('How now brown cow.');
   });
-
 });

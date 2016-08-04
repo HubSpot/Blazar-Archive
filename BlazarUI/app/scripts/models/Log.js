@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Model from './Model';
 import BuildStates from '../constants/BuildStates';
 import utf8 from 'utf8';
@@ -281,11 +281,9 @@ class Log extends Model {
         text: line,
         offset: offsetRunningTotal += getByteLength(line)
       };
-
     });
 
     return compact(formattedLogLines);
-
   }
 
 

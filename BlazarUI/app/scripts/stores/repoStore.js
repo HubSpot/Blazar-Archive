@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Reflux from 'reflux';
 import RepoActions from '../actions/repoActions';
 import RepoApi from '../data/RepoApi';
@@ -8,7 +8,7 @@ const RepoStore = Reflux.createStore({
 
   listenables: RepoActions,
 
-  init() {  
+  init() {
     this.branchesList = [];
   },
 

@@ -5,18 +5,18 @@ const StarProvider = {
   haveSynced: false,
   stars: [],
 
-  checkStorage: function() {
+  checkStorage() {
     if (!this.haveSynced) {
       this.getStars();
       this.haveSynced = true;
     }
   },
 
-  toggleStar: function(repoId, cb) {
+  toggleStar(repoId, cb) {
     const repoId = parseInt(repoId);
     this.checkStorage();
     const index = this.stars.indexOf(repoId);
-    
+
     if (index !== -1) {
       this.stars.splice(index, 1);
     }
@@ -25,11 +25,11 @@ const StarProvider = {
     }
 
     cb(this.stars);
-    store.set('starredRepos', this.stars);    
+    store.set('starredRepos', this.stars);
   },
 
 
-  getStars: function() {
+  getStars() {
     if (this.haveSynced) {
       return this.stars;
     }

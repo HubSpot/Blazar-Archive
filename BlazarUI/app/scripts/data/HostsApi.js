@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import { findWhere, uniq, sortBy, groupBy } from 'underscore';
 import { fromJS } from 'immutable';
 import StoredBuilds from './StoredBuilds';
@@ -16,7 +16,7 @@ class HostsApi extends StoredBuilds {
       const uniqueOrgs = uniq(grouped[group], (b) => {
         return b.gitInfo.organization;
       });
-      
+
       const uniqueOrgsMapped = uniqueOrgs.map((org) => {
         const {host, organization} = org.gitInfo;
 
@@ -25,13 +25,13 @@ class HostsApi extends StoredBuilds {
           blazarPath: `/builds/${host}/${organization}`
         };
       });
-      
+
       hosts.push({
         name: group,
         orgs: uniqueOrgsMapped
       });
     }
-    
+
     this.cb(fromJS(hosts));
   }
 

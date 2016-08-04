@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Resource from '../services/ResourceProvider';
 
 function _parseSlackChannels(slackChannels) {
@@ -24,7 +24,7 @@ function fetchNotifications(params, cb) {
 function addNotification(params, channelName, cb) {
   const notification = {
     branchId: params.branchId,
-    channelName: channelName,
+    channelName,
     onFinish: false,
     onFail: false,
     onChange: false,
@@ -70,7 +70,7 @@ function updateNotification(params, notification, cb) {
 
 function deleteNotification(params, notificationId, cb) {
   const notificationPromise = new Resource({
-    url: `${config.apiRoot}/instant-message/configurations/${notificationId}`, 
+    url: `${config.apiRoot}/instant-message/configurations/${notificationId}`,
     type: 'DELETE',
     contentType: 'application/json'
   }).send();
@@ -105,11 +105,11 @@ function updateSettings(params, data, cb) {
 }
 
 export default {
-  fetchNotifications: fetchNotifications,
-  updateNotification: updateNotification,
-  fetchSlackChannels: fetchSlackChannels,
-  addNotification: addNotification,
-  deleteNotification: deleteNotification,
-  getSettings: getSettings,
-  updateSettings: updateSettings
+  fetchNotifications,
+  updateNotification,
+  fetchSlackChannels,
+  addNotification,
+  deleteNotification,
+  getSettings,
+  updateSettings
 };

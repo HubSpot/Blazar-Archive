@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import React from 'react';
 import {some, uniq, flatten, filter, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
@@ -23,7 +23,7 @@ export const getUsernameFromCookie = function() {
 };
 
 // 1234567890 => 1 Aug 1991 15:00
-export const timestampFormatted = function(timestamp, format='lll') {
+export const timestampFormatted = function(timestamp, format = 'lll') {
   timestamp = parseInt(timestamp);
   if (!timestamp) {
     return '';
@@ -32,8 +32,8 @@ export const timestampFormatted = function(timestamp, format='lll') {
   return timeObject.format(format);
 };
 
-export const timestampDuration = function(startTimestamp, endTimestamp, round='true') {
-  return humanizeDuration(endTimestamp - startTimestamp, {round: round});
+export const timestampDuration = function(startTimestamp, endTimestamp, round = 'true') {
+  return humanizeDuration(endTimestamp - startTimestamp, {round});
 };
 
 // 'BUILD_SUCCEEEDED' => 'Build Succeeded'
@@ -47,7 +47,7 @@ export const humanizeText = function(string) {
   return string;
 };
 
-export const truncate = function(str, len = 10, ellip=false) {
+export const truncate = function(str, len = 10, ellip = false) {
   if (str && str.length > len && str.length > 0) {
     let new_str = str + ' ';
     new_str = str.substr(0, len);
@@ -99,7 +99,6 @@ export const tableRowBuildState = function(state) {
 };
 
 export const getFilteredBranches = function(filters, branches) {
-
   const branchFilters = filters.branch;
 
   const filteredBranches = branches.filter((b) => {
@@ -125,7 +124,7 @@ export const getFilteredBranches = function(filters, branches) {
     return passGo;
   });
 
-  //finally sort by branch and bodule name
+  // finally sort by branch and bodule name
   return filteredBranches.sort((a, b) => {
     return cmp(a.gitInfo.branch, b.gitInfo.branch);
   });
@@ -141,10 +140,10 @@ export const buildIsInactive = function(buildState) {
 
 // DOM Helpers
 export const events = {
-  listenTo: function(event, cb) {
+  listenTo(event, cb) {
     window.addEventListener(event, cb);
   },
-  removeListener: function(event, cb) {
+  removeListener(event, cb) {
     window.removeEventListener(event, cb);
   }
 };
@@ -168,7 +167,7 @@ export const getPathname = function() {
 };
 
 // To do: move these out as components in components/shared
-export const buildResultIcon = function(result, prevBuildState='') {
+export const buildResultIcon = function(result, prevBuildState = '') {
   const classNames = getBuildStatusIconClassNames(result);
   const iconNames = Immutable.List.of(iconStatus[result]);
 
@@ -214,7 +213,6 @@ export const sortBuildsByRepoAndBranchImmutable = function(builds) {
 
 export const sortBuildsByRepoAndBranch = function(builds) {
   return builds.sort((a, b) => {
-
     // Sort by repo, DESC
     let repoNameA = a.gitInfo.repository.toLowerCase();
     let repoNameB = b.gitInfo.repository.toLowerCase();

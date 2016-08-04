@@ -16,7 +16,7 @@ class Collection {
   get() {
     return this.data;
   }
-  
+
   mergeData(incoming, current) {
     if (current === 'undefined') {
       return incoming;
@@ -37,9 +37,9 @@ class Collection {
         current.push(incoming[i]);
       }
     }
-    
+
     return current;
-  };
+  }
 
   set(data) {
     this.data = data;
@@ -52,10 +52,10 @@ class Collection {
       dataType: 'json'
     });
 
-    promise.done( (resp) => {
+    promise.done((resp) => {
       if (this.options.mergeOnFetch) {
         this.data = this.mergeData(resp, this.data);
-      } 
+      }
       else {
         this.data = resp;
       }
@@ -69,7 +69,6 @@ class Collection {
     });
 
     return promise;
-
   }
 
 }

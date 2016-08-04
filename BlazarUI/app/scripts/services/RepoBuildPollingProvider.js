@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import { fromJS } from 'immutable';
 import {has, findWhere, some, contains, extend, flatten} from 'underscore';
 import {timestampDuration} from '../components/Helpers';
@@ -14,32 +14,32 @@ class RepoBuildPollingProvider {
     this.shouldPoll = true;
     this.params = params;
     this.branchId = undefined;
-    
+
     this.promises = {
       branchId: new Resource({
         url: `${config.apiRoot}/branches/state`,
         type: 'GET'
       }).send(),
-      
-      moduleBuilds: function() {
+
+      moduleBuilds() {
         return new Resource({
           url: `${config.apiRoot}/branches/builds/${this.repoBuildId}/modules`,
           type: 'GET'
         }).send();
-      },      
-      repoBuild: function() {
+      },
+      repoBuild() {
         return new Resource({
           url: `${config.apiRoot}/builds/history/branch/${this.branchId}/build/${this.params.buildNumber}`,
           type: 'GET'
         }).send();
       },
-      branchHistory: function() {
+      branchHistory() {
         return new Resource({
           url: `${config.apiRoot}/builds/history/branch/${this.branchId}`,
           tpe: 'GET'
         }).send();
       },
-      moduleNames: function() {
+      moduleNames() {
         return new Resource({
           url: `${config.apiRoot}/branches/${this.branchId}/modules`,
           type: 'GET'
@@ -47,32 +47,30 @@ class RepoBuildPollingProvider {
       }
     };
   }
-  
+
   _parseModules(modules) {
     const {params} = this;
 
     const modules = modules.map((module) => {
-      module.blazarPath = `/builds/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}/${params.buildNumber}/${module.name}`;    
+      module.blazarPath = `/builds/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}/${params.buildNumber}/${module.name}`;
       return module;
     });
 
     return fromJS(modules);
   }
-  
+
   _shouldPoll(moduleBuildStates) {
     if (moduleBuildStates.length === 0) {
       return true;
     }
-  
+
     return some(moduleBuildStates, (state) => {
       return contains(ActiveBuildStates, state);
     });
   }
 
   _fetchBuilds(cb) {
-
     this.promises.branchId.then((builds) => {
-      
       // get the branch id:
       this.branchId = findWhere(builds.map((build) => build.gitInfo), {
         host: this.params.host,
@@ -80,15 +78,14 @@ class RepoBuildPollingProvider {
         repository: this.params.repo,
         branch: this.params.branch
       }).id;
-      
+
       // get repositoryId
       this.promises.branchHistory.call(this).then((resp) => {
         this.repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
 
         // get repo build and module build info
-        Q.spread([this.promises.moduleNames.call(this), this.promises.moduleBuilds.call(this), this.promises.repoBuild.call(this)], 
+        Q.spread([this.promises.moduleNames.call(this), this.promises.moduleBuilds.call(this), this.promises.repoBuild.call(this)],
           (moduleNames, moduleBuilds, repoBuild) => {
-
             const moduleBuildStates = flatten(moduleBuilds.map((build) => {
               return build.state;
             }));
@@ -97,18 +94,18 @@ class RepoBuildPollingProvider {
             if (!this._shouldPoll(moduleBuildStates)) {
               this.disconnect();
             }
-            
+
             repoBuild.duration = timestampDuration(repoBuild.startTimestamp, repoBuild.endTimestamp);
-            
+
             // merge module names with module builds
             const moduleNamesOnly = moduleNames.map((module) => {
               return { id: module.id, name: module.name };
             });
-            
+
             const ModuleBuildsWithName = moduleBuilds.map((build) => {
               return extend(build, findWhere(moduleNamesOnly, { id: build.moduleId }));
             });
-            
+
             cb(false, {
               moduleBuilds: this._parseModules(ModuleBuildsWithName),
               currentRepoBuild: fromJS(repoBuild),
@@ -118,22 +115,16 @@ class RepoBuildPollingProvider {
             setTimeout(() => {
               this.poll(cb);
             }, config.activeBuildModuleRefresh);
-          
-        }).fail((error) => {
-          cb(error, null);
-        }); 
-
+          }).fail((error) => {
+            cb(error, null);
+          });
       }, (error) => {
         console.warn(error);
         cb(err, null);
       });
-      
     }, (error) => {
       cb(error, null);
     });
-      
-    
-
   }
 
   poll(cb) {
@@ -141,12 +132,12 @@ class RepoBuildPollingProvider {
       return;
     }
 
-    this._fetchBuilds(cb);    
+    this._fetchBuilds(cb);
   }
 
   disconnect() {
     this.shouldPoll = false;
-  }  
+  }
 
 }
 

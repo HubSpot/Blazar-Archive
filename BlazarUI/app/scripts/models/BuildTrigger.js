@@ -1,8 +1,8 @@
-/*global config*/
+/* global config*/
 import Model from './Model';
 
 class BuildTrigger extends Model {
-  
+
   constructor(options) {
     options.type = 'POST';
     super(options);

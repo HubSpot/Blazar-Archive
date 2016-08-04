@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import React from 'react';
 import { render } from 'react-dom';
 import { createHistory } from 'history';
@@ -20,7 +20,7 @@ if (config.heapToken) {
   });
 }
 
-const browserHistory = useRouterHistory(createHistory) ({
+const browserHistory = useRouterHistory(createHistory)({
   basename: config.appRoot
 });
 

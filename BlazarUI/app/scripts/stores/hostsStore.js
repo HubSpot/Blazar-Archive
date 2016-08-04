@@ -9,12 +9,12 @@ const HostsStore = Reflux.createStore({
   onLoadHosts() {
     const hostsApi = new HostsApi().fetchBuilds((hosts) => {
       this.trigger({
-        hosts: hosts,
+        hosts,
         loadingHosts: false
       });
     });
   }
-  
+
 
 });
 

@@ -23,7 +23,7 @@ class Feedback {
       page: this.page || 'No Page',
       other: this.other
     };
-    
+
     return $.ajax({
       type: 'POST',
       contentType: 'application/json',

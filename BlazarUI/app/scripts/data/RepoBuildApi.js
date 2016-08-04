@@ -1,4 +1,4 @@
-/*global config*/
+/* global config*/
 import Resource from '../services/ResourceProvider';
 import Q from 'q';
 import { findWhere, map, extend, max, contains } from 'underscore';
@@ -141,9 +141,9 @@ function cancelBuild(params) {
 }
 
 export default {
-  fetchRepoBuild: fetchRepoBuild,
-  fetchRepoBuildById: fetchRepoBuildById,
-  fetchModuleBuilds: fetchModuleBuilds,
-  fetchModuleBuildsById: fetchModuleBuildsById,
-  cancelBuild: cancelBuild
+  fetchRepoBuild,
+  fetchRepoBuildById,
+  fetchModuleBuilds,
+  fetchModuleBuildsById,
+  cancelBuild
 };
