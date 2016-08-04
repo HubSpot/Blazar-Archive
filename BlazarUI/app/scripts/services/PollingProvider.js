@@ -1,13 +1,8 @@
-/* global config*/
-import { fromJS } from 'immutable';
-import {has} from 'underscore';
-import humanizeDuration from 'humanize-duration';
-import $ from 'jquery';
 import Resource from './ResourceProvider';
 
 class PollingProvider {
 
-  constructor({url, type, dataType, data = '', filter}) {
+  constructor({url, type, dataType, data = ''}) {
     this.url = url;
     this.type = type;
     this.dataType = dataType;
@@ -45,7 +40,7 @@ class PollingProvider {
     promise.always(() => {
       setTimeout(() => {
         this.poll.call(this, cb);
-      }, config.buildsRefresh);
+      }, window.config.buildsRefresh);
     });
   }
 

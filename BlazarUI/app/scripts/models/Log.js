@@ -1,9 +1,8 @@
-/* global config*/
 import Model from './Model';
 import BuildStates from '../constants/BuildStates';
 import utf8 from 'utf8';
 import {getByteLength} from '../utils/logHelpers';
-import {rest, initial, first, last, find, compact} from 'underscore';
+import {rest, initial, first, last, compact} from 'underscore';
 
 class Log extends Model {
 
@@ -15,7 +14,7 @@ class Log extends Model {
   init(options) {
     this.logLines = [];
     this.fetchCount = 0;
-    this.baseRequestLength = config.offsetLength;
+    this.baseRequestLength = window.config.offsetLength;
     this.requestOffset = this.getMaxOffset(options.size);
     this.lengthOverride = false;
     this.shouldPoll = options.buildState === BuildStates.IN_PROGRESS;
@@ -37,9 +36,9 @@ class Log extends Model {
   url() {
     if (this.requestOffset === -1) {
       console.warn('requestOffset not properly set');
-      return;
+      return null;
     }
-    return `${config.apiRoot}/modules/builds/${this.options.buildId}/log?offset=${this.requestOffset}&length=${this.lengthOverride || this.baseRequestLength}`;
+    return `${window.config.apiRoot}/modules/builds/${this.options.buildId}/log?offset=${this.requestOffset}&length=${this.lengthOverride || this.baseRequestLength}`;
   }
 
   getMaxOffset(size) {
@@ -50,24 +49,16 @@ class Log extends Model {
     // First fetch or navigated 'To Bottom'
     if (!this.fetchAction || this.fetchAction === 'bottom') {
       this.handleEndOfLogFetch();
-    }
-
-    // Navigated 'To Top'
-    else if (this.fetchAction === 'top') {
+    } else if (this.fetchAction === 'top') {
+      // Navigated 'To Top'
       this.handleToTopFetch();
-    }
-
-    // Scrolling Down
-    else if (this.fetchAction === 'next') {
+    } else if (this.fetchAction === 'next') {
+      // Scrolling Down
       this.handleNextFetch();
-    }
-
-    // Scrolling up
-    else if (this.fetchAction === 'previous') {
+    } else if (this.fetchAction === 'previous') {
+      // Scrolling up
       this.handlePreviousFetch();
-    }
-
-    else {
+    } else {
       console.warn('Parse condition not met. ', this);
     }
   }
@@ -76,16 +67,10 @@ class Log extends Model {
     // Scrolling up
     if (this.fetchAction === 'previous') {
       this.handlePreviousFetch();
-    }
-
-    else {
-      if (this.fetchCount === 1) {
-        this.handleFirstActiveFetch();
-      }
-
-      else {
-        this.handleMoreActiveFetch();
-      }
+    } else if (this.fetchCount === 1) {
+      this.handleFirstActiveFetch();
+    } else {
+      this.handleMoreActiveFetch();
     }
   }
 
@@ -102,9 +87,7 @@ class Log extends Model {
 
     if (this.buildInProgress) {
       this.parseActiveBuild();
-    }
-
-    else {
+    } else {
       this.parseInactiveBuild();
     }
   }
@@ -117,10 +100,9 @@ class Log extends Model {
       // incomplete last line of the next fetch if we continue to scroll up
       this.firstLine = first(this.newLogLines);
       this.newLogLines = rest(this.newLogLines);
-    }
-    // our log is larger than at least 1 offset
-    // e.g. we used the "To Top" button
-    else if (this.options.size > this.baseRequestLength) {
+    } else if (this.options.size > this.baseRequestLength) {
+      // our log is larger than at least 1 offset
+      // e.g. we used the "To Top" button
       // save and chop off last incomplete line
       this.lastLine = last(this.newLogLines);
       this.newLogLines = initial(this.newLogLines);
@@ -142,10 +124,8 @@ class Log extends Model {
       // as long as our offset is less than offsetLength
       // we dont need to worry about lines being cutoff
       this.logLines = [...this.logLines, ...this.newLogLines];
-    }
-
-    // if we are not polling
-    else if (!this.shouldPoll) {
+    } else if (!this.shouldPoll) {
+      // if we are not polling
       this.parseNextFetch();
     }
   }
@@ -157,10 +137,6 @@ class Log extends Model {
       // the incomplete last line of the next fetch if we scroll up
       this.firstLine = first(this.newLogLines);
       this.newLogLines = rest(this.newLogLines);
-    }
-
-    if (this.options.buildState === BuildStates.IN_PROGRESS) {
-
     }
 
     this.logLines = [...this.logLines, ...this.newLogLines];
@@ -185,7 +161,7 @@ class Log extends Model {
   }
 
   // Helper for parse, used to manage incomplete lines when scrolling up
-  parseNextFetch(options = {}) {
+  parseNextFetch() {
     // save incomplete last line so we can prepend it to the
     // incomplete first line of the next fetch if we continue to scroll down
     const tempLast = last(this.newLogLines);
@@ -203,7 +179,7 @@ class Log extends Model {
 
   // Helper for parse, used to manage incomplete lines when scrolling down
   parsePreviousFetch(options = {}) {
-    let {removeFirstLine} = options;
+    const {removeFirstLine} = options;
     // save incomplete first line so we can append it to the
     // incomplete last line of the next fetch if we continue to scroll up
     const tempFirst = first(this.newLogLines);
@@ -271,15 +247,15 @@ class Log extends Model {
 
       try {
         line = utf8.decode(line);
-      }
-
-      catch (err) {
+      } catch (err) {
         console.warn("We couldn't decode some UTF-8, so we're displaying this log line undecoded:\n", line);
       }
 
+      offsetRunningTotal += getByteLength(line);
+
       return {
         text: line,
-        offset: offsetRunningTotal += getByteLength(line)
+        offset: offsetRunningTotal
       };
     });
 

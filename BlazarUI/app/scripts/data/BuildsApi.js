@@ -1,6 +1,4 @@
-/* global config*/
 import $ from 'jquery';
-import { fromJS } from 'immutable';
 import {has, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import PollingProvider from '../services/PollingProvider';
@@ -9,7 +7,7 @@ import StarProvider from '../services/starProvider';
 function _groupBuilds(builds) {
   const stars = StarProvider.getStars();
 
-  let groupedBuilds = { all: builds };
+  const groupedBuilds = { all: builds };
 
   groupedBuilds.building = builds.filter((build) => {
     return has(build, 'inProgressBuild');
@@ -83,7 +81,7 @@ function fetchBuilds(extraData, cb) {
   }
 
   this.buildsPoller = new PollingProvider({
-    url: `${config.apiRoot}/branches/state`,
+    url: `${window.config.apiRoot}/branches/state`,
     type: 'GET',
     dataType: 'json',
     data: $.param(exclusionOpts).replace(/%5B%5D/g, '')
@@ -107,7 +105,7 @@ function stopPolling() {
   this.buildsPoller.disconnect();
 }
 
-function fetchBuild(id) {
+function fetchBuild() {
 
 }
 

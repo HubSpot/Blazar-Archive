@@ -1,10 +1,9 @@
-/* global config*/
 import Model from './Model';
 
 class LogSize extends Model {
 
   url() {
-    return `${config.apiRoot}/modules/builds/${this.options.buildId}/log/size`;
+    return `${window.config.apiRoot}/modules/builds/${this.options.buildId}/log/size`;
   }
 
 }

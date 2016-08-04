@@ -14,7 +14,7 @@ export const getStarredModules = (stars, modules) => {
 };
 
 export const markStarredModules = (modules, stars) => {
-  modules.map((module) => {
+  return modules.map((module) => {
     module.module.isStarred = false;
     stars.forEach((star) => {
       if (star.moduleId === module.module.id) {
@@ -22,7 +22,6 @@ export const markStarredModules = (modules, stars) => {
         return;
       }
     });
+    return module;
   });
-
-  return modules;
 };

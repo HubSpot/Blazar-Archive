@@ -3,9 +3,7 @@
 //
 import Reflux from 'reflux';
 import BuildsActions from '../actions/buildsActions';
-import {sortBuilds} from '../utils/buildsHelpers';
 import BuildsApi from '../data/BuildsApi';
-import Immutable from 'immutable';
 import {isEmpty} from 'underscore';
 
 const BuildsStore = Reflux.createStore({

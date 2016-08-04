@@ -1,9 +1,6 @@
-/* global config*/
 import { fromJS } from 'immutable';
-import {has, findWhere, some, contains, extend, flatten} from 'underscore';
+import {findWhere, some, contains, extend, flatten} from 'underscore';
 import {timestampDuration} from '../components/Helpers';
-import humanizeDuration from 'humanize-duration';
-import $ from 'jquery';
 import Q from 'q';
 import Resource from './ResourceProvider';
 import ActiveBuildStates from '../constants/ActiveBuildStates';
@@ -17,31 +14,31 @@ class RepoBuildPollingProvider {
 
     this.promises = {
       branchId: new Resource({
-        url: `${config.apiRoot}/branches/state`,
+        url: `${window.config.apiRoot}/branches/state`,
         type: 'GET'
       }).send(),
 
       moduleBuilds() {
         return new Resource({
-          url: `${config.apiRoot}/branches/builds/${this.repoBuildId}/modules`,
+          url: `${window.config.apiRoot}/branches/builds/${this.repoBuildId}/modules`,
           type: 'GET'
         }).send();
       },
       repoBuild() {
         return new Resource({
-          url: `${config.apiRoot}/builds/history/branch/${this.branchId}/build/${this.params.buildNumber}`,
+          url: `${window.config.apiRoot}/builds/history/branch/${this.branchId}/build/${this.params.buildNumber}`,
           type: 'GET'
         }).send();
       },
       branchHistory() {
         return new Resource({
-          url: `${config.apiRoot}/builds/history/branch/${this.branchId}`,
+          url: `${window.config.apiRoot}/builds/history/branch/${this.branchId}`,
           tpe: 'GET'
         }).send();
       },
       moduleNames() {
         return new Resource({
-          url: `${config.apiRoot}/branches/${this.branchId}/modules`,
+          url: `${window.config.apiRoot}/branches/${this.branchId}/modules`,
           type: 'GET'
         }).send();
       }
@@ -51,12 +48,12 @@ class RepoBuildPollingProvider {
   _parseModules(modules) {
     const {params} = this;
 
-    const modules = modules.map((module) => {
+    const modulesWithBlazarPath = modules.map((module) => {
       module.blazarPath = `/builds/${params.host}/${params.org}/${params.repo}/${encodeURIComponent(params.branch)}/${params.buildNumber}/${module.name}`;
       return module;
     });
 
-    return fromJS(modules);
+    return fromJS(modulesWithBlazarPath);
   }
 
   _shouldPoll(moduleBuildStates) {
@@ -81,7 +78,7 @@ class RepoBuildPollingProvider {
 
       // get repositoryId
       this.promises.branchHistory.call(this).then((resp) => {
-        this.repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
+        this.repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber, 10)}).id;
 
         // get repo build and module build info
         Q.spread([this.promises.moduleNames.call(this), this.promises.moduleBuilds.call(this), this.promises.repoBuild.call(this)],
@@ -114,13 +111,13 @@ class RepoBuildPollingProvider {
 
             setTimeout(() => {
               this.poll(cb);
-            }, config.activeBuildModuleRefresh);
+            }, window.config.activeBuildModuleRefresh);
           }).fail((error) => {
             cb(error, null);
           });
       }, (error) => {
         console.warn(error);
-        cb(err, null);
+        cb(error, null);
       });
     }, (error) => {
       cb(error, null);

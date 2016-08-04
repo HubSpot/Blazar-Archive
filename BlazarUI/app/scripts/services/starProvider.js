@@ -13,15 +13,14 @@ const StarProvider = {
   },
 
   toggleStar(repoId, cb) {
-    const repoId = parseInt(repoId);
+    const parsedRepoId = parseInt(repoId, 10);
     this.checkStorage();
-    const index = this.stars.indexOf(repoId);
+    const index = this.stars.indexOf(parsedRepoId);
 
     if (index !== -1) {
       this.stars.splice(index, 1);
-    }
-    else {
-      this.stars.push(parseInt(repoId));
+    } else {
+      this.stars.push(parsedRepoId);
     }
 
     cb(this.stars);
@@ -35,7 +34,8 @@ const StarProvider = {
     }
 
     this.haveSynced = true;
-    return this.stars = store.get('starredRepos') || [];
+    this.stars = store.get('starredRepos') || [];
+    return this.stars;
   }
 
 };

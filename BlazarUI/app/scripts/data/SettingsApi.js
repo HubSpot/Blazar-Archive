@@ -1,4 +1,3 @@
-/* global config*/
 import Resource from '../services/ResourceProvider';
 
 function _parseSlackChannels(slackChannels) {
@@ -12,7 +11,7 @@ function _parseSlackChannels(slackChannels) {
 
 function fetchNotifications(params, cb) {
   const notificationsPromise = new Resource({
-    url: `${config.apiRoot}/instant-message/configurations/branches/${params.branchId}`,
+    url: `${window.config.apiRoot}/instant-message/configurations/branches/${params.branchId}`,
     type: 'GET'
   }).send();
 
@@ -33,7 +32,7 @@ function addNotification(params, channelName, cb) {
   };
 
   const notificationPromise = new Resource({
-    url: `${config.apiRoot}/instant-message/configurations`,
+    url: `${window.config.apiRoot}/instant-message/configurations`,
     type: 'POST',
     contentType: 'application/json',
     data: JSON.stringify(notification)
@@ -46,7 +45,7 @@ function addNotification(params, channelName, cb) {
 
 function fetchSlackChannels(cb) {
   const channelsPromise = new Resource({
-    url: `${config.apiRoot}/instant-message/slack/list-channels`,
+    url: `${window.config.apiRoot}/instant-message/slack/list-channels`,
     type: 'GET'
   }).send();
 
@@ -57,7 +56,7 @@ function fetchSlackChannels(cb) {
 
 function updateNotification(params, notification, cb) {
   const notificationPromise = new Resource({
-    url: `${config.apiRoot}/instant-message/configurations/${notification.id}`,
+    url: `${window.config.apiRoot}/instant-message/configurations/${notification.id}`,
     type: 'PUT',
     contentType: 'application/json',
     data: JSON.stringify(notification)
@@ -70,7 +69,7 @@ function updateNotification(params, notification, cb) {
 
 function deleteNotification(params, notificationId, cb) {
   const notificationPromise = new Resource({
-    url: `${config.apiRoot}/instant-message/configurations/${notificationId}`,
+    url: `${window.config.apiRoot}/instant-message/configurations/${notificationId}`,
     type: 'DELETE',
     contentType: 'application/json'
   }).send();
@@ -82,7 +81,7 @@ function deleteNotification(params, notificationId, cb) {
 
 function getSettings(params, cb) {
   const settingsPromise = new Resource({
-    url: `${config.apiRoot}/branches/${params.branchId}/settings`,
+    url: `${window.config.apiRoot}/branches/${params.branchId}/settings`,
     type: 'GET',
     contentType: 'application/json',
   }).send();
@@ -93,7 +92,7 @@ function getSettings(params, cb) {
 
 function updateSettings(params, data, cb) {
   const settingsPromise = new Resource({
-    url: `${config.apiRoot}/branches/${params.branchId}/settings`,
+    url: `${window.config.apiRoot}/branches/${params.branchId}/settings`,
     type: 'PUT',
     contentType: 'application/json',
     data: JSON.stringify(data)

@@ -1,5 +1,3 @@
-/* global config*/
-
 class Poller {
 
   constructor(options) {
@@ -15,7 +13,7 @@ class Poller {
         return;
       }
       that._fetchBuilds((resp) => {
-        setTimeout(_doPoll, config.buildsRefresh);
+        setTimeout(_doPoll, window.config.buildsRefresh);
         if (cb) {
           cb(resp);
         }

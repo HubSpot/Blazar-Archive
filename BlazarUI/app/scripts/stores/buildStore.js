@@ -1,4 +1,3 @@
-/* global config*/
 import Reflux from 'reflux';
 import BuildActions from '../actions/buildActions';
 import BuildApi from '../data/BuildApi';
@@ -18,8 +17,7 @@ const BuildStore = Reflux.createStore({
 
     if (err) {
       this.triggerError();
-    }
-    else {
+    } else {
       this.triggerSuccess();
     }
   },
@@ -37,9 +35,8 @@ const BuildStore = Reflux.createStore({
     // custom error message
     if (typeof(this.error) === 'string') {
       error = this.error;
-    }
-    // send the xhr message
-    else {
+    } else {
+      // send the xhr message
       error = {
         status: this.error.status,
         statusText: this.error.statusText

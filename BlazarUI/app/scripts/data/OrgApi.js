@@ -1,4 +1,4 @@
-import { findWhere, uniq, sortBy, filter } from 'underscore';
+import { uniq, sortBy } from 'underscore';
 import { fromJS } from 'immutable';
 import StoredBuilds from './StoredBuilds';
 

@@ -1,4 +1,3 @@
-/* global config*/
 import Model from './Model';
 
 class BuildTrigger extends Model {
@@ -9,8 +8,7 @@ class BuildTrigger extends Model {
   }
 
   url() {
-    const moduleId = this.moduleId;
-    return `${config.apiRoot}/build/module/${this.options.moduleId}`;
+    return `${window.config.apiRoot}/build/module/${this.options.moduleId}`;
   }
 }
 

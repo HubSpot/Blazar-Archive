@@ -1,6 +1,5 @@
-/* global config*/
 import React from 'react';
-import { Route, IndexRoute, Redirect } from 'react-router';
+import { Route, IndexRoute } from 'react-router';
 import $ from 'jquery';
 
 // Pages
@@ -16,7 +15,7 @@ import NotFound from './pages/notFound.jsx';
 
 function redirectRepoBuildShortlink(nextState, replace, callback) {
   const data = $.ajax({
-    url: `${config.apiRoot}/branches/builds/${nextState.params.repoBuildId}`,
+    url: `${window.config.apiRoot}/branches/builds/${nextState.params.repoBuildId}`,
     type: 'GET',
     dataType: 'json'
   });
@@ -24,7 +23,7 @@ function redirectRepoBuildShortlink(nextState, replace, callback) {
   data.then((resp) => {
     replace(`/builds/branch/${resp.branchId}/build/${resp.buildNumber}`);
     callback();
-  }, (error) => {
+  }, () => {
     replace('/not-found');
     callback();
   });

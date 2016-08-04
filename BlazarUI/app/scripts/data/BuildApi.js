@@ -1,5 +1,3 @@
-/* global config*/
-import Reflux from 'reflux';
 import {extend, findWhere, contains} from 'underscore';
 import BuildStates from '../constants/BuildStates';
 import {buildIsOnDeck} from '../components/Helpers';
@@ -41,24 +39,19 @@ class BuildApi {
 
       if (startOfLogLoaded) {
         this._triggerUpdate({positionChange: position});
-      }
-
-      else {
+      } else {
         this._resetLogViaNavigation(position);
       }
-    }
+    } else if (position === 'bottom') {
+      // navigated to the bottom
 
-    // navigated to the bottom
-    else if (position === 'bottom') {
       if (buildInProgress) {
         this.setLogPollingState(true);
       }
 
       if (endOfLogLoaded) {
         this._triggerUpdate({positionChange: position});
-      }
-
-      else {
+      } else {
         this._resetLogViaNavigation(position);
       }
     }
@@ -73,9 +66,7 @@ class BuildApi {
 
     if (log.minOffsetLoaded === 0) {
       this._triggerUpdate();
-    }
-
-    else {
+    } else {
       log.fetchPrevious().done(this._triggerUpdate.bind(this));
     }
   }
@@ -136,7 +127,7 @@ class BuildApi {
 
   _fetchLog() {
     if (!this.build.logCollection) {
-      return;
+      return null;
     }
 
     const logPromise = this.build.logCollection.fetch();
@@ -156,13 +147,13 @@ class BuildApi {
     }
 
     if (this.build.logCollection.shouldPoll && this.build.model.data.state === BuildStates.IN_PROGRESS) {
-      this._fetchLog().done((data, textStatus, jqxhr) => {
+      this._fetchLog().done((data) => {
         this._triggerUpdate();
         this.build.logCollection.requestOffset = data.nextOffset;
 
         setTimeout(() => {
           this._pollLog();
-        }, config.activeBuildLogRefresh);
+        }, window.config.activeBuildLogRefresh);
       });
     }
   }
@@ -173,7 +164,7 @@ class BuildApi {
     }
 
     if (this.build.model.data.state === BuildStates.IN_PROGRESS) {
-      this._fetchBuild().done((data) => {
+      this._fetchBuild().done(() => {
         // build has finished, get most up to date info
         if (this.build.model.data.state !== BuildStates.IN_PROGRESS) {
           this._updateLogSize()
@@ -182,7 +173,7 @@ class BuildApi {
         }
         setTimeout(() => {
           this._pollBuild();
-        }, config.activeBuildRefresh);
+        }, window.config.activeBuildRefresh);
       });
     }
   }
@@ -196,7 +187,7 @@ class BuildApi {
   }
 
   _processFinishedBuild(cb) {
-    this._getLog().then(this._fetchLog.bind(this)).done((data) => {
+    this._getLog().then(this._fetchLog.bind(this)).done(() => {
       this._triggerUpdate();
       if (cb) {
         cb();
@@ -215,32 +206,32 @@ class BuildApi {
 
   _getBuild() {
     const branchHistoryPromise = new Resource({
-      url: `${config.apiRoot}/builds/history/branch/${this.params.branchId}`,
+      url: `${window.config.apiRoot}/builds/history/branch/${this.params.branchId}`,
       type: 'GET'
     }).send();
 
     return branchHistoryPromise.then((resp) => {
       // now get modules so we can get the moduleId by the module name
       const repoBuildModules = new Resource({
-        url: `${config.apiRoot}/branches/${this.params.branchId}/modules`,
+        url: `${window.config.apiRoot}/branches/${this.params.branchId}/modules`,
         type: 'GET'
       }).send();
 
       return repoBuildModules.then((modules) => {
         const repoBuildModule = findWhere(modules, {name: this.params.moduleName, active: true});
 
-        let buildModules;
+        let buildModulesPromise;
 
         if (this.params.buildNumber !== 'latest') {
-          const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber)}).id;
+          const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber, 10)}).id;
           // last get module build based on module id
-          buildModules = new Resource({
-            url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
+          buildModulesPromise = new Resource({
+            url: `${window.config.apiRoot}/branches/builds/${repoBuildId}/modules`,
             type: 'GET'
           }).send();
 
-          return buildModules.then((modules) => {
-            const moduleBuild = findWhere(modules, {moduleId: repoBuildModule.id});
+          return buildModulesPromise.then((buildModules) => {
+            const moduleBuild = findWhere(buildModules, {moduleId: repoBuildModule.id});
 
             this.build.model = new Build({
               id: moduleBuild.id,
@@ -251,18 +242,18 @@ class BuildApi {
           });
         }
 
-        buildModules = new Resource({
-          url: `${config.apiRoot}/branches/state/${this.params.branchId}/modules`,
+        buildModulesPromise = new Resource({
+          url: `${window.config.apiRoot}/branches/state/${this.params.branchId}/modules`,
           type: 'GET'
         }).send();
 
-        return buildModules.then((modules) => {
-          const moduleBuild = modules.filter((module) => {
+        return buildModulesPromise.then((buildModules) => {
+          const moduleBuild = buildModules.filter((module) => {
             return module.module.id === repoBuildModule.id;
           })[0];
 
           const buildToUse = this._getBuildToUse(moduleBuild);
-          const repoBuildId = findWhere(resp, {buildNumber: parseInt(buildToUse.buildNumber)}).id;
+          const repoBuildId = findWhere(resp, {buildNumber: parseInt(buildToUse.buildNumber, 10)}).id;
 
           this.build.model = new Build({
             id: buildToUse.id,
@@ -278,7 +269,7 @@ class BuildApi {
   }
 
   _getBuildToUse(moduleBuild) {
-    let inProgressBuild = moduleBuild.inProgressBuild;
+    const inProgressBuild = moduleBuild.inProgressBuild;
 
     if (inProgressBuild && contains(['QUEUED', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED', 'UNSTABLE'], inProgressBuild.state)) {
       return inProgressBuild;
@@ -291,7 +282,7 @@ class BuildApi {
     const logSizePromise = this._getLogSize();
 
     if (!logSizePromise || !this.build.model) {
-      return;
+      return null;
     }
 
     logSizePromise.done((resp) => {
@@ -306,12 +297,8 @@ class BuildApi {
   }
 
   _getLogSize() {
-    if (!this.build.model) {
-      return;
-    }
-
-    if (buildIsOnDeck(this.build.model.data.state)) {
-      return;
+    if (!this.build.model || buildIsOnDeck(this.build.model.data.state)) {
+      return null;
     }
 
     const logSize = new LogSize({
@@ -332,7 +319,7 @@ class BuildApi {
     const logSizePromise = this._getLogSize();
 
     if (!logSizePromise) {
-      return;
+      return null;
     }
 
     logSizePromise.done((resp) => {
@@ -366,6 +353,7 @@ class BuildApi {
       case BuildStates.CANCELLED:
         this._processCancelledBuild();
         break;
+      default:
     }
   }
 

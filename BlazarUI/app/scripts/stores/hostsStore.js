@@ -7,7 +7,7 @@ const HostsStore = Reflux.createStore({
   listenables: HostsActions,
 
   onLoadHosts() {
-    const hostsApi = new HostsApi().fetchBuilds((hosts) => {
+    new HostsApi().fetchBuilds((hosts) => {
       this.trigger({
         hosts,
         loadingHosts: false

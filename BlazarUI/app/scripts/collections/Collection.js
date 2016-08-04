@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import {binarySearch} from '../utils/buildsHelpers';
-import bs from 'binary-search';
 
 class Collection {
 
@@ -31,9 +30,7 @@ class Collection {
 
       if (buildIndex > 0) {
         current[buildIndex] = incoming[i];
-      }
-
-      else {
+      } else {
         current.push(incoming[i]);
       }
     }
@@ -55,8 +52,7 @@ class Collection {
     promise.done((resp) => {
       if (this.options.mergeOnFetch) {
         this.data = this.mergeData(resp, this.data);
-      }
-      else {
+      } else {
         this.data = resp;
       }
 

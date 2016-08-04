@@ -1,5 +1,3 @@
-/* global config*/
-import { findWhere } from 'underscore';
 import StoredBuilds from './StoredBuilds';
 
 class BranchesApi extends StoredBuilds {

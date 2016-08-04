@@ -1,4 +1,3 @@
-/* global config*/
 import Reflux from 'reflux';
 
 const BuildActions = Reflux.createActions([

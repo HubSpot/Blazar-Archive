@@ -1,7 +1,7 @@
-module.exports = function(a, b) {
-  let ret = [];
+module.exports = (a, b) => {
+  const ret = [];
   let i = b ? a : 0;
-  let len = b ? b : a;
+  const len = b || a;
 
   for (; i < len; i++) {
     ret.push(i);

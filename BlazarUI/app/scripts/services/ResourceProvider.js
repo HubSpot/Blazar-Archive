@@ -1,7 +1,6 @@
 //
 // Generic Ajax Resource Provider
 //
-import { fromJS } from 'immutable';
 import $ from 'jquery';
 import {extend} from 'underscore';
 

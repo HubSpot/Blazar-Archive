@@ -1,4 +1,3 @@
-/* global config*/
 import Reflux from 'reflux';
 import RepoActions from '../actions/repoActions';
 import RepoApi from '../data/RepoApi';

@@ -2,7 +2,6 @@
 // Super class for polling the builds store
 //  - extended by BranchesApi abnd BranchBuildsApi
 //
-import {isEmpty} from 'underscore';
 import BuildsStore from '../stores/buildsStore';
 
 class StoredBuilds {
@@ -28,7 +27,7 @@ class StoredBuilds {
   }
 
   // used by subclasses
-  _parse(resp) {
+  _parse() {
 
   }
 

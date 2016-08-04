@@ -1,5 +1,4 @@
-/* global config*/
-import { findWhere, uniq, sortBy, groupBy } from 'underscore';
+import { uniq, groupBy, mapObject } from 'underscore';
 import { fromJS } from 'immutable';
 import StoredBuilds from './StoredBuilds';
 
@@ -10,10 +9,10 @@ class HostsApi extends StoredBuilds {
       return build.gitInfo.host;
     });
 
-    let hosts = [];
+    const hosts = [];
 
-    for (let group in grouped) {
-      const uniqueOrgs = uniq(grouped[group], (b) => {
+    mapObject(grouped, (orgs, group) => {
+      const uniqueOrgs = uniq(orgs, (b) => {
         return b.gitInfo.organization;
       });
 
@@ -30,7 +29,7 @@ class HostsApi extends StoredBuilds {
         name: group,
         orgs: uniqueOrgsMapped
       });
-    }
+    });
 
     this.cb(fromJS(hosts));
   }

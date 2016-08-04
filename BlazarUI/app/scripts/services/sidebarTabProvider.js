@@ -24,7 +24,8 @@ const sidebarTabProvider = {
     }
 
     this.haveSynced = true;
-    return this.tab = store.get('sidebarTab') || 'starred';
+    this.tab = store.get('sidebarTab') || 'starred';
+    return this.tab;
   }
 
 };
