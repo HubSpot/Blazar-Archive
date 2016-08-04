@@ -1,46 +1,107 @@
+.inter-project-tag
+  font-weight 600
+  font-size 12px
+  color #6a78d1
+  background-color #e1e4f6
+  padding 2px 5px
+  margin 5px 0 20px
+  display inline-block
+
 .inter-project-alert
-  transition max-height 1s
-  max-height 52px
+  transition max-height 1s ease
+  max-height 75px
   overflow hidden
+  margin-bottom 15px
+  background-color #e1e4f6
+  border none
+  position relative
+
+  a
+    color #00a4bd
+    font-weight 500
+
+  h3
+    font-size 14px
+    font-weight 600
+    margin-top 0
+
+    &.inter-project-alert__builds-header
+      text-transform capitalize
+
+  ul
+    padding-left 20px
+
+  li
+    list-style-type none
 
   &.expanded
     max-height 2000px
 
-  &:hover
-    cursor pointer
+    &::-webkit-scrollbar
+      width 8px
 
-    .inter-project-alert__expand
-      text-decoration: underline
+    &::-webkit-scrollbar-thumb
+      border-radius 5px
+      background-color rgba(0, 0, 0, .3)
+      -webkit-box-shadow 0 0 1px rgba(255, 255, 255, .5)
+      margin-right 5px
 
-  h3
-    margin 0
-    font-size 14px
-    font-weight 400
+  .inter-project-alert__summary
     display block
+    margin-bottom 20px
+
+    .inter-project-alert__build-number
+      color #7c98b6
+      background-color #eaf0f6
+      padding 2px 5px
+      font-weight 600
+      margin-right 10px
 
     .inter-project-alert__status
-      font-weight: 600
+      font-weight 600
+      padding 2px 5px
+      text-transform capitalize
+      margin 0 5px
 
       &.success
-        color: #3c763d
+        color #00bda5
+        background-color #ccf2ed
 
       &.warning
-        color: #8a6d3b
+        color #eaa836
+        background-color #fdf3e1
 
       &.danger
-        color: #a94442
+        color #f2545b
+        background-color #fddbdc
 
-  .inter-project-alert__expand
-    float: right
+      &.in-progress
+        color #6a78d1
+        background-color #f0f1fa
 
-  .inter-project-alert__details
-    margin-top 20px
+    .inter-project-alert__expand
+      position absolute
+      right 20px
+      top 25px
+      cursor pointer
 
-    div
-      margin 10px 10px 20px 10px
-
+  .inter-project-alert__failed
     ul
-      margin-left 10px
+      list-style-type none
+      margin 0 0 20px 0
+      padding 0
 
       li
-        font-weight 300
+        display block
+        width 100%
+        background-color #fcdde5
+        padding 10px 20px
+        border-radius 4px
+        border 1px solid #f2545b
+        margin-bottom 10px
+
+        &:before
+          content 'Build failed'
+          color #f2545b
+          font-weight 600
+          margin-right 20px

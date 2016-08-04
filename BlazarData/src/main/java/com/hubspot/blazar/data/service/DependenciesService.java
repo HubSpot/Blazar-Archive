@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
+import com.hubspot.blazar.base.Dependency;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.GitInfo;
@@ -166,6 +167,19 @@ public class DependenciesService {
   public void delete(int moduleId) {
     dependenciesDao.deleteProvides(moduleId);
     dependenciesDao.deleteDepends(moduleId);
+  }
+
+
+  public Set<Dependency> getProvided(int moduleId) {
+    return dependenciesDao.getProvided(moduleId);
+  }
+
+  public Set<Dependency> getDependencies(int moduleId) {
+    return dependenciesDao.getDependencies(moduleId);
+  }
+
+  public Set<GitInfo> getBranchesWithNonVersionedDependencies() {
+    return dependenciesDao.getBranchesWithNonVersionedDependencies();
   }
 
   private void updateProvides(DiscoveredModule module) {

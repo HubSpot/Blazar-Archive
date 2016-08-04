@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.hubspot.blazar.base.externalservice.mesos.Resources;
 
 public class BuildConfig {
   private final List<BuildStep> steps;
@@ -17,11 +18,12 @@ public class BuildConfig {
   private final List<String> buildDeps;
   private final List<String> webhooks;
   private final List<String> cache;
+  private final Optional<Resources> buildResources;
   private final Optional<GitInfo> buildpack;
   private final Optional<String> user;
   private final Map<String, StepActivationCriteria> stepActivation;
-  private final Set<String> depends;
-  private final Set<String> provides;
+  private final Set<Dependency> depends;
+  private final Set<Dependency> provides;
 
   @JsonCreator
   public BuildConfig(@JsonProperty("steps") List<BuildStep> steps,
@@ -30,26 +32,28 @@ public class BuildConfig {
                      @JsonProperty("buildDeps") List<String> buildDeps,
                      @JsonProperty("webhooks") List<String> webhooks,
                      @JsonProperty("cache") List<String> cache,
+                     @JsonProperty("buildResources") Optional<Resources> buildResources,
                      @JsonProperty("buildpack") Optional<GitInfo> buildpack,
                      @JsonProperty("user") Optional<String> user,
                      @JsonProperty("stepActivation") Map<String, StepActivationCriteria> stepActivation,
-                     @JsonProperty("depends") Set<String> depends,
-                     @JsonProperty("provides") Set<String> provides) {
+                     @JsonProperty("depends") Set<Dependency> depends,
+                     @JsonProperty("provides") Set<Dependency> provides) {
     this.steps = Objects.firstNonNull(steps, Collections.<BuildStep>emptyList());
     this.before = Objects.firstNonNull(before, Collections.<BuildStep>emptyList());
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
+    this.buildResources = Objects.firstNonNull(buildResources, Optional.<Resources>absent());
     this.buildpack = Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
     this.cache = Objects.firstNonNull(cache, Collections.<String>emptyList());
     this.user = Objects.firstNonNull(user, Optional.<String>absent());
     this.stepActivation = Objects.firstNonNull(stepActivation, Collections.<String, StepActivationCriteria>emptyMap());
-    this.depends = Objects.firstNonNull(depends, Collections.<String>emptySet());
-    this.provides = Objects.firstNonNull(provides, Collections.<String>emptySet());
+    this.depends = Objects.firstNonNull(depends, Collections.<Dependency>emptySet());
+    this.provides = Objects.firstNonNull(provides, Collections.<Dependency>emptySet());
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null, null, null, null, null, null, null, null);
+    return new BuildConfig(null, null, null, null, null, null, null, null, null, null, null, null);
   }
 
   public List<BuildStep> getSteps() {
@@ -76,6 +80,10 @@ public class BuildConfig {
     return cache;
   }
 
+  public Optional<Resources> getBuildResources() {
+    return buildResources;
+  }
+
   public Optional<GitInfo> getBuildpack() {
     return buildpack;
   }
@@ -88,16 +96,16 @@ public class BuildConfig {
     return stepActivation;
   }
 
-  public Set<String> getProvides() {
+  public Set<Dependency> getProvides() {
     return provides;
   }
 
-  public Set<String> getDepends() {
+  public Set<Dependency> getDepends() {
     return depends;
   }
 
   public BuildConfig withUser(String user) {
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, buildpack, Optional.of(user), stepActivation, depends, provides);
+    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, buildResources, buildpack, Optional.of(user), stepActivation, depends, provides);
   }
 
 }

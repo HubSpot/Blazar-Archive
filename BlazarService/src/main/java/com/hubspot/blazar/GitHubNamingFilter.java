@@ -1,5 +1,14 @@
 package com.hubspot.blazar;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.MultivaluedMap;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -9,14 +18,6 @@ import com.fasterxml.jackson.jaxrs.cfg.ObjectReaderInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectReaderModifier;
 import com.google.inject.Inject;
 import com.hubspot.blazar.github.GitHubProtos;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-
-import javax.ws.rs.core.MultivaluedMap;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 public class GitHubNamingFilter implements ContainerRequestFilter {
   private final Set<Class<?>> gitHubClasses;
@@ -27,7 +28,7 @@ public class GitHubNamingFilter implements ContainerRequestFilter {
   }
 
   @Override
-  public ContainerRequest filter(ContainerRequest request) {
+  public void filter(ContainerRequestContext requestContext) throws IOException {
     ObjectReaderInjector.set(new ObjectReaderModifier() {
 
       @Override
@@ -37,13 +38,12 @@ public class GitHubNamingFilter implements ContainerRequestFilter {
                                  ObjectReader r,
                                  JsonParser p) throws IOException {
         if (gitHubClasses.contains(resultType.getRawClass())) {
-          return r.with(r.getConfig().with(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES));
+          return r.with(r.getConfig().with(PropertyNamingStrategy.SNAKE_CASE));
         } else {
           return r;
         }
       }
     });
-
-    return request;
   }
+
 }

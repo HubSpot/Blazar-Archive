@@ -15,11 +15,11 @@ import EmptyMessage from '../shared/EmptyMessage.jsx';
 import {getFilteredBranches, filterInactiveBuilds, sortBranchesByTimestamp} from '../Helpers.js'
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
-import RepoStore from '../../stores/repoStore';
-import RepoActions from '../../actions/repoActions';
+import BuildsStore from '../../stores/buildsStore';
+import BuildsActions from '../../actions/buildsActions';
 
 let initialState = {
-  branches: [],
+  builds: [],
   loading: true,
   filters: {
     branch: [],
@@ -36,39 +36,48 @@ class RepoContainer extends Component {
   }
 
   componentDidMount() {
-    this.setup(this.props.params);
+    this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
+    const builds = BuildsStore.getBuilds().all;
+    this.setState({
+      builds: this.getFilteredBuilds(this.props, builds),
+      loading: !builds.length
+    });
   }
 
   componentWillReceiveProps(nextprops) {
-    this.setState(initialState);
-    this.tearDown();
-    this.setup(nextprops.params);
+    this.setState({
+      filters: {
+        branch: [],
+        repo: []
+      },
+      error: null,
+      builds: this.getFilteredBuilds(nextprops, BuildsStore.getBuilds().all)
+    });
   }
 
   componentWillUnmount() {
-    this.tearDown();
+    this.unsubscribeFromBuilds();
   }
 
   onStatusChange(state) {
     if (state.error) {
       state.loading = false;
     }
+
+    state.builds = this.getFilteredBuilds(this.props, state.builds.all);
+
     this.setState(state);
-  }
-
-  setup(params) {
-    this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
-    RepoActions.loadBranchesAndBuilds(params);
-  }
-
-  tearDown() {
-    RepoActions.stopPolling();
-    this.unsubscribeFromRepo();
   }
 
   updateFilters(newFilters) {
     this.setState({
       filters: newFilters,
+    });
+  }
+
+  getFilteredBuilds(props, builds) {
+    return builds.filter(build => {
+      return build.gitInfo.repository.toLowerCase() === props.params.repo.toLowerCase();
     });
   }
 
@@ -91,11 +100,12 @@ class RepoContainer extends Component {
               hide={this.state.error}
               updateFilters={this.updateFilters}
               {...this.state}
+              branches={this.state.builds}
             />
             <BranchesTable
               hide={this.state.error}
               {...this.state}
-              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.branches))}
+              branches={filterInactiveBuilds(getFilteredBranches(this.state.filters, this.state.builds))}
             />
           </UIGridItem>
         </UIGrid>

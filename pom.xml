@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>15.2</version>
+    <version>15.5</version>
   </parent>
 
   <artifactId>Blazar</artifactId>
@@ -44,14 +44,11 @@
 
   <properties>
     <basepom.check.skip-findbugs>true</basepom.check.skip-findbugs>
-
-    <dep.jackson.version>2.6.4</dep.jackson.version>
     <dep.horizon.version>0.0.24</dep.horizon.version>
-    <dep.rosetta.version>3.10.8</dep.rosetta.version>
-    <singularity.version>0.4.11</singularity.version>
-    <mesos.version>0.23.0</mesos.version>
+    <dep.rosetta.version>3.11.0</dep.rosetta.version>
+    <singularity.version>0.10.0-QA-SNAPSHOT</singularity.version>
+    <mesos.version>0.28.2</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
-    <dep.guava.version>18.0</dep.guava.version>
     <project.build.targetJdk>1.8</project.build.targetJdk>
   </properties>
 
@@ -107,19 +104,14 @@
         <version>1.2</version>
       </dependency>
       <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>jsr311-api</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
         <groupId>com.hubspot.dropwizard</groupId>
         <artifactId>dropwizard-guicier</artifactId>
-        <version>0.7.1.2</version>
+        <version>1.0.0.1</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
         <artifactId>jackson-jaxrs-propertyfiltering</artifactId>
-        <version>0.7.2</version>
+        <version>0.8.0</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
@@ -178,6 +170,11 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>net.sourceforge.argparse4j</groupId>
+        <artifactId>argparse4j</artifactId>
+        <version>0.7.0</version>
+      </dependency>
+      <dependency>
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>woodstox-core-asl</artifactId>
         <version>4.4.1</version>
@@ -186,11 +183,6 @@
         <groupId>io.takari.slack</groupId>
         <artifactId>simple-slack-api</artifactId>
         <version>0.5.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.codahale.metrics</groupId>
-        <artifactId>metrics-jdbi</artifactId>
-        <version>${dep.metrics.version}</version>
       </dependency>
       <dependency>
         <groupId>org.antlr</groupId>
@@ -203,19 +195,9 @@
         <version>1.4.190</version>
       </dependency>
       <dependency>
-        <groupId>org.liquibase</groupId>
-        <artifactId>liquibase-core</artifactId>
-        <version>3.4.2</version>
-      </dependency>
-      <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
         <version>1.10.19</version>
-      </dependency>
-      <dependency>
-        <groupId>com.mattbertolini</groupId>
-        <artifactId>liquibase-slf4j</artifactId>
-        <version>1.2.1</version>
       </dependency>
       <dependency>
         <groupId>org.jukito</groupId>

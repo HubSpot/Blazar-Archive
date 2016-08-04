@@ -1,0 +1,12 @@
+depends:
+- name: Repo4-Module1
+  version: 1.0.0
+- name: Repo4-Module2
+  version: 1.0.0
+provides:
+- name: Repo5-Module1
+  version: 1.0.0
+steps:
+- commands:
+  - echo TESTING 123
+  description: Provide steps so blazar will try to build this

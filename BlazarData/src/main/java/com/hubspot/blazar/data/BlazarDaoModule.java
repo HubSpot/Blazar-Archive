@@ -12,18 +12,19 @@ import com.google.inject.Scopes;
 import com.hubspot.blazar.data.dao.BranchDao;
 import com.hubspot.blazar.data.dao.BranchSettingsDao;
 import com.hubspot.blazar.data.dao.DependenciesDao;
+import com.hubspot.blazar.data.dao.InstantMessageConfigurationDao;
 import com.hubspot.blazar.data.dao.InterProjectBuildDao;
 import com.hubspot.blazar.data.dao.InterProjectBuildMappingDao;
 import com.hubspot.blazar.data.dao.MalformedFileDao;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
-import com.hubspot.blazar.data.dao.InstantMessageConfigurationDao;
 import com.hubspot.blazar.data.dao.StateDao;
 import com.hubspot.guice.transactional.DataSourceLocator;
 import com.hubspot.guice.transactional.TransactionalDataSource;
 import com.hubspot.guice.transactional.TransactionalModule;
 import com.hubspot.guice.transactional.impl.DefaultDataSourceLocator;
+
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
 

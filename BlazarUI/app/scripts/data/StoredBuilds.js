@@ -1,7 +1,3 @@
-//
-// Super class for polling the builds store
-//  - extended by BranchesApi abnd BranchBuildsApi
-//
 import BuildsStore from '../stores/buildsStore';
 
 class StoredBuilds {

@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import {has, contains, bindAll} from 'underscore';
+import {has, contains, bindAll, isEmpty} from 'underscore';
 import {humanizeText, timestampFormatted, truncate} from '../Helpers';
 import classNames from 'classnames';
 
@@ -9,6 +9,7 @@ import Sha from '../shared/Sha.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
 
 import Commits from './Commits.jsx';
+import InterProjectAlert from './InterProjectAlert.jsx';
 
 import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
@@ -75,6 +76,30 @@ class RepoBuildDetail extends Component {
     );
   }
 
+  renderInterProjectBuildMessage() {
+    const {upAndDownstreamModules} = this.props;
+
+    if (!upAndDownstreamModules.interProjectBuildId) {
+      return null;
+    }
+
+    let suffix;
+
+    if (isEmpty(upAndDownstreamModules.rootRepoBuilds)) {
+      suffix = ".";
+    }
+
+    else {
+      suffix = ", triggered by an upstream module.";
+    }
+
+    return (
+      <span className="build-detail-header__unstable-message">
+        This build was part of an <strong>inter-project build</strong>{suffix}
+      </span>
+    );
+  }
+
   renderUnstableMessage() {
     const {currentRepoBuild} = this.props;
 
@@ -138,6 +163,7 @@ class RepoBuildDetail extends Component {
           <p className='build-detail-header__build-state'>
             Build {buildDetail.buildResult}
             <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
+            {this.renderInterProjectBuildMessage()}
             {this.renderUnstableMessage()}
           </p>
           <RepoBuildCancelButton
@@ -146,6 +172,10 @@ class RepoBuildDetail extends Component {
             build={build}
           />
         </div>
+        <InterProjectAlert
+          branchInfo={this.props.branchInfo}
+          upAndDownstreamModules={this.props.upAndDownstreamModules}
+        />
         {this.renderCommits()}
       </div>
     );

@@ -8,6 +8,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.hubspot.rosetta.annotations.StoredAsJson;
@@ -94,6 +95,17 @@ public class Module {
 
   public Module withId(int id) {
     return new Module(Optional.of(id), name, type, path, glob, active, createdTimestamp, updatedTimestamp, buildpack);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("id", id)
+        .add("name", name)
+        .add("type", type)
+        .add("path", path)
+        .add("glob", glob)
+        .add("buildpack", buildpack).toString();
   }
 
   @Override

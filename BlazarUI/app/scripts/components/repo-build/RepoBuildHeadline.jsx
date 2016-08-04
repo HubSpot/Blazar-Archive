@@ -9,24 +9,35 @@ import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
 
 class RepoBuildHeadline extends Component {
-    
-  render() {
-    if (this.props.loading || this.props.currentRepoBuild === undefined) {
+
+  renderInterProjectBuildTag() {
+    const {upAndDownstreamModules} = this.props;
+
+    if (!upAndDownstreamModules.interProjectBuildId) {
       return null;
     }
-    
+
+    return <span className="inter-project-tag">Inter-project build</span>;
+  }
+
+  render() {
+    if (this.props.loading || !this.props.currentRepoBuild) {
+      return null;
+    }
+
     const {stars, params, currentRepoBuild, branchInfo} = this.props;
     const branchId = parseInt(params.branchId, 10);
 
     return (
       <div>
-        <SimpleBreadcrumbs 
-          repo={true} 
+        <SimpleBreadcrumbs
+          repo={true}
           branch={true}
           {...this.props} />
         <Headline className='repobuild-headline'>
           <span>Build #{currentRepoBuild.buildNumber}</span>
         </Headline>
+        {this.renderInterProjectBuildTag()}
       </div>
     )
   }
