@@ -46,8 +46,8 @@
     <basepom.check.skip-findbugs>true</basepom.check.skip-findbugs>
     <dep.horizon.version>0.0.24</dep.horizon.version>
     <dep.rosetta.version>3.11.0</dep.rosetta.version>
-    <singularity.version>0.4.11</singularity.version>
-    <mesos.version>0.23.0</mesos.version>
+    <singularity.version>0.10.0-QA-SNAPSHOT</singularity.version>
+    <mesos.version>0.28.2</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
     <project.build.targetJdk>1.8</project.build.targetJdk>
   </properties>
