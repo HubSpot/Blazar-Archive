@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.hubspot.blazar.base.externalservice.mesos.Resources;
 
 public class BuildConfig {
   private final List<BuildStep> steps;
@@ -18,7 +17,6 @@ public class BuildConfig {
   private final List<String> buildDeps;
   private final List<String> webhooks;
   private final List<String> cache;
-  private final Optional<Resources> buildResources;
   private final Optional<GitInfo> buildpack;
   private final Optional<String> user;
   private final Map<String, StepActivationCriteria> stepActivation;
@@ -32,7 +30,6 @@ public class BuildConfig {
                      @JsonProperty("buildDeps") List<String> buildDeps,
                      @JsonProperty("webhooks") List<String> webhooks,
                      @JsonProperty("cache") List<String> cache,
-                     @JsonProperty("buildResources") Optional<Resources> buildResources,
                      @JsonProperty("buildpack") Optional<GitInfo> buildpack,
                      @JsonProperty("user") Optional<String> user,
                      @JsonProperty("stepActivation") Map<String, StepActivationCriteria> stepActivation,
@@ -43,7 +40,6 @@ public class BuildConfig {
     this.env = Objects.firstNonNull(env, Collections.<String,String>emptyMap());
     this.buildDeps = Objects.firstNonNull(buildDeps, Collections.<String>emptyList());
     this.webhooks = Objects.firstNonNull(webhooks, Collections.<String>emptyList());
-    this.buildResources = Objects.firstNonNull(buildResources, Optional.<Resources>absent());
     this.buildpack = Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
     this.cache = Objects.firstNonNull(cache, Collections.<String>emptyList());
     this.user = Objects.firstNonNull(user, Optional.<String>absent());
@@ -53,7 +49,7 @@ public class BuildConfig {
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null, null, null, null, null, null, null, null, null);
+    return new BuildConfig(null, null, null, null, null, null, null, null, null, null, null);
   }
 
   public List<BuildStep> getSteps() {
@@ -80,10 +76,6 @@ public class BuildConfig {
     return cache;
   }
 
-  public Optional<Resources> getBuildResources() {
-    return buildResources;
-  }
-
   public Optional<GitInfo> getBuildpack() {
     return buildpack;
   }
@@ -105,7 +97,7 @@ public class BuildConfig {
   }
 
   public BuildConfig withUser(String user) {
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, buildResources, buildpack, Optional.of(user), stepActivation, depends, provides);
+    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, buildpack, Optional.of(user), stepActivation, depends, provides);
   }
 
 }
