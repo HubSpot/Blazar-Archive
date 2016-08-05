@@ -10,14 +10,14 @@ const LazyRender = React.createClass({
     extraChildHeight: React.PropTypes.number
   },
 
-  getDefaultProps: () => {
+  getDefaultProps() {
     return {
       itemPadding: 7,
       extraChildHeight: 0
     };
   },
 
-  getInitialState: () => {
+  getInitialState() {
     return {
       childrenTop: 0,
       childrenToRender: 10,
@@ -26,11 +26,11 @@ const LazyRender = React.createClass({
     };
   },
 
-  componentDidMount: () => {
+  componentDidMount() {
     this.onMount();
   },
 
-  componentWillReceiveProps: (nextProps) => {
+  componentWillReceiveProps(nextProps) {
     const childrenTop = Math.floor(this.state.scrollTop / this.state.childHeight);
     let childrenBottom = (nextProps.children.length - childrenTop -
                           this.state.childrenToRender);
@@ -60,17 +60,17 @@ const LazyRender = React.createClass({
     });
   },
 
-  componentDidUpdate: () => {
+  componentDidUpdate() {
     this.onUpdate();
   },
 
-  onUpdate: () => {
+  onUpdate() {
     if (this.state.childHeight !== this.getChildHeight()) {
       this.setState({childHeight: this.getChildHeight()});
     }
   },
 
-  onMount: () => {
+  onMount() {
     const childHeight = this.getChildHeight();
 
     const height = this.getHeight(
@@ -95,7 +95,7 @@ const LazyRender = React.createClass({
     });
   },
 
-  onScroll: () => {
+  onScroll() {
     const container = this.refs.container;
     const scrollTop = container.scrollTop;
 
@@ -114,12 +114,12 @@ const LazyRender = React.createClass({
     });
   },
 
-  getHeight: (numChildren, childHeight, maxHeight, extraChildHeight = 0) => {
+  getHeight(numChildren, childHeight, maxHeight, extraChildHeight = 0) {
     const fullHeight = (numChildren * childHeight) + extraChildHeight;
     return fullHeight < maxHeight ? fullHeight : maxHeight;
   },
 
-  getElementHeight: (element) => {
+  getElementHeight(element) {
     let elmHeight;
     let elmMargin;
     const elm = element;
@@ -134,7 +134,7 @@ const LazyRender = React.createClass({
     return (elmHeight + elmMargin);
   },
 
-  getChildHeight: () => {
+  getChildHeight() {
     if (this.props.childHeight) {
       return this.props.childHeight;
     }
@@ -152,7 +152,7 @@ const LazyRender = React.createClass({
     return this.getElementHeight(firstChild);
   },
 
-  render: () => {
+  render() {
     if (!this.props.children.length) {
       return <div />;
     }

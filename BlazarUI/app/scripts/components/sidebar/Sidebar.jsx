@@ -1,19 +1,11 @@
 import React, {PropTypes} from 'react';
 
-const Sidebar = ({}) => {
-  let headline;
-
-  if (this.props.headline) {
-    headline = <h2 className="sidebar__headline">{this.props.headline}</h2>;
-  }
-
-  return (
-    <div className="sidebar">
-      {headline}
-      {this.props.children}
-    </div>
-  );
-};
+const Sidebar = ({headline, children}) => (
+  <div className="sidebar">
+    {headline && <h2 className="sidebar__headline">{headline}</h2>}
+    {children}
+  </div>
+);
 
 Sidebar.propTypes = {
   headline: PropTypes.string,
