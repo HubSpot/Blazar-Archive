@@ -2,13 +2,14 @@ import React, { Component, PropTypes } from 'react';
 import classNames from 'classnames';
 
 class EmptyMessage extends Component {
-  
+
   getClassNames() {
-    return classNames([
-      'empty-message',
-      {'simple': this.props.simple},
-      {'no-border': this.props.noBorder}
-    ])
+    return classNames(
+      'empty-message', {
+        'simple': this.props.simple,
+        'no-border': this.props.noBorder
+      }
+    );
   }
 
   render() {
@@ -16,10 +17,9 @@ class EmptyMessage extends Component {
       <div className={this.getClassNames()}>
         {this.props.children}
       </div>
-    )
+    );
   }
-
-};
+}
 
 EmptyMessage.propTypes = {
   children: PropTypes.node,

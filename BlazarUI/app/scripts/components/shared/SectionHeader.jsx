@@ -1,15 +1,10 @@
-import React, {Component, PropTypes} from 'react';
+import React, {PropTypes} from 'react';
 
-class SectionHeader extends Component {
-
-  render() {
-    return (
-      <h3 className='section-header'>
-        {this.props.children}
-      </h3>
-    );
-  }
-}
+const SectionHeader = ({children}) => (
+  <h3 className="section-header">
+    {children}
+  </h3>
+);
 
 SectionHeader.propTypes = {
   children: PropTypes.node

@@ -60,7 +60,8 @@ UIGridItem.propTypes = {
   offset: PropTypes.oneOf(UIGridConstants.OFFSET_RANGE),
   size: PropTypes.oneOf(UIGridConstants.SIZE_RANGE).isRequired,
   className: PropTypes.string,
-  children: PropTypes.node
+  children: PropTypes.node,
+  align: PropTypes.string
 };
 
 export default UIGridItem;

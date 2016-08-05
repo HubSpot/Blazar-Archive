@@ -9,6 +9,8 @@ class Image extends Component {
         height: this.props.height || 'auto'
       };
     }
+
+    return {};
   }
 
   render() {

@@ -1,12 +1,13 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll} from 'underscore';
 import {scrollTo} from '../Helpers';
 import Icon from './Icon.jsx';
 import ClassNames from 'classnames';
 
 class ScrollTo extends Component {
-  
-  constructor() {
+
+  constructor(props) {
+    super(props);
+
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -18,7 +19,6 @@ class ScrollTo extends Component {
   }
 
   handleClick(event) {
-    const currentTarget = event.currentTarget
     const direction = event.currentTarget.getAttribute('data-direction');
     scrollTo(direction);
   }
@@ -26,11 +26,11 @@ class ScrollTo extends Component {
   render() {
     return (
       <div className={this.getClassNames()}>
-        <span className='scroll-to-btn' data-direction='top' onClick={this.handleClick}>
-          <Icon for='scroll-up' />
+        <span className="scroll-to-btn" data-direction="top" onClick={this.handleClick}>
+          <Icon for="scroll-up" />
         </span>
-        <span className='scroll-to-btn' data-direction='bottom' onClick={this.handleClick}>
-          <Icon for='scroll-down' />
+        <span className="scroll-to-btn" data-direction="bottom" onClick={this.handleClick}>
+          <Icon for="scroll-down" />
         </span>
       </div>
     );
@@ -39,6 +39,6 @@ class ScrollTo extends Component {
 
 ScrollTo.propTypes = {
   className: PropTypes.string
-}
+};
 
 export default ScrollTo;

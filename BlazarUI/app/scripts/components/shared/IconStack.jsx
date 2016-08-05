@@ -7,11 +7,11 @@ class IconStack extends Component {
 
   getBaseClassNames() {
     return classNames([
-      "fa-stack-2x",
+      'fa-stack-2x',
       this.props.classNames
     ]);
   }
-  
+
   renderIconStackBase() {
     return (
       <Icon type="fa" classNames={this.getBaseClassNames()} name={this.props.iconStackBase} />
@@ -38,12 +38,12 @@ IconStack.defaultProps = {
   iconStackBase: '',
   iconNames: Immutable.List.of(),
   classNames: ''
-}
+};
 
 IconStack.propTypes = {
   iconStackBase: PropTypes.string,
   iconNames: PropTypes.instanceOf(Immutable.List),
   classNames: PropTypes.string
-}
+};
 
 export default IconStack;

@@ -1,28 +1,24 @@
 import React, {Component, PropTypes} from 'react';
 import { ICON_LIST } from '../constants';
-import ClassNames from 'classnames'
+import classNames from 'classnames';
 
 class Icon extends Component {
 
   getClassNames() {
-
     if (this.props.for) {
-      return ClassNames([
+      return classNames([
         'icon',
         this.props.classNames,
         ICON_LIST[this.props.for]
       ]);
-    } 
-    else {
-      return ClassNames([
-        'icon',
-        this.props.classNames,
-        this.props.type,
-        `${this.props.type}-${this.props.name}`        
-      ]);
     }
 
-    return classNames;
+    return classNames([
+      'icon',
+      this.props.classNames,
+      this.props.type,
+      `${this.props.type}-${this.props.name}`
+    ]);
   }
 
   render() {

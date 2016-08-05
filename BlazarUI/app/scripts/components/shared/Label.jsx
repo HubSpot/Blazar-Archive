@@ -3,8 +3,8 @@ import React, {Component, PropTypes} from 'react';
 class Label extends Component {
 
   getClassNames() {
-    let labelType = this.props.type || 'default';
-    return 'label label-' + labelType;
+    const labelType = this.props.type || 'default';
+    return `label label-${labelType}`;
   }
 
   render() {

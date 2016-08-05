@@ -4,7 +4,7 @@ import Icon from '../shared/Icon.jsx';
 
 import SidebarFilterStore from '../../stores/sidebarFilterStore';
 
-const FOCUS_SEARCH_BAR_SHORTCUTS = [83, 84] // s, t
+const FOCUS_SEARCH_BAR_SHORTCUTS = [83, 84]; // s, t
 
 // To do: Typeahead in input box
 class SearchFilter extends Component {
@@ -17,7 +17,7 @@ class SearchFilter extends Component {
   }
 
   componentWillMount() {
-    this.handleSearchDebounced = debounce(function () {
+    this.handleSearchDebounced = debounce(() => {
       this.props.onChange(this.refs.searchFilterInput.value);
     }, 250);
   }
@@ -54,19 +54,19 @@ class SearchFilter extends Component {
     const modifierKey = e.metaKey || e.shiftKey || event.ctrlKey;
     const shortcutPressed = contains(FOCUS_SEARCH_BAR_SHORTCUTS, e.which);
     if (shortcutPressed && !modifierKey && notFocusedOnInputElement) {
-       this.focusInput();
+      this.focusInput();
     }
   }
 
   render() {
     return (
       <div>
-        <Icon name='search' classNames='search-filter__icon' />
+        <Icon name="search" classNames="search-filter__icon" />
         <input
           type="text"
           ref="searchFilterInput"
           className="search-input form-control"
-          placeholder='Filter repositories...'
+          placeholder="Filter repositories..."
           value={this.state.searchValue}
           onChange={this.handleChange}
         />

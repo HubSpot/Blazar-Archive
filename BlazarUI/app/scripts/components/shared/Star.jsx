@@ -3,7 +3,7 @@ import Icon from '../shared/Icon.jsx';
 import { bindAll } from 'underscore';
 import classnames from 'classnames';
 import StarActions from '../../actions/starActions';
-  
+
 class Star extends Component {
 
   constructor(props) {
@@ -21,14 +21,15 @@ class Star extends Component {
   }
 
   getContainerClassNames() {
-    return classnames([
+    return classnames(
        'star',
-       this.props.className,
-       {disabled: this.props.disabled},
-       {selected: this.props.isStarred},
-       {unselected: !this.props.isStarred},
-       {loading: this.props.loading}
-    ]);
+       this.props.className, {
+         disabled: this.props.disabled,
+         selected: this.props.isStarred,
+         unselected: !this.props.isStarred,
+         loading: this.props.loading
+       }
+    );
   }
 
   getIconClassNames() {
@@ -41,7 +42,7 @@ class Star extends Component {
   render() {
     return (
       <span onClick={this.handleClick} className={this.getContainerClassNames()}>
-          <Icon name={this.getIconClassNames()}></Icon>
+        <Icon name={this.getIconClassNames()} />
       </span>
     );
   }

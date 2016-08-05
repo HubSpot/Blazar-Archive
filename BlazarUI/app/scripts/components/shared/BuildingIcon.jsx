@@ -18,7 +18,6 @@ class BuildingIcon extends Component {
       </div>
     );
   }
-
 }
 
 BuildingIcon.defaultProps = {
@@ -29,7 +28,8 @@ BuildingIcon.defaultProps = {
 BuildingIcon.propTypes = {
   result: PropTypes.string,
   classNames: PropTypes.string,
-  size: PropTypes.oneOf(['medium', 'small'])
+  size: PropTypes.oneOf(['medium', 'small']),
+  prevBuildState: PropTypes.string
 };
 
 export default BuildingIcon;

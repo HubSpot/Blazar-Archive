@@ -6,7 +6,7 @@ class Logo extends Component {
 
   getRenderedClassNames() {
     return Classnames([
-      "logo",
+      'logo',
       {crumb: this.props.crumb}
     ]);
   }

@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
-import Immutable from 'immutable';
 import ReactTooltip from 'react-tooltip';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
@@ -8,11 +7,6 @@ import Checkbox from './Checkbox.jsx';
 import Loader from './Loader.jsx';
 import Icon from './Icon.jsx';
 import ModuleSelectWrapper from './ModuleSelectWrapper.jsx';
-
-let initialState = {
-  showDownstreamTooltip: false,
-  showCacheTooltip: false
-}
 
 class ModuleModal extends Component {
 
@@ -56,23 +50,23 @@ class ModuleModal extends Component {
     return (
       <div className="downstream-checkbox-wrapper">
         <Checkbox
-          label=' Build Downstream Modules'
-          name='downstream-checkbox'
+          label=" Build Downstream Modules"
+          name="downstream-checkbox"
           checked={true}
           onCheckboxUpdate={this.updateDownstreamModules}
         />
-        <a data-tip data-for='downstreamTooltip'>
+      <a data-tip={true} data-for="downstreamTooltip">
           <Icon
-            type='fa'
-            name='question-circle'
-            classNames='checkbox-tooltip'
+            type="fa"
+            name="question-circle"
+            classNames="checkbox-tooltip"
           />
         </a>
         <ReactTooltip
-          id='downstreamTooltip'
-          place='bottom'
-          type='dark'
-          effect='solid'>
+          id="downstreamTooltip"
+          place="bottom"
+          type="dark"
+          effect="solid">
           Build dependent downstream modules within the same repository
         </ReactTooltip>
       </div>
@@ -82,24 +76,24 @@ class ModuleModal extends Component {
     return (
       <div className="inter-project-checkbox-wrapper">
         <Checkbox
-          label=' Trigger Inter-Project Build'
-          name='triggerInterProjectBuild-checkbox'
+          label=" Trigger Inter-Project Build"
+          name="triggerInterProjectBuild-checkbox"
           checked={false}
           onCheckboxUpdate={this.updateTriggerInterProjectBuild}
         />
-        <div className='tooltip-wrapper'>
-          <a data-tip data-for='triggerInterProjectBuildTooltip'>
+        <div className="tooltip-wrapper">
+          <a data-tip={true} data-for="triggerInterProjectBuildTooltip">
             <Icon
-              type='fa'
-              name='question-circle'
-              classNames='checkbox-tooltip'
+              type="fa"
+              name="question-circle"
+              classNames="checkbox-tooltip"
             />
           </a>
           <ReactTooltip
-            id='triggerInterProjectBuildTooltip'
-            place='bottom'
-            type='dark'
-            effect='solid'>
+            id="triggerInterProjectBuildTooltip"
+            place="bottom"
+            type="dark"
+            effect="solid">
             Trigger inter-project build of all dependent modules
           </ReactTooltip>
         </div>
@@ -111,25 +105,25 @@ class ModuleModal extends Component {
     return (
       <div className="cache-checkbox-wrapper">
         <Checkbox
-          label=' Reset Cache'
-          name='cache-checkbox'
+          label=" Reset Cache"
+          name="cache-checkbox"
           checked={false}
           onCheckboxUpdate={this.updateResetCache}
         />
-        <div className='tooltip-wrapper'>
-          <a data-tip data-for='cache-tooltip'>
+        <div className="tooltip-wrapper">
+          <a data-tip={true} data-for="cache-tooltip">
             <Icon
-              type='fa'
-              name='question-circle'
-              classNames='checkbox-tooltip'
+              type="fa"
+              name="question-circle"
+              classNames="checkbox-tooltip"
             />
           </a>
          <ReactTooltip
-            className='cache-tooltip'
-            id='cache-tooltip'
-            place='bottom'
-            type='dark'
-            effect='solid'>
+           className="cache-tooltip"
+           id="cache-tooltip"
+           place="bottom"
+           type="dark"
+           effect="solid">
             Reset data cached from the previous build
           </ReactTooltip>
         </div>
@@ -141,7 +135,7 @@ class ModuleModal extends Component {
     if (this.props.loadingModules) {
       return (
         <Modal.Body>
-          <Loader align='top-center' />
+          <Loader align="top-center" />
         </Modal.Body>
       );
     }
@@ -154,8 +148,8 @@ class ModuleModal extends Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className='row'>
-            <div className='col-md-6'>
+          <div className="row">
+            <div className="col-md-6">
               <span className="module-modal__text">Choose modules to build:</span>
               <ModuleSelectWrapper
                 modules={this.props.modules}
@@ -163,15 +157,15 @@ class ModuleModal extends Component {
               />
             </div>
           </div>
-          <div className='checkbox-wrapper'>
+          <div className="checkbox-wrapper">
             {this.renderDownstreamToggle()}
             {this.renderResetCache()}
             {this.renderInterProjectToggle()}
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button id='module-modal-nevermind-button' onClick={this.props.closeModal}>Nevermind</Button>
-          <Button id='module-modal-build-button' onClick={this.getModuleIdsAndBuild} className='btn btn-primary'>Build</Button>
+          <Button id="module-modal-nevermind-button" onClick={this.props.closeModal}>Nevermind</Button>
+          <Button id="module-modal-build-button" onClick={this.getModuleIdsAndBuild} className="btn btn-primary">Build</Button>
         </Modal.Footer>
       </div>
     );
@@ -179,7 +173,7 @@ class ModuleModal extends Component {
 
   render() {
     return (
-      <Modal dialogClassName='module-modal' bsSize='large' show={this.props.showModal} onKeyPress={this.maybeStartBuild} onHide={this.props.closeModal}>
+      <Modal dialogClassName="module-modal" bsSize="large" show={this.props.showModal} onKeyPress={this.maybeStartBuild} onHide={this.props.closeModal}>
         {this.renderModalContent()}
       </Modal>
     );
@@ -192,7 +186,7 @@ ModuleModal.propTypes = {
   onSelectUpdate: PropTypes.func.isRequired,
   onCheckboxUpdate: PropTypes.func.isRequired,
   onResetCacheUpdate: PropTypes.func.isRequired,
-  onTriggerInterProjectBuild:  PropTypes.func.isRequired,
+  onTriggerInterProjectBuild: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
   loadingModules: PropTypes.bool,
   modules: PropTypes.array.isRequired
