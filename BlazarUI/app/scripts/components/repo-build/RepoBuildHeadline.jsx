@@ -42,7 +42,7 @@ RepoBuildHeadline.propTypes = {
   loading: PropTypes.bool.isRequired,
   branchInfo: PropTypes.object.isRequired,
   upAndDownstreamModules: PropTypes.object.isRequired,
-  currentRepoBuild: PropTypes.object.isRequired
+  currentRepoBuild: PropTypes.object
 };
 
 export default RepoBuildHeadline;

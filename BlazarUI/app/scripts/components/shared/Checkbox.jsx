@@ -37,7 +37,7 @@ Checkbox.propTypes = {
   checked: PropTypes.bool,
   onCheckboxUpdate: PropTypes.func,
   name: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   label: PropTypes.string.isRequired
 };
 

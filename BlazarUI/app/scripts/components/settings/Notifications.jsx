@@ -21,7 +21,7 @@ class Notifications extends Component {
       addingNewChannel: false
     };
 
-    bindAll(this, 'onChannelClick', 'onButtonClick', 'onSelectedNewChannel', 'onChannelDelete');
+    bindAll(this, 'onChannelClick', 'onButtonClick', 'onSelectedNewChannel');
   }
 
   componentDidMount() {
@@ -130,7 +130,6 @@ class Notifications extends Component {
               addingNewChannel={this.state.addingNewChannel}
               onChannelClick={this.onChannelClick}
               onSelectedNewChannel={this.onSelectedNewChannel}
-              onChannelDelete={this.onChannelDelete}
               {...this.props}
             />
             <div className="notifications__new-channel-button-wrapper">

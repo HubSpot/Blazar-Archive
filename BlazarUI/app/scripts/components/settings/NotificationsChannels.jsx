@@ -48,7 +48,6 @@ class NotificationsChannels extends Component {
 
   deleteNotification(notificationId, channelName) {
     SettingsActions.deleteNotification(notificationId);
-    this.props.onChannelDelete(channelName);
 
     this.setState({
       channelDeleted: channelName,
@@ -157,7 +156,6 @@ NotificationsChannels.propTypes = {
   slackChannels: PropTypes.array.isRequired,
   onChannelClick: PropTypes.func.isRequired,
   onSelectedNewChannel: PropTypes.func.isRequired,
-  onChannelDelete: PropTypes.func.isRequired,
   addingNewChannel: PropTypes.bool.isRequired,
   selectedChannel: PropTypes.string
 };
