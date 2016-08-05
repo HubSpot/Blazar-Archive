@@ -6,8 +6,8 @@ class BuildLogLine extends Component {
   getClassNames() {
     return ClassNames([
       'log-line',
-      {'log-line-emphasis' : this.props.emphasis}
-    ])
+      {'log-line-emphasis': this.props.emphasis}
+    ]);
   }
 
   render() {

@@ -1,6 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import Button from 'react-bootstrap/lib/Button';
-import Icon from '../shared/Icon.jsx';
 import {bindAll} from 'underscore';
 
 import SidebarFilterActions from '../../actions/sidebarFilterActions';
@@ -20,7 +18,7 @@ class SidebarToggle extends Component {
   getButtonClassNames(type) {
     let classNames = `sidebar__filter-buttons-btn ${type}`;
     if (this.props.toggleFilterState === type) {
-      classNames += ' active'
+      classNames += ' active';
     }
     return classNames;
   }
@@ -28,28 +26,27 @@ class SidebarToggle extends Component {
   render() {
     return (
       <div className="sidebar__filter-buttons">
-        
         <a
           id="all"
           className={this.getButtonClassNames('all')}
-          onClick={this.handleToggle}>
+          onClick={this.handleToggle}
+        >
           All
         </a>
-
         <a
           id="starred"
           className={this.getButtonClassNames('starred')}
-          onClick={this.handleToggle}>
+          onClick={this.handleToggle}
+        >
             Starred
         </a>
-
         <a
           id="building"
           className={this.getButtonClassNames('building')}
-          onClick={this.handleToggle}>
+          onClick={this.handleToggle}
+        >
             Building
         </a>
-
       </div>
     );
   }

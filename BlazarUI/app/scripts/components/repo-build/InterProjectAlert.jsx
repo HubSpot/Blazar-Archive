@@ -2,10 +2,8 @@ import React, {Component, PropTypes} from 'react';
 import {isEmpty, map} from 'underscore';
 import {Link} from 'react-router';
 import Alert from 'react-bootstrap/lib/Alert';
-import {contains} from 'underscore';
 import classNames from 'classnames';
 
-import BuildStates from '../../constants/BuildStates';
 import {getInterProjectClassName, InterProjectBuildTypes} from '../../constants/InterProjectConstants';
 
 class InterProjectAlert extends Component {
@@ -168,7 +166,7 @@ class InterProjectAlert extends Component {
     }
 
     return (
-      <a onClick={this.onClickExpand} className='inter-project-alert__expand'>
+      <a onClick={this.onClickExpand} className="inter-project-alert__expand">
         {this.state.expanded ? 'hide' : 'show'} details
       </a>
     );
@@ -199,7 +197,7 @@ class InterProjectAlert extends Component {
 
     return (
       <Alert
-        bsStyle='info'
+        bsStyle="info"
         className={this.getClassNames()}
       >
         <div className="inter-project-alert__summary">

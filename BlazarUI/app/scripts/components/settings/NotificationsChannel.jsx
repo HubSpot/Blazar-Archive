@@ -1,15 +1,18 @@
 import React, {Component, PropTypes} from 'react';
+import {bindAll} from 'underscore';
 
 import Icon from '../shared/Icon.jsx';
 
-let initialState = {
-  deleteConfirmation: false
-}
-
 class NotificationsChannel extends Component {
-  
-  constructor() {
-    this.state = initialState;
+
+  constructor(props) {
+    super(props);
+
+    bindAll(this, 'deleteNotification', 'hideDeleteConfirmation', 'onClickTrashCan');
+
+    this.state = {
+      deleteConfirmation: false
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -28,7 +31,7 @@ class NotificationsChannel extends Component {
   hideDeleteConfirmation() {
     this.setState({
       deleteConfirmation: false
-    })
+    });
   }
 
   onClickTrashCan() {
@@ -36,17 +39,14 @@ class NotificationsChannel extends Component {
       this.setState({
         deleteConfirmation: true
       });
-    }
-
-    else {
+    } else {
       this.hideDeleteConfirmation();
     }
   }
 
   renderDeleteConfirmation() {
-
     if (!this.props.isSelected) {
-      return;
+      return null;
     }
 
     let divClass = 'notifications__delete-select';
@@ -57,15 +57,15 @@ class NotificationsChannel extends Component {
 
     return (
       <div className={divClass}>
-        <span className='notifications__delete-select-question'>
-          Remove? 
+        <span className="notifications__delete-select-question">
+          Remove?
         </span>
-        <div className='notifications__delete-select-yes' onClick={this.deleteNotification.bind(this)}>
+        <div className="notifications__delete-select-yes" onClick={this.deleteNotification}>
           <span>
             Yes
           </span>
         </div>
-        <div className='notifications__delete-select-no' onClick={this.hideDeleteConfirmation.bind(this)}>
+        <div className="notifications__delete-select-no" onClick={this.hideDeleteConfirmation}>
           <span>
             Keep
           </span>
@@ -79,9 +79,7 @@ class NotificationsChannel extends Component {
       return null;
     }
 
-    return (
-      <div className='notifications__triangle' />
-    );
+    return <div className="notifications__triangle" />;
   }
 
   renderTrashCan() {
@@ -90,8 +88,8 @@ class NotificationsChannel extends Component {
     }
 
     return (
-      <div className='notifications__delete' onClick={this.onClickTrashCan.bind(this)}>
-        <Icon type='fa' name='trash' />
+      <div className="notifications__delete" onClick={this.onClickTrashCan}>
+        <Icon type="fa" name="trash" />
       </div>
     );
   }
@@ -101,8 +99,8 @@ class NotificationsChannel extends Component {
     const finalClassName = `notifications__channel${extraClassName}`;
 
     return (
-      <div className={finalClassName} onClick={this.props.onClick.bind(this, this.props.channel)}>
-        <div className='notifications__channel-wrapper'>
+      <div className={finalClassName} onClick={() => this.props.onClick(this.props.channel)}>
+        <div className="notifications__channel-wrapper">
           # {this.props.channel}
         </div>
         {this.renderTrashCan()}

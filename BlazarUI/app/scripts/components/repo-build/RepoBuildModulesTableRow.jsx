@@ -1,16 +1,16 @@
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
-import ProgressBar from 'react-bootstrap/lib/ProgressBar';
-import {contains, has} from 'underscore';
 import moment from 'moment';
 import classNames from 'classnames';
-import {humanizeText, timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon, getTableDurationText} from '../Helpers';
+import {timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon, getTableDurationText} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
 
   constructor(props, context) {
     super(props, context);
+
+    this.onTableClick = this.onTableClick.bind(this);
   }
 
   isDebugMode() {
@@ -34,22 +34,18 @@ class RepoBuildModulesTableRow extends Component {
 
     if (link === 'build-link' || link === 'singularity-link') {
       return;
-    }
-
-    else if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(data.state) === -1) {
+    } else if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(data.state) === -1) {
       if (!e.metaKey) {
         this.context.router.push(data.blazarPath);
-      }
-
-      else {
-        window.open(config.appRoot + data.blazarPath);
+      } else {
+        window.open(`${window.config.appRoot}${data.blazarPath}`);
         return;
       }
     }
   }
 
   renderBuildLink() {
-    const {data, params} = this.props;
+    const {data} = this.props;
 
     if (data.state === BuildStates.SKIPPED || data.state === BuildStates.CANCELLED) {
       return (
@@ -58,8 +54,10 @@ class RepoBuildModulesTableRow extends Component {
     }
 
     return (
-      <span><Link className='build-link' to={data.blazarPath}>{data.name}</Link></span>
-    );    
+      <span>
+        <Link className="build-link" to={data.blazarPath}>{data.name}</Link>
+      </span>
+    );
   }
 
   renderSingularityLink() {
@@ -80,7 +78,7 @@ class RepoBuildModulesTableRow extends Component {
 
     return (
       <td>
-        <a className='singularity-link' href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>
+        <a className="singularity-link" href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>
       </td>
     );
   }
@@ -91,19 +89,19 @@ class RepoBuildModulesTableRow extends Component {
     if (data.state === BuildStates.IN_PROGRESS) {
       data.endTimestamp = moment();
     }
-    
+
     return getTableDurationText(data.state, timestampDuration(data.startTimestamp, data.endTimestamp));
   }
 
   render() {
-    const {data, params} = this.props;
+    const {data} = this.props;
 
     return (
-      <tr onClick={this.onTableClick.bind(this)} className={this.getRowClassNames(data.state)}>
-        <td className='build-status'>
+      <tr onClick={this.onTableClick} className={this.getRowClassNames(data.state)}>
+        <td className="build-status">
           {buildResultIcon(data.state)}
         </td>
-        <td className='table-cell-link'>
+        <td className="table-cell-link">
           {this.renderBuildLink()}
         </td>
         <td>

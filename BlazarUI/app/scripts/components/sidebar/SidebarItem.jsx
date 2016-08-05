@@ -1,23 +1,22 @@
 import React, {Component, PropTypes} from 'react';
-import {Link} from 'react-router'
+import {Link} from 'react-router';
 import classnames from 'classnames';
-import {has, contains} from 'underscore';
 import {truncate} from '../Helpers.js';
-import BuildingIcon from '../shared/BuildingIcon.jsx';
 import Icon from '../shared/Icon.jsx';
-import Star from '../shared/Star.jsx';
 import BuildStates from '../../constants/BuildStates.js';
 import {buildResultIcon} from '../Helpers.js';
 
-let initialState = {
-  expanded: false,
-  height: 67
-};
-
 class SidebarItem extends Component {
 
-  constructor() {
-    this.state = initialState;
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      expanded: false,
+      height: 67
+    };
+
+    this.toggleExpand = this.toggleExpand.bind(this);
   }
 
   getItemClasses() {
@@ -33,9 +32,7 @@ class SidebarItem extends Component {
 
     if (this.state.expanded) {
       heightDelta = 67 - heightWithChildren;
-    }
-
-    else {
+    } else {
       heightDelta = heightWithChildren - 67;
     }
 
@@ -49,11 +46,9 @@ class SidebarItem extends Component {
   getBuildToUse(build) {
     const {lastBuild, inProgressBuild} = build;
 
-    if (inProgressBuild !== undefined) {
+    if (inProgressBuild) {
       return inProgressBuild;
-    }
-
-    else if (lastBuild !== undefined) {
+    } else if (lastBuild) {
       return lastBuild;
     }
 
@@ -71,14 +66,12 @@ class SidebarItem extends Component {
 
     if (!this.state.expanded) {
       toggleExpandMessage = `show ${numberRemaining} more`;
-    }
-
-    else {
-      toggleExpandMessage = `show fewer`;
+    } else {
+      toggleExpandMessage = 'show fewer';
     }
 
     return (
-      <div onClick={this.toggleExpand.bind(this)} className='sidebar-item__and-more'>
+      <div onClick={this.toggleExpand} className="sidebar-item__and-more">
         {toggleExpandMessage}
       </div>
     );
@@ -89,9 +82,9 @@ class SidebarItem extends Component {
     const blazarRepositoryPath = `/builds/repo/${repository}`;
 
     return (
-      <div className='sidebar-item__repo-link'>
-        <Icon type='octicon' name='repo' classNames='repo-octicon'/>{ '   ' }
-          <span className='sidebar-item__module-repo-name'>
+      <div className="sidebar-item__repo-link">
+        <Icon type="octicon" name="repo" classNames="repo-octicon" />{ '   ' }
+          <span className="sidebar-item__module-repo-name">
             <Link to={blazarRepositoryPath}>
               {truncate(repository, 22, true)}
             </Link>
@@ -104,7 +97,7 @@ class SidebarItem extends Component {
     const {gitInfo} = build;
 
     return (
-      <span className='sidebar-item__module-branch-name'>
+      <span className="sidebar-item__module-branch-name">
         <Link to={gitInfo.blazarBranchPath}>
           {gitInfo.branch}
         </Link>
@@ -121,7 +114,7 @@ class SidebarItem extends Component {
 
     return (
       <Link to={buildToUse.blazarPath}>
-        <div className='sidebar-item__building-icon-link'>
+        <div className="sidebar-item__building-icon-link">
           {buildResultIcon(buildToUse.state)}
         </div>
       </Link>
@@ -136,23 +129,21 @@ class SidebarItem extends Component {
     }
 
     return (
-      <Link to={buildToUse.blazarPath} className='sidebar-item__build-number'>
+      <Link to={buildToUse.blazarPath} className="sidebar-item__build-number">
         #{buildToUse.buildNumber}
       </Link>
     );
   }
 
   renderBranchRow(build, key) {
-    const {gitInfo, lastBuild} = build;
+    const {lastBuild} = build;
 
     if (!build.inProgressBuild && !lastBuild) {
       return null;
     }
 
-    let buildState = build.inProgressBuild !== undefined ? build.inProgressBuild.state : lastBuild.state;
-
     return (
-      <div key={key} className='sidebar-item__branch-link'>
+      <div key={key} className="sidebar-item__branch-link">
         {this.renderBuildIcon(build)}
         {this.renderBranchText(build)}
         {this.renderBuildNumber(build)}
@@ -162,7 +153,7 @@ class SidebarItem extends Component {
 
   renderBranchRows() {
     const {builds} = this.props;
-    let realBuilds = builds.slice();
+    const realBuilds = builds.slice();
 
     if (realBuilds.length > 1 && !this.state.expanded) {
       const originalSize = realBuilds.length;
@@ -177,14 +168,12 @@ class SidebarItem extends Component {
       );
     }
 
-    else {
-      return (
-        <div>
-          {realBuilds.map((build, i) => {return this.renderBranchRow(build, i);})}
-          {this.renderExpandText()}
-        </div>
-      )
-    }
+    return (
+      <div>
+        {realBuilds.map((build, i) => {return this.renderBranchRow(build, i);})}
+        {this.renderExpandText()}
+      </div>
+    );
   }
 
   render() {
@@ -193,7 +182,7 @@ class SidebarItem extends Component {
         {this.renderRepoLink()}
         {this.renderBranchRows()}
       </li>
-    )
+    );
   }
 }
 
@@ -201,7 +190,8 @@ SidebarItem.propTypes = {
   isStarred: PropTypes.bool,
   builds: PropTypes.array.isRequired,
   repository: PropTypes.string.isRequired,
-  onExpand: PropTypes.func.isRequired
+  onExpand: PropTypes.func.isRequired,
+  classNames: PropTypes.string
 };
 
 export default SidebarItem;

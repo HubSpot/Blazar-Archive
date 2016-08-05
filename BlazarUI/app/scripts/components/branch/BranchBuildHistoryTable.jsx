@@ -8,12 +8,8 @@ class BranchBuildHistoryTable extends Component {
 
   render() {
     if (!this.props.data) {
-      return (
-        <Loader align='top-center' />
-      );
-    }
-
-    if (this.props.data.size === 0) {
+      return <Loader align="top-center" />;
+    } else if (!this.props.data.size) {
       return (
         <EmptyMessage> No build history </EmptyMessage>
       );
@@ -30,7 +26,9 @@ class BranchBuildHistoryTable extends Component {
 
 BranchBuildHistoryTable.propTypes = {
   loading: PropTypes.bool,
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
+  buildTable: PropTypes.func.isRequired,
+  params: PropTypes.object.isRequired
 };
 
 export default TableMaker(BranchBuildHistoryTable, {showProgress: false});

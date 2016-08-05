@@ -1,13 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import Select from 'react-select';
-import {bindAll, uniq, flatten} from 'underscore';
-import {filterInactiveBuilds, uniqueBranches} from '../Helpers';
+import {bindAll} from 'underscore';
+import {getUniqueBranches} from '../Helpers';
 
 class BranchFilter extends Component {
 
   constructor() {
-    bindAll(this, 'handleBranchFilterChange', 'handleModuleFilterChange', 'handleFilterFocus', 'handleFilterBlur');  
-    
+    bindAll(this, 'handleBranchFilterChange', 'handleModuleFilterChange', 'handleFilterFocus', 'handleFilterBlur');
+
     this.filters = {
       branch: [],
       module: []
@@ -15,35 +15,35 @@ class BranchFilter extends Component {
 
     this.state = {
       filteringInProgress: false
-    }
+    };
   }
 
   shouldComponentUpdate() {
     return !this.state.filteringInProgress;
   }
-  
+
   handleFilterFocus() {
     this.setState({
       filteringInProgress: true
     });
   }
-  
+
   handleFilterBlur() {
     this.setState({
       filteringInProgress: false
-    })
+    });
   }
-  
+
   handleBranchFilterChange(val, multiVal) {
     this.filters.branch = multiVal;
-    this.updateFilterProps()
+    this.updateFilterProps();
   }
 
   handleModuleFilterChange(val, multiVal) {
     this.filters.module = multiVal;
-    this.updateFilterProps()
+    this.updateFilterProps();
   }
-  
+
   updateFilterProps() {
     this.props.updateFilters(this.filters);
   }
@@ -60,15 +60,15 @@ class BranchFilter extends Component {
     }
 
     return (
-      <div className='filter-container branch-filter'>
+      <div className="filter-container branch-filter">
         <Select
           onFocus={this.handleFilterFocus}
           onBlur={this.handleFilterBlur}
-          placeholder='Filter by branch'
-          className='branch-filter-input'
+          placeholder="Filter by branch"
+          className="branch-filter-input"
           name="branchFilter"
           value={this.props.filters.branch}
-          options={uniqueBranches(this.filterInactiveBranches())}
+          options={getUniqueBranches(this.filterInactiveBranches())}
           onChange={this.handleBranchFilterChange}
         />
 
@@ -79,7 +79,10 @@ class BranchFilter extends Component {
 
 BranchFilter.propTypes = {
   filters: PropTypes.object.isRequired,
-  updateFilters: PropTypes.func.isRequired
+  updateFilters: PropTypes.func.isRequired,
+  branches: PropTypes.array.isRequired,
+  loading: PropTypes.bool,
+  hide: PropTypes.bool
 };
 
 export default BranchFilter;

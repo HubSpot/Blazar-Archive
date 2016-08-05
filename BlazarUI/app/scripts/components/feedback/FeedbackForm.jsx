@@ -1,10 +1,9 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import {bindAll} from 'underscore';
 import Input from 'react-bootstrap/lib/Input';
 import Button from 'react-bootstrap/lib/Button';
 import Icon from '../shared/Icon.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
-import Feedback from '../../models/Feedback';
 import FeedbackActions from '../../actions/feedbackActions';
 import FeedbackStore from '../../stores/feedbackStore';
 import { getUsernameFromCookie } from '../Helpers.js';
@@ -20,19 +19,18 @@ class FeedbackForm extends Component {
       nameValue: getUsernameFromCookie() || '',
       messageValue: '',
       submitDisabled: true,
-      submitted: false,
       autofocus: 'name'
-    }
+    };
   }
-  
+
   componentDidMount() {
-    this.unsubscribeFeedbackForm = FeedbackStore.listen(this.onStatusChange)
+    this.unsubscribeFeedbackForm = FeedbackStore.listen(this.onStatusChange);
   }
-  
+
   componentWillUnmount() {
-    this.unsubscribeFeedbackForm()
+    this.unsubscribeFeedbackForm();
   }
-  
+
   onStatusChange(status) {
     this.setState(status);
   }
@@ -47,7 +45,7 @@ class FeedbackForm extends Component {
       submitted: false
     });
   }
-  
+
   resetForm() {
     this.setState({
       sendError: false,
@@ -62,9 +60,9 @@ class FeedbackForm extends Component {
   getContainerClassName() {
     if (this.state.visible) {
       return 'feedback-container visible';
-    } else {
-      return 'feedback-container';
     }
+
+    return 'feedback-container';
   }
 
   handleNameChange() {
@@ -86,7 +84,7 @@ class FeedbackForm extends Component {
       username: this.state.nameValue,
       message: this.state.messageValue,
       page: window.location.href
-    }
+    };
 
     FeedbackActions.sendFeedback(payload);
   }
@@ -95,9 +93,8 @@ class FeedbackForm extends Component {
     if (this.state.submitted) {
       return this.renderSubmitted();
     }
-    else {
-      return this.renderForm();
-    }
+
+    return this.renderForm();
   }
 
   renderSubmitted() {
@@ -106,24 +103,25 @@ class FeedbackForm extends Component {
         <Alert bsStyle="danger" className="feedback__sent" >
           <h4>Sorry, we received an error submitting feedback</h4>
           <pre>{this.state.sendError}</pre>
-          <p>Please visit channel  { ' ' }
+          <p>
+            Please visit channel { ' ' }
             <span className="channel-name">
               <a href="https://hubspot.slack.com/messages/platform-support/" target="blank">#platform-support</a>
             </span> in Slack for support.</p>
         </Alert>
-      )
+      );
     }
 
     return (
       <div className="feedback__sent">
         <h4>Thanks for helping us improve Blazar!</h4>
-        <p className="big-icon"><Icon for="circle-check"/></p>
+        <p className="big-icon"><Icon for="circle-check" /></p>
         <p>To join the conversation, hit up { ' ' }
           <span className="channel-name">
             <a href="https://hubspot.slack.com/messages/platform-support/" target="blank">#platform-support</a>
           </span> in Slack.
         </p>
-        <button onClick={this.resetForm} className='btn submit-more-btn'>Submit more feedback</button>
+        <button onClick={this.resetForm} className="btn submit-more-btn">Submit more feedback</button>
       </div>
     );
   }
@@ -133,16 +131,16 @@ class FeedbackForm extends Component {
       <div>
         <p>
           Running into an issue? Fill out the form below and we'll be alerted in Slack.
-          <span className='text-muted'> (There's no need to include the url; we will receive it with your message.)</span>
+          <span className="text-muted"> (There's no need to include the url; we will receive it with your message.)</span>
         </p>
-        
-        <hr/>
+
+        <hr />
         <Input
           type="text"
           placeholder="Your Name"
           ref="name"
           value={this.state.nameValue}
-          onChange={this.handleNameChange} 
+          onChange={this.handleNameChange}
           autoFocus={this.state.autofocus === 'name'}
         />
         <Input
@@ -152,10 +150,10 @@ class FeedbackForm extends Component {
           ref="message"
           help=""
           value={this.state.messageValue}
-          onChange={this.handleMessageChange} 
+          onChange={this.handleMessageChange}
           autoFocus={this.state.autofocus === 'message'}
         />
-        <Button bsStyle="info" block disabled={this.state.submitDisabled} onClick={this.submitFeedback}>Submit</Button>
+        <Button bsStyle="info" block={true} disabled={this.state.submitDisabled} onClick={this.submitFeedback}>Submit</Button>
       </div>
     );
   }

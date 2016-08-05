@@ -6,8 +6,6 @@ import classNames from 'classnames';
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
-import Headline from '../shared/headline/Headline.jsx';
-import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import BranchBuildHistoryTable from './BranchBuildHistoryTable.jsx';
 import BranchHeadline from './BranchHeadline.jsx';
 import Loader from '../shared/Loader.jsx';
@@ -15,7 +13,6 @@ import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import BuildButton from './BuildButton.jsx';
 import ModuleModal from '../shared/ModuleModal.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
-import Immutable from 'immutable';
 import $ from 'jquery';
 
 import StarStore from '../../stores/starStore';
@@ -23,14 +20,13 @@ import StarActions from '../../actions/starActions';
 
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
-import InterProjectStore from '../../stores/interProjectStore';
 import InterProjectActions from '../../actions/interProjectActions';
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
 
 import {getPreviousBuildState} from '../Helpers.js';
 
-let initialState = {
+const initialState = {
   builds: null,
   stars: [],
   loadingBranches: true,
@@ -56,7 +52,7 @@ class BranchContainer extends Component {
   constructor() {
     this.state = initialState;
 
-    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'triggerBuild');
+    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'triggerBuild', 'refreshBranches');
   }
 
   componentDidMount() {
@@ -109,8 +105,8 @@ class BranchContainer extends Component {
   }
 
   setScrollListener() {
-    $(window).scroll($.proxy(function() {
-      const scrolledToBottom = $(window).scrollTop() + $(window).height() == $(document).height();
+    $(window).scroll($.proxy(() => {
+      const scrolledToBottom = $(window).scrollTop() + $(window).height() === $(document).height();
 
       if (scrolledToBottom) {
         this.setState({
@@ -158,18 +154,18 @@ class BranchContainer extends Component {
   updateResetCache() {
     this.setState({
       resetCache: !this.state.resetCache
-    })
+    });
   }
 
   updateTriggerInterProjectBuild() {
     this.setState({
       triggerInterProjectBuild: !this.state.triggerInterProjectBuild
-    })
+    });
   }
 
 
   triggerBuild() {
-    let newState = this.state;
+    const newState = this.state;
 
     if (this.state.selectedModules.length === 0) {
       newState.selectedModules = this.state.modules.map((module) => {
@@ -194,7 +190,7 @@ class BranchContainer extends Component {
   buildDocumentTitle() {
     const {branchInfo} = this.state;
 
-    return branchInfo ? branchInfo.repository + ' - ' + branchInfo.branch : 'Branch Build History';
+    return branchInfo ? `${branchInfo.repository}-${branchInfo.branch}` : 'Branch Build History';
   }
 
   renderTable() {
@@ -206,21 +202,18 @@ class BranchContainer extends Component {
       );
     }
 
-    else {
-      if (this.state.builds) {
-        this.props.params.prevBuildState = getPreviousBuildState(this.state.builds);
-      }
-
-      return (
-        <BranchBuildHistoryTable
-          data={this.state.builds !== null ? this.state.builds.slice(0, this.state.maxRows) : null}
-          loading={this.isLoading()}
-          {...this.state}
-          {...this.props}
-        />
-      );
+    if (this.state.builds) {
+      this.props.params.prevBuildState = getPreviousBuildState(this.state.builds);
     }
 
+    return (
+      <BranchBuildHistoryTable
+        data={this.state.builds !== null ? this.state.builds.slice(0, this.state.maxRows) : null}
+        loading={this.isLoading()}
+        {...this.state}
+        {...this.props}
+      />
+    );
   }
 
   renderMalformedFileAlert() {
@@ -232,8 +225,9 @@ class BranchContainer extends Component {
       <UIGrid>
         <UIGridItem size={12}>
           <MalformedFileNotification
-          loading={this.state.loadingMalformedFiles}
-          malformedFiles={this.state.malformedFiles} />
+            loading={this.state.loadingMalformedFiles}
+            malformedFiles={this.state.malformedFiles}
+          />
         </UIGridItem>
       </UIGrid>
     );
@@ -241,14 +235,14 @@ class BranchContainer extends Component {
 
   renderBuildSettingsButton() {
     if (this.isLoading()) {
-      return;
+      return null;
     }
 
     const buildSettingsLink = `/settings/branch/${this.props.params.branchId}`;
 
     return (
       <Link to={buildSettingsLink}>
-        <Button id='build-settings-button'>
+        <Button id="build-settings-button">
             Build Settings
         </Button>
       </Link>
@@ -259,12 +253,10 @@ class BranchContainer extends Component {
     const showedAllRows = this.state.builds === null || this.state.maxRows >= this.state.builds.size;
 
     if (this.isLoading() || showedAllRows) {
-      return;
+      return null;
     }
 
-    return (
-      <Loader align='center' />
-    );
+    return <Loader align="center" />;
   }
 
   render() {
@@ -276,12 +268,12 @@ class BranchContainer extends Component {
               loading={this.isLoading()}
               branchInfo={this.state.branchInfo}
               branchesList={this.state.branchesList}
-              refreshBranches={this.refreshBranches.bind(this)}
+              refreshBranches={this.refreshBranches}
               {...this.state}
               {...this.props}
             />
           </UIGridItem>
-          <UIGridItem style={{'paddingTop': '32px'}} size={5} align='RIGHT'>
+          <UIGridItem style={{'paddingTop': '32px'}} size={5} align="RIGHT">
             <BuildButton
               openModuleModal={this.openModuleModal}
               loading={this.isLoading()}

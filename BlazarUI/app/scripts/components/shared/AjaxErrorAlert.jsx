@@ -4,11 +4,11 @@ import Alert from 'react-bootstrap/lib/Alert';
 
 class AjaxErrorAlert extends Component {
 
-  render() {    
+  render() {
     if (!this.props.error) {
       return null;
     }
-    
+
     return (
       <Alert bsStyle="danger">
         <strong>Status {this.props.error.status}. Sorry, we're experiencing an error.</strong>

@@ -1,11 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll, clone, some} from 'underscore';
+import {bindAll} from 'underscore';
 
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
-import Loader from '../shared/Loader.jsx';
 
 import StarStore from '../../stores/starStore';
 import StarActions from '../../actions/starActions';
@@ -25,7 +24,7 @@ import RepoBuildDetail from './RepoBuildDetail.jsx';
 
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 
-let initialState = {
+const initialState = {
   moduleBuilds: false,
   stars: [],
   malformedFiles: [],
@@ -117,7 +116,7 @@ class RepoBuildContainer extends Component {
   buildDocumentTitle() {
     const {branchInfo, currentRepoBuild} = this.state;
     const titlePrefix = currentRepoBuild ? `#${currentRepoBuild.buildNumber}` : `#${this.props.params.buildNumber}`;
-    const titleInfo = branchInfo ? ' | ' + branchInfo.repository  + ' - ' + branchInfo.branch : '';
+    const titleInfo = branchInfo ? ` | ${branchInfo.repository} - ${branchInfo.branch}` : '';
 
     return titlePrefix + titleInfo;
   }
@@ -151,8 +150,9 @@ class RepoBuildContainer extends Component {
       <UIGrid>
         <UIGridItem size={12}>
           <MalformedFileNotification
-          loading={this.state.loadingMalformedFiles}
-          malformedFiles={this.state.malformedFiles} />
+            loading={this.state.loadingMalformedFiles}
+            malformedFiles={this.state.malformedFiles}
+          />
         </UIGridItem>
       </UIGrid>
     );

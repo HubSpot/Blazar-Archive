@@ -26,7 +26,7 @@ const initialState = {
   error: false,
   loading: true,
   loadingBranchInfo: true
-}
+};
 
 class BuildContainer extends Component {
 
@@ -49,7 +49,7 @@ class BuildContainer extends Component {
   }
 
   componentWillUnmount() {
-    this.tearDown()
+    this.tearDown();
   }
 
   setup(props) {
@@ -85,7 +85,7 @@ class BuildContainer extends Component {
     this.setState(state);
 
     if (state.data && state.data.build && buildIsOnDeck(state.data.build.state)) {
-      setTimeout( () => {
+      setTimeout(() => {
         BuildActions.loadBuild(this.props.params);
       }, 2000);
     }
@@ -107,7 +107,7 @@ class BuildContainer extends Component {
     const {branchInfo, data} = this.state;
     const {moduleName, buildNumber} = this.props.params;
 
-    const titlePrefix = `${moduleName} #` + (data.build.buildNumber || buildNumber);
+    const titlePrefix = `${moduleName} #${(data.build.buildNumber || buildNumber)}`;
     const titleInfo = branchInfo ? ' | ' + `${branchInfo.repository} - ${branchInfo.branch}` : '';
 
     return titlePrefix + titleInfo;
@@ -115,9 +115,9 @@ class BuildContainer extends Component {
 
   render() {
     return (
-      <PageContainer documentTitle={this.buildDocumentTitle()} classNames='build-container'>
+      <PageContainer documentTitle={this.buildDocumentTitle()} classNames="build-container">
         <div className={this.getHeaderClasses()}>
-          <UIGrid containerClassName='build-header__name-and-buttons'>
+          <UIGrid containerClassName="build-header__name-and-buttons">
             <UIGridItem size={8}>
               <BuildHeadline
                 {...this.props}
@@ -133,7 +133,7 @@ class BuildContainer extends Component {
             </UIGridItem>
           </UIGrid>
         </div>
-        <div className='build-body'>
+        <div className="build-body">
           <BuildLog
             build={this.state.data.build}
             log={this.state.data.log}

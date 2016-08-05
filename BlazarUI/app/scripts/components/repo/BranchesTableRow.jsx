@@ -1,25 +1,19 @@
 import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
 import {Link} from 'react-router';
-import {LABELS, iconStatus} from '../constants';
 import {has} from 'underscore';
-import {tableRowBuildState, humanizeText, timestampFormatted, buildResultIcon, timestampDuration} from '../Helpers';
+import {tableRowBuildState, timestampFormatted, buildResultIcon, timestampDuration} from '../Helpers';
 import moment from 'moment';
 import classNames from 'classnames';
-
-import Icon from '../shared/Icon.jsx';
-import Sha from '../shared/Sha.jsx';
-
-let initialState = {
-  moment: moment()
-}
 
 class BranchesTableRow extends Component {
 
   constructor(props, context) {
     super(props, context);
 
-    this.state = initialState;
+    this.state = {
+      moment: moment()
+    };
   }
 
   componentDidMount() {
@@ -33,7 +27,7 @@ class BranchesTableRow extends Component {
   updateMoment() {
     this.setState({
       moment: moment()
-    })
+    });
   }
 
   getRowClassNames(state) {
@@ -46,35 +40,29 @@ class BranchesTableRow extends Component {
   onTableClick(blazarPath, e) {
     const link = e.target.className;
 
-    if (link === 'branch-link' || link === 'build-link' || link === 'sha-link') {
+    if (!blazarPath || link === 'branch-link' || link === 'build-link' || link === 'sha-link') {
       return;
-    }
-
-    else if (blazarPath !== undefined) {
-      if (!e.metaKey) {
-        this.context.router.push(blazarPath);
-      }
-
-      else {
-        window.open(config.appRoot + blazarPath);
-        return;
-      }
+    } else if (!e.metaKey) {
+      this.context.router.push(blazarPath);
+    } else {
+      window.open(`${window.config.appRoot}${blazarPath}`);
+      return;
     }
   }
 
-  renderBranchLink(gitInfo) {
+  renderBranchLink() {
     const {gitInfo} = this.props.data;
 
     return (
       <span>
-        <Link className='branch-link' to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
+        <Link className="branch-link" to={gitInfo.blazarBranchPath}>{gitInfo.branch}</Link>
       </span>
     );
   }
-  
+
   renderNoHistoryTable() {
     return (
-      <tr> 
+      <tr>
         <td></td>
         <td>
           {this.renderBranchLink()}
@@ -83,47 +71,51 @@ class BranchesTableRow extends Component {
         <td></td>
         <td></td>
         <td></td>
-      </tr> 
-    )
-  } 
-  
+      </tr>
+    );
+  }
+
   renderFullTable() {
     const {
       lastBuild,
       inProgressBuild,
-      pendingBuild,
-      gitInfo
+      pendingBuild
     } = this.props.data;
-    
-    let sha, buildLink;
-    const build = inProgressBuild ? inProgressBuild : pendingBuild ? pendingBuild : lastBuild;
+
+    let buildLink;
+    let build;
+
+    if (inProgressBuild) {
+      build = inProgressBuild;
+    } else if (pendingBuild) {
+      build = pendingBuild;
+    } else {
+      build = lastBuild;
+    }
+
     let duration = build.duration;
 
     if (build.state === BuildStates.IN_PROGRESS) {
       duration = timestampDuration(build.startTimestamp, this.state.moment);
     }
 
-    if (build.sha !== undefined) {
-      sha = <Sha gitInfo={gitInfo} build={build} />;
-    }
-
     if (build.blazarPath) {
       buildLink = (
-        <Link className='build-link' to={build.blazarPath}>
+        <Link className="build-link" to={build.blazarPath}>
           {build.buildNumber}
         </Link>
       );
     }
 
     return (
-      <tr onClick={this.onTableClick.bind(this, build.blazarPath)} className={this.getRowClassNames(build.state)}>
-        <td className='build-status'>
+      <tr onClick={(e) => this.onTableClick(build.blazarPath, e)} className={this.getRowClassNames(build.state)}>
+        <td className="build-status">
           {buildResultIcon(build.state)}
         </td>
         <td>
-          {this.renderBranchLink(gitInfo)}
+          {this.renderBranchLink()}
         </td>
-        <td className='build-result-link'>
+        <td className="build-result-link">
           {buildLink}
         </td>
         <td>
@@ -134,7 +126,6 @@ class BranchesTableRow extends Component {
         </td>
       </tr>
     );
-  
   }
 
   render() {

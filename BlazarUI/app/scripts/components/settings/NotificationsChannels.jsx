@@ -7,16 +7,14 @@ import NotificationsChannel from './NotificationsChannel.jsx';
 
 import SettingsActions from '../../actions/settingsActions';
 
-let initialState = {
-  channelDeleted: undefined,
-  showToast: false,
-  showedToastAt: moment()
-};
-
 class NotificationsChannels extends Component {
 
   constructor() {
-    this.state = initialState;
+    this.state = {
+      channelDeleted: undefined,
+      showToast: false,
+      showedToastAt: moment()
+    };
 
     bindAll(this, 'handleSlackChannelPicked');
   }
@@ -86,8 +84,9 @@ class NotificationsChannels extends Component {
           channel={notification.channelName}
           isSelected={this.props.selectedChannel === notification.channelName}
           onClick={this.props.onChannelClick}
-          onDelete={this.deleteNotification.bind(this, notification.id, notification.channelName)}
-          key={i} />
+          onDelete={() => this.deleteNotification(notification.id, notification.channelName)}
+          key={i}
+        />
       );
     });
   }
@@ -106,16 +105,17 @@ class NotificationsChannels extends Component {
     });
 
     return (
-      <div className='notifications__new-channel-hashtag'>
-      <span>#</span>
-      <Select
-        placeholder="Choose a channel"
-        className='slack-channel-input'
-        name="slackChannel"
-        options={slackChannels}
-        onChange={this.handleSlackChannelPicked}
-        allowCreate={true}
-        addLabelText='{label}' />
+      <div className="notifications__new-channel-hashtag">
+        <span>#</span>
+        <Select
+          placeholder="Choose a channel"
+          className="slack-channel-input"
+          name="slackChannel"
+          options={slackChannels}
+          onChange={this.handleSlackChannelPicked}
+          allowCreate={true}
+          addLabelText="{label}"
+        />
       </div>
     );
   }
@@ -124,14 +124,14 @@ class NotificationsChannels extends Component {
     let opacityModifier = '';
 
     if (this.state.showToast) {
-      opacityModifier = ' revealed'
+      opacityModifier = ' revealed';
     }
 
     const classNames = `notifications__delete-toast${opacityModifier}`;
 
     return (
       <div className={classNames}>
-        <div className='notifications__delete-toast-inner'>
+        <div className="notifications__delete-toast-inner">
           <span>Notification channel removed</span>
           <p>You will no longer receive notifications in <strong>#{this.state.channelDeleted}</strong></p>
         </div>
@@ -141,8 +141,8 @@ class NotificationsChannels extends Component {
 
   render() {
     return (
-      <div className='notifications__channels-container'>
-        <div className='notifications__channels'>
+      <div className="notifications__channels-container">
+        <div className="notifications__channels">
           {this.renderChannels()}
           {this.renderNewChannel()}
           {this.renderToast()}

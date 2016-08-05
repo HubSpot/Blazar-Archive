@@ -1,20 +1,19 @@
-import React, {Component, PropTypes} from 'react';
+import React, {PropTypes} from 'react';
 
-class Sidebar extends Component {
+const Sidebar = ({}) => {
+  let headline;
 
-  render() {
-    let headline;
-    if (this.props.headline) {
-      headline = <h2 className='sidebar__headline'>{this.props.headline}</h2>;
-    }
-    return (
-      <div className='sidebar'>
-        {headline}
-        {this.props.children}
-      </div>
-    );
+  if (this.props.headline) {
+    headline = <h2 className="sidebar__headline">{this.props.headline}</h2>;
   }
-}
+
+  return (
+    <div className="sidebar">
+      {headline}
+      {this.props.children}
+    </div>
+  );
+};
 
 Sidebar.propTypes = {
   headline: PropTypes.string,

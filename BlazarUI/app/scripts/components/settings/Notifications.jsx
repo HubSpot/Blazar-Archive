@@ -11,40 +11,21 @@ import NotificationsList from './NotificationsList.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 
-let initialState = {
-  selectedChannel: undefined,
-  addingNewChannel: false
-};
-
 class Notifications extends Component {
 
   constructor(props, context) {
     super(props, context);
 
-    this.state = initialState;
+    this.state = {
+      selectedChannel: undefined,
+      addingNewChannel: false
+    };
+
     bindAll(this, 'onChannelClick', 'onButtonClick', 'onSelectedNewChannel', 'onChannelDelete');
   }
 
   componentDidMount() {
-    const {notifications} = this.props;
-
-    if (notifications.length) {
-      this.setState({
-        selectedChannel: notifications[0].channelName
-      });
-    }
-
-    $(window).keyup($.proxy(function(event) {
-      if (event.keyCode === 27 && this.state.addingNewChannel) {
-        this.setState({
-          addingNewChannel: false
-        });
-      }
-    }, this));
-  }
-
-  componentWillUnmount() {
-    $(window).unbind('keyup');
+    this.onMount();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -59,6 +40,28 @@ class Notifications extends Component {
         selectedChannel: notifications[notifications.length - 1].channelName
       });
     }
+  }
+
+  componentWillUnmount() {
+    $(window).unbind('keyup');
+  }
+
+  onMount() {
+    const {notifications} = this.props;
+
+    if (notifications.length) {
+      this.setState({
+        selectedChannel: notifications[0].channelName
+      });
+    }
+
+    $(window).keyup($.proxy((event) => {
+      if (event.keyCode === 27 && this.state.addingNewChannel) {
+        this.setState({
+          addingNewChannel: false
+        });
+      }
+    }, this));
   }
 
   getChannels() {
@@ -91,10 +94,6 @@ class Notifications extends Component {
     });
   }
 
-  onChannelDelete(channelName) {
-    // you can use this information
-  }
-
   renderButton() {
     const buttonClasses = classNames([
       'notifications__channel-button',
@@ -102,30 +101,30 @@ class Notifications extends Component {
     ]);
 
     return (
-      <Button 
+      <Button
         className={buttonClasses}
-        onClick={this.onButtonClick} 
-        bsStyle='primary'>
+        onClick={this.onButtonClick}
+        bsStyle="primary">
         Add New Channel
       </Button>
-    )
+    );
   }
 
   render() {
     return (
-      <div className='notifications'>
+      <div className="notifications">
         <NotificationsHeadline />
         <UIGrid>
           <UIGridItem size={12}>
-            <div className='notifications__channels-headline'>
+            <div className="notifications__channels-headline">
               <span>
                 Channels
               </span>
             </div>
           </UIGridItem>
         </UIGrid>
-        <UIGrid className='notifications__grid settings__grid'>
-          <UIGridItem size={4} className='notifications__channel-list'>
+        <UIGrid className="notifications__grid settings__grid">
+          <UIGridItem size={4} className="notifications__channel-list">
             <NotificationsChannels
               selectedChannel={this.state.selectedChannel}
               addingNewChannel={this.state.addingNewChannel}
@@ -134,7 +133,7 @@ class Notifications extends Component {
               onChannelDelete={this.onChannelDelete}
               {...this.props}
             />
-            <div className='notifications__new-channel-button-wrapper'>
+            <div className="notifications__new-channel-button-wrapper">
               {this.renderButton()}
             </div>
           </UIGridItem>

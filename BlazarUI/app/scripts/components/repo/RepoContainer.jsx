@@ -1,47 +1,38 @@
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
 import PageContainer from '../shared/PageContainer.jsx';
-import Immutable from 'immutable';
 
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
-import Loader from '../shared/Loader.jsx';
 import Icon from '../shared/Icon.jsx';
 import BranchFilter from './BranchFilter.jsx';
 import BranchesTable from './BranchesTable.jsx';
-import EmptyMessage from '../shared/EmptyMessage.jsx';
-import {getFilteredBranches, filterInactiveBuilds, sortBranchesByTimestamp} from '../Helpers.js'
+import {getFilteredBranches, filterInactiveBuilds} from '../Helpers';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
 import BuildsStore from '../../stores/buildsStore';
-import BuildsActions from '../../actions/buildsActions';
-
-let initialState = {
-  builds: [],
-  loading: true,
-  filters: {
-    branch: [],
-    repo: []
-  },
-  error: null
-};
 
 class RepoContainer extends Component {
 
   constructor() {
     bindAll(this, 'onStatusChange', 'updateFilters');
-    this.state = initialState;
+
+    this.state = {
+      builds: [],
+      loading: true,
+      filters: {
+        branch: [],
+        repo: []
+      },
+      error: null
+    };
   }
 
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
-    const builds = BuildsStore.getBuilds().all;
-    this.setState({
-      builds: this.getFilteredBuilds(this.props, builds),
-      loading: !builds.length
-    });
+    this.onMount();
   }
 
   componentWillReceiveProps(nextprops) {
@@ -57,6 +48,15 @@ class RepoContainer extends Component {
 
   componentWillUnmount() {
     this.unsubscribeFromBuilds();
+  }
+
+  onMount() {
+    const builds = BuildsStore.getBuilds().all;
+
+    this.setState({
+      builds: this.getFilteredBuilds(this.props, builds),
+      loading: !builds.length
+    });
   }
 
   onStatusChange(state) {

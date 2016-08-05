@@ -1,8 +1,6 @@
-/*global config*/
 import React, {Component, PropTypes} from 'react';
-import Immutable, { fromJS } from 'immutable'
-import $ from 'jquery';
-import { bindAll } from 'underscore';
+import Immutable, { fromJS } from 'immutable';
+import {bindAll} from 'underscore';
 
 import BuildStates from '../../constants/BuildStates';
 
@@ -18,32 +16,23 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import RepoBuildActions from '../../actions/repoBuildActions';
 import RepoBuildStore from '../../stores/repoBuildStore';
 
-let initialState = {
-  expandedCard: -1,
-  loading: false,
-  repoBuild: {},
-  moduleBuildsList: []
-};
-
 class Dashboard extends Component {
 
   constructor(props) {
     super(props);
 
-    this.state = initialState;
-    bindAll(this, 'pollWithLatestBuild');
+    this.state = {
+      expandedCard: -1,
+      loading: false,
+      repoBuild: {},
+      moduleBuildsList: []
+    };
+
+    bindAll(this, 'onStatusChange', 'pollWithLatestBuild');
   }
 
   componentDidMount() {
-    this.unsubscribeFromRepo = RepoBuildStore.listen(this.onStatusChange.bind(this));
-  }
-
-  componentWillUnmount() {
-    this.unsubscribeFromRepo();
-    
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-    }
+    this.unsubscribeFromRepo = RepoBuildStore.listen(this.onStatusChange);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -51,7 +40,7 @@ class Dashboard extends Component {
       const starredBuilds = nextProps.starredBuilds.toJS();
       let newIndex;
 
-      for (var i = 0; i < starredBuilds.length; i++) {
+      for (let i = 0; i < starredBuilds.length; i++) {
         if (starredBuilds[i].gitInfo.id === this.state.branchId) {
           newIndex = i;
         }
@@ -64,6 +53,14 @@ class Dashboard extends Component {
       this.setState({
         expandedCard: newIndex
       });
+    }
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeFromRepo();
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
     }
   }
 
@@ -91,8 +88,6 @@ class Dashboard extends Component {
   }
 
   getBuildByBranchId(branchId) {
-    const {starredBuilds} = this.props;
-
     const build = this.props.starredBuilds.toJS().filter((starredBuild) => {
       return starredBuild.gitInfo.id === branchId;
     })[0];
@@ -111,7 +106,7 @@ class Dashboard extends Component {
       this.triggerRepoBuildReload(build, branchId);
     }
 
-    this.timeout = setTimeout(this.pollWithLatestBuild, config.activeBuildModuleRefresh);
+    this.timeout = setTimeout(this.pollWithLatestBuild, window.config.activeBuildModuleRefresh);
   }
 
   onCardClick(key, build) {
@@ -124,7 +119,7 @@ class Dashboard extends Component {
 
     this.setState({
       expandedCard: key,
-      branchId: branchId,
+      branchId,
       loading: true
     });
 
@@ -139,40 +134,29 @@ class Dashboard extends Component {
       return (
         <RepoBranchCard
           {...this.state}
-          onClick={this.onCardClick.bind(this, key, build)}
+          onClick={() => this.onCardClick(key, build)}
           key={key}
-          expanded={key === this.state.expandedCard} 
+          expanded={key === this.state.expandedCard}
           belowExpanded={key === this.state.expandedCard + 1 && this.state.expandedCard !== -1}
           first={key === 0}
           last={key === numberOfBuilds - 1}
           item={build}
-          loading={this.props.loadingBuilds || this.props.loadingStars || this.state.loading} />
+          loading={this.props.loadingBuilds || this.props.loadingStars || this.state.loading}
+        />
       );
-    })
-  }
-
-  renderHeader() {
-    return (
-      <RepoBranchCardStackHeader />
-    );
-  }
-
-  renderRepoBranchCardStackZeroState() {
-    return (
-      <RepoBranchCardStackZeroState />
-    );
+    });
   }
 
   render() {
     return (
-      <UIGrid>                
-        <UIGridItem size={12} className='dashboard-unit'>
+      <UIGrid>
+        <UIGridItem size={12} className="dashboard-unit">
           <Headline>
             Starred Branches
           </Headline>
           <CardStack
-            header={this.renderHeader()}
-            zeroState={this.renderRepoBranchCardStackZeroState()}
+            header={<RepoBranchCardStackHeader />}
+            zeroState={<RepoBranchCardStackZeroState />}
             loading={this.props.loadingBuilds || this.props.loadingStars}>
             {this.renderCards()}
           </CardStack>
