@@ -25,6 +25,7 @@
   "dependencies": {
     "ansi_up": "^1.2.1",
     "babel-core": "^4.7.0",
+    "babel-eslint": "^6.0.0",
     "babel-jest": "^4.0.0",
     "babel-loader": "^4.2.0",
     "binary-search": "^1.2.0",
