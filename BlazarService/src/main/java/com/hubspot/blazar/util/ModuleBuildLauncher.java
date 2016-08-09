@@ -94,6 +94,7 @@ public class ModuleBuildLauncher {
   private BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
     List<BuildStep> steps = primary.getSteps().isEmpty() ? secondary.getSteps() : primary.getSteps();
     List<BuildStep> before = primary.getBefore().isEmpty() ? secondary.getBefore() : primary.getBefore();
+    Optional<BuildConfig.PostBuildSteps> after = primary.getAfter().isPresent() ? primary.getAfter() : secondary.getAfter();
     Map<String, String> env = new LinkedHashMap<>();
     env.putAll(secondary.getEnv());
     env.putAll(primary.getEnv());
@@ -120,7 +121,7 @@ public class ModuleBuildLauncher {
     provides.addAll(primary.getDepends());
     provides.addAll(secondary.getDepends());
 
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
+    return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
   }
 
   private BuildConfig configAtSha(GitInfo gitInfo, Module module) throws IOException, NonRetryableBuildException {
