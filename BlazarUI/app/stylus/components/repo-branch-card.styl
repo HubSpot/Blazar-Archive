@@ -1,8 +1,29 @@
-@import './card-variables.styl'
+@import '../card-variables'
 
 $info-width = 30%
 $last-build-width = 20%
 $details-width = 50%
+
+.repo-branch-card__zero-state
+  height 200px
+  padding 50px 20px
+  font-family HelveticaNeue-light
+  color #425b76
+  text-align center
+  max-width 600px
+  margin auto
+
+  & img
+    padding-bottom 30px
+
+  & h1
+    margin 0 0 20px 0
+    font-size 20px
+    font-family HelveticaNeue-medium
+
+  & p
+    font-size 16px
+    line-height 24px
 
 .repo-branch-card__header
   height 50px
@@ -44,10 +65,6 @@ $details-width = 50%
   width $info-width
   height 100%
 
-.repo-branch-card__inner-wrapper
-  display inline-block
-  width 100%
-
 .repo-branch-card__repo
   padding-top 6px
   font-size 16px
@@ -55,6 +72,18 @@ $details-width = 50%
   white-space nowrap
   text-overflow ellipsis
   max-width calc(100% - 10px)
+
+.repo-branch-card__main
+  padding 10px 20px
+  height $initial-height
+  cursor pointer
+  background-color white
+  transition background $bg-transition-duration
+  width calc(100% - 80px)
+  display inline-block
+
+  & > div
+    display inline-block
 
 .repo-branch-card__build-and-status
   width 80px
@@ -122,13 +151,11 @@ $details-width = 50%
   color #425b76
   font-family HelveticaNeue-bold
 
-.repo-branch-card__details
+.repo-branch-card__triggered-by
   width $details-width
   height 100%
   vertical-align middle
   line-height 20px
-
-.repo-branch-card__triggered-by
   font-family HelveticaNeue-light
   color #425b76
   overflow hidden
@@ -152,7 +179,7 @@ $details-width = 50%
   padding-top 17px
   font-family HelveticaNeue-medium
 
-.repo-branch-card__expanded-header
+.repo-branch-card__details-header
   font-family HelveticaNeue-light
   font-size 18px
   color #425b76
@@ -161,13 +188,13 @@ $details-width = 50%
   & .repo-branch-card__build-number
     font-family HelveticaNeue
 
-.repo-branch-card__expanded-author
+.repo-branch-card__author
   font-size 14px
   color #2965a8
   font-family HelveticaNeue
   padding-left 20px
 
-.repo-branch-card__expanded-module-rows
+.repo-branch-card__module-rows
   margin-top 20px
   box-shadow 0 3px 3px 0 rgba(0, 0, 0, 0.2)
 

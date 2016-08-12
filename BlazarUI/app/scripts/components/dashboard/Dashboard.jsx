@@ -6,10 +6,7 @@ import { bindAll } from 'underscore';
 
 import BuildStates from '../../constants/BuildStates';
 
-import CardStack from '../shared/CardStack.jsx';
-import RepoBranchCard from '../shared/RepoBranchCard.jsx';
-import RepoBranchCardStackHeader from '../shared/RepoBranchCardStackHeader.jsx';
-import RepoBranchCardStackZeroState from '../shared/RepoBranchCardStackZeroState.jsx';
+import RepoBranchCardStack from '../shared/RepoBranchCardStack.jsx';
 
 import Headline from '../shared/headline/Headline.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -19,7 +16,7 @@ import RepoBuildActions from '../../actions/repoBuildActions';
 import RepoBuildStore from '../../stores/repoBuildStore';
 
 let initialState = {
-  expandedCard: -1,
+  expandedCard: null,
   loading: false,
   repoBuild: {},
   moduleBuildsList: []
@@ -31,7 +28,7 @@ class Dashboard extends Component {
     super(props);
 
     this.state = initialState;
-    bindAll(this, 'pollWithLatestBuild');
+    bindAll(this, 'pollWithLatestBuild', 'onCardClick');
   }
 
   componentDidMount() {
@@ -40,14 +37,14 @@ class Dashboard extends Component {
 
   componentWillUnmount() {
     this.unsubscribeFromRepo();
-    
+
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.state.expandedCard !== -1) {
+    if (this.state.expandedCard) {
       const starredBuilds = nextProps.starredBuilds.toJS();
       let newIndex;
 
@@ -73,8 +70,8 @@ class Dashboard extends Component {
 
   resetSelectedCard() {
     this.setState({
-      expandedCard: -1,
-      build: undefined
+      expandedCard: null,
+      build: null
     });
 
     if (this.timeout) {
@@ -132,50 +129,20 @@ class Dashboard extends Component {
     this.pollWithLatestBuild(branchId);
   }
 
-  renderCards() {
-    const numberOfBuilds = this.props.starredBuilds.size;
-
-    return this.props.starredBuilds.map((build, key) => {
-      return (
-        <RepoBranchCard
-          {...this.state}
-          onClick={this.onCardClick.bind(this, key, build)}
-          key={key}
-          expanded={key === this.state.expandedCard} 
-          belowExpanded={key === this.state.expandedCard + 1 && this.state.expandedCard !== -1}
-          first={key === 0}
-          last={key === numberOfBuilds - 1}
-          item={build}
-          loading={this.props.loadingBuilds || this.props.loadingStars || this.state.loading} />
-      );
-    })
-  }
-
-  renderHeader() {
-    return (
-      <RepoBranchCardStackHeader />
-    );
-  }
-
-  renderRepoBranchCardStackZeroState() {
-    return (
-      <RepoBranchCardStackZeroState />
-    );
-  }
-
   render() {
     return (
-      <UIGrid>                
+      <UIGrid>
         <UIGridItem size={12} className='dashboard-unit'>
           <Headline>
             Starred Branches
           </Headline>
-          <CardStack
-            header={this.renderHeader()}
-            zeroState={this.renderRepoBranchCardStackZeroState()}
-            loading={this.props.loadingBuilds || this.props.loadingStars}>
-            {this.renderCards()}
-          </CardStack>
+          <RepoBranchCardStack
+            onClick={this.onCardClick}
+            starredBuilds={this.props.starredBuilds}
+            expandedCard={this.state.expandedCard}
+            moduleBuildsList={this.state.moduleBuildsList}
+            loading={this.props.loadingBuilds || this.props.loadingStars}
+          />
         </UIGridItem>
       </UIGrid>
     );

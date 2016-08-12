@@ -8,7 +8,7 @@ class RepoBranchCardStackZeroState extends Component {
     const starImagePath = `${config.staticRoot}/images/sad-star.svg`;
 
     return (
-      <div className='card-stack__zero-state'>
+      <div className='repo-branch-card__zero-state'>
         <Image src={starImagePath} />
         <h1>You haven't starred any branches</h1>
         <p>Branches that you’ve starred will normally show up here. You can use the navigation on
