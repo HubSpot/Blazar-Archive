@@ -1,14 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import {map} from 'underscore';
 import TableHeadRow from './TableHeadRow.jsx';
-import classNames from 'classnames';
-
 
 class TableHead extends Component {
-
-  getClassNames() {
-    return this.props.classNames;
-  }
 
   getColumns() {
     return map(this.props.columnNames, (name, i) =>
@@ -17,9 +11,8 @@ class TableHead extends Component {
   }
 
   render() {
-
     return (
-      <thead className={this.getClassNames()}>
+      <thead className={this.props.classNames}>
         <tr>
           {this.getColumns()}
         </tr>

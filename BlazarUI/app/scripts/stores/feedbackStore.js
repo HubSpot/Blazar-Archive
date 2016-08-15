@@ -6,14 +6,14 @@ const FeedbackStore = Reflux.createStore({
 
   listenables: FeedbackActions,
 
-  onSendFeedbackCompleted: function() {
+  onSendFeedbackCompleted() {
     this.trigger({
       submitted: true,
       sent: true
     });
   },
 
-  onSendFeedbackFailed: function(error) {
+  onSendFeedbackFailed(error) {
     this.trigger({
       submitted: true,
       sent: false,

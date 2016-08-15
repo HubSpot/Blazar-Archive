@@ -12,7 +12,6 @@ function renderedOutput(elt) {
 }
 
 describe('<TableHead />', () => {
-
   let tableHead;
   let mockColumns = [
     {label: 'Module', key: 'module'},
@@ -31,5 +30,4 @@ describe('<TableHead />', () => {
   it('should generate children with table rows', () => {
     expect(tableHead.props.children.type).toBe('tr');
   });
-
 });

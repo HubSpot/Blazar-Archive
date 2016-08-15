@@ -1,17 +1,27 @@
-export const getByteLength = function(normal_val) {
+export const getByteLength = (normalVal) => {
   // Force string type
-  normal_val = String(normal_val);
+  normalVal = String(normalVal);
 
   let byteLen = 0;
-  for (let i = 0; i < normal_val.length; i++) {
-    const c = normal_val.charCodeAt(i);
-    byteLen += c < (1 <<  7) ? 1 :
-               c < (1 << 11) ? 2 :
-               c < (1 << 16) ? 3 :
-               c < (1 << 21) ? 4 :
-               c < (1 << 26) ? 5 :
-               c < (1 << 31) ? 6 : Number.NaN;
+  for (let i = 0; i < normalVal.length; i++) {
+    const c = normalVal.charCodeAt(i);
+
+    if (c < (1 << 7)) {
+      byteLen += 1;
+    } else if (c < (1 << 11)) {
+      byteLen += 2;
+    } else if (c < (1 << 16)) {
+      byteLen += 3;
+    } else if (c < (1 << 21)) {
+      byteLen += 4;
+    } else if (c < (1 << 26)) {
+      byteLen += 5;
+    } else if (c < (1 << 31)) {
+      byteLen += 6;
+    } else {
+      byteLen += Number.NaN;
+    }
   }
+
   return byteLen;
-  
 };

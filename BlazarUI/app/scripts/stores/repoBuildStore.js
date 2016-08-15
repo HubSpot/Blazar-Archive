@@ -2,7 +2,6 @@ import Reflux from 'reflux';
 
 import RepoBuildActions from '../actions/repoBuildActions';
 import RepoBuildApi from '../data/RepoBuildApi';
-import ActiveBuildStates from '../constants/ActiveBuildStates';
 
 import { buildIsInactive } from '../components/Helpers';
 
@@ -98,7 +97,7 @@ const RepoBuildStore = Reflux.createStore({
     this.onLoadRepoBuild(this.params);
 
     if (this.shouldPoll) {
-      setTimeout(this._poll, config.activeBuildModuleRefresh);
+      setTimeout(this._poll, window.config.activeBuildModuleRefresh);
     }
   }
 

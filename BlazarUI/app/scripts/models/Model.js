@@ -4,7 +4,7 @@ import $ from 'jquery';
 
 class Model {
 
-  constructor(options) {    
+  constructor(options) {
     const defaultOptions = {
       parse: true
     };
@@ -15,7 +15,7 @@ class Model {
 
   parse() {}
 
-  fetch() {    
+  fetch() {
     const promise = $.ajax({
       url: this.options.url || this.url(),
       type: this.options.type || 'GET',
@@ -34,7 +34,6 @@ class Model {
     });
 
     return promise;
-
   }
 
   addTimeHelpers() {

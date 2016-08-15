@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {contains, pluck, isEqual, filter} from 'underscore';
-import Immutable, {fromJS} from 'immutable'
+import React, {Component, PropTypes} from 'react';
+import {contains} from 'underscore';
+import Immutable, {fromJS} from 'immutable';
 import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
@@ -53,7 +53,7 @@ class DashboardContainer extends Component {
           && build.gitInfo.active;
       });
 
-      this.setState({ starredBuilds: starredBuilds });
+      this.setState({starredBuilds});
     }
   }
 
@@ -64,7 +64,7 @@ class DashboardContainer extends Component {
 
   render() {
     return (
-      <PageContainer documentTitle='Dashboard' classNames='page-dashboard'>
+      <PageContainer documentTitle="Dashboard" classNames="page-dashboard">
         <Dashboard
           starredBuilds={fromJS(sortBranchesByTimestamp(this.state.starredBuilds, false))}
           loadingStars={this.state.loadingStars}
@@ -75,5 +75,9 @@ class DashboardContainer extends Component {
     );
   }
 }
+
+DashboardContainer.propTypes = {
+  params: PropTypes.object.isRequired
+};
 
 export default DashboardContainer;

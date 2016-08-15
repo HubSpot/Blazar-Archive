@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import {Button} from 'react-bootstrap';
-import Icon from '../shared/Icon.jsx';
 
 class BuildButton extends Component {
 
@@ -8,11 +7,11 @@ class BuildButton extends Component {
     if (this.props.loading) {
       return null;
     }
-    
+
     return (
-      <Button 
-        id='build-now-button'
-        bsStyle="primary" 
+      <Button
+        id="build-now-button"
+        bsStyle="primary"
         onClick={this.props.openModuleModal}
         style={{'marginRight': '5px'}}
       >

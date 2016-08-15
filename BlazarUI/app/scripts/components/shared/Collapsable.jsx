@@ -14,6 +14,10 @@ class Collapsable extends Component {
   }
 
   componentDidMount() {
+    this.onMount();
+  }
+
+  onMount() {
     this.setState({
       expanded: this.props.initialToggleStateOpen
     });
@@ -53,8 +57,7 @@ class Collapsable extends Component {
   }
 
   getInnerClassNames() {
-    let classNames = this.state.expanded ? 'show' : 'hide';
-    return classNames;
+    return this.state.expanded ? 'show' : 'hide';
   }
 
   getRenderedIcon() {
@@ -62,18 +65,16 @@ class Collapsable extends Component {
       return null;
     }
 
-    return (
-      <Icon classNames='collapsable__header-icon' type='fa' name={this.getIconState()} />
-    );
+    return <Icon classNames="collapsable__header-icon" type="fa" name={this.getIconState()} />;
   }
 
   render() {
     let icon;
-    const branch = this.props.branch;
 
     if (this.props.iconName) {
-      icon = <Icon type={this.props.iconType} name={this.props.iconName} classNames="icon-roomy" />
+      icon = <Icon type={this.props.iconType} name={this.props.iconName} classNames="icon-roomy" />;
     }
+
     return (
       <div className={this.getWrapperClassNames()}>
         <h4 onClick={this.handleToggle} className={this.getHeaderClassNames()}>
@@ -100,12 +101,14 @@ Collapsable.defaultProps = {
 Collapsable.propTypes = {
   header: PropTypes.node,
   children: PropTypes.node,
-  iconType: PropTypes.oneOf(['fa','octicon']),
+  iconType: PropTypes.oneOf(['fa', 'octicon']),
   iconName: PropTypes.string,
   noBorder: PropTypes.bool,
   updateToggleState: PropTypes.func,
   componentId: PropTypes.number,
-  disableToggle: PropTypes.bool
+  disableToggle: PropTypes.bool,
+  initialToggleStateOpen: PropTypes.bool,
+  headerClassNames: PropTypes.string
 };
 
 export default Collapsable;

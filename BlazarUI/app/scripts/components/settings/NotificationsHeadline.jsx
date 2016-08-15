@@ -1,27 +1,26 @@
-/*global config*/
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 
 class NotificationsHeadline extends Component {
 
   renderSlackBotMessageMaybe() {
-    if (!config.slackBotName) {
+    if (!window.config.slackBotName) {
       return null;
     }
 
     return (
-      <p className='notifications-headline-details'>
-        To get notifications invite @{config.slackBotName} so he can post in your channel.
+      <p className="notifications-headline-details">
+        To get notifications, invite @{window.config.slackBotName} so it can post in your channel.
       </p>
     );
   }
 
   render() {
     return (
-      <div className='notifications__headline'>
-        <span className='notifications__headline-title'>
+      <div className="notifications__headline">
+        <span className="notifications__headline-title">
           Build Notifications
         </span>
-        <p className='notifications-headline-details'>
+        <p className="notifications-headline-details">
           Blazar allows you to send notifications about your builds to multiple Slack channels.
         </p>
         {this.renderSlackBotMessageMaybe()}
@@ -29,9 +28,5 @@ class NotificationsHeadline extends Component {
     );
   }
 }
-
-NotificationsHeadline.propTypes = {
-
-};
 
 export default NotificationsHeadline;

@@ -9,10 +9,16 @@ const RepoStore = Reflux.createStore({
   onLoadRepos(params) {
     this.orgApi = new OrgApi({params}).fetchBuilds((repos) => {
       this.trigger({
-        repos: repos,
+        repos,
         loading: false
       });
     });
+  },
+
+  onStopPolling() {
+    if (this.branchesApi) {
+      this.branchesApi.stopPollingBuilds();
+    }
   }
 
 });

@@ -1,13 +1,13 @@
 import React, {Component, PropTypes} from 'react';
-import ClassNames from 'classnames';
+import classNames from 'classnames';
 
-class Headline extends Component{
+class Headline extends Component {
 
   getClassNames() {
-    return ClassNames([
+    return classNames([
       'headline',
       this.props.className,
-      {'border' : this.props.border}
+      {'border': this.props.border}
     ]);
   }
 
@@ -22,7 +22,7 @@ class Headline extends Component{
 
 Headline.defaultProps = {
   border: false
-}
+};
 
 Headline.propTypes = {
   children: PropTypes.node,

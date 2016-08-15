@@ -13,16 +13,14 @@ function renderedOutput(elt) {
 }
 
 describe('<PageContainer />', () => {
-
   // let pageContainer, pageContainerRendered;
   let pageContainer;
 
   beforeEach(() => {
-
     const component = (
       <PageContainer
-        headline='I am headline'
-        classNames='banana'
+        headline="I am headline"
+        classNames="banana"
       >
         <p>The human torch was denied a bank loan.</p>
       </PageContainer>
@@ -38,7 +36,7 @@ describe('<PageContainer />', () => {
 
   it('should render all the children', () => {
     expect(pageContainer.props.children).toEqual([
-      <h2 className='PageContainer__headline'>I am headline</h2>,
+      <h2 className="PageContainer__headline">I am headline</h2>,
       <p>The human torch was denied a bank loan.</p>
     ]);
   });
@@ -47,6 +45,4 @@ describe('<PageContainer />', () => {
   it('should have the correct class names', () => {
     expect(pageContainer.props.className).toEqual('page-content banana');
   });
-
-
 });

@@ -1,4 +1,3 @@
-/*global config*/
 import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import humanizeDuration from 'humanize-duration';
@@ -12,7 +11,7 @@ function _parse(params, resp) {
     }
     return build;
   });
-  
+
   return fromJS(builds);
 }
 
@@ -24,7 +23,7 @@ function _parseModules(resp) {
 
 function fetchBranchBuildHistory(params, cb) {
   const branchBuildHistoryPromise = new Resource({
-    url: `${config.apiRoot}/builds/history/branch/${params.branchId}`,
+    url: `${window.config.apiRoot}/builds/history/branch/${params.branchId}`,
     type: 'GET'
   }).send();
 
@@ -35,7 +34,7 @@ function fetchBranchBuildHistory(params, cb) {
 
 function fetchBranchInfo(params, cb) {
   const branchInfoPromise = new Resource({
-    url: `${config.apiRoot}/branches/${params.branchId}`,
+    url: `${window.config.apiRoot}/branches/${params.branchId}`,
     type: 'GET'
   }).send();
 
@@ -46,7 +45,7 @@ function fetchBranchInfo(params, cb) {
 
 function fetchBranchModules(params, cb) {
   const branchModulesPromise = new Resource({
-    url: `${config.apiRoot}/branches/${params.branchId}/modules`,
+    url: `${window.config.apiRoot}/branches/${params.branchId}/modules`,
     type: 'GET'
   }).send();
 
@@ -57,7 +56,7 @@ function fetchBranchModules(params, cb) {
 
 function fetchMalformedFiles(params, cb) {
   const malformedFilesPromise = new Resource({
-    url: `${config.apiRoot}/branches/${params.branchId}/malformedFiles`,
+    url: `${window.config.apiRoot}/branches/${params.branchId}/malformedFiles`,
     type: 'GET'
   }).send();
 
@@ -68,7 +67,7 @@ function fetchMalformedFiles(params, cb) {
 
 function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) {
   return JSON.stringify({
-    moduleIds: moduleIds, 
+    moduleIds,
     buildDownstreams: downstreamModules,
     resetCaches: resetCache
   });
@@ -80,7 +79,7 @@ function triggerBuild(params, moduleIds, downstreamModules, resetCache, cb) {
   }
   const username = getUsernameFromCookie() ? `username=${getUsernameFromCookie()}` : '';
   const buildPromise = new Resource({
-    url: `${config.apiRoot}/branches/builds/branch/${params.branchId}?${username}`,
+    url: `${window.config.apiRoot}/branches/builds/branch/${params.branchId}?${username}`,
     type: 'POST',
     contentType: 'application/json',
     data: _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache)
@@ -95,9 +94,9 @@ function triggerBuild(params, moduleIds, downstreamModules, resetCache, cb) {
 }
 
 export default {
-  fetchBranchBuildHistory: fetchBranchBuildHistory,
-  fetchBranchInfo: fetchBranchInfo,
-  fetchBranchModules: fetchBranchModules,
-  fetchMalformedFiles: fetchMalformedFiles,
-  triggerBuild: triggerBuild
+  fetchBranchBuildHistory,
+  fetchBranchInfo,
+  fetchBranchModules,
+  fetchMalformedFiles,
+  triggerBuild
 };

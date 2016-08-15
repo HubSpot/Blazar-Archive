@@ -1,10 +1,12 @@
 import React, {Component, PropTypes} from 'react';
 import {dataTagValue} from '../Helpers';
-import ClassNames from 'classnames';
+import classNames from 'classnames';
 
 class PaginationLink extends Component {
 
-  constructor() {      
+  constructor(props) {
+    super(props);
+
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -16,28 +18,28 @@ class PaginationLink extends Component {
       return;
     }
 
-    this.props.changePage(parseInt(page));
+    this.props.changePage(parseInt(page, 10));
     e.preventDefault();
   }
-  
+
   getRenderedClassNames() {
-    return ClassNames([
-      {'pagination-active-link': this.props.activePage === this.props.page},
-      {'disabled' : this.props.disabled}
-    ]);
+    return classNames({
+      'pagination-active-link': this.props.activePage === this.props.page,
+      'disabled': this.props.disabled
+    });
   }
-  
+
   getListClassNames() {
-    return ClassNames([
-      {'pagination-active-link': this.props.activePage === this.props.page},
-      {'disabled' : this.props.disabled}
-    ]);  
+    return classNames({
+      'pagination-active-link': this.props.activePage === this.props.page,
+      'disabled': this.props.disabled
+    });
   }
 
   render() {
     return (
       <li className={this.getListClassNames()}>
-        <a data-active={!this.props.disabled} onClick={this.handleClick} href='#' data-page={this.props.page} className={this.getRenderedClassNames()}>
+        <a data-active={!this.props.disabled} onClick={this.handleClick} href="#" data-page={this.props.page} className={this.getRenderedClassNames()}>
           {this.props.label || this.props.page + 1}
         </a>
       </li>
@@ -53,7 +55,8 @@ PaginationLink.propTypes = {
   disabled: PropTypes.bool,
   changePage: PropTypes.func.isRequired,
   label: PropTypes.string,
-  activePage: PropTypes.number
-}
+  activePage: PropTypes.number,
+  page: PropTypes.number
+};
 
 export default PaginationLink;

@@ -7,7 +7,6 @@ import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import Icon from '../shared/Icon.jsx';
 import Filter from '../shared/Filter.jsx';
-import RepoListing from './RepoListing.jsx';
 
 import OrgActions from '../../actions/orgActions';
 import OrgStore from '../../stores/orgStore';
@@ -31,7 +30,7 @@ class OrgContainer extends Component {
   }
 
   componentWillReceiveProps(nextprops) {
-    this.setState({ loading: true });
+    this.setState({loading: true});
     OrgActions.loadRepos(nextprops.params);
   }
 
@@ -51,12 +50,10 @@ class OrgContainer extends Component {
   }
 
   getFilterOptions() {
-    return this.state.repos.toJS().map((item) => {
-      return {
-        value: item.repository,
-        label: item.repository
-      }
-    });
+    return this.state.repos.toJS().map((item) => ({
+      value: item.repository,
+      label: item.repository
+    }));
   }
 
   getFilteredRepos() {
@@ -69,7 +66,6 @@ class OrgContainer extends Component {
     return repos.filter((item) => {
       return item.get('repository') === filterValue;
     });
-
   }
 
   render() {
@@ -85,7 +81,7 @@ class OrgContainer extends Component {
               </HeadlineDetail>
             </Headline>
             <Filter
-              placeholder='Filter Repositories'
+              placeholder="Filter Repositories"
               options={this.getFilterOptions()}
               value={this.state.filterValue}
               handleFilterChange={this.handleFilterChange}

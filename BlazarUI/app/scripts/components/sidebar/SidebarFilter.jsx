@@ -33,18 +33,19 @@ class SidebarFilter extends Component {
     return (
       <div>
         <SidebarToggle
-          toggleFilter={this.toggleFilter} 
-          toggleFilterState={this.props.toggleFilterState} />
+          toggleFilter={this.toggleFilter}
+          toggleFilterState={this.props.toggleFilterState}
+        />
         <div className={selectorClass} />
-        <div className='sidebar__filter-search'>
+        <div className="sidebar__filter-search">
           <SearchFilter
             ref="buildFilterSearch"
-            placeholder='Filter repositories...'
-            onChange={this.setInputValue} />
+            placeholder="Filter repositories..."
+            onChange={this.setInputValue}
+          />
         </div>
       </div>
     );
-
   }
 }
 

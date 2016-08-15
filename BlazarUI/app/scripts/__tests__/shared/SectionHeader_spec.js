@@ -12,7 +12,6 @@ function renderedOutput(elt) {
 }
 
 describe('<SectionHeader />', () => {
-
   let sectionHeader;
 
   beforeEach(() => {
@@ -30,6 +29,4 @@ describe('<SectionHeader />', () => {
   it('should have all the children', () => {
     expect(sectionHeader.props.children).toBe('Hey');
   });
-
-
 });

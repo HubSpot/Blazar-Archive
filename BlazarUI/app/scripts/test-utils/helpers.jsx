@@ -7,17 +7,17 @@ function simulate (eventType, node) {
 }
 
 module.exports = {
-  render: function(Component, options) {
+  render: (Component, options) => {
     extend({}, options);
     return TestUtils.renderIntoDocument(Component(options));
   },
-  click: function (node) {
+  click: (node) => {
     simulate('click', node);
   }
 };
 
-export const renderedOutput = function(elt) {
+export const renderedOutput = (elt) => {
   const shallowRenderer = TestUtils.createRenderer();
   shallowRenderer.render(elt);
   return shallowRenderer.getRenderOutput();
-}
+};

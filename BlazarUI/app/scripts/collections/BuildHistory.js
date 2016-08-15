@@ -1,10 +1,9 @@
-/*global config*/
 import BaseCollection from './BaseCollection';
 
 class BuildHistory extends BaseCollection {
 
   url() {
-    return `${config.apiRoot}/build/history/module/${this.options.moduleId}`;
+    return `${window.config.apiRoot}/build/history/module/${this.options.moduleId}`;
   }
 }
 

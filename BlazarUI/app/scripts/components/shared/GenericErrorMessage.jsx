@@ -6,16 +6,13 @@ class GenericErrorMessage extends Component {
   getSeverity() {
     switch (this.props.severity) {
       case 'high':
-        return 'danger'
-
+        return 'danger';
       case 'medium':
-        return 'warning'
-
+        return 'warning';
       case 'low':
-        return 'info'
-
+        return 'info';
       default:
-        return 'danger'
+        return 'danger';
     }
   }
 
@@ -34,10 +31,11 @@ class GenericErrorMessage extends Component {
 
 GenericErrorMessage.defaultProps = {
   severity: 'high'
-}
+};
 
 GenericErrorMessage.propTypes = {
-  message: PropTypes.node
+  message: PropTypes.node,
+  severity: PropTypes.string
 };
 
 export default GenericErrorMessage;

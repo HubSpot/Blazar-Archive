@@ -6,14 +6,12 @@ import EmptyMessage from '../shared/EmptyMessage.jsx';
 class BranchesTable extends Component {
 
   sortMasterFirst() {
-    let branches = [];
+    const branches = [];
 
-    this.props.branches.map((b) => {
-      if (b.gitInfo.branch === "master") {
+    this.props.branches.forEach((b) => {
+      if (b.gitInfo.branch === 'master') {
         branches.unshift(b);
-      }
-
-      else {
+      } else {
         branches.push(b);
       }
     });
@@ -24,11 +22,9 @@ class BranchesTable extends Component {
   render() {
     if (this.props.hide) {
       return null;
-    }
-
-    if (this.props.branches.length === 0) {
+    } else if (!this.props.branches.length) {
       return (
-        <EmptyMessage> No build history </EmptyMessage>
+        <EmptyMessage>No build history</EmptyMessage>
       );
     }
 
@@ -42,7 +38,9 @@ class BranchesTable extends Component {
 
 BranchesTable.propTypes = {
   loading: PropTypes.bool,
-  branches: PropTypes.array.isRequired
+  hide: PropTypes.bool,
+  branches: PropTypes.array.isRequired,
+  buildTable: PropTypes.func.isRequired
 };
 
 export default TableMaker(BranchesTable, {showProgress: false});

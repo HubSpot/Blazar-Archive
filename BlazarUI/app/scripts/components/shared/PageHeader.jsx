@@ -1,20 +1,10 @@
-import React, {Component, PropTypes} from 'react';
-import {bindAll} from 'underscore';
+import React, {PropTypes} from 'react';
 
-class PageHeader extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <div className='page-header'>
-        {this.props.children}
-      </div>
-    );
-  }
-}
+const PageHeader = ({children}) => (
+  <div className="page-header">
+    {children}
+  </div>
+);
 
 PageHeader.propTypes = {
   children: PropTypes.node

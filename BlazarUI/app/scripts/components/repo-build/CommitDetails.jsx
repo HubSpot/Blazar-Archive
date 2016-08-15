@@ -5,32 +5,29 @@ import classNames from 'classnames';
 import Icon from '../shared/Icon.jsx';
 import Image from '../shared/Image.jsx';
 
-import {Link} from 'react-router';
-
 class CommitDetails extends Component {
 
   getClassNames() {
     const {commitInfo} = this.props;
-    const rowSuffix = commitInfo.oddRow ? '--odd' : '--even';
 
-    return classNames([
-      'commits__commit',
-      'commits__commit' + rowSuffix
-    ]);
+    return classNames(
+      'commits__commit', {
+        'commits__commit--odd': commitInfo.oddRow,
+        'commits__commit--even': !commitInfo.oddRow
+      }
+    );
   }
 
   getPictureClassNames() {
     const {commitInfo} = this.props;
-    const rowSuffix = commitInfo.oddRow ? '--odd' : '--even';
-    const firstRowSuffix = commitInfo.firstRow ? '--firstrow' : '';
-    const lastRowSuffix = commitInfo.lastRow ? '--lastrow' : '';
 
-    return classNames([
-      'commits__picture',
-      'commits__picture' + rowSuffix,
-      'commits__picture' + firstRowSuffix,
-      'commits__picture' + lastRowSuffix
-    ]);
+    return classNames(
+      'commits__picture', {
+        'commits__picture--odd': commitInfo.oddRow,
+        'commits__picture--firstrow': commitInfo.firstRow,
+        'commits__picture--lastrow': commitInfo.lastRow
+      }
+    );
   }
 
   renderTimestamp() {
@@ -83,7 +80,7 @@ class CommitDetails extends Component {
 
     return (
       <div className={this.getPictureClassNames()}>
-        <Icon type="octicon" name='git-commit' classNames="commits__picture-icon" />
+        <Icon type="octicon" name="git-commit" classNames="commits__picture-icon" />
       </div>
     );
   }
@@ -101,6 +98,6 @@ class CommitDetails extends Component {
 
 CommitDetails.propTypes = {
   commitInfo: PropTypes.object.isRequired
-}
+};
 
 export default CommitDetails;

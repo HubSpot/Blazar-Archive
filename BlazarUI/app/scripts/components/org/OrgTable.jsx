@@ -9,14 +9,10 @@ class OrgTable extends Component {
 
   render() {
     if (this.props.loading) {
+      return <Loader align="top-center" />;
+    } else if (!this.props.repos.size) {
       return (
-        <Loader align='top-center' />
-      );
-    }
-
-    if (this.props.repos.size === 0) {
-      return (
-        <EmptyMessage> No repositories </EmptyMessage>
+        <EmptyMessage>No repositories</EmptyMessage>
       );
     }
 
@@ -30,7 +26,8 @@ class OrgTable extends Component {
 
 OrgTable.propTypes = {
   loading: PropTypes.bool,
-  repos: PropTypes.instanceOf(Immutable.List).isRequired
+  repos: PropTypes.instanceOf(Immutable.List).isRequired,
+  buildTable: PropTypes.func.isRequired
 };
 
 export default TableMaker(OrgTable, {showProgress: false});

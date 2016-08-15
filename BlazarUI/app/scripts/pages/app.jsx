@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import DocumentTitle from 'react-document-title';
 import SidebarContainer from '../components/sidebar/SidebarContainer.jsx';
 import FeedbackForm from '../components/feedback/FeedbackForm.jsx';
@@ -19,18 +19,23 @@ class App extends Component {
 
   render() {
     return (
-      <DocumentTitle title='Blazar'>
+      <DocumentTitle title="Blazar">
         <div>
           <div className="page-wrapper">
             <SidebarContainer params={this.props.params} />
             {this.props.children}
           </div>
           <FeedbackForm />
-          <ApiModal show={this.state.showApiModal} onHide={this.closeApiModal}/>
+          <ApiModal show={this.state.showApiModal} onHide={this.closeApiModal} />
         </div>
       </DocumentTitle>
     );
   }
+}
+
+App.propTypes = {
+  params: PropTypes.object.isRequired,
+  children: PropTypes.node.isRequired
 }
 
 export default App;

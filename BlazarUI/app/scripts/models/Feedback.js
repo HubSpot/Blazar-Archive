@@ -17,17 +17,17 @@ class Feedback {
   }
 
   submit() {
-    let data = {
+    const data = {
       username: this.username || 'No Username',
       message: this.message || 'No message',
       page: this.page || 'No Page',
       other: this.other
     };
-    
+
     return $.ajax({
       type: 'POST',
       contentType: 'application/json',
-      url: `${config.apiRoot}/user-feedback`,
+      url: `${window.config.apiRoot}/user-feedback`,
       dataType: 'json',
       data: JSON.stringify(data)
     });

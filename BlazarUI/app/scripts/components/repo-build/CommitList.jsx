@@ -21,7 +21,8 @@ class CommitList extends Component {
       return (
         <CommitDetails
           key={i}
-          commitInfo={commit} />
+          commitInfo={commit}
+        />
       );
     });
   }
@@ -50,6 +51,6 @@ CommitList.propTypes = {
   commits: PropTypes.array.isRequired,
   timestamp: PropTypes.number.isRequired,
   isFirstCommit: PropTypes.bool.isRequired
-}
+};
 
 export default CommitList;

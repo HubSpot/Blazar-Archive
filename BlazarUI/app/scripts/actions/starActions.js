@@ -8,14 +8,14 @@ const StarActions = Reflux.createActions([
   'setSource'
 ]);
 
-StarActions.loadStars.preEmit = function(source = '') {
+StarActions.loadStars.preEmit = (source = '') => {
   StarActions.setSource(source);
   StarActions.loadStarsSuccess(StarProvider.getStars());
 };
 
-StarActions.toggleStar = function(repoId) {
+StarActions.toggleStar = (repoId) => {
   StarProvider.toggleStar(repoId, (stars) => {
-    StarActions.loadStarsSuccess(stars);  
+    StarActions.loadStarsSuccess(stars);
   });
 };
 

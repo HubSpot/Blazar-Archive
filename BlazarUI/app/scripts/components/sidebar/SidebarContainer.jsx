@@ -1,8 +1,7 @@
 import $ from 'jquery';
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
-import {bindAll, has, debounce} from 'underscore';
-import Immutable from 'immutable';
+import {bindAll, debounce} from 'underscore';
 
 import Sidebar from './Sidebar.jsx';
 import SidebarFilter from './SidebarFilter.jsx';
@@ -83,8 +82,8 @@ class SidebarContainer extends Component {
   }
 
   getSidebarHeight() {
-    let filterHeight = $('.sidebar__filter').height() || defaultSidebarFilterHeight;
-    let logoHeight = $('.sidebar__logo').height() || 45;
+    const filterHeight = $('.sidebar__filter').height() || defaultSidebarFilterHeight;
+    const logoHeight = $('.sidebar__logo').height() || 45;
     return $(window).height() - filterHeight - logoHeight;
   }
 
@@ -92,7 +91,7 @@ class SidebarContainer extends Component {
     this.setState(state);
   }
 
-  onStarChange(state) {
+  onStarChange() {
     if (this.state.toggleFilterState === 'starred') {
       BuildsActions.loadBuilds(this.props.params);
     }
@@ -122,12 +121,12 @@ class SidebarContainer extends Component {
     if (loading) {
       return (
         <Sidebar>
-          <Link to='/'>
-            <div className='sidebar__logo'>
+          <Link to="/">
+            <div className="sidebar__logo">
               <Logo crumb={false} />
             </div>
           </Link>
-          <Loader align='top-center'/>
+          <Loader align="top-center" />
         </Sidebar>
       );
     }
@@ -135,8 +134,8 @@ class SidebarContainer extends Component {
     if (error) {
       return (
         <Sidebar>
-          <Link to='/'>
-            <div className='sidebar__logo'>
+          <Link to="/">
+            <div className="sidebar__logo">
               <Logo crumb={false} />
             </div>
           </Link>
@@ -151,12 +150,12 @@ class SidebarContainer extends Component {
 
     return (
       <Sidebar>
-        <Link to='/'>
-          <div className='sidebar__logo'>
+        <Link to="/">
+          <div className="sidebar__logo">
             <Logo crumb={false} />
           </div>
         </Link>
-        <div className='sidebar__filter'>
+        <div className="sidebar__filter">
           <SidebarFilter
             {...this.state}
             updateResults={this.updateResults}
@@ -164,7 +163,7 @@ class SidebarContainer extends Component {
             toggleFilterState={this.state.toggleFilterState}
           />
         </div>
-        <div className='sidebar__list'>
+        <div className="sidebar__list">
           <SidebarRepoList
             filteredBuilds={matches}
             {...this.state}
@@ -179,7 +178,10 @@ class SidebarContainer extends Component {
       </Sidebar>
     );
   }
-
 }
+
+SidebarContainer.propTypes = {
+  params: PropTypes.object.isRequired
+};
 
 export default SidebarContainer;

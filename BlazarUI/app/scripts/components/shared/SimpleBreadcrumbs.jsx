@@ -1,26 +1,22 @@
-/*global config*/
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 
 import Icon from './Icon.jsx';
 
 class SimpleBreadcrumbs extends Component {
-	constructor(props) {
-    super(props);
+
+  getBuildNumber() {
+    const {params, data} = this.props;
+
+    if (params.buildNumber !== 'latest') {
+      return params.buildNumber;
+    }
+
+    return data.build.buildNumber;
   }
 
-	getBuildNumber() {
-		const {params, data} = this.props;
-
-		if (params.buildNumber !== 'latest') {
-			return params.buildNumber;
-		}
-
-		return data.build.buildNumber;
-	}
-
   renderRepoCrumb() {
-    const {params, repo, branchInfo} = this.props;
+    const {repo, branchInfo} = this.props;
 
     if (!repo) {
       return null;
@@ -29,7 +25,7 @@ class SimpleBreadcrumbs extends Component {
     const repoLink = `/builds/repo/${branchInfo.repository}`;
 
     return (
-      <span className='simple-breadcrumbs__repo'>
+      <span className="simple-breadcrumbs__repo">
         <Link to={repoLink}>{branchInfo.repository}</Link>
       </span>
     );
@@ -45,26 +41,26 @@ class SimpleBreadcrumbs extends Component {
     const branchLink = `/builds/branch/${params.branchId}`;
 
     return (
-      <span className='simple-breadcrumbs__branch'>
-        <Icon type='fa' name='angle-right' />
+      <span className="simple-breadcrumbs__branch">
+        <Icon type="fa" name="angle-right" />
         <Link to={branchLink}>{branchInfo.branch}</Link>
       </span>
     );
   }
 
   renderBuildCrumb() {
-    const {params, build, branchInfo} = this.props;
+    const {params, build} = this.props;
 
     if (!build) {
       return null;
     }
 
-		const buildNumber = this.getBuildNumber();
+    const buildNumber = this.getBuildNumber();
     const buildLink = `/builds/branch/${params.branchId}/build/${buildNumber}`;
 
     return (
-      <span className='simple-breadcrumbs__build'>
-        <Icon type='fa' name='angle-right' />
+      <span className="simple-breadcrumbs__build">
+        <Icon type="fa" name="angle-right" />
         <Link to={buildLink}>#{buildNumber}</Link>
       </span>
     );
@@ -72,12 +68,12 @@ class SimpleBreadcrumbs extends Component {
 
   render() {
     return (
-      <div className='simple-breadcrumbs'>
+      <div className="simple-breadcrumbs">
         {this.renderRepoCrumb()}
         {this.renderBranchCrumb()}
         {this.renderBuildCrumb()}
       </div>
-    )
+    );
   }
 }
 
@@ -86,7 +82,8 @@ SimpleBreadcrumbs.propTypes = {
   branch: PropTypes.bool,
   build: PropTypes.bool,
   params: PropTypes.object,
-  branchInfo: PropTypes.object
+  branchInfo: PropTypes.object,
+  data: PropTypes.object
 };
 
 export default SimpleBreadcrumbs;

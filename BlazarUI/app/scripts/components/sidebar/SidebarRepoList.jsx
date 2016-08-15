@@ -1,19 +1,19 @@
 import React, {Component, PropTypes} from 'react';
-import {bindAll} from 'underscore';
 import LazyRender from '../shared/LazyRender.jsx';
 import Loader from '../shared/Loader.jsx';
 import SidebarItem from './SidebarItem.jsx';
-import {has} from 'underscore';
 import {sortBuildsByRepoAndBranch, filterInactiveBuilds} from '../Helpers.js';
-
-let initialState = {
-  extraChildHeight: 4
-}
 
 class SidebarRepoList extends Component {
 
-  constructor() {
-    this.state = initialState;
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      extraChildHeight: 4
+    };
+
+    this.refreshSidebar = this.refreshSidebar.bind(this);
   }
 
   refreshSidebar(extraChildDelta) {
@@ -23,7 +23,6 @@ class SidebarRepoList extends Component {
   }
 
   renderBuildsList(builds) {
-
     let buildKeys = Object.keys(builds);
 
     if (this.props.filterText === '') {
@@ -35,7 +34,7 @@ class SidebarRepoList extends Component {
 
       let sortedBuilds =
         filterInactiveBuilds(
-          Object.keys(branchesMap).map((branch, i) => {
+          Object.keys(branchesMap).map((branch) => {
             return branchesMap[branch];
           })
         );
@@ -52,7 +51,7 @@ class SidebarRepoList extends Component {
         <SidebarItem
           key={i}
           builds={sortedBuilds}
-          onExpand={this.refreshSidebar.bind(this)}
+          onExpand={this.refreshSidebar}
           repository={sortedBuilds[0].gitInfo.repository}
         />
       );
@@ -70,7 +69,7 @@ class SidebarRepoList extends Component {
 
     if (changingBuildsType) {
       return (
-        <Loader align='top-center' className='sidebar-loader' />
+        <Loader align="top-center" className="sidebar-loader" />
       );
     }
 
@@ -82,7 +81,6 @@ class SidebarRepoList extends Component {
         {this.renderBuildsList(filteredBuilds)}
       </LazyRender>
     );
-
   }
 }
 
@@ -90,7 +88,8 @@ SidebarRepoList.propTypes = {
   sidebarHeight: PropTypes.number.isRequired,
   changingBuildsType: PropTypes.bool.isRequired,
   filteredBuilds: PropTypes.object.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
+  filterText: PropTypes.string.isRequired
 };
 
 export default SidebarRepoList;

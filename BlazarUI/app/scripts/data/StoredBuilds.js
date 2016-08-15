@@ -1,4 +1,3 @@
-import {isEmpty} from 'underscore';
 import BuildsStore from '../stores/buildsStore';
 
 class StoredBuilds {
@@ -17,7 +16,6 @@ class StoredBuilds {
     }
 
     this._afterInitialFetch();
-
   }
 
   _afterInitialFetch() {
@@ -25,7 +23,7 @@ class StoredBuilds {
   }
 
   // used by subclasses
-  _parse(resp) {
+  _parse() {
 
   }
 

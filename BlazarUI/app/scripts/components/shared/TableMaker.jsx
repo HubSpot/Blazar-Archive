@@ -1,23 +1,19 @@
 import React, {Component, PropTypes} from 'react';
-import Classnames from 'classnames';
-import BuildStates from '../../constants/BuildStates.js';
 import TableHead from './TableHead.jsx';
 import Pagination from './Pagination.jsx';
-import Progress from '../../utils/progress';
-import {bindAll, has} from 'underscore';
+import {bindAll} from 'underscore';
 import Loader from '../shared/Loader.jsx';
 
 function TableMaker(RenderedComponent, options) {
-
-  let initialState = {
+  const initialState = {
     page: 0,
     rowsPerPage: 25,
     paginate: options.paginate
   };
 
   class Table extends Component {
-    
-    constructor() {      
+
+    constructor() {
       bindAll(this, 'buildTable', 'getRows', 'changePage');
       this.state = initialState;
     }
@@ -29,15 +25,12 @@ function TableMaker(RenderedComponent, options) {
     }
 
     changePage(page) {
-      this.setState({
-        page: page
-      })
+      this.setState({page});
     }
-
 
     getRows(data, TableRow, params) {
       const pageStart = this.state.page * this.state.rowsPerPage;
-      const pageEnd = pageStart + this.state.rowsPerPage;      
+      const pageEnd = pageStart + this.state.rowsPerPage;
       const currentRows = options.paginate ? data.slice(pageStart, pageEnd) : data;
 
       return currentRows.map((item, i) => {
@@ -48,7 +41,6 @@ function TableMaker(RenderedComponent, options) {
             key={i}
           />
         );
-
       });
     }
 
@@ -56,7 +48,7 @@ function TableMaker(RenderedComponent, options) {
       const {columnNames, data, rowComponent, params} = tableOptions;
 
       return (
-        <div className='table-wrapper'>
+        <div className="table-wrapper">
           <table className="fixed-table table table-hover table-striped">
             <TableHead
               columnNames={columnNames}
@@ -72,24 +64,26 @@ function TableMaker(RenderedComponent, options) {
 
     render() {
       if (this.props.loading) {
-        return(
-          <Loader align='left' />
-        )
+        return <Loader align="left" />;
       }
 
       return (
-        <RenderedComponent 
-          {...this.props} 
-          {...this.state} 
+        <RenderedComponent
+          {...this.props}
+          {...this.state}
           getRows={this.getRows}
           buildTable={this.buildTable}
         />
       );
     }
+  }
 
+  Table.propTypes = {
+    loading: PropTypes.bool,
+    params: PropTypes.object
   };
-  
+
   return Table;
-};
+}
 
 export default TableMaker;

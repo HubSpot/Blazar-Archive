@@ -1,12 +1,10 @@
 import React, {Component, PropTypes} from 'react';
 import {has, contains, bindAll, isEmpty} from 'underscore';
-import {humanizeText, timestampFormatted, truncate} from '../Helpers';
+import {humanizeText, timestampFormatted} from '../Helpers';
 import classNames from 'classnames';
 
 import Loader from '../shared/Loader.jsx';
 import RepoBuildCancelButton from './RepoBuildCancelButton.jsx';
-import Sha from '../shared/Sha.jsx';
-import Alert from 'react-bootstrap/lib/Alert';
 
 import Commits from './Commits.jsx';
 import InterProjectAlert from './InterProjectAlert.jsx';
@@ -18,11 +16,12 @@ import {LABELS} from '../constants';
 class RepoBuildDetail extends Component {
 
   constructor() {
-    bindAll(this, 'handleResize')
+    bindAll(this, 'handleResize', 'flipShowCommits');
+
     this.state = {
       windowWidth: window.innerWidth,
       showCommits: false
-    }
+    };
   }
 
   componentDidMount() {
@@ -41,7 +40,7 @@ class RepoBuildDetail extends Component {
     ]);
   }
 
-  handleResize(e) {
+  handleResize() {
     this.setState({
       windowWidth: window.innerWidth
     });
@@ -72,7 +71,8 @@ class RepoBuildDetail extends Component {
         commits={commitList}
         showCommits={this.state.showCommits}
         anyNewCommits={newCommits.length > 0}
-        flipShowCommits={this.flipShowCommits.bind(this)} />
+        flipShowCommits={this.flipShowCommits}
+      />
     );
   }
 
@@ -86,11 +86,9 @@ class RepoBuildDetail extends Component {
     let suffix;
 
     if (isEmpty(upAndDownstreamModules.rootRepoBuilds)) {
-      suffix = ".";
-    }
-
-    else {
-      suffix = ", triggered by an upstream module.";
+      suffix = '.';
+    } else {
+      suffix = ', triggered by an upstream module.';
     }
 
     return (
@@ -115,54 +113,40 @@ class RepoBuildDetail extends Component {
   }
 
   render() {
-    const {currentRepoBuild} = this.props;
-
     if (this.props.error) {
       return null;
-    }
-
-    else if (this.props.loading) {
+    } else if (this.props.loading) {
       return (
-        <div className='build-detail'>
-          <Loader align='left' roomy={true} />
+        <div className="build-detail">
+          <Loader align="left" roomy={true} />
         </div>
       );
     }
 
     const build = this.props.currentRepoBuild;
 
-    const gitInfo = {
-      host: this.props.params.host,
-      organization: this.props.params.org,
-      repository: this.props.params.repo
-    }
-
-    let endtime, duration;
-
-    let buildDetail = {
+    const buildDetail = {
       endtime: '',
       duration: '',
       durationPrefix: '',
       buildResult: humanizeText(build.state)
-    }
+    };
 
     if (contains(FINAL_BUILD_STATES, build.state)) {
-      buildDetail.endtime = timestampFormatted(build.endTimestamp)
+      buildDetail.endtime = timestampFormatted(build.endTimestamp);
       const conjunction = build.state === BuildStates.CANCELLED ? 'after' : 'in';
 
       buildDetail.duration = `${conjunction} ${build.duration}`;
-    }
-
-    else if (build.state === BuildStates.IN_PROGRESS) {
+    } else if (build.state === BuildStates.IN_PROGRESS) {
       buildDetail.duration = `started ${timestampFormatted(build.startTimestamp)}`;
     }
 
     return (
       <div>
         <div className={this.getWrapperClassNames(build)}>
-          <p className='build-detail-header__build-state'>
+          <p className="build-detail-header__build-state">
             Build {buildDetail.buildResult}
-            <span className='build-detail-header__timestamp'>{buildDetail.duration}</span>
+            <span className="build-detail-header__timestamp">{buildDetail.duration}</span>
             {this.renderInterProjectBuildMessage()}
             {this.renderUnstableMessage()}
           </p>
@@ -187,7 +171,11 @@ class RepoBuildDetail extends Component {
 RepoBuildDetail.propTypes = {
   loading: PropTypes.bool.isRequired,
   currentRepoBuild: PropTypes.object,
-  error: PropTypes.string
+  error: PropTypes.string,
+  triggerCancelBuild: PropTypes.func.isRequired,
+  upAndDownstreamModules: PropTypes.object.isRequired,
+  params: PropTypes.object.isRequired,
+  branchInfo: PropTypes.object.isRequired
 };
 
 export default RepoBuildDetail;

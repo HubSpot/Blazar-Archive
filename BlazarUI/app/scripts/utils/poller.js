@@ -1,13 +1,11 @@
-/*global config*/
-
 class Poller {
-  
+
   constructor(options) {
     this.collection = options.collection;
     this.interval = options.interval;
     this.dontPoll = false;
   }
-  
+
   startPolling(cb) {
     const that = this;
     (function _doPoll() {
@@ -15,14 +13,14 @@ class Poller {
         return;
       }
       that._fetchBuilds((resp) => {
-        setTimeout(_doPoll, config.buildsRefresh);
+        setTimeout(_doPoll, window.config.buildsRefresh);
         if (cb) {
           cb(resp);
         }
       });
     })();
   }
-  
+
   stopPolling() {
     this.dontPoll = true;
   }
@@ -30,26 +28,24 @@ class Poller {
   _fetchBuilds(cb) {
     const promise = this.collection.fetch();
     let result;
-    
+
     promise.done((data, textStatus, jqXHR) => {
       result = {
         success: true,
-        data: data,
-        textStatus: textStatus,
-        jqXHR: jqXHR
+        data,
+        textStatus,
+        jqXHR
       };
     });
 
-    promise.always( () => {
+    promise.always(() => {
       if (typeof cb === 'function') {
         cb(result);
       }
     });
-      
   }
-  
 
-  
+
 }
 
 

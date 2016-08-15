@@ -1,16 +1,6 @@
-import React, {Component, PropTypes} from 'react';
+import React, {PropTypes} from 'react';
 
-class TableHeadRow extends Component {
-
-  render() {
-
-    return (
-        <th>{this.props.label}</th>
-      );
-
-  }
-
-}
+const TableHeadRow = ({label}) => <th>{label}</th>;
 
 TableHeadRow.propTypes = {
   label: PropTypes.string

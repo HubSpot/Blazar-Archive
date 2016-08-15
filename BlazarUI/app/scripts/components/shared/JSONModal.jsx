@@ -17,9 +17,9 @@ class JSONModal extends Component {
 
   modal() {
     return (
-      <Modal dialogClassName='json-modal' bsSize='large' show={this.state.showModal} onHide={this.closeModal}>
+      <Modal dialogClassName="json-modal" bsSize="large" show={this.state.showModal} onHide={this.closeModal}>
         <Modal.Body>
-          <pre className='json-modal__inner-content' dangerouslySetInnerHTML={this.getJSONMarkup()} />
+          <pre className="json-modal__inner-content" dangerouslySetInnerHTML={this.getJSONMarkup()} />
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.closeModal}>Close</Button>
@@ -27,11 +27,11 @@ class JSONModal extends Component {
       </Modal>
     );
   }
-  
+
   getJSONMarkup() {
     return {__html: json2html(this.props.json)};
   }
-  
+
   openModal() {
     this.setState({
       showModal: true
@@ -50,17 +50,17 @@ class JSONModal extends Component {
       this.props.classname
     ]);
   }
-  
+
   handleTriggerJsonModal() {
     this.setState({
       showModal: true
-    })
+    });
   }
 
   render() {
     return (
       <span>
-        <button id='json-modal-button' onClick={this.handleTriggerJsonModal} className={this.getClassNames()}>JSON</button>
+        <button id="json-modal-button" onClick={this.handleTriggerJsonModal} className={this.getClassNames()}>JSON</button>
         {this.modal()}
       </span>
     );
@@ -68,7 +68,8 @@ class JSONModal extends Component {
 }
 
 JSONModal.propTypes = {
-  json: PropTypes.object.isRequired
+  json: PropTypes.object.isRequired,
+  classname: PropTypes.string
 };
 
 export default JSONModal;

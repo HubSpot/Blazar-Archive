@@ -6,7 +6,7 @@ import CommitList from './CommitList.jsx';
 class Commits extends Component {
 
   splitCommitsIntoDays() {
-    let commitMap = {}; // keyed by day
+    const commitMap = {}; // keyed by day
 
     let sortedCommits = this.props.commits.sort((a, b) => {
       return b.timestamp - a.timestamp;
@@ -16,7 +16,7 @@ class Commits extends Component {
       sortedCommits = sortedCommits.slice(0, 1);
     }
 
-    sortedCommits.map((commit, i) => {
+    sortedCommits.forEach((commit, i) => {
       const day = moment(parseInt(commit.timestamp, 10)).format('M-DD-YY');
       let entry;
 
@@ -27,9 +27,7 @@ class Commits extends Component {
       if (commitMap[day] !== undefined) {
         entry = commitMap[day];
         entry.push(commit);
-      }
-
-      else {
+      } else {
         entry = [commit];
       }
 
@@ -41,8 +39,9 @@ class Commits extends Component {
 
   buildCompareLink() {
     const {currentCommit, previousCommit} = this.props;
+    const previousCommitUri = previousCommit.url.replace('/commit/', '/compare/');
 
-    return previousCommit.url.replace('/commit/', '/compare/') + '...' + currentCommit.id;
+    return `${previousCommitUri}...${currentCommit.id}`;
   }
 
   renderSummaryText() {
@@ -51,13 +50,9 @@ class Commits extends Component {
 
     if (!anyNewCommits) {
       msg = 'No new commits in this build. Showing most recent commit';
-    }
-
-    else if (!showCommits) {
+    } else if (!showCommits) {
       msg = `Showing 1 of ${commits.length} new commits in this build`;
-    }
-
-    else {
+    } else {
       msg = `Showing ${commits.length} of ${commits.length} new commit${commits.length === 1 ? '' : 's'} in this build`;
     }
 
@@ -65,18 +60,18 @@ class Commits extends Component {
 
     if (previousCommit !== undefined) {
       compareNode = (
-        <a target='_blank' href={this.buildCompareLink()}>compare</a>
+        <a target="_blank" href={this.buildCompareLink()}>compare</a>
       );
     }
 
     return (
       <span>
         {msg}
-        <span className='commits__compare-link'>
+        <span className="commits__compare-link">
           {compareNode}
         </span>
       </span>
-    )
+    );
   }
 
   renderSummary() {
@@ -100,7 +95,8 @@ class Commits extends Component {
           key={i}
           isFirstCommit={isFirstCommit}
           commits={commitList}
-          timestamp={timestamp} />
+          timestamp={timestamp}
+        />
       );
     });
 

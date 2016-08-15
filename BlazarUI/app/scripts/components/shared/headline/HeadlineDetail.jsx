@@ -1,19 +1,15 @@
-import React, {Component, PropTypes} from 'react';
+import React, {PropTypes} from 'react';
 
-class HeadlineDetail extends Component{
+const HeadlineDetail = ({children, block, crumb}) => {
+  let extraClass = `headline__detail${(block ? ' headline-block' : '')}`;
+  extraClass += crumb ? ' headline-crumb' : '';
 
-  render() {
-
-  	let extraClass = 'headline__detail' + (this.props.block ? ' headline-block' : '');
-    extraClass += this.props.crumb ? ' headline-crumb' : '';
-
-    return (
-      <span className={extraClass}>
-        {' '} <span className='headline__detail-subheadline'>{this.props.children}</span>
-      </span>
-    );
-  }
-}
+  return (
+    <span className={extraClass}>
+      {' '} <span className="headline__detail-subheadline">{children}</span>
+    </span>
+  );
+};
 
 HeadlineDetail.propTypes = {
   children: PropTypes.node,

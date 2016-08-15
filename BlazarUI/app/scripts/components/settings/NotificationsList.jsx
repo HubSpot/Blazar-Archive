@@ -14,7 +14,7 @@ class NotificationsList extends Component {
   toggleNotificationSetting(event) {
     const {notifications, channel} = this.props;
 
-    let channelNotifications = findWhere(notifications, {channelName: channel});
+    const channelNotifications = findWhere(notifications, {channelName: channel});
     channelNotifications[event.target.id] = !channelNotifications[event.target.id];
 
     SettingsActions.updateNotification(channelNotifications);
@@ -22,8 +22,8 @@ class NotificationsList extends Component {
 
   renderDefault() {
     return (
-      <div className='notifications__list--empty'>
-        <Icon type='fa' name='bell-slash-o' />
+      <div className="notifications__list--empty">
+        <Icon type="fa" name="bell-slash-o" />
         <p>
           No channels configured for notifications.
         </p>
@@ -43,64 +43,64 @@ class NotificationsList extends Component {
 
     const channelNotifications = findWhere(notifications, {channelName: channel});
 
-    if (channelNotifications === undefined) {
-      return;
+    if (!channelNotifications) {
+      return null;
     }
 
     return (
       <div>
-        <div className='notifications__setting'>
-          <div className='notifications__setting-title'>
+        <div className="notifications__setting">
+          <div className="notifications__setting-title">
             <span>
               On Failure
             </span>
           </div>
-          <div className='notifications__setting-description'>
+          <div className="notifications__setting-description">
             <span>
               Send a notification every time this build fails
             </span>
           </div>
-          <div className='notifications__setting-toggle'>
+          <div className="notifications__setting-toggle">
             <Toggle
-              id='onFail'
+              id="onFail"
               onChange={this.toggleNotificationSetting}
               checked={channelNotifications.onFail}
             />
           </div>
         </div>
-        <div className='notifications__setting'>
-          <div className='notifications__setting-title'>
+        <div className="notifications__setting">
+          <div className="notifications__setting-title">
             <span>
               On Success
             </span>
           </div>
-          <div className='notifications__setting-description'>
+          <div className="notifications__setting-description">
             <span>
               Send a notification every time this build succeeds
             </span>
           </div>
-          <div className='notifications__setting-toggle'>
+          <div className="notifications__setting-toggle">
             <Toggle
-              id='onFinish'
+              id="onFinish"
               onChange={this.toggleNotificationSetting}
               checked={channelNotifications.onFinish}
             />
           </div>
         </div>
-        <div className='notifications__setting'>
-          <div className='notifications__setting-title'>
+        <div className="notifications__setting">
+          <div className="notifications__setting-title">
             <span>
               On Status Change
             </span>
           </div>
-          <div className='notifications__setting-description'>
+          <div className="notifications__setting-description">
             <span>
               Send a notification when this build breaks or recovers
             </span>
           </div>
-          <div className='notifications__setting-toggle'>
+          <div className="notifications__setting-toggle">
             <Toggle
-              id='onChange'
+              id="onChange"
               onChange={this.toggleNotificationSetting}
               checked={channelNotifications.onChange}
             />
@@ -112,7 +112,7 @@ class NotificationsList extends Component {
 
   render() {
     return (
-      <div className='notifications__list'>
+      <div className="notifications__list">
         {this.renderNotificationsList()}
       </div>
     );

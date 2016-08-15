@@ -1,12 +1,9 @@
-/*global config*/
 import React, {Component, PropTypes} from 'react';
 import {bindAll} from 'underscore';
-import {Link} from 'react-router';
 
 import Notifications from './Notifications.jsx';
 
 import Headline from '../shared/headline/Headline.jsx';
-import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
@@ -21,7 +18,7 @@ import BranchSettings from './BranchSettings.jsx';
 import BranchActions from '../../actions/branchActions';
 import BranchStore from '../../stores/branchStore';
 
-let initialState = {
+const initialState = {
   notifications: [],
   slackChannels: [],
   branchInfo: {},
@@ -48,7 +45,7 @@ class SettingsContainer extends Component {
     SettingsActions.loadSlackChannels();
   }
 
-  componentWillReceiveProps(nextprops) {
+  componentWillReceiveProps(nextProps) {
     this.setState(initialState);
     SettingsActions.loadNotifications(nextProps.params);
     SettingsActions.loadSettings(this.props.params);
@@ -66,7 +63,11 @@ class SettingsContainer extends Component {
   buildDocumentTitle() {
     const {branchInfo} = this.state;
 
-    return 'Settings' + (branchInfo ? ' | ' + branchInfo.repository + ' - ' + branchInfo.branch : '');
+    if (!branchInfo) {
+      return 'Settings';
+    }
+
+    return `Settings | ${branchInfo.repository} - ${branchInfo.branch}`;
   }
 
   onTriggerInterProjectBuilds() {
@@ -78,12 +79,10 @@ class SettingsContainer extends Component {
   }
 
   renderHeadline() {
-    const branchUrl = `/builds/branch/${this.props.params.branchId}`;
-
     return (
       <div>
         <SimpleBreadcrumbs repo={true} branch={true} {...this.props} {...this.state} />
-        <Headline className='notifications__page-headline'>
+        <Headline className="notifications__page-headline">
           <Icon type="fa" name="wrench" classNames="headline-icon" />
           <span>Settings</span>
         </Headline>
@@ -93,10 +92,9 @@ class SettingsContainer extends Component {
 
   renderContent() {
     if (this.state.loading || this.state.loadingBranchInfo || this.state.loadingSettings) {
-      return (
-        <Loader align='left' />
-      )
+      return <Loader align="left" />;
     }
+
     return (
       <UIGrid>
           <UIGridItem size={12}>

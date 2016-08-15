@@ -13,7 +13,6 @@ function renderedOutput(elt) {
 }
 
 describe('<Sha />', () => {
-
   let sha, gitInfo, build;
 
   beforeEach(() => {
@@ -38,11 +37,9 @@ describe('<Sha />', () => {
     };
 
     sha = renderedOutput(<Sha gitInfo={gitInfo} build={build}></Sha>);
-
   });
 
   it('should have the right tag', () => {
     expect(sha.type).toBe('span');
   });
-
 });

@@ -13,7 +13,6 @@ import {renderedOutput} from '../../test-utils/helpers';
 
 
 describe('<Breadcrumbs />', () => {
-
   let breadcrumbs;
   const appRoot = '';
 
@@ -43,5 +42,4 @@ describe('<Breadcrumbs />', () => {
   // To do:
   // it('should render all the children', () => {
   // });
-
 });

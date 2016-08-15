@@ -12,11 +12,10 @@ function renderedOutput(elt) {
 }
 
 describe('<TableHeadRow />', () => {
-
   let tableHeadRow;
 
   beforeEach(() => {
-    tableHeadRow = renderedOutput(<TableHeadRow label='A tarantula enjoys a fine chewing gum' />);
+    tableHeadRow = renderedOutput(<TableHeadRow label="A tarantula enjoys a fine chewing gum" />);
   });
 
   it('should generate a th', () => {
@@ -26,5 +25,4 @@ describe('<TableHeadRow />', () => {
   it('should generate a label', () => {
     expect(tableHeadRow.props.children).toEqual('A tarantula enjoys a fine chewing gum');
   });
-
 });

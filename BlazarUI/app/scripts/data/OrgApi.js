@@ -1,4 +1,4 @@
-import { findWhere, uniq, sortBy, filter } from 'underscore';
+import { uniq, sortBy } from 'underscore';
 import { fromJS } from 'immutable';
 import StoredBuilds from './StoredBuilds';
 
@@ -7,7 +7,7 @@ class OrgApi extends StoredBuilds {
   _parse() {
     const {params} = this.options;
 
-    // get unique repos 
+    // get unique repos
     const repos = uniq(this.builds.filter((build) => {
       return build.gitInfo.branch === 'master';
     }).map((build) => {
@@ -26,7 +26,7 @@ class OrgApi extends StoredBuilds {
     const reposFiltered = repos.filter((repo) => {
       return repo.organization === params.org;
     });
-    
+
     const sortedRepos = sortBy(reposFiltered, (r) => {
       return r.repository.toLowerCase();
     });

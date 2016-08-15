@@ -1,9 +1,7 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PropTypes } from 'react';
 import classNames from 'classnames';
 import { Link } from 'react-router';
-import { buildResultIcon } from '../Helpers';
 import moment from 'moment';
-import humanizeDuration from 'humanize-duration';
 
 import Card from './Card.jsx';
 import ModuleRow from './ModuleRow.jsx';
@@ -37,8 +35,8 @@ class RepoBranchCard extends Card {
     const topologicalSort = build.dependencyGraph.topologicalSort;
 
     return moduleBuildsList.sort((a, b) => {
-      let indexA = topologicalSort.indexOf(a.moduleId);
-      let indexB = topologicalSort.indexOf(b.moduleId);
+      const indexA = topologicalSort.indexOf(a.moduleId);
+      const indexB = topologicalSort.indexOf(b.moduleId);
 
       if (indexA < indexB) {
         return -1;
@@ -80,12 +78,10 @@ class RepoBranchCard extends Card {
   }
 
   renderBuildNumberLink() {
-    const {item} = this.props;
     const build = this.getBuildToDisplay();
-    const gitInfo = item.get('gitInfo');
 
     return (
-      <Link className='repo-branch-card__build-number' to={build.get('blazarPath')}>
+      <Link className="repo-branch-card__build-number" to={build.get('blazarPath')}>
         #{build.get('buildNumber')}
       </Link>
     );
@@ -100,7 +96,7 @@ class RepoBranchCard extends Card {
     }
 
     const currentCommit = commitInfo.get('current');
-    const commitUrl = previousCommit.get('url').replace('/commit/', '/compare/') + '...' + currentCommit.get('id');
+    const commitUrl = `${previousCommit.get('url').replace('/commit/', '/compare/')}...${currentCommit.get('id')}`;
 
     return (
       <a href={commitUrl}>
@@ -110,31 +106,23 @@ class RepoBranchCard extends Card {
   }
 
   renderModuleRows(modules) {
-    return modules.map((module, i) => {
-      return (
-        <ModuleRow
-          module={module}
-          key={i} />
-      );
-    });
+    return modules.map((module, i) => <ModuleRow module={module} key={i} />);
   }
 
   renderDetails() {
-    const {item, moduleBuildsList, expanded, loading} = this.props;
+    const {moduleBuildsList, expanded, loading} = this.props;
     const build = this.getBuildToDisplay();
 
     if (!expanded) {
       return (
-        <div className='card-stack__expanded collapsed'>
-          <div className='card-stack__expanded-module-rows collapsed' />
+        <div className="card-stack__expanded collapsed">
+          <div className="card-stack__expanded-module-rows collapsed" />
         </div>
       );
-    }
-
-    else if (loading) {
+    } else if (loading) {
       return (
-        <div className='card-stack__expanded'>
-          <Loader align='center' />
+        <div className="card-stack__expanded">
+          <Loader align="center" />
         </div>
       );
     }
@@ -147,20 +135,18 @@ class RepoBranchCard extends Card {
       const buildTime = this.getBuildTime(build.get('startTimestamp'));
       const author = build.get('buildTrigger').get('id');
       detailedTriggerMessage = `Triggered ${buildTime}${author === 'unknown' ? '' : ` by ${author}`}`;
-    }
-
-    else {
+    } else {
       buildTriggerMessage = 'automatically by a code push';
       detailedTriggerMessage = this.buildCompareLink();
     }
 
     return (
-      <div className='card-stack__expanded'>
-        <div className='repo-branch-card__expanded-header'>
+      <div className="card-stack__expanded">
+        <div className="repo-branch-card__expanded-header">
           <span>Build {this.renderBuildNumberLink()} was started {buildTriggerMessage}</span>
-          <span className='repo-branch-card__expanded-author'>{detailedTriggerMessage}</span>
+          <span className="repo-branch-card__expanded-author">{detailedTriggerMessage}</span>
         </div>
-        <div className='repo-branch-card__expanded-module-rows'>
+        <div className="repo-branch-card__expanded-module-rows">
           {this.renderModuleRows(this.sortModules(moduleBuildsList))}
         </div>
       </div>
@@ -172,12 +158,12 @@ class RepoBranchCard extends Card {
     const gitInfo = item.get('gitInfo');
 
     return (
-      <div className='repo-branch-card__info'>
-        <div className='repo-branch-card__repo'>
+      <div className="repo-branch-card__info">
+        <div className="repo-branch-card__repo">
           {this.renderRepoLink()}
         </div>
-        <div className='repo-branch-card__branch-and-build'>
-          <span className='repo-branch-card__branch'>
+        <div className="repo-branch-card__branch-and-build">
+          <span className="repo-branch-card__branch">
             <Link to={gitInfo.get('blazarBranchPath')}>
               {gitInfo.get('branch')}
             </Link>
@@ -188,7 +174,6 @@ class RepoBranchCard extends Card {
   }
 
   renderBuildAuthorMaybe() {
-    const {item} = this.props;
     const trigger = this.getBuildToDisplay().get('buildTrigger');
     const author = trigger.get('id');
 
@@ -198,27 +183,24 @@ class RepoBranchCard extends Card {
 
     return (
       <span>
-        Triggered by <span className='repo-branch-card__author'>{author}</span>
+        Triggered by <span className="repo-branch-card__author">{author}</span>
       </span>
     );
   }
 
   renderLastBuild() {
-    const {item} = this.props;
     const build = this.getBuildToDisplay();
     let timestamp;
 
     if (build.get('state') === BuildStates.IN_PROGRESS) {
       timestamp = 'In Progress';
-    }
-
-    else {
+    } else {
       timestamp = this.getBuildTime(build.get('startTimestamp'));
     }
 
     return (
-      <div className='repo-branch-card__last-build'>
-        <span className='repo-branch-card__last-build-time'>
+      <div className="repo-branch-card__last-build">
+        <span className="repo-branch-card__last-build-time">
           {timestamp}
         </span>
       </div>
@@ -226,7 +208,6 @@ class RepoBranchCard extends Card {
   }
 
   renderTriggeredBy() {
-    const {item} = this.props;
     const build = this.getBuildToDisplay();
     let buildTriggerMessage;
     let sha;
@@ -235,14 +216,10 @@ class RepoBranchCard extends Card {
       const buildAuthor = this.renderBuildAuthorMaybe();
       if (!buildAuthor) {
         buildTriggerMessage = 'Triggered by user';
-      }
-
-      else {
+      } else {
         buildTriggerMessage = buildAuthor;
       }
-    }
-
-    else {
+    } else {
       buildTriggerMessage = 'Triggered by code push';
       const commitInfo = build.get('commitInfo');
 
@@ -258,8 +235,8 @@ class RepoBranchCard extends Card {
     }
 
     return (
-      <div className='repo-branch-card__details'>
-        <div className='repo-branch-card__triggered-by'>
+      <div className="repo-branch-card__details">
+        <div className="repo-branch-card__triggered-by">
           <span>{buildTriggerMessage} {sha ? '(' : ''}{sha}{sha ? ')' : ''}</span>
         </div>
       </div>
@@ -267,12 +244,11 @@ class RepoBranchCard extends Card {
   }
 
   renderStatus() {
-    const {item} = this.props;
     const build = this.getBuildToDisplay();
     const classWithModifier = `repo-branch-card__status-banner--${[BuildStates.FAILED, BuildStates.UNSTABLE].indexOf(build.get('state')) !== -1 ? 'FAILED' : 'SUCCESS'}`;
 
     return (
-      <div className='repo-branch-card__status'>
+      <div className="repo-branch-card__status">
         <div className={classWithModifier}>
           <span />
         </div>
@@ -281,7 +257,6 @@ class RepoBranchCard extends Card {
   }
 
   renderBuildAndStatus() {
-    const {item} = this.props;
     const build = this.getBuildToDisplay();
     const colorClass = `repo-branch-card__build-and-status repo-branch-card__build-and-status--${build.get('state')}`;
 
@@ -293,15 +268,11 @@ class RepoBranchCard extends Card {
   }
 
   render() {
-    const {item} = this.props;
-    const build = this.getBuildToDisplay();
-    const gitInfo = item.get('gitInfo');
-
     return (
       <div className={this.getClassNames()}>
-        <div className='repo-branch-card__inner-wrapper' onClick={this.props.onClick}>
+        <div className="repo-branch-card__inner-wrapper" onClick={this.props.onClick}>
           {this.renderBuildAndStatus()}
-          <div className='card-stack__card-main'>
+          <div className="card-stack__card-main">
             {this.renderInfo()}
             {this.renderLastBuild()}
             {this.renderTriggeredBy()}

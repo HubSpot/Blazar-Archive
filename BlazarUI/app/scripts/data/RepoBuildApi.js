@@ -1,4 +1,3 @@
-/*global config*/
 import Resource from '../services/ResourceProvider';
 import Q from 'q';
 import { findWhere, map, extend, max, contains } from 'underscore';
@@ -14,7 +13,7 @@ function _parse(resp) {
 
 function _fetchModuleNames(params) {
   const moduleNamesPromise = new Resource({
-    url: `${config.apiRoot}/branches/${params.branchId}/modules`,
+    url: `${window.config.apiRoot}/branches/${params.branchId}/modules`,
     type: 'GET'
   }).send();
 
@@ -23,7 +22,7 @@ function _fetchModuleNames(params) {
 
 function _fetchModuleNamesById(branchId) {
   const moduleNamesPromise = new Resource({
-    url: `${config.apiRoot}/branches/${branchId}/modules`,
+    url: `${window.config.apiRoot}/branches/${branchId}/modules`,
     type: 'GET'
   }).send();
 
@@ -32,7 +31,7 @@ function _fetchModuleNamesById(branchId) {
 
 function _fetchBranchBuildHistory(params) {
   const branchBuildHistoryPromise = new Resource({
-    url: `${config.apiRoot}/builds/history/branch/${params.branchId}`,
+    url: `${window.config.apiRoot}/builds/history/branch/${params.branchId}`,
     type: 'GET'
   }).send();
 
@@ -56,19 +55,19 @@ function fetchRepoBuild(params, cb) {
   return _fetchBranchBuildHistory(params).then((resp) => {
     const repoBuild = _getRepoBuildByParam(params, resp);
     const repoBuildPromise = new Resource({
-      url: `${config.apiRoot}/branches/builds/${repoBuild.id}`,
+      url: `${window.config.apiRoot}/branches/builds/${repoBuild.id}`,
       type: 'GET'
     }).send();
 
-    return repoBuildPromise.then((resp) => {
-      return cb(_parse(resp));
+    return repoBuildPromise.then((repoBuilds) => {
+      return cb(_parse(repoBuilds));
     });
   });
 }
 
 function fetchRepoBuildById(repoBuildId, cb) {
   const repoBuildPromise = new Resource({
-    url: `${config.apiRoot}/branches/builds/${repoBuildId}`,
+    url: `${window.config.apiRoot}/branches/builds/${repoBuildId}`,
     type: 'GET'
   }).send();
 
@@ -81,7 +80,7 @@ function fetchModuleBuilds(params, cb) {
   return _fetchBranchBuildHistory(params).then((resp) => {
     const repoBuild = _getRepoBuildByParam(params, resp);
     const moduleBuildsPromise = new Resource({
-      url: `${config.apiRoot}/branches/builds/${repoBuild.id}/modules`,
+      url: `${window.config.apiRoot}/branches/builds/${repoBuild.id}/modules`,
       type: 'GET'
     }).send();
     const moduleInfoPromise = _fetchModuleNames(params);
@@ -105,7 +104,7 @@ function fetchModuleBuilds(params, cb) {
 
 function fetchModuleBuildsById(branchId, repoBuildId, buildNumber, cb) {
   const moduleBuildsPromise = new Resource({
-    url: `${config.apiRoot}/branches/builds/${repoBuildId}/modules`,
+    url: `${window.config.apiRoot}/branches/builds/${repoBuildId}/modules`,
     type: 'GET'
   }).send();
   const moduleInfoPromise = _fetchModuleNamesById(branchId);
@@ -130,7 +129,7 @@ function cancelBuild(params) {
   return _fetchBranchBuildHistory(params).then((resp) => {
     const repoBuild = findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
     const cancelPromise = new Resource({
-      url: `${config.apiRoot}/branches/builds/${repoBuild.id}/cancel`,
+      url: `${window.config.apiRoot}/branches/builds/${repoBuild.id}/cancel`,
       type: 'POST'
     }).send();
 
@@ -141,9 +140,9 @@ function cancelBuild(params) {
 }
 
 export default {
-  fetchRepoBuild: fetchRepoBuild,
-  fetchRepoBuildById: fetchRepoBuildById,
-  fetchModuleBuilds: fetchModuleBuilds,
-  fetchModuleBuildsById: fetchModuleBuildsById,
-  cancelBuild: cancelBuild
+  fetchRepoBuild,
+  fetchRepoBuildById,
+  fetchModuleBuilds,
+  fetchModuleBuildsById,
+  cancelBuild
 };

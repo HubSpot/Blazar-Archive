@@ -9,9 +9,7 @@ class BaseCollection extends Collection {
   }
 
   addHelpers() {
-
     return map(this.data, (item) => {
-
       const {
         gitInfo,
         module,
@@ -43,9 +41,7 @@ class BaseCollection extends Collection {
       }
 
       return item;
-
     });
-
   }
 
 

@@ -1,4 +1,3 @@
-/*global config*/
 import Reflux from 'reflux';
 import BranchActions from '../actions/branchActions';
 import BranchApi from '../data/BranchApi';
@@ -83,10 +82,11 @@ const BranchStore = Reflux.createStore({
   onTriggerBuild(params, state) {
     const {selectedModules, buildDownstreamModules, resetCache} = state;
 
-    BranchApi.triggerBuild(params, selectedModules, buildDownstreamModules, resetCache, (error, resp) => {
+    BranchApi.triggerBuild(params, selectedModules, buildDownstreamModules, resetCache, (error) => {
       if (error) {
         this.error = error;
-        return this.triggerErrorUpdate();
+        this.triggerErrorUpdate();
+        return;
       }
 
       this.onLoadBranchBuildHistory(params);
@@ -106,7 +106,7 @@ const BranchStore = Reflux.createStore({
     this.onLoadBranchBuildHistory(this.params);
 
     if (this.shouldPoll) {
-      setTimeout(this._poll, config.buildsRefresh);
+      setTimeout(this._poll, window.config.buildsRefresh);
     }
   }
 

@@ -1,10 +1,7 @@
 import React, {Component, PropTypes} from 'react';
-import Button from 'react-bootstrap/lib/Button';
 import Alert from 'react-bootstrap/lib/Alert';
 import json2html from 'json-to-html';
 import classNames from 'classnames';
-
-import Icon from '../shared/Icon.jsx';
 
 class MalformedFileNotification extends Component {
 
@@ -26,12 +23,12 @@ class MalformedFileNotification extends Component {
 
   renderConfigInfo() {
     return this.props.malformedFiles.map((malformedFile, i) => {
-      const {branchId, type, path, details} = malformedFile;
+      const {path, details} = malformedFile;
 
       return (
         <div key={i} className="malformed-files__file">
-          <code className='malformed-files__file-name'>{path}</code>
-          <pre className='malformed-files__file-contents' dangerouslySetInnerHTML={this.getJSONMarkup(details)} />
+          <code className="malformed-files__file-name">{path}</code>
+          <pre className="malformed-files__file-contents" dangerouslySetInnerHTML={this.getJSONMarkup(details)} />
         </div>
       );
     });
@@ -50,7 +47,7 @@ class MalformedFileNotification extends Component {
 
   renderAlert() {
     return (
-      <Alert bsStyle='danger' className={classNames('malformed-files__alert', {expanded: this.state.expanded})}>
+      <Alert bsStyle="danger" className={classNames('malformed-files__alert', {expanded: this.state.expanded})}>
         One or more of your config files for this branch is malformed.
         <a onClick={this.toggleExpanded} className="pull-right">{this.state.expanded ? 'hide' : 'show'} details</a>
         {this.state.expanded && this.renderDetails()}

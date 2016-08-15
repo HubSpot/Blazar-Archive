@@ -1,25 +1,19 @@
 import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
 import {Link} from 'react-router';
-import {LABELS, iconStatus} from '../constants';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import {tableRowBuildState, timestampFormatted, humanizeText, buildResultIcon, getTableDurationText, buildIsOnDeck, timestampDuration} from '../Helpers';
+import {tableRowBuildState, timestampFormatted, buildResultIcon, getTableDurationText, buildIsOnDeck, timestampDuration} from '../Helpers';
 
-import Icon from '../shared/Icon.jsx';
 import Sha from '../shared/Sha.jsx';
-
-let initialState = {
-  moment: +moment()
-}
 
 class BranchBuildHistoryTableRow extends Component {
 
   constructor(props, context) {
     super(props, context);
 
-    this.state = initialState;
+    this.state = {moment: +moment()};
   }
 
   componentDidMount() {
@@ -34,7 +28,7 @@ class BranchBuildHistoryTableRow extends Component {
   updateMoment() {
     this.setState({
       moment: +moment()
-    })
+    });
   }
 
   onTableClick(blazarPath, e) {
@@ -42,17 +36,11 @@ class BranchBuildHistoryTableRow extends Component {
 
     if (link === 'build-link' || link === 'sha-link') {
       return;
-    }
-
-    else {
-      if (!e.metaKey) {
-        this.context.router.push(blazarPath);
-      }
-
-      else {
-        window.open(config.appRoot + blazarPath);
-        return;
-      }
+    } else if (!e.metaKey) {
+      this.context.router.push(blazarPath);
+    } else {
+      window.open(window.config.appRoot + blazarPath);
+      return;
     }
   }
 
@@ -65,21 +53,20 @@ class BranchBuildHistoryTableRow extends Component {
 
   renderSha() {
     const {data, params} = this.props;
-    let sha;
 
-    if (data.sha !== undefined) {
-      const gitInfo = {
-        host: params.host,
-        organization: params.org,
-        repository: params.repo,
-      }
+    if (!data.sha) {
+      return null;
+    }
 
-      return (
-        <Sha gitInfo={gitInfo} build={data} />  
-      );
-    }  
+    const gitInfo = {
+      host: params.host,
+      organization: params.org,
+      repository: params.repo,
+    };
+
+    return <Sha gitInfo={gitInfo} build={data} />;
   }
-  
+
   renderDuration() {
     const {data} = this.props;
     let duration = data.duration;
@@ -90,32 +77,30 @@ class BranchBuildHistoryTableRow extends Component {
 
     return getTableDurationText(data.state, duration);
   }
-  
+
   renderStartTime() {
     return timestampFormatted(this.props.data.startTimestamp);
   }
 
   renderBuildLink() {
     const {data} = this.props;
-    
+
     if (buildIsOnDeck(data.state)) {
       return data.buildNumber;
     }
 
-    return (
-      <Link className='build-link' to={data.blazarPath}>{data.buildNumber}</Link>
-    );
+    return <Link className="build-link" to={data.blazarPath}>{data.buildNumber}</Link>;
   }
 
   render() {
-    const {data, params} = this.props;
+    const {data} = this.props;
 
     return (
-      <tr onClick={this.onTableClick.bind(this, data.blazarPath)} className={this.getRowClassNames(data.state)}>
-        <td className='build-status'>
+      <tr onClick={(e) => this.onTableClick(data.blazarPath, e)} className={this.getRowClassNames(data.state)}>
+        <td className="build-status">
           {buildResultIcon(data.state)}
         </td>
-        <td className='build-result-link'>
+        <td className="build-result-link">
           <span>{this.renderBuildLink()}</span>
         </td>
         <td>
@@ -137,7 +122,8 @@ BranchBuildHistoryTableRow.contextTypes = {
 };
 
 BranchBuildHistoryTableRow.propTypes = {
-  data: PropTypes.object.isRequired
+  data: PropTypes.object.isRequired,
+  params: PropTypes.object.isRequired
 };
 
 export default BranchBuildHistoryTableRow;

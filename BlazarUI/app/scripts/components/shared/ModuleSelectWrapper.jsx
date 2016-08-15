@@ -1,5 +1,4 @@
 import React, {Component, PropTypes} from 'react';
-import Immutable, { fromJS } from 'immutable';
 import Select from 'react-select';
 
 class ModuleSelectWrapper extends Component {
@@ -10,7 +9,7 @@ class ModuleSelectWrapper extends Component {
     this.state = {};
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     return nextProps.modules.length !== this.props.modules.length;
   }
 
@@ -23,15 +22,15 @@ class ModuleSelectWrapper extends Component {
     });
   }
 
-	render() {
+  render() {
     return (
-      <div className='module-select'>
+      <div className="module-select">
         <Select
-          placeholder='No modules selected.'
-          className='module-select__input'
-          name='moduleSelect'
-          clearAllText='None'
-          noResultsText='All modules have been selected.'
+          placeholder="No modules selected."
+          className="module-select__input"
+          name="moduleSelect"
+          clearAllText="None"
+          noResultsText="All modules have been selected."
           multi={true}
           value={this.createModuleSelectOptions(this.props.modules)}
           options={this.createModuleSelectOptions(this.props.modules)}

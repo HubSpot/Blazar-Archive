@@ -8,7 +8,7 @@ const SidebarFilterStore = Reflux.createStore({
   init() {
     this.searchValue = '';
   },
-  
+
   clearSearchValue() {
     this.searchValue = '';
 
