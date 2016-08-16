@@ -107,30 +107,4 @@ public class BuildConfig {
     return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, buildpack, Optional.of(user), stepActivation, depends, provides);
   }
 
-  public static class PostBuildSteps {
-    private final List<BuildStep> onFailure;
-    private final List<BuildStep> onSuccess;
-    private final List<BuildStep> always;
-
-    @JsonCreator
-    public PostBuildSteps(@JsonProperty("onFailure") List<BuildStep> onFailure,
-                          @JsonProperty("onSuccess") List<BuildStep> onSuccess,
-                          @JsonProperty("always") List<BuildStep> always) {
-      this.onFailure = Objects.firstNonNull(onFailure, Collections.emptyList());
-      this.onSuccess = Objects.firstNonNull(onSuccess, Collections.emptyList());
-      this.always = Objects.firstNonNull(always, Collections.emptyList());
-    }
-
-    public List<BuildStep> getOnFailure() {
-      return onFailure;
-    }
-
-    public List<BuildStep> getOnSuccess() {
-      return onSuccess;
-    }
-
-    public List<BuildStep> getAlways() {
-      return always;
-    }
-  }
 }
