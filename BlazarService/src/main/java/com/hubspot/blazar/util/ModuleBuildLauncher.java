@@ -94,7 +94,7 @@ public class ModuleBuildLauncher {
   private BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
     List<BuildStep> steps = primary.getSteps().isEmpty() ? secondary.getSteps() : primary.getSteps();
     List<BuildStep> before = primary.getBefore().isEmpty() ? secondary.getBefore() : primary.getBefore();
-    Optional<BuildConfig.PostBuildSteps> after = primary.getAfter().isPresent() ? primary.getAfter() : secondary.getAfter();
+    Optional<BuildConfig.PostBuildSteps> after = (!primary.getAfter().isPresent()) ? secondary.getAfter() : primary.getAfter();
     Map<String, String> env = new LinkedHashMap<>();
     env.putAll(secondary.getEnv());
     env.putAll(primary.getEnv());
