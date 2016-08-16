@@ -99,7 +99,8 @@ public class BranchStateResource {
   @Path("/{id}/modules")
   @PropertyFiltering
   public Set<ModuleState> getModules(@PathParam("id") int branchId) {
-    return stateService.getModuleStatesByBranch(branchId);
+    Set<ModuleState> states = stateService.getModuleStatesByBranch(branchId);
+    return states;
   }
 
   private static String pickImage(RepositoryBuild.State state) {
