@@ -56,6 +56,10 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.rholder</groupId>
+      <artifactId>guava-retrying</artifactId>
+    </dependency>
+    <dependency>
       <groupId>aopalliance</groupId>
       <artifactId>aopalliance</artifactId>
     </dependency>
@@ -200,7 +204,7 @@
       <artifactId>joda-time</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.takari.slack</groupId>
+      <groupId>com.github.Ullink</groupId>
       <artifactId>simple-slack-api</artifactId>
     </dependency>
 

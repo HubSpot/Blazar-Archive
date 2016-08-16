@@ -1,8 +1,14 @@
 package com.hubspot.blazar.util;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
@@ -147,4 +153,13 @@ public class SlackUtils {
   private static SlackAttachment makeAttachment(String title) {
     return new SlackAttachment(title, title, "", "");
   }
+
+  public static Retryer<Boolean> makeSlackMessageSendingRetryer() {
+    return RetryerBuilder.<Boolean>newBuilder()
+        .retryIfResult(Predicates.equalTo(Boolean.FALSE))
+        .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+        .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+        .build();
+  }
+
 }
