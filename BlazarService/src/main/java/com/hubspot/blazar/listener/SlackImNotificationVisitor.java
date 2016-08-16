@@ -82,7 +82,10 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
     }
 
     SlackMessageHandle<SlackMessageReply> result = slackSession.get().sendMessageToUser(user.get(), "", attachment);
-    if (!result.getReply().isOk()) {
+    if (result == null) {
+      LOG.warn("Failed to send slack message to user: {} message: {} slack response was null", email, attachment.toString());
+      return false;
+    } else if (!result.getReply().isOk()) {
       LOG.warn("Failed to send slack message to user: {} message: {} error: {}", email, attachment.toString(), result.getReply().getErrorMessage());
       return false;
     }

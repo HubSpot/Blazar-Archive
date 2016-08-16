@@ -105,7 +105,10 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     }
 
     SlackMessageHandle<SlackMessageReply> result = slackSession.get().sendMessage(slackChannel.get(), "", attachment);
-    if (!result.getReply().isOk()) {
+    if (result == null)  {
+      LOG.warn("Failed to send slack message to channel: {} message: {} slack result was null", channelName, attachment.toString());
+      return false;
+    } else if (!result.getReply().isOk()) {
       LOG.warn("Failed to send slack message to channel: {} message: {} error: {}", channelName, attachment.toString(), result.getReply().getErrorMessage());
       return false;
     }
