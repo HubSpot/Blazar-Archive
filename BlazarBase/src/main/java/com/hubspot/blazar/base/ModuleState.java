@@ -56,8 +56,12 @@ public class ModuleState {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
     ModuleState that = (ModuleState) o;
     return Objects.equals(this.module, that.module) &&
