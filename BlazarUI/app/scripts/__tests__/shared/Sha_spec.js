@@ -13,7 +13,9 @@ function renderedOutput(elt) {
 }
 
 describe('<Sha />', () => {
-  let sha, gitInfo, build;
+  let sha;
+  let gitInfo;
+  let build;
 
   beforeEach(() => {
     gitInfo = {
@@ -36,7 +38,7 @@ describe('<Sha />', () => {
       state: 'LAUNCHING'
     };
 
-    sha = renderedOutput(<Sha gitInfo={gitInfo} build={build}></Sha>);
+    sha = renderedOutput(<Sha gitInfo={gitInfo} build={build} />);
   });
 
   it('should have the right tag', () => {
