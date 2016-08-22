@@ -1,3 +1,6 @@
 {
-  "extends": "hubspot"
+  "extends": "hubspot",
+  "rules": {
+    "no-console": "off"
+  }
 }
