@@ -2,6 +2,7 @@ import Resource from '../services/ResourceProvider';
 import Q from 'q';
 import { findWhere, map, extend, max, contains } from 'underscore';
 import humanizeDuration from 'humanize-duration';
+import $ from 'jquery';
 
 function _parse(resp) {
   if (resp.startTimestamp && resp.endTimestamp) {
@@ -30,9 +31,18 @@ function _fetchModuleNamesById(branchId) {
 }
 
 function _fetchBranchBuildHistory(params) {
+  const inclusionOpts = {
+    property: [
+      'buildNumber',
+      'id',
+      'state'
+    ]
+  };
+
   const branchBuildHistoryPromise = new Resource({
     url: `${window.config.apiRoot}/builds/history/branch/${params.branchId}`,
-    type: 'GET'
+    type: 'GET',
+    data: $.param(inclusionOpts, true)
   }).send();
 
   return branchBuildHistoryPromise;

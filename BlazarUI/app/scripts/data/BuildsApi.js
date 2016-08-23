@@ -84,7 +84,7 @@ function fetchBuilds(extraData, cb) {
     url: `${window.config.apiRoot}/branches/state`,
     type: 'GET',
     dataType: 'json',
-    data: $.param(exclusionOpts).replace(/%5B%5D/g, '')
+    data: $.param(exclusionOpts, true)
   });
 
   this.buildsPoller.poll((err, resp) => {
