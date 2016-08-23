@@ -42,7 +42,7 @@ function _fetchBranchBuildHistory(params) {
   const branchBuildHistoryPromise = new Resource({
     url: `${window.config.apiRoot}/builds/history/branch/${params.branchId}`,
     type: 'GET',
-    data: $.param(inclusionOpts).replace(/%5B%5D/g, '')
+    data: $.param(inclusionOpts, true)
   }).send();
 
   return branchBuildHistoryPromise;
