@@ -2,6 +2,7 @@ import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import humanizeDuration from 'humanize-duration';
 import { getUsernameFromCookie } from '../components/Helpers.js';
+import $ from 'jquery';
 
 function _parse(params, resp) {
   const builds = resp.map((build) => {
@@ -22,9 +23,26 @@ function _parseModules(resp) {
 }
 
 function fetchBranchBuildHistory(params, cb) {
+  const exclusionOpts = {
+    property: [
+      '!buildTrigger',
+      '!buildOptions',
+      '!dependencyGraph',
+      '!commitInfo.newCommits',
+      '!commitInfo.previous',
+      '!commitInfo.truncated',
+      '!commitInfo.current.author',
+      '!commitInfo.current.committer',
+      '!commitInfo.current.modified',
+      '!commitInfo.current.added',
+      '!commitInfo.current.removed'
+    ]
+  };
+
   const branchBuildHistoryPromise = new Resource({
     url: `${window.config.apiRoot}/builds/history/branch/${params.branchId}`,
-    type: 'GET'
+    type: 'GET',
+    data: $.param(exclusionOpts).replace(/%5B%5D/g, '')
   }).send();
 
   return branchBuildHistoryPromise.then((resp) => {
