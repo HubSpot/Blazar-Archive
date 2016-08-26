@@ -1,7 +1,17 @@
 import React, {Component, PropTypes} from 'react';
+import {connect} from 'react-redux';
 import {bindAll} from 'underscore';
 import {buildIsOnDeck} from '../Helpers';
 import classNames from 'classnames';
+
+import {
+  TailerProvider,
+  BlazarLogTailer
+} from 'singularityui-tailer/src/components';
+
+import {
+  blazarSetApiRoot
+} from 'singularityui-tailer/src/actions';
 
 import PageContainer from '../shared/PageContainer.jsx';
 import UIGrid from '../shared/grid/UIGrid.jsx';
@@ -9,7 +19,6 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 
 import BuildHeadline from './BuildHeadline.jsx';
 import BuildLogNavigation from './BuildLogNavigation.jsx';
-import BuildLog from './BuildLog.jsx';
 
 import BuildStore from '../../stores/buildStore';
 import BuildActions from '../../actions/buildActions';
@@ -35,6 +44,10 @@ class BuildContainer extends Component {
     bindAll(this, 'onStatusChange', 'requestNavigationChange');
     this.haveMounted = false;
     this.state = initialState;
+  }
+
+  componentWillMount() {
+    this.props.blazarSetApiRoot();
   }
 
   componentDidMount() {
@@ -66,11 +79,11 @@ class BuildContainer extends Component {
   }
 
   fetchNext() {
-    BuildActions.fetchNext();
+    // BuildActions.fetchNext();
   }
 
   fetchPrevious() {
-    BuildActions.fetchPrevious();
+    // BuildActions.fetchPrevious();
   }
 
   requestNavigationChange(position) {
@@ -78,7 +91,7 @@ class BuildContainer extends Component {
   }
 
   requestPollingStateChange(change) {
-    BuildActions.setLogPollingState(change);
+    // BuildActions.setLogPollingState(change);
   }
 
   onStatusChange(state) {
@@ -114,6 +127,19 @@ class BuildContainer extends Component {
   }
 
   render() {
+    let maybeTailer;
+
+    const { build } = this.state.data;
+    if (build.hasOwnProperty('id')) {
+      const tailerId = `${build.id}/log`;
+      maybeTailer = (
+        <BlazarLogTailer
+          tailerId={tailerId}
+          buildId={`${build.id}`}
+        />
+      );
+    }
+
     return (
       <PageContainer documentTitle={this.buildDocumentTitle()} classNames="build-container">
         <div className={this.getHeaderClasses()}>
@@ -133,24 +159,31 @@ class BuildContainer extends Component {
             </UIGridItem>
           </UIGrid>
         </div>
-        <div className="build-body">
-          <BuildLog
-            build={this.state.data.build}
-            log={this.state.data.log}
-            fetchNext={this.fetchNext}
-            fetchPrevious={this.fetchPrevious}
-            positionChange={this.state.data.positionChange}
-            requestPollingStateChange={this.requestPollingStateChange}
-            {...this.state}
-          />
-        </div>
+        <TailerProvider getTailerState={(state) => state.tailer}>
+          <div className="build-body" heap-ignore="1">
+            {maybeTailer}
+          </div>
+        </TailerProvider>
       </PageContainer>
     );
   }
 }
 
+const { apiRootOverride } = localStorage;
+
+const mapDispatchToProps = (dispatch) => ({
+  blazarSetApiRoot: () => dispatch(blazarSetApiRoot(
+    `${apiRootOverride || ''}`
+  ))
+});
+
+
 BuildContainer.propTypes = {
+  blazarSetApiRoot: PropTypes.func.isRequired,
   params: PropTypes.object.isRequired
 };
 
-export default BuildContainer;
+export default connect(
+  null,
+  mapDispatchToProps
+)(BuildContainer);

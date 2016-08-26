@@ -7,8 +7,9 @@ import {rest, initial, first, last, compact} from 'underscore';
 class Log extends Model {
 
   constructor(options) {
-    this.init(options);
     super(options);
+
+    this.init(options);
   }
 
   init(options) {

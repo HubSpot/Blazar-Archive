@@ -32,6 +32,7 @@ const initialState = {
 class SettingsContainer extends Component {
 
   constructor() {
+    super();
     this.state = initialState;
     bindAll(this, 'onStatusChange', 'onTriggerInterProjectBuilds', 'onInterProjectBuildOptIn');
   }

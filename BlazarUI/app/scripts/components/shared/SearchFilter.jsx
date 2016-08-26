@@ -10,6 +10,7 @@ const FOCUS_SEARCH_BAR_SHORTCUTS = [83, 84]; // s, t
 class SearchFilter extends Component {
 
   constructor() {
+    super();
     bindAll(this, 'handleChange', 'onStoreChange', 'handleKeyup');
     this.state = {
       searchValue: ''

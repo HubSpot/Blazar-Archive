@@ -1,6 +1,6 @@
 @import '../variables'
 
-.build-log
+.log-pane
   position absolute
   z-index 1
   top 80px
@@ -8,8 +8,8 @@
   bottom 0
   right 0
   width 100%
-  overflow-y scroll
-  padding 10px 0
+  overflow scroll
+  padding 0
   margin 0
   font-family $monospace
   font-size 12px  
@@ -42,3 +42,139 @@
 .log-line-emphasis
   margin-top 10px
   font-weight $font-heavy
+
+section.log-pane
+  overflow: scroll
+  // will repaint on scroll if you don't put this in!!!
+  transform: translateZ(0)
+  font-family: Consolas, "Liberation Mono", Courier, monospace
+
+  header
+    flex: 0 1 auto
+
+  div.log-line-wrapper
+    flex: 1 1 auto
+    min-height: 0
+    // firefox
+
+  .log-row
+    font-size: 12px
+    line-height: 12px
+    height: 14px
+    padding: 0 10px
+    white-space: pre
+
+    span:last-child
+      padding-right: 10px
+
+    &.missing
+      background-color: rgba(255, 255, 255, 0.1)
+
+    &.loading
+      background-color: rgba(255, 255, 255, 0.4)
+
+  footer
+    flex: 0 1 40px
+
+.log-pane
+
+  .ansi-bold
+    font-weight: bold
+
+  .ansi-dim
+    opacity: 0.7
+
+  .ansi-italic
+    font-style: italic
+  .ansi-blink
+    /* evil */
+  .ansi-underline
+    text-decoration: underline
+  .ansi-reverse
+    -webkit-filter: invert(100%)
+    -moz-filter: invert(100%)
+    filter: invert(100%)
+  .ansi-hidden
+    opacity: 0
+  .ansi-strikethrough
+    text-decoration: line-through
+  .ansi-black
+    color: #1E1E1E
+  .ansi-red
+    color: #CF6A4C
+  .ansi-green
+    color: #8F9D6A
+  .ansi-yellow
+    color: #F9EE98
+  .ansi-blue
+    color: #7587A6
+  .ansi-magenta
+    color: #9B859D
+  .ansi-cyan
+    color: #AFC4DB
+  .ansi-white
+    color: #FFFFFF
+  .ansi-bright-black
+    font-weight: bold
+    color: #1E1E1E
+  .ansi-bright-red
+    font-weight: bold
+    color: #CF6A4C
+  .ansi-bright-green
+    font-weight: bold
+    color: #8F9D6A
+  .ansi-bright-yellow
+    font-weight: bold
+    color: #F9EE98
+  .ansi-bright-blue
+    font-weight: bold
+    color: #7587A6
+  .ansi-bright-magenta
+    font-weight: bold
+    color: #9B859D
+  .ansi-bright-cyan
+    font-weight: bold
+    color: #AFC4DB
+  .ansi-bright-white
+    font-weight: bold
+    color: #FFFFFF
+  .ansi-black-bg
+    background-color: #1E1E1E
+  .ansi-red-bg
+    background-color: #CF6A4C
+  .ansi-green-bg
+    background-color: #8F9D6A
+  .ansi-yellow-bg
+    background-color: #F9EE98
+  .ansi-blue-bg
+    background-color: #7587A6
+  .ansi-magenta-bg
+    background-color: #9B859D
+  .ansi-cyan-bg
+    background-color: #AFC4DB
+  .ansi-white-bg
+    background-color: #FFFFFF
+  .ansi-bright-black-bg
+    font-weight: bold
+    background-color: #1E1E1E
+  .ansi-bright-red-bg
+    font-weight: bold
+    background-color: #CF6A4C
+  .ansi-bright-green-bg
+    font-weight: bold
+    background-color: #8F9D6A
+  .ansi-bright-yellow-bg
+    font-weight: bold
+    background-color: #F9EE98
+  .ansi-bright-blue-bg
+    font-weight: bold
+    background-color: #7587A6
+  .ansi-bright-magenta-bg
+    font-weight: bold
+    background-color: #9B859D
+  .ansi-bright-cyan-bg
+    font-weight: bold
+    background-color: #AFC4DB
+  .ansi-bright-white-bg
+    font-weight: bold
+    background-color: #FFFFFF

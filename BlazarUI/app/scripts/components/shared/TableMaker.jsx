@@ -14,6 +14,7 @@ function TableMaker(RenderedComponent, options) {
   class Table extends Component {
 
     constructor() {
+      super();
       bindAll(this, 'buildTable', 'getRows', 'changePage');
       this.state = initialState;
     }

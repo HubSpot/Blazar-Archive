@@ -7,6 +7,7 @@ import ApiModal from '../components/shared/ApiModal.jsx';
 class App extends Component {
 
   constructor() {
+    super();
     this.state = {
       showApiModal: (!window.config.apiRoot)
     };

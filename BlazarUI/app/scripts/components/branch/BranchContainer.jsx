@@ -50,6 +50,7 @@ const initialState = {
 class BranchContainer extends Component {
 
   constructor() {
+    super();
     this.state = initialState;
 
     bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'triggerBuild', 'refreshBranches');

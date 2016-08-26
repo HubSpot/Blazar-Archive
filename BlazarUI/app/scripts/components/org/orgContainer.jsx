@@ -15,6 +15,7 @@ import OrgTable from './OrgTable.jsx';
 class OrgContainer extends Component {
 
   constructor() {
+    super();
     this.state = {
       repos: Immutable.List.of(),
       loading: true,

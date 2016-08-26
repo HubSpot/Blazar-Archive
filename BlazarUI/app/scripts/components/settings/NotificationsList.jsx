@@ -8,6 +8,7 @@ import SettingsActions from '../../actions/settingsActions';
 
 class NotificationsList extends Component {
   constructor() {
+    super();
     bindAll(this, 'toggleNotificationSetting');
   }
 

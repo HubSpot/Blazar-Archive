@@ -17,6 +17,7 @@ import BuildsStore from '../../stores/buildsStore';
 class RepoContainer extends Component {
 
   constructor() {
+    super();
     bindAll(this, 'onStatusChange', 'updateFilters');
 
     this.state = {

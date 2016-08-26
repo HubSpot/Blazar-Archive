@@ -6,6 +6,7 @@ import classNames from 'classnames';
 class MalformedFileNotification extends Component {
 
   constructor() {
+    super();
     this.state = {expanded: false};
 
     this.toggleExpanded = this.toggleExpanded.bind(this);
