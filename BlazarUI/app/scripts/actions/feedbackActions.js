@@ -5,13 +5,10 @@ const FeedbackActions = Reflux.createActions([
   { 'sendFeedback': {children: ['completed', 'failed']} }
 ]);
 
-FeedbackActions.sendFeedback.listen((payload) => {
+FeedbackActions.sendFeedback.listen(function onSendFeedback(payload) {
   const feedback = new Feedback(payload);
-  // to do: implement reflux catch method, waiting on an issue response.
   feedback.submit()
-    .done(() => {
-      this.completed();
-    })
+    .done(this.completed)
     .fail((jqXHR, textStatus, errorThrown) => {
       this.failed(`Status ${jqXHR.status}: ${errorThrown}`);
     });
