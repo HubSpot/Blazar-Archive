@@ -1,13 +1,27 @@
+@import '../variables'
 
-
-.module-item-summary
+.module-item
   height 75px
   list-style none
   border 1px #cbd6e2 solid
   margin-bottom 9px
+  display flex
+
+.module-build--success, .module-build--info
+  &:hover
+    background-color $color-gypsum
+
+.module-build--failed
+  background-color $color-norman-light
+  &:hover
+    background-color #fcd4e1
+
+.module-build--warning
+  background-color $color-marigold-light
+  &:hover
+    background-color #ffedd6
 
 .module-item-summary__build-number
-  float left
   height 73px
   width 75px
   line-height 73px
@@ -15,72 +29,45 @@
   font-size 18px
 
   &.module-item-summary__build-number--success
-    background-color #ccf2ed
+    background-color $color-oz-medium
 
-.module-item-summary__main
-  padding-left: 19px
+.module-build
+  padding-left 19px
   display inline-block
+  flex-grow 1
+  cursor pointer
 
-.module-item-summary__name
-  font-size 16px
+.module-build-tabs + .module-build
+  padding-left: 29px
+
+.module-build__module-name
+  font-size 18px
   color #00a4bd
   margin-top 12px
-  font-weight 600
+  font-weight normal
   font-family "Avenir Next"
 
 .module-build-tabs
-  float left
   height 73px
   font-size 18px
   text-align center
   font-size 18px
 
-.module-build-tab
-  height 36.5px
-  line-height 36.5px
-  color #cbd6e2
-  width 75px
-  float left
-
-.module-build-tab--active
-  color #ffffff
-
-.module-build-tab__arrow
-  border-left 18.25px solid black
-  border-top 18.25px solid transparent
-  border-bottom 18.25px solid transparent
-  float left
-
-.module-build-tab__arrow--success
-  border-left-color #ccf2ed
-
-.module-build-tab__arrow--in-progress
-  border-left-color #7fd1de
-
-.module-build-tab__arrow--failed
-  border-left-color #f9aabe
-
-.module-build-tab--success
-  background-color #ccf2ed
-
-  &.module-build-tab--active
-    color #425b76
-
-.module-build-tab--in-progress
-  background-color #7fd1de
-
-.module-build-tab--failed
-  background-color #f9aabe
-
-.module-build-status--success, .module-build-status--failed
+.status-circle
   height 10px
   width 10px
   border-radius 50%
   display inline-block
   margin-right 5px
 
-.module-build-status--success
+.status-circle--success
   background-color #00bda5
 
-.module-build-status--failed
+.status-circle--failed
   background-color #d94c71
+
+.module-build-icon--info
+  color $color-calypso
+
+.module-build-icon--warning
+  color $color-marigold-dark

@@ -19,7 +19,7 @@ class ModuleItem extends Component {
     const {moduleState} = this.props;
     const {selectedBuild} = this.state;
     return (
-      <li className="module-item-summary">
+      <li className="module-item">
         <ModuleBuildTabs
           moduleState={moduleState}
           selectedBuildNumber={selectedBuild.get('buildNumber')}

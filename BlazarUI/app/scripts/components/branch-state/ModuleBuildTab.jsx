@@ -2,50 +2,26 @@ import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 
-import ModuleBuildStates from '../../constants/ModuleBuildStates';
-
-const getStateClass = (moduleBuild) => {
-  switch (moduleBuild.get('state')) {
-    case ModuleBuildStates.FAILED:
-      return 'module-build-tab--failed';
-    case ModuleBuildStates.SUCCEEDED:
-      return 'module-build-tab--success';
-    case ModuleBuildStates.IN_PROGRESS:
-      return 'module-build-tab--in-progress';
-    default:
-      return null;
-  }
-};
-
-const getArrowStateClass = (moduleBuild) => {
-  switch (moduleBuild.get('state')) {
-    case ModuleBuildStates.FAILED:
-      return 'module-build-tab__arrow--failed';
-    case ModuleBuildStates.SUCCEEDED:
-      return 'module-build-tab__arrow--success';
-    case ModuleBuildStates.IN_PROGRESS:
-      return 'module-build-tab__arrow--in-progress';
-    default:
-      return null;
-  }
-};
-
-const getTabClasses = (moduleBuild, active = false) => {
-  return classNames('module-build-tab', getStateClass(moduleBuild), {
-    'module-build-tab--active': active
-  });
-};
+import { getClassNameColorModifier } from '../../constants/ModuleBuildStates';
 
 const ModuleBuildTab = ({moduleBuild, active, onClick}) => {
   const buildNumber = moduleBuild.get('buildNumber');
+  const colorModifier = getClassNameColorModifier(moduleBuild.get('state'));
+  const tabClasses = classNames('module-build-tab', `module-build-tab--${colorModifier}`, {
+    'module-build-tab--active': active
+  });
+
   if (!active) {
-    return <div className={getTabClasses(moduleBuild)} onClick={onClick}>#{buildNumber}</div>;
+    return <div className={tabClasses} onClick={onClick}>#{buildNumber}</div>;
   }
 
+  const arrowClasses = classNames('module-build-tab__arrow',
+    `module-build-tab__arrow--${colorModifier}`);
+
   return (
-    <div>
-      <div className={getTabClasses(moduleBuild, active)}>#{buildNumber}</div>
-      <div className={classNames('module-build-tab__arrow', getArrowStateClass(moduleBuild)) } />
+    <div className="module-build-tab__wrapper">
+      <div className={tabClasses}>#{buildNumber}</div>
+      <div className={arrowClasses} />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import keyMirror from 'keymirror';
 
-export default keyMirror({
+const ModuleBuildStates = keyMirror({
   // waiting states
   QUEUED: null,
   WAITING_FOR_UPSTREAM_BUILD: null,
@@ -15,3 +15,18 @@ export default keyMirror({
   FAILED: null,
   SKIPPED: null
 });
+
+export const getClassNameColorModifier = (state) => {
+  switch (state) {
+    case ModuleBuildStates.FAILED:
+      return 'failed';
+    case ModuleBuildStates.SUCCEEDED:
+      return 'success';
+    case ModuleBuildStates.CANCELLED:
+      return 'warning';
+    default:
+      return 'info';
+  }
+};
+
+export default ModuleBuildStates;

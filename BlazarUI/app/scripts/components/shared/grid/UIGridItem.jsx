@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import classNames from 'classnames';
 import UIGridConstants from './UIGridConstants.jsx';
 
 const OFFSET_CLASSES = {
@@ -40,7 +41,8 @@ const ALIGN_CLASSES = {
 class UIGridItem extends Component {
 
   getClassName() {
-    return `${SIZE_CLASSES[this.props.size]} ${OFFSET_CLASSES[this.props.offset]} ${ALIGN_CLASSES[this.props.align]} ${this.props.className}`;
+    const {size, offset, align, className} = this.props;
+    return classNames(SIZE_CLASSES[size], OFFSET_CLASSES[offset], ALIGN_CLASSES[align], className);
   }
 
   render() {
