@@ -1,18 +1,19 @@
 import Immutable from 'immutable';
 import ActionTypes from '../redux-actions/ActionTypes';
+import BranchInfo from '../data/records/BranchInfo';
 
 const initialState = Immutable.Map({
-  moduleStates: Immutable.List(),
+  branchInfo: new BranchInfo(),
   loading: false
 });
 
-export default function branchState(state = initialState, action) {
+export default function branch(state = initialState, action) {
   switch (action.type) {
-    case ActionTypes.REQUEST_MODULE_STATES:
+    case ActionTypes.REQUEST_BRANCH_INFO:
       return initialState.set('loading', true);
-    case ActionTypes.RECEIVE_MODULE_STATES:
+    case ActionTypes.RECEIVE_BRANCH_INFO:
       return state.merge({
-        moduleStates: action.payload,
+        branchInfo: action.payload,
         loading: false
       });
     default:

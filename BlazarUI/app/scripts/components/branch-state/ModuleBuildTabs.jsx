@@ -1,20 +1,7 @@
 import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import classNames from 'classnames';
 
 import ModuleBuildTab from './ModuleBuildTab.jsx';
-import ModuleBuildStates from '../../constants/ModuleBuildStates';
-
-const getTabClasses = (moduleBuild, selectedBuildNumber) => {
-  const isSelected = moduleBuild.get('buildNumber') === selectedBuildNumber;
-  const state = moduleBuild.get('state');
-  return classNames('module-build-tab', {
-    'module-build-tab--failed': state === ModuleBuildStates.FAILED,
-    'module-build-tab--success': state === ModuleBuildStates.SUCCEEDED,
-    'module-build-tab--in-progress': state === ModuleBuildStates.IN_PROGRESS,
-    'module-build-tab--active': isSelected
-  });
-};
 
 const ModuleBuildTabs = ({moduleState, selectedBuildNumber, onSelectModuleBuild}) => {
   const lastNonSkippedBuild = moduleState.get('lastNonSkippedBuild');

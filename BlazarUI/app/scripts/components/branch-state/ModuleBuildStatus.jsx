@@ -41,8 +41,11 @@ const ModuleBuildStatus = ({moduleBuild}) => {
       const endTimestamp = moduleBuild.get('endTimestamp');
       const startTime = moment(startTimestamp).fromNow();
       const duration = getBuildDuration(startTimestamp, endTimestamp);
-      const buildResult = (state === ModuleBuildStates.SUCCEEDED) ? 'Built' : 'Failed';
-      return <p>{buildResult} <strong>{startTime}</strong> in <strong>{duration}</strong></p>;
+
+      const isSuccessful = state === ModuleBuildStates.SUCCEEDED;
+      const buildResult = isSuccessful ? 'Built' : 'Failed';
+      const className = isSuccessful ? 'module-build-status--success' : 'module-build-status--failed';
+      return <p><span className={className} />{buildResult} <strong>{startTime}</strong> in <strong>{duration}</strong></p>;
     }
 
     case ModuleBuildStates.CANCELLED:
