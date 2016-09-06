@@ -23,8 +23,6 @@ import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
-import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
-import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.github.GitHubProtos.CreateEvent;
 import com.hubspot.blazar.github.GitHubProtos.DeleteEvent;
@@ -37,28 +35,25 @@ public class GitHubWebhookHandler {
 
   private final BranchService branchService;
   private final RepositoryBuildService repositoryBuildService;
-  private final InterProjectBuildService interProjectBuildService;
-  private final InterProjectBuildMappingService interProjectBuildMappingService;
   private final BranchSettingsService branchSettingsService;
   private final GitHubHelper gitHubHelper;
   private final Set<String> whitelist;
+  private final Set<String> blacklist;
 
   @Inject
   public GitHubWebhookHandler(BranchService branchService,
                               RepositoryBuildService repositoryBuildService,
-                              InterProjectBuildService interProjectBuildService,
-                              InterProjectBuildMappingService interProjectBuildMappingService,
                               BranchSettingsService branchSettingsService,
                               GitHubHelper gitHubHelper,
                               @Named("whitelist") Set<String> whitelist,
+                              @Named("blacklist") Set<String> blacklist,
                               EventBus eventBus) {
     this.branchService = branchService;
     this.repositoryBuildService = repositoryBuildService;
-    this.interProjectBuildService = interProjectBuildService;
-    this.interProjectBuildMappingService = interProjectBuildMappingService;
     this.branchSettingsService = branchSettingsService;
     this.gitHubHelper = gitHubHelper;
     this.whitelist = whitelist;
+    this.blacklist = blacklist;
 
     eventBus.register(this);
   }
@@ -66,6 +61,11 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handleCreateEvent(CreateEvent createEvent) throws IOException {
     if (!createEvent.hasRepository()) {
+      return;
+    }
+
+    if (blacklist.contains(createEvent.getRepository().getName())) {
+      LOG.info("Ignoring hook from repo {} because it is in the blacklist.", createEvent.getRepository().getName());
       return;
     }
 
@@ -83,6 +83,11 @@ public class GitHubWebhookHandler {
       return;
     }
 
+    if (blacklist.contains(deleteEvent.getRepository().getName())) {
+      LOG.info("Ignoring hook from repo {} because it is in the blacklist.", deleteEvent.getRepository().getName());
+      return;
+    }
+
     if ("branch".equalsIgnoreCase(deleteEvent.getRefType())) {
       branchService.delete(gitInfo(deleteEvent));
     }
@@ -91,6 +96,11 @@ public class GitHubWebhookHandler {
   @Subscribe
   public void handlePushEvent(PushEvent pushEvent) throws IOException {
     if (!pushEvent.hasRepository()) {
+      return;
+    }
+
+    if (blacklist.contains(pushEvent.getRepository().getName())) {
+      LOG.info("Ignoring hook from repo {} because it is in the blacklist.", pushEvent.getRepository().getName());
       return;
     }
 
