@@ -49,7 +49,10 @@ public class BlazarConfiguration extends Configuration {
   @JsonProperty("slack_blazar")
   private Optional<BlazarSlackConfiguration> slackConfiguration = Optional.absent();
 
+  // allows you to opt-in whole repositories by name
   private Set<String> whitelist = Collections.emptySet();
+  // allows you to opt out whole repositories by name
+  private Set<String> blacklist = Collections.emptySet();
 
   private boolean webhookOnly = false;
 
@@ -121,6 +124,15 @@ public class BlazarConfiguration extends Configuration {
 
   public BlazarConfiguration setWhitelist(Set<String> whitelist) {
     this.whitelist = whitelist;
+    return this;
+  }
+
+  public Set<String> getBlacklist() {
+    return blacklist;
+  }
+
+  public BlazarConfiguration setBlacklist(Set<String> blacklist) {
+    this.blacklist = blacklist;
     return this;
   }
 

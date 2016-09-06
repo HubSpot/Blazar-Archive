@@ -148,6 +148,13 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
   @Provides
   @Singleton
+  @Named("blacklist")
+  public Set<String> providesBlacklist(BlazarConfiguration configuration) {
+    return configuration.getBlacklist();
+  }
+
+  @Provides
+  @Singleton
   public AsyncHttpClient providesAsyncHttpClient(ObjectMapper mapper) {
     HttpConfig config = HttpConfig.newBuilder().setObjectMapper(mapper).setRetryStrategy(new RetryStrategy() {
 
