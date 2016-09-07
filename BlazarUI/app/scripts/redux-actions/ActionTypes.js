@@ -6,5 +6,6 @@ export default keyMirror({
   REQUEST_BRANCH_INFO: null,
   RECEIVE_BRANCH_INFO: null,
   REQUEST_MODULE_STATES: null,
-  RECEIVE_MODULE_STATES: null
+  RECEIVE_MODULE_STATES: null,
+  SELECT_MODULE: null
 });

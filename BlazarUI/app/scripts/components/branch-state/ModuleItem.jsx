@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PropTypes, Component } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import ModuleBuildTabs from './ModuleBuildTabs.jsx';
@@ -16,7 +16,7 @@ class ModuleItem extends Component {
   }
 
   render() {
-    const {moduleState} = this.props;
+    const {moduleState, selectModule} = this.props;
     const {selectedBuild} = this.state;
     return (
       <li className="module-item">
@@ -25,14 +25,15 @@ class ModuleItem extends Component {
           selectedBuildNumber={selectedBuild.get('buildNumber')}
           onSelectModuleBuild={this.handleSelectModuleBuild}
         />
-        <ModuleBuild module={moduleState.get('module')} moduleBuild={selectedBuild} />
+        <ModuleBuild module={moduleState.get('module')} moduleBuild={selectedBuild} onClick={selectModule} />
       </li>
     );
   }
 }
 
 ModuleItem.propTypes = {
-  moduleState: ImmutablePropTypes.map
+  moduleState: ImmutablePropTypes.map,
+  selectModule: PropTypes.func.isRequired
 };
 
 export default ModuleItem;

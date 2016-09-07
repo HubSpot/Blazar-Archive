@@ -13,3 +13,8 @@ export const loadBranchModuleStates = (branchId) => {
     });
   };
 };
+
+export const selectModule = (moduleId) => ({
+  type: ActionTypes.SELECT_MODULE,
+  payload: moduleId
+});

@@ -8,7 +8,7 @@ import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import ModuleList from './ModuleList.jsx';
 import BranchStateHeadline from './BranchStateHeadline.jsx';
 
-const BranchState = ({activeModules, inactiveModules, branchId, router}) => {
+const BranchState = ({activeModules, inactiveModules, branchId, router, selectModule, selectedModuleId}) => {
   const onBranchSelect = (selectedBranchId) => {
     router.push(`/branchState/branch/${selectedBranchId}`);
   };
@@ -19,9 +19,9 @@ const BranchState = ({activeModules, inactiveModules, branchId, router}) => {
         <UIGrid>
           <UIGridItem size={12}>
             <h2>Active modules</h2>
-            <ModuleList modules={activeModules} />
+            <ModuleList modules={activeModules} selectModule={selectModule} selectedModuleId={selectedModuleId} />
             <h2>Inactive modules</h2>
-            <ModuleList modules={inactiveModules} />
+            <ModuleList modules={inactiveModules} selectModule={selectModule} selectedModuleId={selectedModuleId} />
           </UIGridItem>
         </UIGrid>
       </PageContainer>
@@ -32,7 +32,9 @@ BranchState.propTypes = {
   branchId: PropTypes.number.isRequired,
   activeModules: ImmutablePropTypes.list,
   inactiveModules: ImmutablePropTypes.list,
-  router: routerShape
+  router: routerShape,
+  selectModule: PropTypes.func.isRequired,
+  selectedModuleId: PropTypes.string
 };
 
 export default BranchState;

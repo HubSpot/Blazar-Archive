@@ -3,6 +3,7 @@ import ActionTypes from '../redux-actions/ActionTypes';
 
 const initialState = Immutable.Map({
   moduleStates: Immutable.List(),
+  selectedModuleId: null,
   loading: false
 });
 
@@ -15,6 +16,8 @@ export default function branchState(state = initialState, action) {
         moduleStates: action.payload,
         loading: false
       });
+    case ActionTypes.SELECT_MODULE:
+      return state.set('selectedModuleId', action.payload);
     default:
       return state;
   }
