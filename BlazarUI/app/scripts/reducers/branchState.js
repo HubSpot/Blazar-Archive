@@ -18,6 +18,8 @@ export default function branchState(state = initialState, action) {
       });
     case ActionTypes.SELECT_MODULE:
       return state.set('selectedModuleId', action.payload);
+    case ActionTypes.DESELECT_MODULE:
+      return state.set('selectedModuleId', null);
     default:
       return state;
   }

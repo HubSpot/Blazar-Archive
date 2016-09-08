@@ -76,7 +76,8 @@ $warning-hover-bg = #ffedd6
   border ($tab-height / 2) solid transparent
   border-right 0
   position absolute
-  right (- $tab-height / 2)
+  // overlap to prevent gap with tab during card expand transition
+  right (- $tab-height / 2) + 0.25px
   top 0
 
 .module-build-tab__arrow--success

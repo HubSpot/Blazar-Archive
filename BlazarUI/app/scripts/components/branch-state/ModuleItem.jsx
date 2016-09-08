@@ -16,7 +16,7 @@ class ModuleItem extends Component {
   }
 
   render() {
-    const {moduleState, selectModule} = this.props;
+    const {moduleState, onClick} = this.props;
     const {selectedBuild} = this.state;
     return (
       <li className="module-item">
@@ -25,7 +25,7 @@ class ModuleItem extends Component {
           selectedBuildNumber={selectedBuild.get('buildNumber')}
           onSelectModuleBuild={this.handleSelectModuleBuild}
         />
-        <ModuleBuild module={moduleState.get('module')} moduleBuild={selectedBuild} onClick={selectModule} />
+        <ModuleBuild module={moduleState.get('module')} moduleBuild={selectedBuild} onClick={onClick} />
       </li>
     );
   }
@@ -33,7 +33,7 @@ class ModuleItem extends Component {
 
 ModuleItem.propTypes = {
   moduleState: ImmutablePropTypes.map,
-  selectModule: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired
 };
 
 export default ModuleItem;

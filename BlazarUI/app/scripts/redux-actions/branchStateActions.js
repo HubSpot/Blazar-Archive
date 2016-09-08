@@ -18,3 +18,7 @@ export const selectModule = (moduleId) => ({
   type: ActionTypes.SELECT_MODULE,
   payload: moduleId
 });
+
+export const deselectModule = () => ({
+  type: ActionTypes.DESELECT_MODULE
+});

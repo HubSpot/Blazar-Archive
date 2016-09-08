@@ -90,7 +90,6 @@ BranchStateHeadline.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    branchInfo: state.branch.get('branchInfo'),
     branchesList: state.repo.get('branchesList')
   };
 };
