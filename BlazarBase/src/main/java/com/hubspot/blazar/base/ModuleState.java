@@ -9,19 +9,19 @@ import com.google.common.base.Optional;
 public class ModuleState {
 
   private final Module module;
-  private final Optional<ModuleBuild> lastSuccessfulBuild;
-  private final Optional<ModuleBuild> lastNonSkippedBuild;
-  private final Optional<ModuleBuild> lastBuild;
-  private final Optional<ModuleBuild> inProgressBuild;
-  private final Optional<ModuleBuild> pendingBuild;
+  private final Optional<BuildInfo> lastSuccessfulBuild;
+  private final Optional<BuildInfo> lastNonSkippedBuild;
+  private final Optional<BuildInfo> lastBuild;
+  private final Optional<BuildInfo> inProgressBuild;
+  private final Optional<BuildInfo> pendingBuild;
 
   @JsonCreator
   public ModuleState(@JsonProperty("module") Module module,
-                     @JsonProperty("lastSuccessfulBuild") Optional<ModuleBuild> lastSuccessfulBuild,
-                     @JsonProperty("lastNonSkippedBuild") Optional<ModuleBuild> lastNonSkippedBuild,
-                     @JsonProperty("lastBuild") Optional<ModuleBuild> lastBuild,
-                     @JsonProperty("inProgressBuild") Optional<ModuleBuild> inProgressBuild,
-                     @JsonProperty("pendingBuild") Optional<ModuleBuild> pendingBuild) {
+                     @JsonProperty("lastSuccessfulBuild") Optional<BuildInfo> lastSuccessfulBuild,
+                     @JsonProperty("lastNonSkippedBuild") Optional<BuildInfo> lastNonSkippedBuild,
+                     @JsonProperty("lastBuild") Optional<BuildInfo> lastBuild,
+                     @JsonProperty("inProgressBuild") Optional<BuildInfo> inProgressBuild,
+                     @JsonProperty("pendingBuild") Optional<BuildInfo> pendingBuild) {
     this.module = module;
     this.lastSuccessfulBuild = lastSuccessfulBuild;
     this.lastNonSkippedBuild = lastNonSkippedBuild;
@@ -30,27 +30,88 @@ public class ModuleState {
     this.pendingBuild = pendingBuild;
   }
 
+
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+
+  public static class Builder {
+    private Optional<Module> module;
+    private Optional<BuildInfo> lastSuccessfulBuild;
+    private Optional<BuildInfo> lastNonSkippedBuild;
+    private Optional<BuildInfo> lastBuild;
+    private Optional<BuildInfo> inProgressBuild;
+    private Optional<BuildInfo> pendingBuild;
+
+    public Builder() {
+      this.module = Optional.absent();
+      this.lastSuccessfulBuild = Optional.absent();
+      this.lastNonSkippedBuild = Optional.absent();
+      this.lastBuild = Optional.absent();
+      this.inProgressBuild = Optional.absent();
+      this.pendingBuild = Optional.absent();
+    }
+
+    public Builder setModule(Module module) {
+      this.module = Optional.of(module);
+      return this;
+    }
+
+    public Builder setLastSuccessfulBuild(Optional<BuildInfo> build) {
+      this.lastSuccessfulBuild = build;
+      return this;
+    }
+
+    public Builder setLastNonSkippedBuild(Optional<BuildInfo> build) {
+      this.lastNonSkippedBuild = build;
+      return this;
+    }
+
+    public Builder setLastBuild(Optional<BuildInfo> build) {
+      this.lastBuild = build;
+      return this;
+    }
+
+    public Builder setInProgressBuild(Optional<BuildInfo> build) {
+      this.inProgressBuild = build;
+      return this;
+    }
+
+    public Builder setPendingBuild(Optional<BuildInfo> build) {
+      this.pendingBuild = build;
+      return this;
+    }
+
+    public ModuleState build() {
+      if (!module.isPresent()) {
+        throw new RuntimeException("A ModuleState must have a module, no module given to this builder");
+      }
+      return new ModuleState(module.get(), lastSuccessfulBuild, lastNonSkippedBuild, lastBuild, inProgressBuild, pendingBuild);
+    }
+  }
+
+
   public Module getModule() {
     return module;
   }
 
-  public Optional<ModuleBuild> getLastSuccessfulBuild() {
+  public Optional<BuildInfo> getLastSuccessfulBuild() {
     return lastSuccessfulBuild;
   }
 
-  public Optional<ModuleBuild> getLastNonSkippedBuild() {
+  public Optional<BuildInfo> getLastNonSkippedBuild() {
     return lastNonSkippedBuild;
   }
 
-  public Optional<ModuleBuild> getLastBuild() {
+  public Optional<BuildInfo> getLastBuild() {
     return lastBuild;
   }
 
-  public Optional<ModuleBuild> getInProgressBuild() {
+  public Optional<BuildInfo> getInProgressBuild() {
     return inProgressBuild;
   }
 
-  public Optional<ModuleBuild> getPendingBuild() {
+  public Optional<BuildInfo> getPendingBuild() {
     return pendingBuild;
   }
 
