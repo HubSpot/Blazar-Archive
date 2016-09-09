@@ -7,7 +7,7 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
 import com.google.common.base.Optional;
-import com.hubspot.blazar.base.BuildInfo;
+import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryState;
 
 public interface StateDao {
@@ -42,45 +42,36 @@ public interface StateDao {
 
   @SingleValueResult
   @SqlQuery("" +
-     "SELECT repositoryBuild.*, lastSuccessfulBuild.* "+
-      "FROM module_builds AS lastSuccessfulBuild " +
-      "LEFT OUTER JOIN repo_builds AS repositoryBuild on (lastSuccessfulBuild.repoBuildId = repositoryBuild.id) " +
-      "WHERE lastSuccessfulBuild.moduleId = :moduleId " +
-      "AND lastSuccessfulBuild.state = 'SUCCEEDED' " +
-      "ORDER BY lastSuccessfulBuild.id DESC LIMIT 1")
-  Optional<BuildInfo> getLastSuccessfulBuildInfo(@Bind("moduleId") int moduleId);
-
-  @SingleValueResult
-  @SqlQuery("" +
-      "SELECT repositoryBuild.*, lastNonSkippedBuild.* " +
-      "FROM module_builds AS lastNonSkippedBuild " +
-      "LEFT OUTER JOIN repo_builds AS repositoryBuild on (lastNonSkippedBuild.repoBuildId = repositoryBuild.id) " +
-      "WHERE lastNonSkippedBuild.moduleId = :moduleId " +
-      "AND lastNonSkippedBuild.state in ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED') " +
-      "ORDER BY lastNonSkippedBuild.id DESC LIMIT 1")
-  Optional<BuildInfo> getLastNonSkippedBuildInfo(@Bind("moduleId") int moduleId);
-
-  @SingleValueResult
-  @SqlQuery("" +
-      "SELECT repositoryBuild.*, inProgressBuild.* " +
-      "FROM module_builds AS inProgressBuild " +
-      "LEFT OUTER JOIN repo_builds AS repositoryBuild on (inProgressBuild.repoBuildId = repositoryBuild.id) " +
-      "WHERE inProgressBuild.id = :inProgressBuildId")
-  Optional<BuildInfo> getInProgressBuildInfo(@Bind("inProgressBuildId") long inProgressBuildId);
-
-  @SingleValueResult
-  @SqlQuery("" +
-      "SELECT repositoryBuild.*, lastBuild.* " +
-      "FROM module_builds AS lastBuild " +
-      "LEFT OUTER JOIN repo_builds AS repositoryBuild on (lastBuild.repoBuildId = repositoryBuild.id) " +
-      "WHERE lastBuild.id = :lastBuildId")
-  Optional<BuildInfo> getLastBuildInfo(@Bind("lastBuildId") long lastBuildId);
-
-  @SingleValueResult
-  @SqlQuery("" +
-      "SELECT repositoryBuild.*, pendingBuild.* " +
-      "FROM module_builds AS pendingBuild " +
-      "LEFT OUTER JOIN repo_builds AS repositoryBuild on (pendingBuild.repoBuildId = repositoryBuild.id) " +
-      "WHERE pendingBuild.id = :pendingBuildId")
-  Optional<BuildInfo> getPendingBuildInfo(@Bind("pendingBuildId") long pendingBuildId);
+      "SELECT * " +
+      "  FROM modules AS module " +
+      // last build
+      "     LEFT OUTER JOIN module_builds AS lastModuleBuild ON (module.lastBuildId = lastModuleBuild.id) " +
+      "     LEFT OUTER JOIN repo_builds AS lastRepoBuild ON (lastModuleBuild.repoBuildId = lastRepoBuild.id) " +
+      // in progress build
+      "     LEFT OUTER JOIN module_builds AS inProgressModuleBuild ON (module.inProgressBuildId = inProgressModuleBuild.id) " +
+      "     LEFT OUTER JOIN repo_builds AS inProgressRepoBuild ON (inProgressModuleBuild.repoBuildId = inProgressRepoBuild.id) " +
+      // pending build
+      "     LEFT OUTER JOIN module_builds AS pendingModuleBuild ON (module.pendingBuildId =pendingModuleBuild.id) " +
+      "     LEFT OUTER JOIN repo_builds AS pendingRepoBuild ON (pendingModuleBuild.repoBuildId = pendingRepoBuild.id) " +
+      // last non skipped
+      "     LEFT OUTER JOIN module_builds AS lastNonSkippedModuleBuild ON (module.id = lastNonSkippedModuleBuild.moduleId) " +
+      "     LEFT OUTER JOIN repo_builds AS lastNonSkippedRepoBuild ON (lastNonSkippedModuleBuild.repoBuildId = lastNonSkippedRepoBuild.id) " +
+      // last successful
+      "     LEFT OUTER JOIN module_builds AS lastSuccessfulModuleBuild ON (module.id = lastSuccessfulModuleBuild.moduleId) " +
+      "     LEFT OUTER JOIN repo_builds AS lastSuccessfulRepoBuild ON (lastSuccessfulModuleBuild.repoBuildId = lastSuccessfulRepoBuild.id) " +
+      "  WHERE module.id = :moduleId " +
+      // lastNonSkipped and lastSuccessful ids are gotten in subqueries to avoid sorting for the lastNonSkipped and then also lastSuccessful
+      "  AND lastNonSkippedModuleBuild.id = (SELECT lastNonSkippedBuild.id FROM module_builds AS lastNonSkippedBuild " +
+      "                                      LEFT OUTER JOIN repo_builds AS repositoryBuild ON (lastNonSkippedBuild.repoBuildId = repositoryBuild.id) " +
+      "                                      WHERE lastNonSkippedBuild.moduleId = :moduleId " +
+      "                                      AND lastNonSkippedBuild.state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED') " +
+      "                                      ORDER BY lastNonSkippedBuild.id DESC LIMIT 1) " +
+      "  AND lastSuccessfulModuleBuild.id = (SELECT lastSuccessfulBuild.id " +
+      "                                      FROM module_builds AS lastSuccessfulBuild " +
+      "                                      LEFT OUTER JOIN repo_builds AS repositoryBuild ON (lastSuccessfulBuild.repoBuildId = repositoryBuild.id) " +
+      "                                      WHERE lastSuccessfulBuild.moduleId = :moduleId" +
+      "                                      AND lastSuccessfulBuild.state = 'SUCCEEDED' " +
+      "                                      ORDER BY lastSuccessfulBuild.id DESC LIMIT 1)")
+  Optional<ModuleState> getModuleStateById(@Bind("moduleId") long moduleId);
 }
+
