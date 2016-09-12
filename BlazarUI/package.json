@@ -46,7 +46,7 @@
     "q": "^1.4.1",
     "react": "15.0.1",
     "react-addons-pure-render-mixin": "15.0.1",
-    "react-bootstrap": "^0.28.3",
+    "react-bootstrap": "^0.30.3",
     "react-classset": "0.0.2",
     "react-document-title": "^2.0.1",
     "react-dom": "15.0.1",

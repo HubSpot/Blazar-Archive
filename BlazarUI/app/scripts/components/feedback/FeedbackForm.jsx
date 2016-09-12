@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import {bindAll} from 'underscore';
-import Input from 'react-bootstrap/lib/Input';
+import FormGroup from 'react-bootstrap/lib/FormGroup';
+import FormControl from 'react-bootstrap/lib/FormControl';
 import Button from 'react-bootstrap/lib/Button';
 import Icon from '../shared/Icon.jsx';
 import Alert from 'react-bootstrap/lib/Alert';
@@ -67,15 +69,15 @@ class FeedbackForm extends Component {
 
   handleNameChange() {
     this.setState({
-      nameValue: this.refs.name.getValue(),
-      submitDisabled: !(this.refs.name.getValue() && this.refs.message.getValue())
+      nameValue: this.nameInput.value,
+      submitDisabled: !(this.nameInput.value && this.messageTextArea.value)
     });
   }
 
   handleMessageChange() {
     this.setState({
-      messageValue: this.refs.message.getValue(),
-      submitDisabled: !(this.refs.name.getValue() && this.refs.message.getValue())
+      messageValue: this.messageTextArea.value,
+      submitDisabled: !(this.nameInput.value && this.messageTextArea.value)
     });
   }
 
@@ -135,24 +137,28 @@ class FeedbackForm extends Component {
         </p>
 
         <hr />
-        <Input
-          type="text"
-          placeholder="Your Name"
-          ref="name"
-          value={this.state.nameValue}
-          onChange={this.handleNameChange}
-          autoFocus={this.state.autofocus === 'name'}
-        />
-        <Input
-          className="message-area"
-          type="textarea"
-          placeholder="Message"
-          ref="message"
-          help=""
-          value={this.state.messageValue}
-          onChange={this.handleMessageChange}
-          autoFocus={this.state.autofocus === 'message'}
-        />
+        <FormGroup>
+          <FormControl
+            type="text"
+            placeholder="Your Name"
+            ref={(ref) => {this.nameInput = ReactDOM.findDOMNode(ref);}}
+            value={this.state.nameValue}
+            onChange={this.handleNameChange}
+            autoFocus={this.state.autofocus === 'name'}
+          />
+        </FormGroup>
+        <FormGroup>
+          <FormControl
+            className="message-area"
+            componentClass="textarea"
+            placeholder="Message"
+            ref={(ref) => {this.messageTextArea = ReactDOM.findDOMNode(ref);}}
+            help=""
+            value={this.state.messageValue}
+            onChange={this.handleMessageChange}
+            autoFocus={this.state.autofocus === 'message'}
+          />
+        </FormGroup>
         <Button bsStyle="info" block={true} disabled={this.state.submitDisabled} onClick={this.submitFeedback}>Submit</Button>
       </div>
     );
