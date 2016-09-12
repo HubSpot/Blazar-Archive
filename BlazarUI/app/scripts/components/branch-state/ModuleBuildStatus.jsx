@@ -28,7 +28,7 @@ const ModuleBuildStatus = ({moduleBuild}) => {
   switch (state) {
     case ModuleBuildStates.QUEUED:
     case ModuleBuildStates.WAITING_FOR_UPSTREAM_BUILD:
-      return <p><Icon name="clock-o" classNames="module-build-icon--info" />Waiting to build...</p>;
+      return <p><Icon name="clock-o" classNames="module-build-icon--info" /> Waiting to build...</p>;
 
     case ModuleBuildStates.LAUNCHING:
       return <p><Icon for="spinner" classNames="module-build-icon--info" /> Starting build...</p>;
