@@ -38,7 +38,6 @@ public class HikariDataSourceFactory extends DataSourceFactory {
     options.put(MysqldResourceI.PORT, Integer.toString(port));
     options.put("character-set-server", "utf8");
     options.put("sql-mode", "ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION");
-    options.put("log-output", "NONE");
 
     mysqldResource.start("embedded-mysql", options);
 
