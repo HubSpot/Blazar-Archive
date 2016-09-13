@@ -9,49 +9,44 @@ import com.google.common.base.Optional;
 public class ModuleState {
 
   private final Module module;
-  private final Optional<ModuleBuild> lastSuccessfulBuild;
-  private final Optional<ModuleBuild> lastNonSkippedBuild;
-  private final Optional<ModuleBuild> lastBuild;
-  private final Optional<ModuleBuild> inProgressBuild;
-  private final Optional<ModuleBuild> pendingBuild;
+  private final Optional<ModuleBuild> lastSuccessfulModuleBuild;
+  private final Optional<RepositoryBuild> lastSuccessfulRepoBuild;
+  private final Optional<ModuleBuild> lastNonSkippedModuleBuild;
+  private final Optional<RepositoryBuild> lastNonSkippedRepoBuild;
+  private final Optional<ModuleBuild> lastModuleBuild;
+  private final Optional<RepositoryBuild> lastRepoBuild;
+  private final Optional<ModuleBuild> inProgressModuleBuild;
+  private final Optional<RepositoryBuild> inProgressRepoBuild;
+  private final Optional<ModuleBuild> pendingModuleBuild;
+  private final Optional<RepositoryBuild> pendingRepoBuild;
 
   @JsonCreator
   public ModuleState(@JsonProperty("module") Module module,
-                     @JsonProperty("lastSuccessfulBuild") Optional<ModuleBuild> lastSuccessfulBuild,
-                     @JsonProperty("lastNonSkippedBuild") Optional<ModuleBuild> lastNonSkippedBuild,
-                     @JsonProperty("lastBuild") Optional<ModuleBuild> lastBuild,
-                     @JsonProperty("inProgressBuild") Optional<ModuleBuild> inProgressBuild,
-                     @JsonProperty("pendingBuild") Optional<ModuleBuild> pendingBuild) {
+                     @JsonProperty("lastSuccessfulModuleBuild") Optional<ModuleBuild> lastSuccessfulModuleBuild,
+                     @JsonProperty("lastSuccessfulRepoBuild") Optional<RepositoryBuild> lastSuccessfulRepoBuild,
+                     @JsonProperty("lastNonSkippedModuleBuild") Optional<ModuleBuild> lastNonSkippedModuleBuild,
+                     @JsonProperty("lastNonSkippedRepoBuild") Optional<RepositoryBuild> lastNonSkippedRepoBuild,
+                     @JsonProperty("lastModuleBuild") Optional<ModuleBuild> lastModuleBuild,
+                     @JsonProperty("lastRepoBuild") Optional<RepositoryBuild> lastRepoBuild,
+                     @JsonProperty("inProgressModuleBuild") Optional<ModuleBuild> inProgressModuleBuild,
+                     @JsonProperty("inProgressRepoBuild") Optional<RepositoryBuild> inProgressRepoBuild,
+                     @JsonProperty("pendingModuleBuild") Optional<ModuleBuild> pendingModuleBuild,
+                     @JsonProperty("pendingRepoBuild") Optional<RepositoryBuild> pendingRepoBuild) {
     this.module = module;
-    this.lastSuccessfulBuild = lastSuccessfulBuild;
-    this.lastNonSkippedBuild = lastNonSkippedBuild;
-    this.lastBuild = lastBuild;
-    this.inProgressBuild = inProgressBuild;
-    this.pendingBuild = pendingBuild;
+    this.lastSuccessfulModuleBuild = lastSuccessfulModuleBuild;
+    this.lastSuccessfulRepoBuild = lastSuccessfulRepoBuild;
+    this.lastNonSkippedModuleBuild = lastNonSkippedModuleBuild;
+    this.lastNonSkippedRepoBuild = lastNonSkippedRepoBuild;
+    this.lastModuleBuild = lastModuleBuild;
+    this.lastRepoBuild = lastRepoBuild;
+    this.inProgressModuleBuild = inProgressModuleBuild;
+    this.inProgressRepoBuild = inProgressRepoBuild;
+    this.pendingModuleBuild = pendingModuleBuild;
+    this.pendingRepoBuild = pendingRepoBuild;
   }
 
   public Module getModule() {
     return module;
-  }
-
-  public Optional<ModuleBuild> getLastSuccessfulBuild() {
-    return lastSuccessfulBuild;
-  }
-
-  public Optional<ModuleBuild> getLastNonSkippedBuild() {
-    return lastNonSkippedBuild;
-  }
-
-  public Optional<ModuleBuild> getLastBuild() {
-    return lastBuild;
-  }
-
-  public Optional<ModuleBuild> getInProgressBuild() {
-    return inProgressBuild;
-  }
-
-  public Optional<ModuleBuild> getPendingBuild() {
-    return pendingBuild;
   }
 
   @Override
@@ -64,16 +59,20 @@ public class ModuleState {
     }
 
     ModuleState that = (ModuleState) o;
-    return Objects.equals(this.module, that.module) &&
-        Objects.equals(this.lastSuccessfulBuild, that.lastSuccessfulBuild) &&
-        Objects.equals(this.lastNonSkippedBuild, that.lastNonSkippedBuild) &&
-        Objects.equals(this.lastBuild, that.lastNonSkippedBuild) &&
-        Objects.equals(this.inProgressBuild, that.inProgressBuild) &&
-        Objects.equals(this.pendingBuild, that.pendingBuild);
+    return Objects.equals(this.lastSuccessfulModuleBuild, that.lastSuccessfulModuleBuild) &&
+        Objects.equals(this.lastSuccessfulRepoBuild, that.lastSuccessfulRepoBuild) &&
+        Objects.equals(this.lastNonSkippedModuleBuild, that.lastNonSkippedModuleBuild) &&
+        Objects.equals(this.lastNonSkippedRepoBuild, that.lastNonSkippedRepoBuild) &&
+        Objects.equals(this.lastModuleBuild, that.lastModuleBuild) &&
+        Objects.equals(this.lastRepoBuild, that.lastRepoBuild) &&
+        Objects.equals(this.inProgressModuleBuild, that.inProgressModuleBuild) &&
+        Objects.equals(this.inProgressRepoBuild, that.inProgressRepoBuild) &&
+        Objects.equals(this.pendingModuleBuild, that.pendingModuleBuild) &&
+        Objects.equals(this.pendingRepoBuild, that.pendingRepoBuild);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(module, lastSuccessfulBuild, lastNonSkippedBuild, lastBuild, inProgressBuild, pendingBuild);
+    return Objects.hash(module, lastSuccessfulModuleBuild , lastSuccessfulRepoBuild , lastNonSkippedModuleBuild , lastNonSkippedRepoBuild , lastModuleBuild , lastRepoBuild , inProgressModuleBuild , inProgressRepoBuild , pendingModuleBuild , pendingRepoBuild);
   }
 }
