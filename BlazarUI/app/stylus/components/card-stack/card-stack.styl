@@ -1,0 +1,64 @@
+@import './card-variables.styl'
+
+$border = $border-width solid $border-color
+
+.card-stack
+  margin 0 $expanded-card-margin
+
+// Individual card and variations
+.card
+  position relative
+  background-color white
+  box-shadow $shadow-depth-1
+  margin-bottom 10px
+  transition margin $transition-duration $transition-timing-func, box-shadow $transition-duration $transition-timing-func
+
+  &:hover:not(.card--expanded)
+    box-shadow $shadow-depth-2
+    z-index 2
+
+.card--expanded
+  margin-left -($expanded-card-margin)
+  margin-right -($expanded-card-margin)
+  box-shadow $shadow-depth-3
+  z-index 3
+
+.card__summary
+  border $border
+  display inline-block
+  width 100%
+  z-index 1
+  position relative
+
+.card__details
+  max-height 1000px
+  overflow-y hidden
+  transition max-height 1.5s ease-out
+  border $border
+  border-top none
+  margin-top -($border-width)
+
+.card__details--collapsed
+  max-height 0
+  // quick to avoid delay in collapse transition using max-height
+  transition-duration 0.5s
+
+// No margin between cards
+.card-stack--condensed
+  box-shadow $shadow-depth-1
+
+  .card
+    margin-bottom 0
+    background-color white
+    box-shadow none
+
+    & + .card:not(.card--expanded)
+      margin-top -($border-width)
+
+    &:hover:not(.card--expanded)
+      box-shadow $shadow-depth-2
+
+  .card--expanded
+    box-shadow $shadow-depth-3
+    margin-top -10px
+    margin-bottom -10px
