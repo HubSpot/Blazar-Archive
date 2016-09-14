@@ -19,17 +19,14 @@ import com.hubspot.blazar.data.dao.StateDao;
 @Singleton
 public class StateService {
   // Tracks how long it takes to get all module states for a branch
-  private static final String METRIC_FETCH_BRANCH_STATE_TIMER = StateService.class.getName() + ".branch_state.fetch_time";
   private static final Logger LOG = LoggerFactory.getLogger(StateService.class);
   private final StateDao stateDao;
   private ModuleService moduleService;
-  private MetricRegistry metricRegistry;
 
   @Inject
   public StateService(StateDao stateDao, ModuleService moduleService, MetricRegistry metricRegistry) {
     this.stateDao = stateDao;
     this.moduleService = moduleService;
-    this.metricRegistry = metricRegistry;
   }
 
   public Set<RepositoryState> getAllRepositoryStates() {
