@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 
 public class ModuleState {
 
@@ -33,16 +34,28 @@ public class ModuleState {
                      @JsonProperty("pendingModuleBuild") Optional<ModuleBuild> pendingModuleBuild,
                      @JsonProperty("pendingRepoBuild") Optional<RepositoryBuild> pendingRepoBuild) {
     this.module = module;
-    this.lastSuccessfulModuleBuild = lastSuccessfulModuleBuild;
-    this.lastSuccessfulRepoBuild = lastSuccessfulRepoBuild;
-    this.lastNonSkippedModuleBuild = lastNonSkippedModuleBuild;
-    this.lastNonSkippedRepoBuild = lastNonSkippedRepoBuild;
-    this.lastModuleBuild = lastModuleBuild;
-    this.lastRepoBuild = lastRepoBuild;
-    this.inProgressModuleBuild = inProgressModuleBuild;
-    this.inProgressRepoBuild = inProgressRepoBuild;
-    this.pendingModuleBuild = pendingModuleBuild;
-    this.pendingRepoBuild = pendingRepoBuild;
+    this.lastSuccessfulModuleBuild = filterModuleBuild(lastSuccessfulModuleBuild);
+    this.lastSuccessfulRepoBuild = filterRepoBuild(lastSuccessfulRepoBuild);
+    this.lastNonSkippedModuleBuild = filterModuleBuild(lastNonSkippedModuleBuild);
+    this.lastNonSkippedRepoBuild = filterRepoBuild(lastNonSkippedRepoBuild);
+    this.lastModuleBuild = filterModuleBuild(lastModuleBuild);
+    this.lastRepoBuild = filterRepoBuild(lastRepoBuild);
+    this.inProgressModuleBuild = filterModuleBuild(inProgressModuleBuild);
+    this.inProgressRepoBuild = filterRepoBuild(inProgressRepoBuild);
+    this.pendingModuleBuild = filterModuleBuild(pendingModuleBuild);
+    this.pendingRepoBuild =  filterRepoBuild(pendingRepoBuild);
+  }
+
+  private static Optional<ModuleBuild> filterModuleBuild(Optional<ModuleBuild> moduleBuildOptional) {
+    return filter(moduleBuildOptional, moduleBuild -> moduleBuild.getId().isPresent());
+  }
+
+  private static Optional<RepositoryBuild> filterRepoBuild(Optional<RepositoryBuild> repositoryBuildOptional) {
+    return filter(repositoryBuildOptional, repositoryBuild -> repositoryBuild.getId().isPresent());
+  }
+
+  private static <T> Optional<T> filter(Optional<T> optional, Predicate<T> predicate) {
+    return optional.isPresent() && predicate.apply(optional.get()) ? optional : Optional.absent();
   }
 
   public Module getModule() {

@@ -73,5 +73,6 @@ public interface StateDao {
       "                                      AND lastSuccessfulBuild.state = 'SUCCEEDED' " +
       "                                      ORDER BY lastSuccessfulBuild.id DESC LIMIT 1)")
   Optional<ModuleState> getModuleStateById(@Bind("moduleId") long moduleId);
+
 }
 
