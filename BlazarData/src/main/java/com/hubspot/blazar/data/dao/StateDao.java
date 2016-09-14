@@ -64,7 +64,7 @@ public interface StateDao {
       "  AND lastNonSkippedModuleBuild.id = (SELECT lastNonSkippedBuild.id FROM module_builds AS lastNonSkippedBuild " +
       "                                      LEFT OUTER JOIN repo_builds AS repositoryBuild ON (lastNonSkippedBuild.repoBuildId = repositoryBuild.id) " +
       "                                      WHERE lastNonSkippedBuild.moduleId = :moduleId " +
-      "                                      AND lastNonSkippedBuild.state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED') " +
+      "                                      AND lastNonSkippedBuild.state IN ('SUCCEEDED', 'CANCELLED', 'FAILED') " +
       "                                      ORDER BY lastNonSkippedBuild.id DESC LIMIT 1) " +
       "  AND lastSuccessfulModuleBuild.id = (SELECT lastSuccessfulBuild.id " +
       "                                      FROM module_builds AS lastSuccessfulBuild " +

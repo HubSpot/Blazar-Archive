@@ -49,6 +49,46 @@ public class ModuleState {
     return module;
   }
 
+  public Optional<ModuleBuild> getLastSuccessfulModuleBuild() {
+    return lastSuccessfulModuleBuild;
+  }
+
+  public Optional<RepositoryBuild> getLastSuccessfulRepoBuild() {
+    return lastSuccessfulRepoBuild;
+  }
+
+  public Optional<ModuleBuild> getLastNonSkippedModuleBuild() {
+    return lastNonSkippedModuleBuild;
+  }
+
+  public Optional<RepositoryBuild> getLastNonSkippedRepoBuild() {
+    return lastNonSkippedRepoBuild;
+  }
+
+  public Optional<ModuleBuild> getLastModuleBuild() {
+    return lastModuleBuild;
+  }
+
+  public Optional<RepositoryBuild> getLastRepoBuild() {
+    return lastRepoBuild;
+  }
+
+  public Optional<ModuleBuild> getInProgressModuleBuild() {
+    return inProgressModuleBuild;
+  }
+
+  public Optional<RepositoryBuild> getInProgressRepoBuild() {
+    return inProgressRepoBuild;
+  }
+
+  public Optional<ModuleBuild> getPendingModuleBuild() {
+    return pendingModuleBuild;
+  }
+
+  public Optional<RepositoryBuild> getPendingRepoBuild() {
+    return pendingRepoBuild;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
