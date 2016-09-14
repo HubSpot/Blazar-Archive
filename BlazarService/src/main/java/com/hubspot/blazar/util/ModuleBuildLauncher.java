@@ -25,6 +25,7 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
+import com.hubspot.blazar.base.PostBuildSteps;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.StepActivationCriteria;
 import com.hubspot.blazar.config.BlazarConfiguration;
@@ -94,6 +95,7 @@ public class ModuleBuildLauncher {
   private BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
     List<BuildStep> steps = primary.getSteps().isEmpty() ? secondary.getSteps() : primary.getSteps();
     List<BuildStep> before = primary.getBefore().isEmpty() ? secondary.getBefore() : primary.getBefore();
+    Optional<PostBuildSteps> after = (!primary.getAfter().isPresent()) ? secondary.getAfter() : primary.getAfter();
     Map<String, String> env = new LinkedHashMap<>();
     env.putAll(secondary.getEnv());
     env.putAll(primary.getEnv());
@@ -120,7 +122,7 @@ public class ModuleBuildLauncher {
     provides.addAll(primary.getDepends());
     provides.addAll(secondary.getDepends());
 
-    return new BuildConfig(steps, before, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
+    return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
   }
 
   private BuildConfig configAtSha(GitInfo gitInfo, Module module) throws IOException, NonRetryableBuildException {
