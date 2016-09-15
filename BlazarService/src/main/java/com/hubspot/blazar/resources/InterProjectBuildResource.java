@@ -68,6 +68,9 @@ public class InterProjectBuildResource {
   @POST
   @Path("/")
   public InterProjectBuild triggerWithOptions(BuildOptions buildOptions, @QueryParam("username") Optional<String> username) {
+    if (buildOptions.getModuleIds() == null) {
+      throw new IllegalArgumentException("ModuleIds cannot be null");
+    }
     InterProjectBuild build = InterProjectBuild.getQueuedBuild(buildOptions.getModuleIds(), BuildTrigger.forUser(username.or("unknown")));
     long id = interProjectBuildService.enqueue(build);
     return interProjectBuildService.getWithId(id).get();

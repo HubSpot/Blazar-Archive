@@ -13,6 +13,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.RateLimitHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +34,9 @@ import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
 import com.hubspot.blazar.exception.IllegalStateExceptionMapper;
+import com.hubspot.blazar.externalservice.sentry.DevNullExceptionNotifier;
+import com.hubspot.blazar.externalservice.sentry.ExceptionNotifier;
+import com.hubspot.blazar.externalservice.sentry.SentryExceptionNotifier;
 import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BranchStateResource;
@@ -67,6 +72,7 @@ import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import io.dropwizard.db.DataSourceFactory;
 
 public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfiguration> {
+  private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceModule.class);
 
   @Override
   public void configure(Binder binder) {
@@ -102,6 +108,12 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     if (getConfiguration().getSlackConfiguration().isPresent()) {
       binder.bind(UserFeedbackResource.class);
       binder.bind(SlackUtils.class);
+    }
+
+    if (getConfiguration().getSentryConfiguration().isPresent()) {
+      binder.bind(ExceptionNotifier.class).to(SentryExceptionNotifier.class);
+    } else {
+      binder.bind(ExceptionNotifier.class).to(DevNullExceptionNotifier.class);
     }
 
     binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());

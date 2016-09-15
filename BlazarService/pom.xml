@@ -83,6 +83,10 @@
       <groupId>net.sourceforge.argparse4j</groupId>
       <artifactId>argparse4j</artifactId>
     </dependency>
+    <dependency>
+      <groupId>net.kencochrane.raven</groupId>
+      <artifactId>raven</artifactId>
+    </dependency>
     <!-- for jade and jets3t -->
     <dependency>
       <groupId>org.slf4j</groupId>

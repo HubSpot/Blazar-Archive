@@ -29,6 +29,8 @@ import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
+import com.hubspot.blazar.externalservice.sentry.DevNullExceptionNotifier;
+import com.hubspot.blazar.externalservice.sentry.ExceptionNotifier;
 import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.listener.GitHubStatusVisitor;
 import com.hubspot.blazar.listener.TestBuildLauncher;
@@ -57,6 +59,8 @@ public class BlazarServiceTestModule extends AbstractModule {
     bind(SlackSession.class).toInstance(mock(SlackSession.class));
     bind(AsyncHttpClient.class).toInstance(mock(AsyncHttpClient.class));
     bind(Integer.class).annotatedWith(Names.named("")).toInstance(0);
+    bind(ExceptionNotifier.class).to(DevNullExceptionNotifier.class);
+
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
     moduleBuildVisitors.addBinding().to(TestBuildLauncher.class);
     bindGitHubMap(); // does its own binding

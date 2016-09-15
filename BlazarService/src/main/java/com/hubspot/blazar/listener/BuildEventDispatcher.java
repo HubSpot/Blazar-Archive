@@ -21,6 +21,8 @@ import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
+import com.hubspot.blazar.externalservice.sentry.ExceptionNotifier;
+import com.hubspot.blazar.externalservice.sentry.ExceptionNotifierUtils;
 
 @Singleton
 public class BuildEventDispatcher {
@@ -32,6 +34,8 @@ public class BuildEventDispatcher {
   private final InterProjectBuildService interProjectBuildService;
   private final Set<InterProjectBuildVisitor> interProjectBuildVisitors;
   private final Set<ModuleBuildVisitor> moduleVisitors;
+  private final ExceptionNotifier exceptionNotifier;
+  private final EventBus eventBus;
 
   @Inject
   public BuildEventDispatcher(RepositoryBuildService repositoryBuildService,
@@ -40,6 +44,7 @@ public class BuildEventDispatcher {
                               Set<RepositoryBuildVisitor> repositoryVisitors,
                               Set<InterProjectBuildVisitor> interProjectBuildVisitors,
                               Set<ModuleBuildVisitor> moduleVisitors,
+                              ExceptionNotifier exceptionNotifier,
                               EventBus eventBus) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
@@ -47,6 +52,8 @@ public class BuildEventDispatcher {
     this.repositoryVisitors = repositoryVisitors;
     this.interProjectBuildVisitors = interProjectBuildVisitors;
     this.moduleVisitors = moduleVisitors;
+    this.exceptionNotifier = exceptionNotifier;
+    this.eventBus = eventBus;
 
     eventBus.register(this);
   }
@@ -71,6 +78,7 @@ public class BuildEventDispatcher {
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", build.getId().get(), e);
       repositoryBuildService.fail(build);
+
     }
   }
 
@@ -91,6 +99,7 @@ public class BuildEventDispatcher {
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", build.getId().get(), e);
       moduleBuildService.fail(build);
+      ExceptionNotifierUtils.notify(e, build, exceptionNotifier);
     }
   }
 
@@ -121,6 +130,7 @@ public class BuildEventDispatcher {
     } catch (NonRetryableBuildException e) {
       LOG.warn("Got non Retryable Exception in InterProjectBuild {}, marking as Finished", build.getId().get());
       interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(build, InterProjectBuild.State.FAILED));
+      ExceptionNotifierUtils.notify(e, build, exceptionNotifier);
     }
   }
 }
