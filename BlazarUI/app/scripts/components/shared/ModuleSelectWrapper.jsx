@@ -5,12 +5,17 @@ class ModuleSelectWrapper extends Component {
 
   constructor(props) {
     super(props);
-
-    this.state = {};
+    this.handleChange = this.handleChange.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
     return nextProps.modules.length !== this.props.modules.length;
+  }
+
+  handleChange(value) {
+    // react-select returns an empty string if nothing is selected
+    const moduleIds = value ? value.split(',').map(Number) : [];
+    this.props.onUpdateSelectedModuleIds(moduleIds);
   }
 
   createModuleSelectOptions(modules) {
@@ -32,9 +37,9 @@ class ModuleSelectWrapper extends Component {
           clearAllText="None"
           noResultsText="All modules have been selected."
           multi={true}
-          value={this.createModuleSelectOptions(this.props.modules)}
+          value={this.props.selectedModuleIds}
           options={this.createModuleSelectOptions(this.props.modules)}
-          onChange={this.props.onSelectUpdate}
+          onChange={this.handleChange}
         />
       </div>
     );
@@ -43,7 +48,8 @@ class ModuleSelectWrapper extends Component {
 
 ModuleSelectWrapper.propTypes = {
   modules: PropTypes.array.isRequired,
-  onSelectUpdate: PropTypes.func.isRequired
+  selectedModuleIds: PropTypes.arrayOf(PropTypes.number).isRequired,
+  onUpdateSelectedModuleIds: PropTypes.func.isRequired
 };
 
 export default ModuleSelectWrapper;

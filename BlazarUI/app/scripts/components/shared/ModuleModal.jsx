@@ -13,17 +13,12 @@ class ModuleModal extends Component {
   constructor(props) {
     super(props);
 
-    bindAll(this, 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'updateSelectedModules', 'getModuleIdsAndBuild', 'maybeStartBuild');
+    bindAll(this, 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'getModuleIdsAndBuild', 'maybeStartBuild');
   }
 
   getModuleIdsAndBuild() {
     this.props.triggerBuild();
     this.props.closeModal();
-  }
-
-  updateSelectedModules(modules) {
-    const finalModules = modules.split(',');
-    this.props.onSelectUpdate(finalModules);
   }
 
   updateResetCache() {
@@ -153,7 +148,8 @@ class ModuleModal extends Component {
               <span className="module-modal__text">Choose modules to build:</span>
               <ModuleSelectWrapper
                 modules={this.props.modules}
-                onSelectUpdate={this.updateSelectedModules}
+                selectedModuleIds={this.props.selectedModuleIds}
+                onUpdateSelectedModuleIds={this.props.onUpdateSelectedModuleIds}
               />
             </div>
           </div>
@@ -165,7 +161,7 @@ class ModuleModal extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button id="module-modal-nevermind-button" onClick={this.props.closeModal}>Nevermind</Button>
-          <Button id="module-modal-build-button" onClick={this.getModuleIdsAndBuild} className="btn btn-primary">Build</Button>
+          <Button id="module-modal-build-button" disabled={!this.props.selectedModuleIds.length} onClick={this.getModuleIdsAndBuild} bsStyle="primary">Build</Button>
         </Modal.Footer>
       </div>
     );
@@ -183,13 +179,14 @@ class ModuleModal extends Component {
 ModuleModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   triggerBuild: PropTypes.func.isRequired,
-  onSelectUpdate: PropTypes.func.isRequired,
+  onUpdateSelectedModuleIds: PropTypes.func.isRequired,
   onCheckboxUpdate: PropTypes.func.isRequired,
   onResetCacheUpdate: PropTypes.func.isRequired,
   onTriggerInterProjectBuild: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
   loadingModules: PropTypes.bool,
-  modules: PropTypes.array.isRequired
+  modules: PropTypes.array.isRequired,
+  selectedModuleIds: PropTypes.arrayOf(PropTypes.number).isRequired
 };
 
 export default ModuleModal;

@@ -80,9 +80,9 @@ const BranchStore = Reflux.createStore({
   },
 
   onTriggerBuild(params, state) {
-    const {selectedModules, buildDownstreamModules, resetCache} = state;
+    const {selectedModuleIds, buildDownstreamModules, resetCache} = state;
 
-    BranchApi.triggerBuild(params, selectedModules, buildDownstreamModules, resetCache, (error) => {
+    BranchApi.triggerBuild(params, selectedModuleIds, buildDownstreamModules, resetCache, (error) => {
       if (error) {
         this.error = error;
         this.triggerErrorUpdate();
