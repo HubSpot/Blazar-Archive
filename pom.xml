@@ -236,6 +236,26 @@
         <artifactId>javassist</artifactId>
         <version>3.19.0-GA</version>
       </dependency>
+      <dependency>
+        <groupId>com.getsentry.raven</groupId>
+        <artifactId>raven-logback</artifactId>
+        <version>7.2.3</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${dep.logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${dep.logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-logging</artifactId>
+        <version>${dropwizard.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
