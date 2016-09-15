@@ -11,14 +11,7 @@
 
   <artifactId>BlazarTestBase</artifactId>
   <dependencies>
-    <dependency>
-      <groupId>org.jdbi</groupId>
-      <artifactId>jdbi</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.hubspot.rosetta</groupId>
-      <artifactId>RosettaJdbi</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-mxj</artifactId>
@@ -26,10 +19,6 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>

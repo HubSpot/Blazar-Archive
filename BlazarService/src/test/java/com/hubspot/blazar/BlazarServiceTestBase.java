@@ -25,6 +25,7 @@ public class BlazarServiceTestBase extends BlazarTestBase {
 
   @After
   public void cleanup() throws Exception {
+    runSql("cleanup.sql");
     runSql("schema.sql");
     if (BlazarServiceTestModule.EVENT_BUS_EXCEPTION_COUNT.size() > 0) {
       fail(String.format("Event bus exception count was %d (> 0), check log for stack traces.", BlazarServiceTestModule.EVENT_BUS_EXCEPTION_COUNT.size()));

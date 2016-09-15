@@ -20,6 +20,7 @@ public class BlazarDataTestBase extends BlazarTestBase {
 
   @After
   public void cleanup() throws Exception {
+    runSql("cleanup.sql");
     runSql("schema.sql");
   }
 }
