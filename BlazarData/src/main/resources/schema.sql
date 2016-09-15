@@ -212,4 +212,3 @@ ALTER TABLE `module_depends` ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 --changeset jgoodwin:10 dbms:mysql
 ALTER TABLE `module_provides` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
-
