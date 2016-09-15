@@ -1,76 +1,57 @@
 @import '../variables'
+@import './module-build-number'
 
 $tab-height = 36.5px
 
-$success-bg = $color-oz-light
-$success-color = $color-oz-medium
-$success-active-bg = $color-oz-medium
-$success-hover-bg = #cbf7f3
+$success-inactive-bg = $color-oz-light
+$success-inactive-color = $color-oz-medium
+$success-inactive-hover-bg = #cbf7f3
 
-$info-bg = $color-calypso-light
-$info-color = $color-calypso-medium
-$info-active-bg = $color-calypso-medium
-$info-hover-bg = #cbf1f7
+$info-inactive-bg = $color-calypso-light
+$info-inactive-color = $color-calypso-medium
+$info-inactive-hover-bg = #cbf1f7
 
-$failed-bg = $color-norman-light
-$failed-color = $color-norman-medium
-$failed-active-bg = $color-norman-medium
-$failed-hover-bg = #fcd4e1
+$failed-inactive-bg = $color-norman-light
+$failed-inactive-color = $color-norman-medium
+$failed-inactive-hover-bg = #fcd4e1
 
-$warning-bg = $color-marigold-light
-$warning-color = $color-marigold
-$warning-active-bg = $color-marigold-medium
-$warning-hover-bg = #ffedd6
+$warning-inactive-bg = $color-marigold-light
+$warning-inactive-color = $color-marigold
+$warning-inactive-hover-bg = #ffedd6
 
 .module-build-tab__wrapper
   position relative
+  height 50%
 
 .module-build-tab
-  height $tab-height
-  line-height $tab-height
-  color #cbd6e2
   width 75px
-  &:not(.module-build-tab--active)
-    cursor pointer
 
-.module-build-tab--success
-  background-color $success-bg
-  color $success-color
-  &:hover
-    background-color $success-hover-bg
-
-.module-build-tab--info
-  background-color $info-bg
-  color $info-color
-  &:hover
-    background-color $info-hover-bg
-
-.module-build-tab--failed
-  background-color $failed-bg
-  color $failed-color
-  &:hover
-    background-color $failed-hover-bg
-
-.module-build-tab--warning
-  background-color $warning-bg
-  color $color-marigold
-  &:hover
-    background-color $warning-hover-bg
-
-.module-build-tab--active
-  color $color-heffalump
+.module-build-tab--inactive
+  cursor pointer
 
   &.module-build-tab--success
-    background-color $success-active-bg
+    background-color $success-inactive-bg
+    color $success-inactive-color
+    &:hover
+      background-color $success-inactive-hover-bg
 
   &.module-build-tab--info
-    background-color $info-active-bg
+    background-color $info-inactive-bg
+    color $info-inactive-color
+    &:hover
+      background-color $info-inactive-hover-bg
 
   &.module-build-tab--failed
-    background-color $failed-active-bg
+    background-color $failed-inactive-bg
+    color $failed-inactive-color
+    &:hover
+      background-color $failed-inactive-hover-bg
 
   &.module-build-tab--warning
-    background-color $warning-active-bg
+    background-color $warning-inactive-bg
+    color $warning-inactive-color
+    &:hover
+      background-color $warning-inactive-hover-bg
 
 .module-build-tab__arrow
   border ($tab-height / 2) solid transparent
@@ -81,13 +62,13 @@ $warning-hover-bg = #ffedd6
   top 0
 
 .module-build-tab__arrow--success
-  border-left-color $success-active-bg
+  border-left-color $build-number-success-bg
 
 .module-build-tab__arrow--info
-  border-left-color $info-active-bg
+  border-left-color $build-number-info-bg
 
 .module-build-tab__arrow--failed
-  border-left-color $failed-active-bg
+  border-left-color $build-number-failed-bg
 
 .module-build-tab__arrow--warning
-  border-left-color $warning-active-bg
+  border-left-color $build-number-warning-bg

@@ -1,5 +1,6 @@
 import ActionTypes from './ActionTypes';
 import BranchStateApi from '../data/BranchStateApi';
+import { loadModuleBuildHistory } from './moduleBuildHistoryActions';
 
 export const loadBranchModuleStates = (branchId) => {
   return (dispatch) => {
@@ -14,10 +15,15 @@ export const loadBranchModuleStates = (branchId) => {
   };
 };
 
-export const selectModule = (moduleId) => ({
-  type: ActionTypes.SELECT_MODULE,
-  payload: moduleId
-});
+export const selectModule = (moduleId) => {
+  return (dispatch) => {
+    dispatch({
+      type: ActionTypes.SELECT_MODULE,
+      payload: moduleId
+    });
+    dispatch(loadModuleBuildHistory(moduleId));
+  };
+};
 
 export const deselectModule = () => ({
   type: ActionTypes.DESELECT_MODULE

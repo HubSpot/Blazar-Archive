@@ -1,28 +1,64 @@
-import React, { PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import { connect } from 'react-redux';
+
 import ModuleBuildHistoryItem from './ModuleBuildHistoryItem.jsx';
 import ModuleBuildHistoryPagination from './ModuleBuildHistoryPagination.jsx';
 
-const ModuleBuildHistory = ({moduleName, moduleId}) => {
-  return (
-    <div className="module-build-history">
-      <h5>Recent builds</h5>
+class ModuleBuildHistory extends Component {
+  renderMainContent() {
+    const {moduleBuilds} = this.props;
+    if (!moduleBuilds.size) {
+      return <p>No builds to display.</p>;
+    }
+
+    return (
       <ul className="historical-module-build-list">
-        <ModuleBuildHistoryItem />
-        <ModuleBuildHistoryItem />
-        <ModuleBuildHistoryItem />
-        <ModuleBuildHistoryItem />
-        <ModuleBuildHistoryItem />
+        {moduleBuilds.map((moduleBuild) =>
+          <ModuleBuildHistoryItem key={moduleBuild.get('id')} moduleBuild={moduleBuild} />)}
       </ul>
+    );
+  }
+
+  renderPagination() {
+    const {moduleName, moduleId, hasMorePages} = this.props;
+    if (!hasMorePages) {
+      return null;
+    }
+
+    return (
       <nav className="text-center" aria-label={`${moduleName} build history`}>
         <ModuleBuildHistoryPagination moduleId={moduleId} />
       </nav>
-    </div>
-  );
-};
+    );
+  }
+
+  render() {
+    return (
+      <div className="module-build-history">
+        <h5>Recent builds</h5>
+        {this.renderMainContent()}
+        {this.renderPagination()}
+      </div>
+    );
+  }
+}
 
 ModuleBuildHistory.propTypes = {
   moduleName: PropTypes.string.isRequired,
-  moduleId: PropTypes.number.isRequired
+  moduleId: PropTypes.number.isRequired,
+  hasMorePages: PropTypes.bool,
+  moduleBuilds: ImmutablePropTypes.list,
+  loading: PropTypes.bool
 };
 
-export default ModuleBuildHistory;
+const mapStateToProps = (state, ownProps) => {
+  const buildHistory = state.moduleBuildHistoriesByModuleId.get(ownProps.moduleId);
+  return {
+    hasMorePages: buildHistory.get('totalPages') > 1,
+    moduleBuilds: buildHistory.get('moduleBuilds'),
+    loading: buildHistory.get('loading')
+  };
+};
+
+export default connect(mapStateToProps)(ModuleBuildHistory);

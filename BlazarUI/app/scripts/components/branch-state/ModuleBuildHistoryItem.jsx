@@ -1,17 +1,23 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
+import ModuleBuildNumber from './ModuleBuildNumber.jsx';
+import ModuleBuildStatus from './ModuleBuildStatus.jsx';
 
-const ModuleBuildHistory = () => {
+const ModuleBuildHistoryItem = ({moduleBuild}) => {
   return (
     <li>
       <a className="historical-module-build">
-        <div className="historical-module-build__build-number">
-          #37
+        <ModuleBuildNumber moduleBuild={moduleBuild} className="historical-module-build__build-number" />
+        <div className="module-build-history-item__status">
+          <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} />
         </div>
-        <p className="module-build-history-item__status">Built 2 hours ago in 1 minute 25 seconds</p>
         <span className="build-trigger-label build-trigger-label--code-push">code push</span>
       </a>
     </li>
   );
 };
 
-export default ModuleBuildHistory;
+ModuleBuildHistoryItem.propTypes = {
+  moduleBuild: PropTypes.object.isRequired
+};
+
+export default ModuleBuildHistoryItem;

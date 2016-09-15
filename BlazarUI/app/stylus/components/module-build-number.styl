@@ -1,0 +1,31 @@
+@import '../variables'
+
+$build-number-success-bg = $color-oz-medium
+$build-number-info-bg = $color-calypso-medium
+$build-number-failed-bg = $color-norman-medium
+$build-number-warning-bg = $color-marigold-medium
+$build-number-muted-bg = $color-koala
+$build-number-muted-color = $color-eerie
+
+.module-build-number
+  display flex
+  align-items center
+  justify-content center
+  color $color-heffalump
+  height 100%
+
+.module-build-number--success
+  background-color $build-number-success-bg
+
+.module-build-number--info
+  background-color $build-number-info-bg
+
+.module-build-number--failed
+  background-color $build-number-failed-bg
+
+.module-build-number--warning
+  background-color $build-number-warning-bg
+
+.module-build-number--muted
+  background-color $build-number-muted-bg
+  color $build-number-muted-color

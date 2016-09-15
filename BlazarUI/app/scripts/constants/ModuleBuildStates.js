@@ -24,6 +24,8 @@ export const getClassNameColorModifier = (state) => {
       return 'success';
     case ModuleBuildStates.CANCELLED:
       return 'warning';
+    case ModuleBuildStates.SKIPPED:
+      return 'muted';
     default:
       return 'info';
   }
