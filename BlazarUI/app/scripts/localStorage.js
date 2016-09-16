@@ -19,3 +19,12 @@ export const loadStarredBranches = () => {
 export const saveStarredBranches = (starredBranches) => {
   store.set('starredBranches', starredBranches.toJS());
 };
+
+// used to sync local storage across tabs and windows
+export const onStarredBranchesUpdate = (callback) => {
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'starredBranches') {
+      callback(Immutable.Set(store.get('starredBranches') || []));
+    }
+  });
+};

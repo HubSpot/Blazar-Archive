@@ -8,6 +8,10 @@ export default function repo(state = Immutable.Set(), action) {
       return state.has(parsedBranchId) ?
         state.delete(parsedBranchId) : state.add(parsedBranchId);
     }
+
+    case ActionTypes.SYNC_STARRED_BRANCHES:
+      return action.payload;
+
     default:
       return state;
   }
