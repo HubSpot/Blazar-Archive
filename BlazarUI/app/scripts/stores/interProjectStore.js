@@ -14,8 +14,8 @@ const InterProjectStore = Reflux.createStore({
   },
 
   onTriggerInterProjectBuild(params, state) {
-    const {selectedModules, resetCache} = state;
-    InterProjectApi.triggerInterProjectBuild(selectedModules, resetCache, (error) => {
+    const {selectedModuleIds, resetCache} = state;
+    InterProjectApi.triggerInterProjectBuild(selectedModuleIds, resetCache, (error) => {
       if (error) {
         this.error = error;
         this.triggerErrorUpdate();

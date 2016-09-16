@@ -37,7 +37,7 @@ const initialState = {
   malformedFiles: [],
   showModuleModal: false,
   modules: [],
-  selectedModules: [],
+  selectedModuleIds: [],
   buildDownstreamModules: 'WITHIN_REPOSITORY',
   triggerInterProjectBuild: false,
   resetCache: false,
@@ -52,7 +52,7 @@ class BranchContainer extends Component {
   constructor() {
     this.state = initialState;
 
-    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModules', 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'triggerBuild', 'refreshBranches');
+    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModuleIds', 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'triggerBuild', 'refreshBranches');
   }
 
   componentDidMount() {
@@ -129,7 +129,8 @@ class BranchContainer extends Component {
 
   openModuleModal() {
     this.setState({
-      showModuleModal: true
+      showModuleModal: true,
+      selectedModuleIds: this.state.modules.map((module) => module.id)
     });
   }
 
@@ -139,9 +140,9 @@ class BranchContainer extends Component {
     });
   }
 
-  updateSelectedModules(modules) {
+  updateSelectedModuleIds(moduleIds) {
     this.setState({
-      selectedModules: modules
+      selectedModuleIds: moduleIds
     });
   }
 
@@ -165,18 +166,10 @@ class BranchContainer extends Component {
 
 
   triggerBuild() {
-    const newState = this.state;
-
-    if (this.state.selectedModules.length === 0) {
-      newState.selectedModules = this.state.modules.map((module) => {
-        return module.id;
-      });
-    }
-
     if (this.state.triggerInterProjectBuild) {
-      InterProjectActions.triggerInterProjectBuild(this.props.params, newState);
+      InterProjectActions.triggerInterProjectBuild(this.props.params, this.state);
     } else {
-      BranchActions.triggerBuild(this.props.params, newState);
+      BranchActions.triggerBuild(this.props.params, this.state);
     }
   }
 
@@ -284,11 +277,12 @@ class BranchContainer extends Component {
               showModal={this.state.showModuleModal}
               closeModal={this.closeModuleModal}
               triggerBuild={this.triggerBuild}
-              onSelectUpdate={this.updateSelectedModules}
+              onUpdateSelectedModuleIds={this.updateSelectedModuleIds}
               onCheckboxUpdate={this.updateDownstreamModules}
               onResetCacheUpdate={this.updateResetCache}
               onTriggerInterProjectBuild={this.updateTriggerInterProjectBuild}
               modules={this.state.modules}
+              selectedModuleIds={this.state.selectedModuleIds}
             />
             {this.renderBuildSettingsButton()}
           </UIGridItem>
