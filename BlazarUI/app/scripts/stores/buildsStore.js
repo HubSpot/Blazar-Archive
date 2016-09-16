@@ -6,6 +6,8 @@ import BuildsActions from '../actions/buildsActions';
 import BuildsApi from '../data/BuildsApi';
 import {isEmpty} from 'underscore';
 
+import reduxStore from '../reduxStore';
+
 const BuildsStore = Reflux.createStore({
 
   listenables: BuildsActions,
@@ -20,6 +22,11 @@ const BuildsStore = Reflux.createStore({
 
   getBuilds() {
     return this.builds;
+  },
+
+  updateStarredBuilds(starredBranchIds) {
+    this.builds.starred = this.builds.all.filter((build) => starredBranchIds.has(build.gitInfo.id));
+    this.trigger({builds: this.builds});
   },
 
   onStopPollingBuilds() {
@@ -52,6 +59,16 @@ const BuildsStore = Reflux.createStore({
     });
   }
 
+});
+
+let previouslyStarredBranches = null;
+
+reduxStore.subscribe(() => {
+  const starredBranches = reduxStore.getState().starredBranches;
+  if (previouslyStarredBranches !== starredBranches) {
+    BuildsStore.updateStarredBuilds(starredBranches);
+    previouslyStarredBranches = starredBranches;
+  }
 });
 
 export default BuildsStore;

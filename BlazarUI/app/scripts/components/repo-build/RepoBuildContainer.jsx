@@ -6,9 +6,6 @@ import UIGrid from '../shared/grid/UIGrid.jsx';
 import UIGridItem from '../shared/grid/UIGridItem.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 
-import StarStore from '../../stores/starStore';
-import StarActions from '../../actions/starActions';
-
 import RepoBuildStore from '../../stores/repoBuildStore';
 import RepoBuildActions from '../../actions/repoBuildActions';
 
@@ -26,12 +23,10 @@ import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 
 const initialState = {
   moduleBuilds: false,
-  stars: [],
   malformedFiles: [],
   loadingMalformedFiles: true,
   loadingModuleBuilds: true,
   loadingRepoBuild: true,
-  loadingStars: true,
   branchInfo: {},
   upAndDownstreamModules: {},
   currentRepoBuild: null,
@@ -63,11 +58,9 @@ class RepoBuildContainer extends Component {
   }
 
   setup(params) {
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
     this.unsubscribeFromRepoBuild = RepoBuildStore.listen(this.onStatusChange);
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     this.unsubscribeFromInterProject = InterProjectStore.listen(this.onStatusChange);
-    StarActions.loadStars('repoBuildContainer');
     RepoBuildActions.loadModuleBuilds(params);
     RepoBuildActions.loadRepoBuild(params);
     RepoBuildActions.startPolling(params);
@@ -89,7 +82,6 @@ class RepoBuildContainer extends Component {
 
   tearDown() {
     RepoBuildActions.stopPolling();
-    this.unsubscribeFromStars();
     this.unsubscribeFromRepoBuild();
     this.unsubscribeFromBranch();
     this.unsubscribeFromInterProject();
@@ -104,10 +96,9 @@ class RepoBuildContainer extends Component {
   }
 
   isLoading() {
-    const {loadingStars, loadingModuleBuilds, loadingRepoBuild, moduleBuilds, loadingUpAndDownstreamModules} = this.state;
+    const {loadingModuleBuilds, loadingRepoBuild, moduleBuilds, loadingUpAndDownstreamModules} = this.state;
 
-    return loadingStars
-      || loadingModuleBuilds
+    return loadingModuleBuilds
       || loadingRepoBuild
       || !moduleBuilds
       || loadingUpAndDownstreamModules;

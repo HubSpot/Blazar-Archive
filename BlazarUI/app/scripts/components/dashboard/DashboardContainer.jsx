@@ -1,14 +1,10 @@
 import React, {Component, PropTypes} from 'react';
-import {contains} from 'underscore';
-import Immutable, {fromJS} from 'immutable';
+import {fromJS} from 'immutable';
 import Dashboard from './Dashboard.jsx';
 import PageContainer from '../shared/PageContainer.jsx';
 
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
-
-import StarActions from '../../actions/starActions';
-import StarStore from '../../stores/starStore';
 
 import {sortBranchesByTimestamp} from '../Helpers.js';
 
@@ -20,55 +16,37 @@ class DashboardContainer extends Component {
     this.onStatusChange = this.onStatusChange.bind(this);
 
     this.state = {
-      stars: Immutable.List.of(),
-      builds: Immutable.List.of(),
-      starredBuilds: [],
-      loadingStars: true,
+      builds: {
+        all: [],
+        building: [],
+        starred: []
+      },
       loading: true
     };
   }
 
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStatusChange);
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
-
-    StarActions.loadStars();
     BuildsActions.loadBuilds(this.props.params);
   }
 
   componentWillUnmount() {
     BuildsActions.stopPollingBuilds();
     this.unsubscribeFromBuilds();
-    this.unsubscribeFromStars();
   }
 
-  checkStarHistory() {
-    if (this.state.stars.size === 0) {
-      return;
-    }
-
-    if (this.state.builds.all) {
-      const starredBuilds = this.state.builds.all.filter((build) => {
-        return contains(this.state.stars, build.gitInfo.id)
-          && build.gitInfo.active;
-      });
-
-      this.setState({starredBuilds});
-    }
-  }
 
   onStatusChange(state) {
     this.setState(state);
-    this.checkStarHistory();
   }
 
   render() {
+    const activeStarredBuilds = this.state.builds.starred.filter((build) => build.gitInfo.active);
     return (
       <PageContainer documentTitle="Dashboard" classNames="page-dashboard">
         <Dashboard
-          starredBuilds={fromJS(sortBranchesByTimestamp(this.state.starredBuilds, false))}
-          loadingStars={this.state.loadingStars}
-          loadingBuilds={this.state.loading}
+          starredBuilds={fromJS(sortBranchesByTimestamp(activeStarredBuilds, false))}
+          loading={this.state.loading}
           params={this.props.params}
         />
       </PageContainer>

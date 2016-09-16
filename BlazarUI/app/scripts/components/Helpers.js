@@ -1,5 +1,5 @@
 import React from 'react';
-import {some, uniq, contains} from 'underscore';
+import {uniq, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
@@ -71,12 +71,6 @@ export const cmp = (x, y) => {
   }
 
   return 0;
-};
-
-export const getIsStarredState = (stars, id) => {
-  return some(stars, (star) => {
-    return star.moduleId === id;
-  });
 };
 
 // Data Helpers

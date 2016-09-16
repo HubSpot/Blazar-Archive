@@ -15,9 +15,6 @@ import ModuleModal from '../shared/ModuleModal.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 import $ from 'jquery';
 
-import StarStore from '../../stores/starStore';
-import StarActions from '../../actions/starActions';
-
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 import InterProjectActions from '../../actions/interProjectActions';
@@ -28,9 +25,7 @@ import {getPreviousBuildState} from '../Helpers.js';
 
 const initialState = {
   builds: null,
-  stars: [],
   loadingBranches: true,
-  loadingStars: true,
   loadingModules: true,
   loadingMalformedFiles: true,
   loadingRepo: true,
@@ -76,8 +71,6 @@ class BranchContainer extends Component {
   setup(params) {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
-    StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuildHistory(params);
     BranchActions.loadBranchInfo(params);
     BranchActions.loadBranchModules(params);
@@ -89,7 +82,6 @@ class BranchContainer extends Component {
 
   tearDown() {
     BranchActions.stopPolling();
-    this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
     this.unsubscribeFromRepo();
     $(window).unbind('scroll');
@@ -175,7 +167,6 @@ class BranchContainer extends Component {
 
   isLoading() {
     return this.state.loadingBranches
-      || this.state.loadingStars
       || this.state.loadingModules
       || this.state.loadingRepo;
   }

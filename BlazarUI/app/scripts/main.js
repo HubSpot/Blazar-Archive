@@ -1,14 +1,14 @@
 import React from 'react';
 import { render } from 'react-dom';
+
 import { createHistory } from 'history';
 import { Router, useRouterHistory } from 'react-router';
 import routes from './routes';
-import { getUsernameFromCookie } from './components/Helpers.js';
 
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
-import rootReducer from './reducers';
+import store from './reduxStore';
+
+import { getUsernameFromCookie } from './components/Helpers.js';
 
 if (!window.config.apiRoot) {
   console.warn('You need to set your apiRoot via localStorage');
@@ -27,11 +27,6 @@ if (window.config.heapToken) {
 const browserHistory = useRouterHistory(createHistory)({
   basename: window.config.appRoot
 });
-
-const store = compose(
-  applyMiddleware(thunk),
-  window.devToolsExtension ? window.devToolsExtension() : f => f
-)(createStore)(rootReducer);
 
 render(
   <Provider store={store}>

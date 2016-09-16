@@ -136,7 +136,7 @@ class Dashboard extends Component {
               starredBuilds={this.props.starredBuilds}
               expandedCard={this.state.expandedCard}
               moduleBuildsList={this.state.moduleBuildsList}
-              loading={this.props.loadingBuilds || this.props.loadingStars}
+              loading={this.props.loading}
             />
           </div>
         </UIGridItem>
@@ -147,8 +147,7 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
   starredBuilds: PropTypes.instanceOf(Immutable.List),
-  loadingStars: PropTypes.bool,
-  loadingBuilds: PropTypes.bool,
+  loading: PropTypes.bool,
   params: PropTypes.object
 };
 

@@ -1,6 +1,5 @@
 /* global config */
 import React, {Component, PropTypes} from 'react';
-import {contains} from 'underscore';
 import Select from 'react-select';
 import Image from '../shared/Image.jsx';
 import Headline from '../shared/headline/Headline.jsx';
@@ -79,7 +78,6 @@ class BranchHeadline extends Component {
       return null;
     }
 
-    const {stars} = this.props;
     const branchId = parseInt(this.props.params.branchId, 10);
 
     return (
@@ -89,11 +87,7 @@ class BranchHeadline extends Component {
           {...this.props}
         />
         <Headline className="headline branch-headline">
-          <Star
-            className="icon-roomy"
-            isStarred={contains(stars, branchId)}
-            id={branchId}
-          />
+          <Star className="icon-roomy" branchId={branchId} />
           <Icon type="octicon" name="git-branch" classNames="headline-icon" />
           <Select
             className="branch-select-input"
@@ -119,7 +113,6 @@ BranchHeadline.propTypes = {
   loading: PropTypes.bool.isRequired,
   branchInfo: PropTypes.object.isRequired,
   refreshBranches: PropTypes.func.isRequired,
-  stars: PropTypes.array.isRequired,
   branchesList: PropTypes.array.isRequired
 };
 
