@@ -23,7 +23,7 @@ public class BlazarGHRepository extends GHRepository {
   private final String name;
   private final String fullName;
   private Map<String, ? extends GHBranch> branches;
-  private final BlazarGHUser owner;
+  private BlazarGHUser owner;
   private List<BlazarGHCommit> commits;
   private final BlazarGHTree tree;
   private String host;
@@ -58,6 +58,15 @@ public class BlazarGHRepository extends GHRepository {
   @Override
   public String getFullName() {
     return this.fullName;
+  }
+
+  @Override
+  public String getOwnerName() {
+    return this.owner.getLogin();
+  }
+
+  public void setOwner(BlazarGHUser user) {
+    this.owner = user;
   }
 
   @Override

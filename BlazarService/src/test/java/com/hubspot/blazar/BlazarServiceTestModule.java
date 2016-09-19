@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
@@ -26,6 +29,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
@@ -71,6 +75,19 @@ public class BlazarServiceTestModule extends AbstractModule {
   private BlazarConfiguration buildBlazarConfiguration() {
     return new BlazarConfiguration() {
       private final UiConfiguration uiConfiguration = new UiConfiguration("http://localhost/test/base/url");
+      private final Map<String, GitHubConfiguration> gitHubConfiguration = buildGitHubConfiguration();
+
+      private Map<String, GitHubConfiguration> buildGitHubConfiguration() {
+        GitHubConfiguration g = new GitHubConfiguration(Optional.absent(), Optional.absent(), Optional.of(false), Optional.absent(), Lists.newArrayList("test"));
+        HashMap<String, GitHubConfiguration> configurationHashMap = new HashMap<>();
+        configurationHashMap.put("git.example.com", g);
+        return configurationHashMap;
+      }
+
+      @Override
+      public Map<String, GitHubConfiguration> getGitHubConfiguration() {
+        return gitHubConfiguration;
+      }
 
       @Override
       public UiConfiguration getUiConfiguration() {

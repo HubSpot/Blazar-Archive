@@ -124,6 +124,7 @@ public class GitInfo {
         .add("repository", repository)
         .add("repositoryId", repositoryId)
         .add("branch", branch)
+        .add("active", active)
         .toString();
   }
 

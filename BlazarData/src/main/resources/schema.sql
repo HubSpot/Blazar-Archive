@@ -191,5 +191,9 @@ ALTER TABLE `malformed_files` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 ALTER TABLE `module_provides` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 
---changeset jgoodwin:11
+--changeset jgoodwin:11 dbms:h2
+CREATE INDEX branch_active on branches (active)
+
+--changeset jgoodwin:11 dbms:mysql
 CREATE INDEX branch_active on branches (active) DESC
+

@@ -35,6 +35,7 @@ public class GitBranchUpdater implements Runnable {
     if (!configuration.getGitHubConfiguration().containsKey(oldBranch.getHost())) {
       LOG.warn("No git host configured for {}/{}/{}#{} marking as inactive", oldBranch.getHost(), oldBranch.getOrganization(), oldBranch.getRepository(), oldBranch.getBranch());
       branchService.delete(oldBranch);
+      return;
     }
 
     GitHubConfiguration githubConfiguration = configuration.getGitHubConfiguration().get(oldBranch.getHost());
@@ -52,13 +53,13 @@ public class GitBranchUpdater implements Runnable {
     String newRepoOrg = ghRepository.getOwnerName();
 
     // Whether we listen & process updates for repos in this org
-    boolean orgIsConfigured = !githubConfiguration.getOrganizations().contains(newRepoOrg);
-    boolean orgNameChanged = oldRepoOrg.equals(newRepoOrg);
-    boolean repoNameChanged = oldRepoName.equals(newRepoName);
+    boolean orgIsConfigured = githubConfiguration.getOrganizations().contains(newRepoOrg);
+    boolean orgNameChanged = !oldRepoOrg.equals(newRepoOrg);
+    boolean repoNameChanged = !oldRepoName.equals(newRepoName);
 
     // Only update a branch if it has changed.
     if (orgNameChanged || repoNameChanged || orgIsConfigured != oldBranch.isActive()) {
-      GitInfo updatedBranch = updateBranch(oldBranch, newRepoOrg, newRepoOrg, orgIsConfigured);
+      GitInfo updatedBranch = updateBranch(oldBranch, newRepoOrg, newRepoName, orgIsConfigured);
       // this log is in the format ORG/REPO#BRANCH (ACTIVE)
       String oldRepoLogString = String.format("%s/%s#%s (%s)", oldRepoOrg, oldRepoName, oldBranch.getBranch(), oldBranch.isActive());
       String newRepoLogString = String.format("%s/%s#%s (%s)", newRepoOrg, newRepoName, oldBranch.getBranch(), orgIsConfigured);
