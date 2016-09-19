@@ -24,13 +24,13 @@ import com.hubspot.blazar.util.GitHubHelper;
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.setup.Bootstrap;
 
-public class CleanMissingReposCommand extends ConfiguredCommand<BlazarConfiguration> {
+public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfiguration> {
   private static String COMMAND_NAME = "clean_missing_repos";
   private static String COMMAND_DESC = "Finds repos no longer in the managed organizations and marks all branches as inactive";
-  private static final Logger LOG = LoggerFactory.getLogger(CleanMissingReposCommand.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CleanRepoMetadataCommand.class);
   private final ExecutorService executorService;
 
-  public CleanMissingReposCommand() {
+  public CleanRepoMetadataCommand() {
     super(COMMAND_NAME, COMMAND_DESC);
     this.executorService = Executors.newFixedThreadPool(10);
   }
