@@ -17,7 +17,7 @@ public class BuildStep {
   @JsonCreator
   public BuildStep(@JsonProperty("name") Optional<String> name,
                    @JsonProperty("description") Optional<String> description,
-                   @JsonProperty("commands") List<BuildCommand> commands,
+                   @JsonProperty("command") List<BuildCommand> commands,
                    @JsonProperty("activeByDefault") Optional<Boolean> activeByDefault) {
     this.name = Objects.firstNonNull(name, Optional.<String>absent());
     this.description = Objects.firstNonNull(description, Optional.<String>absent());

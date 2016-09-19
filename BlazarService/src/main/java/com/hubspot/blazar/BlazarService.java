@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.guice.BlazarServiceModule;
-import com.hubspot.blazar.guice.VersionBackFillCommand;
+import com.hubspot.blazar.command.CleanMissingReposCommand;
+import com.hubspot.blazar.command.VersionBackFillCommand;
 import com.hubspot.dropwizard.guicier.GuiceBundle;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 
@@ -35,6 +36,7 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
     bootstrap.getObjectMapper().setSerializationInclusion(Include.NON_NULL);
     bootstrap.getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     bootstrap.addCommand(new VersionBackFillCommand());
+    bootstrap.addCommand(new CleanMissingReposCommand());
   }
 
   @Override

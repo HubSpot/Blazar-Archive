@@ -1,4 +1,4 @@
-package com.hubspot.blazar.guice;
+package com.hubspot.blazar.command;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,6 +25,7 @@ import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
+import com.hubspot.blazar.guice.VersionBackFillCommandModule;
 
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.setup.Bootstrap;
