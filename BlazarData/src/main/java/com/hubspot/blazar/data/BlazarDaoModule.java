@@ -18,6 +18,7 @@ import com.hubspot.blazar.data.dao.InterProjectBuildMappingDao;
 import com.hubspot.blazar.data.dao.MalformedFileDao;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
+import com.hubspot.blazar.data.dao.QueueItemDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
 import com.hubspot.blazar.data.dao.StateDao;
 import com.hubspot.guice.transactional.DataSourceLocator;
@@ -48,6 +49,7 @@ public class BlazarDaoModule extends AbstractModule {
     bindDao(binder(), InterProjectBuildDao.class);
     bindDao(binder(), InterProjectBuildMappingDao.class);
     bindDao(binder(), BranchSettingsDao.class);
+    bindDao(binder(), QueueItemDao.class);
   }
 
   private static <T> void bindDao(Binder binder, Class<T> type) {
@@ -65,5 +67,15 @@ public class BlazarDaoModule extends AbstractModule {
   @Singleton
   public TransactionalDataSource providesTransactionalDataSource(ManagedDataSource managedDataSource) {
     return new TransactionalDataSource(managedDataSource);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return o != null && getClass().equals(o.getClass());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

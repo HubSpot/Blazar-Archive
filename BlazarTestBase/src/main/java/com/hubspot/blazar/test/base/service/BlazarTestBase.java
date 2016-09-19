@@ -16,17 +16,17 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 
 public abstract class BlazarTestBase {
-  protected static final AtomicReference<Injector> injector = new AtomicReference<>();
+  protected final AtomicReference<Injector> injector = new AtomicReference<>();
 
   protected <T> T getFromGuice(Class<T> type) {
     return injector.get().getInstance(type);
   }
 
-  private static Connection getConnection() throws SQLException {
+  private Connection getConnection() throws SQLException {
     return injector.get().getInstance(ManagedDataSource.class).getConnection();
   }
 
-  protected static void runSql(String resourceName) throws Exception {
+  protected void runSql(String resourceName) throws Exception {
     liquibase.logging.LogFactory.setInstance(new LogFactory() {
 
       @Override
