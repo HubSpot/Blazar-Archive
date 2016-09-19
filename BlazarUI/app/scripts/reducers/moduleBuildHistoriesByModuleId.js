@@ -22,7 +22,7 @@ function moduleBuildHistory(state = initialState, action) {
       const {moduleBuilds} = action.payload;
       const offset = PAGE_SIZE * (state.get('page') - 1);
       return state.merge({
-        totalPages: moduleBuilds.length / PAGE_SIZE,
+        totalPages: Math.ceil(moduleBuilds.length / PAGE_SIZE),
         moduleBuilds: moduleBuilds.slice(offset, offset + PAGE_SIZE),
         loading: false
       });

@@ -1,9 +1,5 @@
 @import '../variables'
 
-$success-bg = $color-oz-light
-$success-color = $color-oz-medium
-$success-active-bg
-
 .module-build-history
   padding 20px
 
@@ -42,21 +38,6 @@ $success-active-bg
   flex-grow 1
   color $color-eerie
 
-.build-trigger-label
-  padding 1px 5px
-
-.historical-module-build .build-trigger-label
+.module-build-history-item__build-trigger-label
   margin-right 20px
   font-size 12px
-
-.build-trigger-label--code-push
-  color $color-sorbet
-  background-color $color-sorbet-light
-
-.build-trigger-label--manual
-  color $color-heffalump
-  background-color $color-koala
-
-.build-trigger-label--dependency
-  color $color-thunderdome-medium
-  background-color $color-thunderdome

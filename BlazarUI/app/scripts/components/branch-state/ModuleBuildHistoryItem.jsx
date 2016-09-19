@@ -1,6 +1,11 @@
 import React, { PropTypes } from 'react';
+import Immutable from 'immutable';
+import { sample } from 'underscore';
+
 import ModuleBuildNumber from './ModuleBuildNumber.jsx';
 import ModuleBuildStatus from './ModuleBuildStatus.jsx';
+import BuildTriggerLabel from './BuildTriggerLabel.jsx';
+import BuildTriggerTypes from '../../constants/BuildTriggerTypes';
 
 const ModuleBuildHistoryItem = ({moduleBuild}) => {
   return (
@@ -10,7 +15,13 @@ const ModuleBuildHistoryItem = ({moduleBuild}) => {
         <div className="module-build-history-item__status">
           <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} />
         </div>
-        <span className="build-trigger-label build-trigger-label--code-push">code push</span>
+        <div className="module-build-history-item__build-trigger-label">
+          <BuildTriggerLabel buildTrigger={Immutable.Map({
+            type: sample(Object.keys(BuildTriggerTypes)),
+            id: 'Mock'
+          })}
+          />
+        </div>
       </a>
     </li>
   );

@@ -5,10 +5,10 @@ import ModuleBuildNumber from './ModuleBuildNumber.jsx';
 import ModuleBuildTab from './ModuleBuildTab.jsx';
 
 const ModuleBuildTabs = ({moduleState, selectedBuildNumber, onSelectModuleBuild}) => {
-  const lastNonSkippedBuild = moduleState.get('lastNonSkippedBuild');
+  const lastNonSkippedBuild = moduleState.get('lastNonSkippedModuleBuild');
   const lastNonSkippedBuildNumber = lastNonSkippedBuild.get('buildNumber');
 
-  const lastSuccessfulBuild = moduleState.get('lastSuccessfulBuild');
+  const lastSuccessfulBuild = moduleState.get('lastSuccessfulModuleBuild');
   const lastSuccessfulBuildNumber = lastSuccessfulBuild.get('buildNumber');
 
   if (lastNonSkippedBuildNumber === lastSuccessfulBuildNumber) {

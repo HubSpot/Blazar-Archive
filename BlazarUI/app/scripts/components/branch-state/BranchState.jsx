@@ -28,10 +28,10 @@ const BranchState = ({activeModules, inactiveModules, branchId, branchInfo, rout
           <h2 className="module-list-header">Active modules</h2>
           <ModuleList modules={activeModules} onItemClick={handleModuleItemClick} selectedModuleId={selectedModuleId} />
         </section>
-        <section id="inactive-modules">
+        {!!inactiveModules.size && <section id="inactive-modules">
           <h2 className="module-list-header">Inactive modules</h2>
           <ModuleList modules={inactiveModules} onItemClick={handleModuleItemClick} selectedModuleId={selectedModuleId} />
-        </section>
+        </section>}
       </PageContainer>
   );
 };

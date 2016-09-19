@@ -20,7 +20,7 @@ export default [
         'updatedTimestamp': 1471467413444
       }
     },
-    'lastSuccessfulBuild': {
+    'lastSuccessfulModuleBuild': {
       'id': 1011314,
       'repoBuildId': 139317,
       'moduleId': 21906,
@@ -284,7 +284,7 @@ export default [
         'provides': []
       }
     },
-    'lastNonSkippedBuild': {
+    'lastNonSkippedModuleBuild': {
       'id': 1011314,
       'repoBuildId': 139317,
       'moduleId': 21906,
@@ -548,7 +548,7 @@ export default [
         'provides': []
       }
     },
-    'lastBuild': {
+    'lastModuleBuild': {
       'id': 1011314,
       'repoBuildId': 139317,
       'moduleId': 21906,
@@ -812,12 +812,12 @@ export default [
         'provides': []
       }
     },
-    'inProgressBuild': {
+    'inProgressModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
     },
-    'pendingBuild': {
+    'pendingModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
@@ -844,7 +844,7 @@ export default [
         'updatedTimestamp': 1469727508292
       }
     },
-    'lastSuccessfulBuild': {
+    'lastSuccessfulModuleBuild': {
       'id': 1023549,
       'repoBuildId': 141241,
       'moduleId': 10734,
@@ -1108,7 +1108,7 @@ export default [
         'provides': []
       }
     },
-    'lastNonSkippedBuild': {
+    'lastNonSkippedModuleBuild': {
       'id': 1023959,
       'repoBuildId': 141312,
       'moduleId': 10734,
@@ -1371,7 +1371,7 @@ export default [
         'provides': []
       }
     },
-    'lastBuild': {
+    'lastModuleBuild': {
       'id': 1023549,
       'repoBuildId': 141241,
       'moduleId': 10734,
@@ -1635,7 +1635,7 @@ export default [
         'provides': []
       }
     },
-    'inProgressBuild': {
+    'inProgressModuleBuild': {
       'id': 1023959,
       'repoBuildId': 141312,
       'moduleId': 10734,
@@ -1898,7 +1898,7 @@ export default [
         'provides': []
       }
     },
-    'pendingBuild': {
+    'pendingModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
@@ -1925,7 +1925,7 @@ export default [
         'updatedTimestamp': 1471467413444
       }
     },
-    'lastSuccessfulBuild': {
+    'lastSuccessfulModuleBuild': {
       'id': 992175,
       'repoBuildId': 136226,
       'moduleId': 1436,
@@ -2102,7 +2102,7 @@ export default [
         'provides': []
       }
     },
-    'lastNonSkippedBuild': {
+    'lastNonSkippedModuleBuild': {
       'id': 1065551,
       'repoBuildId': 147337,
       'moduleId': 1436,
@@ -2279,7 +2279,7 @@ export default [
         'provides': []
       }
     },
-    'lastBuild': {
+    'lastModuleBuild': {
       'id': 1065551,
       'repoBuildId': 147337,
       'moduleId': 1436,
@@ -2456,12 +2456,12 @@ export default [
         'provides': []
       }
     },
-    'inProgressBuild': {
+    'inProgressModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
     },
-    'pendingBuild': {
+    'pendingModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
@@ -2488,7 +2488,7 @@ export default [
         'updatedTimestamp': 1471467413444
       }
     },
-    'lastSuccessfulBuild': {
+    'lastSuccessfulModuleBuild': {
       'id': 1010735,
       'repoBuildId': 139221,
       'moduleId': 21909,
@@ -2665,7 +2665,7 @@ export default [
         'provides': []
       }
     },
-    'lastNonSkippedBuild': {
+    'lastNonSkippedModuleBuild': {
       'id': 1010735,
       'repoBuildId': 139221,
       'moduleId': 21909,
@@ -2842,7 +2842,7 @@ export default [
         'provides': []
       }
     },
-    'lastBuild': {
+    'lastModuleBuild': {
       'id': 1010735,
       'repoBuildId': 139221,
       'moduleId': 21909,
@@ -3019,12 +3019,12 @@ export default [
         'provides': []
       }
     },
-    'inProgressBuild': {
+    'inProgressModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
     },
-    'pendingBuild': {
+    'pendingModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
@@ -3051,7 +3051,7 @@ export default [
         'updatedTimestamp': 1471645308460
       }
     },
-    'lastSuccessfulBuild': {
+    'lastSuccessfulModuleBuild': {
       'id': 1001272,
       'repoBuildId': 137301,
       'moduleId': 1442,
@@ -3315,7 +3315,7 @@ export default [
         'provides': []
       }
     },
-    'lastNonSkippedBuild': {
+    'lastNonSkippedModuleBuild': {
       'id': 1096978,
       'repoBuildId': 151773,
       'moduleId': 1442,
@@ -3324,7 +3324,7 @@ export default [
       'startTimestamp': 1472596119784,
       'endTimestamp': 1472596119787
     },
-    'lastBuild': {
+    'lastModuleBuild': {
       'id': 1096978,
       'repoBuildId': 151773,
       'moduleId': 1442,
@@ -3333,12 +3333,12 @@ export default [
       'startTimestamp': 1472596119784,
       'endTimestamp': 1472596119787
     },
-    'inProgressBuild': {
+    'inProgressModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
     },
-    'pendingBuild': {
+    'pendingModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
@@ -3355,7 +3355,7 @@ export default [
       'createdTimestamp': 1459280405000,
       'updatedTimestamp': 1462806335000
     },
-    'lastSuccessfulBuild': {
+    'lastSuccessfulModuleBuild': {
       'id': 207330,
       'repoBuildId': 27567,
       'moduleId': 17149,
@@ -3614,7 +3614,7 @@ export default [
         'provides': []
       }
     },
-    'lastNonSkippedBuild': {
+    'lastNonSkippedModuleBuild': {
       'id': 207330,
       'repoBuildId': 27567,
       'moduleId': 17149,
@@ -3873,7 +3873,7 @@ export default [
         'provides': []
       }
     },
-    'lastBuild': {
+    'lastModuleBuild': {
       'id': 207330,
       'repoBuildId': 27567,
       'moduleId': 17149,
@@ -4132,12 +4132,12 @@ export default [
         'provides': []
       }
     },
-    'inProgressBuild': {
+    'inProgressModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
     },
-    'pendingBuild': {
+    'pendingModuleBuild': {
       'repoBuildId': 0,
       'moduleId': 0,
       'buildNumber': 0
