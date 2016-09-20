@@ -31,9 +31,9 @@ public class GitBranchUpdaterTest extends BlazarServiceTestBase {
   @Inject
   private BranchService branchService;
   @Inject
-  private GitHubHelper gitHubHelper;
-  @Inject
   private BlazarConfiguration blazarConfiguration;
+  @Inject
+  private GitHubHelper gitHubHelper;
 
   @Before
   public void before() throws Exception {
@@ -74,19 +74,25 @@ public class GitBranchUpdaterTest extends BlazarServiceTestBase {
 
     // Alter the owner of the repo inside our fake GitHub
     BlazarGHRepository unModifiedRepo = (BlazarGHRepository) gitHubHelper.repositoryFor(movedBranch);
-    unModifiedRepo.setOwner(new BlazarGHUser("new-user", "new-user-login", "new.user@example.com"));
-    // Verify that we changed the fake github
-    GHRepository repository = gitHubHelper.repositoryFor(movedBranch);
-    assertThat(repository.getOwnerName()).isEqualTo("new-user-login");
+    BlazarGHUser oldOwner = unModifiedRepo.getOwner();
+    try {
+      unModifiedRepo.setOwner(new BlazarGHUser("new-user", "new-user-login", "new.user@example.com"));
+      // Verify that we changed the fake github
+      GHRepository repository = gitHubHelper.repositoryFor(movedBranch);
+      assertThat(repository.getOwnerName()).isEqualTo("new-user-login");
 
-    buildUpdater(movedBranch).run();
-    buildUpdater(unChangedBranch).run();
-    GitInfo maybeUpdatedBranch = branchService.get(movedBranch.getId().get()).get();
-    GitInfo maybeUnChangedBranch = branchService.get(2).get();
-    assertThat(maybeUpdatedBranch.isActive()).isFalse();
-    assertThat(maybeUpdatedBranch.getOrganization()).isEqualTo("new-user-login");
-    assertThat(maybeUnChangedBranch.isActive()).isTrue();
-    assertThat(maybeUnChangedBranch.getOrganization()).isEqualTo(maybeUnChangedBranch.getOrganization());
+      buildUpdater(movedBranch).run();
+      buildUpdater(unChangedBranch).run();
+      GitInfo maybeUpdatedBranch = branchService.get(movedBranch.getId().get()).get();
+      GitInfo maybeUnChangedBranch = branchService.get(2).get();
+      assertThat(maybeUpdatedBranch.isActive()).isFalse();
+      assertThat(maybeUpdatedBranch.getOrganization()).isEqualTo("new-user-login");
+      assertThat(maybeUnChangedBranch.isActive()).isTrue();
+      assertThat(maybeUnChangedBranch.getOrganization()).isEqualTo(maybeUnChangedBranch.getOrganization());
+    } finally {
+      // return owner to its old state.
+      unModifiedRepo.setOwner(oldOwner);
+    }
   }
 
   private GitBranchUpdater buildUpdater(GitInfo gitInfo) {
