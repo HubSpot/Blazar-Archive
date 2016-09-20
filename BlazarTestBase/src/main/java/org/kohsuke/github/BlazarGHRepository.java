@@ -65,6 +65,11 @@ public class BlazarGHRepository extends GHRepository {
     return this.owner.getLogin();
   }
 
+  @Override
+  public BlazarGHUser getOwner() {
+    return owner;
+  }
+
   public void setOwner(BlazarGHUser user) {
     this.owner = user;
   }
