@@ -25,8 +25,8 @@ import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.setup.Bootstrap;
 
 public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfiguration> {
-  private static String COMMAND_NAME = "clean_missing_repos";
-  private static String COMMAND_DESC = "Finds repos no longer in the managed organizations and marks all branches as inactive";
+  private static final String COMMAND_NAME = "clean_missing_repos";
+  private static final String COMMAND_DESC = "Finds repos no longer in the managed organizations and marks all branches as inactive";
   private static final Logger LOG = LoggerFactory.getLogger(CleanRepoMetadataCommand.class);
   private final ExecutorService executorService;
 
@@ -39,10 +39,10 @@ public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfigurat
   protected void run(Bootstrap<BlazarConfiguration> bootstrap,
                      Namespace namespace,
                      BlazarConfiguration configuration) throws Exception {
-    Injector i = Guice.createInjector(new CommandModule(bootstrap, configuration));
+    Injector injector = Guice.createInjector(new CommandModule(bootstrap, configuration));
     try {
-      GitHubHelper gitHubHelper = i.getInstance(GitHubHelper.class);
-      BranchService branchService = i.getInstance(BranchService.class);
+      GitHubHelper gitHubHelper = injector.getInstance(GitHubHelper.class);
+      BranchService branchService = injector.getInstance(BranchService.class);
       Set<GitInfo> branches = branchService.getAllActive();
       Map<GitInfo, CompletableFuture<Void>> futures = new HashMap<>();
 

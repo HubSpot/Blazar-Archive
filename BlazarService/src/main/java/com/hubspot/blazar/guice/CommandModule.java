@@ -24,12 +24,10 @@ public class CommandModule extends AbstractModule {
   private final Bootstrap<BlazarConfiguration> bootstrap;
   private final BlazarConfiguration configuration;
 
-  public CommandModule(Bootstrap<BlazarConfiguration> bootstrap,
-                                        BlazarConfiguration configuration) {
+  public CommandModule(Bootstrap<BlazarConfiguration> bootstrap, BlazarConfiguration configuration) {
     this.bootstrap = bootstrap;
     this.configuration = configuration;
   }
-
 
   @Override
   protected void configure() {
