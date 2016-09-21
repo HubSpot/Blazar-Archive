@@ -7,7 +7,7 @@ import ModuleBuildHistoryPagination from './ModuleBuildHistoryPagination.jsx';
 
 class ModuleBuildHistory extends Component {
   renderMainContent() {
-    const {moduleBuilds} = this.props;
+    const {moduleBuilds, moduleName, branchId} = this.props;
     if (!moduleBuilds.size) {
       return <p>No builds to display.</p>;
     }
@@ -15,7 +15,13 @@ class ModuleBuildHistory extends Component {
     return (
       <ul className="historical-module-build-list">
         {moduleBuilds.map((moduleBuild) =>
-          <ModuleBuildHistoryItem key={moduleBuild.get('id')} moduleBuild={moduleBuild} />)}
+          <ModuleBuildHistoryItem
+            key={moduleBuild.get('id')}
+            moduleBuild={moduleBuild}
+            moduleName={moduleName}
+            branchId={branchId}
+          />
+        )}
       </ul>
     );
   }
@@ -47,6 +53,7 @@ class ModuleBuildHistory extends Component {
 ModuleBuildHistory.propTypes = {
   moduleName: PropTypes.string.isRequired,
   moduleId: PropTypes.number.isRequired,
+  branchId: PropTypes.number.isRequired,
   hasMorePages: PropTypes.bool,
   moduleBuilds: ImmutablePropTypes.list,
   loading: PropTypes.bool
@@ -57,7 +64,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     hasMorePages: buildHistory.get('totalPages') > 1,
     moduleBuilds: buildHistory.get('moduleBuilds'),
-    loading: buildHistory.get('loading')
+    loading: buildHistory.get('loading'),
+    branchId: state.branch.getIn(['branchInfo', 'id'])
   };
 };
 

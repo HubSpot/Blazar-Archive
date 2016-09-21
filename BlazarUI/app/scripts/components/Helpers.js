@@ -6,6 +6,7 @@ import BuildStates from '../constants/BuildStates.js';
 import FINAL_BUILD_STATES from '../constants/finalBuildStates';
 import ACTIVE_BUILD_STATES from '../constants/ActiveBuildStates';
 import QUEUED_BUILD_STATES from '../constants/QueuedBuildStates';
+import MODULE_BUILD_STATES from '../constants/ModuleBuildStates';
 import {iconStatus} from './constants';
 import IconStack from './shared/IconStack.jsx';
 import Immutable from 'immutable';
@@ -287,4 +288,14 @@ export const sortBranchesByTimestamp = (builds, isMasterPinned = true) => {
 
     return buildB.startTimestamp - buildA.startTimestamp;
   });
+};
+
+export const canViewDetailedModuleBuildInfo = (module) => {
+  const moduleState = module.get('state');
+  return moduleState !== MODULE_BUILD_STATES.CANCELLED
+    && moduleState !== MODULE_BUILD_STATES.SKIPPED;
+};
+
+export const getBlazarModuleBuildPath = (branchId, buildNumber, moduleName) => {
+  return `/builds/branch/${branchId}/build/${buildNumber}/module/${moduleName}`;
 };
