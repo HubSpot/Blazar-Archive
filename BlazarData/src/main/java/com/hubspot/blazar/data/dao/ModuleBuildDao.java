@@ -13,6 +13,7 @@ import com.google.common.base.Optional;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
+import com.hubspot.blazar.base.ModuleBuildInfo;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
 public interface ModuleBuildDao {
@@ -27,8 +28,21 @@ public interface ModuleBuildDao {
   @SqlQuery("SELECT * FROM module_builds WHERE state = :state")
   Set<ModuleBuild> getByState(@Bind("state") State state);
 
-  @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :moduleId ORDER BY id DESC")
-  List<ModuleBuild> getByModule(@Bind("moduleId") int moduleId);
+  @SqlQuery("" +
+      "SELECT * FROM module_builds AS moduleBuild " +
+      "LEFT OUTER JOIN repo_builds AS branchBuild ON moduleBuild.repoBuildId = branchBuild.id  " +
+      "WHERE moduleId = :moduleId " +
+      "AND moduleBuild.buildNumber <= :buildNumber " +
+      "ORDER BY moduleBuild.buildNumber " +
+      "LIMIT :limit")
+  List<ModuleBuildInfo> getLimitedModuleBuildHistory(@Bind("moduleId") int moduleId, @Bind("buildNumber") int buildNumber, @Bind("limit") int limit);
+
+  @SingleValueResult
+  @SqlQuery("" +
+      "SELECT COUNT(*) AS count FROM module_builds AS moduleBuild " +
+      "WHERE moduleId = :moduleId " +
+      "AND moduleBuild.buildNumber <= :buildNumberForPageStart")
+  Optional<Integer> getRemainingBuildCountForPagedHistory(@Bind("moduleId") int moduleId, @Bind("buildNumberForPageStart") int buildNumberForPageStart);
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM module_builds WHERE moduleId = :moduleId AND buildNumber = :buildNumber")

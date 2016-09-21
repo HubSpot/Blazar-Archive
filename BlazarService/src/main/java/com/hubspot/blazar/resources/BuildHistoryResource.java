@@ -2,6 +2,7 @@ package com.hubspot.blazar.resources;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.ModuleActivityPage;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
@@ -12,6 +13,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -42,10 +44,12 @@ public class BuildHistoryResource {
   }
 
   @GET
-  @Path("/module/{id}")
+  @Path("/module/{moduleId}/{fromBuildNumber}")
   @PropertyFiltering
-  public List<ModuleBuild> getByModule(@PathParam("id") int moduleId) {
-    return moduleBuildService.getByModule(moduleId);
+  public ModuleActivityPage getByModule(@PathParam("moduleId") int moduleId,
+                                        @PathParam("fromBuildNumber") int fromBuildNumber,
+                                        @QueryParam("pageSize") Optional<Integer> maybePageSize) {
+    return moduleBuildService.getModuleBuildHistoryPage(moduleId, fromBuildNumber, maybePageSize);
   }
 
   @GET

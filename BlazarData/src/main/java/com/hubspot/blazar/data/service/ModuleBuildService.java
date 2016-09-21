@@ -16,12 +16,15 @@ import com.google.common.eventbus.EventBus;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
+import com.hubspot.blazar.base.ModuleBuildInfo;
+import com.hubspot.blazar.base.ModuleActivityPage;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.dao.ModuleBuildDao;
 import com.hubspot.blazar.data.dao.ModuleDao;
 
 @Singleton
 public class ModuleBuildService {
+  public static final int MAX_MODULE_HISTORY_PAGE_SIZE = 10;
   private static final Logger LOG = LoggerFactory.getLogger(ModuleBuildService.class);
 
   private final ModuleBuildDao moduleBuildDao;
@@ -47,8 +50,14 @@ public class ModuleBuildService {
     return moduleBuildDao.getByState(state);
   }
 
-  public List<ModuleBuild> getByModule(int moduleId) {
-    return moduleBuildDao.getByModule(moduleId);
+  public ModuleActivityPage getModuleBuildHistoryPage(int moduleId, int fromBuildNumber, Optional<Integer> maybePageSize) {
+    int pageSize = MAX_MODULE_HISTORY_PAGE_SIZE;
+    if (maybePageSize.isPresent() && maybePageSize.get() < MAX_MODULE_HISTORY_PAGE_SIZE) {
+      pageSize = maybePageSize.get();
+    }
+    List<ModuleBuildInfo> builds = moduleBuildDao.getLimitedModuleBuildHistory(moduleId, fromBuildNumber, pageSize);
+    int remainingCt = Math.max(0, moduleBuildDao.getRemainingBuildCountForPagedHistory(moduleId, fromBuildNumber).get() - builds.size());
+    return new ModuleActivityPage(builds, remainingCt);
   }
 
   public Optional<ModuleBuild> getPreviousBuild(ModuleBuild build) {
