@@ -18,7 +18,7 @@ import com.google.inject.Injector;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.guice.CommandModule;
+import com.hubspot.blazar.guice.BaseCommandModule;
 import com.hubspot.blazar.util.GitHubHelper;
 
 import io.dropwizard.cli.ConfiguredCommand;
@@ -39,7 +39,7 @@ public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfigurat
   protected void run(Bootstrap<BlazarConfiguration> bootstrap,
                      Namespace namespace,
                      BlazarConfiguration configuration) throws Exception {
-    Injector injector = Guice.createInjector(new CommandModule(bootstrap, configuration));
+    Injector injector = Guice.createInjector(new BaseCommandModule(bootstrap, configuration));
     try {
       GitHubHelper gitHubHelper = injector.getInstance(GitHubHelper.class);
       BranchService branchService = injector.getInstance(BranchService.class);
