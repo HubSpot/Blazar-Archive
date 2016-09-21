@@ -4,7 +4,6 @@ import static org.mockito.Mockito.mock;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
@@ -78,10 +78,8 @@ public class BlazarServiceTestModule extends AbstractModule {
       private final Map<String, GitHubConfiguration> gitHubConfiguration = buildGitHubConfiguration();
 
       private Map<String, GitHubConfiguration> buildGitHubConfiguration() {
-        GitHubConfiguration g = new GitHubConfiguration(Optional.absent(), Optional.absent(), Optional.of(false), Optional.absent(), Lists.newArrayList("test"));
-        HashMap<String, GitHubConfiguration> configurationHashMap = new HashMap<>();
-        configurationHashMap.put("git.example.com", g);
-        return configurationHashMap;
+        GitHubConfiguration gitHubConfiguration = new GitHubConfiguration(Optional.absent(), Optional.absent(), Optional.of(false), Optional.absent(), ImmutableList.of("test"));
+        return ImmutableMap.of("git.example.com", gitHubConfiguration);
       }
 
       @Override

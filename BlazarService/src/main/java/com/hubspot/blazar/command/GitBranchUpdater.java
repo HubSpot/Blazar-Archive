@@ -15,10 +15,10 @@ import com.hubspot.blazar.util.GitHubHelper;
 public class GitBranchUpdater implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(GitBranchUpdater.class);
 
-  private GitHubHelper gitHubHelper;
+  private final GitHubHelper gitHubHelper;
   private final BlazarConfiguration configuration;
-  private BranchService branchService;
-  private GitInfo oldBranch;
+  private final BranchService branchService;
+  private final GitInfo oldBranch;
 
   public GitBranchUpdater(GitInfo oldBranch,
                           GitHubHelper gitHubHelper,
@@ -44,7 +44,7 @@ public class GitBranchUpdater implements Runnable {
       ghRepository = gitHubHelper.repositoryFor(oldBranch);
     } catch (IOException e) {
       LOG.error("Caught exception while trying to find {} in github", oldBranch, e);
-      return;
+      throw new RuntimeException(e);
     }
 
     String oldRepoOrg = oldBranch.getOrganization();
@@ -60,10 +60,7 @@ public class GitBranchUpdater implements Runnable {
     // Only update a branch if it has changed.
     if (orgNameChanged || repoNameChanged || orgIsConfigured != oldBranch.isActive()) {
       GitInfo updatedBranch = updateBranch(oldBranch, newRepoOrg, newRepoName, orgIsConfigured);
-      // this log is in the format ORG/REPO#BRANCH (ACTIVE)
-      String oldRepoLogString = String.format("%s/%s#%s (%s)", oldRepoOrg, oldRepoName, oldBranch.getBranch(), oldBranch.isActive());
-      String newRepoLogString = String.format("%s/%s#%s (%s)", newRepoOrg, newRepoName, oldBranch.getBranch(), orgIsConfigured);
-      LOG.info("Branch {} has changed updating to {}", oldRepoLogString, newRepoLogString);
+      LOG.info("Branch {} has changed updating to {}", oldBranch, updatedBranch);
       branchService.upsert(updatedBranch);
     }
   }

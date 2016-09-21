@@ -52,17 +52,17 @@ public class BlazarGHRepository extends GHRepository {
 
   @Override
   public String getName() {
-    return this.name;
+    return name;
   }
 
   @Override
   public String getFullName() {
-    return this.fullName;
+    return fullName;
   }
 
   @Override
   public String getOwnerName() {
-    return this.owner.getLogin();
+    return owner.getLogin();
   }
 
   @Override
@@ -71,7 +71,7 @@ public class BlazarGHRepository extends GHRepository {
   }
 
   public void setOwner(BlazarGHUser user) {
-    this.owner = user;
+    owner = user;
   }
 
   @Override
@@ -130,7 +130,7 @@ public class BlazarGHRepository extends GHRepository {
   @Override
   public URL getHtmlUrl() {
     try {
-      return new URL("https", this.host, String.format("/%s/%s", this.owner.getLogin(), this.name));
+      return new URL("https", host, String.format("/%s/%s", owner.getLogin(), name));
     } catch (MalformedURLException e) {
       throw new RuntimeException(e);
     }
@@ -150,7 +150,7 @@ public class BlazarGHRepository extends GHRepository {
   @Override
   public GHContent getFileContent(String path, String ref) throws IOException {
     if (branches.containsKey(ref)) {
-      BlazarGHTree tree = (BlazarGHTree) this.getTreeRecursive(ref, 1);
+      BlazarGHTree tree = (BlazarGHTree) getTreeRecursive(ref, 1);
       for (BlazarGHTreeEntry entry : tree.getSubclassTree()) {
         if (entry.getPath().equals(path)) {
           return entry.getContent();
@@ -195,7 +195,7 @@ public class BlazarGHRepository extends GHRepository {
     newEntries.addAll(change.getEntries());
     newEntries.addAll(tree.getSubclassTree());
     newBranches.get(change.getBranch()).setRepository(this);
-    this.tree.set(change.getCommit().getSHA1(), newEntries);
+    tree.set(change.getCommit().getSHA1(), newEntries);
   }
 
   public void revertLastChange() throws IOException {
