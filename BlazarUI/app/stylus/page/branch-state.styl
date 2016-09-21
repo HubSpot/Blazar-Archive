@@ -10,6 +10,43 @@
   a
     color $color-calypso
 
+  .btn
+    radius 3px
+
+  .btn-lg
+    font-size 18px
+
+  .btn-default
+    color $color-button-secondary-text
+    background-color $color-olaf
+    border-color $color-lorax
+
+    &:hover,
+    &:focus
+      background-color $color-button-secondary-hover-fill
+      color $color-button-secondary-text
+
+    &:active
+      background-color $color-button-secondary-active-fill
+
+  .btn-primary
+    color $color-olaf
+    background-color $color-lorax
+    border-color $color-lorax
+
+    &:hover,
+    &:focus
+      background-color $color-button-primary-hover-fill
+      border-color $color-button-primary-hover-fill
+      color $color-olaf
+
+    &:active
+      background-color $color-lorax-dark
+      border-color $color-lorax-dark
+
+  #build-settings-button
+    margin-right 12px
+
 #active-modules, #inactive-modules
   margin-bottom 40px
 

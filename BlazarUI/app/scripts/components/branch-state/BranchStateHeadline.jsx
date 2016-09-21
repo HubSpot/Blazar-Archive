@@ -2,8 +2,14 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import Select from 'react-select';
+
+import {Link} from 'react-router';
+import {ButtonToolbar, Button} from 'react-bootstrap';
+
 import PageHeader from '../shared/PageHeader.jsx';
 import Icon from '../shared/Icon.jsx';
+import Star from '../shared/Star.jsx';
+
 import { loadBranchInfo } from '../../redux-actions/branchActions';
 import { loadBranches } from '../../redux-actions/repoActions';
 import { loadBranchModuleStates } from '../../redux-actions/branchStateActions';
@@ -45,6 +51,24 @@ class BranchStateHeadline extends Component {
     });
   }
 
+  renderActions() {
+    const {branchId} = this.props;
+    const buildSettingsLink = `/settings/branch/${branchId}`;
+    return (
+      <div className="pull-right">
+        <Link to={buildSettingsLink}>
+          <Button id="build-settings-button">
+            Build settings
+          </Button>
+        </Link>
+        <Button id="build-now-button" bsStyle="primary">
+          Build now
+        </Button>
+        <Star className="branch-state-headline__star" branchId={this.props.branchId} />
+      </div>
+    );
+  }
+
   render() {
     const {branch, repository} = this.props.branchInfo;
     if (!branch) {
@@ -56,6 +80,7 @@ class BranchStateHeadline extends Component {
         <PageHeader>
           <PageHeader.PageTitle>
             <Icon type="octicon" name="repo" classNames="headline-icon" />{repository}
+            {this.renderActions()}
           </PageHeader.PageTitle>
         </PageHeader>
         <div className="page-header__sub-header">
