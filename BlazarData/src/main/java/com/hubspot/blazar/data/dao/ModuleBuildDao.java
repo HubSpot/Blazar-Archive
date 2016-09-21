@@ -29,8 +29,8 @@ public interface ModuleBuildDao {
   Set<ModuleBuild> getByState(@Bind("state") State state);
 
   @SqlQuery("" +
-      "SELECT * FROM module_builds AS moduleBuild " +
-      "LEFT OUTER JOIN repo_builds AS branchBuild ON moduleBuild.repoBuildId = branchBuild.id  " +
+      "SELECT moduleBuild.*, branchBuild.* FROM module_builds AS moduleBuild " +
+      "JOIN repo_builds AS branchBuild ON moduleBuild.repoBuildId = branchBuild.id  " +
       "WHERE moduleId = :moduleId " +
       "AND moduleBuild.buildNumber <= :buildNumber " +
       "ORDER BY moduleBuild.buildNumber " +
