@@ -29,6 +29,8 @@ import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.listener.BuildEventDispatcher;
 
+import io.dropwizard.db.ManagedDataSource;
+
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarServiceTestModule.class})
 public class ModuleActivityTest extends BlazarServiceTestBase {
@@ -50,8 +52,9 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
   private final List<RepositoryBuild> launchedBuilds = new ArrayList<>();
 
   @Before
-  public void before() throws Exception {
-    runSql("InterProjectData.sql");
+  @Inject
+  public void before(ManagedDataSource dataSource) throws Exception {
+    runSql(dataSource, "InterProjectData.sql");
     module = moduleService.get(1).get();
     branch = branchService.get(moduleService.getBranchIdFromModuleId(module.getId().get())).get();
 
@@ -91,6 +94,11 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
     ModuleActivityPage page3 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), 5, Optional.of(4));
     // check that we find 5
     assertThat(page3.getModuleBuildInfos().size()).isEqualTo(4);
+  }
+
+  public void testGetsHistory() {
+    ModuleActivityPage page = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), 10, Optional.of(100));
+    assertThat(page.getModuleBuildInfos().size()).isEqualTo(4);
   }
 
   public static GitInfo newGitInfo(int repositoryId, String repositoryName, String branch) {
