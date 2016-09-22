@@ -79,29 +79,6 @@ const BranchStore = Reflux.createStore({
     this.shouldPoll = false;
   },
 
-  onTriggerBuild(params, state) {
-    const {selectedModuleIds, buildDownstreamModules, resetCache} = state;
-
-    BranchApi.triggerBuild(params, selectedModuleIds, buildDownstreamModules, resetCache, (error) => {
-      if (error) {
-        this.error = error;
-        this.triggerErrorUpdate();
-        return;
-      }
-
-      this.onLoadBranchBuildHistory(params);
-    });
-  },
-
-  triggerErrorUpdate() {
-    this.trigger({
-      error: this.error,
-      loadingBranches: false
-    });
-
-    this.error = undefined;
-  },
-
   _poll() {
     this.onLoadBranchBuildHistory(this.params);
 

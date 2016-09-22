@@ -4,7 +4,6 @@ import ReactTooltip from 'react-tooltip';
 import Modal from 'react-bootstrap/lib/Modal';
 import Button from 'react-bootstrap/lib/Button';
 import Checkbox from './Checkbox.jsx';
-import Loader from './Loader.jsx';
 import Icon from './Icon.jsx';
 import ModuleSelectWrapper from './ModuleSelectWrapper.jsx';
 
@@ -12,32 +11,39 @@ class ModuleModal extends Component {
 
   constructor(props) {
     super(props);
-
-    bindAll(this, 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'getModuleIdsAndBuild', 'maybeStartBuild');
+    bindAll(this, 'handleSubmit', 'maybeSubmit');
   }
 
-  getModuleIdsAndBuild() {
-    this.props.triggerBuild();
+  componentWillReceiveProps(nextProps) {
+    const openingModal = nextProps.showModal && !this.props.showModal;
+    if (openingModal) {
+      const moduleIds = nextProps.modules.map((module) => module.id);
+      this.props.onUpdateSelectedModuleIds(moduleIds);
+    }
+  }
+
+  handleSubmit() {
+    const {
+      branchId,
+      selectedModuleIds,
+      resetCache,
+      buildDownstreamModules,
+      triggerInterProjectBuild,
+      onBuildStart
+    } = this.props;
+
+    this.props.triggerBuild(branchId, {
+      selectedModuleIds,
+      resetCache,
+      buildDownstreamModules,
+      triggerInterProjectBuild
+    }, onBuildStart);
     this.props.closeModal();
   }
 
-  updateResetCache() {
-    this.props.onResetCacheUpdate();
-  }
-
-  updateTriggerInterProjectBuild() {
-    this.props.onTriggerInterProjectBuild();
-  }
-
-  updateDownstreamModules(isChecked) {
-    const enumValue = isChecked ? 'WITHIN_REPOSITORY' : 'NONE';
-    this.props.onCheckboxUpdate(enumValue);
-  }
-
-  maybeStartBuild(target) {
+  maybeSubmit(target) {
     if (target.charCode === 13) {
-      this.props.triggerBuild();
-      this.props.closeModal();
+      this.handleSubmit();
     }
   }
 
@@ -47,8 +53,8 @@ class ModuleModal extends Component {
         <Checkbox
           label=" Build Downstream Modules"
           name="downstream-checkbox"
-          checked={true}
-          onCheckboxUpdate={this.updateDownstreamModules}
+          checked={this.props.buildDownstreamModules}
+          onCheckboxUpdate={this.props.onCheckboxUpdate}
         />
       <a data-tip={true} data-for="downstreamTooltip">
           <Icon
@@ -67,14 +73,15 @@ class ModuleModal extends Component {
       </div>
     );
   }
+
   renderInterProjectToggle() {
     return (
       <div className="inter-project-checkbox-wrapper">
         <Checkbox
           label=" Trigger Inter-Project Build"
           name="triggerInterProjectBuild-checkbox"
-          checked={false}
-          onCheckboxUpdate={this.updateTriggerInterProjectBuild}
+          checked={this.props.triggerInterProjectBuild}
+          onCheckboxUpdate={this.props.onTriggerInterProjectBuild}
         />
         <div className="tooltip-wrapper">
           <a data-tip={true} data-for="triggerInterProjectBuildTooltip">
@@ -102,8 +109,8 @@ class ModuleModal extends Component {
         <Checkbox
           label=" Reset Cache"
           name="cache-checkbox"
-          checked={false}
-          onCheckboxUpdate={this.updateResetCache}
+          checked={this.props.resetCache}
+          onCheckboxUpdate={this.props.onResetCacheUpdate}
         />
         <div className="tooltip-wrapper">
           <a data-tip={true} data-for="cache-tooltip">
@@ -127,14 +134,6 @@ class ModuleModal extends Component {
   }
 
   renderModalContent() {
-    if (this.props.loadingModules) {
-      return (
-        <Modal.Body>
-          <Loader align="top-center" />
-        </Modal.Body>
-      );
-    }
-
     return (
       <div>
         <Modal.Header>
@@ -161,7 +160,7 @@ class ModuleModal extends Component {
         </Modal.Body>
         <Modal.Footer>
           <Button id="module-modal-nevermind-button" onClick={this.props.closeModal}>Nevermind</Button>
-          <Button id="module-modal-build-button" disabled={!this.props.selectedModuleIds.length} onClick={this.getModuleIdsAndBuild} bsStyle="primary">Build</Button>
+          <Button id="module-modal-build-button" disabled={!this.props.selectedModuleIds.length} onClick={this.handleSubmit} bsStyle="primary">Build</Button>
         </Modal.Footer>
       </div>
     );
@@ -169,7 +168,7 @@ class ModuleModal extends Component {
 
   render() {
     return (
-      <Modal dialogClassName="module-modal" bsSize="large" show={this.props.showModal} onKeyPress={this.maybeStartBuild} onHide={this.props.closeModal}>
+      <Modal dialogClassName="module-modal" bsSize="large" show={this.props.showModal} onKeyPress={this.maybeSubmit} onHide={this.props.closeModal}>
         {this.renderModalContent()}
       </Modal>
     );
@@ -177,16 +176,22 @@ class ModuleModal extends Component {
 }
 
 ModuleModal.propTypes = {
+  showModal: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
   triggerBuild: PropTypes.func.isRequired,
+  onBuildStart: PropTypes.func,
+  branchId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  modules: PropTypes.array.isRequired,
+
   onUpdateSelectedModuleIds: PropTypes.func.isRequired,
   onCheckboxUpdate: PropTypes.func.isRequired,
   onResetCacheUpdate: PropTypes.func.isRequired,
   onTriggerInterProjectBuild: PropTypes.func.isRequired,
-  showModal: PropTypes.bool.isRequired,
-  loadingModules: PropTypes.bool,
-  modules: PropTypes.array.isRequired,
-  selectedModuleIds: PropTypes.arrayOf(PropTypes.number).isRequired
+
+  selectedModuleIds: PropTypes.arrayOf(PropTypes.number).isRequired,
+  buildDownstreamModules: PropTypes.bool.isRequired,
+  resetCache: PropTypes.bool.isRequired,
+  triggerInterProjectBuild: PropTypes.bool.isRequired
 };
 
 export default ModuleModal;

@@ -4,11 +4,13 @@ import repo from './repo';
 import branch from './branch';
 import starredBranches from './starredBranches';
 import moduleBuildHistoriesByModuleId from './moduleBuildHistoriesByModuleId';
+import buildBranchForm from './buildBranchForm';
 
 export default combineReducers({
   branchState,
   repo,
   branch,
   starredBranches,
-  moduleBuildHistoriesByModuleId
+  moduleBuildHistoriesByModuleId,
+  buildBranchForm
 });

@@ -86,29 +86,22 @@ function fetchMalformedFiles(params, cb) {
 function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) {
   return JSON.stringify({
     moduleIds,
-    buildDownstreams: downstreamModules,
+    buildDownstreams: downstreamModules ? 'WITHIN_REPOSITORY' : 'NONE',
     resetCaches: resetCache
   });
 }
 
-function triggerBuild(params, moduleIds, downstreamModules, resetCache, cb) {
+function triggerBuild(branchId, moduleIds, downstreamModules, resetCache) {
   if (moduleIds === null) {
     moduleIds = [];
   }
   const username = getUsernameFromCookie() ? `username=${getUsernameFromCookie()}` : '';
-  const buildPromise = new Resource({
-    url: `${window.config.apiRoot}/branches/builds/branch/${params.branchId}?${username}`,
+  return new Resource({
+    url: `${window.config.apiRoot}/branches/builds/branch/${branchId}?${username}`,
     type: 'POST',
     contentType: 'application/json',
     data: _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache)
   }).send();
-
-  buildPromise.then((resp) => {
-    cb(false, resp);
-  }, (error) => {
-    console.warn(error);
-    cb('Error triggering build. Check your console for more detail.');
-  });
 }
 
 export default {

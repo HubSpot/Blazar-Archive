@@ -4,7 +4,10 @@ import BranchInfo from '../data/records/BranchInfo';
 
 export const loadBranchInfo = (branchId) => {
   return (dispatch) => {
-    dispatch({type: ActionTypes.REQUEST_BRANCH_INFO});
+    dispatch({
+      type: ActionTypes.REQUEST_BRANCH_INFO,
+      payload: branchId
+    });
 
     BranchApi.fetchBranchInfo({branchId}, (branchInfo) => {
       dispatch({

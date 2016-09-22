@@ -10,7 +10,10 @@ const initialState = Immutable.Map({
 export default function branch(state = initialState, action) {
   switch (action.type) {
     case ActionTypes.REQUEST_BRANCH_INFO:
-      return initialState.set('loading', true);
+      return initialState.merge({
+        branchInfo: new BranchInfo({id: action.payload}),
+        loading: true
+      });
     case ActionTypes.RECEIVE_BRANCH_INFO:
       return state.merge({
         branchInfo: action.payload,

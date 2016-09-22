@@ -9,23 +9,16 @@ function _generateBuildModuleJsonBody(moduleIds, downstreamModules, resetCache) 
   });
 }
 
-function triggerInterProjectBuild(moduleIds, resetCache, cb) {
+function triggerInterProjectBuild(moduleIds, resetCache) {
   if (moduleIds === null) {
     moduleIds = [];
   }
   const username = getUsernameFromCookie() ? `username=${getUsernameFromCookie()}` : '';
-  const buildPromise = new Resource({
+  return new Resource({
     url: `${window.config.apiRoot}/inter-project-builds?${username}`,
     type: 'POST',
     data: _generateBuildModuleJsonBody(moduleIds, 'NONE', resetCache)
   }).send();
-
-  buildPromise.then((resp) => {
-    cb(false, resp);
-  }, (error) => {
-    console.warn(error);
-    cb('Error triggering build. Check your console for more detail.');
-  });
 }
 
 function getUpAndDownstreamModules(repoBuildId, cb) {

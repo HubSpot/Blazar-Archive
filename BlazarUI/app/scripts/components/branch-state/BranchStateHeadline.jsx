@@ -3,8 +3,8 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import Select from 'react-select';
 
-import {Link} from 'react-router';
-import {ButtonToolbar, Button} from 'react-bootstrap';
+import { Link } from 'react-router';
+import { Button } from 'react-bootstrap';
 
 import PageHeader from '../shared/PageHeader.jsx';
 import Icon from '../shared/Icon.jsx';
@@ -13,6 +13,7 @@ import Star from '../shared/Star.jsx';
 import { loadBranchInfo } from '../../redux-actions/branchActions';
 import { loadBranches } from '../../redux-actions/repoActions';
 import { loadBranchModuleStates } from '../../redux-actions/branchStateActions';
+import { showBranchBuildModal } from '../../redux-actions/buildBranchFormActions';
 
 
 class BranchStateHeadline extends Component {
@@ -61,7 +62,7 @@ class BranchStateHeadline extends Component {
             Build settings
           </Button>
         </Link>
-        <Button id="build-now-button" bsStyle="primary">
+        <Button id="build-now-button" bsStyle="primary" onClick={this.props.showBranchBuildModal}>
           Build now
         </Button>
         <Star className="branch-state-headline__star" branchId={this.props.branchId} />
@@ -110,7 +111,8 @@ BranchStateHeadline.propTypes = {
   branchesList: ImmutablePropTypes.list.isRequired,
   loadBranches: PropTypes.func.isRequired,
   onBranchSelect: PropTypes.func.isRequired,
-  loadBranchModuleStates: PropTypes.func.isRequired
+  loadBranchModuleStates: PropTypes.func.isRequired,
+  showBranchBuildModal: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => {
@@ -122,7 +124,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   loadBranchInfo,
   loadBranches,
-  loadBranchModuleStates
+  loadBranchModuleStates,
+  showBranchBuildModal
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(BranchStateHeadline);

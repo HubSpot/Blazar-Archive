@@ -5,8 +5,9 @@ import { routerShape } from 'react-router';
 import PageContainer from '../shared/PageContainer.jsx';
 import ModuleList from './ModuleList.jsx';
 import BranchStateHeadline from './BranchStateHeadline.jsx';
+import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
 
-const BranchState = ({activeModules, inactiveModules, branchId, branchInfo, router, selectModule, deselectModule, selectedModuleId}) => {
+const BranchState = ({activeModules, inactiveModules, branchId, branchInfo, router, selectModule, deselectModule, selectedModuleId, loadBranchModuleStates}) => {
   const onBranchSelect = (selectedBranchId) => {
     router.push(`/branchState/branch/${selectedBranchId}`);
   };
@@ -32,6 +33,11 @@ const BranchState = ({activeModules, inactiveModules, branchId, branchInfo, rout
           <h2 className="module-list-header">Inactive modules</h2>
           <ModuleList modules={inactiveModules} onItemClick={handleModuleItemClick} selectedModuleId={selectedModuleId} />
         </section>}
+        <BuildBranchModalContainer
+          branchId={branchId}
+          modules={activeModules.map(moduleState => moduleState.get('module')).toJS()}
+          onBuildStart={() => loadBranchModuleStates(branchId)}
+        />
       </PageContainer>
   );
 };
@@ -44,7 +50,8 @@ BranchState.propTypes = {
   router: routerShape,
   selectModule: PropTypes.func.isRequired,
   deselectModule: PropTypes.func.isRequired,
-  selectedModuleId: PropTypes.number
+  selectedModuleId: PropTypes.number,
+  loadBranchModuleStates: PropTypes.func.isRequired
 };
 
 export default BranchState;
