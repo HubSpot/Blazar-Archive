@@ -27,7 +27,6 @@ public class BlazarTestModule extends AbstractModule {
     return dataSourceFactory;
   }
 
-
   private ObjectMapper buildObjectMapper() {
     return Jackson.newObjectMapper()
         .registerModule(new ProtobufModule())
