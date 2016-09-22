@@ -6,10 +6,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.hubspot.blazar.test.base.data.HikariDataSourceFactory;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
+
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jackson.Jackson;
 
@@ -19,11 +18,10 @@ public class BlazarTestModule extends AbstractModule {
   protected void configure() {
     bind(MetricRegistry.class).toInstance(new MetricRegistry());
     bind(ObjectMapper.class).toInstance(buildObjectMapper());
+    bind(DataSourceFactory.class).toInstance(buildTestDataSourceFactory());
   }
 
-  @Provides
-  @Singleton
-  private DataSourceFactory providesTestDataSourceFactory() {
+  private DataSourceFactory buildTestDataSourceFactory() {
     final DataSourceFactory dataSourceFactory = new HikariDataSourceFactory();
     dataSourceFactory.setCommitOnReturn(true);
     return dataSourceFactory;

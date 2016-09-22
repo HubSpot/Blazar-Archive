@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.sql.Connection;
 import java.time.Duration;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -14,19 +15,29 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import org.slf4j.Logger;
+import javax.sql.DataSource;
+
 import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.base.Throwables;
 import com.mysql.management.MysqldResource;
 import com.mysql.management.MysqldResourceI;
 import com.zaxxer.hikari.HikariConfig;
 
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
+import liquibase.Contexts;
+import liquibase.Liquibase;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.ext.logging.slf4j.Slf4jLogger;
+import liquibase.logging.LogFactory;
+import liquibase.logging.Logger;
+import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.resource.ResourceAccessor;
 
 public class HikariDataSourceFactory extends DataSourceFactory {
-  private static final Logger LOG = LoggerFactory.getLogger(HikariDataSourceFactory.class);
+  private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(HikariDataSourceFactory.class);
 
   @Override
   public ManagedDataSource build(MetricRegistry metricRegistry, String name) {
@@ -55,8 +66,8 @@ public class HikariDataSourceFactory extends DataSourceFactory {
     Duration offset = Duration.ofMillis(Calendar.getInstance().getTimeZone().getRawOffset());
     long hours = offset.toHours();
     long minutes = offset.minusHours(hours).toMinutes();
-    // force the + on '+00' for 0 hour offset
-    String mysqlOffset = 0 == hours ? String.format("+00:%02d", minutes) : String.format("%02d:%02d", hours, minutes);
+    // force the + on '+00' for positive offset
+    String mysqlOffset = 0 >= hours ? String.format("+%02d:%02d", hours, minutes) : String.format("%02d:%02d", hours, minutes);
     options.put("default-time-zone", mysqlOffset);
     options.put("sql-mode", "ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION");
     mysqldResource.start("embedded-mysql", options);
@@ -85,7 +96,13 @@ public class HikariDataSourceFactory extends DataSourceFactory {
     configuration.setUsername("root");
     configuration.setPassword("");
 
-    return new HikariManagedDataSource(configuration);
+    HikariManagedDataSource datasource = new HikariManagedDataSource(configuration);
+    try {
+      runSql(datasource, "schema.sql");
+    } catch (Exception e) {
+      Throwables.propagate(e);
+    }
+    return datasource;
   }
 
   private static void deleteDirRecursively(Path dir) throws IOException {
@@ -102,5 +119,23 @@ public class HikariDataSourceFactory extends DataSourceFactory {
         return FileVisitResult.CONTINUE;
       }
     });
+  }
+
+  private void runSql(DataSource dataSource, String resourceName) throws Exception {
+    liquibase.logging.LogFactory.setInstance(new LogFactory() {
+      @Override
+      public Logger getLog(String name) {
+        liquibase.logging.Logger log = new Slf4jLogger();
+        log.setName(name);
+        return log;
+      }
+    });
+
+    try (Connection connection = dataSource.getConnection()) {
+      ResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
+      JdbcConnection jdbcConnection = new JdbcConnection(connection);
+      Liquibase liquibase = new Liquibase(resourceName, resourceAccessor, jdbcConnection);
+      liquibase.update(new Contexts());
+    }
   }
 }

@@ -3,30 +3,20 @@ package com.hubspot.blazar;
 import static org.assertj.core.api.Assertions.fail;
 
 import org.junit.After;
-import org.junit.BeforeClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.hubspot.blazar.test.base.service.BlazarTestBase;
 
-public class BlazarServiceTestBase extends BlazarTestBase {
-  private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceTestBase.class);
+import io.dropwizard.db.ManagedDataSource;
 
-  @BeforeClass
-  public static void setup() throws Exception {
-    synchronized (injector) {
-      if (injector.get() == null) {
-        injector.set(Guice.createInjector(new BlazarServiceTestModule()));
-        runSql("schema.sql");
-      }
-    }
-  }
+public class BlazarServiceTestBase extends BlazarTestBase {
+  @Inject
+  private ManagedDataSource managedDataSource;
 
   @After
-  public void cleanup() throws Exception {
-    runSql("cleanup.sql");
-    runSql("schema.sql");
+  @Inject
+  public void cleanup(ManagedDataSource dataSource) throws Exception {
+    runSql(dataSource, "cleanup.sql");
     if (BlazarServiceTestModule.EVENT_BUS_EXCEPTION_COUNT.size() > 0) {
       fail(String.format("Event bus exception count was %d (> 0), check log for stack traces.", BlazarServiceTestModule.EVENT_BUS_EXCEPTION_COUNT.size()));
     }
