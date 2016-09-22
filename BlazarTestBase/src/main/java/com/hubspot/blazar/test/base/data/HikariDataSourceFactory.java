@@ -88,7 +88,7 @@ public class HikariDataSourceFactory extends DataSourceFactory {
 
     LOG.info("Singleton Embedded MySQL started successfully");
 
-    String jdbcUrlFormat = "jdbc:mysql://127.0.0.1:%d/%s?createDatabaseIfNotExist=true&autoReconnect=true&characterEncoding=UTF8";
+    String jdbcUrlFormat = "jdbc:mysql://127.0.0.1:%d/%s?createDatabaseIfNotExist=true&autoReconnect=true&characterEncoding=UTF8&useSSL=false";
     String jdbcUrl = String.format(jdbcUrlFormat, mysqldResource.getPort(), "blazar");
     HikariConfig configuration = new HikariConfig();
     configuration.setJdbcUrl(jdbcUrl);
