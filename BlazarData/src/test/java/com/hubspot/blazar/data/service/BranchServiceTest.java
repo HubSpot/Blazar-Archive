@@ -40,8 +40,7 @@ public class BranchServiceTest extends BlazarDataTestBase {
     long before = System.currentTimeMillis();
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     original = branchService.upsert(original);
-    // Embedded Mysql uses 1s precision
-    // We have to ensure we wait for at least 1s for updated timestamp to be larger
+    // The last updated column is `TIMESTAMP` and as such is 1s precision
     Thread.sleep(1000);
 
     GitInfo renamed = newGitInfo(123, "Underwatch", "master");
