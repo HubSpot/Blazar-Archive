@@ -2,20 +2,22 @@ package com.hubspot.blazar.data.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
+import org.jukito.JukitoRunner;
+import org.jukito.UseModules;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.google.common.base.Optional;
+import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.BlazarDataTestBase;
+import com.hubspot.blazar.data.BlazarDataTestModule;
 
+@RunWith(JukitoRunner.class)
+@UseModules({BlazarDataTestModule.class})
 public class BranchServiceTest extends BlazarDataTestBase {
+  @Inject
   private BranchService branchService;
-
-  @Before
-  public void before() {
-    this.branchService = getFromGuice(BranchService.class);
-  }
 
   @Test
   public void testUpsertBasic() {
