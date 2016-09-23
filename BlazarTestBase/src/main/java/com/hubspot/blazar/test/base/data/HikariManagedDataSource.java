@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import io.dropwizard.db.ManagedDataSource;
 
-public class HikariManagedDataSource extends HikariDataSource implements ManagedDataSource{
+public class HikariManagedDataSource extends HikariDataSource implements ManagedDataSource {
 
   public HikariManagedDataSource(HikariConfig configuration) {
     super(configuration);
@@ -13,7 +13,7 @@ public class HikariManagedDataSource extends HikariDataSource implements Managed
 
   @Override
   public void start() throws Exception {
-    // no op
+
   }
 
   @Override

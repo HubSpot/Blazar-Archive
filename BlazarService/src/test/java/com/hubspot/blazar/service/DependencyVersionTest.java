@@ -44,14 +44,10 @@ public class DependencyVersionTest extends BlazarServiceTestBase {
   private ModuleService moduleService;
   @Inject
   private DependenciesService dependenciesService;
-  @Inject
-  private ManagedDataSource dataSource;
 
+  @Inject
   @Before
-  public void before() throws Exception {
-    // set up the data for these inter-project build tests
-    // todo migrate inter project data to a more common place
-    runSql(dataSource, "schema.sql");
+  public void before(ManagedDataSource dataSource) throws Exception {
     runSql(dataSource, "InterProjectData.sql");
   }
 
