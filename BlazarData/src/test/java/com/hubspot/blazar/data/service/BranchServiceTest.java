@@ -20,8 +20,9 @@ public class BranchServiceTest extends DatabaseBackedTest {
   private BranchService branchService;
 
   @Test
-  public void testUpsertBasic() {
+  public void testUpsertBasic() throws Exception {
     long before = System.currentTimeMillis();
+    Thread.sleep(1000); // because the timestamp is in seconds, we need to ensure we wait at least one.
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     GitInfo inserted = branchService.upsert(original);
 
