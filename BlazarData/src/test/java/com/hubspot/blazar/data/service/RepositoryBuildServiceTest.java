@@ -22,14 +22,16 @@ import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
-import com.hubspot.blazar.data.BlazarDataTestBase;
 import com.hubspot.blazar.data.BlazarDataTestModule;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
+import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
+
+import io.dropwizard.db.ManagedDataSource;
 
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarDataTestModule.class})
-public class RepositoryBuildServiceTest extends BlazarDataTestBase {
+public class RepositoryBuildServiceTest extends DatabaseBackedTest {
   @Inject
   private RepositoryBuildService repositoryBuildService;
   @Inject
@@ -48,8 +50,9 @@ public class RepositoryBuildServiceTest extends BlazarDataTestBase {
   private DependencyGraph dependencyGraphOne;
   private DependencyGraph dependencyGraphTwo;
 
+  @Inject
   @Before
-  public void before() {
+  public void before(ManagedDataSource dataSource) {
 
     branchOne = branchService.upsert(GitInfo.fromString("github.com/HubSpot/Test#one"));
     branchTwo = branchService.upsert(GitInfo.fromString("github.com/HubSpot/Test#two"));
