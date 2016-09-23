@@ -10,17 +10,18 @@ import org.junit.runner.RunWith;
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.data.BlazarDataTestBase;
 import com.hubspot.blazar.data.BlazarDataTestModule;
+import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
 
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarDataTestModule.class})
-public class BranchServiceTest extends BlazarDataTestBase {
+public class BranchServiceTest extends DatabaseBackedTest {
   @Inject
   private BranchService branchService;
 
   @Test
   public void testUpsertBasic() {
+    long before = System.currentTimeMillis();
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     GitInfo inserted = branchService.upsert(original);
 
@@ -30,8 +31,8 @@ public class BranchServiceTest extends BlazarDataTestBase {
 
     assertThat(retrieved.isPresent()).isTrue();
     assertThat(retrieved.get()).isEqualTo(inserted);
-    assertThat(retrieved.get().getCreatedTimestamp()).isBetween(System.currentTimeMillis() - 1000, System.currentTimeMillis());
-    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(System.currentTimeMillis() - 1000, System.currentTimeMillis());
+    assertThat(retrieved.get().getCreatedTimestamp()).isBetween(before, System.currentTimeMillis());
+    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(before, System.currentTimeMillis());
     assertThat(retrieved.get().getUpdatedTimestamp()).isEqualTo(retrieved.get().getCreatedTimestamp());
   }
 
