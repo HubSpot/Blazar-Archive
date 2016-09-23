@@ -4,6 +4,7 @@ import { routerShape } from 'react-router';
 import {bindAll} from 'underscore';
 
 import PageContainer from '../shared/PageContainer.jsx';
+import Loader from '../shared/Loader.jsx';
 import ModuleList from './ModuleList.jsx';
 import BranchStateHeadline from './BranchStateHeadline.jsx';
 import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
@@ -62,21 +63,14 @@ class BranchState extends Component {
     }
   }
 
-  render() {
-    const {
-      activeModules,
-      inactiveModules,
-      branchId,
-      branchInfo,
-      selectedModuleId,
-      loadBranchModuleStates
-    } = this.props;
-
-    const title = branchInfo.branch ? `${branchInfo.repository}-${branchInfo.branch}` : 'Branch State';
+  renderModuleLists() {
+    const {loadingModuleStates, activeModules, inactiveModules, selectedModuleId} = this.props;
+    if (loadingModuleStates) {
+      return <Loader />;
+    }
 
     return (
-      <PageContainer classNames="page-content--branch-state" documentTitle={title}>
-        <BranchStateHeadline branchId={branchId} branchInfo={branchInfo} onBranchSelect={this.handleBranchSelect} />
+      <div>
         <section id="active-modules">
           <h2 className="module-list-header">Active modules</h2>
           <ModuleList modules={this.sortActiveModules(activeModules)} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
@@ -85,6 +79,24 @@ class BranchState extends Component {
           <h2 className="module-list-header">Inactive modules</h2>
           <ModuleList modules={inactiveModules} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
         </section>}
+      </div>
+    );
+  }
+
+  render() {
+    const {
+      activeModules,
+      branchId,
+      branchInfo,
+      loadBranchModuleStates
+    } = this.props;
+
+    const title = branchInfo.branch ? `${branchInfo.repository}-${branchInfo.branch}` : 'Branch State';
+
+    return (
+      <PageContainer classNames="page-content--branch-state" documentTitle={title}>
+        <BranchStateHeadline branchId={branchId} branchInfo={branchInfo} onBranchSelect={this.handleBranchSelect} />
+        {this.renderModuleLists()}
         <BuildBranchModalContainer
           branchId={branchId}
           modules={activeModules.map(moduleState => moduleState.get('module')).toJS()}
@@ -106,7 +118,8 @@ BranchState.propTypes = {
   selectedModuleId: PropTypes.number,
   loadBranchModuleStates: PropTypes.func.isRequired,
   pollBranchModuleStates: PropTypes.func.isRequired,
-  stopPollingBranchModuleStates: PropTypes.func.isRequired
+  stopPollingBranchModuleStates: PropTypes.func.isRequired,
+  loadingModuleStates: PropTypes.bool.isRequired
 };
 
 export default BranchState;
