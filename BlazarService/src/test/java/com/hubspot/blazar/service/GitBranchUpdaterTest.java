@@ -24,6 +24,8 @@ import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.util.GitHubHelper;
 
+import io.dropwizard.db.ManagedDataSource;
+
 
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarServiceTestModule.class})
@@ -35,9 +37,10 @@ public class GitBranchUpdaterTest extends BlazarServiceTestBase {
   @Inject
   private GitHubHelper gitHubHelper;
 
+  @Inject
   @Before
-  public void before() throws Exception {
-    runSql("InterProjectData.sql");
+  public void before(ManagedDataSource dataSource) throws Exception {
+    runSql(dataSource, "InterProjectData.sql");
   }
 
   @Test
