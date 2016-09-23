@@ -30,6 +30,25 @@ class BranchState extends Component {
     this.props.stopPollingBranchModuleStates();
   }
 
+  sortActiveModules() {
+    const {activeModules} = this.props;
+    if (activeModules.isEmpty()) {
+      return activeModules;
+    }
+
+    const topologicalSort = activeModules.first().getIn(['lastRepoBuild', 'dependencyGraph', 'topologicalSort']);
+    return activeModules.sort((a, b) => {
+      const indexA = topologicalSort.indexOf(a.getIn(['module', 'id']));
+      const indexB = topologicalSort.indexOf(b.getIn(['module', 'id']));
+
+      if (indexA < indexB) {
+        return -1;
+      }
+
+      return 1;
+    });
+  }
+
   handleBranchSelect(selectedBranchId) {
     this.props.router.push(`/branchState/branch/${selectedBranchId}`);
   }
@@ -60,7 +79,7 @@ class BranchState extends Component {
         <BranchStateHeadline branchId={branchId} branchInfo={branchInfo} onBranchSelect={this.handleBranchSelect} />
         <section id="active-modules">
           <h2 className="module-list-header">Active modules</h2>
-          <ModuleList modules={activeModules} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
+          <ModuleList modules={this.sortActiveModules(activeModules)} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
         </section>
         {!!inactiveModules.size && <section id="inactive-modules">
           <h2 className="module-list-header">Inactive modules</h2>

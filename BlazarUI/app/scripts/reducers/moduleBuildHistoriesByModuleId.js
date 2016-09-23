@@ -37,7 +37,8 @@ export default function moduleBuildHistoriesByModuleId(state = Immutable.Map(), 
   switch (action.type) {
     case ActionTypes.RECEIVE_MODULE_STATES:
       return Immutable.Map(action.payload.map((moduleState) => {
-        return [moduleState.module.id, initialState];
+        const moduleId = moduleState.module.id;
+        return [moduleId, state.get(moduleId, initialState)];
       }));
 
     case ActionTypes.SELECT_MODULE_BUILD_HISTORY_PAGE:

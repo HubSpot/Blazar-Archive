@@ -4,23 +4,20 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import ModuleBuildNumber from './ModuleBuildNumber.jsx';
 import ModuleBuildTab from './ModuleBuildTab.jsx';
 
-const ModuleBuildTabs = ({moduleState, selectedBuildNumber, onSelectModuleBuild}) => {
-  const lastNonSkippedBuild = moduleState.get('lastNonSkippedModuleBuild');
-  const lastNonSkippedBuildNumber = lastNonSkippedBuild.get('buildNumber');
-
-  const lastSuccessfulBuild = moduleState.get('lastSuccessfulModuleBuild');
+const ModuleBuildTabs = ({currentBuild, lastSuccessfulBuild, selectedBuildNumber, onSelectModuleBuild}) => {
+  const currentBuildNumber = currentBuild.get('buildNumber');
   const lastSuccessfulBuildNumber = lastSuccessfulBuild.get('buildNumber');
 
-  if (lastNonSkippedBuildNumber === lastSuccessfulBuildNumber) {
+  if (currentBuildNumber === lastSuccessfulBuildNumber) {
     return <ModuleBuildNumber className="module-item-summary__build-number" moduleBuild={lastSuccessfulBuild} />;
   }
 
   return (
     <div className="module-build-tabs">
       <ModuleBuildTab
-        moduleBuild={lastNonSkippedBuild}
-        active={lastNonSkippedBuildNumber === selectedBuildNumber}
-        onClick={() => onSelectModuleBuild(lastNonSkippedBuild)}
+        moduleBuild={currentBuild}
+        active={currentBuildNumber === selectedBuildNumber}
+        onClick={() => onSelectModuleBuild(currentBuild)}
       />
       <ModuleBuildTab
         moduleBuild={lastSuccessfulBuild}
@@ -32,7 +29,8 @@ const ModuleBuildTabs = ({moduleState, selectedBuildNumber, onSelectModuleBuild}
 };
 
 ModuleBuildTabs.propTypes = {
-  moduleState: ImmutablePropTypes.map,
+  currentBuild: ImmutablePropTypes.map,
+  lastSuccessfulBuild: ImmutablePropTypes.map,
   selectedBuildNumber: PropTypes.number.isRequired,
   onSelectModuleBuild: PropTypes.func.isRequired
 };

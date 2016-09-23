@@ -7,25 +7,41 @@ import ModuleBuild from './ModuleBuild.jsx';
 class ModuleItem extends Component {
   constructor(props) {
     super(props);
-    this.state = {selectedBuild: props.moduleState.get('lastNonSkippedModuleBuild')};
+    this.state = {selectedBuild: this.getCurrentBuild(props.moduleState)};
     this.handleSelectModuleBuild = this.handleSelectModuleBuild.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({selectedBuild: nextProps.moduleState.get('lastNonSkippedModuleBuild')});
+    const currentBuild = this.getCurrentBuild(this.props.moduleState);
+    const nextCurrentBuild = this.getCurrentBuild(nextProps.moduleState);
+    if (!currentBuild.equals(nextCurrentBuild)) {
+      this.setState({selectedBuild: this.getCurrentBuild(nextProps.moduleState)});
+    }
   }
 
   handleSelectModuleBuild(moduleBuild) {
     this.setState({selectedBuild: moduleBuild});
   }
 
+  getCurrentBuild(moduleState) {
+    return moduleState.get('inProgressModuleBuild') ||
+      moduleState.get('inProgressModuleBuild') ||
+      moduleState.get('lastNonSkippedModuleBuild');
+  }
+
+  getCurrentRepoBuild(moduleState) {
+    return moduleState.get('inProgressRepoBuild') ||
+      moduleState.get('inProgressRepoBuild') ||
+      moduleState.get('lastNonSkippedRepoBuild');
+  }
+
   getSelectedRepoBuild() {
     const selectedRepoBuildId = this.state.selectedBuild.get('repoBuildId');
-    const lastNonSkippedRepoBuild = this.props.moduleState.get('lastNonSkippedRepoBuild');
+    const currentRepoBuild = this.getCurrentRepoBuild(this.props.moduleState);
     const lastSuccessfulRepoBuild = this.props.moduleState.get('lastSuccessfulRepoBuild');
 
-    if (lastNonSkippedRepoBuild.get('id') === selectedRepoBuildId) {
-      return lastNonSkippedRepoBuild;
+    if (currentRepoBuild.get('id') === selectedRepoBuildId) {
+      return currentRepoBuild;
     } else if (lastSuccessfulRepoBuild.get('id') === selectedRepoBuildId) {
       return lastSuccessfulRepoBuild;
     }
@@ -39,7 +55,8 @@ class ModuleItem extends Component {
     return (
       <li className="module-item">
         <ModuleBuildTabs
-          moduleState={moduleState}
+          currentBuild={this.getCurrentBuild(moduleState)}
+          lastSuccessfulBuild={moduleState.get('lastSuccessfulModuleBuild')}
           selectedBuildNumber={selectedBuild.get('buildNumber')}
           onSelectModuleBuild={this.handleSelectModuleBuild}
         />
