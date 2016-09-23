@@ -17,6 +17,7 @@ import java.util.UUID;
 import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.MetricRegistry;
+import com.hubspot.blazar.test.base.service.BlazarTestBase;
 import com.mysql.management.MysqldResource;
 import com.mysql.management.MysqldResourceI;
 import com.zaxxer.hikari.HikariConfig;
@@ -83,8 +84,13 @@ public class HikariDataSourceFactory extends DataSourceFactory {
     configuration.setDriverClassName("com.mysql.jdbc.Driver");
     configuration.setUsername("root");
     configuration.setPassword("");
-
-    return new HikariManagedDataSource(configuration);
+    ManagedDataSource dataSource = new HikariManagedDataSource(configuration);
+    try {
+      BlazarTestBase.runSql(dataSource, "schema.sql");
+    } catch (Exception e) {
+      LOG.error("Got exception setting up schema for database", e);
+    }
+    return dataSource;
   }
 
   private static void deleteDirRecursively(Path dir) throws IOException {
