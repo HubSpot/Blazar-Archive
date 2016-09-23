@@ -50,9 +50,8 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
   private DependencyGraph dependencyGraphOne;
   private DependencyGraph dependencyGraphTwo;
 
-  @Inject
   @Before
-  public void before(ManagedDataSource dataSource) {
+  public void before() {
 
     branchOne = branchService.upsert(GitInfo.fromString("github.com/HubSpot/Test#one"));
     branchTwo = branchService.upsert(GitInfo.fromString("github.com/HubSpot/Test#two"));

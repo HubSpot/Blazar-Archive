@@ -15,7 +15,7 @@ import liquibase.resource.ResourceAccessor;
 
 public abstract class BlazarTestBase {
 
-  protected static void runSql(DataSource dataSource, String resourceName) throws Exception {
+  public static void runSql(DataSource dataSource, String resourceName) throws Exception {
     liquibase.logging.LogFactory.setInstance(new LogFactory() {
 
       @Override
