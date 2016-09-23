@@ -81,11 +81,10 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   private TestUtils testUtils;
   @Inject
   private Map<String, GitHub> gitHubMap;
-  @Inject
-  private ManagedDataSource dataSource;
 
   @Before
-  public void before() throws Exception {
+  @Inject
+  public void before(ManagedDataSource dataSource) throws Exception {
     // set up the data for these inter-project build tests
     runSql(dataSource, "InterProjectData.sql");
   }

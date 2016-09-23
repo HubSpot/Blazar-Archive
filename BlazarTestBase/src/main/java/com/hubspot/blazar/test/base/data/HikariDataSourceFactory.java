@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.sql.Connection;
 import java.time.Duration;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -15,26 +14,15 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
 import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.base.Throwables;
 import com.mysql.management.MysqldResource;
 import com.mysql.management.MysqldResourceI;
 import com.zaxxer.hikari.HikariConfig;
 
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.ManagedDataSource;
-import liquibase.Contexts;
-import liquibase.Liquibase;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.ext.logging.slf4j.Slf4jLogger;
-import liquibase.logging.LogFactory;
-import liquibase.logging.Logger;
-import liquibase.resource.ClassLoaderResourceAccessor;
-import liquibase.resource.ResourceAccessor;
 
 public class HikariDataSourceFactory extends DataSourceFactory {
   private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(HikariDataSourceFactory.class);
@@ -96,13 +84,7 @@ public class HikariDataSourceFactory extends DataSourceFactory {
     configuration.setUsername("root");
     configuration.setPassword("");
 
-    HikariManagedDataSource datasource = new HikariManagedDataSource(configuration);
-    try {
-      runSql(datasource, "schema.sql");
-    } catch (Exception e) {
-      Throwables.propagate(e);
-    }
-    return datasource;
+    return new HikariManagedDataSource(configuration);
   }
 
   private static void deleteDirRecursively(Path dir) throws IOException {
@@ -119,23 +101,5 @@ public class HikariDataSourceFactory extends DataSourceFactory {
         return FileVisitResult.CONTINUE;
       }
     });
-  }
-
-  private void runSql(DataSource dataSource, String resourceName) throws Exception {
-    liquibase.logging.LogFactory.setInstance(new LogFactory() {
-      @Override
-      public Logger getLog(String name) {
-        liquibase.logging.Logger log = new Slf4jLogger();
-        log.setName(name);
-        return log;
-      }
-    });
-
-    try (Connection connection = dataSource.getConnection()) {
-      ResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
-      JdbcConnection jdbcConnection = new JdbcConnection(connection);
-      Liquibase liquibase = new Liquibase(resourceName, resourceAccessor, jdbcConnection);
-      liquibase.update(new Contexts());
-    }
   }
 }

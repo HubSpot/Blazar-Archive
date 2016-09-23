@@ -23,21 +23,16 @@ import io.dropwizard.db.ManagedDataSource;
 @UseModules({BlazarServiceTestModule.class})
 public class RepositoryBuildTest extends BlazarServiceTestBase {
 
-
   @Inject
   private BuildEventDispatcher buildEventDispatcher;
   @Inject
   private BranchService branchService;
   @Inject
   private TestUtils testUtils;
-  @Inject
-  private ManagedDataSource dataSource;
 
+  @Inject
   @Before
-  public void before() throws Exception {
-    // set up the data for these inter-project build tests
-    // todo migrate inter project data to a more common place
-    runSql(dataSource, "schema.sql");
+  public void before(ManagedDataSource dataSource) throws Exception {
     runSql(dataSource, "InterProjectData.sql");
   }
 
