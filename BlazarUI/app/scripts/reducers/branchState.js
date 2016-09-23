@@ -4,13 +4,20 @@ import ActionTypes from '../redux-actions/ActionTypes';
 const initialState = Immutable.Map({
   moduleStates: Immutable.List(),
   selectedModuleId: null,
-  loading: false
+  loading: false,
+  isPolling: false,
+  branchId: null
 });
 
 export default function branchState(state = initialState, action) {
   switch (action.type) {
-    case ActionTypes.REQUEST_MODULE_STATES:
-      return initialState.set('loading', true);
+    case ActionTypes.START_POLLING_MODULE_STATES:
+      return initialState.merge({
+        loading: action.payload !== state.get('branchId'),
+        isPolling: true
+      });
+    case ActionTypes.STOP_POLLING_MODULE_STATES:
+      return state.set('isPolling', false);
     case ActionTypes.RECEIVE_MODULE_STATES:
       return state.merge({
         moduleStates: action.payload,

@@ -1,37 +1,70 @@
-import React, { PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { routerShape } from 'react-router';
+import {bindAll} from 'underscore';
 
 import PageContainer from '../shared/PageContainer.jsx';
 import ModuleList from './ModuleList.jsx';
 import BranchStateHeadline from './BranchStateHeadline.jsx';
 import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
 
-const BranchState = ({activeModules, inactiveModules, branchId, branchInfo, router, selectModule, deselectModule, selectedModuleId, loadBranchModuleStates}) => {
-  const onBranchSelect = (selectedBranchId) => {
-    router.push(`/branchState/branch/${selectedBranchId}`);
-  };
+class BranchState extends Component {
+  constructor(props) {
+    super(props);
+    bindAll(this, 'handleBranchSelect', 'handleModuleItemClick');
+  }
 
-  const handleModuleItemClick = (id) => {
+  componentDidMount() {
+    const {pollBranchModuleStates, branchId} = this.props;
+    pollBranchModuleStates(branchId);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {pollBranchModuleStates, branchId} = this.props;
+    if (nextProps.branchId !== branchId) {
+      pollBranchModuleStates(nextProps.branchId);
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.stopPollingBranchModuleStates();
+  }
+
+  handleBranchSelect(selectedBranchId) {
+    this.props.router.push(`/branchState/branch/${selectedBranchId}`);
+  }
+
+  handleModuleItemClick(id) {
+    const {selectModule, deselectModule, selectedModuleId} = this.props;
     if (id === selectedModuleId) {
       deselectModule();
     } else {
       selectModule(id);
     }
-  };
+  }
 
-  const title = branchInfo.branch ? `${branchInfo.repository}-${branchInfo.branch}` : 'Branch State';
+  render() {
+    const {
+      activeModules,
+      inactiveModules,
+      branchId,
+      branchInfo,
+      selectedModuleId,
+      loadBranchModuleStates
+    } = this.props;
 
-  return (
+    const title = branchInfo.branch ? `${branchInfo.repository}-${branchInfo.branch}` : 'Branch State';
+
+    return (
       <PageContainer classNames="page-content--branch-state" documentTitle={title}>
-        <BranchStateHeadline branchId={branchId} branchInfo={branchInfo} onBranchSelect={onBranchSelect} />
+        <BranchStateHeadline branchId={branchId} branchInfo={branchInfo} onBranchSelect={this.handleBranchSelect} />
         <section id="active-modules">
           <h2 className="module-list-header">Active modules</h2>
-          <ModuleList modules={activeModules} onItemClick={handleModuleItemClick} selectedModuleId={selectedModuleId} />
+          <ModuleList modules={activeModules} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
         </section>
         {!!inactiveModules.size && <section id="inactive-modules">
           <h2 className="module-list-header">Inactive modules</h2>
-          <ModuleList modules={inactiveModules} onItemClick={handleModuleItemClick} selectedModuleId={selectedModuleId} />
+          <ModuleList modules={inactiveModules} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
         </section>}
         <BuildBranchModalContainer
           branchId={branchId}
@@ -39,8 +72,9 @@ const BranchState = ({activeModules, inactiveModules, branchId, branchInfo, rout
           onBuildStart={() => loadBranchModuleStates(branchId)}
         />
       </PageContainer>
-  );
-};
+    );
+  }
+}
 
 BranchState.propTypes = {
   branchId: PropTypes.number.isRequired,
@@ -51,7 +85,9 @@ BranchState.propTypes = {
   selectModule: PropTypes.func.isRequired,
   deselectModule: PropTypes.func.isRequired,
   selectedModuleId: PropTypes.number,
-  loadBranchModuleStates: PropTypes.func.isRequired
+  loadBranchModuleStates: PropTypes.func.isRequired,
+  pollBranchModuleStates: PropTypes.func.isRequired,
+  stopPollingBranchModuleStates: PropTypes.func.isRequired
 };
 
 export default BranchState;

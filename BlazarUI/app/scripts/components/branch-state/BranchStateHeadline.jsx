@@ -12,7 +12,6 @@ import Star from '../shared/Star.jsx';
 
 import { loadBranchInfo } from '../../redux-actions/branchActions';
 import { loadBranches } from '../../redux-actions/repoActions';
-import { loadBranchModuleStates } from '../../redux-actions/branchStateActions';
 import { showBranchBuildModal } from '../../redux-actions/buildBranchFormActions';
 
 
@@ -20,13 +19,11 @@ class BranchStateHeadline extends Component {
   componentDidMount() {
     const {branchId} = this.props;
     this.props.loadBranchInfo(branchId);
-    this.props.loadBranchModuleStates(branchId);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.branchId !== this.props.branchId) {
       this.props.loadBranchInfo(nextProps.branchId);
-      this.props.loadBranchModuleStates(nextProps.branchId);
       return;
     }
 
@@ -111,7 +108,6 @@ BranchStateHeadline.propTypes = {
   branchesList: ImmutablePropTypes.list.isRequired,
   loadBranches: PropTypes.func.isRequired,
   onBranchSelect: PropTypes.func.isRequired,
-  loadBranchModuleStates: PropTypes.func.isRequired,
   showBranchBuildModal: PropTypes.func.isRequired
 };
 
@@ -124,7 +120,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   loadBranchInfo,
   loadBranches,
-  loadBranchModuleStates,
   showBranchBuildModal
 };
 

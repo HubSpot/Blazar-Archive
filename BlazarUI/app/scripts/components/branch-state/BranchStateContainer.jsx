@@ -1,7 +1,7 @@
 import BranchState from './BranchState.jsx';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { selectModule, deselectModule, loadBranchModuleStates } from '../../redux-actions/branchStateActions';
+import branchStateActions from '../../redux-actions/branchStateActions';
 
 const mapStateToProps = (state, ownProps) => {
   const polledState = state.branchState.get('moduleStates');
@@ -15,8 +15,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default withRouter(connect(mapStateToProps, {
-  selectModule,
-  deselectModule,
-  loadBranchModuleStates
-})(BranchState));
+export default withRouter(connect(mapStateToProps, branchStateActions)(BranchState));

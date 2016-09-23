@@ -11,6 +11,10 @@ class ModuleItem extends Component {
     this.handleSelectModuleBuild = this.handleSelectModuleBuild.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({selectedBuild: nextProps.moduleState.get('lastNonSkippedModuleBuild')});
+  }
+
   handleSelectModuleBuild(moduleBuild) {
     this.setState({selectedBuild: moduleBuild});
   }
