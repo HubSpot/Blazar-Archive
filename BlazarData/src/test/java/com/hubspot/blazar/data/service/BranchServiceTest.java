@@ -79,4 +79,9 @@ public class BranchServiceTest extends DatabaseBackedTest {
     assertThat(branchRetrieved.isPresent()).isTrue();
     assertThat(branchRetrieved.get()).isEqualTo(branch);
   }
+
+
+  public static GitInfo newGitInfo(int repositoryId, String repositoryName, String branch) {
+    return new GitInfo(Optional.absent(), "github", "HubSpot", repositoryName, repositoryId, branch, true, System.currentTimeMillis(), System.currentTimeMillis());
+  }
 }
