@@ -7,7 +7,6 @@ import BuildTriggerLabel from './BuildTriggerLabel.jsx';
 import CommitInfo from './CommitInfo.jsx';
 
 import { getClassNameColorModifier } from '../../constants/ModuleBuildStates';
-import BuildTriggerTypes from '../../constants/BuildTriggerTypes';
 import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../Helpers';
 
 const getModuleName = (module, moduleBuild, repoBuild) => {
@@ -23,12 +22,11 @@ const getModuleName = (module, moduleBuild, repoBuild) => {
 const ModuleBuild = ({module, moduleBuild, repoBuild, onClick}) => {
   const colorModifier = getClassNameColorModifier(moduleBuild.get('state'));
   const buildTrigger = repoBuild.get('buildTrigger');
-  const showCommitInfo = buildTrigger.get('type') === BuildTriggerTypes.PUSH;
   return (
     <div className={`module-build  module-build--${colorModifier}`} onClick={onClick}>
       <div className="module-build__labels">
         <BuildTriggerLabel buildTrigger={buildTrigger} />
-        {showCommitInfo && <CommitInfo commitInfo={repoBuild.get('commitInfo')} />}
+        <CommitInfo commitInfo={repoBuild.get('commitInfo')} />
       </div>
       <h3 className="module-build__module-name">{getModuleName(module, moduleBuild, repoBuild)}</h3>
       <ModuleBuildStatus moduleBuild={moduleBuild} />

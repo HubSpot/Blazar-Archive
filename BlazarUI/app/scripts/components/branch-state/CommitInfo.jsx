@@ -5,18 +5,20 @@ import CommitLink from './CommitLink.jsx';
 import CompareCommitsLink from './CompareCommitsLink.jsx';
 
 const CommitInfo = ({commitInfo}) => {
-  if (!commitInfo.get('previous')) {
+  const previousCommit = commitInfo.get('previous');
+  const currentCommit = commitInfo.get('current');
+  if (!previousCommit || previousCommit.get('id') === currentCommit.get('id')) {
     return <CommitLink commit={commitInfo.get('current')} />;
   }
 
-  const previousCommit = <CommitLink commit={commitInfo.get('previous')} />;
-  const currentCommit = <CommitLink commit={commitInfo.get('current')} />;
+  const previousCommitLink = <CommitLink commit={commitInfo.get('previous')} />;
+  const currentCommitLink = <CommitLink commit={commitInfo.get('current')} />;
   const arrow = <Icon name="long-arrow-right" />;
   const compareLink = <CompareCommitsLink className="commit-info__compare-link" commitInfo={commitInfo} />;
 
   return (
     <p className="module-build__commit-info" onClick={(e) => e.stopPropagation()}>
-      {previousCommit} {arrow} {currentCommit}{compareLink}
+      {previousCommitLink} {arrow} {currentCommitLink}{compareLink}
     </p>
   );
 };
