@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import moment from 'moment';
-import ModuleBuildStates from '../../constants/ModuleBuildStates';
-import Icon from '../shared/Icon.jsx';
+import ModuleBuildStates from '../../../constants/ModuleBuildStates';
+import Icon from '../../shared/Icon.jsx';
 
 const getMinutes = (duration) => {
   const minutes = Math.floor(duration.asMinutes());

@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 
-import ModuleBuildNumber from './ModuleBuildNumber.jsx';
+import ModuleBuildNumber from './shared/ModuleBuildNumber.jsx';
 import { getClassNameColorModifier } from '../../constants/ModuleBuildStates';
 
 const ModuleBuildTab = ({moduleBuild, active, onClick}) => {

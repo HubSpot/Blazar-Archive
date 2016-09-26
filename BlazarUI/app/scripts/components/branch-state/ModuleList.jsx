@@ -4,7 +4,7 @@ import CardStack from '../shared/card-stack/CardStack.jsx';
 import Card from '../shared/card-stack/Card.jsx';
 
 import ModuleItem from './ModuleItem.jsx';
-import ModuleBuildHistory from './ModuleBuildHistory.jsx';
+import ModuleBuildHistory from './module-build-history/ModuleBuildHistory.jsx';
 
 const ModuleList = ({modules, onItemClick, selectedModuleId}) => {
   return (

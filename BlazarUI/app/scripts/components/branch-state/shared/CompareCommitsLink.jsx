@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import Icon from '../shared/Icon.jsx';
+import Icon from '../../shared/Icon.jsx';
 
 const CompareCommitsLink = ({commitInfo, className}) => {
   const previousCommitUrl = commitInfo.getIn(['previous', 'url']);

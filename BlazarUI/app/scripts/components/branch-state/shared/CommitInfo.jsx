@@ -1,6 +1,6 @@
 import React from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import Icon from '../shared/Icon.jsx';
+import Icon from '../../shared/Icon.jsx';
 import CommitLink from './CommitLink.jsx';
 import CompareCommitsLink from './CompareCommitsLink.jsx';
 

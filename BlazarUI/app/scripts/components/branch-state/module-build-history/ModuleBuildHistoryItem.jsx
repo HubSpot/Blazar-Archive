@@ -4,12 +4,12 @@ import classNames from 'classnames';
 import { sample } from 'underscore';
 import { Link } from 'react-router';
 
-import ModuleBuildNumber from './ModuleBuildNumber.jsx';
-import ModuleBuildStatus from './ModuleBuildStatus.jsx';
-import BuildTriggerLabel from './BuildTriggerLabel.jsx';
+import ModuleBuildNumber from '../shared/ModuleBuildNumber.jsx';
+import ModuleBuildStatus from '../shared/ModuleBuildStatus.jsx';
+import BuildTriggerLabel from '../shared/BuildTriggerLabel.jsx';
 
-import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../Helpers';
-import BuildTriggerTypes from '../../constants/BuildTriggerTypes';
+import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../../Helpers';
+import BuildTriggerTypes from '../../../constants/BuildTriggerTypes';
 
 const renderContent = (moduleBuild, clickable) => {
   const classes = classNames('historical-module-build', {'historical-module-build--clickable': clickable});

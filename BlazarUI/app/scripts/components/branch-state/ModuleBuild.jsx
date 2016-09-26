@@ -2,9 +2,9 @@ import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Link } from 'react-router';
 
-import ModuleBuildStatus from './ModuleBuildStatus.jsx';
-import BuildTriggerLabel from './BuildTriggerLabel.jsx';
-import CommitInfo from './CommitInfo.jsx';
+import ModuleBuildStatus from './shared/ModuleBuildStatus.jsx';
+import BuildTriggerLabel from './shared/BuildTriggerLabel.jsx';
+import CommitInfo from './shared/CommitInfo.jsx';
 
 import { getClassNameColorModifier } from '../../constants/ModuleBuildStates';
 import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../Helpers';

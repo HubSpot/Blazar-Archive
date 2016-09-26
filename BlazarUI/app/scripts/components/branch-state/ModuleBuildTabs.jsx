@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import ModuleBuildNumber from './ModuleBuildNumber.jsx';
+import ModuleBuildNumber from './shared/ModuleBuildNumber.jsx';
 import ModuleBuildTab from './ModuleBuildTab.jsx';
 
 const ModuleBuildTabs = ({currentBuild, lastSuccessfulBuild, selectedBuildNumber, onSelectModuleBuild}) => {

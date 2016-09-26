@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Pagination from 'react-bootstrap/lib/Pagination';
-import Icon from '../shared/Icon.jsx';
-import { selectPage } from '../../redux-actions/moduleBuildHistoryActions';
+import Icon from '../../shared/Icon.jsx';
+import { selectPage } from '../../../redux-actions/moduleBuildHistoryActions';
 
 const mapStateToProps = (state, ownProps) => {
   const buildHistory = state.moduleBuildHistoriesByModuleId.get(ownProps.moduleId);

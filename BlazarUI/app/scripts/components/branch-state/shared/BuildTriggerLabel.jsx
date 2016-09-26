@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import BuildTriggerTypes from '../../constants/BuildTriggerTypes';
+import BuildTriggerTypes from '../../../constants/BuildTriggerTypes';
 
 import Tooltip from 'react-bootstrap/lib/Tooltip';
 import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';

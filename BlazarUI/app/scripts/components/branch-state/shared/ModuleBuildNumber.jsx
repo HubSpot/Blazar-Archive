@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import classNames from 'classnames';
-import { getClassNameColorModifier } from '../../constants/ModuleBuildStates';
+import { getClassNameColorModifier } from '../../../constants/ModuleBuildStates';
 
 const ModuleBuildNumber = ({moduleBuild, className}) => {
   const buildNumber = moduleBuild.get('buildNumber');
