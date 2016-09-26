@@ -7,8 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Duration;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -40,25 +38,7 @@ public class HikariDataSourceFactory extends DataSourceFactory {
     options.put(MysqldResourceI.PORT, Integer.toString(port));
     options.put("character-set-server", "utf8");
 
-    /**
-     *  This forces the embedded mysql used for tests to have the same timezone offset
-     *  as the parent java process. This fixes things when you're running
-     *  locally and java thinks its in UTC but mysql uses the system timezone which is not UTC.
-     *
-     *  This also avoids having to install and load TimeZone conversion tables to allow mysql
-     *  to convert `UTC` to `+00:00`. If they are installed into the embedded mysql then you
-     *  can simplify the below to:
-     *
-     *  options.put("default-time-zone", Calendar.getInstance().getTimeZone().getID());
-     */
-
-    Duration offset = Duration.ofMillis(Calendar.getInstance().getTimeZone().getRawOffset());
-    long hours = offset.toHours();
-    long minutes = offset.minusHours(hours).toMinutes();
-    // force the + on '+00' for positive offset
-    String mysqlOffset = 0 >= hours ? String.format("+%02d:%02d", hours, minutes) : String.format("%02d:%02d", hours, minutes);
-    options.put("default-time-zone", mysqlOffset);
-    options.put("sql-mode", "ONLY_FULL_GROUP_BY,NO_AUTO_VALUE_ON_ZERO,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION");
+    options.put("default-time-zone", "+00:00");  // otherwise the timezone will be the Tz of the host
     mysqldResource.start("embedded-mysql", options);
 
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
