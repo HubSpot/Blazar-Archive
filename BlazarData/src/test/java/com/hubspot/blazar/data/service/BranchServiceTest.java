@@ -1,24 +1,28 @@
 package com.hubspot.blazar.data.service;
 
-import com.google.common.base.Optional;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.data.BlazarDataTestBase;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BranchServiceTest extends BlazarDataTestBase {
+import org.jukito.JukitoRunner;
+import org.jukito.UseModules;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.google.common.base.Optional;
+import com.google.inject.Inject;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.data.BlazarDataTestModule;
+import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
+
+@RunWith(JukitoRunner.class)
+@UseModules({BlazarDataTestModule.class})
+public class BranchServiceTest extends DatabaseBackedTest {
+  @Inject
   private BranchService branchService;
 
-  @Before
-  public void before() {
-    this.branchService = getFromGuice(BranchService.class);
-  }
-
   @Test
-  public void testUpsertBasic() {
+  public void testUpsertBasic() throws Exception {
+    long before = System.currentTimeMillis();
+    Thread.sleep(1000); // because the timestamp is in seconds, we need to ensure we wait at least one.
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     GitInfo inserted = branchService.upsert(original);
 
@@ -28,15 +32,18 @@ public class BranchServiceTest extends BlazarDataTestBase {
 
     assertThat(retrieved.isPresent()).isTrue();
     assertThat(retrieved.get()).isEqualTo(inserted);
-    assertThat(retrieved.get().getCreatedTimestamp()).isBetween(System.currentTimeMillis() - 1000, System.currentTimeMillis());
-    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(System.currentTimeMillis() - 1000, System.currentTimeMillis());
+    assertThat(retrieved.get().getCreatedTimestamp()).isBetween(before, System.currentTimeMillis());
+    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(before, System.currentTimeMillis());
     assertThat(retrieved.get().getUpdatedTimestamp()).isEqualTo(retrieved.get().getCreatedTimestamp());
   }
 
   @Test
-  public void testUpsertRepositoryRename() {
+  public void testUpsertRepositoryRename() throws InterruptedException {
+    long before = System.currentTimeMillis();
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     original = branchService.upsert(original);
+    // The last updated column is `TIMESTAMP` and as such is 1s precision
+    Thread.sleep(1000);
 
     GitInfo renamed = newGitInfo(123, "Underwatch", "master");
     renamed = branchService.upsert(renamed);
@@ -47,7 +54,7 @@ public class BranchServiceTest extends BlazarDataTestBase {
 
     assertThat(retrieved.isPresent()).isTrue();
     assertThat(retrieved.get()).isEqualTo(renamed);
-    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(System.currentTimeMillis() - 1000, System.currentTimeMillis());
+    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(before, System.currentTimeMillis());
     assertThat(retrieved.get().getUpdatedTimestamp()).isGreaterThan(retrieved.get().getCreatedTimestamp());
   }
 

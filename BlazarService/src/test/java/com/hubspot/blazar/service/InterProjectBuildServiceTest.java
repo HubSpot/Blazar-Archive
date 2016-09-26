@@ -51,6 +51,8 @@ import com.hubspot.blazar.listener.BuildEventDispatcher;
 import com.hubspot.blazar.util.SingularityBuildLauncher;
 import com.hubspot.blazar.util.TestSingularityBuildLauncher;
 
+import io.dropwizard.db.ManagedDataSource;
+
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarServiceTestModule.class})
 public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
@@ -81,9 +83,10 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   private Map<String, GitHub> gitHubMap;
 
   @Before
-  public void before() throws Exception {
+  @Inject
+  public void before(ManagedDataSource dataSource) throws Exception {
     // set up the data for these inter-project build tests
-    runSql("InterProjectData.sql");
+    runSql(dataSource, "InterProjectData.sql");
   }
 
   @Test

@@ -17,10 +17,11 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.listener.BuildEventDispatcher;
 
+import io.dropwizard.db.ManagedDataSource;
+
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarServiceTestModule.class})
 public class RepositoryBuildTest extends BlazarServiceTestBase {
-
 
   @Inject
   private BuildEventDispatcher buildEventDispatcher;
@@ -29,11 +30,10 @@ public class RepositoryBuildTest extends BlazarServiceTestBase {
   @Inject
   private TestUtils testUtils;
 
+  @Inject
   @Before
-  public void before() throws Exception {
-    // set up the data for these inter-project build tests
-    // todo migrate inter project data to a more common place
-    runSql("InterProjectData.sql");
+  public void before(ManagedDataSource dataSource) throws Exception {
+    runSql(dataSource, "InterProjectData.sql");
   }
 
   @Test

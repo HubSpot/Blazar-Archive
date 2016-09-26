@@ -26,6 +26,8 @@ import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
 import com.hubspot.blazar.listener.BuildEventDispatcher;
 
+import io.dropwizard.db.ManagedDataSource;
+
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarServiceTestModule.class})
 public class DependencyVersionTest extends BlazarServiceTestBase {
@@ -43,11 +45,10 @@ public class DependencyVersionTest extends BlazarServiceTestBase {
   @Inject
   private DependenciesService dependenciesService;
 
+  @Inject
   @Before
-  public void before() throws Exception {
-    // set up the data for these inter-project build tests
-    // todo migrate inter project data to a more common place
-    runSql("InterProjectData.sql");
+  public void before(ManagedDataSource dataSource) throws Exception {
+    runSql(dataSource, "InterProjectData.sql");
   }
 
   @Test

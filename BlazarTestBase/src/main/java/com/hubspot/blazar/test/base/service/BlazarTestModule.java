@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
+import com.hubspot.blazar.test.base.data.HikariDataSourceFactory;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
+
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jackson.Jackson;
 
@@ -14,20 +16,14 @@ public class BlazarTestModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(DataSourceFactory.class).toInstance(buildDataSourceFactory());
     bind(MetricRegistry.class).toInstance(new MetricRegistry());
     bind(ObjectMapper.class).toInstance(buildObjectMapper());
+    bind(DataSourceFactory.class).toInstance(buildTestDataSourceFactory());
   }
 
-  private DataSourceFactory buildDataSourceFactory() {
-    final DataSourceFactory dataSourceFactory = new DataSourceFactory();
-    dataSourceFactory.setDriverClass("org.h2.Driver");
-    dataSourceFactory.setUrl("jdbc:h2:mem:blazar;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1;mode=MySQL");
+  private DataSourceFactory buildTestDataSourceFactory() {
+    final DataSourceFactory dataSourceFactory = new HikariDataSourceFactory();
     dataSourceFactory.setCommitOnReturn(true);
-
-    dataSourceFactory.setUser("user");
-    dataSourceFactory.setPassword("password");
-
     return dataSourceFactory;
   }
 
