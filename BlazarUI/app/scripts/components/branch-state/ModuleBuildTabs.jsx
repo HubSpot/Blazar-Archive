@@ -6,10 +6,10 @@ import ModuleBuildTab from './ModuleBuildTab.jsx';
 
 const ModuleBuildTabs = ({currentBuild, lastSuccessfulBuild, selectedBuildNumber, onSelectModuleBuild}) => {
   const currentBuildNumber = currentBuild.get('buildNumber');
-  const lastSuccessfulBuildNumber = lastSuccessfulBuild.get('buildNumber');
+  const lastSuccessfulBuildNumber = lastSuccessfulBuild ? lastSuccessfulBuild.get('buildNumber') : null;
 
-  if (currentBuildNumber === lastSuccessfulBuildNumber) {
-    return <ModuleBuildNumber className="module-item-summary__build-number" moduleBuild={lastSuccessfulBuild} />;
+  if (!lastSuccessfulBuild || currentBuildNumber === lastSuccessfulBuildNumber) {
+    return <ModuleBuildNumber className="module-item-summary__build-number" moduleBuild={currentBuild} />;
   }
 
   return (

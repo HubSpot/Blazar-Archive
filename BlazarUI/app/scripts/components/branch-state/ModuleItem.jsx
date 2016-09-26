@@ -25,13 +25,13 @@ class ModuleItem extends Component {
 
   getCurrentBuild(moduleState) {
     return moduleState.get('inProgressModuleBuild') ||
-      moduleState.get('inProgressModuleBuild') ||
+      moduleState.get('pendingModuleBuild') ||
       moduleState.get('lastNonSkippedModuleBuild');
   }
 
   getCurrentRepoBuild(moduleState) {
     return moduleState.get('inProgressRepoBuild') ||
-      moduleState.get('inProgressRepoBuild') ||
+      moduleState.get('pendingRepoBuild') ||
       moduleState.get('lastNonSkippedRepoBuild');
   }
 
