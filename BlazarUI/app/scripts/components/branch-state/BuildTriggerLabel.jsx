@@ -2,12 +2,26 @@ import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import BuildTriggerTypes from '../../constants/BuildTriggerTypes';
 
+import Tooltip from 'react-bootstrap/lib/Tooltip';
+import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
+
 const BuildTriggerLabel = ({buildTrigger}) => {
   switch (buildTrigger.get('type')) {
     case BuildTriggerTypes.PUSH:
       return <span className="build-trigger-label build-trigger-label--code-push">code push</span>;
-    case BuildTriggerTypes.MANUAL:
-      return <span className="build-trigger-label build-trigger-label--manual">manual</span>;
+    case BuildTriggerTypes.MANUAL: {
+      const tooltip = (
+        <Tooltip id="historical-deploy-permalink-tooltip">
+          Triggered by {buildTrigger.get('id')}
+        </Tooltip>
+      );
+
+      return (
+        <OverlayTrigger placement="bottom" overlay={tooltip}>
+          <span className="build-trigger-label build-trigger-label--manual">manual</span>
+        </OverlayTrigger>
+      );
+    }
     case BuildTriggerTypes.BRANCH_CREATION:
       return <span className="build-trigger-label build-trigger-label--new-branch">new branch</span>;
     case BuildTriggerTypes.INTER_PROJECT:
