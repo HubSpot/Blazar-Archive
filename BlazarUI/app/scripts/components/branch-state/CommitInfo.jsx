@@ -5,6 +5,10 @@ import CommitLink from './CommitLink.jsx';
 import CompareCommitsLink from './CompareCommitsLink.jsx';
 
 const CommitInfo = ({commitInfo}) => {
+  if (!commitInfo.get('previous')) {
+    return <CommitLink commit={commitInfo.get('current')} />;
+  }
+
   const previousCommit = <CommitLink commit={commitInfo.get('previous')} />;
   const currentCommit = <CommitLink commit={commitInfo.get('current')} />;
   const arrow = <Icon name="long-arrow-right" />;
