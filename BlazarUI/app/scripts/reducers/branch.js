@@ -4,7 +4,8 @@ import BranchInfo from '../data/records/BranchInfo';
 
 const initialState = Immutable.Map({
   branchInfo: new BranchInfo(),
-  loading: false
+  loading: false,
+  error: null
 });
 
 export default function branch(state = initialState, action) {
@@ -15,6 +16,10 @@ export default function branch(state = initialState, action) {
         loading: true
       });
     case ActionTypes.RECEIVE_BRANCH_INFO:
+      if (action.error) {
+        return initialState.set('error', Immutable.fromJS(action.payload));
+      }
+
       return state.merge({
         branchInfo: action.payload,
         loading: false

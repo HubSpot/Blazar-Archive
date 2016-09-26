@@ -33,7 +33,7 @@ const BranchStore = Reflux.createStore({
   onLoadBranchInfo(params) {
     this.params = params;
 
-    BranchApi.fetchBranchInfo(params, (resp) => {
+    BranchApi.fetchBranchInfo(params).then((resp) => {
       this.branchInfo = resp;
 
       this.trigger({

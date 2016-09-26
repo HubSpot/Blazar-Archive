@@ -27,7 +27,9 @@ export default function branchState(state = initialState, action) {
     case ActionTypes.RECEIVE_MODULE_STATES:
       return state.merge({
         moduleStates: action.payload,
-        loading: false
+        loading: false,
+        // stop polling if api returns an empty array if the branch does not exist
+        isPolling: !action.payload.length ? false : state.get('isPolling')
       });
     case ActionTypes.SELECT_MODULE:
       return state.set('selectedModuleId', action.payload);

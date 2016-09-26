@@ -9,10 +9,16 @@ export const loadBranchInfo = (branchId) => {
       payload: branchId
     });
 
-    BranchApi.fetchBranchInfo({branchId}, (branchInfo) => {
+    BranchApi.fetchBranchInfo({branchId}).then((branchInfo) => {
       dispatch({
         type: ActionTypes.RECEIVE_BRANCH_INFO,
         payload: new BranchInfo(branchInfo)
+      });
+    }, (error) => {
+      dispatch({
+        type: ActionTypes.RECEIVE_BRANCH_INFO,
+        error: true,
+        payload: error
       });
     });
   };

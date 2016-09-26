@@ -50,15 +50,11 @@ function fetchBranchBuildHistory(params, cb) {
   });
 }
 
-function fetchBranchInfo(params, cb) {
-  const branchInfoPromise = new Resource({
+function fetchBranchInfo(params) {
+  return new Resource({
     url: `${window.config.apiRoot}/branches/${params.branchId}`,
     type: 'GET'
   }).send();
-
-  return branchInfoPromise.then((resp) => {
-    cb(resp);
-  });
 }
 
 function fetchBranchModules(params, cb) {

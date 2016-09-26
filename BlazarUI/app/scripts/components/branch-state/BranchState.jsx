@@ -4,6 +4,7 @@ import { routerShape } from 'react-router';
 import {bindAll} from 'underscore';
 
 import PageContainer from '../shared/PageContainer.jsx';
+import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import Loader from '../shared/Loader.jsx';
 import ModuleList from './ModuleList.jsx';
 import BranchStateHeadline from './BranchStateHeadline.jsx';
@@ -99,10 +100,20 @@ class BranchState extends Component {
       activeModules,
       branchId,
       branchInfo,
-      loadBranchModuleStates
+      loadBranchModuleStates,
+      branchNotFound
     } = this.props;
 
     const title = branchInfo.branch ? `${branchInfo.repository}-${branchInfo.branch}` : 'Branch State';
+
+    if (branchNotFound) {
+      return (
+        <PageContainer classNames="page-content--branch-state" documentTitle={title}>
+          <GenericErrorMessage message="Branch not found." />
+        </PageContainer>
+      );
+    }
+
 
     return (
       <PageContainer classNames="page-content--branch-state" documentTitle={title}>
@@ -130,7 +141,8 @@ BranchState.propTypes = {
   loadBranchModuleStates: PropTypes.func.isRequired,
   pollBranchModuleStates: PropTypes.func.isRequired,
   stopPollingBranchModuleStates: PropTypes.func.isRequired,
-  loadingModuleStates: PropTypes.bool.isRequired
+  loadingModuleStates: PropTypes.bool.isRequired,
+  branchNotFound: PropTypes.bool
 };
 
 export default BranchState;
