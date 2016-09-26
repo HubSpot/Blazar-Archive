@@ -12,26 +12,20 @@
 .module-build-history__pagination
   margin 0
 
-.historical-module-build-list
+.module-build-history__list
   padding-left 0
 
   li
     display block
 
-.historical-module-build
+.module-build-history-item
   display flex
   align-items center
   height 30px
   margin-bottom -1px
   border 1px solid $color-battleship
 
-.historical-module-build--clickable:hover
-  background-color $color-gypsum
-
-.historical-module-build-link-wrapper:hover
-  text-decoration none
-
-.historical-module-build__build-number
+.module-build-history-item__build-number
   width 50px
 
 .module-build-history-item__status
@@ -43,3 +37,9 @@
 .module-build-history-item__build-trigger-label
   margin-right 20px
   font-size 12px
+
+.module-build-history-item--clickable:hover
+  background-color $color-gypsum
+
+.module-build-history-item-link-wrapper:hover
+  text-decoration none

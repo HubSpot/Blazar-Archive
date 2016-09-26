@@ -12,10 +12,10 @@ import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../../
 import BuildTriggerTypes from '../../../constants/BuildTriggerTypes';
 
 const renderContent = (moduleBuild, clickable) => {
-  const classes = classNames('historical-module-build', {'historical-module-build--clickable': clickable});
+  const classes = classNames('module-build-history-item', {'module-build-history-item--clickable': clickable});
   return (
     <div className={classes}>
-      <ModuleBuildNumber moduleBuild={moduleBuild} className="historical-module-build__build-number" />
+      <ModuleBuildNumber moduleBuild={moduleBuild} className="module-build-history-item__build-number" />
         <div className="module-build-history-item__status">
           <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} />
         </div>
@@ -38,7 +38,7 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchId}) => {
   const linkPath = getBlazarModuleBuildPath(branchId, moduleBuild.get('buildNumber'), moduleName);
   return (
     <li>
-      <Link to={linkPath} className="historical-module-build-link-wrapper">
+      <Link to={linkPath} className="module-build-history-item-link-wrapper">
         {renderContent(moduleBuild, true)}
       </Link>
     </li>

@@ -13,7 +13,7 @@ class ModuleBuildHistory extends Component {
     }
 
     return (
-      <ul className="historical-module-build-list">
+      <ul className="module-build-history__list">
         {moduleBuilds.map((moduleBuild) =>
           <ModuleBuildHistoryItem
             key={moduleBuild.get('id')}
