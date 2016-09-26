@@ -11,7 +11,7 @@ const CommitInfo = ({commitInfo}) => {
   const compareLink = <CompareCommitsLink className="commit-info__compare-link" commitInfo={commitInfo} />;
 
   return (
-    <p className="module-build__commit-info">
+    <p className="module-build__commit-info" onClick={(e) => e.stopPropagation()}>
       {previousCommit} {arrow} {currentCommit}{compareLink}
     </p>
   );

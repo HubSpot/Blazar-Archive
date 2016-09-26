@@ -11,11 +11,17 @@ const initialState = Immutable.Map({
 
 export default function branchState(state = initialState, action) {
   switch (action.type) {
-    case ActionTypes.START_POLLING_MODULE_STATES:
-      return initialState.merge({
-        loading: action.payload !== state.get('branchId'),
-        isPolling: true
-      });
+    case ActionTypes.START_POLLING_MODULE_STATES: {
+      if (action.payload !== state.get('branchId')) {
+        return initialState.merge({
+          loading: true,
+          isPolling: true,
+          branchId: action.payload
+        });
+      }
+
+      return state.set('isPolling', true);
+    }
     case ActionTypes.STOP_POLLING_MODULE_STATES:
       return state.set('isPolling', false);
     case ActionTypes.RECEIVE_MODULE_STATES:

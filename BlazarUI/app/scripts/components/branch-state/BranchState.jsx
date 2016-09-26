@@ -12,12 +12,13 @@ import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
 class BranchState extends Component {
   constructor(props) {
     super(props);
-    bindAll(this, 'handleBranchSelect', 'handleModuleItemClick');
+    bindAll(this, 'handleBranchSelect', 'handleModuleItemClick', 'handleVisibilityChange');
   }
 
   componentDidMount() {
     const {pollBranchModuleStates, branchId} = this.props;
     pollBranchModuleStates(branchId);
+    window.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -29,6 +30,7 @@ class BranchState extends Component {
 
   componentWillUnmount() {
     this.props.stopPollingBranchModuleStates();
+    window.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   sortActiveModules() {
@@ -60,6 +62,15 @@ class BranchState extends Component {
       deselectModule();
     } else {
       selectModule(id);
+    }
+  }
+
+  handleVisibilityChange() {
+    if (document.hidden) {
+      this.props.stopPollingBranchModuleStates();
+    } else {
+      const {pollBranchModuleStates, branchId} = this.props;
+      pollBranchModuleStates(branchId);
     }
   }
 
