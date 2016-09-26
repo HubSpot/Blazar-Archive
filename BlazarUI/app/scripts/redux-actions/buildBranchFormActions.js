@@ -2,12 +2,12 @@ import ActionTypes from './ActionTypes';
 import InterProjectApi from '../data/InterProjectApi';
 import BranchApi from '../data/BranchApi';
 
-export const showBranchBuildModal = () => ({
-  type: ActionTypes.SHOW_BRANCH_BUILD_MODAL
+export const showBuildBranchModal = () => ({
+  type: ActionTypes.SHOW_BUILD_BRANCH_MODAL
 });
 
 export const hideBranchBuildModal = () => ({
-  type: ActionTypes.HIDE_BRANCH_BUILD_MODAL
+  type: ActionTypes.HIDE_BUILD_BRANCH_MODAL
 });
 
 export const updateBranchBuildSelectedModuleIds = (ids) => ({

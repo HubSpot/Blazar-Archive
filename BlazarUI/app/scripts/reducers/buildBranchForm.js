@@ -14,9 +14,9 @@ const toggleValue = (value) => !value;
 
 export default function buildBranchForm(state = initialState, action) {
   switch (action.type) {
-    case ActionTypes.SHOW_BRANCH_BUILD_MODAL:
+    case ActionTypes.SHOW_BUILD_BRANCH_MODAL:
       return initialState.set('showModal', true);
-    case ActionTypes.HIDE_BRANCH_BUILD_MODAL:
+    case ActionTypes.HIDE_BUILD_BRANCH_MODAL:
       return state.set('showModal', false);
 
     case ActionTypes.UPDATE_BRANCH_BUILD_SELECTED_MODULE_IDS:

@@ -12,7 +12,7 @@ import Star from '../shared/Star.jsx';
 
 import { loadBranchInfo } from '../../redux-actions/branchActions';
 import { loadBranches } from '../../redux-actions/repoActions';
-import { showBranchBuildModal } from '../../redux-actions/buildBranchFormActions';
+import { showBuildBranchModal } from '../../redux-actions/buildBranchFormActions';
 
 
 class BranchStateHeadline extends Component {
@@ -59,7 +59,7 @@ class BranchStateHeadline extends Component {
             Build settings
           </Button>
         </Link>
-        <Button id="build-now-button" bsStyle="primary" onClick={this.props.showBranchBuildModal}>
+        <Button id="build-now-button" bsStyle="primary" onClick={this.props.showBuildBranchModal}>
           Build now
         </Button>
         <Star className="branch-state-headline__star" branchId={this.props.branchId} />
@@ -108,7 +108,7 @@ BranchStateHeadline.propTypes = {
   branchesList: ImmutablePropTypes.list.isRequired,
   loadBranches: PropTypes.func.isRequired,
   onBranchSelect: PropTypes.func.isRequired,
-  showBranchBuildModal: PropTypes.func.isRequired
+  showBuildBranchModal: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => {
@@ -120,7 +120,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   loadBranchInfo,
   loadBranches,
-  showBranchBuildModal
+  showBuildBranchModal
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(BranchStateHeadline);

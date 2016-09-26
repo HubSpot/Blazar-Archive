@@ -15,7 +15,7 @@ class ModuleItem extends Component {
     const currentBuild = this.getCurrentBuild(this.props.moduleState);
     const nextCurrentBuild = this.getCurrentBuild(nextProps.moduleState);
     if (!currentBuild.equals(nextCurrentBuild)) {
-      this.setState({selectedBuild: this.getCurrentBuild(nextProps.moduleState)});
+      this.setState({selectedBuild: nextCurrentBuild});
     }
   }
 

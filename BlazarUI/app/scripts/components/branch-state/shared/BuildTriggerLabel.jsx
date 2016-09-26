@@ -10,9 +10,10 @@ const BuildTriggerLabel = ({buildTrigger}) => {
     case BuildTriggerTypes.PUSH:
       return <span className="build-trigger-label build-trigger-label--code-push">code push</span>;
     case BuildTriggerTypes.MANUAL: {
+      const user = buildTrigger.get('id');
       const tooltip = (
         <Tooltip id="historical-deploy-permalink-tooltip">
-          Triggered by {buildTrigger.get('id')}
+          Triggered by {user === 'unknown' ? 'unknown user' : user}
         </Tooltip>
       );
 

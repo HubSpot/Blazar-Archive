@@ -4,10 +4,10 @@ import { withRouter } from 'react-router';
 import branchStateActions from '../../redux-actions/branchStateActions';
 
 const mapStateToProps = (state, ownProps) => {
-  const polledState = state.branchState.get('moduleStates');
+  const moduleStates = state.branchState.get('moduleStates');
   return {
-    activeModules: polledState.filter(moduleState => moduleState.getIn(['module', 'active'])),
-    inactiveModules: polledState.filter(moduleState => !moduleState.getIn(['module', 'active'])),
+    activeModules: moduleStates.filter(moduleState => moduleState.getIn(['module', 'active'])),
+    inactiveModules: moduleStates.filter(moduleState => !moduleState.getIn(['module', 'active'])),
     branchId: parseInt(ownProps.params.branchId, 10),
     branchInfo: state.branch.get('branchInfo'),
     loadingModuleStates: state.branchState.get('loading'),

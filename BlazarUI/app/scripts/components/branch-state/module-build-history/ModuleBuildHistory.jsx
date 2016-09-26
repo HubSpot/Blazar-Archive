@@ -42,7 +42,7 @@ class ModuleBuildHistory extends Component {
   render() {
     return (
       <div className="module-build-history">
-        <h5>Recent builds</h5>
+        <h5>Build activity</h5>
         {this.renderMainContent()}
         {this.renderPagination()}
       </div>

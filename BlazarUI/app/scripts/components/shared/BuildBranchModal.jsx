@@ -7,7 +7,7 @@ import Checkbox from './Checkbox.jsx';
 import Icon from './Icon.jsx';
 import ModuleSelectWrapper from './ModuleSelectWrapper.jsx';
 
-class ModuleModal extends Component {
+class BuildBranchModal extends Component {
 
   constructor(props) {
     super(props);
@@ -175,7 +175,7 @@ class ModuleModal extends Component {
   }
 }
 
-ModuleModal.propTypes = {
+BuildBranchModal.propTypes = {
   showModal: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
   triggerBuild: PropTypes.func.isRequired,
@@ -194,4 +194,4 @@ ModuleModal.propTypes = {
   triggerInterProjectBuild: PropTypes.bool.isRequired
 };
 
-export default ModuleModal;
+export default BuildBranchModal;

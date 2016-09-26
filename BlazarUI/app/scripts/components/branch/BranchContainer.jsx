@@ -20,7 +20,7 @@ import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
-import { showBranchBuildModal } from '../../redux-actions/buildBranchFormActions';
+import { showBuildBranchModal } from '../../redux-actions/buildBranchFormActions';
 
 import {getPreviousBuildState} from '../Helpers.js';
 
@@ -207,7 +207,7 @@ class BranchContainer extends Component {
           </UIGridItem>
           <UIGridItem style={{'paddingTop': '32px'}} size={5} align="RIGHT">
             <BuildButton
-              openModuleModal={this.props.showBranchBuildModal}
+              openBuildBranchModal={this.props.showBuildBranchModal}
               loading={this.isLoading()}
             />
             <BuildBranchModalContainer
@@ -232,7 +232,7 @@ class BranchContainer extends Component {
 
 BranchContainer.propTypes = {
   params: PropTypes.object.isRequired,
-  showBranchBuildModal: PropTypes.func.isRequired,
+  showBuildBranchModal: PropTypes.func.isRequired,
   branchBuildError: PropTypes.string
 };
 
@@ -240,4 +240,4 @@ const mapStateToProps = (state) => ({
   branchBuildError: state.buildBranchForm.get('error')
 });
 
-export default connect(mapStateToProps, {showBranchBuildModal})(BranchContainer);
+export default connect(mapStateToProps, {showBuildBranchModal})(BranchContainer);

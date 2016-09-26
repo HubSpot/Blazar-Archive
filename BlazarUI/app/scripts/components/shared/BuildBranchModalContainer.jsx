@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import ModuleModal from '../shared/ModuleModal.jsx';
+import BuildBranchModal from '../shared/BuildBranchModal.jsx';
 import {
   hideBranchBuildModal,
   updateBranchBuildSelectedModuleIds,
@@ -27,4 +27,4 @@ export default connect(mapStateToProps, {
   onTriggerInterProjectBuild: toggleTriggerInterProjectBuild,
   onResetCacheUpdate: toggleResetCache,
   triggerBuild
-})(ModuleModal);
+})(BuildBranchModal);
