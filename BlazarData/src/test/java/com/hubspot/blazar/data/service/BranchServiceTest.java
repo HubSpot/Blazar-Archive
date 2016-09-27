@@ -13,7 +13,6 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.BlazarDataTestModule;
 import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
 
-
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarDataTestModule.class})
 public class BranchServiceTest extends DatabaseBackedTest {
