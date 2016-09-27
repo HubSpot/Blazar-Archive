@@ -243,6 +243,15 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <forkCount>2</forkCount>
+            <reuseForks>true</reuseForks>
+            <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
+          </configuration>
+        </plugin>
+        <plugin>
           <groupId>com.comoyo.maven.plugins</groupId>
           <artifactId>protoc-bundled-plugin</artifactId>
           <version>1.4.47</version>
