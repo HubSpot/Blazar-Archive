@@ -2,7 +2,6 @@ package com.hubspot.blazar.data.dao;
 
 import java.util.List;
 
-import com.hubspot.blazar.base.RepositoryBuild.State;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
@@ -11,6 +10,7 @@ import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
@@ -20,7 +20,7 @@ public interface RepositoryBuildDao {
   @SqlQuery("SELECT * FROM repo_builds WHERE id = :id")
   Optional<RepositoryBuild> get(@Bind("id") long id);
 
-  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId ORDER BY id DESC")
+  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId ORDER BY buildNumber DESC")
   List<RepositoryBuild> getByBranch(@Bind("branchId") int branchId);
 
   @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND state = :state ORDER BY id DESC")
