@@ -25,7 +25,7 @@ import com.hubspot.blazar.data.dao.ModuleDao;
 
 @Singleton
 public class ModuleBuildService {
-  public static final int MAX_MODULE_HISTORY_PAGE_SIZE = 10;
+  public static final int MAX_MODULE_ACTIVITY_PAGE_SIZE = 10;
   private static final Logger LOG = LoggerFactory.getLogger(ModuleBuildService.class);
 
   private final ModuleBuildDao moduleBuildDao;
@@ -52,8 +52,8 @@ public class ModuleBuildService {
   }
 
   public ModuleActivityPage getModuleBuildHistoryPage(int moduleId, Optional<Integer> maybeFromBuildNumber, Optional<Integer> maybePageSize) {
-    int pageSize = MAX_MODULE_HISTORY_PAGE_SIZE;
-    if (maybePageSize.isPresent() && 0 < maybePageSize.get() && maybePageSize.get() < MAX_MODULE_HISTORY_PAGE_SIZE) {
+    int pageSize = MAX_MODULE_ACTIVITY_PAGE_SIZE;
+    if (maybePageSize.isPresent() && 0 < maybePageSize.get() && maybePageSize.get() < MAX_MODULE_ACTIVITY_PAGE_SIZE) {
       pageSize = maybePageSize.get();
     }
 
