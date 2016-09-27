@@ -6,6 +6,11 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * This class represents a page of history from BuildHistoryResource#getByModule()
+ * moduleBuildInfos is a list of paired module/repo builds in the form of ModuleBuildInfo
+ * remaining is the number of builds left to be paged through
+ */
 public class ModuleActivityPage {
 
   private final List<ModuleBuildInfo> moduleBuildInfos;

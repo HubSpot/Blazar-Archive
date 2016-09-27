@@ -5,6 +5,10 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Matches a module build with its associated branch build so its easy to send
+ * buildTrigger, buildOptions, dependencyGraph etc. to the front end.
+ */
 public class ModuleBuildInfo {
 
   private final ModuleBuild moduleBuild;
