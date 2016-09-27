@@ -3,6 +3,7 @@ package com.hubspot.blazar.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.jukito.JukitoRunner;
@@ -46,12 +47,13 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
   private TestUtils testUtils;
   private GitInfo branch;
   private Module module;
-  private final List<RepositoryBuild> launchedBuilds = new ArrayList<>();
+  private List<RepositoryBuild> launchedBuilds;
 
   @Before
   @Inject
   public void before(ManagedDataSource dataSource) throws Exception {
     runSql(dataSource, "InterProjectData.sql");
+    launchedBuilds = new ArrayList<>();
     module = moduleService.get(1).get();
     branch = branchService.get(moduleService.getBranchIdFromModuleId(module.getId().get())).get();
 
@@ -68,6 +70,8 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
     ModuleActivityPage page = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(10), Optional.of(100));
     // check that we find the number of builds we started
     assertThat(page.getModuleBuildInfos().size()).isEqualTo(launchedBuilds.size());
+    // builds are launched in ASC order, but history endpoint returns in DESC order
+    launchedBuilds.sort(Comparator.comparing(RepositoryBuild::getBuildNumber, Comparator.reverseOrder()));
 
     // check that they are correctly paired (module build is associated with repo build found)
     for (int i = 0; i < page.getModuleBuildInfos().size(); i++) {
@@ -94,7 +98,7 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
   }
 
   public void testGetsHistory() {
-    ModuleActivityPage page = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), 10, Optional.of(100));
+    ModuleActivityPage page = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(10), Optional.of(100));
     assertThat(page.getModuleBuildInfos().size()).isEqualTo(4);
   }
 
