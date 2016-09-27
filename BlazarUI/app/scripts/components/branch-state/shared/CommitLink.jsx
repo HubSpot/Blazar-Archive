@@ -3,7 +3,11 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 const CommitLink = ({commit}) => {
   const truncatedSha = commit.get('id').substr(0, 8);
-  return <a href={commit.get('url')} target="_blank">{truncatedSha}</a>;
+  return (
+    <a className="commit-link" href={commit.get('url')} target="_blank">
+      {truncatedSha}
+    </a>
+  );
 };
 
 CommitLink.propTypes = {

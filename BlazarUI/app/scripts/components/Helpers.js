@@ -299,3 +299,15 @@ export const canViewDetailedModuleBuildInfo = (module) => {
 export const getBlazarModuleBuildPath = (branchId, buildNumber, moduleName) => {
   return `/builds/branch/${branchId}/build/${buildNumber}/module/${moduleName}`;
 };
+
+export const getCurrentModuleBuild = (moduleState) => {
+  return moduleState.get('inProgressModuleBuild') ||
+    moduleState.get('pendingModuleBuild') ||
+    moduleState.get('lastNonSkippedModuleBuild');
+};
+
+export const getCurrentRepoBuild = (moduleState) => {
+  return moduleState.get('inProgressRepoBuild') ||
+    moduleState.get('pendingRepoBuild') ||
+    moduleState.get('lastNonSkippedRepoBuild');
+};

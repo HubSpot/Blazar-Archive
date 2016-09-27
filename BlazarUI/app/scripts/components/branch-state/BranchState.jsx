@@ -9,6 +9,10 @@ import Loader from '../shared/Loader.jsx';
 import ModuleList from './ModuleList.jsx';
 import BranchStateHeadline from './BranchStateHeadline.jsx';
 import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
+import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
+
+import ModuleBuildStates from '../../constants/ModuleBuildStates';
+import { getCurrentModuleBuild } from '../Helpers';
 
 class BranchState extends Component {
   constructor(props) {
@@ -51,6 +55,16 @@ class BranchState extends Component {
 
       return 1;
     });
+  }
+
+  getFailingModuleNames(moduleStates) {
+    return moduleStates
+      .filter((moduleState) => {
+        return getCurrentModuleBuild(moduleState).get('state') === ModuleBuildStates.FAILED
+      })
+      .map((moduleState) => {
+        return moduleState.getIn(['module', 'name']);
+      });
   }
 
   handleBranchSelect(selectedBranchId) {
@@ -114,10 +128,13 @@ class BranchState extends Component {
       );
     }
 
+    const failingModuleNames = this.getFailingModuleNames(activeModules);
+    const hasFailingModules = !!failingModuleNames.size;
 
     return (
       <PageContainer classNames="page-content--branch-state" documentTitle={title}>
         <BranchStateHeadline branchId={branchId} branchInfo={branchInfo} onBranchSelect={this.handleBranchSelect} />
+        {hasFailingModules && <FailingModuleBuildsAlert failingModuleNames={failingModuleNames} />}
         {this.renderModuleLists()}
         <BuildBranchModalContainer
           branchId={branchId}
