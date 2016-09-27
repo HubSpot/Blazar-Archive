@@ -9,9 +9,9 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Optional;
-import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.ModuleBuildInfo;
 import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryState;
 import com.hubspot.blazar.data.dao.StateDao;
@@ -21,12 +21,10 @@ public class StateService {
   // Tracks how long it takes to get all module states for a branch
   private static final Logger LOG = LoggerFactory.getLogger(StateService.class);
   private final StateDao stateDao;
-  private ModuleService moduleService;
 
   @Inject
-  public StateService(StateDao stateDao, ModuleService moduleService, MetricRegistry metricRegistry) {
+  public StateService(StateDao stateDao) {
     this.stateDao = stateDao;
-    this.moduleService = moduleService;
   }
 
   public Set<RepositoryState> getAllRepositoryStates() {
@@ -45,18 +43,48 @@ public class StateService {
    * Collects the ModuleState for every module on the branch.
    *
    */
-  public Set<ModuleState> getModuleStatesByBranch(int branchId) {
+  public Set<ModuleState> getAllModuleStatesForBranch(int branchId) {
     long start = System.currentTimeMillis();
-    Set<ModuleState> states = new HashSet<>();
-    Set<Module> modules = moduleService.getByBranch(branchId);
-    for (Module m : modules) {
-      Optional<ModuleState> optionalState = stateDao.getModuleStateById(m.getId().get());
-      if (optionalState.isPresent()) {
-        states.add(optionalState.get());
-      }
+    Set<ModuleState> partialStates = stateDao.getPartialModuleStatesForBranch(branchId);
+    Set<ModuleState> completeStates = new HashSet<>();
+    for (ModuleState partialState : partialStates) {
+      // this module state is partial, only has "last", "pending", and "inProgress"
+      completeStates.add(buildCompleteState(partialState));
     }
-    LOG.info("Built composite state for branch {} in {}", branchId, System.currentTimeMillis() - start);
-    return states;
+    LOG.info("Built all states for branch {} in {}", branchId, System.currentTimeMillis() - start);
+    return completeStates;
   }
 
+
+  private ModuleState buildCompleteState(ModuleState partialState) {
+    Set<ModuleBuildInfo> remainingInfo = stateDao.getLastSuccessfulAndNonSkippedBuildInfos(partialState.getModule().getId().get());
+    // remaining info contains: the most recent successful build and the most recent non-skipped build
+    Optional<ModuleBuildInfo> successfulInfo = Optional.absent();
+    Optional<ModuleBuildInfo> otherInfo = Optional.absent();
+
+    for (ModuleBuildInfo info : remainingInfo) {
+      if (info.getModuleBuild().getState().equals(ModuleBuild.State.SUCCEEDED)) {
+        successfulInfo = Optional.of(info);
+      } else {
+        otherInfo = Optional.of(info);
+      }
+    }
+
+    // If the most recent non-skipped build is not present that means it is the successful build
+    if (!otherInfo.isPresent()) {
+      otherInfo = successfulInfo;
+    }
+
+    return new ModuleState(partialState.getModule(),
+        successfulInfo.isPresent() ? Optional.of(successfulInfo.get().getModuleBuild()) : Optional.absent(),
+        successfulInfo.isPresent() ? Optional.of(successfulInfo.get().getBranchBuild()) : Optional.absent(),
+        otherInfo.isPresent() ? Optional.of(otherInfo.get().getModuleBuild()) : Optional.absent(),
+        otherInfo.isPresent() ? Optional.of(otherInfo.get().getBranchBuild()) : Optional.absent(),
+        partialState.getLastModuleBuild(),
+        partialState.getLastRepoBuild(),
+        partialState.getInProgressModuleBuild(),
+        partialState.getInProgressRepoBuild(),
+        partialState.getPendingModuleBuild(),
+        partialState.getPendingRepoBuild());
+  }
 }

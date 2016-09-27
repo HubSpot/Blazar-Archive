@@ -33,9 +33,13 @@ public interface ModuleBuildDao {
       "JOIN repo_builds AS branchBuild ON moduleBuild.repoBuildId = branchBuild.id  " +
       "WHERE moduleId = :moduleId " +
       "AND moduleBuild.buildNumber <= :buildNumber " +
-      "ORDER BY moduleBuild.buildNumber " +
+      "ORDER BY moduleBuild.buildNumber DESC " +
       "LIMIT :limit")
   List<ModuleBuildInfo> getLimitedModuleBuildHistory(@Bind("moduleId") int moduleId, @Bind("buildNumber") int buildNumber, @Bind("limit") int limit);
+
+  @SingleValueResult
+  @SqlQuery("SELECT buildNumber FROM module_builds WHERE moduleId = :moduleId ORDER BY buildNumber DESC")
+  Optional<Integer> getMaxBuildNumber(@Bind("moduleId") int moduleId);
 
   @SingleValueResult
   @SqlQuery("" +

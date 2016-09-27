@@ -26,7 +26,6 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.listener.BuildEventDispatcher;
 
 import io.dropwizard.db.ManagedDataSource;
@@ -41,8 +40,6 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
   private BranchService branchService;
   @Inject
   private ModuleService moduleService;
-  @Inject
-  private RepositoryBuildService repositoryBuildService;
   @Inject
   private ModuleBuildService moduleBuildService;
   @Inject
@@ -68,7 +65,7 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
 
   @Test
   public void testGetsRightHistory() {
-    ModuleActivityPage page = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), 10, Optional.of(100));
+    ModuleActivityPage page = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(10), Optional.of(100));
     // check that we find the number of builds we started
     assertThat(page.getModuleBuildInfos().size()).isEqualTo(launchedBuilds.size());
 
@@ -83,15 +80,15 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
 
   @Test
   public void testGetsCorrectPageSize() {
-    ModuleActivityPage page1 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), 10, Optional.of(100));
+    ModuleActivityPage page1 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(10), Optional.of(100));
     // check that we find 10 (the number of builds we started)
     assertThat(page1.getModuleBuildInfos().size()).isEqualTo(10);
 
-    ModuleActivityPage page2 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), 5, Optional.of(100));
+    ModuleActivityPage page2 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(5), Optional.of(100));
     // check that we find 5
     assertThat(page2.getModuleBuildInfos().size()).isEqualTo(5);
 
-    ModuleActivityPage page3 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), 5, Optional.of(4));
+    ModuleActivityPage page3 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(5), Optional.of(4));
     // check that we find 5
     assertThat(page3.getModuleBuildInfos().size()).isEqualTo(4);
   }

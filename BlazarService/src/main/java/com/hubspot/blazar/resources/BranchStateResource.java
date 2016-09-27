@@ -99,7 +99,7 @@ public class BranchStateResource {
   @Path("/{id}/modules")
   @PropertyFiltering
   public Set<ModuleState> getModules(@PathParam("id") int branchId) {
-    Set<ModuleState> states = stateService.getModuleStatesByBranch(branchId);
+    Set<ModuleState> states = stateService.getAllModuleStatesForBranch(branchId);
     return states;
   }
 

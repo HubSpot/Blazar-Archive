@@ -22,20 +22,24 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.hubspot.blazar.data.service.StateService;
 
 @Path("/branches/builds")
 @Produces(MediaType.APPLICATION_JSON)
 public class RepositoryBuildResource {
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
+  private StateService stateService;
   private final BranchService branchService;
 
   @Inject
   public RepositoryBuildResource(RepositoryBuildService repositoryBuildService,
                                  ModuleBuildService moduleBuildService,
+                                 StateService stateService,
                                  BranchService branchService) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
+    this.stateService = stateService;
     this.branchService = branchService;
   }
 

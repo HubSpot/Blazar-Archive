@@ -1,10 +1,15 @@
 package com.hubspot.blazar.resources;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleActivityPage;
+import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
@@ -21,11 +26,18 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildHistoryResource {
   private final RepositoryBuildService repositoryBuildService;
+  private BranchService branchService;
+  private ModuleService moduleService;
   private final ModuleBuildService moduleBuildService;
 
   @Inject
-  public BuildHistoryResource(RepositoryBuildService repositoryBuildService, ModuleBuildService moduleBuildService) {
+  public BuildHistoryResource(RepositoryBuildService repositoryBuildService,
+                              BranchService branchService,
+                              ModuleService moduleService,
+                              ModuleBuildService moduleBuildService) {
     this.repositoryBuildService = repositoryBuildService;
+    this.branchService = branchService;
+    this.moduleService = moduleService;
     this.moduleBuildService = moduleBuildService;
   }
 
@@ -40,22 +52,25 @@ public class BuildHistoryResource {
   @Path("/branch/{id}/build/{number}")
   @PropertyFiltering
   public Optional<RepositoryBuild> getByBranch(@PathParam("id") int branchId, @PathParam("number") int buildNumber) {
+    branchService.checkBranchExists(branchId);
     return repositoryBuildService.getByBranchAndNumber(branchId, buildNumber);
   }
 
   @GET
-  @Path("/module/{moduleId}/{fromBuildNumber}")
+  @Path("/module/{moduleId}")
   @PropertyFiltering
   public ModuleActivityPage getByModule(@PathParam("moduleId") int moduleId,
-                                        @PathParam("fromBuildNumber") int fromBuildNumber,
+                                        @QueryParam("fromBuildNumber") Optional<Integer> maybeFromBuildNumber,
                                         @QueryParam("pageSize") Optional<Integer> maybePageSize) {
-    return moduleBuildService.getModuleBuildHistoryPage(moduleId, fromBuildNumber, maybePageSize);
+    moduleService.checkModuleExists(moduleId);
+    return moduleBuildService.getModuleBuildHistoryPage(moduleId, maybeFromBuildNumber, maybePageSize);
   }
 
   @GET
   @Path("/module/{id}/build/{number}")
   @PropertyFiltering
   public Optional<ModuleBuild> getByModule(@PathParam("id") int moduleId, @PathParam("number") int buildNumber) {
+    moduleService.checkModuleExists(moduleId);
     return moduleBuildService.getByModuleAndNumber(moduleId, buildNumber);
   }
 }
