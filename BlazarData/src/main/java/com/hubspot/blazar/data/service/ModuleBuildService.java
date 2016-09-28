@@ -61,7 +61,9 @@ public class ModuleBuildService {
     if (maybeFromBuildNumber.isPresent() && 0 < maybeFromBuildNumber.get()) {
       fromBuildNumber = maybeFromBuildNumber.get();
     } else {
+      long start = System.currentTimeMillis();
       Optional<Integer> maxBuildNumber = moduleBuildDao.getMaxBuildNumber(moduleId);
+      LOG.debug("Got max build number for module {} in {}", moduleId, System.currentTimeMillis() - start);
       if (maxBuildNumber.isPresent()) {
         fromBuildNumber = maxBuildNumber.get();
       } else {
@@ -70,7 +72,9 @@ public class ModuleBuildService {
     }
 
     // get a specific page
+    long start = System.currentTimeMillis();
     List<ModuleBuildInfo> builds = moduleBuildDao.getLimitedModuleBuildHistory(moduleId, fromBuildNumber, pageSize);
+    LOG.debug("Got {} builds of activity for module {} in {}", pageSize, moduleId,  System.currentTimeMillis() - start);
     int remainingCt = Math.max(0, moduleBuildDao.getRemainingBuildCountForPagedHistory(moduleId, fromBuildNumber).get() - builds.size());
     return new ModuleActivityPage(builds, remainingCt);
   }

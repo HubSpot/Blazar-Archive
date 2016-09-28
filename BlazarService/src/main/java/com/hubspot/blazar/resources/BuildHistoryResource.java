@@ -22,6 +22,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Path("/builds/history")
 @Produces(MediaType.APPLICATION_JSON)
 public class BuildHistoryResource {
@@ -29,6 +32,7 @@ public class BuildHistoryResource {
   private BranchService branchService;
   private ModuleService moduleService;
   private final ModuleBuildService moduleBuildService;
+  private static final Logger LOG = LoggerFactory.getLogger(BuildHistoryResource.class);
 
   @Inject
   public BuildHistoryResource(RepositoryBuildService repositoryBuildService,
