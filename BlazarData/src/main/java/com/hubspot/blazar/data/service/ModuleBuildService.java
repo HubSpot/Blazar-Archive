@@ -25,7 +25,7 @@ import com.hubspot.blazar.data.dao.ModuleDao;
 
 @Singleton
 public class ModuleBuildService {
-  public static final int MAX_MODULE_ACTIVITY_PAGE_SIZE = 10;
+  public static final int MAX_MODULE_ACTIVITY_PAGE_SIZE = 100;
   private static final Logger LOG = LoggerFactory.getLogger(ModuleBuildService.class);
 
   private final ModuleBuildDao moduleBuildDao;

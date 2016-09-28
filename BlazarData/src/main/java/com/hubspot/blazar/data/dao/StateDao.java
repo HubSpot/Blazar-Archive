@@ -67,13 +67,13 @@ public interface StateDao {
       "     LEFT OUTER JOIN modules as module on (branches.id = module.branchId) " +
       // last build
       "     LEFT OUTER JOIN module_builds AS lastModuleBuild ON (module.lastBuildId = lastModuleBuild.id) " +
-      "     LEFT OUTER JOIN repo_builds AS lastRepoBuild ON (lastModuleBuild.repoBuildId = lastRepoBuild.id) " +
+      "     LEFT OUTER JOIN repo_builds AS lastBranchBuild ON (lastModuleBuild.repoBuildId = lastRepoBuild.id) " +
       // in progress build
       "     LEFT OUTER JOIN module_builds AS inProgressModuleBuild ON (module.inProgressBuildId = inProgressModuleBuild.id) " +
-      "     LEFT OUTER JOIN repo_builds AS inProgressRepoBuild ON (inProgressModuleBuild.repoBuildId = inProgressRepoBuild.id) " +
+      "     LEFT OUTER JOIN repo_builds AS inProgressBranchBuild ON (inProgressModuleBuild.repoBuildId = inProgressRepoBuild.id) " +
       // pending build
       "     LEFT OUTER JOIN module_builds AS pendingModuleBuild ON (module.pendingBuildId = pendingModuleBuild.id) " +
-      "     LEFT OUTER JOIN repo_builds AS pendingRepoBuild ON (pendingModuleBuild.repoBuildId = pendingRepoBuild.id) " +
+      "     LEFT OUTER JOIN repo_builds AS pendingBranchBuild ON (pendingModuleBuild.repoBuildId = pendingRepoBuild.id) " +
       "  WHERE branches.id = :branchId")
   Set<ModuleState> getPartialModuleStatesForBranch(@Bind("branchId") int branchId);
 

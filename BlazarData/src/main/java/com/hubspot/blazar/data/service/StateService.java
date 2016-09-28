@@ -81,10 +81,10 @@ public class StateService {
         otherInfo.isPresent() ? Optional.of(otherInfo.get().getModuleBuild()) : Optional.absent(),
         otherInfo.isPresent() ? Optional.of(otherInfo.get().getBranchBuild()) : Optional.absent(),
         partialState.getLastModuleBuild(),
-        partialState.getLastRepoBuild(),
+        partialState.getLastBranchBuild(),
         partialState.getInProgressModuleBuild(),
-        partialState.getInProgressRepoBuild(),
+        partialState.getInProgressBranchBuild(),
         partialState.getPendingModuleBuild(),
-        partialState.getPendingRepoBuild());
+        partialState.getPendingBranchBuild());
   }
 }
