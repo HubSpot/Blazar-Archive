@@ -1,14 +1,14 @@
 import Immutable from 'immutable';
 import ActionTypes from '../redux-actions/ActionTypes';
+import { PAGE_SIZE } from '../constants/ModuleBuildActivity';
 
 const initialState = Immutable.Map({
   page: 1,
   totalPages: 0,
-  moduleBuilds: Immutable.List(),
-  loading: false
+  moduleBuildInfos: Immutable.List(),
+  loading: false,
+  startingBuildNumber: null
 });
-
-const PAGE_SIZE = 5;
 
 function moduleBuildHistory(state = initialState, action) {
   switch (action.type) {
@@ -19,11 +19,21 @@ function moduleBuildHistory(state = initialState, action) {
       return state.set('loading', true);
 
     case ActionTypes.RECEIVE_MODULE_BUILD_HISTORY: {
-      const {moduleBuilds} = action.payload;
-      const offset = PAGE_SIZE * (state.get('page') - 1);
+      const {page, moduleActivityPage: {moduleBuildInfos, remaining}} = action.payload;
+      if (page === 1) {
+        const startingBuildNumber = moduleBuildInfos.length ?
+          moduleBuildInfos[0].moduleBuild.buildNumber : null;
+
+        return state.merge({
+          moduleBuildInfos,
+          loading: false,
+          totalPages: Math.ceil(remaining / PAGE_SIZE) + 1,
+          startingBuildNumber
+        });
+      }
+
       return state.merge({
-        totalPages: Math.ceil(moduleBuilds.length / PAGE_SIZE),
-        moduleBuilds: moduleBuilds.slice(offset, offset + PAGE_SIZE),
+        moduleBuildInfos,
         loading: false
       });
     }

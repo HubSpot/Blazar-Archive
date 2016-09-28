@@ -8,18 +8,22 @@ const CommitInfo = ({commitInfo}) => {
   const previousCommit = commitInfo.get('previous');
   const currentCommit = commitInfo.get('current');
   if (!previousCommit || previousCommit.get('id') === currentCommit.get('id')) {
-    return <CommitLink commit={commitInfo.get('current')} />;
+    return (
+      <div className="module-build__commit-info" onClick={(e) => e.stopPropagation()}>
+        <CommitLink commit={commitInfo.get('current')} />
+      </div>
+    );
   }
 
-  const previousCommitLink = <CommitLink commit={commitInfo.get('previous')} />;
-  const currentCommitLink = <CommitLink commit={commitInfo.get('current')} />;
+  const previousCommitLink = <CommitLink commit={previousCommit} />;
+  const currentCommitLink = <CommitLink commit={currentCommit} />;
   const arrow = <Icon name="long-arrow-right" />;
   const compareLink = <CompareCommitsLink className="commit-info__compare-link" commitInfo={commitInfo} />;
 
   return (
-    <p className="module-build__commit-info" onClick={(e) => e.stopPropagation()}>
+    <div className="module-build__commit-info" onClick={(e) => e.stopPropagation()}>
       {previousCommitLink} {arrow} {currentCommitLink}{compareLink}
-    </p>
+    </div>
   );
 };
 

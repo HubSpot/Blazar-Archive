@@ -7,7 +7,7 @@ const CompareCommitsLink = ({commitInfo, className}) => {
   const currentCommitId = commitInfo.getIn(['current', 'id']);
   const commitUrl = `${previousCommitUrl.replace('/commit/', '/compare/')}...${currentCommitId}`;
   return (
-    <a className={className} href={commitUrl} target="_blank">
+    <a className={className} href={commitUrl} target="_blank" onClick={(e) => e.stopPropagation()}>
       <Icon type="octicon" name="diff" />
     </a>
   );

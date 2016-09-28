@@ -23,6 +23,7 @@
   height 30px
   margin-bottom -1px
   border 1px solid $color-battleship
+  position relative
 
 .module-build-history-item__build-number
   width 50px
@@ -33,11 +34,15 @@
   flex-grow 1
 
 .module-build-history-item__build-trigger-label
-  margin-right 20px
   font-size 12px
+  position absolute
+  right 30px
 
-.module-build-history-item--clickable:hover
-  background-color $color-gypsum
+.module-build-history-item__commit-info
+  margin-right 6px
 
-.module-build-history-item-link-wrapper:hover
-  text-decoration none
+.module-build-history-item--clickable
+  cursor pointer
+
+  &:hover
+    background-color $color-gypsum

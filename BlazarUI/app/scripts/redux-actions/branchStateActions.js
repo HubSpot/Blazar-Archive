@@ -18,7 +18,8 @@ export const loadBranchModuleStates = (branchId) => {
 const _pollBranchModuleStates = (branchId) => {
   return (dispatch, getState) => {
     dispatch(loadBranchModuleStates(branchId)).then(() => {
-      if (getState().branchState.get('isPolling')) {
+      const state = getState().branchState;
+      if (state.get('isPolling') && state.get('branchId') === branchId) {
         pollingTimeoutId = setTimeout(() => {
           dispatch(_pollBranchModuleStates(branchId));
         }, window.config.moduleStateRefresh);

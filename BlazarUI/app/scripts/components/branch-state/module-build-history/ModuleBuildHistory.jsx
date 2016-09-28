@@ -2,25 +2,32 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
+import Loader from '../../shared/Loader.jsx';
 import ModuleBuildHistoryItem from './ModuleBuildHistoryItem.jsx';
 import ModuleBuildHistoryPagination from './ModuleBuildHistoryPagination.jsx';
 
 class ModuleBuildHistory extends Component {
   renderMainContent() {
-    const {moduleBuilds, moduleName, branchId} = this.props;
-    if (!moduleBuilds.size) {
-      return <p>No builds to display.</p>;
+    const {moduleBuildInfos, moduleName, loading} = this.props;
+    if (!moduleBuildInfos.size) {
+      return loading ? <Loader /> : <p>No builds to display.</p>;
     }
 
     return (
       <ul className="module-build-history__list">
-        {moduleBuilds.map((moduleBuild) =>
-          <ModuleBuildHistoryItem
-            key={moduleBuild.get('id')}
-            moduleBuild={moduleBuild}
-            moduleName={moduleName}
-            branchId={branchId}
-          />
+        {moduleBuildInfos.map((moduleBuildInfo) => {
+          const moduleBuild = moduleBuildInfo.get('moduleBuild');
+          const branchBuild = moduleBuildInfo.get('branchBuild');
+          return (
+            <ModuleBuildHistoryItem
+              key={moduleBuild.get('id')}
+              moduleBuild={moduleBuild}
+              moduleName={moduleName}
+              branchBuild={branchBuild}
+            />
+          );
+        }
+
         )}
       </ul>
     );
@@ -53,9 +60,8 @@ class ModuleBuildHistory extends Component {
 ModuleBuildHistory.propTypes = {
   moduleName: PropTypes.string.isRequired,
   moduleId: PropTypes.number.isRequired,
-  branchId: PropTypes.number.isRequired,
   hasMorePages: PropTypes.bool,
-  moduleBuilds: ImmutablePropTypes.list,
+  moduleBuildInfos: ImmutablePropTypes.list,
   loading: PropTypes.bool
 };
 
@@ -63,9 +69,8 @@ const mapStateToProps = (state, ownProps) => {
   const buildHistory = state.moduleBuildHistoriesByModuleId.get(ownProps.moduleId);
   return {
     hasMorePages: buildHistory.get('totalPages') > 1,
-    moduleBuilds: buildHistory.get('moduleBuilds'),
-    loading: buildHistory.get('loading'),
-    branchId: state.branch.getIn(['branchInfo', 'id'])
+    moduleBuildInfos: buildHistory.get('moduleBuildInfos'),
+    loading: buildHistory.get('loading')
   };
 };
 
