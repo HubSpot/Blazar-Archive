@@ -40,7 +40,7 @@ const routes = (
     <Route name="repoBuild" path="/builds/branch/:branchId/build/:buildNumber" component={ RepoBuild } />
     <Route name="build" path="/builds/branch/:branchId/build/:buildNumber/module/:moduleName" component={ Build } />
     <Route name="repoBuildShortlink" path="/builds/repo-build/:repoBuildId" onEnter={redirectRepoBuildShortlink} />
-    <Route name="branchState" path="/branchState/branch/:branchId" component= { BranchState } />
+    <Route name="branchState" path="/branches/:branchId/state" component= { BranchState } />
     <Route name="notFound" path="*" component={ NotFound } />
   </Route>
 );
