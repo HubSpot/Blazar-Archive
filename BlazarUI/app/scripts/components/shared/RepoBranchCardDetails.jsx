@@ -109,7 +109,7 @@ class RepoBranchCardDetails extends Component {
       <div className="repo-branch-card__details">
         <div className="repo-branch-card__details-header">
           <span>Build {this.renderBuildNumberLink()} was started {buildTriggerMessage}</span>
-          <span className="repo-branch-card__author">{detailedTriggerMessage}</span>
+          <span className="repo-branch-card__expanded-author">{detailedTriggerMessage}</span>
         </div>
         <div className="repo-branch-card__module-rows">
           {this.renderModuleRows(this.sortModules(this.props.moduleBuildsList))}
