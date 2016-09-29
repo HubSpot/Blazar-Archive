@@ -68,7 +68,7 @@ class BranchState extends Component {
   }
 
   handleBranchSelect(selectedBranchId) {
-    this.props.router.push(`/branchState/branch/${selectedBranchId}`);
+    this.props.router.push(`/branches/${selectedBranchId}/state`);
   }
 
   handleModuleItemClick(id) {
