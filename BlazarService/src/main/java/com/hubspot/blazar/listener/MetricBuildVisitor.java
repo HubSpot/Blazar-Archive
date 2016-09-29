@@ -44,13 +44,13 @@ public class MetricBuildVisitor implements ModuleBuildVisitor, RepositoryBuildVi
 
     for (ModuleBuild.State state : ModuleBuild.State.values()) {
       if (state.isRunning() || state.isWaiting()) {
-        metricRegistry.register((state.getClass().getCanonicalName() + "." + state.toString() + ".count").toLowerCase(), buildModuleStateGuage(state));
+        metricRegistry.register((state.getClass().getCanonicalName() + "." + state.toString() + ".count"), buildModuleStateGuage(state));
       }
     }
 
     for (RepositoryBuild.State state : RepositoryBuild.State.values()) {
       if (!state.isComplete()) {
-        metricRegistry.register((state.getClass().getCanonicalName() + "." + state.toString() + ".count").toLowerCase(), buildBranchStateGuage(state));
+        metricRegistry.register((state.getClass().getCanonicalName() + "." + state.toString() + ".count"), buildBranchStateGuage(state));
       }
     }
   }
