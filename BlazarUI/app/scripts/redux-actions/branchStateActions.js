@@ -1,6 +1,7 @@
 import ActionTypes from './ActionTypes';
 import BranchStateApi from '../data/BranchStateApi';
 import { loadModuleBuildHistory } from './moduleBuildHistoryActions';
+import Q from 'q';
 
 let pollingTimeoutId = null;
 
@@ -15,9 +16,22 @@ export const loadBranchModuleStates = (branchId) => {
   };
 };
 
+const shouldPollModuleBuildHistory = (getState) => {
+  const state = getState();
+  const selectedModuleId = state.branchState.get('selectedModuleId');
+  return selectedModuleId && state.moduleBuildHistoriesByModuleId.getIn([selectedModuleId, 'page']) === 1;
+};
+
 const _pollBranchModuleStates = (branchId) => {
   return (dispatch, getState) => {
-    dispatch(loadBranchModuleStates(branchId)).then(() => {
+    const pollRequests = [dispatch(loadBranchModuleStates(branchId))];
+
+    if (shouldPollModuleBuildHistory(getState)) {
+      const selectedModuleId = getState().branchState.get('selectedModuleId');
+      pollRequests.push(dispatch(loadModuleBuildHistory(selectedModuleId)));
+    }
+
+    Q.all(pollRequests).then(() => {
       const state = getState().branchState;
       if (state.get('isPolling') && state.get('branchId') === branchId) {
         pollingTimeoutId = setTimeout(() => {

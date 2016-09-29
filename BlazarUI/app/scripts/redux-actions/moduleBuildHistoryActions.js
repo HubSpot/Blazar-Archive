@@ -18,12 +18,13 @@ export const loadModuleBuildHistory = (moduleId, maybePage) => {
     const buildHistory = getState().moduleBuildHistoriesByModuleId.get(moduleId);
     const page = maybePage || buildHistory.get('page');
     const offset = computeBuildNumberOffset(buildHistory, page);
-    BranchStateApi.fetchModuleBuildHistory(moduleId, offset, PAGE_SIZE).then((moduleActivityPage) => {
-      dispatch({
-        type: ActionTypes.RECEIVE_MODULE_BUILD_HISTORY,
-        payload: {moduleId, moduleActivityPage, page}
+    return BranchStateApi.fetchModuleBuildHistory(moduleId, offset, PAGE_SIZE)
+      .then((moduleActivityPage) => {
+        dispatch({
+          type: ActionTypes.RECEIVE_MODULE_BUILD_HISTORY,
+          payload: {moduleId, moduleActivityPage, page}
+        });
       });
-    });
   };
 };
 
