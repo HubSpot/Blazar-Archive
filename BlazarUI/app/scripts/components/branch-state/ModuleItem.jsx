@@ -3,7 +3,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import ModuleBuildTabs from './ModuleBuildTabs.jsx';
 import ModuleBuild from './ModuleBuild.jsx';
-import { getCurrentModuleBuild, getCurrentRepoBuild } from '../Helpers';
+import { getCurrentModuleBuild, getCurrentBranchBuild } from '../Helpers';
 
 class ModuleItem extends Component {
   constructor(props) {
@@ -24,15 +24,15 @@ class ModuleItem extends Component {
     this.setState({selectedBuild: moduleBuild});
   }
 
-  getSelectedRepoBuild() {
+  getSelectedBranchBuild() {
     const selectedRepoBuildId = this.state.selectedBuild.get('repoBuildId');
-    const currentRepoBuild = getCurrentRepoBuild(this.props.moduleState);
-    const lastSuccessfulRepoBuild = this.props.moduleState.get('lastSuccessfulRepoBuild');
+    const currentBranchBuild = getCurrentBranchBuild(this.props.moduleState);
+    const lastSuccessfulBranchBuild = this.props.moduleState.get('lastSuccessfulBranchBuild');
 
-    if (currentRepoBuild.get('id') === selectedRepoBuildId) {
-      return currentRepoBuild;
-    } else if (lastSuccessfulRepoBuild.get('id') === selectedRepoBuildId) {
-      return lastSuccessfulRepoBuild;
+    if (currentBranchBuild.get('id') === selectedRepoBuildId) {
+      return currentBranchBuild;
+    } else if (lastSuccessfulBranchBuild.get('id') === selectedRepoBuildId) {
+      return lastSuccessfulBranchBuild;
     }
 
     return null;
@@ -52,7 +52,7 @@ class ModuleItem extends Component {
         <ModuleBuild
           module={moduleState.get('module')}
           moduleBuild={selectedBuild}
-          repoBuild={this.getSelectedRepoBuild()}
+          branchBuild={this.getSelectedBranchBuild()}
           onClick={onClick}
         />
       </li>

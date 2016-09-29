@@ -306,8 +306,8 @@ export const getCurrentModuleBuild = (moduleState) => {
     moduleState.get('lastNonSkippedModuleBuild');
 };
 
-export const getCurrentRepoBuild = (moduleState) => {
-  return moduleState.get('inProgressRepoBuild') ||
-    moduleState.get('pendingRepoBuild') ||
-    moduleState.get('lastNonSkippedRepoBuild');
+export const getCurrentBranchBuild = (moduleState) => {
+  return moduleState.get('inProgressBranchBuild') ||
+    moduleState.get('pendingBranchBuild') ||
+    moduleState.get('lastNonSkippedBranchBuild');
 };

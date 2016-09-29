@@ -44,7 +44,7 @@ class BranchState extends Component {
       return activeModules;
     }
 
-    const topologicalSort = activeModules.first().getIn(['lastRepoBuild', 'dependencyGraph', 'topologicalSort']);
+    const topologicalSort = activeModules.first().getIn(['lastBranchBuild', 'dependencyGraph', 'topologicalSort']);
     return activeModules.sort((a, b) => {
       const indexA = topologicalSort.indexOf(a.getIn(['module', 'id']));
       const indexB = topologicalSort.indexOf(b.getIn(['module', 'id']));
@@ -60,7 +60,7 @@ class BranchState extends Component {
   getFailingModuleNames(moduleStates) {
     return moduleStates
       .filter((moduleState) => {
-        return getCurrentModuleBuild(moduleState).get('state') === ModuleBuildStates.FAILED
+        return getCurrentModuleBuild(moduleState).get('state') === ModuleBuildStates.FAILED;
       })
       .map((moduleState) => {
         return moduleState.getIn(['module', 'name']);
