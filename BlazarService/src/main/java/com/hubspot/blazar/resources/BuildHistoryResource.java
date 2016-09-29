@@ -67,7 +67,7 @@ public class BuildHistoryResource {
                                         @QueryParam("fromBuildNumber") Optional<Integer> maybeFromBuildNumber,
                                         @QueryParam("pageSize") Optional<Integer> maybePageSize) {
     moduleService.checkModuleExists(moduleId);
-    return moduleBuildService.getModuleBuildHistoryPage(moduleId, maybeFromBuildNumber, maybePageSize);
+    return moduleBuildService.getModuleActivityPage(moduleId, maybeFromBuildNumber, maybePageSize);
   }
 
   @GET

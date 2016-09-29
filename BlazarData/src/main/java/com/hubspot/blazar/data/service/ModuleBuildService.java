@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleActivityPage;
@@ -51,32 +50,38 @@ public class ModuleBuildService {
     return moduleBuildDao.getByState(state);
   }
 
-  public ModuleActivityPage getModuleBuildHistoryPage(int moduleId, Optional<Integer> maybeFromBuildNumber, Optional<Integer> maybePageSize) {
+  public ModuleActivityPage getModuleActivityPage(int moduleId, Optional<Integer> maybeFromBuildNumber, Optional<Integer> maybePageSize) {
     int pageSize = MAX_MODULE_ACTIVITY_PAGE_SIZE;
     if (maybePageSize.isPresent() && 0 < maybePageSize.get() && maybePageSize.get() < MAX_MODULE_ACTIVITY_PAGE_SIZE) {
       pageSize = maybePageSize.get();
     }
 
-    int fromBuildNumber;
-    if (maybeFromBuildNumber.isPresent() && 0 < maybeFromBuildNumber.get()) {
-      fromBuildNumber = maybeFromBuildNumber.get();
-    } else {
-      long start = System.currentTimeMillis();
-      Optional<Integer> maxBuildNumber = moduleBuildDao.getMaxBuildNumber(moduleId);
-      LOG.debug("Got max build number for module {} in {}", moduleId, System.currentTimeMillis() - start);
-      if (maxBuildNumber.isPresent()) {
-        fromBuildNumber = maxBuildNumber.get();
-      } else {
-        return new ModuleActivityPage(ImmutableList.of(), 0);
-      }
-    }
-
-    // get a specific page
+    List<ModuleBuildInfo> builds;
     long start = System.currentTimeMillis();
-    List<ModuleBuildInfo> builds = moduleBuildDao.getLimitedModuleBuildHistory(moduleId, fromBuildNumber, pageSize);
-    LOG.debug("Got {} builds of activity for module {} in {}", pageSize, moduleId,  System.currentTimeMillis() - start);
-    int remainingCt = Math.max(0, moduleBuildDao.getRemainingBuildCountForPagedHistory(moduleId, fromBuildNumber).get() - builds.size());
-    return new ModuleActivityPage(builds, remainingCt);
+    if (maybeFromBuildNumber.isPresent() && 0 < maybeFromBuildNumber.get()) {
+      int fromBuildNumber = maybeFromBuildNumber.get();
+      builds = moduleBuildDao.getLimitedModuleBuildHistory(moduleId, fromBuildNumber, pageSize);
+    } else {
+      builds = moduleBuildDao.getLatestLimitedModuleBuildHistory(moduleId, pageSize);
+    }
+    LOG.debug("Got {} builds of activity for module {} in {}", builds.size(), moduleId,  System.currentTimeMillis() - start);
+
+    // calculate remaining
+    if (builds.isEmpty()) {
+      return new ModuleActivityPage(builds, 0);
+    }
+    int lastBuildNumber = builds.get(builds.size() - 1).getBranchBuild().getBuildNumber();
+    /**
+     * We have to actually count this, because if a module gets added to a branch its build history
+     * starts at the build# for the build it was added on, and doesn't go back all the way to "1"
+     */
+    Optional<Integer> remainingCount = moduleBuildDao.getRemainingBuildCountForPagedHistory(moduleId, lastBuildNumber);
+
+    // the count() aggregation shouldn't return nothing, but in case it does:
+    if (!remainingCount.isPresent()) {
+      return new ModuleActivityPage(builds, 0);
+    }
+    return new ModuleActivityPage(builds, remainingCount.get());
   }
 
   public Optional<ModuleBuild> getPreviousBuild(ModuleBuild build) {

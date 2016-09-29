@@ -66,8 +66,8 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void testGetsRightHistory() {
-    ModuleActivityPage page = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(10), Optional.of(100));
+  public void testGetsRightActivity() {
+    ModuleActivityPage page = moduleBuildService.getModuleActivityPage(module.getId().get(), Optional.of(10), Optional.of(100));
     // check that we find the number of builds we started
     assertThat(page.getModuleBuildInfos().size()).isEqualTo(launchedBuilds.size());
     // builds are launched in ASC order, but history endpoint returns in DESC order
@@ -84,21 +84,21 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
 
   @Test
   public void testGetsCorrectPageSize() {
-    ModuleActivityPage page1 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(10), Optional.of(100));
+    ModuleActivityPage page1 = moduleBuildService.getModuleActivityPage(module.getId().get(), Optional.of(10), Optional.of(100));
     // check that we find 10 (the number of builds we started)
     assertThat(page1.getModuleBuildInfos().size()).isEqualTo(10);
 
-    ModuleActivityPage page2 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(5), Optional.of(100));
+    ModuleActivityPage page2 = moduleBuildService.getModuleActivityPage(module.getId().get(), Optional.of(5), Optional.of(100));
     // check that we find 5
     assertThat(page2.getModuleBuildInfos().size()).isEqualTo(5);
 
-    ModuleActivityPage page3 = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(5), Optional.of(4));
+    ModuleActivityPage page3 = moduleBuildService.getModuleActivityPage(module.getId().get(), Optional.of(5), Optional.of(4));
     // check that we find 5
     assertThat(page3.getModuleBuildInfos().size()).isEqualTo(4);
   }
 
-  public void testGetsHistory() {
-    ModuleActivityPage page = moduleBuildService.getModuleBuildHistoryPage(module.getId().get(), Optional.of(10), Optional.of(100));
+  public void testGetsActivity() {
+    ModuleActivityPage page = moduleBuildService.getModuleActivityPage(module.getId().get(), Optional.of(10), Optional.of(100));
     assertThat(page.getModuleBuildInfos().size()).isEqualTo(4);
   }
 
