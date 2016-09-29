@@ -14,7 +14,7 @@ const appConfig = {
   activeBuildLogRefresh: process.env.ACTIVE_BUILD_LOG_REFRESH || 500,
 
   // state of modules in a branch polling frequency in ms
-  moduleStateRefresh: process.env.MODULE_STATE_REFRESH || 3000,
+  moduleStateRefresh: process.env.MODULE_STATE_REFRESH || 10000,
 
   // byte count when fetching log offsets
   offsetLength: process.env.BLAZAR_OFFSET_LENGTH || 50000,
