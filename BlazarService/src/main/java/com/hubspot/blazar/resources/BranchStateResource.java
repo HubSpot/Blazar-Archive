@@ -65,16 +65,16 @@ public class BranchStateResource {
   }
 
   @GET
-  @Path("/{id}")
+  @Path("/{branchId}")
   @PropertyFiltering
-  public Optional<RepositoryState> get(@PathParam("id") int branchId) {
+  public Optional<RepositoryState> get(@PathParam("branchId") int branchId) {
     return stateService.getRepositoryState(branchId);
   }
 
   @GET
-  @Path("/{id}/shield")
+  @Path("/{branchId}/shield")
   @Produces("image/svg+xml")
-  public StreamingOutput getShield(@PathParam("id") int branchId) {
+  public StreamingOutput getShield(@PathParam("branchId") int branchId) {
     Optional<RepositoryState> state = stateService.getRepositoryState(branchId);
     if (!state.isPresent()) {
       throw new IllegalArgumentException(String.format("No state for id  %d", branchId));
@@ -96,10 +96,10 @@ public class BranchStateResource {
   }
 
   @GET
-  @Path("/{id}/modules")
+  @Path("/{branchId}/modules")
   @PropertyFiltering
-  public Set<ModuleState> getModules(@PathParam("id") int branchId) {
-    Set<ModuleState> states = stateService.getModuleStatesByBranch(branchId);
+  public Set<ModuleState> getModules(@PathParam("branchId") int branchId) {
+    Set<ModuleState> states = stateService.getAllModuleStatesForBranch(branchId);
     return states;
   }
 
