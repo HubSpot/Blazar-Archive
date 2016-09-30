@@ -1,17 +1,39 @@
-@import './card-variables.styl'
-
 $info-width = 30%
 $last-build-width = 20%
 $details-width = 50%
 
+$border = 1px solid $color-battleship
+$card-summary-height = 80px
+$bg-transition-duration = .15s
+$build-and-status-width = 80px
+
+.repo-branch-card-stack__zero-state
+  font-family HelveticaNeue-light
+  color $color-heffalump
+  text-align center
+  max-width 560px
+  margin auto
+
+  & h1
+    margin-top 30px
+    margin-bottom 20px
+    font-size 20px
+    font-family HelveticaNeue-medium
+
+  & p
+    font-size 16px
+    line-height 24px
+
 .repo-branch-card__header
   height 50px
+  line-height 50px
   background-color #F9FBFD
   border $border
   border-bottom 0
-  color #425b76
+  color $color-heffalump
   font-family HelveticaNeue-medium
-  padding-left 80px
+  padding-left $build-and-status-width
+  text-transform uppercase
 
   & > div
     width 100%
@@ -19,34 +41,21 @@ $details-width = 50%
 
   & div
     display inline-block
-    height 100%
-    line-height 50px
 
 .repo-branch-card__header-info
   width $info-width
 
-  &:before
-    content 'BRANCH'
-
 .repo-branch-card__header-last-built
   width $last-build-width
-
-  &:before
-    content 'LAST BUILT'
 
 .repo-branch-card__header-details
   width $details-width
 
-  &:before
-    content 'DETAILS'
+.repo-branch-card__summary
+  cursor pointer
 
 .repo-branch-card__info
   width $info-width
-  height 100%
-
-.repo-branch-card__inner-wrapper
-  display inline-block
-  width 100%
 
 .repo-branch-card__repo
   padding-top 6px
@@ -56,17 +65,26 @@ $details-width = 50%
   text-overflow ellipsis
   max-width calc(100% - 10px)
 
+.repo-branch-card__main
+  padding 10px 20px
+  background-color white
+  height $card-summary-height
+  width "calc(100% - %s)" % $build-and-status-width
+  display inline-block
+
+  & > div
+    display inline-block
+
 .repo-branch-card__build-and-status
-  width 80px
-  height $initial-height
+  width $build-and-status-width
+  height $card-summary-height
   float left
-  line-height $initial-height
+  line-height $card-summary-height
   text-align center
   font-size 18px
-  cursor pointer
 
   & span
-    color #425b76
+    color $color-heffalump
 
 .repo-branch-card__build-and-status--SUCCEEDED
   background-color #ccf2ed
@@ -84,8 +102,6 @@ $details-width = 50%
   padding-top 4px
   font-family HelveticaNeue-Light
   color #7c98b6
-  display inline-block
-  height 25px
   overflow hidden
   white-space nowrap
   text-overflow ellipsis
@@ -93,12 +109,12 @@ $details-width = 50%
 
 .repo-branch-card__branch
   font-family HelveticaNeue
-  color #425b76
+  color $color-heffalump
   background-color #eceef1
   padding 3px 7px
 
   & a
-    color #425b76
+    color $color-heffalump
 
   &:before
     font-family 'octicons'
@@ -106,60 +122,52 @@ $details-width = 50%
 
 .repo-branch-card__build-number
   font-family HelveticaNeue-light
-  color #425b76
+  color $color-heffalump
 
 .repo-branch-card__last-build
   width $last-build-width
   height 100%
   vertical-align middle
-  line-height 20px
   overflow hidden
   white-space nowrap
   text-overflow ellipsis
   max-width calc(100% - 15px)
 
 .repo-branch-card__last-build-time
-  color #425b76
+  color $color-heffalump
   font-family HelveticaNeue-bold
 
-.repo-branch-card__details
+.repo-branch-card__triggered-by
   width $details-width
   height 100%
   vertical-align middle
-  line-height 20px
-
-.repo-branch-card__triggered-by
   font-family HelveticaNeue-light
-  color #425b76
+  color $color-heffalump
   overflow hidden
   white-space nowrap
   text-overflow ellipsis
   max-width calc(100% - 10px)
 
-.repo-branch-card__modules-built
-  color #425b76
+.repo-branch-card__details
+  padding 20px
+  background-color $color-gypsum
+  position relative
 
-.repo-branch-card__modules-skipped
-  color #7c98b6
-  font-family HelveticaNeue-light
-
-.repo-branch-card__status
-  max-width 18%
-  height 100%
-  vertical-align middle
-  float right
-  padding-left 2%
-  padding-top 17px
-  font-family HelveticaNeue-medium
-
-.repo-branch-card__expanded-header
+.repo-branch-card__details-header
   font-family HelveticaNeue-light
   font-size 18px
-  color #425b76
-  display block
+  color $color-heffalump
 
   & .repo-branch-card__build-number
     font-family HelveticaNeue
+
+.repo-branch-card__author
+  color #425b76
+  font-family HelveticaNeue-medium
+
+.repo-branch-card__module-rows
+  margin-top 20px
+  box-shadow 0 3px 3px 0 rgba(0, 0, 0, 0.2)
 
 .repo-branch-card__expanded-author
   font-size 14px
@@ -167,16 +175,12 @@ $details-width = 50%
   font-family HelveticaNeue
   padding-left 20px
 
-.repo-branch-card__expanded-module-rows
-  margin-top 20px
-  box-shadow 0 3px 3px 0 rgba(0, 0, 0, 0.2)
-
 .repo-branch-card__expanded-module-row
   background-color white
   border 1px solid #eaf0f6
   height 40px
   padding 10px
-  color #425b76
+  color $color-heffalump
   transition background $bg-transition-duration
 
   & span
@@ -190,10 +194,6 @@ $details-width = 50%
 .repo-branch-card__expanded-module-row--no-log:hover
   background-color white
 
-.repo-branch-card__author
-  color #425b76
-  font-family HelveticaNeue-medium
-
 .repo-branch-card__expanded-status
   padding-left 25px
   float left
@@ -202,7 +202,3 @@ $details-width = 50%
 .repo-branch-card__expanded-timestamp
   float right
   max-width 30%
-
-.repo-branch-card--failed
-  & .card-stack__card-main
-    background-color #FDF0F0

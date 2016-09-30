@@ -1,0 +1,49 @@
+@import '../../variables'
+
+.module-build-history
+  padding 20px
+
+  h5
+    font-weight bold
+    font-size 16px
+    margin-bottom 20px
+
+.module-build-history__pagination
+  margin 0
+
+.module-build-history__list
+  padding-left 0
+  box-shadow 0 3px 6px rgba(0,0,0,0.20)
+
+  li
+    display block
+
+.module-build-history-item
+  display flex
+  align-items center
+  height 30px
+  margin-bottom -1px
+  border 1px solid $color-battleship
+  position relative
+
+.module-build-history-item__build-number
+  width 50px
+
+.module-build-history-item__status
+  margin 0
+  padding-left 20px
+  flex-grow 1
+
+.module-build-history-item__build-trigger-label
+  font-size 12px
+  position absolute
+  right 30px
+
+.module-build-history-item__commit-info
+  margin-right 6px
+
+.module-build-history-item--clickable
+  cursor pointer
+
+  &:hover
+    background-color $color-gypsum

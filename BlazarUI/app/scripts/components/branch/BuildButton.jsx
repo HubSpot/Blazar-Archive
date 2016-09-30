@@ -12,7 +12,7 @@ class BuildButton extends Component {
       <Button
         id="build-now-button"
         bsStyle="primary"
-        onClick={this.props.openModuleModal}
+        onClick={this.props.openBuildBranchModal}
         style={{'marginRight': '5px'}}
       >
         Build Now
@@ -22,7 +22,7 @@ class BuildButton extends Component {
 }
 
 BuildButton.propTypes = {
-  openModuleModal: PropTypes.func.isRequired,
+  openBuildBranchModal: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired
 };
 

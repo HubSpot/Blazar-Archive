@@ -12,6 +12,7 @@ import Settings from './pages/settings.jsx';
 import Build from './pages/build.jsx';
 import RepoBuild from './pages/repoBuild.jsx';
 import NotFound from './pages/notFound.jsx';
+import BranchState from './components/branch-state/BranchStateContainer.jsx';
 
 function redirectRepoBuildShortlink(nextState, replace, callback) {
   const data = $.ajax({
@@ -39,6 +40,7 @@ const routes = (
     <Route name="repoBuild" path="/builds/branch/:branchId/build/:buildNumber" component={ RepoBuild } />
     <Route name="build" path="/builds/branch/:branchId/build/:buildNumber/module/:moduleName" component={ Build } />
     <Route name="repoBuildShortlink" path="/builds/repo-build/:repoBuildId" onEnter={redirectRepoBuildShortlink} />
+    <Route name="branchState" path="/branches/:branchId/state" component= { BranchState } />
     <Route name="notFound" path="*" component={ NotFound } />
   </Route>
 );

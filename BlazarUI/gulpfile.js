@@ -1,11 +1,13 @@
 var gulp = require('gulp');
 var path = require('path');
 var $ = require('gulp-load-plugins')();
+var addsrc = require('gulp-add-src');
 var del = require('del');
 var concatCss = require('gulp-concat-css');
 var gulpCopy = require('gulp-copy');
 var url = require('url');
 var mustache = require('gulp-mustache');
+var bootstrap = require('bootstrap-styl');
 
 // config to sent to html as global config variables
 var appConfig = require('./appConfig.js');
@@ -69,12 +71,17 @@ gulp.task('html', function() {
 
 gulp.task('vendorStyles', function () {
   var files = [
-    './node_modules/bootstrap/dist/css/bootstrap.css',
     './node_modules/font-awesome/css/font-awesome.css',
     './node_modules/react-select/dist/default.css',
     './node_modules/react-select/dist/react-select.css'
   ];
-  return gulp.src(files)
+  return gulp.src(app + 'stylus/vendor-overrides/bootstrap-overrides.styl')
+    .pipe($.stylus({
+      use: bootstrap(),
+      compress: true,
+      'include css': true
+    }))
+    .pipe(addsrc(files))
     .pipe(concatCss('vendor.css'))
     .pipe(gulp.dest(dist + 'css'));
 });
@@ -143,10 +150,11 @@ gulp.task('images', function(cb) {
 // watch styl, html and js file changes
 gulp.task('watch', function() {
   gulp.watch(app + 'images/**/*.{png,jpg,jpeg,gif,svg}', ['images']);
-  gulp.watch(app + 'stylus/**/*.styl', ['styles']);
+  gulp.watch(app + 'stylus/**/!(bootstrap-overrides).styl', ['styles']);
   gulp.watch(app + 'index.mustache', ['html']);
   gulp.watch(app + 'scripts/**/*.jsx', ['scripts', 'lint']);
   gulp.watch(app + 'scripts/**/*.js', ['scripts', 'lint']);
+  gulp.watch(app + 'stylus/vendor-overrides/bootstrap-overrides.styl', ['vendorStyles']);
   // gulp.watch(app + 'scripts/**/*.jsx', ['scripts']);
   // gulp.watch(app + 'scripts/**/*.js', ['scripts']);
 });

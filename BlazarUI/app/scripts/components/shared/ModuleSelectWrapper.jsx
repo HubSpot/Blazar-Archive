@@ -8,10 +8,6 @@ class ModuleSelectWrapper extends Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
-  shouldComponentUpdate(nextProps) {
-    return nextProps.modules.length !== this.props.modules.length;
-  }
-
   handleChange(value) {
     // react-select returns an empty string if nothing is selected
     const moduleIds = value ? value.split(',').map(Number) : [];

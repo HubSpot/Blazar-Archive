@@ -1,0 +1,80 @@
+@import '../variables'
+
+.page-content--branch-state
+  padding 30px 20px 30px 40px
+  min-width 700px
+  font-family "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif
+  color $color-heffalump
+
+  .page-header
+    padding-top 0
+
+  a
+    color $color-calypso
+
+  .btn
+    radius 3px
+
+  .btn-lg
+    font-size 18px
+
+  .btn-default
+    color $color-button-secondary-text
+    background-color $color-olaf
+    border-color $color-lorax
+
+    &:hover,
+    &:focus
+      background-color $color-button-secondary-hover-fill
+      color $color-button-secondary-text
+
+    &:active
+      background-color $color-button-secondary-active-fill
+
+  .btn-primary
+    color $color-olaf
+    background-color $color-lorax
+    border-color $color-lorax
+
+    &:hover,
+    &:focus
+      background-color $color-button-primary-hover-fill
+      border-color $color-button-primary-hover-fill
+      color $color-olaf
+
+    &:active
+      background-color $color-lorax-dark
+      border-color $color-lorax-dark
+
+  #build-settings-button
+    margin-right 12px
+
+#active-modules, #inactive-modules
+  margin-bottom 40px
+
+.module-list-header
+  font-size 24px
+  margin-bottom 30px
+  font-weight 400
+
+  &:before
+    content ""
+    width 25px
+    height 28px
+    float left
+    margin-right 5px
+    background url("../images/module-icon.svg")
+
+.branch-state-headline__star
+  margin-left 20px
+  margin-right 15px
+  position relative
+  top 3px
+
+.failing-module-builds
+  margin-bottom 30px
+
+.failing-module-builds__list
+  list-style none
+  padding-left 20px
+  margin-bottom 0

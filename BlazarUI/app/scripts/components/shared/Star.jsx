@@ -1,65 +1,50 @@
 import React, {Component, PropTypes} from 'react';
+import { connect } from 'react-redux';
 import Icon from '../shared/Icon.jsx';
-import { bindAll } from 'underscore';
 import classnames from 'classnames';
-import StarActions from '../../actions/starActions';
+import { toggleStar } from '../../redux-actions/starredBranchesActions';
 
 class Star extends Component {
 
   constructor(props) {
     super(props);
-    bindAll(this, 'handleClick');
+    this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick(event) {
     event.stopPropagation();
-
-    if (this.props.disabled) {
-      return;
-    }
-    StarActions.toggleStar(this.props.id);
+    this.props.toggleStar(this.props.branchId);
   }
 
   getContainerClassNames() {
     return classnames(
        'star',
        this.props.className, {
-         disabled: this.props.disabled,
          selected: this.props.isStarred,
          unselected: !this.props.isStarred,
-         loading: this.props.loading
        }
     );
-  }
-
-  getIconClassNames() {
-    return classnames([
-       {'star': this.props.isStarred},
-       {'star-o': !this.props.isStarred}
-    ]);
   }
 
   render() {
     return (
       <span onClick={this.handleClick} className={this.getContainerClassNames()}>
-        <Icon name={this.getIconClassNames()} />
+        <Icon name={this.props.isStarred ? 'star' : 'star-o'} />
       </span>
     );
   }
 
 }
 
-Star.defaultProps = {
-  isStarred: false,
-  disabled: false
-};
-
 Star.propTypes = {
-  loading: PropTypes.bool,
   className: PropTypes.string,
   isStarred: PropTypes.bool.isRequired,
-  id: PropTypes.number,
-  disabled: PropTypes.bool
+  branchId: PropTypes.number.isRequired,
+  toggleStar: PropTypes.func.isRequired
 };
 
-export default Star;
+const mapStateToProps = (state, ownProps) => ({
+  isStarred: state.starredBranches.has(ownProps.branchId)
+});
+
+export default connect(mapStateToProps, {toggleStar})(Star);

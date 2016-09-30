@@ -7,7 +7,6 @@
 @import 'header'
 
 //vendor overrides
-@import 'vendor-overrides/bootstrap'
 @import 'vendor-overrides/react-toggle'
 @import 'vendor-overrides/select'
 
@@ -16,13 +15,21 @@
 // styles that may be overidden
 @import 'components/filter'
 //
+@import 'components/alert'
+@import 'components/branch-state/build-trigger-label'
+@import 'components/branch-state/module-build'
+@import 'components/branch-state/module-build-history'
+@import 'components/branch-state/module-build-number'
+@import 'components/branch-state/module-build-status'
+@import 'components/branch-state/module-build-tab'
+@import 'components/branch-state/module-item'
 @import 'components/breadcrumb'
 @import 'components/build-detail'
 @import 'components/building-icon'
 @import 'components/build-log'
 @import 'components/build-log-navigation'
 @import 'components/branch-filter'
-@import 'components/card-stack'
+@import 'components/card-stack/card-stack'
 @import 'components/clickable-table-row'
 @import 'components/collapsable'
 @import 'components/commits'
@@ -53,6 +60,7 @@
 
 // pages
 @import 'page/branch'
+@import 'page/branch-state'
 @import 'page/build'
 @import 'page/dashboard'
 @import 'page/module'

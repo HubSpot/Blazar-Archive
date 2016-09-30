@@ -11,7 +11,6 @@ import Loader from '../shared/Loader.jsx';
 import AjaxErrorAlert from '../shared/AjaxErrorAlert.jsx';
 import Logo from '../shared/Logo.jsx';
 
-import StarStore from '../../stores/starStore';
 import BuildsStore from '../../stores/buildsStore';
 import BuildsActions from '../../actions/buildsActions';
 import sidebarTabProvider from '../../services/sidebarTabProvider';
@@ -30,7 +29,6 @@ class SidebarContainer extends Component {
 
     bindAll(this,
       'onStoreChange',
-      'onStarChange',
       'updateResults',
       'setToggleState',
       'startPollingBuilds',
@@ -58,7 +56,6 @@ class SidebarContainer extends Component {
 
   componentDidMount() {
     this.unsubscribeFromBuilds = BuildsStore.listen(this.onStoreChange);
-    this.unsubscribeFromStars = StarStore.listen(this.onStarChange);
     this.startPollingBuilds();
     window.addEventListener('resize', this.handleResizeDebounced);
     window.addEventListener('blur', this.stopPollingBuilds);
@@ -89,12 +86,6 @@ class SidebarContainer extends Component {
 
   onStoreChange(state) {
     this.setState(state);
-  }
-
-  onStarChange() {
-    if (this.state.toggleFilterState === 'starred') {
-      BuildsActions.loadBuilds(this.props.params);
-    }
   }
 
   updateResults(input) {

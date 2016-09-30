@@ -13,6 +13,9 @@ const appConfig = {
   // active build log polling frequency in ms
   activeBuildLogRefresh: process.env.ACTIVE_BUILD_LOG_REFRESH || 500,
 
+  // state of modules in a branch polling frequency in ms
+  moduleStateRefresh: process.env.MODULE_STATE_REFRESH || 10000,
+
   // byte count when fetching log offsets
   offsetLength: process.env.BLAZAR_OFFSET_LENGTH || 50000,
 
@@ -28,6 +31,6 @@ const appConfig = {
   slackBotName: process.env.SLACK_BOT_NAME || '',
 
   heapToken: process.env.HEAP_TOKEN || false
-}
+};
 
 module.exports = appConfig;

@@ -7,9 +7,6 @@ body
 .ui-grid
   margin: 10px 5px
 
-  &.tight
-    margin: 0
-
 .page-wrapper
   height 100vh
   width 100%
@@ -26,7 +23,7 @@ body
   border-right 1px solid $gray
   background-color $offwhite
   z-index 10
-  
+
   *
     user-select none
 
@@ -36,24 +33,6 @@ body
   margin-left $layout-offset-md
   padding 5px 10px
 
-.page-header
-  position fixed
-  z-index 2
-  width "calc(100% - %s)" % $layout-offset-md
-  height 45px
-  top 0
-  left $layout-offset-md
-  margin 0
-  padding 10px 30px 2px 30px
-  border-bottom 1px solid $gray
-  background-color $offwhite
-  transition: height 0.3s;
-
-.page-section
-  background #fff
-  padding 10px
-  standard-border()
-
 .logo
   position relative
   display inline-block
@@ -61,7 +40,7 @@ body
   z-index 3
   margin-right 10px
   margin-top 5px
-  
+
 .logo-image
   width 60px
 
@@ -69,3 +48,13 @@ body
   padding-top 20px
   padding-left 10px
   display block
+
+.page-header__sub-header
+  margin-top: -20px
+  margin-bottom: 30px
+  position: relative
+
+  .branch-select-input
+    left: 16px
+    top: -6px
+    width: 30%

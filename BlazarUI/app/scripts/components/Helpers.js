@@ -1,11 +1,12 @@
 import React from 'react';
-import {some, uniq, contains} from 'underscore';
+import {uniq, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
 import BuildStates from '../constants/BuildStates.js';
 import FINAL_BUILD_STATES from '../constants/finalBuildStates';
 import ACTIVE_BUILD_STATES from '../constants/ActiveBuildStates';
 import QUEUED_BUILD_STATES from '../constants/QueuedBuildStates';
+import MODULE_BUILD_STATES from '../constants/ModuleBuildStates';
 import {iconStatus} from './constants';
 import IconStack from './shared/IconStack.jsx';
 import Immutable from 'immutable';
@@ -71,12 +72,6 @@ export const cmp = (x, y) => {
   }
 
   return 0;
-};
-
-export const getIsStarredState = (stars, id) => {
-  return some(stars, (star) => {
-    return star.moduleId === id;
-  });
 };
 
 // Data Helpers
@@ -293,4 +288,26 @@ export const sortBranchesByTimestamp = (builds, isMasterPinned = true) => {
 
     return buildB.startTimestamp - buildA.startTimestamp;
   });
+};
+
+export const canViewDetailedModuleBuildInfo = (module) => {
+  const moduleState = module.get('state');
+  return moduleState !== MODULE_BUILD_STATES.CANCELLED
+    && moduleState !== MODULE_BUILD_STATES.SKIPPED;
+};
+
+export const getBlazarModuleBuildPath = (branchId, buildNumber, moduleName) => {
+  return `/builds/branch/${branchId}/build/${buildNumber}/module/${moduleName}`;
+};
+
+export const getCurrentModuleBuild = (moduleState) => {
+  return moduleState.get('inProgressModuleBuild') ||
+    moduleState.get('pendingModuleBuild') ||
+    moduleState.get('lastNonSkippedModuleBuild');
+};
+
+export const getCurrentBranchBuild = (moduleState) => {
+  return moduleState.get('inProgressBranchBuild') ||
+    moduleState.get('pendingBranchBuild') ||
+    moduleState.get('lastNonSkippedBranchBuild');
 };

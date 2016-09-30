@@ -1,23 +1,16 @@
 import $ from 'jquery';
-import {has, contains} from 'underscore';
+import {has} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import PollingProvider from '../services/PollingProvider';
-import StarProvider from '../services/starProvider';
+import store from '../reduxStore';
 
 function _groupBuilds(builds) {
-  const stars = StarProvider.getStars();
-
-  const groupedBuilds = { all: builds };
-
-  groupedBuilds.building = builds.filter((build) => {
-    return has(build, 'inProgressBuild');
-  });
-
-  groupedBuilds.starred = builds.filter((build) => {
-    return contains(stars, build.gitInfo.id);
-  }) || [];
-
-  return groupedBuilds;
+  const starredBranchIds = store.getState().starredBranches;
+  return {
+    all: builds,
+    starred: builds.filter((build) => starredBranchIds.has(build.gitInfo.id)),
+    building: builds.filter((build) => has(build, 'inProgressBuild'))
+  };
 }
 
 function _parse(data) {

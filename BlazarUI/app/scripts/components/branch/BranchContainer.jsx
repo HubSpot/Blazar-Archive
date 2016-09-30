@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import { connect } from 'react-redux';
 import {Link} from 'react-router';
 import {Button} from 'react-bootstrap';
 import {bindAll} from 'underscore';
@@ -11,36 +12,26 @@ import BranchHeadline from './BranchHeadline.jsx';
 import Loader from '../shared/Loader.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import BuildButton from './BuildButton.jsx';
-import ModuleModal from '../shared/ModuleModal.jsx';
+import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 import $ from 'jquery';
 
-import StarStore from '../../stores/starStore';
-import StarActions from '../../actions/starActions';
-
 import BranchStore from '../../stores/branchStore';
 import BranchActions from '../../actions/branchActions';
-import InterProjectActions from '../../actions/interProjectActions';
 import RepoStore from '../../stores/repoStore';
 import RepoActions from '../../actions/repoActions';
+import { showBuildBranchModal } from '../../redux-actions/buildBranchFormActions';
 
 import {getPreviousBuildState} from '../Helpers.js';
 
 const initialState = {
   builds: null,
-  stars: [],
   loadingBranches: true,
-  loadingStars: true,
   loadingModules: true,
   loadingMalformedFiles: true,
   loadingRepo: true,
   malformedFiles: [],
-  showModuleModal: false,
   modules: [],
-  selectedModuleIds: [],
-  buildDownstreamModules: 'WITHIN_REPOSITORY',
-  triggerInterProjectBuild: false,
-  resetCache: false,
   branchId: 0,
   branchInfo: {},
   branchesList: [],
@@ -51,8 +42,7 @@ class BranchContainer extends Component {
 
   constructor() {
     this.state = initialState;
-
-    bindAll(this, 'openModuleModal', 'closeModuleModal', 'onStatusChange', 'updateSelectedModuleIds', 'updateDownstreamModules', 'updateResetCache', 'updateTriggerInterProjectBuild', 'triggerBuild', 'refreshBranches');
+    bindAll(this, 'onStatusChange', 'refreshBranches');
   }
 
   componentDidMount() {
@@ -76,8 +66,6 @@ class BranchContainer extends Component {
   setup(params) {
     this.unsubscribeFromBranch = BranchStore.listen(this.onStatusChange);
     this.unsubscribeFromRepo = RepoStore.listen(this.onStatusChange);
-    this.unsubscribeFromStars = StarStore.listen(this.onStatusChange);
-    StarActions.loadStars('repoBuildContainer');
     BranchActions.loadBranchBuildHistory(params);
     BranchActions.loadBranchInfo(params);
     BranchActions.loadBranchModules(params);
@@ -89,7 +77,6 @@ class BranchContainer extends Component {
 
   tearDown() {
     BranchActions.stopPolling();
-    this.unsubscribeFromStars();
     this.unsubscribeFromBranch();
     this.unsubscribeFromRepo();
     $(window).unbind('scroll');
@@ -127,55 +114,8 @@ class BranchContainer extends Component {
     this.tryLoadBranches();
   }
 
-  openModuleModal() {
-    this.setState({
-      showModuleModal: true,
-      selectedModuleIds: this.state.modules.map((module) => module.id)
-    });
-  }
-
-  closeModuleModal() {
-    this.setState({
-      showModuleModal: false
-    });
-  }
-
-  updateSelectedModuleIds(moduleIds) {
-    this.setState({
-      selectedModuleIds: moduleIds
-    });
-  }
-
-  updateDownstreamModules(enumValue) {
-    this.setState({
-      buildDownstreamModules: enumValue
-    });
-  }
-
-  updateResetCache() {
-    this.setState({
-      resetCache: !this.state.resetCache
-    });
-  }
-
-  updateTriggerInterProjectBuild() {
-    this.setState({
-      triggerInterProjectBuild: !this.state.triggerInterProjectBuild
-    });
-  }
-
-
-  triggerBuild() {
-    if (this.state.triggerInterProjectBuild) {
-      InterProjectActions.triggerInterProjectBuild(this.props.params, this.state);
-    } else {
-      BranchActions.triggerBuild(this.props.params, this.state);
-    }
-  }
-
   isLoading() {
     return this.state.loadingBranches
-      || this.state.loadingStars
       || this.state.loadingModules
       || this.state.loadingRepo;
   }
@@ -187,11 +127,10 @@ class BranchContainer extends Component {
   }
 
   renderTable() {
-    if (this.state.error) {
+    const error = this.props.branchBuildError || this.state.error;
+    if (error) {
       return (
-        <GenericErrorMessage
-          message={this.state.error}
-        />
+        <GenericErrorMessage message={error} />
       );
     }
 
@@ -268,21 +207,13 @@ class BranchContainer extends Component {
           </UIGridItem>
           <UIGridItem style={{'paddingTop': '32px'}} size={5} align="RIGHT">
             <BuildButton
-              openModuleModal={this.openModuleModal}
+              openBuildBranchModal={this.props.showBuildBranchModal}
               loading={this.isLoading()}
-              error={this.state.error}
             />
-            <ModuleModal
-              loadingModules={this.isLoading()}
-              showModal={this.state.showModuleModal}
-              closeModal={this.closeModuleModal}
-              triggerBuild={this.triggerBuild}
-              onUpdateSelectedModuleIds={this.updateSelectedModuleIds}
-              onCheckboxUpdate={this.updateDownstreamModules}
-              onResetCacheUpdate={this.updateResetCache}
-              onTriggerInterProjectBuild={this.updateTriggerInterProjectBuild}
+            <BuildBranchModalContainer
+              branchId={this.props.params.branchId}
               modules={this.state.modules}
-              selectedModuleIds={this.state.selectedModuleIds}
+              onBuildStart={() => {BranchActions.loadBranchBuildHistory(this.props.params);}}
             />
             {this.renderBuildSettingsButton()}
           </UIGridItem>
@@ -299,9 +230,14 @@ class BranchContainer extends Component {
   }
 }
 
-
 BranchContainer.propTypes = {
-  params: PropTypes.object.isRequired
+  params: PropTypes.object.isRequired,
+  showBuildBranchModal: PropTypes.func.isRequired,
+  branchBuildError: PropTypes.string
 };
 
-export default BranchContainer;
+const mapStateToProps = (state) => ({
+  branchBuildError: state.buildBranchForm.get('error')
+});
+
+export default connect(mapStateToProps, {showBuildBranchModal})(BranchContainer);

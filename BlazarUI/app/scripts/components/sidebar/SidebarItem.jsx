@@ -187,7 +187,6 @@ class SidebarItem extends Component {
 }
 
 SidebarItem.propTypes = {
-  isStarred: PropTypes.bool,
   builds: PropTypes.array.isRequired,
   repository: PropTypes.string.isRequired,
   onExpand: PropTypes.func.isRequired,
