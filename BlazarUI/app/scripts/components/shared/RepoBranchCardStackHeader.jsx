@@ -4,13 +4,13 @@ const RepoBranchCardStackHeader = () => (
   <div className="repo-branch-card__header">
     <div>
       <div className="repo-branch-card__header-info">
-        <span />
+        Branch
       </div>
       <div className="repo-branch-card__header-last-built">
-        <span />
+        Last Built
       </div>
       <div className="repo-branch-card__header-details">
-        <span />
+        Details
       </div>
     </div>
   </div>

@@ -1,0 +1,49 @@
+@import '../new-colors'
+
+$pagination-color ?= $color-calypso
+$pagination-border ?= none
+$pagination-hover-color ?= $color-calypso
+$pagination-active-color ?= $color-calypso
+$pagination-active-bg ?= $color-calypso-light
+$pagination-hover-bg ?= $color-koala
+
+@import 'bootstrap'
+
+.pagination > li > a
+  border-radius 3px
+  padding 5px 9px
+
+.pagination > li:not(:last-child) > a
+  margin-right 4px
+
+.btn-default:active, .btn-default.active,
+.open > .dropdown-toggle.btn-default
+  border-color #ccc
+
+.alert
+  border-radius $radius-standard
+  margin-bottom 10px
+
+.btn
+  border-radius $radius-standard
+
+  &:active, &:focus
+    outline 0
+
+.btn-primary
+  background-color $color-primary
+  border-color $color-primary-dark-accent
+
+// add-ons
+.table-border
+  border 1px solid $gray
+
+label
+  font-weight: $font-normal
+
+.page-header
+  border-bottom 1px solid $color-battleship
+  margin 0 0 30px
+  padding-bottom 12px
+  padding-top 30px
+  color $color-heffalump
