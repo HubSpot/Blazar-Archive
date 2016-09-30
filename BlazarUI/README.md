@@ -8,8 +8,8 @@ Makes use of:
  - [React Router](https://github.com/rackt/react-router)
  - [Reflux](https://github.com/spoike/refluxjs)
 
-## Heap		
-		
+## Heap
+
 Blazar uses [Heap](https://www.heapanalytics.com/) to record usage statistics for an internal instance of the app. If you'd like to integrate your own Heap account when running your own instance of Blazar, set your Heap token in `process.env.HEAP_TOKEN` (see `appConfig.js`).
 
 ## Installation
@@ -30,7 +30,7 @@ $ gulp
 ```
 
 #### Connecting to the API
-For local development, to avoid any cross-domain restrictions, the connect-server has a middleware proxy in place. Add your API endpoint URL path to an environment variable named BLAZAR_API_URL and the gulp file will pick it up. You can override your API Root at any time by typing the following into your console: localStorage.set('apiRootOverride', 'http://example/blazar/api')
+For local development, to avoid any cross-domain restrictions, the connect-server has a middleware proxy in place. Add your API endpoint URL path to an environment variable named BLAZAR_API_URL and the gulp file will pick it up.
 
 ## Build
 
