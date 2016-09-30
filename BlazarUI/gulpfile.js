@@ -117,16 +117,14 @@ gulp.task('serve', function() {
     },
     fallback: dist + 'index.html',
     middleware: function(connect, opt) {
-      if (!isProduction) {
-        if (process.env.BLAZAR_API_URL) {
-          appConfig.apiRoot = '/api';
-          return [ (function() {
-            var proxy = require('proxy-middleware');
-            var options = url.parse(process.env.BLAZAR_API_URL);
-            options.route = '/api';
-            return proxy(options);
-          })()]
-        }
+      if (!isProduction && process.env.BLAZAR_API_URL) {
+        appConfig.apiRoot = '/api';
+        return [ (function() {
+          var proxy = require('proxy-middleware');
+          var options = url.parse(process.env.BLAZAR_API_URL);
+          options.route = '/api';
+          return proxy(options);
+        })()]
       }
       return [];
     }
