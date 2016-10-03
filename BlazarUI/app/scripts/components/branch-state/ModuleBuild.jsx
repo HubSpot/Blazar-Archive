@@ -23,8 +23,13 @@ const ModuleBuild = ({module, moduleBuild, branchBuild, onClick}) => {
   const colorModifier = getClassNameColorModifier(moduleBuild.get('state'));
   const buildTrigger = branchBuild.get('buildTrigger');
   const commitInfo = branchBuild.get('commitInfo');
+  const handleClick = (e) => {
+    if (e.target.tagName !== 'A') {
+      onClick();
+    }
+  };
   return (
-    <div className={`module-build  module-build--${colorModifier}`} onClick={onClick}>
+    <div className={`module-build  module-build--${colorModifier}`} onClick={handleClick}>
       <div className="module-build__labels">
         <BuildTriggerLabel buildTrigger={buildTrigger} />
         <CommitInfo commitInfo={commitInfo} />
