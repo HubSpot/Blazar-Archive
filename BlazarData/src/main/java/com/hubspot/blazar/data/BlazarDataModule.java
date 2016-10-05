@@ -4,11 +4,13 @@ import com.google.inject.AbstractModule;
 import com.hubspot.blazar.data.cache.StateCache;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
+import com.hubspot.blazar.data.service.CachingMetricsService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.MalformedFileService;
+import com.hubspot.blazar.data.service.MetricsService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
@@ -34,5 +36,7 @@ public class BlazarDataModule extends AbstractModule {
     bind(InterProjectBuildService.class);
     bind(InterProjectBuildMappingService.class);
     bind(BranchSettingsService.class);
+    bind(MetricsService.class);
+    bind(CachingMetricsService.class);
   }
 }
