@@ -59,7 +59,7 @@ public class ModuleBuildLauncher {
   }
 
   public void launch(RepositoryBuild repositoryBuild, ModuleBuild build) throws Exception {
-    GitInfo gitInfo = branchService.get(repositoryBuild.getBranchId()).get().withBranch(repositoryBuild.getSha().get());
+    GitInfo gitInfo = branchService.get(repositoryBuild.getBranchId()).get().toBuilder().setBranch(repositoryBuild.getSha().get()).build();
     Module module = moduleService.get(build.getModuleId()).get();
 
     BuildConfig buildConfig = configAtSha(gitInfo, module);

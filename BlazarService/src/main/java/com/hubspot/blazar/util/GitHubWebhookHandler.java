@@ -112,7 +112,8 @@ public class GitHubWebhookHandler {
         return;
       }
       if (!isOptedIn(gitInfo)) {
-        LOG.debug("Not {}#{} is not opted in to Blazar", gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+        LOG.info("{}#{} is not opted in to Blazar, marking as inactive", gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+        branchService.upsert(gitInfo.toBuilder().setActive(false).build());
         return;
       }
       gitInfo = branchService.upsert(gitInfo);
