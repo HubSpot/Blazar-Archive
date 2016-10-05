@@ -44,7 +44,10 @@ class BranchHeadline extends Component {
     }
 
     const branchLink = `/builds/branch/${selected}`;
-    this.context.router.push(branchLink);
+    this.context.router.push({
+      pathname: branchLink,
+      state: {handlingBranchSelect: true}
+    });
   }
 
   getFilteredBranches() {
