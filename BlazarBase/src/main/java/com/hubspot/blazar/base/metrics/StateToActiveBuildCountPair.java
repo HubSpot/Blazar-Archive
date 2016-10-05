@@ -11,8 +11,7 @@ public class StateToActiveBuildCountPair {
   private final Integer count;
 
   @JsonCreator
-  public StateToActiveBuildCountPair(@JsonProperty("stateName") String stateName,
-                                     @JsonProperty("count") Integer count) {
+  public StateToActiveBuildCountPair(@JsonProperty("stateName") String stateName, @JsonProperty("count") Integer count) {
     this.stateName = stateName;
     this.count = count;
   }

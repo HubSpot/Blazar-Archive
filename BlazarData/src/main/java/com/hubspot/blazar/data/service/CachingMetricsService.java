@@ -31,6 +31,7 @@ public class CachingMetricsService {
     if (currentTime - moduleBuildCountMapLastWrite > MODULE_BUILD_COUNT_MAX_AGE_MILLIS) {
       // refresh cache
       moduleBuildCountMap = metricsService.countActiveModuleBuildsByState();
+      moduleBuildCountMapLastWrite = currentTime;
     }
 
     if (!moduleBuildCountMap.containsKey(state)) {
@@ -43,6 +44,7 @@ public class CachingMetricsService {
     long currentTime = System.currentTimeMillis();
     if (currentTime - repoBuildCountMapLastWrite > BRANCH_BUILD_COUNT_MAX_AGE_MILLIS) {
       repoBuildCountMap = metricsService.countActiveBranchBuildsByState();
+      repoBuildCountMapLastWrite = currentTime;
     }
 
     if (!repoBuildCountMap.containsKey(state)) {
