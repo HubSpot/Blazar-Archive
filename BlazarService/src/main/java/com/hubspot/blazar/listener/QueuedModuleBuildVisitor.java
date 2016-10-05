@@ -69,7 +69,7 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
 
       if (buildingUpstreams.isEmpty()) {
         LOG.info("{} is no longer waiting for upstreams and is ready to build", buildingStatusLogPrefix);
-        return buildingUpstreams.isEmpty();
+        return true;
       }
 
       Set<Long> runningUpstreamModuleBuildIds = new HashSet<>();
