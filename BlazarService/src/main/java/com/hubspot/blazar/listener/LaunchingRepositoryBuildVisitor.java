@@ -99,8 +99,8 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     Set<Module> skipped = Sets.difference(modules, toBuild);
 
     if (modules.isEmpty()) {
-      LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
-      repositoryBuildService.update(build.withState(State.SUCCEEDED).withEndTimestamp(System.currentTimeMillis()));
+      LOG.info("No module builds for repository build {}, setting status to failed", build.getId().get());
+      repositoryBuildService.update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
     } else {
       for (Module module : toBuild) {
         moduleBuildService.enqueue(build, module);
