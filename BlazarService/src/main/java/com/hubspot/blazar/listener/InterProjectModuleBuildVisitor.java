@@ -117,7 +117,6 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
   private boolean shouldBuild(int moduleId, int branchId, DependencyGraph graph, Set<InterProjectBuildMapping> mappings) {
     // don't start builds of modules previously triggered
     if (mappings.stream().filter((InterProjectBuildMapping m) -> m.getModuleId() == moduleId).findFirst().isPresent()) {
-      LOG.info("Not staring dependency build for module {} on branch {} because one already is started", moduleId, branchId);
       return false;
     }
     for (Integer upstream: graph.getAllUpstreamNodes(moduleId)) {
