@@ -88,8 +88,8 @@ const RepoBuildStore = Reflux.createStore({
     this.shouldPoll = false;
   },
 
-  onCancelBuild(params) {
-    RepoBuildApi.cancelBuild(params);
+  onCancelBuild(repoBuildId) {
+    RepoBuildApi.cancelBuild(repoBuildId);
   },
 
   _poll() {

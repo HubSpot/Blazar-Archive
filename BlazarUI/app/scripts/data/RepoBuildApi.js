@@ -135,17 +135,14 @@ function fetchModuleBuildsById(branchId, repoBuildId, buildNumber, cb) {
     });
 }
 
-function cancelBuild(params) {
-  return _fetchBranchBuildHistory(params).then((resp) => {
-    const repoBuild = findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
-    const cancelPromise = new Resource({
-      url: `${window.config.apiRoot}/branches/builds/${repoBuild.id}/cancel`,
-      type: 'POST'
-    }).send();
+function cancelBuild(repoBuildId) {
+  const cancelPromise = new Resource({
+    url: `${window.config.apiRoot}/branches/builds/${repoBuildId}/cancel`,
+    type: 'POST'
+  }).send();
 
-    cancelPromise.error((error) => {
-      console.warn(error); // TODO: be better
-    });
+  cancelPromise.error((error) => {
+    console.warn(error); // TODO: be better
   });
 }
 

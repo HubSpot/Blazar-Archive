@@ -18,7 +18,7 @@ import { getCurrentModuleBuild } from '../Helpers';
 class BranchState extends Component {
   constructor(props) {
     super(props);
-    bindAll(this, 'handleBranchSelect', 'handleModuleItemClick', 'handleVisibilityChange');
+    bindAll(this, 'handleBranchSelect', 'handleModuleItemClick', 'handleVisibilityChange', 'refreshBranchModuleStates');
   }
 
   componentDidMount() {
@@ -85,6 +85,11 @@ class BranchState extends Component {
       });
   }
 
+  refreshBranchModuleStates() {
+    const {branchId, loadBranchModuleStates} = this.props;
+    loadBranchModuleStates(branchId);
+  }
+
   handleBranchSelect(selectedBranchId) {
     this.props.router.push(`/branches/${selectedBranchId}/state`);
   }
@@ -132,11 +137,21 @@ class BranchState extends Component {
         {hasFailingModules && <FailingModuleBuildsAlert failingModuleNames={failingModuleNames} />}
         <section id="active-modules">
           <h2 className="module-list-header">Active modules</h2>
-          <ModuleList modules={this.sortModules(activeModules)} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
+          <ModuleList
+            modules={this.sortModules(activeModules)}
+            onItemClick={this.handleModuleItemClick}
+            selectedModuleId={selectedModuleId}
+            onCancelBuild={this.refreshBranchModuleStates}
+          />
         </section>
         {!!inactiveModules.size && <section id="inactive-modules">
           <h2 className="module-list-header">Inactive modules</h2>
-          <ModuleList modules={this.sortModules(inactiveModules)} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
+          <ModuleList
+            modules={this.sortModules(inactiveModules)}
+            onItemClick={this.handleModuleItemClick}
+            selectedModuleId={selectedModuleId}
+            onCancelBuild={this.refreshBranchModuleStates}
+          />
         </section>}
       </div>
     );
@@ -147,7 +162,6 @@ class BranchState extends Component {
       activeModules,
       branchId,
       branchInfo,
-      loadBranchModuleStates,
       branchNotFound
     } = this.props;
 
@@ -168,7 +182,7 @@ class BranchState extends Component {
         <BuildBranchModalContainer
           branchId={branchId}
           modules={activeModules.map(moduleState => moduleState.get('module')).toJS()}
-          onBuildStart={() => loadBranchModuleStates(branchId)}
+          onBuildStart={this.refreshBranchModuleStates}
         />
       </PageContainer>
     );

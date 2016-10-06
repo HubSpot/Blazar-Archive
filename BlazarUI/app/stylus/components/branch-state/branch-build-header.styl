@@ -1,3 +1,5 @@
+@import '../../variables'
+
 .branch-build-header
   margin-top 20px
   margin-bottom 10px
@@ -11,5 +13,26 @@
 .branch-build-header__build-trigger-label-wrapper
   margin-right 5px
 
-.branch-build-header__commit-info-wrapper
+.branch-build-header__action-items
   float right
+  font-weight 500
+
+  > :not(:first-child):before
+    content " | "
+    margin 0 5px
+
+.branch-build-header__cancel-build-button
+  color $color-candy-apple
+  font-weight 500
+  padding 0
+
+  &:hover, &:focus, &[disabled]:hover
+    color $color-candy-apple-dark
+
+.commit-info__compare-link
+  margin-left 5px
+  position relative
+  bottom 1px
+
+.commit-link
+  color $color-calypso

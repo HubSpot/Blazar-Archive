@@ -9,9 +9,9 @@ const CommitInfo = ({commitInfo}) => {
   const currentCommit = commitInfo.get('current');
   if (!previousCommit || previousCommit.get('id') === currentCommit.get('id')) {
     return (
-      <div className="module-build__commit-info" onClick={(e) => e.stopPropagation()}>
+      <span className="commit-info" onClick={(e) => e.stopPropagation()}>
         <CommitLink commit={commitInfo.get('current')} />
-      </div>
+      </span>
     );
   }
 
@@ -21,9 +21,9 @@ const CommitInfo = ({commitInfo}) => {
   const compareLink = <CompareCommitsLink className="commit-info__compare-link" commitInfo={commitInfo} />;
 
   return (
-    <div className="module-build__commit-info" onClick={(e) => e.stopPropagation()}>
+    <span className="commit-info" onClick={(e) => e.stopPropagation()}>
       {previousCommitLink} {arrow} {currentCommitLink}{compareLink}
-    </div>
+    </span>
   );
 };
 

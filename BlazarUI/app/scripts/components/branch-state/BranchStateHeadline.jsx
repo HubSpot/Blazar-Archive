@@ -104,11 +104,9 @@ BranchStateHeadline.propTypes = {
   showBuildBranchModal: PropTypes.func.isRequired
 };
 
-const mapStateToProps = (state) => {
-  return {
-    branchesList: state.repo.get('branchesList')
-  };
-};
+const mapStateToProps = (state) => ({
+  branchesList: state.repo.get('branchesList')
+});
 
 const mapDispatchToProps = {
   loadBranches,
