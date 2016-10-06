@@ -39,7 +39,7 @@ class BranchState extends Component {
     window.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
-  sortActiveModules() {
+  sortModules() {
     const {activeModules} = this.props;
     if (activeModules.isEmpty()) {
       return activeModules;
@@ -47,6 +47,22 @@ class BranchState extends Component {
 
     const topologicalSort = activeModules.first().getIn(['lastBranchBuild', 'dependencyGraph', 'topologicalSort']);
     return activeModules.sort((a, b) => {
+      // first sort by descending build number to prioritize more recent builds
+      const buildNumberA = getCurrentModuleBuild(a).get('buildNumber');
+      const buildNumberB = getCurrentModuleBuild(b).get('buildNumber');
+
+      if (buildNumberA > buildNumberB) {
+        return -1;
+      } else if (buildNumberA < buildNumberB) {
+        return 1;
+      }
+
+      // then sort by dependency order so that module builds proceed from top to bottom
+      // gracefully handling old builds without topological sort info
+      if (!topologicalSort) {
+        return 1;
+      }
+
       const indexA = topologicalSort.indexOf(a.getIn(['module', 'id']));
       const indexB = topologicalSort.indexOf(b.getIn(['module', 'id']));
 
@@ -115,11 +131,11 @@ class BranchState extends Component {
         {hasFailingModules && <FailingModuleBuildsAlert failingModuleNames={failingModuleNames} />}
         <section id="active-modules">
           <h2 className="module-list-header">Active modules</h2>
-          <ModuleList modules={this.sortActiveModules(activeModules)} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
+          <ModuleList modules={this.sortModules(activeModules)} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
         </section>
         {!!inactiveModules.size && <section id="inactive-modules">
           <h2 className="module-list-header">Inactive modules</h2>
-          <ModuleList modules={inactiveModules} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
+          <ModuleList modules={this.sortModules(inactiveModules)} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
         </section>}
       </div>
     );
