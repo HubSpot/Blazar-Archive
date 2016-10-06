@@ -28,6 +28,8 @@ const appConfig = {
 
   usernameCookie: process.env.BLAZAR_USERNAME_COOKIE || '',
 
+  betaUserCookie: process.env.BLAZAR_BETA_USER_COOKIE || '',
+
   slackBotName: process.env.SLACK_BOT_NAME || '',
 
   heapToken: process.env.HEAP_TOKEN || false

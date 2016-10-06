@@ -8,6 +8,7 @@ import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import Loader from '../shared/Loader.jsx';
 import ModuleList from './ModuleList.jsx';
 import BranchStateHeadline from './BranchStateHeadline.jsx';
+import BetaFeatureAlert from './BetaFeatureAlert.jsx';
 import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
 import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
 
@@ -90,13 +91,19 @@ class BranchState extends Component {
   }
 
   renderModuleLists() {
-    const {loadingModuleStates, activeModules, inactiveModules, selectedModuleId} = this.props;
-    if (loadingModuleStates) {
+    const {loadingModuleStates, activeModules, inactiveModules, selectedModuleId, branchId} = this.props;
+    const loadingHeader = !this.props.branchInfo.branch;
+    if (loadingModuleStates || loadingHeader) {
       return <Loader />;
     }
 
+    const failingModuleNames = this.getFailingModuleNames(activeModules);
+    const hasFailingModules = !!failingModuleNames.size;
+
     return (
       <div>
+        <BetaFeatureAlert branchId={branchId} />
+        {hasFailingModules && <FailingModuleBuildsAlert failingModuleNames={failingModuleNames} />}
         <section id="active-modules">
           <h2 className="module-list-header">Active modules</h2>
           <ModuleList modules={this.sortActiveModules(activeModules)} onItemClick={this.handleModuleItemClick} selectedModuleId={selectedModuleId} />
@@ -128,13 +135,9 @@ class BranchState extends Component {
       );
     }
 
-    const failingModuleNames = this.getFailingModuleNames(activeModules);
-    const hasFailingModules = !!failingModuleNames.size;
-
     return (
       <PageContainer classNames="page-content--branch-state" documentTitle={title}>
         <BranchStateHeadline branchId={branchId} branchInfo={branchInfo} onBranchSelect={this.handleBranchSelect} />
-        {hasFailingModules && <FailingModuleBuildsAlert failingModuleNames={failingModuleNames} />}
         {this.renderModuleLists()}
         <BuildBranchModalContainer
           branchId={branchId}
