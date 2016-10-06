@@ -28,3 +28,15 @@ export const onStarredBranchesUpdate = (callback) => {
     }
   });
 };
+
+export const loadDismissedBetaNotifications = () => {
+  return Immutable.Map(store.get('dismissedBetaNotifications') || {});
+};
+
+export const saveDismissedBetaNotifications = (dismissedBetaNotifications) => {
+  // only allow toggling off notifications
+  const savedDismissedBetaNotifications = loadDismissedBetaNotifications();
+  store.set('dismissedBetaNotifications', savedDismissedBetaNotifications
+    .mergeWith((saved, toSave) => saved || toSave, dismissedBetaNotifications)
+    .toJS());
+};

@@ -5,6 +5,7 @@ import branch from './branch';
 import starredBranches from './starredBranches';
 import moduleBuildHistoriesByModuleId from './moduleBuildHistoriesByModuleId';
 import buildBranchForm from './buildBranchForm';
+import dismissedBetaNotifications from './dismissedBetaNotifications';
 
 export default combineReducers({
   branchState,
@@ -12,5 +13,6 @@ export default combineReducers({
   branch,
   starredBranches,
   moduleBuildHistoriesByModuleId,
-  buildBranchForm
+  buildBranchForm,
+  dismissedBetaNotifications
 });

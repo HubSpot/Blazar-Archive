@@ -12,7 +12,8 @@ const mapStateToProps = (state, ownProps) => {
     branchInfo: state.branch.get('branchInfo'),
     loadingModuleStates: state.branchState.get('loading'),
     selectedModuleId: state.branchState.get('selectedModuleId'),
-    branchNotFound: state.branch.getIn(['error', 'status']) === 404
+    branchNotFound: state.branch.getIn(['error', 'status']) === 404,
+    showBetaFeatureAlert: !state.dismissedBetaNotifications.get('branchStatePage')
   };
 };
 
