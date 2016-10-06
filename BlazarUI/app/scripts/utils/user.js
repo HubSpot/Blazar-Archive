@@ -1,3 +1,5 @@
-import store from 'store';
+import Cookies from 'js-cookie';
 
-export const isBetaUser = store.get('blazar-beta');
+const { betaUserCookie } = window.config;
+
+export const isBetaUser = betaUserCookie && !!Cookies.get(betaUserCookie);
