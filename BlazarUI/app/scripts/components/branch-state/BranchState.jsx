@@ -91,7 +91,16 @@ class BranchState extends Component {
   }
 
   renderModuleLists() {
-    const {loadingModuleStates, activeModules, inactiveModules, selectedModuleId, branchId} = this.props;
+    const {
+      loadingModuleStates,
+      activeModules,
+      inactiveModules,
+      selectedModuleId,
+      branchId,
+      dismissBetaNotification,
+      showBetaFeatureAlert
+    } = this.props;
+
     const loadingHeader = !this.props.branchInfo.branch;
     if (loadingModuleStates || loadingHeader) {
       return <Loader />;
@@ -102,7 +111,7 @@ class BranchState extends Component {
 
     return (
       <div>
-        <BetaFeatureAlert branchId={branchId} />
+        {showBetaFeatureAlert && <BetaFeatureAlert branchId={branchId} onDismiss={dismissBetaNotification} />}
         {hasFailingModules && <FailingModuleBuildsAlert failingModuleNames={failingModuleNames} />}
         <section id="active-modules">
           <h2 className="module-list-header">Active modules</h2>
@@ -162,7 +171,9 @@ BranchState.propTypes = {
   pollBranchModuleStates: PropTypes.func.isRequired,
   stopPollingBranchModuleStates: PropTypes.func.isRequired,
   loadingModuleStates: PropTypes.bool.isRequired,
-  branchNotFound: PropTypes.bool
+  branchNotFound: PropTypes.bool,
+  showBetaFeatureAlert: PropTypes.bool,
+  dismissBetaNotification: PropTypes.func.isRequired
 };
 
 export default BranchState;

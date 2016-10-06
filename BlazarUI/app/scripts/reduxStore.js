@@ -3,12 +3,21 @@ import thunk from 'redux-thunk';
 import { throttle } from 'underscore';
 
 import rootReducer from './reducers';
-import { loadStarredBranches, saveStarredBranches, onStarredBranchesUpdate } from './localStorage';
 import ActionTypes from './redux-actions/ActionTypes';
+import {
+  loadStarredBranches,
+  saveStarredBranches,
+  onStarredBranchesUpdate,
+  loadDismissedBetaNotifications,
+  saveDismissedBetaNotifications
+} from './localStorage';
 
 const store = createStore(
   rootReducer,
-  {starredBranches: loadStarredBranches()},
+  {
+    starredBranches: loadStarredBranches(),
+    dismissedBetaNotifications: loadDismissedBetaNotifications()
+  },
   compose(
     applyMiddleware(thunk),
     window.devToolsExtension ? window.devToolsExtension() : f => f
@@ -16,7 +25,9 @@ const store = createStore(
 );
 
 store.subscribe(throttle(() => {
-  saveStarredBranches(store.getState().starredBranches);
+  const { starredBranches, dismissedBetaNotifications } = store.getState();
+  saveStarredBranches(starredBranches);
+  saveDismissedBetaNotifications(dismissedBetaNotifications);
 }, 1000));
 
 onStarredBranchesUpdate((starredBranches) => {

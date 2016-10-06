@@ -95,6 +95,11 @@ class BranchStateHeadline extends Component {
             openOnFocus={true}
             autoBlur={true}
           />
+          <p className="branch-state-headline__sub-header-links">
+            <Link to={`/branches/${this.props.branchId}/builds`} className="build-history-link">
+              <Icon name="history" /> Branch build history
+            </Link>
+          </p>
         </div>
       </div>
     );

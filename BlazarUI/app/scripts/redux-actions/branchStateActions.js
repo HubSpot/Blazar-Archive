@@ -71,10 +71,15 @@ export const deselectModule = () => ({
   type: ActionTypes.DESELECT_MODULE
 });
 
+export const dismissBetaNotification = () => ({
+  type: ActionTypes.DISMISS_BRANCH_STATE_PAGE_BETA_NOTIFICATION
+});
+
 export default {
   loadBranchModuleStates,
   pollBranchModuleStates,
   stopPollingBranchModuleStates,
   selectModule,
-  deselectModule
+  deselectModule,
+  dismissBetaNotification
 };
