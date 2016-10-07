@@ -37,14 +37,13 @@ public class GitBranchUpdaterTest extends BlazarServiceTestBase {
   @Inject
   private GitHubHelper gitHubHelper;
 
-  @Inject
   @Before
   public void before(ManagedDataSource dataSource) throws Exception {
     runSql(dataSource, "InterProjectData.sql");
   }
 
   @Test
-  public void doesNotChangeUnchangedBranch() {
+  public void itDoesNotChangeUnchangedBranch() {
     GitInfo unchangedBranch = branchService.get(1).get();
     buildUpdater(unchangedBranch).run();
     GitInfo maybeChangedBranch = branchService.get(1).get();
@@ -52,26 +51,52 @@ public class GitBranchUpdaterTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void deletesBranchWithoutHost() {
+  public void itDeletesBranchWithDuplicateRepoId() {
+    GitInfo unchangedBranch = branchService.get(1).get();
+    GitInfo branchWithNewGitHubId = new GitInfo(unchangedBranch.getId(),
+        unchangedBranch.getHost(),
+        unchangedBranch.getOrganization(),
+        unchangedBranch.getRepository(),
+        1337,
+        unchangedBranch.getBranch(),
+        unchangedBranch.isActive(),
+        unchangedBranch.getCreatedTimestamp(),
+        unchangedBranch.getUpdatedTimestamp());
+
+    // This creates a new branch
+    branchWithNewGitHubId = branchService.upsert(branchWithNewGitHubId);
+
+    // Verify that the name information is the same, repoId is different and it is active
+    assertThat(branchWithNewGitHubId.getHost()).isEqualTo(unchangedBranch.getHost());
+    assertThat(branchWithNewGitHubId.getOrganization()).isEqualTo(unchangedBranch.getOrganization());
+    assertThat(branchWithNewGitHubId.getRepository()).isEqualTo(unchangedBranch.getRepository());
+    assertThat(branchWithNewGitHubId.getRepositoryId()).isNotEqualTo(unchangedBranch.getRepositoryId());
+    assertThat(branchWithNewGitHubId.isActive()).isTrue();
+
+    buildUpdater(branchWithNewGitHubId).run();
+
+    Optional<GitInfo> maybeDeletedBranch = branchService.get(branchWithNewGitHubId.getId().get());
+    // Check the branch is now inactive but present
+    assertThat(maybeDeletedBranch.isPresent()).isTrue();
+    assertThat(maybeDeletedBranch.get().isActive()).isFalse();
+
+
+  }
+
+  @Test
+  public void itUpdatesAndSetsABranchToInactiveIfItWasMovedToAnUnManagedOrganization() {
     GitInfo branchWithoutConfiguredHost = buildGitInfo("git.bar.example.com/org/repo#branch");
     branchWithoutConfiguredHost = branchService.upsert(branchWithoutConfiguredHost);
-    GitInfo unchangedBranch = branchService.get(1).get();
     assertThat(branchWithoutConfiguredHost.isActive()).isTrue();
 
-    buildUpdater(unchangedBranch).run();
     buildUpdater(branchWithoutConfiguredHost).run();
-    buildUpdater(unchangedBranch).run();
-
-    // ensure unchangedBranch didn't get changed even though the other did
-    GitInfo maybeUnChangedBranch = branchService.get(1).get();
-    assertThat(maybeUnChangedBranch).isEqualTo(unchangedBranch);
 
     GitInfo maybeChangedBranch = branchService.get(branchWithoutConfiguredHost.getId().get()).get();
     assertThat(maybeChangedBranch.isActive()).isFalse();
   }
 
   @Test
-  public void archivesBranchThatMovedOrgs() throws IOException {
+  public void itArchivesABranchThatMovedOrganizations() throws IOException {
     GitInfo movedBranch = branchService.get(1).get();
     GitInfo unChangedBranch = branchService.get(2).get();
 

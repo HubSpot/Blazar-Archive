@@ -83,28 +83,27 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   private Map<String, GitHub> gitHubMap;
 
   @Before
-  @Inject
   public void before(ManagedDataSource dataSource) throws Exception {
     // set up the data for these inter-project build tests
     runSql(dataSource, "InterProjectData.sql");
   }
 
   @Test
-  public void testInterBuildDependencyTree() {
+  public void itBuildsADependencyGraph() {
     Optional<Module> module1 = moduleService.get(1);
     DependencyGraph graph = dependenciesService.buildInterProjectDependencyGraph(Sets.newHashSet(module1.get()));
     assertThat(Arrays.asList(1, 4, 7, 8, 10, 11, 9, 13)).isEqualTo(graph.getTopologicalSort());
   }
 
   @Test
-  public void testInterProjectMappings() {
+  public void itCreatesInterProjectBuildMappings() {
     long mappingId = interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(1, 2, Optional.of(3L), 4));
     InterProjectBuildMapping createdMapping = interProjectBuildMappingService.getByMappingId(mappingId).get();
     assertThat(new InterProjectBuildMapping(Optional.of(mappingId), 123, 123, Optional.of(3L), 123, Optional.<Long>absent(), InterProjectBuild.State.QUEUED)).isEqualTo(createdMapping);
   }
 
   @Test
-  public void testSuccessfulInterProjectBuild() throws Exception {
+  public void itCompletesBuildSuccessfully() throws Exception {
     ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
     // Trigger interProjectBuild
     InterProjectBuild testableBuild = testUtils.runInterProjectBuild(1, Optional.<BuildTrigger>absent());
@@ -128,7 +127,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void testModuleGroupingManualBuild() throws InterruptedException {
+  public void itGroupsModulesCorrectlyOnManualBuild() throws InterruptedException {
     ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
     // Trigger interProjectBuild
     InterProjectBuild testableBuild = testUtils.runInterProjectBuild(7, Optional.<BuildTrigger>absent());
@@ -148,7 +147,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void testModuleGroupingOnPushToOneModule() throws Exception {
+  public void itGroupsModulesCorrectlyOnPush() throws Exception {
     int repoId = 3;
     String sha = "2222222222222222222222222222222222222222";
     // ensure we have a previous build
@@ -187,7 +186,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
 
   @Test
-  public void testInterProjectBuildFromPush() throws Exception {
+  public void itDoesInterProjectBuildOnPush() throws Exception {
     int repoId = 1;
     String sha = "0000000000000000000000000000000000000000";
     GitInfo gitInfo = branchService.get(repoId).get();
@@ -210,7 +209,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   }
 
   @Test
-  public void testInterProjectBuildWithFailures() throws Exception {
+  public void itCancelsDownstreamBuildsForInterProjectBuildWithFailures() throws Exception {
     Set<Integer> expectedFailures = Sets.newHashSet(7);
     Set<Integer> expectedSuccess  = Sets.newHashSet(1, 4);
     Set<Integer> expectedCancel = Sets.newHashSet(8, 9, 10, 11, 13);
