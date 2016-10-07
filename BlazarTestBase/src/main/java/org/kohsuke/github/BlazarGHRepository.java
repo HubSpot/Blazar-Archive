@@ -19,6 +19,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 public class BlazarGHRepository extends GHRepository {
+  private final int id;
   private static final Logger LOG = LoggerFactory.getLogger(BlazarGHRepository.class);
   private final String name;
   private final String fullName;
@@ -31,10 +32,12 @@ public class BlazarGHRepository extends GHRepository {
 
   @JsonCreator
   public BlazarGHRepository(@JsonProperty("name") String name,
+                            @JsonProperty("id") int id,
                             @JsonProperty("commits") List<BlazarGHCommit> commits,
                             @JsonProperty("branches") Map<String, BlazarGHBranch> branches,
                             @JsonProperty("tree") BlazarGHTree tree,
                             @JsonProperty("owner") BlazarGHUser owner) throws IOException {
+    this.id = id;
     this.name = name;
     this.owner = owner;
     this.commits = commits;
@@ -48,6 +51,11 @@ public class BlazarGHRepository extends GHRepository {
     this.tree = tree;
     this.fullName = String.format("%s/%s", owner.getLogin(), name);
     this.history = new ArrayList<>();
+  }
+
+  @Override
+  public int getId() {
+    return id;
   }
 
   @Override

@@ -45,17 +45,14 @@ public class DependencyVersionTest extends BlazarServiceTestBase {
   @Inject
   private DependenciesService dependenciesService;
 
-  @Inject
   @Before
   public void before(ManagedDataSource dataSource) throws Exception {
     runSql(dataSource, "InterProjectData.sql");
   }
 
   @Test
-  public void testRepositoryBuild() throws InterruptedException, IOException {
-    // Discovery all branches
-
-    // check that all modules have a version
+  public void itHasModuleVersion() throws InterruptedException, IOException {
+    // Run discovery on all branches and check that all modules have a version
     for (GitInfo branch : branchService.getAll()) {
       moduleDiscoveryService.handleDiscoveryResult(branch, compositeModuleDiscovery.discover(branch));
       for (Module module : moduleService.getByBranch(branch.getId().get())) {

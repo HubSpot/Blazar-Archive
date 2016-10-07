@@ -2,6 +2,8 @@ package com.hubspot.blazar.command;
 
 import java.io.IOException;
 
+import net.sourceforge.argparse4j.inf.Namespace;
+
 import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +14,28 @@ import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.util.GitHubHelper;
 
+import io.dropwizard.setup.Bootstrap;
+
+/**
+ *
+ * GitHub repositories can change owners and names, and be deleted without Blazar
+ * getting an event to update its metadata. Because we don't receive events this
+ * cleaner is run against all repos periodically to ensure that we delete anything
+ * that has been deleted or moved to a non-managed organization.
+ *
+ * @see CleanRepoMetadataCommand#run(Bootstrap, Namespace, BlazarConfiguration)
+ * for the DropWizard command
+ *
+ * This runnable checks GitHub for the current metadata about a single repository
+ * If the information is different from what Blazar knows we update that
+ * information accordingly:
+ *
+ * - If the repository does not exist, we delete it.
+ * - If the repository name has changed, we update it.
+ * - If the organization name has changed, we update it.
+ * - If the organization name is not a managed organization, we delete it.
+ *
+ */
 public class GitBranchUpdater implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(GitBranchUpdater.class);
 
@@ -33,7 +57,7 @@ public class GitBranchUpdater implements Runnable {
   @Override
   public void run() {
     if (!configuration.getGitHubConfiguration().containsKey(oldBranch.getHost())) {
-      LOG.warn("No git host configured for {}/{}/{}#{} marking as inactive", oldBranch.getHost(), oldBranch.getOrganization(), oldBranch.getRepository(), oldBranch.getBranch());
+      LOG.warn("No git host configured for {}/{}#{} marking as inactive", oldBranch.getHost(), oldBranch.getFullRepositoryName(), oldBranch.getBranch());
       branchService.delete(oldBranch);
       return;
     }
@@ -47,6 +71,12 @@ public class GitBranchUpdater implements Runnable {
       throw new RuntimeException(e);
     }
 
+    if (ghRepository.getId() != oldBranch.getRepositoryId()) {
+      LOG.warn("A repository with a different github id {} has replaced {}. Considering {}#{} as deleted ", ghRepository.getId(), oldBranch, oldBranch.getFullRepositoryName(), oldBranch.getBranch());
+      branchService.delete(oldBranch);
+      return;
+    }
+
     String oldRepoOrg = oldBranch.getOrganization();
     String oldRepoName = oldBranch.getRepository();
     String newRepoName = ghRepository.getName();
@@ -56,24 +86,24 @@ public class GitBranchUpdater implements Runnable {
     boolean orgIsConfigured = githubConfiguration.getOrganizations().contains(newRepoOrg);
     boolean orgNameChanged = !oldRepoOrg.equals(newRepoOrg);
     boolean repoNameChanged = !oldRepoName.equals(newRepoName);
-
     // Only update a branch if it has changed.
-    if (orgNameChanged || repoNameChanged || orgIsConfigured != oldBranch.isActive()) {
-      GitInfo updatedBranch = updateBranch(oldBranch, newRepoOrg, newRepoName, orgIsConfigured);
+    if (orgNameChanged || repoNameChanged || !orgIsConfigured) {
+      boolean active = orgIsConfigured;
+      GitInfo updatedBranch = updateBranch(oldBranch, newRepoOrg, newRepoName, active);
       LOG.info("Branch {} has changed updating to {}", oldBranch, updatedBranch);
       branchService.upsert(updatedBranch);
     }
   }
 
-  private GitInfo updateBranch(GitInfo branch, String realRepoOrg, String realRepoName, boolean shouldBeActive) {
+  private GitInfo updateBranch(GitInfo branch, String realRepoOrg, String realRepoName, boolean active) {
     return new GitInfo(branch.getId(),
         branch.getHost(),
         realRepoOrg,
         realRepoName,
         branch.getRepositoryId(),
         branch.getBranch(),
-        shouldBeActive,
+        active,
         branch.getCreatedTimestamp(),
-        branch.getUpdatedTimestamp());
+        System.currentTimeMillis());
   }
 }

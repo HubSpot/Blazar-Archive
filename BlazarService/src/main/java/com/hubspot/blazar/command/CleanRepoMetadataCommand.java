@@ -6,7 +6,9 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import net.sourceforge.argparse4j.inf.Namespace;
 
@@ -25,14 +27,14 @@ import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.setup.Bootstrap;
 
 public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfiguration> {
-  private static final String COMMAND_NAME = "clean_missing_repos";
+  private static final String COMMAND_NAME = "clean_repo_metadata";
   private static final String COMMAND_DESC = "Finds repos no longer in the managed organizations and marks all branches as inactive";
   private static final Logger LOG = LoggerFactory.getLogger(CleanRepoMetadataCommand.class);
   private final ExecutorService executorService;
 
   public CleanRepoMetadataCommand() {
     super(COMMAND_NAME, COMMAND_DESC);
-    this.executorService = Executors.newFixedThreadPool(10);
+    this.executorService = new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(3000));
   }
 
   @Override
