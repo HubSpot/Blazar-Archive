@@ -22,15 +22,17 @@ class BranchState extends Component {
   }
 
   componentDidMount() {
-    const {pollBranchModuleStates, branchId} = this.props;
+    const {pollBranchModuleStates, branchId, loadBranchInfo} = this.props;
     pollBranchModuleStates(branchId);
+    loadBranchInfo(branchId);
     window.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   componentWillReceiveProps(nextProps) {
-    const {pollBranchModuleStates, branchId} = this.props;
+    const {pollBranchModuleStates, branchId, loadBranchInfo} = this.props;
     if (nextProps.branchId !== branchId) {
       pollBranchModuleStates(nextProps.branchId);
+      loadBranchInfo(nextProps.branchId);
     }
   }
 
@@ -183,6 +185,7 @@ BranchState.propTypes = {
   selectModule: PropTypes.func.isRequired,
   deselectModule: PropTypes.func.isRequired,
   selectedModuleId: PropTypes.number,
+  loadBranchInfo: PropTypes.func.isRequired,
   loadBranchModuleStates: PropTypes.func.isRequired,
   pollBranchModuleStates: PropTypes.func.isRequired,
   stopPollingBranchModuleStates: PropTypes.func.isRequired,
