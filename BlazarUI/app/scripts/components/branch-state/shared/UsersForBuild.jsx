@@ -8,7 +8,7 @@ const getUsers = (buildTrigger, commitInfo) => {
     case BuildTriggerTypes.PUSH:
     case BuildTriggerTypes.BRANCH_CREATION: {
       const newCommitAuthors = commitInfo.get('newCommits')
-        .map((commit) => commit.getIn(['author', 'username']))
+        .map((commit) => commit.getIn(['author', 'username']) || commit.getIn(['author', 'email']))
         .toOrderedSet()
         .join(', ');
 
