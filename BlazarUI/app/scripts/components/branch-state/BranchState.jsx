@@ -41,14 +41,13 @@ class BranchState extends Component {
     window.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
-  sortModules() {
-    const {activeModules} = this.props;
-    if (activeModules.isEmpty()) {
-      return activeModules;
+  sortModules(modules) {
+    if (modules.isEmpty()) {
+      return modules;
     }
 
-    const topologicalSort = activeModules.first().getIn(['lastBranchBuild', 'dependencyGraph', 'topologicalSort']);
-    return activeModules.sort((a, b) => {
+    const topologicalSort = modules.first().getIn(['lastBranchBuild', 'dependencyGraph', 'topologicalSort']);
+    return modules.sort((a, b) => {
       // first sort by descending build number to prioritize more recent builds
       const buildNumberA = getCurrentModuleBuild(a).get('buildNumber');
       const buildNumberB = getCurrentModuleBuild(b).get('buildNumber');
