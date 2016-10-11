@@ -10,11 +10,6 @@ import store from './reduxStore';
 
 import { getUsernameFromCookie } from './components/Helpers.js';
 
-if (!window.config.apiRoot) {
-  console.warn('You need to set your apiRoot via localStorage');
-  console.warn('e.g. localStorage["apiRootOverride"] = "https://path.to-api.com/v1/api"');
-}
-
 if (window.config.heapToken) {
   const username = getUsernameFromCookie();
   window.heap.identify(`${username}-blazar`);

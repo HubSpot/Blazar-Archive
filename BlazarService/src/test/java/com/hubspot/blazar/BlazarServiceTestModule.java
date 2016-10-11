@@ -57,6 +57,7 @@ public class BlazarServiceTestModule extends AbstractModule {
     bind(SlackSession.class).toInstance(mock(SlackSession.class));
     bind(AsyncHttpClient.class).toInstance(mock(AsyncHttpClient.class));
     bind(Integer.class).annotatedWith(Names.named("")).toInstance(0);
+
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
     moduleBuildVisitors.addBinding().to(TestBuildLauncher.class);
     bindGitHubMap(); // does its own binding

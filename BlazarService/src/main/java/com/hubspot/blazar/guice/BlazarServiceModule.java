@@ -13,6 +13,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.RateLimitHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,6 +69,7 @@ import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import io.dropwizard.db.DataSourceFactory;
 
 public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfiguration> {
+  private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceModule.class);
 
   @Override
   public void configure(Binder binder) {

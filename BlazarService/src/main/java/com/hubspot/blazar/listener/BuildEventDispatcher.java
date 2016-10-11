@@ -32,6 +32,7 @@ public class BuildEventDispatcher {
   private final InterProjectBuildService interProjectBuildService;
   private final Set<InterProjectBuildVisitor> interProjectBuildVisitors;
   private final Set<ModuleBuildVisitor> moduleVisitors;
+  private final EventBus eventBus;
 
   @Inject
   public BuildEventDispatcher(RepositoryBuildService repositoryBuildService,
@@ -47,6 +48,7 @@ public class BuildEventDispatcher {
     this.repositoryVisitors = repositoryVisitors;
     this.interProjectBuildVisitors = interProjectBuildVisitors;
     this.moduleVisitors = moduleVisitors;
+    this.eventBus = eventBus;
 
     eventBus.register(this);
   }
@@ -71,6 +73,7 @@ public class BuildEventDispatcher {
     } catch (NonRetryableBuildException e) {
       LOG.warn("Failing build {}", build.getId().get(), e);
       repositoryBuildService.fail(build);
+
     }
   }
 
