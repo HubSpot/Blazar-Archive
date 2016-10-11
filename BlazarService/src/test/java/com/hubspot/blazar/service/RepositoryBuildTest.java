@@ -30,14 +30,13 @@ public class RepositoryBuildTest extends BlazarServiceTestBase {
   @Inject
   private TestUtils testUtils;
 
-  @Inject
   @Before
   public void before(ManagedDataSource dataSource) throws Exception {
     runSql(dataSource, "InterProjectData.sql");
   }
 
   @Test
-  public void testRepositoryBuild() throws InterruptedException {
+  public void itRunsABranchBuild() throws InterruptedException {
     GitInfo gitInfo = branchService.get(3).get();
     RepositoryBuild build = testUtils.runDefaultRepositoryBuild(gitInfo);
     assertThat(build.getBranchId()).isEqualTo(3);

@@ -6,6 +6,6 @@ before:
 
 stepActivation:
   upload:
-    branches: [master, VersionBackfillCommand]
+    branches: [hs-master]
   notify:
-    branches: [master, VersionBackfillCommand]
+    branches: [hs-master]

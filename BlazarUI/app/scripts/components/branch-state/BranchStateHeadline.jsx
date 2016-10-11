@@ -10,23 +10,12 @@ import PageHeader from '../shared/PageHeader.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
 
-import { loadBranchInfo } from '../../redux-actions/branchActions';
 import { loadBranches } from '../../redux-actions/repoActions';
 import { showBuildBranchModal } from '../../redux-actions/buildBranchFormActions';
 
 
 class BranchStateHeadline extends Component {
-  componentDidMount() {
-    const {branchId} = this.props;
-    this.props.loadBranchInfo(branchId);
-  }
-
   componentWillReceiveProps(nextProps) {
-    if (nextProps.branchId !== this.props.branchId) {
-      this.props.loadBranchInfo(nextProps.branchId);
-      return;
-    }
-
     const repositoryId = nextProps.branchInfo.repositoryId;
     if (repositoryId && (this.props.branchInfo.repositoryId !== repositoryId)) {
       this.props.loadBranches(repositoryId);
@@ -95,6 +84,11 @@ class BranchStateHeadline extends Component {
             openOnFocus={true}
             autoBlur={true}
           />
+          <p className="branch-state-headline__sub-header-links">
+            <Link to={`/branches/${this.props.branchId}/builds`} className="build-history-link">
+              <Icon name="history" /> Branch build history
+            </Link>
+          </p>
         </div>
       </div>
     );
@@ -104,7 +98,6 @@ class BranchStateHeadline extends Component {
 BranchStateHeadline.propTypes = {
   branchId: PropTypes.number.isRequired,
   branchInfo: PropTypes.object,
-  loadBranchInfo: PropTypes.func.isRequired,
   branchesList: ImmutablePropTypes.list.isRequired,
   loadBranches: PropTypes.func.isRequired,
   onBranchSelect: PropTypes.func.isRequired,
@@ -118,7 +111,6 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-  loadBranchInfo,
   loadBranches,
   showBuildBranchModal
 };

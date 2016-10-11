@@ -19,11 +19,12 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 public class BlazarGHRepository extends GHRepository {
+  private final int id;
   private static final Logger LOG = LoggerFactory.getLogger(BlazarGHRepository.class);
   private final String name;
   private final String fullName;
   private Map<String, ? extends GHBranch> branches;
-  private final BlazarGHUser owner;
+  private BlazarGHUser owner;
   private List<BlazarGHCommit> commits;
   private final BlazarGHTree tree;
   private String host;
@@ -31,10 +32,12 @@ public class BlazarGHRepository extends GHRepository {
 
   @JsonCreator
   public BlazarGHRepository(@JsonProperty("name") String name,
+                            @JsonProperty("id") int id,
                             @JsonProperty("commits") List<BlazarGHCommit> commits,
                             @JsonProperty("branches") Map<String, BlazarGHBranch> branches,
                             @JsonProperty("tree") BlazarGHTree tree,
                             @JsonProperty("owner") BlazarGHUser owner) throws IOException {
+    this.id = id;
     this.name = name;
     this.owner = owner;
     this.commits = commits;
@@ -51,13 +54,32 @@ public class BlazarGHRepository extends GHRepository {
   }
 
   @Override
+  public int getId() {
+    return id;
+  }
+
+  @Override
   public String getName() {
-    return this.name;
+    return name;
   }
 
   @Override
   public String getFullName() {
-    return this.fullName;
+    return fullName;
+  }
+
+  @Override
+  public String getOwnerName() {
+    return owner.getLogin();
+  }
+
+  @Override
+  public BlazarGHUser getOwner() {
+    return owner;
+  }
+
+  public void setOwner(BlazarGHUser user) {
+    owner = user;
   }
 
   @Override
@@ -116,7 +138,7 @@ public class BlazarGHRepository extends GHRepository {
   @Override
   public URL getHtmlUrl() {
     try {
-      return new URL("https", this.host, String.format("/%s/%s", this.owner.getLogin(), this.name));
+      return new URL("https", host, String.format("/%s/%s", owner.getLogin(), name));
     } catch (MalformedURLException e) {
       throw new RuntimeException(e);
     }
@@ -136,7 +158,7 @@ public class BlazarGHRepository extends GHRepository {
   @Override
   public GHContent getFileContent(String path, String ref) throws IOException {
     if (branches.containsKey(ref)) {
-      BlazarGHTree tree = (BlazarGHTree) this.getTreeRecursive(ref, 1);
+      BlazarGHTree tree = (BlazarGHTree) getTreeRecursive(ref, 1);
       for (BlazarGHTreeEntry entry : tree.getSubclassTree()) {
         if (entry.getPath().equals(path)) {
           return entry.getContent();
@@ -181,7 +203,7 @@ public class BlazarGHRepository extends GHRepository {
     newEntries.addAll(change.getEntries());
     newEntries.addAll(tree.getSubclassTree());
     newBranches.get(change.getBranch()).setRepository(this);
-    this.tree.set(change.getCommit().getSHA1(), newEntries);
+    tree.set(change.getCommit().getSHA1(), newEntries);
   }
 
   public void revertLastChange() throws IOException {

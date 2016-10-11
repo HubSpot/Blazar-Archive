@@ -19,15 +19,14 @@ import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.setup.Bootstrap;
 
-public class VersionBackFillCommandModule extends AbstractModule {
+public class BaseCommandModule extends AbstractModule {
 
-  private BlazarConfiguration configuration;
-  private Bootstrap<BlazarConfiguration> bootstrap;
+  private final Bootstrap<BlazarConfiguration> bootstrap;
+  private final BlazarConfiguration configuration;
 
-  public VersionBackFillCommandModule(Bootstrap<BlazarConfiguration> bootstrap,
-                                      BlazarConfiguration configuration) {
-    this.configuration = configuration;
+  public BaseCommandModule(Bootstrap<BlazarConfiguration> bootstrap, BlazarConfiguration configuration) {
     this.bootstrap = bootstrap;
+    this.configuration = configuration;
   }
 
   @Override

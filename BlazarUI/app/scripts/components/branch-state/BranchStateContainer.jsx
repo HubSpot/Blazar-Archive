@@ -2,6 +2,7 @@ import BranchState from './BranchState.jsx';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import branchStateActions from '../../redux-actions/branchStateActions';
+import { loadBranchInfo } from '../../redux-actions/branchActions';
 
 const mapStateToProps = (state, ownProps) => {
   const moduleStates = state.branchState.get('moduleStates');
@@ -12,8 +13,11 @@ const mapStateToProps = (state, ownProps) => {
     branchInfo: state.branch.get('branchInfo'),
     loadingModuleStates: state.branchState.get('loading'),
     selectedModuleId: state.branchState.get('selectedModuleId'),
-    branchNotFound: state.branch.getIn(['error', 'status']) === 404
+    branchNotFound: state.branch.getIn(['error', 'status']) === 404,
+    showBetaFeatureAlert: !state.dismissedBetaNotifications.get('branchStatePage')
   };
 };
 
-export default withRouter(connect(mapStateToProps, branchStateActions)(BranchState));
+const actions = Object.assign({}, branchStateActions, {loadBranchInfo});
+
+export default withRouter(connect(mapStateToProps, actions)(BranchState));

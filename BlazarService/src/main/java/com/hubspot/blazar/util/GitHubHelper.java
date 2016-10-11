@@ -1,15 +1,18 @@
 package com.hubspot.blazar.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.net.UrlEscapers;
-import com.hubspot.blazar.base.BuildConfig;
-import com.hubspot.blazar.base.CommitInfo;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
-import com.hubspot.blazar.github.GitHubProtos.User;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCompare;
@@ -21,17 +24,16 @@ import org.kohsuke.github.GitUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.net.UrlEscapers;
+import com.hubspot.blazar.base.BuildConfig;
+import com.hubspot.blazar.base.CommitInfo;
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.github.GitHubProtos.Commit;
+import com.hubspot.blazar.github.GitHubProtos.User;
 
 @Singleton
 public class GitHubHelper {

@@ -25,6 +25,10 @@ public class BranchService {
     return branchDao.getAll();
   }
 
+  public Set<GitInfo> getAllActive() {
+    return branchDao.getAllActive();
+  }
+
   public Optional<GitInfo> get(int id) {
     return branchDao.get(id);
   }

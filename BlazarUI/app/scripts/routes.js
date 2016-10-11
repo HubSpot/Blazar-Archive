@@ -14,6 +14,8 @@ import RepoBuild from './pages/repoBuild.jsx';
 import NotFound from './pages/notFound.jsx';
 import BranchState from './components/branch-state/BranchStateContainer.jsx';
 
+import { isBetaUser } from './utils/user.js';
+
 function redirectRepoBuildShortlink(nextState, replace, callback) {
   const data = $.ajax({
     url: `${window.config.apiRoot}/branches/builds/${nextState.params.repoBuildId}`,
@@ -30,17 +32,27 @@ function redirectRepoBuildShortlink(nextState, replace, callback) {
   });
 }
 
+function redirectBetaUsersToBranchStatePage(nextState, replace) {
+  const locationState = nextState.location.state || {};
+  if (isBetaUser && !locationState.handlingBranchSelect) {
+    replace(`/branches/${nextState.params.branchId}/state`);
+  }
+}
+
 const routes = (
   <Route name="app" path="/" component={App}>
     <IndexRoute name="dashboard" component={ Dashboard } />
     <Route name="host" path="/builds/org/:org" component={ Org } />
     <Route name="repo" path="/builds/repo/:repo" component={ Repo } />
-    <Route name="branch" path="/builds/branch/:branchId" component={ Branch } />
+    <Route name="branch" path="/builds/branch/:branchId" component={ Branch } onEnter={redirectBetaUsersToBranchStatePage} />
     <Route name="settings" path="/settings/branch/:branchId" component={ Settings } />
     <Route name="repoBuild" path="/builds/branch/:branchId/build/:buildNumber" component={ RepoBuild } />
     <Route name="build" path="/builds/branch/:branchId/build/:buildNumber/module/:moduleName" component={ Build } />
     <Route name="repoBuildShortlink" path="/builds/repo-build/:repoBuildId" onEnter={redirectRepoBuildShortlink} />
+
     <Route name="branchState" path="/branches/:branchId/state" component= { BranchState } />
+    <Route name="branchBuildHistory" path="/branches/:branchId/builds" component= { Branch } />
+
     <Route name="notFound" path="*" component={ NotFound } />
   </Route>
 );

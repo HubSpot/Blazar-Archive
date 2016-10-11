@@ -1,4 +1,4 @@
-package com.hubspot.blazar.guice;
+package com.hubspot.blazar.command;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,6 +25,7 @@ import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
+import com.hubspot.blazar.guice.BaseCommandModule;
 
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.setup.Bootstrap;
@@ -45,12 +46,12 @@ public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfiguratio
   protected void run(Bootstrap<BlazarConfiguration> bootstrap,
                      Namespace namespace,
                      BlazarConfiguration configuration) throws Exception {
-    Injector i = Guice.createInjector(new VersionBackFillCommandModule(bootstrap, configuration));
+    Injector injector = Guice.createInjector(new BaseCommandModule(bootstrap, configuration));
 
     try {
-      CompositeModuleDiscovery compositeModuleDiscovery = i.getInstance(CompositeModuleDiscovery.class);
-      DependenciesService dependenciesService = i.getInstance(DependenciesService.class);
-      ModuleDiscoveryService moduleDiscoveryService = i.getInstance(ModuleDiscoveryService.class);
+      CompositeModuleDiscovery compositeModuleDiscovery = injector.getInstance(CompositeModuleDiscovery.class);
+      DependenciesService dependenciesService = injector.getInstance(DependenciesService.class);
+      ModuleDiscoveryService moduleDiscoveryService = injector.getInstance(ModuleDiscoveryService.class);
 
       Set<GitInfo> toBeReDiscovered = dependenciesService.getBranchesWithNonVersionedDependencies();
       Set<GitInfo> failed = new HashSet<>();

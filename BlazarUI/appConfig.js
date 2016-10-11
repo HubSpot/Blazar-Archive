@@ -20,13 +20,15 @@ const appConfig = {
   offsetLength: process.env.BLAZAR_OFFSET_LENGTH || 50000,
 
   appRoot: process.env.BLAZAR_APP_URI || '',
+
   // If we have an env variable, gulp is proxying it through /api.
-  // Otherwise we'll get it from localStorage later.
-  apiRoot: process.env.BLAZAR_API_URL || '',
+  apiRoot: process.env.BLAZAR_API_URL || '/blazar/v2',
 
   staticRoot: process.env.BLAZAR_STATIC_ROOT || '',
 
   usernameCookie: process.env.BLAZAR_USERNAME_COOKIE || '',
+
+  betaUserCookie: process.env.BLAZAR_BETA_USER_COOKIE || '',
 
   slackBotName: process.env.SLACK_BOT_NAME || '',
 
