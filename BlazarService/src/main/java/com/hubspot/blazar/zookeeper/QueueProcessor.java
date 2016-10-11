@@ -23,11 +23,9 @@ import org.apache.zookeeper.KeeperException.NoNodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
-import com.hubspot.blazar.data.service.CachingMetricsService;
 
 import io.dropwizard.lifecycle.Managed;
 
@@ -48,8 +46,6 @@ public class QueueProcessor implements LeaderLatchListener, Managed {
                         CuratorFramework curatorFramework,
                         ZooKeeperEventBus eventBus,
                         ObjectMapper mapper,
-                        MetricRegistry metricRegistry,
-                        CachingMetricsService cachingMetricsService,
                         Set<Object> erroredItems) {
     this.executorService = executorService;
     this.curatorFramework = curatorFramework;

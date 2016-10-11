@@ -12,6 +12,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.CachingMetricsService;
@@ -78,6 +79,12 @@ public class LeaderMetricManager implements LeaderLatchListener {
         metricRegistry.register(makeMetricName(RepositoryBuild.class, state), makeBranchStateGauge(state));
       }
     }
+
+    for (InterProjectBuild.State state : InterProjectBuild.State.values()) {
+      if (!state.isFinished()) {
+        metricRegistry.register(makeMetricName(InterProjectBuild.class, state), makeInterProjectStateGauge(state));
+      }
+    }
   }
 
   private String zkPathToMetricName(String path) {
@@ -93,7 +100,21 @@ public class LeaderMetricManager implements LeaderLatchListener {
       try {
         return curatorFramework.getChildren().forPath(path).size();
       } catch (Exception e) {
-        return 0;
+        // Throwing a RTE here will cause metrics on the metrics endpoint to
+        // render the error in an "error" field as show below:
+        /*
+            {
+              "gauges": {
+                "com.hubspot.blazar.zookeeper.LeaderMetricManager.queues.ModuleBuild.size": {
+                  error: "java.lang.RuntimeException: java.io.IOException: asdf"
+                },
+                "io.dropwizard.db.ManagedPooledDataSource.db.active": {
+                  value: 0
+                }
+              }
+            }
+        */
+        throw new RuntimeException(e);
       }
     };
   }
@@ -104,5 +125,9 @@ public class LeaderMetricManager implements LeaderLatchListener {
 
   private Gauge<Number> makeModuleStateGauge(ModuleBuild.State state) {
     return () -> cachingMetricsService.getCachedActiveModuleBuildCountByState(state);
+  }
+
+  private Gauge<Number> makeInterProjectStateGauge(InterProjectBuild.State state) {
+    return () -> cachingMetricsService.getCachedActiveInterProjectBuildCountByState(state);
   }
 }

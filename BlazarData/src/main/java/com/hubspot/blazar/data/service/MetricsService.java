@@ -1,13 +1,16 @@
 package com.hubspot.blazar.data.service;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.base.metrics.StateToActiveBuildCountPair;
+import com.hubspot.blazar.base.metrics.StateToActiveBranchBuildCountPair;
+import com.hubspot.blazar.base.metrics.StateToActiveInterProjectBuildCountPair;
+import com.hubspot.blazar.base.metrics.StateToActiveModuleBuildCountPair;
 import com.hubspot.blazar.data.dao.MetricsDao;
 
 public class MetricsService {
@@ -20,20 +23,29 @@ public class MetricsService {
   }
 
   public Map<ModuleBuild.State, Integer> countActiveModuleBuildsByState() {
-    Set<StateToActiveBuildCountPair> pairs = dao.countActiveModuleBuildsByState();
-    Map<ModuleBuild.State, Integer> stateCountMap = new HashMap<>();
-    for (StateToActiveBuildCountPair pair : pairs) {
-      stateCountMap.put(ModuleBuild.State.valueOf(pair.getStateName()), pair.getCount());
+    Set<StateToActiveModuleBuildCountPair> pairs = dao.countActiveModuleBuildsByState();
+    ImmutableMap.Builder<ModuleBuild.State, Integer> mapBuilder = ImmutableMap.builder();
+    for (StateToActiveModuleBuildCountPair pair : pairs) {
+      mapBuilder.put(pair.getState(), pair.getCount());
     }
-    return stateCountMap;
+    return mapBuilder.build();
   }
 
   public Map<RepositoryBuild.State, Integer> countActiveBranchBuildsByState() {
-    Set<StateToActiveBuildCountPair> pairs = dao.countActiveBranchBuildsByState();
-    Map<RepositoryBuild.State, Integer> stateCountMap = new HashMap<>();
-    for (StateToActiveBuildCountPair pair : pairs) {
-      stateCountMap.put(RepositoryBuild.State.valueOf(pair.getStateName()), pair.getCount());
+    Set<StateToActiveBranchBuildCountPair> pairs = dao.countActiveBranchBuildsByState();
+    ImmutableMap.Builder<RepositoryBuild.State, Integer> mapBuilder = ImmutableMap.builder();
+    for (StateToActiveBranchBuildCountPair pair : pairs) {
+      mapBuilder.put(pair.getState(), pair.getCount());
     }
-    return stateCountMap;
+    return mapBuilder.build();
+  }
+
+  public Map<InterProjectBuild.State, Integer> countActiveInterProjectBuildsByState() {
+    Set<StateToActiveInterProjectBuildCountPair> pairs = dao.countActiveInterProjectBuildsByState();
+    ImmutableMap.Builder<InterProjectBuild.State, Integer> mapBuilder = ImmutableMap.builder();
+    for(StateToActiveInterProjectBuildCountPair pair : pairs) {
+      mapBuilder.put(pair.getState(), pair.getCount());
+    }
+    return mapBuilder.build();
   }
 }

@@ -1,13 +1,14 @@
 package com.hubspot.blazar.data.util;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
 
 public class GraphUtilsTest {
   private static final SetMultimap<Integer, Integer> EDGES = ImmutableSetMultimap.<Integer, Integer>builder()
