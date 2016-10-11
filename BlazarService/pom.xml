@@ -84,8 +84,8 @@
       <artifactId>argparse4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>net.kencochrane.raven</groupId>
-      <artifactId>raven</artifactId>
+      <groupId>com.getsentry.raven</groupId>
+      <artifactId>raven-logback</artifactId>
     </dependency>
     <!-- for jade and jets3t -->
     <dependency>

@@ -34,9 +34,6 @@ import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
 import com.hubspot.blazar.exception.IllegalStateExceptionMapper;
-import com.hubspot.blazar.externalservice.sentry.DevNullExceptionNotifier;
-import com.hubspot.blazar.externalservice.sentry.ExceptionNotifier;
-import com.hubspot.blazar.externalservice.sentry.SentryExceptionNotifier;
 import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BranchStateResource;
@@ -108,12 +105,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     if (getConfiguration().getSlackConfiguration().isPresent()) {
       binder.bind(UserFeedbackResource.class);
       binder.bind(SlackUtils.class);
-    }
-
-    if (getConfiguration().getSentryConfiguration().isPresent()) {
-      binder.bind(ExceptionNotifier.class).to(SentryExceptionNotifier.class);
-    } else {
-      binder.bind(ExceptionNotifier.class).to(DevNullExceptionNotifier.class);
     }
 
     binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());

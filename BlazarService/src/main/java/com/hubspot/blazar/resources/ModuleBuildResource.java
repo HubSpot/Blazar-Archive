@@ -35,6 +35,7 @@ import com.hubspot.singularity.SingularityTaskHistoryUpdate;
 import com.hubspot.singularity.SingularityTaskHistoryUpdate.SimplifiedTaskState;
 import com.hubspot.singularity.client.SingularityClient;
 
+
 @Path("/modules/builds")
 @Produces(MediaType.APPLICATION_JSON)
 public class ModuleBuildResource {

@@ -21,6 +21,7 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
 
   @Override
   public void initialize(final Bootstrap<T> bootstrap) {
+
     bootstrap.addBundle(buildGuiceBundle());
     bootstrap.addBundle(new MigrationsBundle<BlazarConfiguration>() {
 

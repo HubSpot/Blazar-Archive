@@ -49,10 +49,6 @@ public class BlazarConfiguration extends Configuration {
   @JsonProperty("slack_blazar")
   private Optional<BlazarSlackConfiguration> slackConfiguration = Optional.absent();
 
-  @Valid
-  @JsonProperty("sentry")
-  private Optional<BlazarSentryConfiguration> sentryConfiguration = Optional.absent();
-
   // allows you to opt-in whole repositories by name
   private Set<String> whitelist = Collections.emptySet();
   // allows you to opt out whole repositories by name
@@ -120,14 +116,6 @@ public class BlazarConfiguration extends Configuration {
 
   public void setSlackConfiguration(Optional<BlazarSlackConfiguration> slackConfiguration) {
     this.slackConfiguration = slackConfiguration;
-  }
-
-  public Optional<BlazarSentryConfiguration> getSentryConfiguration() {
-    return this.sentryConfiguration;
-  }
-
-  public void setSentryConfiguration(Optional<BlazarSentryConfiguration> sentryConfiguration) {
-    this.sentryConfiguration = sentryConfiguration;
   }
 
   public Set<String> getWhitelist() {
