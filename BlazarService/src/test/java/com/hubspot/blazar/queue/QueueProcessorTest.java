@@ -9,62 +9,46 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.jukito.JukitoRunner;
+import org.jukito.UseModules;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.guice.BlazarEventBusModule;
 import com.hubspot.blazar.guice.BlazarQueueProcessorModule;
-import com.hubspot.blazar.test.base.service.BlazarTestBase;
 import com.hubspot.blazar.test.base.service.BlazarTestModule;
+import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
 
-public class QueueProcessorTest extends BlazarTestBase {
-  private EventBus eventBus;
-  private List<Object> received;
-
-  @Before
-  public void setup() throws Exception {
-    synchronized (injector) {
-      if (injector.get() == null) {
-        injector.set(
-            Guice.createInjector(
-                new BlazarTestModule(),
-                new BlazarEventBusModule(),
-                new BlazarQueueProcessorModule()
-            )
-        );
-        runSql("schema.sql");
-        getFromGuice(EventBus.class).register(new Object() {
-
+@RunWith(JukitoRunner.class)
+@UseModules({BlazarQueueProcessorModule.class, BlazarEventBusModule.class, BlazarTestModule.class})
+public class QueueProcessorTest extends DatabaseBackedTest {
+  private List<Object> received = new ArrayList<>();
+  private EventBus eventBus = new EventBus() {
           @Subscribe
           public void handleEvent(Object event) {
             received.add(event);
-          }
-        });
-      }
-    }
+          }};
+  @Inject
+  private QueueProcessor queueProcessor;
 
-    eventBus = getFromGuice(EventBus.class);
-    received = new ArrayList<>();
-
-    QueueProcessor queueProcessor = getFromGuice(QueueProcessor.class);
+  @Before
+  public void before() {
     queueProcessor.start();
     queueProcessor.isLeader();
   }
 
   @After
   public void cleanup() throws Exception {
-    QueueProcessor queueProcessor = getFromGuice(QueueProcessor.class);
     queueProcessor.stop();
     queueProcessor.notLeader();
-
-    runSql("schema.sql");
   }
 
   @Test
