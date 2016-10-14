@@ -43,24 +43,24 @@ import io.dropwizard.logging.layout.LayoutFactory;
 public class SentryAppenderFactory extends AbstractAppenderFactory<ILoggingEvent> {
   private static final String APPENDER_NAME = "sentry-appender";
   private final String sentryDsn;
-  private final String sentryRelease;
+  private final String blazarRelease;
 
   @JsonCreator
   public SentryAppenderFactory(
       @NotNull
       @JsonProperty("sentryDsn") String sentryDsn,
-      @JsonProperty("sentryRelease") String sentryRelease ) {
+      @JsonProperty("blazarRelease") String blazarRelease ) {
 
     this.sentryDsn = sentryDsn;
-    this.sentryRelease = sentryRelease;
+    this.blazarRelease = blazarRelease;
   }
 
   public String getSentryDsn() {
     return sentryDsn;
   }
 
-  public String getSentryRelease() {
-    return sentryRelease;
+  public String getBlazarRelease() {
+    return blazarRelease;
   }
 
   @Override
@@ -73,7 +73,7 @@ public class SentryAppenderFactory extends AbstractAppenderFactory<ILoggingEvent
     final SentryAppender appender = new SentryAppender();
     appender.setName(APPENDER_NAME);
     appender.setDsn(sentryDsn);
-    appender.setRelease(sentryRelease);
+    appender.setRelease(blazarRelease);
     appender.setServerName(getHostNameOrTaskId());
     appender.setContext(context);
     appender.addFilter(levelFilterFactory.build(Level.ERROR));
