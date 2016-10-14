@@ -1,10 +1,10 @@
 import React, {Component, PropTypes} from 'react';
 import {has, contains, bindAll, isEmpty} from 'underscore';
+import { withRouter, routerShape } from 'react-router';
 import {humanizeText, timestampFormatted} from '../Helpers';
-import classNames from 'classnames';
 
 import Loader from '../shared/Loader.jsx';
-import RepoBuildCancelButton from './RepoBuildCancelButton.jsx';
+import CancelBuildButton from '../shared/branch-build/CancelBuildButton.jsx';
 
 import Commits from './Commits.jsx';
 import InterProjectAlert from './InterProjectAlert.jsx';
@@ -16,34 +16,11 @@ import {LABELS} from '../constants';
 class RepoBuildDetail extends Component {
 
   constructor() {
-    bindAll(this, 'handleResize', 'flipShowCommits');
+    bindAll(this, 'flipShowCommits', 'handleCancelBuild');
 
     this.state = {
-      windowWidth: window.innerWidth,
       showCommits: false
     };
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.handleResize);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
-  }
-
-  getWrapperClassNames(build) {
-    return classNames([
-      'build-detail',
-      'alert',
-      `alert-${LABELS[build.state]}`
-    ]);
-  }
-
-  handleResize() {
-    this.setState({
-      windowWidth: window.innerWidth
-    });
   }
 
   flipShowCommits() {
@@ -52,9 +29,14 @@ class RepoBuildDetail extends Component {
     });
   }
 
+  handleCancelBuild() {
+    const {router, params: {branchId}} = this.props;
+    const branchHistoryPagePath = `/builds/branch/${branchId}`;
+    router.push(branchHistoryPagePath);
+  }
+
   renderCommits() {
-    const {currentRepoBuild} = this.props;
-    const build = currentRepoBuild;
+    const build = this.props.currentRepoBuild;
 
     if (!has(build, 'commitInfo')) {
       return null;
@@ -143,17 +125,18 @@ class RepoBuildDetail extends Component {
 
     return (
       <div>
-        <div className={this.getWrapperClassNames(build)}>
+        <div className={`build-detail alert alert-${LABELS[build.state]}`}>
           <p className="build-detail-header__build-state">
             Build {buildDetail.buildResult}
             <span className="build-detail-header__timestamp">{buildDetail.duration}</span>
             {this.renderInterProjectBuildMessage()}
             {this.renderUnstableMessage()}
           </p>
-          <RepoBuildCancelButton
-            params={this.props.params}
-            triggerCancelBuild={this.props.triggerCancelBuild}
+          <CancelBuildButton
+            onCancel={this.handleCancelBuild}
             build={build}
+            btnStyle="danger"
+            btnSize="xsmall"
           />
         </div>
         <InterProjectAlert
@@ -172,10 +155,10 @@ RepoBuildDetail.propTypes = {
   loading: PropTypes.bool.isRequired,
   currentRepoBuild: PropTypes.object,
   error: PropTypes.string,
-  triggerCancelBuild: PropTypes.func.isRequired,
   upAndDownstreamModules: PropTypes.object.isRequired,
   params: PropTypes.object.isRequired,
+  router: routerShape.isRequired,
   branchInfo: PropTypes.object.isRequired
 };
 
-export default RepoBuildDetail;
+export default withRouter(RepoBuildDetail);

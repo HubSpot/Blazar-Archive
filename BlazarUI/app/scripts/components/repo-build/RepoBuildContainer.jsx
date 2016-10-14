@@ -39,7 +39,7 @@ class RepoBuildContainer extends Component {
     super(props);
     this.state = initialState;
 
-    bindAll(this, 'onStatusChange', 'triggerCancelBuild', 'tryLoadInterProjectBuildMapping');
+    bindAll(this, 'onStatusChange', 'tryLoadInterProjectBuildMapping');
   }
 
   componentDidMount() {
@@ -89,10 +89,6 @@ class RepoBuildContainer extends Component {
 
   onStatusChange(state) {
     this.setState(state);
-  }
-
-  triggerCancelBuild() {
-    RepoBuildActions.cancelBuild(this.props.params);
   }
 
   isLoading() {
@@ -168,7 +164,6 @@ class RepoBuildContainer extends Component {
             {...this.props}
             {...this.state}
             loading={this.isLoading()}
-            triggerCancelBuild={this.triggerCancelBuild}
           />
           <RepoBuildModulesTable
             params={this.props.params}

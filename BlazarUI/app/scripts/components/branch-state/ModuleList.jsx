@@ -8,7 +8,7 @@ import ModuleItem from './ModuleItem.jsx';
 import ModuleBuildHistory from './module-build-history/ModuleBuildHistory.jsx';
 import { getCurrentBranchBuild } from '../Helpers';
 
-const ModuleList = ({modules, onItemClick, selectedModuleId}) => {
+const ModuleList = ({modules, onItemClick, selectedModuleId, onCancelBuild}) => {
   const modulesGroupedByCurrentBuild = modules.groupBy((moduleState) =>
     getCurrentBranchBuild(moduleState));
 
@@ -19,7 +19,7 @@ const ModuleList = ({modules, onItemClick, selectedModuleId}) => {
 
         return (
           <div className="module-list-group" key={buildNumber}>
-            <BranchBuildHeader branchBuild={branchBuild} />
+            <BranchBuildHeader branchBuild={branchBuild} onCancelBuild={onCancelBuild} />
             <CardStack className="module-list-card-stack" key={buildNumber}>
               {moduleStates.map(moduleState => {
                 const id = moduleState.getIn(['module', 'id']);
@@ -49,7 +49,8 @@ const ModuleList = ({modules, onItemClick, selectedModuleId}) => {
 ModuleList.propTypes = {
   modules: ImmutablePropTypes.list,
   onItemClick: PropTypes.func.isRequired,
-  selectedModuleId: PropTypes.number
+  selectedModuleId: PropTypes.number,
+  onCancelBuild: PropTypes.func.isRequired
 };
 
 export default ModuleList;

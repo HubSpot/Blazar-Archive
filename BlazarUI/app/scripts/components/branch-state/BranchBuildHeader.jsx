@@ -4,8 +4,9 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import BuildTriggerLabel from './shared/BuildTriggerLabel.jsx';
 import UsersForBuild from './shared/UsersForBuild.jsx';
 import CommitInfo from './shared/CommitInfo.jsx';
+import CancelBuildButton from '../shared/branch-build/CancelBuildButton.jsx';
 
-const ModuleList = ({branchBuild}) => {
+const ModuleList = ({branchBuild, onCancelBuild}) => {
   const buildNumber = branchBuild.get('buildNumber');
   const buildTrigger = branchBuild.get('buildTrigger');
   const commitInfo = branchBuild.get('commitInfo');
@@ -19,7 +20,13 @@ const ModuleList = ({branchBuild}) => {
         <BuildTriggerLabel buildTrigger={buildTrigger} />
       </span>
       <UsersForBuild branchBuild={branchBuild} />
-      <span className="branch-build-header__commit-info-wrapper">
+      <span className="branch-build-header__action-items">
+        <CancelBuildButton
+          onCancel={onCancelBuild}
+          build={branchBuild.toJS()}
+          btnStyle="link"
+          btnClassName="branch-build-header__cancel-build-button"
+        />
         <CommitInfo commitInfo={commitInfo} />
       </span>
     </div>
@@ -31,7 +38,8 @@ ModuleList.propTypes = {
     buildNumber: PropTypes.number.isRequired,
     buildTrigger: ImmutablePropTypes.map.isRequired,
     commitInfo: ImmutablePropTypes.map.isRequired
-  })
+  }),
+  onCancelBuild: PropTypes.func.isRequired
 };
 
 export default ModuleList;
