@@ -1,6 +1,5 @@
 package com.hubspot.blazar.base;
 
-
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;

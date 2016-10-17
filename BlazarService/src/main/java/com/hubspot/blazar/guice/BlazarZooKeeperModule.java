@@ -1,5 +1,15 @@
 package com.hubspot.blazar.guice;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.leader.LeaderLatch;
+import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
+import org.apache.curator.framework.state.ConnectionStateListener;
+import org.jboss.netty.util.internal.ConcurrentIdentityHashMap;
+
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.HostAndPort;
@@ -17,19 +27,12 @@ import com.hubspot.blazar.util.HostUtils.Port;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 import com.hubspot.blazar.zookeeper.BlazarCuratorProvider;
 import com.hubspot.blazar.zookeeper.BlazarLeaderLatch;
+import com.hubspot.blazar.zookeeper.LeaderMetricManager;
 import com.hubspot.blazar.zookeeper.QueueProcessor;
 import com.hubspot.blazar.zookeeper.ZooKeeperEventBus;
+
 import io.dropwizard.jetty.HttpConnectorFactory;
 import io.dropwizard.server.SimpleServerFactory;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.leader.LeaderLatch;
-import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
-import org.apache.curator.framework.state.ConnectionStateListener;
-import org.jboss.netty.util.internal.ConcurrentIdentityHashMap;
-
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class BlazarZooKeeperModule implements Module {
   private final boolean isWebhookOnly;
@@ -46,7 +49,10 @@ public class BlazarZooKeeperModule implements Module {
 
     if (!isWebhookOnly) {
       binder.bind(LeaderLatch.class).to(BlazarLeaderLatch.class);
-      Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(QueueProcessor.class);
+
+      Multibinder<LeaderLatchListener> leaderLatchListeners = Multibinder.newSetBinder(binder, LeaderLatchListener.class);
+      leaderLatchListeners.addBinding().to(QueueProcessor.class);
+      leaderLatchListeners.addBinding().to(LeaderMetricManager.class);
       binder.bind(ScheduledExecutorService.class)
           .annotatedWith(Names.named("QueueProcessor"))
           .toProvider(new ManagedScheduledExecutorServiceProvider(10, "QueueProcessor"))

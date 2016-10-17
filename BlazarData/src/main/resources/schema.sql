@@ -190,3 +190,6 @@ ALTER TABLE `malformed_files` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 --changeset jgoodwin:10 dbms:mysql
 ALTER TABLE `module_provides` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
+
+--changeset jgoodwin:11
+CREATE INDEX build_state on repo_builds (state)

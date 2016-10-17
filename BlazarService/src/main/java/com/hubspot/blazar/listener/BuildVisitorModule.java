@@ -31,8 +31,6 @@ public class BuildVisitorModule implements Module {
     repositoryBuildVisitors.addBinding().to(CompletedRepositoryBuildVisitor.class);
     // update GitHub status
     repositoryBuildVisitors.addBinding().to(GitHubStatusVisitor.class);
-    // monitor repo build state changes
-    repositoryBuildVisitors.addBinding().to(MetricBuildVisitor.class);
     // Make note of launched module Builds for IPR builds
     repositoryBuildVisitors.addBinding().to(InterProjectRepositoryBuildVisitor.class);
 
@@ -57,8 +55,6 @@ public class BuildVisitorModule implements Module {
     moduleBuildVisitors.addBinding().to(DownstreamModuleBuildCanceller.class);
     // complete the repository build once all of the module builds have finished
     moduleBuildVisitors.addBinding().to(RepositoryBuildCompleter.class);
-    // monitor module build state changes
-    moduleBuildVisitors.addBinding().to(MetricBuildVisitor.class);
     // launch interProjectChildren for completed Modules
     moduleBuildVisitors.addBinding().to(InterProjectModuleBuildVisitor.class);
     if (configuration.getSlackConfiguration().isPresent()) {

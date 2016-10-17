@@ -85,9 +85,9 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
   private void sendSlackMessageWithRetries(String channelName, SlackAttachment attachment) {
     try {
       SlackUtils.makeSlackMessageSendingRetryer().call(() -> sendSlackMessage(channelName, attachment));
-      metricRegistry.counter("successful-slack-channel-sends").inc();
+      metricRegistry.meter("successful-slack-channel-sends").mark();
     } catch (Exception e) {
-      metricRegistry.counter("failed-slack-channel-sends").inc();
+      metricRegistry.meter("failed-slack-channel-sends").mark();
       LOG.error("Could not send slack message {}", attachment, e);
     }
   }

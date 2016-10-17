@@ -61,10 +61,10 @@ public class SlackImNotificationVisitor implements RepositoryBuildVisitor {
   private void sendSlackMessageWithRetries(RepositoryBuild build, SlackAttachment attachment) {
     try {
       SlackUtils.makeSlackMessageSendingRetryer().call(() -> sendSlackMessage(build, attachment));
-      metricRegistry.counter("successful-slack-dm-sends").inc();
+      metricRegistry.meter("successful-slack-dm-sends").mark();
     } catch (Exception e){
       LOG.error("Could not send slack message {}", attachment, e);
-      metricRegistry.counter("failed-slack-dm-sends").inc();
+      metricRegistry.meter("failed-slack-dm-sends").mark();
     }
   }
 
