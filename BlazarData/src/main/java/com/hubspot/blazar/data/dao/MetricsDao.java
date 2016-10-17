@@ -4,22 +4,22 @@ import java.util.Set;
 
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 
-import com.hubspot.blazar.base.metrics.StateToActiveBranchBuildCountPair;
-import com.hubspot.blazar.base.metrics.StateToActiveInterProjectBuildCountPair;
-import com.hubspot.blazar.base.metrics.StateToActiveModuleBuildCountPair;
+import com.hubspot.blazar.base.metrics.ActiveBranchBuildsInState;
+import com.hubspot.blazar.base.metrics.ActiveInterProjectBuildsInState;
+import com.hubspot.blazar.base.metrics.ActiveModuleBuildsInState;
 
 public interface MetricsDao {
 
   @SqlQuery("SELECT state, COUNT(id) AS count FROM module_builds " +
       "WHERE state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS') GROUP BY state")
-  Set<StateToActiveModuleBuildCountPair> countActiveModuleBuildsByState();
+  Set<ActiveModuleBuildsInState> countActiveModuleBuildsByState();
 
   @SqlQuery("SELECT state, COUNT(id) AS count FROM repo_builds " +
       "WHERE state IN ('QUEUED', 'LAUNCHING', 'IN_PROGRESS') GROUP BY state")
-  Set<StateToActiveBranchBuildCountPair> countActiveBranchBuildsByState();
+  Set<ActiveBranchBuildsInState> countActiveBranchBuildsByState();
 
   @SqlQuery("SELECT state, count(id) AS count FROM inter_project_builds " +
       "WHERE state in ('QUEUED', 'LAUNCHING', 'IN_PROGRESS') GROUP BY state")
-  Set<StateToActiveInterProjectBuildCountPair> countActiveInterProjectBuildsByState();
+  Set<ActiveInterProjectBuildsInState> countActiveInterProjectBuildsByState();
 
 }

@@ -3,20 +3,20 @@ package com.hubspot.blazar.base.metrics;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.hubspot.blazar.base.InterProjectBuild;
+import com.hubspot.blazar.base.RepositoryBuild;
 
-public class StateToActiveInterProjectBuildCountPair {
+public class ActiveBranchBuildsInState {
 
-  private final InterProjectBuild.State state;
+  private final RepositoryBuild.State state;
   private final int count;
 
-  public StateToActiveInterProjectBuildCountPair(@JsonProperty("state") InterProjectBuild.State state,
-                                                 @JsonProperty("count") int count) {
+  public ActiveBranchBuildsInState(@JsonProperty("state") RepositoryBuild.State state,
+                                   @JsonProperty("count") int count) {
     this.state = state;
     this.count = count;
   }
 
-  public InterProjectBuild.State getState() {
+  public RepositoryBuild.State getState() {
     return this.state;
   }
 
@@ -34,7 +34,7 @@ public class StateToActiveInterProjectBuildCountPair {
       return false;
     }
 
-    StateToActiveInterProjectBuildCountPair pair = (StateToActiveInterProjectBuildCountPair) o;
+    ActiveBranchBuildsInState pair = (ActiveBranchBuildsInState) o;
     return state.equals(pair.state) && count == pair.count;
   }
 
