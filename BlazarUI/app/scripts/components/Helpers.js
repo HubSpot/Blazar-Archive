@@ -48,11 +48,10 @@ export const humanizeText = (string) => {
 
 export const truncate = (str, len = 10, ellip = false) => {
   if (str && str.length > len && str.length > 0) {
-    let newStr = `${str} `;
-    newStr = str.substr(0, len);
-    newStr = str.substr(0, newStr.lastIndexOf(' '));
+    const lastSpaceBeforeLimitIndex = str.lastIndexOf(' ', len - 1);
+    let newStr = str.substr(0, lastSpaceBeforeLimitIndex);
     newStr = (newStr.length > 0) ? newStr : str.substr(0, len);
-    if (ellip && str.length > len) {
+    if (ellip) {
       newStr += '…';
     }
     return newStr;

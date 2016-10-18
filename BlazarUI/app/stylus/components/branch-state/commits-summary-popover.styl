@@ -1,0 +1,52 @@
+@import '../../variables'
+
+.commits-summary-popover
+  max-width 300px
+  font-size 12px
+
+  a
+    color $color-gypsum !important
+
+.commits-summary-popover__commit-list
+  position relative
+  padding-left 14px
+  z-index 0
+
+  &:not(.commits-summary-popover__commit-list--single-commit):before
+    position absolute
+    top 30px
+    bottom 0
+    left 12px
+    width 1px
+    content ""
+    background-color $color-gypsum
+    z-index -1
+
+.commits-summary-poverover__commit-icon
+  width 24px
+  text-align center
+  vertical-align top
+  padding-top 6px
+
+.commits-summary-poverover__commit-icon--first
+  vertical-align middle
+  padding-top 0
+
+.commits-summary-poverover__branch-head-icon
+  padding-bottom 2px
+  background-color $color-heffalump
+
+.commits-summary-poverover__git-commit-icon
+  background-color $color-heffalump
+  line-height 13px
+
+.commits-summary-popover__commit-message
+  padding-left 10px
+  font-style italic
+  padding-top 6px
+  padding-bottom 6px
+
+.commits-summary-popover__footer
+  margin-top 14px
+  margin-bottom 0
+  text-align right

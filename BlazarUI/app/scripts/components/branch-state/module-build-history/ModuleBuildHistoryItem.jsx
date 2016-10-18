@@ -7,6 +7,7 @@ import ModuleBuildStatus from '../shared/ModuleBuildStatus.jsx';
 import BuildTriggerLabel from '../shared/BuildTriggerLabel.jsx';
 import CommitInfoLink from '../shared/CommitInfoLink.jsx';
 import UsersForBuild from '../shared/UsersForBuild.jsx';
+import CommitsSummary from '../shared/CommitsSummary.jsx';
 
 import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../../Helpers';
 
@@ -19,6 +20,8 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild, router}) 
     onClick = () => {router.push(linkPath);};
   }
 
+  const commitInfo = branchBuild.get('commitInfo');
+
   const classes = classNames('module-build-history-item', {'module-build-history-item--clickable': !!onClick});
   return (
     <li>
@@ -30,10 +33,13 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild, router}) 
           <div className="module-build-history-item__users-for-build-wrapper">
             <UsersForBuild branchBuild={branchBuild} />
           </div>
+          <div className="module-build-history-item__commits-wrapper">
+            <CommitsSummary commitInfo={commitInfo} buildId={branchBuild.get('id')} popoverPlacement="left" />
+          </div>
           <div className="module-build-history-item__build-trigger-label">
             <BuildTriggerLabel buildTrigger={branchBuild.get('buildTrigger')} />
           </div>
-          <CommitInfoLink commitInfo={branchBuild.get('commitInfo')} className="module-build-history-item__commit-info" />
+          <CommitInfoLink commitInfo={commitInfo} className="module-build-history-item__commit-info" />
       </div>
     </li>
   );

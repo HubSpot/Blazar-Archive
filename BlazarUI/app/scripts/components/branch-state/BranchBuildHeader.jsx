@@ -5,11 +5,13 @@ import BuildTriggerLabel from './shared/BuildTriggerLabel.jsx';
 import UsersForBuild from './shared/UsersForBuild.jsx';
 import CommitInfo from './shared/CommitInfo.jsx';
 import CancelBuildButton from '../shared/branch-build/CancelBuildButton.jsx';
+import CommitsSummary from './shared/CommitsSummary.jsx';
 
-const ModuleList = ({branchBuild, onCancelBuild}) => {
+const BranchBuildHeader = ({branchBuild, onCancelBuild}) => {
   const buildNumber = branchBuild.get('buildNumber');
   const buildTrigger = branchBuild.get('buildTrigger');
   const commitInfo = branchBuild.get('commitInfo');
+  const buildId = branchBuild.get('id');
 
   return (
     <div className="branch-build-header">
@@ -20,6 +22,7 @@ const ModuleList = ({branchBuild, onCancelBuild}) => {
         <BuildTriggerLabel buildTrigger={buildTrigger} />
       </span>
       <UsersForBuild branchBuild={branchBuild} />
+      <CommitsSummary className="branch-build-header__commits" commitInfo={commitInfo} buildId={buildId} />
       <span className="branch-build-header__action-items">
         <CancelBuildButton
           onCancel={onCancelBuild}
@@ -33,7 +36,7 @@ const ModuleList = ({branchBuild, onCancelBuild}) => {
   );
 };
 
-ModuleList.propTypes = {
+BranchBuildHeader.propTypes = {
   branchBuild: ImmutablePropTypes.mapContains({
     buildNumber: PropTypes.number.isRequired,
     buildTrigger: ImmutablePropTypes.map.isRequired,
@@ -42,4 +45,4 @@ ModuleList.propTypes = {
   onCancelBuild: PropTypes.func.isRequired
 };
 
-export default ModuleList;
+export default BranchBuildHeader;
