@@ -3,7 +3,6 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import BuildTriggerLabel from './shared/BuildTriggerLabel.jsx';
 import UsersForBuild from './shared/UsersForBuild.jsx';
-import CommitInfo from './shared/CommitInfo.jsx';
 import CancelBuildButton from '../shared/branch-build/CancelBuildButton.jsx';
 import CommitsSummary from './shared/CommitsSummary.jsx';
 
@@ -30,7 +29,6 @@ const BranchBuildHeader = ({branchBuild, onCancelBuild}) => {
           btnStyle="link"
           btnClassName="branch-build-header__cancel-build-button"
         />
-        <CommitInfo commitInfo={commitInfo} />
       </span>
     </div>
   );

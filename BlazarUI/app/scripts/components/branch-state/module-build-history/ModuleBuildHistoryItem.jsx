@@ -5,7 +5,6 @@ import { withRouter, routerShape } from 'react-router';
 import ModuleBuildNumber from '../shared/ModuleBuildNumber.jsx';
 import ModuleBuildStatus from '../shared/ModuleBuildStatus.jsx';
 import BuildTriggerLabel from '../shared/BuildTriggerLabel.jsx';
-import CommitInfoLink from '../shared/CommitInfoLink.jsx';
 import UsersForBuild from '../shared/UsersForBuild.jsx';
 import CommitsSummary from '../shared/CommitsSummary.jsx';
 
@@ -39,7 +38,6 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild, router}) 
           <div className="module-build-history-item__build-trigger-label">
             <BuildTriggerLabel buildTrigger={branchBuild.get('buildTrigger')} />
           </div>
-          <CommitInfoLink commitInfo={commitInfo} className="module-build-history-item__commit-info" />
       </div>
     </li>
   );
