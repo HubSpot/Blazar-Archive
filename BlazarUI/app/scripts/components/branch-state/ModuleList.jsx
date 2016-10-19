@@ -6,7 +6,8 @@ import Card from '../shared/card-stack/Card.jsx';
 import BranchBuildHeader from './BranchBuildHeader.jsx';
 import ModuleItem from './ModuleItem.jsx';
 import ModuleBuildHistory from './module-build-history/ModuleBuildHistory.jsx';
-import { getCurrentBranchBuild } from '../Helpers';
+import { getCurrentBranchBuild, getCurrentModuleBuild } from '../Helpers';
+import { isComplete as isModuleBuildComplete } from '../../constants/ModuleBuildStates';
 
 const ModuleList = ({modules, onItemClick, selectedModuleId, onCancelBuild}) => {
   const modulesGroupedByCurrentBuild = modules.groupBy((moduleState) =>
@@ -16,10 +17,19 @@ const ModuleList = ({modules, onItemClick, selectedModuleId, onCancelBuild}) => 
     <div>
       {modulesGroupedByCurrentBuild.map((moduleStates, branchBuild) => {
         const buildNumber = branchBuild.get('buildNumber');
+        const completedModuleBuildCount = moduleStates.count((moduleState) => {
+          const currentModuleBuildState = getCurrentModuleBuild(moduleState).get('state');
+          return isModuleBuildComplete(currentModuleBuildState);
+        });
 
         return (
           <div className="module-list-group" key={buildNumber}>
-            <BranchBuildHeader branchBuild={branchBuild} onCancelBuild={onCancelBuild} />
+            <BranchBuildHeader
+              branchBuild={branchBuild}
+              completedModuleBuildCount={completedModuleBuildCount}
+              totalNonSkippedModuleBuildCount={moduleStates.size}
+              onCancelBuild={onCancelBuild}
+            />
             <CardStack className="module-list-card-stack" key={buildNumber}>
               {moduleStates.map(moduleState => {
                 const id = moduleState.getIn(['module', 'id']);

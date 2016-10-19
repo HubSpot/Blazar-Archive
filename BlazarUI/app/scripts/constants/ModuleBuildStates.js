@@ -1,4 +1,5 @@
 import keyMirror from 'keymirror';
+import {contains} from 'underscore';
 
 const ModuleBuildStates = keyMirror({
   // waiting states
@@ -29,6 +30,17 @@ export const getClassNameColorModifier = (state) => {
     default:
       return 'info';
   }
+};
+
+const COMPLETE_BUILD_STATES = [
+  ModuleBuildStates.SUCCEEDED,
+  ModuleBuildStates.CANCELLED,
+  ModuleBuildStates.FAILED,
+  ModuleBuildStates.SKIPPED
+];
+
+export const isComplete = (state) => {
+  return contains(COMPLETE_BUILD_STATES, state);
 };
 
 export default ModuleBuildStates;

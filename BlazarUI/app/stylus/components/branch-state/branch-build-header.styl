@@ -1,44 +1,55 @@
 @import '../../variables'
 
 .branch-build-header
-  margin-top 20px
-  margin-bottom 10px
-  position relative
+  margin-top 30px
+  margin-bottom 20px
+  display flex
+  align-items center
 
 .branch-build-header__build-number
-  font-weight 400
-  font-size 20px
-  display inline-block
-  margin 0 10px 0 0
+  font-weight 600
+  font-size 14px
+  margin-right 10px
+  position relative
+
+.branch-build-header__active-build-icon
+  position absolute
+  left -20px
+  font-size 16px
+  color $color-calypso
+
+.branch-build-header__build-summary
+  flex-grow 1
+  font-size 12px
+
+.branch-build-header__build-summary-info
+  display flex
 
 .branch-build-header__build-trigger-label-wrapper
-  margin-right 5px
+  min-width 90px
+  width 12%
 
-.branch-build-header__commits
-  position absolute
-  top 3px
-  left 400px
+.branch-build-header__users-for-build-wrapper
+  min-width 160px
+  width 20%
+
+.branch-build-header__commits-wrapper
+  min-width 150px
+  width 10%
+
+.branch-build-header__module-builds-completed
+  font-style italic
+  color $color-eerie
 
 .branch-build-header__action-items
-  float right
-  font-weight 500
-  position relative
-  top 2px
-
-  > :not(:first-child):before
-    content " | "
-    margin 0 5px
+  flex-grow 1
+  text-align right
 
 .branch-build-header__cancel-build-button
   color $color-candy-apple
   font-weight 500
   padding 0
+  font-size 12px
 
   &:hover, &:focus, &[disabled]:hover
     color $color-candy-apple-dark
-
-.users-for-build__additional-users
-  color $color-calypso
-
-.users-for-build__additional-users-list
-  margin 7px 12px
