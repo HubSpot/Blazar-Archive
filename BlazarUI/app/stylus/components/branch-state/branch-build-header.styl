@@ -3,6 +3,7 @@
 .branch-build-header
   margin-top 20px
   margin-bottom 10px
+  position relative
 
 .branch-build-header__build-number
   font-weight 400
@@ -14,11 +15,15 @@
   margin-right 5px
 
 .branch-build-header__commits
-  margin-left 40px
+  position absolute
+  top 3px
+  left 400px
 
 .branch-build-header__action-items
   float right
   font-weight 500
+  position relative
+  top 2px
 
   > :not(:first-child):before
     content " | "
@@ -32,3 +37,8 @@
   &:hover, &:focus, &[disabled]:hover
     color $color-candy-apple-dark
 
+.users-for-build__additional-users
+  color $color-calypso
+
+.users-for-build__additional-users-list
+  margin 7px 12px
