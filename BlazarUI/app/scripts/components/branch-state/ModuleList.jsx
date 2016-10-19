@@ -24,9 +24,9 @@ const ModuleList = ({modules, onItemClick, selectedModuleId, onCancelBuild}) => 
               {moduleStates.map(moduleState => {
                 const id = moduleState.getIn(['module', 'id']);
                 const moduleName = moduleState.getIn(['module', 'name']);
-                const summary = <ModuleItem moduleState={moduleState} onClick={() => onItemClick(id)} />;
-                const details = <ModuleBuildHistory moduleName={moduleName} moduleId={id} />;
                 const isSelected = selectedModuleId === id;
+                const summary = <ModuleItem moduleState={moduleState} isExpanded={isSelected} onClick={() => onItemClick(id)} />;
+                const details = <ModuleBuildHistory moduleName={moduleName} moduleId={id} />;
                 return (
                   <Card
                     key={id}

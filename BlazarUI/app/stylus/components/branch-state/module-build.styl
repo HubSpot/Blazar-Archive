@@ -10,18 +10,52 @@
   &:hover
     background-color $color-gypsum
 
+    .module-build__expand-indicator
+      color $color-calypso-medium
+
 .module-build--failed
   background-color $color-norman-light
+
   &:hover
     background-color #fcd4e1
 
+    .module-build__expand-indicator
+      color $color-flint
+
+  .module-build__expand-indicator
+    color $color-battleship
+
+  .module-build__expand-indicator--expanded
+    color $color-flint
+
 .module-build--warning
   background-color $color-marigold-light
+
   &:hover
     background-color #ffedd6
+
+    .module-build__expand-indicator
+      color $color-calypso-medium
+
+  .module-build__expand-indicator
+    color $color-battleship
+
+  .module-build__expand-indicator--expanded
+    color $color-calypso-medium
 
 .module-build__module-name
   font-size 18px
   color $color-calypso
   margin-top 0
   font-weight normal
+
+.module-build__expand-indicator
+  position absolute
+  right 20px
+  top 15px
+  transform scaleY(0.85)
+  color $color-koala
+  transition color 0.5s
+
+.module-build__expand-indicator--expanded
+  color $color-calypso-medium
