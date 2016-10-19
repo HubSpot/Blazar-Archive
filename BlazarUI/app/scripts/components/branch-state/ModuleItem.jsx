@@ -39,7 +39,7 @@ class ModuleItem extends Component {
   }
 
   render() {
-    const {moduleState, onClick} = this.props;
+    const {moduleState, isExpanded, onClick} = this.props;
     const {selectedBuild} = this.state;
     return (
       <li className="module-item" id={moduleState.getIn(['module', 'name'])}>
@@ -53,6 +53,7 @@ class ModuleItem extends Component {
           module={moduleState.get('module')}
           moduleBuild={selectedBuild}
           branchBuild={this.getSelectedBranchBuild()}
+          isExpanded={isExpanded}
           onClick={onClick}
         />
       </li>
@@ -62,6 +63,7 @@ class ModuleItem extends Component {
 
 ModuleItem.propTypes = {
   moduleState: ImmutablePropTypes.map,
+  isExpanded: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired
 };
 
