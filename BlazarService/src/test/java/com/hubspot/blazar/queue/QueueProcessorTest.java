@@ -31,16 +31,21 @@ import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
 @UseModules({BlazarQueueProcessorModule.class, BlazarEventBusModule.class, BlazarTestModule.class})
 public class QueueProcessorTest extends DatabaseBackedTest {
   private List<Object> received = new ArrayList<>();
-  private EventBus eventBus = new EventBus() {
-          @Subscribe
-          public void handleEvent(Object event) {
-            received.add(event);
-          }};
+
+  @Inject
+  private EventBus eventBus;
+
   @Inject
   private QueueProcessor queueProcessor;
 
   @Before
   public void before() {
+    eventBus.register(new Object() {
+      @Subscribe
+      public void handleEvent(Object event) {
+        received.add(event);
+      }
+    });
     queueProcessor.start();
     queueProcessor.isLeader();
   }

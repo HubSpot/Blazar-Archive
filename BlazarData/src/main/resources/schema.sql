@@ -211,8 +211,7 @@ CREATE TABLE queue_items (
   retryCount int(11) unsigned NOT NULL DEFAULT 0,
   createdTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   desiredExecutionTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  completedTimestamp TIMESTAMP,
+  completedTimestamp TIMESTAMP NULL,
   PRIMARY KEY (id),
   INDEX (completedTimestamp, desiredExecutionTimestamp)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
-
