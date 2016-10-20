@@ -21,8 +21,8 @@ public class BranchServiceTest extends DatabaseBackedTest {
 
   @Test
   public void itInsertsABranchWhenNonePresent() throws Exception {
-    // Round down to nearest second because mysql is 1s precision
-    long before = Math.floorDiv(System.currentTimeMillis(), 1000L) * 1000;
+    // Mysql
+    long before = System.currentTimeMillis() - 1000;
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     GitInfo inserted = branchService.upsert(original);
 
@@ -41,12 +41,9 @@ public class BranchServiceTest extends DatabaseBackedTest {
 
   @Test
   public void itUpdatesARenamedBranchWhenAlreadyExists() throws InterruptedException {
-    long before = System.currentTimeMillis();
+    long before = System.currentTimeMillis() - 1000;
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     original = branchService.upsert(original);
-    // The last updated column is type `TIMESTAMP` and is 1s precision
-    // We have to wait so that the updated timestamp is actually greater
-    Thread.sleep(1000);
     GitInfo renamed = newGitInfo(123, "Underwatch", "master");
     renamed = branchService.upsert(renamed);
 
