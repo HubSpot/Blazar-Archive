@@ -13,7 +13,7 @@ import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
 import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
 
 import ModuleBuildStates from '../../constants/ModuleBuildStates';
-import { getCurrentModuleBuild } from '../Helpers';
+import { getCurrentModuleBuild, getCurrentBranchBuild } from '../Helpers';
 
 class BranchState extends Component {
   constructor(props) {
@@ -46,7 +46,7 @@ class BranchState extends Component {
       return modules;
     }
 
-    const topologicalSort = modules.first().getIn(['lastBranchBuild', 'dependencyGraph', 'topologicalSort']);
+    const topologicalSort = getCurrentBranchBuild(modules.first()).getIn(['dependencyGraph', 'topologicalSort']);
     return modules.sort((a, b) => {
       // first sort by descending build number to prioritize more recent builds
       const buildNumberA = getCurrentModuleBuild(a).get('buildNumber');
