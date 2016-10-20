@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import classNames from 'classnames';
 import { buildIsInactive } from '../../Helpers';
 
 class BranchBuildProgress extends Component {
@@ -25,8 +26,12 @@ class BranchBuildProgress extends Component {
       opacity: this.state.showProgressBar ? 1 : 0
     };
 
+    const progressClassName = classNames('branch-build-progress', {
+      'branch-build-progress--inactive': !this.state.showProgressBar
+    });
+
     return (
-      <div className="branch-build-progress">
+      <div className={progressClassName}>
         <div className="branch-build-progress-bar" style={progressBarStyle} />
       </div>
     );

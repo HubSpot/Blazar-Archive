@@ -25,22 +25,30 @@
   margin-bottom -1px
   border 1px solid $color-battleship
   position relative
+  font-size 12px
 
 .module-build-history-item__build-number
   width 50px
   min-width 50px
+  font-size 14px
 
 .module-build-history-item__status
   margin 0
   padding-left 20px
   flex-grow 1
-  min-width 300px
+  min-width 270px
   white-space nowrap
   text-overflow ellipsis
   overflow hidden
 
+.module-build-history-item__build-trigger-label
+  font-size 12px
+  width 15%
+  min-width 90px
+  margin-right 5px
+
 .module-build-history-item__users-for-build-wrapper
-  width 30%
+  width 25%
   text-overflow ellipsis
   overflow hidden
   white-space nowrap
@@ -48,13 +56,6 @@
 .module-build-history-item__commits-wrapper
   width 15%
   min-width 110px
-
-.module-build-history-item__build-trigger-label
-  font-size 12px
-  width 100px
-  min-width 75px
-  text-align right
-  margin-right 5px
 
 .module-build-history-item--clickable
   cursor pointer
