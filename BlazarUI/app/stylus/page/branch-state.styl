@@ -16,6 +16,7 @@
 
   .btn
     radius 3px
+    padding: 0.75rem 1.5rem
 
   .btn-lg
     font-size 18px
@@ -48,14 +49,44 @@
       background-color $color-lorax-dark
       border-color $color-lorax-dark
 
-  #build-settings-button
-    margin-right 12px
+.branch-state-headline__repo-icon
+  margin-right 10px
+  color $color-eerie
+
+.branch-state-headline__actions
+  float right
+  display flex
+  align-items center
 
 .branch-state-headline__star
   margin-left 20px
   margin-right 15px
+  font-size 28px
+
+.branch-state-headline__branch-select
+  font-size 14px
+  margin-top 8px
+  margin-left 34px
   position relative
-  top 3px
+
+  .branch-select-input
+    font-size 16px
+    top -9px
+    left 16px
+    width 350px
+
+    & .Select-placeholder
+      color $color-calypso
+
+.branch-state-headline__sub-header-links
+  text-align right
+  margin-right 15px
+
+  a
+    text-decoration none
+
+  a + a
+    margin-left 20px
 
 .failing-module-builds
   margin-bottom 30px
@@ -64,13 +95,6 @@
   list-style none
   padding-left 20px
   margin-bottom 0
-
-.branch-state-headline__sub-header-links
-  float right
-  margin-right 20px
-
-  a
-    text-decoration none
 
 .module-list-group
   margin 0 30px
