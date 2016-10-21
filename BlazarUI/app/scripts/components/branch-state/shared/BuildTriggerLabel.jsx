@@ -2,19 +2,63 @@ import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import BuildTriggerTypes from '../../../constants/BuildTriggerTypes';
 
-const BuildTriggerLabel = ({buildTrigger}) => {
+import Tooltip from 'react-bootstrap/lib/Tooltip';
+import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
+
+const BUILD_TRIGGER_LABEL_PROPERTIES = {
+  [BuildTriggerTypes.PUSH]: {
+    labelModifierClassName: 'build-trigger-label--code-push',
+    labelText: 'code push'
+  },
+  [BuildTriggerTypes.MANUAL]: {
+    labelModifierClassName: 'build-trigger-label--manual',
+    labelText: 'manual'
+  },
+  [BuildTriggerTypes.BRANCH_CREATION]: {
+    labelModifierClassName: 'build-trigger-label--new-branch',
+    labelText: 'new branch'
+  },
+  [BuildTriggerTypes.INTER_PROJECT]: {
+    labelModifierClassName: 'build-trigger-label--dependency',
+    labelText: 'dependency'
+  }
+};
+
+const getTooltipText = (buildTrigger) => {
   switch (buildTrigger.get('type')) {
     case BuildTriggerTypes.PUSH:
-      return <span className="build-trigger-label build-trigger-label--code-push">code push</span>;
-    case BuildTriggerTypes.MANUAL:
-      return <span className="build-trigger-label build-trigger-label--manual">manual</span>;
+      return 'This build was triggered by a commit in GitHub';
+    case BuildTriggerTypes.MANUAL: {
+      const user = buildTrigger.get('id');
+      const isUserUnknown = !user || user === 'unknown';
+      return `This build was triggered manually in Blazar by ${isUserUnknown ? 'an unknown user' : user}`;
+    }
     case BuildTriggerTypes.BRANCH_CREATION:
-      return <span className="build-trigger-label build-trigger-label--new-branch">new branch</span>;
+      return 'This build was triggered by a new branch in GitHub';
     case BuildTriggerTypes.INTER_PROJECT:
-      return <span className="build-trigger-label build-trigger-label--dependency">dependency</span>;
+      return 'This build was triggered by the build of an upstream dependency and will trigger the builds of any dependent downstream modules';
     default:
-      return <span className="build-trigger-label">{buildTrigger.get('type')}</span>;
+      return '';
   }
+};
+
+const BuildTriggerLabel = ({buildTrigger}) => {
+  const buildTriggerType = buildTrigger.get('type');
+
+  const labelProperties = BUILD_TRIGGER_LABEL_PROPERTIES[buildTriggerType];
+  if (!labelProperties) {
+    return <span className="build-trigger-label">{buildTriggerType}</span>;
+  }
+
+  const {labelModifierClassName, labelText} = labelProperties;
+  const tooltipId = `${buildTriggerType}-build-trigger-label-tooltip`;
+  const tooltip = <Tooltip id={tooltipId}>{getTooltipText(buildTrigger)}</Tooltip>;
+
+  return (
+    <OverlayTrigger placement="bottom" overlay={tooltip}>
+      <span className={`build-trigger-label ${labelModifierClassName}`}>{labelText}</span>
+    </OverlayTrigger>
+  );
 };
 
 BuildTriggerLabel.propTypes = {
