@@ -124,6 +124,7 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
         .setState(State.LAUNCHING)
         .setStartTimestamp(Optional.of(123L))
         .setCommitInfo(Optional.of(commitInfoOne))
+        .setSha(Optional.of(commitInfoOne.getCurrent().getId()))
         .setDependencyGraph(Optional.of(dependencyGraphOne)).build();
 
     repositoryBuildService.begin(launching);
@@ -151,6 +152,7 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
         .setState(State.LAUNCHING)
         .setStartTimestamp(Optional.of(123L))
         .setCommitInfo(Optional.of(commitInfoOne))
+        .setSha(Optional.of(commitInfoOne.getCurrent().getId()))
         .setDependencyGraph(Optional.of(dependencyGraphOne)).build();
 
     repositoryBuildService.begin(launching);
