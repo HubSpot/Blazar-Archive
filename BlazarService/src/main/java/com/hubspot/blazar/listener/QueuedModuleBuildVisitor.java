@@ -42,7 +42,7 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
     if (upstreamsComplete(repositoryBuild, build)) {
       moduleBuildLauncher.launch(repositoryBuild, build);
     } else {
-      moduleBuildService.update(build.withState(State.WAITING_FOR_UPSTREAM_BUILD));
+      moduleBuildService.update(build.toBuilder().setState(State.WAITING_FOR_UPSTREAM_BUILD).build());
     }
   }
 

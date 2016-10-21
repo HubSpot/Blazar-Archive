@@ -102,7 +102,7 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
               if (taskState.isPresent() && taskState.get().isDone()) {
                 String taskId = task.get().getTaskId().getId();
                 LOG.info("Updating build {} to FAILED because taskId {} is done", build.getId().get(), taskId);
-                moduleBuildService.update(build.withState(State.FAILED).withTaskId(taskId).withEndTimestamp(task.get().getUpdatedAt()));
+                moduleBuildService.update(build.toBuilder().setState(State.FAILED).setTaskId(Optional.of(taskId)).setEndTimestamp(Optional.of(task.get().getUpdatedAt())).build());
                 if (taskState.get().isSuccess()) {
                   metricRegistry.meter(getClass().getName() + ".succeeded").mark();
                 } else {
@@ -126,10 +126,10 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
               LOG.warn("No task history found for taskId {}", taskId);
             } else if (completedTimestamp.isPresent()) {
               LOG.info("Failing build {} because taskId {} is done", build.getId().get(), taskId);
-              moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(completedTimestamp.get()));
+              moduleBuildService.update(build.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(completedTimestamp.get())).build());
             } else if (age > maxAge) {
               LOG.info("Failing build {} because its age {} exceeded max of {}", build.getId().get(), age, maxAge);
-              moduleBuildService.update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+              moduleBuildService.update(build.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
               singularityTaskKiller.killTask(build);
             }
           }

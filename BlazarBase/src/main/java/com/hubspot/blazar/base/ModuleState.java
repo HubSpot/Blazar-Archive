@@ -33,6 +33,9 @@ public class ModuleState {
                      @JsonProperty("inProgressBranchBuild") Optional<RepositoryBuild> inProgressBranchBuild,
                      @JsonProperty("pendingModuleBuild") Optional<ModuleBuild> pendingModuleBuild,
                      @JsonProperty("pendingBranchBuild") Optional<RepositoryBuild> pendingBranchBuild) {
+    if (module == null) {
+      throw new IllegalArgumentException("Cannot construct module state with null module");
+    }
     this.module = module;
     this.lastSuccessfulModuleBuild = filterModuleBuild(lastSuccessfulModuleBuild);
     this.lastSuccessfulBranchBuild = filterBranchBuild(lastSuccessfulBranchBuild);
@@ -46,6 +49,14 @@ public class ModuleState {
     this.pendingBranchBuild =  filterBranchBuild(pendingBranchBuild);
   }
 
+  /* When this object is built by rosetta the missing build rows are filled with nulls,
+   * which results in objects like this being passed to ModuleState's constructor:
+   *
+   * ModuleBuild(Optional.absent(), 0, 0, 0, null, Optional.absent()...)
+   *
+   * This results in a "present" ModuleBuild, but it has no actual values, the filters here
+   * find such elements and replace them with just Optional.absent()
+   */
   private static Optional<ModuleBuild> filterModuleBuild(Optional<ModuleBuild> moduleBuildOptional) {
     return filter(moduleBuildOptional, moduleBuild -> moduleBuild.getId().isPresent());
   }
@@ -128,4 +139,100 @@ public class ModuleState {
   public int hashCode() {
     return Objects.hash(module, lastSuccessfulModuleBuild , lastSuccessfulBranchBuild , lastNonSkippedModuleBuild , lastNonSkippedBranchBuild , lastModuleBuild , lastBranchBuild , inProgressModuleBuild , inProgressBranchBuild , pendingModuleBuild , pendingBranchBuild);
   }
+
+  public Builder toBuilder () {
+    return new Builder(module)
+        .setLastSuccessfulBranchBuild(lastSuccessfulBranchBuild)
+        .setLastSuccessfulModuleBuild(lastSuccessfulModuleBuild)
+        .setLastNonSkippedBranchBuild(lastNonSkippedBranchBuild)
+        .setLastNonSkippedModuleBuild(lastNonSkippedModuleBuild)
+        .setLastBranchBuild(lastBranchBuild)
+        .setLastModuleBuild(lastModuleBuild)
+        .setInProgressBranchBuild(inProgressBranchBuild)
+        .setInProgressModuleBuild(inProgressModuleBuild)
+        .setPendingBranchBuild(pendingBranchBuild)
+        .setPendingModuleBuild(pendingModuleBuild);
+  }
+
+  public static Builder newBuilder(Module module) {
+    return new Builder(module);
+  }
+
+  public static class Builder {
+    private Module module;
+    private Optional<ModuleBuild> lastSuccessfulModuleBuild = Optional.absent();
+    private Optional<RepositoryBuild> lastSuccessfulBranchBuild = Optional.absent();
+    private Optional<ModuleBuild> lastNonSkippedModuleBuild = Optional.absent();
+    private Optional<RepositoryBuild> lastNonSkippedBranchBuild = Optional.absent();
+    private Optional<ModuleBuild> lastModuleBuild = Optional.absent();
+    private Optional<RepositoryBuild> lastBranchBuild = Optional.absent();
+    private Optional<ModuleBuild> inProgressModuleBuild = Optional.absent();
+    private Optional<RepositoryBuild> inProgressBranchBuild = Optional.absent();
+    private Optional<ModuleBuild> pendingModuleBuild = Optional.absent();
+    private Optional<RepositoryBuild> pendingBranchBuild = Optional.absent();
+
+    public Builder(Module module) {
+      this.module = module;
+    }
+
+    public void setModule(Module module) {
+      this.module = module;
+    }
+
+    public Builder setLastSuccessfulModuleBuild(Optional<ModuleBuild> lastSuccessfulModuleBuild) {
+      this.lastSuccessfulModuleBuild = lastSuccessfulModuleBuild;
+      return this;
+    }
+
+    public Builder setLastSuccessfulBranchBuild(Optional<RepositoryBuild> lastSuccessfulBranchBuild) {
+      this.lastSuccessfulBranchBuild = lastSuccessfulBranchBuild;
+      return this;
+    }
+
+    public Builder setLastNonSkippedModuleBuild(Optional<ModuleBuild> lastNonSkippedModuleBuild) {
+      this.lastNonSkippedModuleBuild = lastNonSkippedModuleBuild;
+      return this;
+    }
+
+    public Builder setLastNonSkippedBranchBuild(Optional<RepositoryBuild> lastNonSkippedBranchBuild) {
+      this.lastNonSkippedBranchBuild = lastNonSkippedBranchBuild;
+      return this;
+    }
+
+    public Builder setLastModuleBuild(Optional<ModuleBuild> lastModuleBuild) {
+      this.lastModuleBuild = lastModuleBuild;
+      return this;
+    }
+
+    public Builder setLastBranchBuild(Optional<RepositoryBuild> lastBranchBuild) {
+      this.lastBranchBuild = lastBranchBuild;
+      return this;
+    }
+
+    public Builder setInProgressModuleBuild(Optional<ModuleBuild> inProgressModuleBuild) {
+      this.inProgressModuleBuild = inProgressModuleBuild;
+      return this;
+    }
+
+    public Builder setInProgressBranchBuild(Optional<RepositoryBuild> inProgressBranchBuild) {
+      this.inProgressBranchBuild = inProgressBranchBuild;
+      return this;
+    }
+
+    public Builder setPendingModuleBuild(Optional<ModuleBuild> pendingModuleBuild) {
+      this.pendingModuleBuild = pendingModuleBuild;
+      return this;
+    }
+
+    public Builder setPendingBranchBuild(Optional<RepositoryBuild> pendingBranchBuild) {
+      this.pendingBranchBuild = pendingBranchBuild;
+      return this;
+    }
+
+    public ModuleState build() {
+      return new ModuleState(module, lastSuccessfulModuleBuild, lastSuccessfulBranchBuild, lastNonSkippedModuleBuild, lastNonSkippedBranchBuild, lastModuleBuild, lastBranchBuild,
+           inProgressModuleBuild, inProgressBranchBuild, pendingModuleBuild,pendingBranchBuild);
+    }
+  }
+
 }

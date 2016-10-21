@@ -115,7 +115,7 @@ public class ModuleBuildService {
   @Transactional
   protected ModuleBuild skip(ModuleBuild build) {
     long id = moduleBuildDao.skip(build);
-    build = build.withId(id);
+    build = build.toBuilder().setId(Optional.of(id)).build();;
 
     eventBus.post(build);
 
@@ -125,7 +125,7 @@ public class ModuleBuildService {
   @Transactional
   protected ModuleBuild enqueue(ModuleBuild build) {
     long id = moduleBuildDao.enqueue(build);
-    build = build.withId(id);
+    build = build.toBuilder().setId(Optional.of(id)).build();;
 
     checkAffectedRowCount(moduleDao.updatePendingBuild(build));
 
@@ -170,10 +170,10 @@ public class ModuleBuildService {
     }
 
     if (build.getState().isWaiting()) {
-      beginNoPublish(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
+      beginNoPublish(build.toBuilder().setState(State.LAUNCHING).setStartTimestamp(Optional.of(System.currentTimeMillis())).build());
     }
 
-    update(build.withState(State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
+    update(build.toBuilder().setState(State.CANCELLED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
   }
 
   @Transactional
@@ -183,10 +183,10 @@ public class ModuleBuildService {
     }
 
     if (build.getState().isWaiting()) {
-      beginNoPublish(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
+      beginNoPublish(build.toBuilder().setState(State.LAUNCHING).setStartTimestamp(Optional.of(System.currentTimeMillis())).build());
     }
 
-    update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+    update(build.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
   }
 
   private static void checkAffectedRowCount(int affectedRows) {

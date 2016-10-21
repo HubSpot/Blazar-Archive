@@ -65,10 +65,11 @@ public class ModuleBuildLauncher {
     BuildConfig buildConfig = configAtSha(gitInfo, module);
     BuildConfig resolvedConfig = resolveConfig(buildConfig, module);
 
-    ModuleBuild launching = build.withStartTimestamp(System.currentTimeMillis())
-        .withState(State.LAUNCHING)
-        .withBuildConfig(buildConfig)
-        .withResolvedConfig(resolvedConfig);
+    ModuleBuild launching = build.toBuilder().setStartTimestamp(Optional.of(System.currentTimeMillis()))
+        .setState(State.LAUNCHING)
+        .setBuildConfig(Optional.of(buildConfig))
+        .setResolvedConfig(Optional.of(resolvedConfig))
+        .build();
 
     LOG.info("Updating status of Module Build {} to {}", launching.getId().get(), launching.getState());
     moduleBuildService.begin(launching);

@@ -100,7 +100,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
     if (modules.isEmpty()) {
       LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
-      repositoryBuildService.update(build.withState(State.SUCCEEDED).withEndTimestamp(System.currentTimeMillis()));
+      repositoryBuildService.update(build.toBuilder().setState(State.SUCCEEDED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
     } else {
       for (Module module : toBuild) {
         moduleBuildService.enqueue(build, module);
@@ -111,7 +111,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
       for (Module module : skipped) {
         moduleBuildService.skip(build, module);
       }
-      repositoryBuildService.update(build.withState(State.IN_PROGRESS));
+      repositoryBuildService.update(build.toBuilder().setState(State.IN_PROGRESS).build());
     }
   }
 

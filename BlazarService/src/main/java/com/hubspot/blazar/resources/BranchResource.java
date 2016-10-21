@@ -13,13 +13,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.hubspot.blazar.base.BranchSetting;
 import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.ModuleState;
+import com.hubspot.blazar.base.branch.BranchStatus;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
+import com.hubspot.blazar.data.service.BranchStatusService;
 import com.hubspot.blazar.data.service.MalformedFileService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
@@ -30,7 +34,8 @@ import com.hubspot.jackson.jaxrs.PropertyFiltering;
 @Produces(MediaType.APPLICATION_JSON)
 public class BranchResource {
   private final BranchService branchService;
-  private BranchSettingsService branchSettingsService;
+  private final BranchStatusService branchStatusService;
+  private final BranchSettingsService branchSettingsService;
   private final ModuleService moduleService;
   private final MalformedFileService malformedFileService;
   private final ModuleDiscoveryService moduleDiscoveryService;
@@ -38,12 +43,14 @@ public class BranchResource {
 
   @Inject
   public BranchResource(BranchService branchService,
+                        BranchStatusService branchStatusService,
                         BranchSettingsService branchSettingsService,
                         ModuleService moduleService,
                         MalformedFileService malformedFileService,
                         ModuleDiscoveryService moduleDiscoveryService,
                         ModuleDiscovery moduleDiscovery) {
     this.branchService = branchService;
+    this.branchStatusService = branchStatusService;
     this.branchSettingsService = branchSettingsService;
     this.moduleService = moduleService;
     this.malformedFileService = malformedFileService;
@@ -69,6 +76,23 @@ public class BranchResource {
   @PropertyFiltering
   public Optional<GitInfo> get(@PathParam("id") int branchId) {
     return branchService.get(branchId);
+  }
+
+  @Path("/{branchId}/status")
+  public Optional<BranchStatus> getBranchStatusById(@PathParam("branchId") int branchId) {
+    return branchStatusService.getBranchStatusById(branchId);
+  }
+
+  @GET
+  @Path("/state/{branchId}/modules")
+  @PropertyFiltering
+  public Set<ModuleState> getAllModuleStatesForBranch(@PathParam("branchId") int branchId) {
+    Optional<BranchStatus> status  = getBranchStatusById(branchId);
+    if (status.isPresent()) {
+      return status.get().getModuleStates();
+    } else {
+      return ImmutableSet.of();
+    }
   }
 
   @GET

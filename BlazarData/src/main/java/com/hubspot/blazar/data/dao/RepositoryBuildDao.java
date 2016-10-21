@@ -1,12 +1,15 @@
 package com.hubspot.blazar.data.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
+import org.skife.jdbi.v2.sqlobject.stringtemplate.UseStringTemplate3StatementLocator;
+import org.skife.jdbi.v2.unstable.BindIn;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -14,6 +17,7 @@ import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
+@UseStringTemplate3StatementLocator
 public interface RepositoryBuildDao {
 
   @SingleValueResult
@@ -43,6 +47,10 @@ public interface RepositoryBuildDao {
       "LEFT OUTER JOIN repo_builds AS lastBuild ON (b.lastBuildId = lastBuild.id) " +
       "WHERE b.id = :branchId")
   BuildNumbers getBuildNumbers(@Bind("branchId") int branchId);
+
+  // Adding `ORDER BY buildNumber` here causes a filesort to occur
+  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND state in (<state>)")
+  Set<RepositoryBuild> getRepositoryBuildsByState(@Bind("branchId") int branchId, @BindIn("states") List<RepositoryBuild.State> states);
 
   @SingleValueResult
   @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND buildNumber < :buildNumber ORDER BY buildNumber DESC limit 1")

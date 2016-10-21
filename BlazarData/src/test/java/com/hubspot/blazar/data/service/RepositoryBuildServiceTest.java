@@ -27,8 +27,6 @@ import com.hubspot.blazar.data.util.BuildNumbers;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
 
-import io.dropwizard.db.ManagedDataSource;
-
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarDataTestModule.class})
 public class RepositoryBuildServiceTest extends DatabaseBackedTest {
@@ -122,10 +120,11 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
   public void itBeginsPendingBuild() {
     RepositoryBuild pending = repositoryBuildService.get(buildIdOne).get();
 
-    RepositoryBuild launching = pending.withState(State.LAUNCHING)
-        .withStartTimestamp(123L)
-        .withCommitInfo(commitInfoOne)
-        .withDependencyGraph(dependencyGraphOne);
+    RepositoryBuild launching = pending.toBuilder()
+        .setState(State.LAUNCHING)
+        .setStartTimestamp(Optional.of(123L))
+        .setCommitInfo(Optional.of(commitInfoOne))
+        .setDependencyGraph(Optional.of(dependencyGraphOne)).build();
 
     repositoryBuildService.begin(launching);
 
@@ -148,10 +147,11 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
 
     RepositoryBuild pending = repositoryBuildService.get(buildIdOne).get();
 
-    RepositoryBuild launching = pending.withState(State.LAUNCHING)
-        .withStartTimestamp(123L)
-        .withCommitInfo(commitInfoOne)
-        .withDependencyGraph(dependencyGraphOne);
+    RepositoryBuild launching = pending.toBuilder()
+        .setState(State.LAUNCHING)
+        .setStartTimestamp(Optional.of(123L))
+        .setCommitInfo(Optional.of(commitInfoOne))
+        .setDependencyGraph(Optional.of(dependencyGraphOne)).build();
 
     repositoryBuildService.begin(launching);
 

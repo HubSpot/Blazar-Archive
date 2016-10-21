@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.hubspot.rosetta.annotations.StoredAsJson;
 
@@ -68,8 +69,11 @@ public class ModuleBuild {
                      @JsonProperty("taskId") Optional<String> taskId,
                      @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig,
                      @JsonProperty("resolvedConfig") Optional<BuildConfig> resolvedConfig) {
+    if (repoBuildId == 0 || moduleId == 0 || buildNumber == 0 || state == null) {
+      throw new IllegalArgumentException("repoBuildId, moduleId and buildNumber cannot be 0 and state cannot be null");
+    }
     this.id = id;
-    this.repoBuildId = repoBuildId;
+    this.repoBuildId =  repoBuildId;
     this.moduleId = moduleId;
     this.buildNumber = buildNumber;
     this.state = state;
@@ -81,19 +85,11 @@ public class ModuleBuild {
   }
 
   public static ModuleBuild queuedBuild(RepositoryBuild repositoryBuild, Module module, int buildNumber) {
-    Optional<Long> absentLong = Optional.absent();
-    Optional<String> absentString = Optional.absent();
-    Optional<BuildConfig> absentConfig = Optional.absent();
-
-    return new ModuleBuild(absentLong, repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.QUEUED, absentLong, absentLong, absentString, absentConfig, absentConfig);
+    return newBuilder(repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.QUEUED).build();
   }
 
   public static ModuleBuild skippedBuild(RepositoryBuild repositoryBuild, Module module, int buildNumber) {
-    Optional<Long> absentLong = Optional.absent();
-    Optional<String> absentString = Optional.absent();
-    Optional<BuildConfig> absentConfig = Optional.absent();
-
-    return new ModuleBuild(absentLong, repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.SKIPPED, absentLong, absentLong, absentString, absentConfig, absentConfig);
+    return newBuilder(repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.SKIPPED).build();
   }
 
   public Optional<Long> getId() {
@@ -141,37 +137,9 @@ public class ModuleBuild {
     return resolvedConfig;
   }
 
-  public ModuleBuild withId(long id) {
-    return new ModuleBuild(Optional.of(id), repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, resolvedConfig);
-  }
-
-  public ModuleBuild withState(State state) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, resolvedConfig);
-  }
-
-  public ModuleBuild withStartTimestamp(long startTimestamp) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, Optional.of(startTimestamp), endTimestamp, taskId, buildConfig, resolvedConfig);
-  }
-
-  public ModuleBuild withEndTimestamp(long endTimestamp) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, Optional.of(endTimestamp), taskId, buildConfig, resolvedConfig);
-  }
-
-  public ModuleBuild withTaskId(String taskId) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, Optional.of(taskId), buildConfig, resolvedConfig);
-  }
-
-  public ModuleBuild withBuildConfig(BuildConfig buildConfig) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, Optional.of(buildConfig), resolvedConfig);
-  }
-
-  public ModuleBuild withResolvedConfig(BuildConfig resolvedConfig) {
-    return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, Optional.of(resolvedConfig));
-  }
-
   @Override
   public String toString() {
-    return com.google.common.base.Objects.toStringHelper(this)
+    return MoreObjects.toStringHelper(this)
         .add("id", id)
         .add("moduleId", moduleId)
         .add("repoBuildId", repoBuildId)
@@ -196,5 +164,95 @@ public class ModuleBuild {
   @Override
   public int hashCode() {
     return Objects.hash(moduleId, buildNumber);
+  }
+
+  public Builder toBuilder() {
+    return new Builder(repoBuildId, moduleId, buildNumber, state)
+        .setId(id)
+        .setStartTimestamp(startTimestamp)
+        .setEndTimestamp(endTimestamp)
+        .setTaskId(taskId)
+        .setBuildConfig(buildConfig)
+        .setResolvedConfig(resolvedConfig);
+  }
+
+
+  public static Builder newBuilder(long repoBuildId, int moduleId, int buildNumber, State intialState) {
+      return new Builder(repoBuildId, moduleId, buildNumber, intialState);
+  }
+
+  public static class Builder {
+
+    private Optional<Long> id = Optional.absent();
+    private long repoBuildId;
+    private int moduleId;
+    private int buildNumber;
+    private State state;
+    private Optional<Long> startTimestamp = Optional.absent();
+    private Optional<Long> endTimestamp = Optional.absent();
+    private Optional<String> taskId = Optional.absent();
+    private Optional<BuildConfig> buildConfig = Optional.absent();
+    private Optional<BuildConfig> resolvedConfig = Optional.absent();
+
+    public Builder(long repoBuildId, int moduleId, int buildNumber, State intialState) {
+      this.repoBuildId = repoBuildId;
+      this.moduleId = moduleId;
+      this.buildNumber = buildNumber;
+      this.state = intialState;
+    }
+
+    public Builder setId(Optional<Long> id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder setRepoBuildId(long repoBuildId) {
+      this.repoBuildId = repoBuildId;
+      return this;
+    }
+
+    public Builder setModuleId(int moduleId) {
+      this.moduleId = moduleId;
+      return this;
+    }
+
+    public Builder setBuildNumber(int buildNumber) {
+      this.buildNumber = buildNumber;
+      return this;
+    }
+
+    public Builder setState(State state) {
+      this.state = state;
+      return this;
+    }
+
+    public Builder setStartTimestamp(Optional<Long> startTimestamp) {
+      this.startTimestamp = startTimestamp;
+      return this;
+    }
+
+    public Builder setEndTimestamp(Optional<Long> endTimestamp) {
+      this.endTimestamp = endTimestamp;
+      return this;
+    }
+
+    public Builder setTaskId(Optional<String> taskId) {
+      this.taskId = taskId;
+      return this;
+    }
+
+    public Builder setBuildConfig(Optional<BuildConfig> buildConfig) {
+      this.buildConfig = buildConfig;
+      return this;
+    }
+
+    public Builder setResolvedConfig(Optional<BuildConfig> resolvedConfig) {
+      this.resolvedConfig = resolvedConfig;
+      return this;
+    }
+
+    public ModuleBuild build() {
+      return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, resolvedConfig);
+    }
   }
 }

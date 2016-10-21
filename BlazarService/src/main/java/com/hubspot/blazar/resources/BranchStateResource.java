@@ -17,7 +17,6 @@ import javax.ws.rs.core.StreamingOutput;
 import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
-import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryState;
 import com.hubspot.blazar.cctray.CCTrayProject;
@@ -93,14 +92,6 @@ public class BranchStateResource {
         ByteStreams.copy(Resources.getResource(path).openStream(), outputStream);
       }
     };
-  }
-
-  @GET
-  @Path("/{branchId}/modules")
-  @PropertyFiltering
-  public Set<ModuleState> getModules(@PathParam("branchId") int branchId) {
-    Set<ModuleState> states = stateService.getAllModuleStatesForBranch(branchId);
-    return states;
   }
 
   private static String pickImage(RepositoryBuild.State state) {

@@ -68,7 +68,7 @@ public class ModuleBuildResource {
       throw new IllegalArgumentException("Task ID is required");
     }
 
-    ModuleBuild inProgress = build.withState(State.IN_PROGRESS).withTaskId(taskId.get());
+    ModuleBuild inProgress = build.toBuilder().setState(State.IN_PROGRESS).setTaskId(Optional.of(taskId.get())).build();
     moduleBuildService.update(inProgress);
     return inProgress;
   }
@@ -78,7 +78,7 @@ public class ModuleBuildResource {
   public ModuleBuild completeSuccess(@PathParam("id") long moduleBuildId) {
     ModuleBuild build = getBuildWithExpectedState(moduleBuildId, State.IN_PROGRESS);
 
-    ModuleBuild succeeded = build.withState(State.SUCCEEDED).withEndTimestamp(System.currentTimeMillis());
+    ModuleBuild succeeded = build.toBuilder().setState(State.SUCCEEDED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build();
     moduleBuildService.update(succeeded);
     return succeeded;
   }
@@ -88,7 +88,7 @@ public class ModuleBuildResource {
   public ModuleBuild completeFailure(@PathParam("id") long moduleBuildId) {
     ModuleBuild build = getBuildWithExpectedState(moduleBuildId, State.IN_PROGRESS);
 
-    ModuleBuild failed = build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis());
+    ModuleBuild failed = build.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build();
     moduleBuildService.update(failed);
     return failed;
   }
