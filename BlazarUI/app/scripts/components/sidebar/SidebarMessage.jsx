@@ -2,12 +2,8 @@ import React, {PropTypes} from 'react';
 import MutedMessage from '../shared/MutedMessage.jsx';
 import {NO_MATCH_MESSAGES} from '../constants';
 
-const SidebarMessage = ({dontDisplay, numberOfBuilds, filterText, toggleFilterState}) => {
+const SidebarMessage = ({numberOfBuilds, filterText, toggleFilterState}) => {
   let message = null;
-  // dont display any messages while we are toggling
-  if (dontDisplay) {
-    return null;
-  }
 
   if (!numberOfBuilds && filterText.length) {
     message = (
@@ -30,8 +26,7 @@ const SidebarMessage = ({dontDisplay, numberOfBuilds, filterText, toggleFilterSt
 SidebarMessage.propTypes = {
   numberOfBuilds: PropTypes.number,
   filterText: PropTypes.string,
-  toggleFilterState: PropTypes.string,
-  dontDisplay: PropTypes.bool
+  toggleFilterState: PropTypes.string
 };
 
 export default SidebarMessage;
