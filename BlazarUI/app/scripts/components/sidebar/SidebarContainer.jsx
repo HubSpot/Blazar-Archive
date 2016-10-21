@@ -38,11 +38,9 @@ class SidebarContainer extends Component {
     this.state = {
       builds: undefined,
       loading: true,
-      changingBuildsType: false,
       filterText: '',
       toggleFilterState: sidebarTabProvider.getSidebarTab(),
-      sidebarHeight: this.getSidebarHeight(),
-      dontDisplay: true
+      sidebarHeight: this.getSidebarHeight()
     };
   }
 
@@ -95,14 +93,10 @@ class SidebarContainer extends Component {
   }
 
   setToggleState(toggleState) {
-    BuildsActions.loadBuilds();
     sidebarTabProvider.changeTab(toggleState);
 
     this.setState({
-      filterText: this.state.filterText,
-      toggleFilterState: toggleState,
-      changingBuildsType: true,
-      dontDisplay: true
+      toggleFilterState: toggleState
     });
   }
 

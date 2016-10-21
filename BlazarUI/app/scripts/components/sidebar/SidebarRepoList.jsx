@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import LazyRender from '../shared/LazyRender.jsx';
-import Loader from '../shared/Loader.jsx';
 import SidebarItem from './SidebarItem.jsx';
 import {sortBuildsByRepoAndBranch, filterInactiveBuilds} from '../Helpers.js';
 
@@ -61,16 +60,10 @@ class SidebarRepoList extends Component {
   }
 
   render() {
-    const {changingBuildsType, filteredBuilds, loading} = this.props;
+    const {filteredBuilds, loading} = this.props;
 
     if (loading) {
       return null;
-    }
-
-    if (changingBuildsType) {
-      return (
-        <Loader align="top-center" className="sidebar-loader" />
-      );
     }
 
     return (
@@ -86,7 +79,6 @@ class SidebarRepoList extends Component {
 
 SidebarRepoList.propTypes = {
   sidebarHeight: PropTypes.number.isRequired,
-  changingBuildsType: PropTypes.bool.isRequired,
   filteredBuilds: PropTypes.object.isRequired,
   loading: PropTypes.bool.isRequired,
   filterText: PropTypes.string.isRequired

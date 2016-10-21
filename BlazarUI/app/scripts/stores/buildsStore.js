@@ -39,8 +39,6 @@ const BuildsStore = Reflux.createStore({
       if (err) {
         this.trigger({
           loading: false,
-          dontDisplay: false,
-          changingBuildsType: false,
           error: {
             status: err.status,
             statusText: err.statusText
@@ -52,9 +50,7 @@ const BuildsStore = Reflux.createStore({
 
       this.trigger({
         builds: this.builds,
-        loading: false,
-        dontDisplay: false,
-        changingBuildsType: false
+        loading: false
       });
     });
   }
