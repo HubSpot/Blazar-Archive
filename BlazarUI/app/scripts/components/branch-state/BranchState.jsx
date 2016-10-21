@@ -3,6 +3,9 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { routerShape } from 'react-router';
 import {bindAll} from 'underscore';
 
+import Tabs from '../shared/Tabs.jsx';
+import Tab from 'react-bootstrap/lib/Tab';
+
 import PageContainer from '../shared/PageContainer.jsx';
 import GenericErrorMessage from '../shared/GenericErrorMessage.jsx';
 import Loader from '../shared/Loader.jsx';
@@ -135,24 +138,32 @@ class BranchState extends Component {
       <div>
         {showBetaFeatureAlert && <BetaFeatureAlert branchId={branchId} onDismiss={dismissBetaNotification} />}
         {hasFailingModules && <FailingModuleBuildsAlert failingModuleNames={failingModuleNames} />}
-        <section id="active-modules">
-          <h2 className="module-list-header">Active modules</h2>
-          <ModuleList
-            modules={this.sortModules(activeModules)}
-            onItemClick={this.handleModuleItemClick}
-            selectedModuleId={selectedModuleId}
-            onCancelBuild={this.refreshBranchModuleStates}
-          />
-        </section>
-        {!!inactiveModules.size && <section id="inactive-modules">
-          <h2 className="module-list-header">Inactive modules</h2>
-          <ModuleList
-            modules={this.sortModules(inactiveModules)}
-            onItemClick={this.handleModuleItemClick}
-            selectedModuleId={selectedModuleId}
-            onCancelBuild={this.refreshBranchModuleStates}
-          />
-        </section>}
+        <Tabs id="branch-state-tabs" defaultActiveKey="active-modules">
+          <Tab eventKey="active-modules" title="Active modules">
+            <section id="active-modules">
+              <ModuleList
+                modules={this.sortModules(activeModules)}
+                onItemClick={this.handleModuleItemClick}
+                selectedModuleId={selectedModuleId}
+                onCancelBuild={this.refreshBranchModuleStates}
+              />
+            </section>
+          </Tab>
+
+          {!!inactiveModules.size && (
+            <Tab title="Inactive modules" eventKey="inactive-modules">
+              <section id="inactive-modules">
+                <p className="text-muted">Showing previous builds of modules no longer contained in this branch.</p>
+                <ModuleList
+                  modules={this.sortModules(inactiveModules)}
+                  onItemClick={this.handleModuleItemClick}
+                  selectedModuleId={selectedModuleId}
+                  onCancelBuild={this.refreshBranchModuleStates}
+                />
+              </section>
+            </Tab>
+          )}
+        </Tabs>
       </div>
     );
   }

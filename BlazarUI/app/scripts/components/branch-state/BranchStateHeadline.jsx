@@ -39,15 +39,8 @@ class BranchStateHeadline extends Component {
   }
 
   renderActions() {
-    const {branchId} = this.props;
-    const buildSettingsLink = `/settings/branch/${branchId}`;
     return (
-      <div className="pull-right">
-        <Link to={buildSettingsLink}>
-          <Button id="build-settings-button">
-            Build settings
-          </Button>
-        </Link>
+      <div className="branch-state-headline__actions">
         <Button id="build-now-button" bsStyle="primary" onClick={this.props.showBuildBranchModal}>
           Build now
         </Button>
@@ -56,8 +49,28 @@ class BranchStateHeadline extends Component {
     );
   }
 
+  renderBranchSelect() {
+    return (
+      <div className="branch-state-headline__branch-select">
+        <Icon type="octicon" name="git-branch" classNames="headline-icon" />
+        <Select
+          className="branch-select-input"
+          name="branchSelect"
+          noResultsText="No other branches"
+          value={this.props.branchInfo.branch}
+          options={this.getFilteredBranches()}
+          onChange={this.props.onBranchSelect}
+          searchable={true}
+          clearable={false}
+          openOnFocus={true}
+          autoBlur={true}
+        />
+      </div>
+    );
+  }
+
   render() {
-    const {branch, repository} = this.props.branchInfo;
+    const {branchId, branchInfo: {branch, repository}} = this.props;
     if (!branch) {
       return null;
     }
@@ -65,28 +78,21 @@ class BranchStateHeadline extends Component {
     return (
       <div>
         <PageHeader>
-          <PageHeader.PageTitle>
-            <Icon type="octicon" name="repo" classNames="headline-icon" />{repository}
-            {this.renderActions()}
-          </PageHeader.PageTitle>
+          {this.renderActions()}
+          <div>
+            <PageHeader.PageTitle>
+              <Icon type="octicon" name="repo" classNames="branch-state-headline__repo-icon" />{repository}
+            </PageHeader.PageTitle>
+            {this.renderBranchSelect()}
+          </div>
         </PageHeader>
         <div className="page-header__sub-header">
-          <Icon type="octicon" name="git-branch" classNames="headline-icon" />
-          <Select
-            className="branch-select-input"
-            name="branchSelect"
-            noResultsText="No other branches"
-            value={this.props.branchInfo.branch}
-            options={this.getFilteredBranches()}
-            onChange={this.props.onBranchSelect}
-            searchable={true}
-            clearable={false}
-            openOnFocus={true}
-            autoBlur={true}
-          />
           <p className="branch-state-headline__sub-header-links">
-            <Link to={`/branches/${this.props.branchId}/builds`} className="build-history-link">
+            <Link to={`/branches/${branchId}/builds`} className="build-history-link">
               <Icon name="history" /> Branch build history
+            </Link>
+            <Link to={`/settings/branch/${branchId}`} className="build-settings-link">
+              <Icon name="cog" /> Settings
             </Link>
           </p>
         </div>

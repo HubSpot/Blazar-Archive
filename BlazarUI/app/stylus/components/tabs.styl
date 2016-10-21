@@ -1,0 +1,42 @@
+@import '../variables'
+
+.private-tabs
+  list-style none
+  padding-left 40px
+  border-bottom 1px solid $color-battleship
+
+.private-tab
+  display inline-block
+  margin-right 40px
+  position relative
+
+  >a
+    color $color-slinky !important
+    padding 10px 10px
+    display block
+    text-decoration none
+
+    &:active
+      outline none
+
+.private-tab.active
+  font-weight 600
+
+  .private-tab__indicator
+    opacity 1
+
+.private-tab:not(.active):hover, .private-tab:focus
+  >a
+    color $color-eerie !important
+
+.private-tab__indicator
+  transition: all 150ms ease-out;
+  background-color: currentColor;
+  border-radius: 1.5rem;
+  bottom: -0.15625rem;
+  content: ' ';
+  height: 0.3125rem;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
