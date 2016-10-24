@@ -19,6 +19,8 @@ import com.hubspot.blazar.data.service.RepositoryBuildService;
 public class TestUtils {
   private final InterProjectBuildService interProjectBuildService;
   private final RepositoryBuildService repositoryBuildService;
+  private static final long BUILD_WAIT_TIME = 1000;
+  private static final long BUILD_WAIT_MAX_COUNT = 10;
 
   public static final Logger LOG = LoggerFactory.getLogger(TestUtils.class);
 
@@ -28,9 +30,6 @@ public class TestUtils {
     this.interProjectBuildService = interProjectBuildService;
     this.repositoryBuildService = repositoryBuildService;
   }
-
-
-
 
   public InterProjectBuild runInterProjectBuild(int rootModuleId, Optional<BuildTrigger> triggerOptional) throws InterruptedException {
     BuildTrigger trigger;
@@ -51,33 +50,45 @@ public class TestUtils {
     return waitForRepositoryBuild(build);
   }
 
-  public RepositoryBuild runAndWaitForRepositoryBuild(GitInfo gitInfo, BuildTrigger buildTrigger, BuildOptions buildOptions) throws InterruptedException {
+  public RepositoryBuild runAndWaitForRepositoryBuild(GitInfo gitInfo, BuildTrigger buildTrigger, BuildOptions buildOptions) {
     long id = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
     RepositoryBuild build = repositoryBuildService.get(id).get();
     return waitForRepositoryBuild(build);
   }
 
-  public InterProjectBuild waitForInterProjectBuild(InterProjectBuild build) throws InterruptedException {
+  public InterProjectBuild waitForInterProjectBuild(InterProjectBuild build) {
     int count = 0;
     while (!build.getState().isFinished()) {
-      if (count > 10) {
+      if (count > BUILD_WAIT_MAX_COUNT) {
         fail(String.format("Build %s took more than 10s to complete", build));
       }
       count++;
-      Thread.sleep(1000);
+      try {
+        LOG.debug("Waiting for {} to complete", build);
+        Thread.sleep(BUILD_WAIT_TIME);
+      } catch (InterruptedException e) {
+        LOG.error("Got interrupted while waiting for build", e);
+        Thread.interrupted();
+      }
       build = interProjectBuildService.getWithId(build.getId().get()).get();
     }
     return build;
   }
 
-  public RepositoryBuild waitForRepositoryBuild(RepositoryBuild build) throws InterruptedException {
+  public RepositoryBuild waitForRepositoryBuild(RepositoryBuild build) {
     int count = 0;
     while (!build.getState().isComplete()) {
-      if (count > 10) {
+      if (count > BUILD_WAIT_MAX_COUNT) {
         fail(String.format("Build %s took more than 10s to complete", build));
       }
       count++;
-      Thread.sleep(1000);
+      try {
+        LOG.debug("Waiting for {} to complete", build);
+        Thread.sleep(BUILD_WAIT_TIME);
+      } catch (InterruptedException e) {
+        LOG.error("Got interrupted while waiting for build", e);
+        Thread.interrupted();
+      }
       build = repositoryBuildService.get(build.getId().get()).get();
     }
     return build;

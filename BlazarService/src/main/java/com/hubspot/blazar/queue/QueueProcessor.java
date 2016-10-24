@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 import com.hubspot.blazar.data.dao.QueueItemDao;
@@ -28,6 +30,7 @@ import io.dropwizard.lifecycle.Managed;
 @Singleton
 public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(QueueProcessor.class);
+  private static final long QUEUE_PROCESSOR_CANCEL_TIMEOUT = 2000;
 
   private final ScheduledExecutorService executorService;
   private final Map<String, ScheduledExecutorService> queueExecutors;
@@ -37,6 +40,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private final Set<QueueItem> processingItems;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
+  private Optional<ScheduledFuture<?>> processingTask;
 
   @Inject
   public QueueProcessor(@Named("QueueProcessor") ScheduledExecutorService executorService,
@@ -52,17 +56,33 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
 
     this.running = new AtomicBoolean();
     this.leader = new AtomicBoolean();
+    this.processingTask = Optional.absent();
   }
 
   @Override
   public void start() {
+    startProcessorWithCustomPollingRate(1, TimeUnit.SECONDS);
+  }
+
+  public void startProcessorWithCustomPollingRate(long delay, TimeUnit timeUnit) {
     running.set(true);
-    executorService.scheduleAtFixedRate(this, 0, 1, TimeUnit.SECONDS);
+    LOG.info("Starting Queue Processor with delay of {} {}", delay, timeUnit);
+    processingTask = Optional.of(executorService.scheduleAtFixedRate(this, 0, delay, timeUnit));
+    LOG.info("Queue Processor Started");
   }
 
   @Override
   public void stop() {
-    running.set(false);
+    if (processingTask.isPresent()) {
+      running.set(false);
+      // gracefully allow processing to stop.
+      boolean success = processingTask.get().cancel(false);
+      if (!success && (processingTask.get().isCancelled() || processingTask.get().isDone())) {
+        RuntimeException scheduledExectuorShutdownError = new RuntimeException("Failed to successfully shut down scheduled queue polling task");
+        LOG.error("Error stopping QueueProcessor", scheduledExectuorShutdownError);
+      }
+    }
+    LOG.info("Queue Processor Stopped");
   }
 
   @Override
@@ -86,6 +106,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
         processingItems.addAll(queueItemsSorted);
 
         for (QueueItem queueItem : queueItemsSorted) {
+          LOG.debug("Processing Item: {}", queueItem);
           String queueName = queueItem.getType().getSimpleName();
           queueExecutors.computeIfAbsent(queueName, k -> {
             return new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor-" + queueName).get();
