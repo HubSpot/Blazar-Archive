@@ -7,6 +7,6 @@ before:
 
 stepActivation:
   upload:
-    branches: [hs-master]
+    branches: [hs-master, sql-event-bus-hs-master]
   notify:
-    branches: [hs-master]
+    branches: [hs-master, sql-event-bus-hs-master]
