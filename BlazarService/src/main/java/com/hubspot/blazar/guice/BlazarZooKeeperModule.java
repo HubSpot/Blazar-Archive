@@ -6,7 +6,6 @@ import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.apache.curator.framework.state.ConnectionStateListener;
 
 import com.google.common.base.Optional;
-import com.google.common.eventbus.EventBus;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -16,7 +15,6 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.queue.QueueProcessor;
-import com.hubspot.blazar.queue.SqlEventBus;
 import com.hubspot.blazar.util.HostUtils;
 import com.hubspot.blazar.util.HostUtils.Host;
 import com.hubspot.blazar.util.HostUtils.Port;
@@ -37,12 +35,6 @@ public class BlazarZooKeeperModule implements Module {
     Multibinder<LeaderLatchListener> leaderLatchListeners = Multibinder.newSetBinder(binder, LeaderLatchListener.class);
     leaderLatchListeners.addBinding().to(QueueProcessor.class);
     leaderLatchListeners.addBinding().to(LeaderMetricManager.class);
-  }
-
-  @Provides
-  @Singleton
-  public EventBus providesEventBus(SqlEventBus sqlEventBus) {
-    return sqlEventBus;
   }
 
   @Provides

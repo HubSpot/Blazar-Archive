@@ -30,7 +30,6 @@ import io.dropwizard.lifecycle.Managed;
 @Singleton
 public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(QueueProcessor.class);
-  private static final long QUEUE_PROCESSOR_CANCEL_TIMEOUT = 2000;
 
   private final ScheduledExecutorService executorService;
   private final Map<String, ScheduledExecutorService> queueExecutors;
