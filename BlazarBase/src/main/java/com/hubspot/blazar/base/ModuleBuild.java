@@ -70,7 +70,7 @@ public class ModuleBuild {
                      @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig,
                      @JsonProperty("resolvedConfig") Optional<BuildConfig> resolvedConfig) {
     this.id = id;
-    this.repoBuildId =  repoBuildId;
+    this.repoBuildId = repoBuildId;
     this.moduleId = moduleId;
     this.buildNumber = buildNumber;
     this.state = state;
