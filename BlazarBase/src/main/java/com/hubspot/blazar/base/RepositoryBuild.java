@@ -51,10 +51,6 @@ public class RepositoryBuild {
                          @JsonProperty("commitInfo") Optional<CommitInfo> commitInfo,
                          @JsonProperty("dependencyGraph") Optional<DependencyGraph> dependencyGraph,
                          @JsonProperty("buildOptions") BuildOptions buildOptions) {
-    if (branchId == 0 || buildNumber == 0 || state == null || buildTrigger == null || buildOptions == null) {
-      throw new IllegalArgumentException("Bad arguments passed: branchId, buildNumber cannot be 0, state, buildTrigger, buildOptions cannot be null");
-    }
-
     this.id = id;
     this.branchId = branchId;
     this.buildNumber = buildNumber;

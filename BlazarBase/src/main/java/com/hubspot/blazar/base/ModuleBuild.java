@@ -69,9 +69,6 @@ public class ModuleBuild {
                      @JsonProperty("taskId") Optional<String> taskId,
                      @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig,
                      @JsonProperty("resolvedConfig") Optional<BuildConfig> resolvedConfig) {
-    if (repoBuildId == 0 || moduleId == 0 || buildNumber == 0 || state == null) {
-      throw new IllegalArgumentException("repoBuildId, moduleId and buildNumber cannot be 0 and state cannot be null");
-    }
     this.id = id;
     this.repoBuildId =  repoBuildId;
     this.moduleId = moduleId;
