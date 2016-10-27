@@ -5,6 +5,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -16,6 +18,7 @@ import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuildInfo;
@@ -23,6 +26,7 @@ import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.branch.BranchStatus;
 import com.hubspot.blazar.data.dao.BranchDao;
+import com.hubspot.blazar.data.dao.MalformedFileDao;
 import com.hubspot.blazar.data.dao.RepositoryBuildDao;
 import com.hubspot.blazar.data.dao.StateDao;
 import com.hubspot.blazar.data.service.BranchStatusService;
@@ -51,11 +55,13 @@ public class BranchStatusServiceTest {
   private RepositoryBuild branchBuild5 = RepositoryBuild.newBuilder(1, 5, RepositoryBuild.State.QUEUED, manualTrigger, defaultOptions).build();
   private RepositoryBuild branchBuild6 = RepositoryBuild.newBuilder(1, 6, RepositoryBuild.State.QUEUED, manualTrigger, defaultOptions).build();
 
-
   private BranchDao branchDao = mock(BranchDao.class);
   private StateDao stateDao = mock(StateDao.class);
   private RepositoryBuildDao branchBuildDao = mock(RepositoryBuildDao.class);
-  private BranchStatusService branchStatusService = new BranchStatusService(branchDao, stateDao, branchBuildDao);
+  private MalformedFileDao malformedFileDao = mock(MalformedFileDao.class);
+  private BranchStatusService branchStatusService = new BranchStatusService(branchDao, stateDao, malformedFileDao, branchBuildDao);
+
+  private Set<MalformedFile> malformedFiles = ImmutableSet.of(new MalformedFile(1, "config", "/broken/.blazar.yaml", "Testing 123"));
 
   @Before
   public void before() {
@@ -65,6 +71,8 @@ public class BranchStatusServiceTest {
         .thenReturn(ImmutableSet.of(moduleBuildInfo1, moduleBuildInfo3));
     when(branchBuildDao.getRepositoryBuildsByState(Matchers.eq(1), any()))
         .thenReturn(ImmutableSet.of(branchBuild5, branchBuild6));
+    when(malformedFileDao.getMalformedFiles(Matchers.eq(1)))
+        .thenReturn(malformedFiles);
   }
 
   @Test
@@ -92,6 +100,7 @@ public class BranchStatusServiceTest {
     assertThat(status.get().getQueuedBuilds()).isEqualTo(ImmutableList.of(branchBuild5, branchBuild6));
     assertThat(status.get().getOtherBranches()).doesNotContain(branch1).contains(branch2);
     assertThat(status.get().getModuleStates()).contains(expectedState);
+    assertThat(status.get().getMalformedFiles()).isEqualTo(malformedFiles);
   }
 
 
@@ -121,6 +130,7 @@ public class BranchStatusServiceTest {
     assertThat(status.get().getQueuedBuilds()).isEqualTo(ImmutableList.of(branchBuild5, branchBuild6));
     assertThat(status.get().getOtherBranches()).doesNotContain(branch1).contains(branch2);
     assertThat(status.get().getModuleStates()).contains(expectedState);
+    assertThat(status.get().getMalformedFiles()).isEqualTo(malformedFiles);
   }
 
   @Test
