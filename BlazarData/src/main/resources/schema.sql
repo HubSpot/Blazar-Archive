@@ -193,3 +193,6 @@ ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name
 
 --changeset jgoodwin:11
 CREATE INDEX build_state on repo_builds (state)
+
+-- changeset jgoodwin:12
+CREATE INDEX branch_active on branches (active) DESC

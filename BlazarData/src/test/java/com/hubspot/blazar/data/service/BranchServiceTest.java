@@ -20,9 +20,9 @@ public class BranchServiceTest extends DatabaseBackedTest {
   private BranchService branchService;
 
   @Test
-  public void testUpsertBasic() throws Exception {
-    long before = System.currentTimeMillis();
-    Thread.sleep(1000); // because the timestamp is in seconds, we need to ensure we wait at least one.
+  public void itInsertsABranchWhenNonePresent() throws Exception {
+    // Mysql
+    long before = System.currentTimeMillis() - 1000;
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     GitInfo inserted = branchService.upsert(original);
 
@@ -33,18 +33,17 @@ public class BranchServiceTest extends DatabaseBackedTest {
     assertThat(retrieved.isPresent()).isTrue();
     assertThat(retrieved.get()).isEqualTo(inserted);
     assertThat(retrieved.get().getCreatedTimestamp()).isBetween(before, System.currentTimeMillis());
-    assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(before, System.currentTimeMillis());
-    assertThat(retrieved.get().getUpdatedTimestamp()).isEqualTo(retrieved.get().getCreatedTimestamp());
+
+    assertThat(retrieved.get().getUpdatedTimestamp())
+        .isBetween(before, System.currentTimeMillis())
+        .isEqualTo(retrieved.get().getCreatedTimestamp());
   }
 
   @Test
-  public void testUpsertRepositoryRename() throws InterruptedException {
-    long before = System.currentTimeMillis();
+  public void itUpdatesARenamedBranchWhenAlreadyExists() throws InterruptedException {
+    long before = System.currentTimeMillis() - 1000;
     GitInfo original = newGitInfo(123, "Overwatch", "master");
     original = branchService.upsert(original);
-    // The last updated column is `TIMESTAMP` and as such is 1s precision
-    Thread.sleep(1000);
-
     GitInfo renamed = newGitInfo(123, "Underwatch", "master");
     renamed = branchService.upsert(renamed);
 
@@ -59,7 +58,7 @@ public class BranchServiceTest extends DatabaseBackedTest {
   }
 
   @Test
-  public void testUpsertMultipleBranches() {
+  public void itInsertsMultipleBranches() {
     GitInfo master = newGitInfo(123, "Overwatch", "master");
     master = branchService.upsert(master);
 
