@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { routerShape } from 'react-router';
 import {bindAll} from 'underscore';
@@ -16,7 +17,7 @@ import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
 import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
 
 import ModuleBuildStates from '../../constants/ModuleBuildStates';
-import { getCurrentModuleBuild, getCurrentBranchBuild } from '../Helpers';
+import { getCurrentModuleBuild, getCurrentBranchBuild, getBlazarModuleBuildPath } from '../Helpers';
 
 class BranchState extends Component {
   constructor(props) {
@@ -78,14 +79,18 @@ class BranchState extends Component {
     });
   }
 
-  getFailingModuleNames(moduleStates) {
+  getFailingModuleBuildBlazarPaths(moduleStates) {
     return moduleStates
       .filter((moduleState) => {
         return getCurrentModuleBuild(moduleState).get('state') === ModuleBuildStates.FAILED;
       })
-      .map((moduleState) => {
-        return moduleState.getIn(['module', 'name']);
-      });
+      .reduce((failingModuleBuildBlazarPaths, moduleState) => {
+        const {branchId} = this.props;
+        const moduleBuildNumber = getCurrentModuleBuild(moduleState).get('buildNumber');
+        const moduleName = moduleState.getIn(['module', 'name']);
+        const blazarPath = getBlazarModuleBuildPath(branchId, moduleBuildNumber, moduleName);
+        return failingModuleBuildBlazarPaths.set(moduleName, blazarPath);
+      }, Immutable.Map());
   }
 
   refreshBranchModuleStates() {
@@ -131,13 +136,13 @@ class BranchState extends Component {
       return <Loader />;
     }
 
-    const failingModuleNames = this.getFailingModuleNames(activeModules);
-    const hasFailingModules = !!failingModuleNames.size;
+    const failingModuleBuildBlazarPaths = this.getFailingModuleBuildBlazarPaths(activeModules);
+    const hasFailingModules = !!failingModuleBuildBlazarPaths.size;
 
     return (
       <div>
         {showBetaFeatureAlert && <BetaFeatureAlert branchId={branchId} onDismiss={dismissBetaNotification} />}
-        {hasFailingModules && <FailingModuleBuildsAlert failingModuleNames={failingModuleNames} />}
+        {hasFailingModules && <FailingModuleBuildsAlert failingModuleBuildBlazarPaths={failingModuleBuildBlazarPaths} />}
         <Tabs id="branch-state-tabs" defaultActiveKey="active-modules">
           <Tab eventKey="active-modules" title="Active modules">
             <section id="active-modules">
