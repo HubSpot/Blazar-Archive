@@ -1,6 +1,5 @@
 package com.hubspot.blazar.data.service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -17,20 +16,20 @@ public class CachingMetricsService {
   private static final long MODULE_BUILD_COUNT_MAX_AGE_MILLIS = 500;
   private static final long BRANCH_BUILD_COUNT_MAX_AGE_MILLIS = 500;
   private static final long INTER_PROJECT_BUILD_COUNT_MAX_AGE_MILLIS = 500;
+  private static final long QUEUED_ITEM_COUNT_MAX_AGE_MILLIS = 500;
   private final MetricsService metricsService;
   private volatile Map<ModuleBuild.State, Integer> moduleBuildCountMap = ImmutableMap.of();
   private volatile Map<RepositoryBuild.State, Integer> repoBuildCountMap = ImmutableMap.of();
   private volatile Map<InterProjectBuild.State, Integer> interProjectCountMap = ImmutableMap.of();
+  private volatile Map<Class<?>, Integer> queuedItemCountMap = ImmutableMap.of();
   private volatile long moduleBuildCountMapLastWrite = 0;
   private volatile long repoBuildCountMapLastWrite = 0;
   private volatile long interProjectBuildCountMapLastWrite = 0;
+  private volatile long queuedItemCountMapLastWrite = 0;
 
   @Inject
   public CachingMetricsService(MetricsService metricsService) {
     this.metricsService = metricsService;
-    this.moduleBuildCountMap = new HashMap<>();
-    this.moduleBuildCountMapLastWrite = 0;
-    this.repoBuildCountMapLastWrite = 0;
   }
 
   public synchronized int getCachedActiveModuleBuildCountByState(ModuleBuild.State state) {
@@ -76,6 +75,30 @@ public class CachingMetricsService {
     }
 
     return interProjectCountMap.get(state);
+  }
+
+  public int getCachedQueuedItemCountByType(Class<?> type) {
+    checkAndUpdateQueuedItemCountMap();
+
+    if (!queuedItemCountMap.containsKey(type)) {
+      LOG.info("No events of type {} in count results returning 0", type);
+      return 0;
+    }
+
+    return queuedItemCountMap.get(type);
+  }
+
+  public int getPendingEventTypeCount() {
+    checkAndUpdateQueuedItemCountMap();
+    return queuedItemCountMap.keySet().size();
+  }
+
+  private synchronized void checkAndUpdateQueuedItemCountMap() {
+    if (isTooOld(queuedItemCountMapLastWrite, QUEUED_ITEM_COUNT_MAX_AGE_MILLIS)) {
+      LOG.info("Refreshing queuedItemCountMap cache");
+      queuedItemCountMap = metricsService.countQueuedEventsByType();
+      queuedItemCountMapLastWrite = System.currentTimeMillis();
+    }
   }
 
   private boolean isTooOld(long lastWrite, long maxAge) {

@@ -1,5 +1,6 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,14 +13,18 @@ import com.hubspot.blazar.base.metrics.ActiveBranchBuildsInState;
 import com.hubspot.blazar.base.metrics.ActiveInterProjectBuildsInState;
 import com.hubspot.blazar.base.metrics.ActiveModuleBuildsInState;
 import com.hubspot.blazar.data.dao.MetricsDao;
+import com.hubspot.blazar.data.dao.QueueItemDao;
+import com.hubspot.blazar.data.queue.QueueItem;
 
 public class MetricsService {
 
   private MetricsDao dao;
+  private QueueItemDao queueItemDao;
 
   @Inject
-  public MetricsService(MetricsDao dao) {
+  public MetricsService(MetricsDao dao, QueueItemDao queueItemDao) {
     this.dao = dao;
+    this.queueItemDao = queueItemDao;
   }
 
   public Map<ModuleBuild.State, Integer> countActiveModuleBuildsByState() {
@@ -47,5 +52,18 @@ public class MetricsService {
       mapBuilder.put(pair.getState(), pair.getCount());
     }
     return mapBuilder.build();
+  }
+
+  public Map<Class<?>, Integer> countQueuedEventsByType() {
+    Map<Class<?>, Integer> countMap = new HashMap<>();
+    Set<QueueItem> items = queueItemDao.getItemsReadyToExecute();
+    for (QueueItem item : items) {
+      if (countMap.containsKey(item.getType())) {
+        countMap.put(item.getType(), countMap.get(item.getType()) + 1);
+      } else {
+        countMap.put(item.getType(), 1);
+      }
+    }
+    return ImmutableMap.copyOf(countMap);
   }
 }

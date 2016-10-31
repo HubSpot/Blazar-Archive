@@ -1,17 +1,6 @@
 package com.hubspot.blazar.resources;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.hubspot.blazar.base.ModuleBuild;
-import com.hubspot.blazar.base.ModuleActivityPage;
-import com.hubspot.blazar.base.ModuleState;
-import com.hubspot.blazar.base.RepositoryBuild;
-import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.data.service.ModuleBuildService;
-import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.jackson.jaxrs.PropertyFiltering;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -20,10 +9,19 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Optional;
+import com.hubspot.blazar.base.ModuleActivityPage;
+import com.hubspot.blazar.base.ModuleBuild;
+import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.data.service.BranchService;
+import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
 @Path("/builds/history")
 @Produces(MediaType.APPLICATION_JSON)
