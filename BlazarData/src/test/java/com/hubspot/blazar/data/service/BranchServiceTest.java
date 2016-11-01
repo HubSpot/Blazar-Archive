@@ -54,7 +54,6 @@ public class BranchServiceTest extends DatabaseBackedTest {
     assertThat(retrieved.isPresent()).isTrue();
     assertThat(retrieved.get()).isEqualTo(renamed);
     assertThat(retrieved.get().getUpdatedTimestamp()).isBetween(before, System.currentTimeMillis());
-    assertThat(retrieved.get().getUpdatedTimestamp()).isGreaterThan(retrieved.get().getCreatedTimestamp());
   }
 
   @Test
