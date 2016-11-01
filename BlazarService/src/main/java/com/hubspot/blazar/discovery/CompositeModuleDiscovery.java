@@ -87,9 +87,9 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
   }
 
   /**
-   * There are certain characters which (currently) play havoc with our downstream build tooling (our executor).
-   * In order to prevent downstream failures we validate here in order to make sure that branches we cannot handle,
-   * are not consumed by downstream services. Ideally those services would be more resilient but at this time they are not.
+   * Currently we do not support branch names with special characters despite the fact that github allows certain special
+   * characters in branch names (e.g. a single quote). Having special characters in the branch name causes problems in
+   * services that blazar uses to handle builds, i.e. the build executor and our maven service that detects modules.
    *
    * @param gitInfo The branch we are checking for validity.
    * @return A malformed "file" representing the invalid branch name if it is invalid
