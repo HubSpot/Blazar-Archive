@@ -127,7 +127,7 @@ public class GitHubWebhookHandler {
   }
 
   private boolean isOptedIn(GitInfo gitInfo) throws IOException {
-    return whitelist.contains(gitInfo.getRepository()) || blazarConfigExists(gitInfo);
+    return whitelist.contains(gitInfo.getRepository()) || ( whitelist.isEmpty() && blazarConfigExists(gitInfo));
   }
 
   private boolean blazarConfigExists(GitInfo gitInfo) throws IOException {
