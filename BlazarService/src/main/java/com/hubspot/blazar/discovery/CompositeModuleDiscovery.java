@@ -97,6 +97,7 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
   private Optional<MalformedFile> preDiscoveryBranchValidation(GitInfo gitInfo) {
     String branch = gitInfo.getBranch();
     if (branch.contains("'") ||
+        branch.contains("`") ||
         branch.contains("\"") ||
         ! CharMatcher.ASCII.matchesAllOf(branch)) {
       String message = String.format("Branch %s contained non-ascii or quotation characters not supported by Blazar.\nPlease re-create your branch with a new name.", branch);
