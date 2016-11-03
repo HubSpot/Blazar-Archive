@@ -1,111 +1,59 @@
-import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
+import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Immutable from 'immutable';
 import classNames from 'classnames';
-import {bindAll} from 'underscore';
 
-import Overlay from 'react-bootstrap/lib/Overlay';
+import Button from 'react-bootstrap/lib/Button';
+import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
 import Popover from 'react-bootstrap/lib/Popover';
 
 import Icon from '../../shared/Icon.jsx';
 import CommitsSummaryPopover from './CommitsSummaryPopover.jsx';
 import { getCompareUrl } from '../../../utils/commitInfoHelpers';
 
-// add some delay to allow scrolling across commits
-// in a table without triggering any popovers
-const DELAY = 200;
+const CommitsSummary = ({commitInfo, className, popoverPlacement, buildId}) => {
+  const currentCommit = commitInfo.get('current');
+  const newCommits = commitInfo.get('newCommits');
 
-class CommitsSummary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {show: false};
-    bindAll(this, 'delayedShow', 'delayedHide');
+  let text;
+  let commitList;
+  let viewCommitsInGitHubUrl;
+
+  const hasNewCommits = !newCommits.isEmpty();
+
+  if (hasNewCommits) {
+    commitList = newCommits.sort((a, b) => b.get('timestamp') - a.get('timestamp'));
+    text = (commitList.size === 1) ? '1 commit' : `${commitList.size} commits`;
+    viewCommitsInGitHubUrl = getCompareUrl(commitInfo);
+  } else {
+    commitList = Immutable.List.of(currentCommit);
+    text = 'latest commit';
+    viewCommitsInGitHubUrl = currentCommit.get('url');
   }
 
-  showPopover() {
-    this.setState({show: true});
-  }
+  const popover = (
+    <Popover id={`commit-summary-popover-${buildId}`}>
+      <CommitsSummaryPopover
+        commitList={commitList}
+        viewCommitsInGitHubUrl={viewCommitsInGitHubUrl}
+      />
+    </Popover>
+  );
 
-  hidePopover() {
-    this.setState({show: false});
-  }
-
-  delayedShow() {
-    clearTimeout(this.hideDelay);
-    this.hideDelay = null;
-
-    if (!this.showDelay) {
-      this.showDelay = setTimeout(() => {
-        this.showDelay = null;
-        this.showPopover();
-      }, DELAY);
-    }
-  }
-
-  delayedHide() {
-    clearTimeout(this.showDelay);
-    this.showDelay = null;
-
-    if (!this.hideDelay) {
-      this.hideDelay = setTimeout(() => {
-        this.hideDelay = null;
-        this.hidePopover();
-      }, DELAY);
-    }
-  }
-
-  render() {
-    const {commitInfo, className, popoverPlacement, buildId} = this.props;
-    const currentCommit = commitInfo.get('current');
-    const newCommits = commitInfo.get('newCommits');
-
-    const hasNewCommits = !newCommits.isEmpty();
-    const commitList = hasNewCommits ?
-      newCommits.sort((a, b) => b.get('timestamp') - a.get('timestamp')) :
-      Immutable.List.of(currentCommit);
-
-    const compareCommitsUrl = getCompareUrl(commitInfo);
-
-    let text;
-    if (hasNewCommits) {
-      text = (commitList.size === 1) ? '1 commit' : `${commitList.size} commits`;
-    } else {
-      text = 'latest commit';
-    }
-
-    return (
-      <span>
-        <span
+  return (
+    <span>
+      <OverlayTrigger trigger="click" rootClose={true} placement={popoverPlacement} overlay={popover}>
+        <Button
+          bsStyle="link"
           className={classNames('commits-summary', className)}
-          ref={(ref) => {this.popoverTrigger = ref;}}
-          onMouseEnter={this.delayedShow}
-          onMouseLeave={this.delayedHide}
+          onClick={(e) => e.stopPropagation()}
         >
-          <Icon type="octicon" name="git-commit" /> {text}
-        </span>
-
-        <Overlay
-          show={this.state.show}
-          placement={popoverPlacement}
-          target={() => ReactDOM.findDOMNode(this.popoverTrigger)}
-        >
-          <Popover
-            ref={(ref) => {this.popover = ref;}}
-            onMouseEnter={this.delayedShow}
-            onMouseLeave={this.delayedHide}
-            id={`commit-summary-popover-${buildId}`}
-          >
-            <CommitsSummaryPopover
-              commitList={commitList}
-              compareCommitsUrl={compareCommitsUrl}
-            />
-          </Popover>
-        </Overlay>
-      </span>
-    );
-  }
-}
+          <Icon type="octicon" name="git-commit" classNames="commits-summary-icon" />{text}
+        </Button>
+      </OverlayTrigger>
+    </span>
+  );
+};
 
 CommitsSummary.propTypes = {
   commitInfo: ImmutablePropTypes.mapContains({

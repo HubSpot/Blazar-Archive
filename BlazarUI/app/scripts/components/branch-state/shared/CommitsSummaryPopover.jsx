@@ -3,7 +3,6 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import classNames from 'classnames';
 
 import Icon from '../../shared/Icon.jsx';
-import Image from '../../shared/Image.jsx';
 import { truncate } from '../../Helpers';
 
 const MAX_COMMITS_DISPLAYED = 5;
@@ -13,7 +12,7 @@ const CommitRowIcon = ({isFirstRow}) => {
   if (isFirstRow) {
     return (
       <div className="commits-summary-poverover__branch-head-icon">
-        <Image src={`${window.config.staticRoot}/images/branch_head.png`} height={25} width={25} />
+        <Icon type="octicon" name="git-branch" />
       </div>
     );
   }
@@ -46,7 +45,7 @@ const CommitRow = ({commit, index}) => {
         <CommitRowIcon isFirstRow={isFirstRow} />
       </td>
       <td className="commits-summary-popover__commit-message">
-        <a href={commit.get('url')} target="_blank">{formattedCommitMessage}</a>
+        {formattedCommitMessage}
       </td>
     </tr>
   );
@@ -60,13 +59,19 @@ CommitRow.propTypes = {
   index: PropTypes.number.isRequired
 };
 
-const CommitsSummaryPopover = ({commitList, compareCommitsUrl}) => {
+const CommitsSummaryPopover = ({commitList, viewCommitsInGitHubUrl}) => {
   const truncateCommits = commitList.size > MAX_COMMITS_DISPLAYED;
   const displayedCommits = commitList.take(MAX_COMMITS_DISPLAYED);
   const singleCommit = commitList.size === 1;
 
-  const externalLinkText = truncateCommits ?
-    `View all ${commitList.size} commits` : 'View commits in github';
+  let externalLinkText;
+  if (singleCommit) {
+    externalLinkText = 'View in GitHub';
+  } else if (truncateCommits) {
+    externalLinkText = `View all ${commitList.size} commits in GitHub`;
+  } else {
+    externalLinkText = 'View commits in GitHub';
+  }
 
   const tableClassNames = classNames('commits-summary-popover__commit-list',
     {'commits-summary-popover__commit-list--single-commit': singleCommit});
@@ -80,24 +85,22 @@ const CommitsSummaryPopover = ({commitList, compareCommitsUrl}) => {
           }
         </tbody>
       </table>
-      {!singleCommit && (
-        <p className="commits-summary-popover__footer">
-          <a
-            className="commits-summary-popover__view-commits-link"
-            href={compareCommitsUrl}
-            target="_blank"
-          >
-            {externalLinkText} <Icon name="external-link" />
-          </a>
-        </p>
-      )}
+      <p className="commits-summary-popover__footer">
+        <a
+          className="commits-summary-popover__view-commits-link"
+          href={viewCommitsInGitHubUrl}
+          target="_blank"
+        >
+          {externalLinkText} <Icon name="external-link" />
+        </a>
+      </p>
     </div>
   );
 };
 
 CommitsSummaryPopover.propTypes = {
   commitList: ImmutablePropTypes.list.isRequired,
-  compareCommitsUrl: PropTypes.string.isRequired
+  viewCommitsInGitHubUrl: PropTypes.string.isRequired
 };
 
 export default CommitsSummaryPopover;
