@@ -33,6 +33,10 @@
         });
       </script>
     {{ /heapToken }}
+    {{ #sentryDsn }}
+      <script src="https://cdn.ravenjs.com/3.8.0/raven.min.js"></script>
+      <script>window.Raven.config("{{{sentryDsn}}}").install()</script>
+    {{ /sentryDsn }}
   </head>
   <body>
     <div id="app" />

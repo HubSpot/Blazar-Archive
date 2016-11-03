@@ -32,7 +32,11 @@ const appConfig = {
 
   slackBotName: process.env.SLACK_BOT_NAME || '',
 
-  heapToken: process.env.HEAP_TOKEN || false
+  // app id for Heap (mobile and web analytics)
+  heapToken: process.env.HEAP_TOKEN || false,
+
+  // data source name for this project in Sentry (error tracking platform)
+  sentryDsn: process.env.SENTRY_DSN || false
 };
 
 module.exports = appConfig;
