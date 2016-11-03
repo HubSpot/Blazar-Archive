@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.hubspot.blazar.data.cache.StateCache;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
+import com.hubspot.blazar.data.service.BranchStatusService;
 import com.hubspot.blazar.data.service.CachingMetricsService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
@@ -38,5 +39,6 @@ public class BlazarDataModule extends AbstractModule {
     bind(BranchSettingsService.class);
     bind(MetricsService.class);
     bind(CachingMetricsService.class);
+    bind(BranchStatusService.class);
   }
 }
