@@ -53,12 +53,21 @@ public class BranchStatusService {
     Set<ModuleState> moduleStates = getAllModuleStatesForBranch(branchId);
     Set<GitInfo> otherBranches = branchDao.getByRepository(branch.getRepositoryId());
     otherBranches.remove(branch);
-    Set<RepositoryBuild> queuedBuilds = repositoryBuildDao.getRepositoryBuildsByState(branchId, ImmutableList.of(RepositoryBuild.State.QUEUED, RepositoryBuild.State.LAUNCHING));
+    Set<RepositoryBuild> queuedBuilds = repositoryBuildDao.getRepositoryBuildsByState(branchId, ImmutableList.of(RepositoryBuild.State.QUEUED));
     List<RepositoryBuild> queuedBuildsList = new ArrayList<>(queuedBuilds);
     queuedBuildsList.sort(Comparator.comparingInt(RepositoryBuild::getBuildNumber));
     Set<MalformedFile> malformedFiles = malformedFileDao.getMalformedFiles(branchId);
 
-    return Optional.of(new BranchStatus(queuedBuildsList, moduleStates, otherBranches, malformedFiles, branch));
+    // We can only have up to 1 build in either of these states at a time
+    java.util.Optional<RepositoryBuild> maybeActiveBuild = repositoryBuildDao
+        .getRepositoryBuildsByState(branchId, ImmutableList.of(RepositoryBuild.State.LAUNCHING, RepositoryBuild.State.IN_PROGRESS))
+        .stream().findFirst();
+
+    if (maybeActiveBuild.isPresent()) {
+      return Optional.of(new BranchStatus(queuedBuildsList, Optional.of(maybeActiveBuild.get()), moduleStates, otherBranches, malformedFiles, branch));
+    } else {
+      return Optional.of(new BranchStatus(queuedBuildsList, Optional.absent(), moduleStates, otherBranches, malformedFiles, branch));
+    }
   }
 
   private Set<ModuleState> getAllModuleStatesForBranch(int branchId) {

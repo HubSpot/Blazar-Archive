@@ -1,7 +1,6 @@
 package com.hubspot.blazar.data.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,8 +68,10 @@ public class BranchStatusServiceTest {
     when(branchDao.getByRepository(Matchers.eq(1337))).thenReturn(Sets.newHashSet(branch1, branch2));
     when(stateDao.getLastSuccessfulAndNonSkippedBuildInfos(Matchers.eq(1)))
         .thenReturn(ImmutableSet.of(moduleBuildInfo1, moduleBuildInfo3));
-    when(branchBuildDao.getRepositoryBuildsByState(Matchers.eq(1), any()))
+    when(branchBuildDao.getRepositoryBuildsByState(Matchers.eq(1), Matchers.eq(ImmutableList.of(RepositoryBuild.State.QUEUED))))
         .thenReturn(ImmutableSet.of(branchBuild5, branchBuild6));
+    when(branchBuildDao.getRepositoryBuildsByState(Matchers.eq(1), Matchers.eq(ImmutableList.of(RepositoryBuild.State.LAUNCHING, RepositoryBuild.State.IN_PROGRESS))))
+        .thenReturn(ImmutableSet.of(branchBuild4));
     when(malformedFileDao.getMalformedFiles(Matchers.eq(1)))
         .thenReturn(malformedFiles);
   }
@@ -95,11 +96,13 @@ public class BranchStatusServiceTest {
         .setPendingModuleBuild(Optional.of(moduleBuild4pending))
         .build();
 
+
     Optional<BranchStatus> status = branchStatusService.getBranchStatusById(1);
     assertThat(status.isPresent()).isTrue();
     assertThat(status.get().getQueuedBuilds()).isEqualTo(ImmutableList.of(branchBuild5, branchBuild6));
     assertThat(status.get().getOtherBranches()).doesNotContain(branch1).contains(branch2);
-    assertThat(status.get().getModuleStates()).contains(expectedState);
+    assertThat(status.get().getModuleStates()).isEqualTo(ImmutableSet.of(expectedState));
+    assertThat(status.get().getActiveBuild()).isEqualTo(Optional.of(branchBuild4));
     assertThat(status.get().getMalformedFiles()).isEqualTo(malformedFiles);
   }
 
@@ -129,7 +132,8 @@ public class BranchStatusServiceTest {
     assertThat(status.isPresent()).isTrue();
     assertThat(status.get().getQueuedBuilds()).isEqualTo(ImmutableList.of(branchBuild5, branchBuild6));
     assertThat(status.get().getOtherBranches()).doesNotContain(branch1).contains(branch2);
-    assertThat(status.get().getModuleStates()).contains(expectedState);
+    assertThat(status.get().getModuleStates()).isEqualTo(ImmutableSet.of(expectedState));
+    assertThat(status.get().getActiveBuild()).isEqualTo(Optional.of(branchBuild4));
     assertThat(status.get().getMalformedFiles()).isEqualTo(malformedFiles);
   }
 
