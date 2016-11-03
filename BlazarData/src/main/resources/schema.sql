@@ -1,6 +1,5 @@
---liquibase formatted sql
-
---changeset tpetr:1
+-- liquibase formatted sql
+-- changeset tpetr:1
 
 CREATE TABLE `branches` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -94,7 +93,7 @@ CREATE TABLE `malformed_files` (
   PRIMARY KEY (`branchId`, `type`, `path`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---changeset jhaber:2 dbms:mysql
+-- changeset jhaber:2 dbms:mysql
 ALTER TABLE `branches` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
 ALTER TABLE `branches` MODIFY `branch` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -119,7 +118,7 @@ ALTER TABLE `module_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
 ALTER TABLE `malformed_files` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
---changeset jgoodwin:5 runAlways:false
+-- changeset jgoodwin:5 runAlways:false
 CREATE TABLE `instant_message_configs` (
   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `branchId` BIGINT(20) UNSIGNED NOT NULL,
@@ -135,7 +134,7 @@ CREATE TABLE `instant_message_configs` (
   INDEX (`channelName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---changeset jgoodwin:6 runAlways:false
+-- changeset jgoodwin:6 runAlways:false
 CREATE TABLE inter_project_builds (
   `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
   `state` VARCHAR(40) NOT NULL,
@@ -162,7 +161,7 @@ CREATE TABLE inter_project_build_mappings (
   INDEX (`repoBuildId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---changeset jgoodwin:7 runAlways:false
+-- changeset jgoodwin:7 runAlways:false
 CREATE TABLE branch_settings (
   `branchId` INT(11),
   `triggerInterProjectBuilds` TINYINT(1),
@@ -170,11 +169,11 @@ CREATE TABLE branch_settings (
   PRIMARY KEY (`branchId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---changeset jgoodwin:8
+-- changeset jgoodwin:8
 ALTER TABLE `module_provides` ADD COLUMN `version` VARCHAR(190);
 ALTER TABLE `module_depends` ADD COLUMN `version` VARCHAR(190);
 
---changeset jgoodwin:9 dbms:mysql
+-- changeset jgoodwin:9 dbms:mysql
 ALTER TABLE `module_provides` MODIFY  `version` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE `module_provides` MODIFY `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -187,12 +186,15 @@ ALTER TABLE `inter_project_build_mappings` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=
 ALTER TABLE `inter_project_builds` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 ALTER TABLE `malformed_files` ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
 
---changeset jgoodwin:10 dbms:mysql
+-- changeset jgoodwin:10 dbms:mysql
 ALTER TABLE `module_provides` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 ALTER TABLE `module_depends` DROP PRIMARY KEY, ADD PRIMARY KEY(`moduleId`, `name`, `version`);
 
---changeset jgoodwin:11
-CREATE INDEX build_state on repo_builds (state)
+-- changeset jgoodwin:11
+CREATE INDEX build_state on repo_builds (state);
 
 -- changeset jgoodwin:12
-CREATE INDEX branch_active on branches (active) DESC
+CREATE INDEX branch_active on branches (active DESC);
+
+-- changeset jgoodwin:13
+ALTER TABLE `malformed_files` MODIFY `details` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
