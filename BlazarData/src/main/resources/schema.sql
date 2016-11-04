@@ -211,3 +211,6 @@ CREATE TABLE queue_items (
   PRIMARY KEY (id),
   INDEX (completedTimestamp, desiredExecutionTimestamp)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+CREATE INDEX build_state_and_timestamps on repo_builds (state, endTimestamp, startTimestamp);
+DROP INDEX build_state on repo_builds;
