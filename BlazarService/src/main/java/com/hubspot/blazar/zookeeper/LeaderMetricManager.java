@@ -16,20 +16,24 @@ import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.CachingMetricsService;
+import com.hubspot.blazar.data.service.MetricsService;
 import com.hubspot.blazar.github.GitHubProtos;
 
 @Singleton
 public class LeaderMetricManager implements LeaderLatchListener {
   private static final Logger LOG = LoggerFactory.getLogger(LeaderMetricManager.class);
   private final MetricRegistry metricRegistry;
+  private MetricsService metricsService;
   private final CachingMetricsService cachingMetricsService;
   private static final Set<Class<?>> EXPECTED_EVENT_TYPES = ImmutableSet.of(ModuleBuild.class,
       RepositoryBuild.class, InterProjectBuild.class, GitHubProtos.DeleteEvent.class, GitHubProtos.PushEvent.class, GitHubProtos.CreateEvent.class);
 
   @Inject
   public LeaderMetricManager(MetricRegistry metricRegistry,
+                             MetricsService metricsService,
                              CachingMetricsService cachingMetricsService)  {
     this.metricRegistry = metricRegistry;
+    this.metricsService = metricsService;
     this.cachingMetricsService = cachingMetricsService;
   }
 
@@ -79,6 +83,13 @@ public class LeaderMetricManager implements LeaderLatchListener {
         metricRegistry.register(makeMetricName(InterProjectBuild.class, state), makeInterProjectStateGauge(state));
       }
     }
+
+    // Hung build gauges (To alert on any builds that appear to not be progressing)
+    Gauge<Integer> hungBuildCountGauge = cachingMetricsService::getCachedHungBuildCount;
+    metricRegistry.register(getClass().getName() + ".RepositoryBuild.hung.count", hungBuildCountGauge);
+
+    Gauge<String> hungBuildDataGauge = cachingMetricsService::getCachedHungBuildData;
+    metricRegistry.register(getClass().getName() + ".RepositoryBuild.hung.data", hungBuildDataGauge);
   }
 
   private String queuedEventTypeToMetricName(Class<?> eventType) {
@@ -108,4 +119,5 @@ public class LeaderMetricManager implements LeaderLatchListener {
   private Gauge<Number> makeQueuedItemTypesGauge() {
     return cachingMetricsService::getPendingEventTypeCount;
   }
+
 }
