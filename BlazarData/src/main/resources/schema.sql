@@ -1,8 +1,4 @@
 -- liquibase formatted sql
-<<<<<<< HEAD
-=======
-
->>>>>>> f20108a... Use a sql-backed event bus
 -- changeset tpetr:1
 
 CREATE TABLE `branches` (
