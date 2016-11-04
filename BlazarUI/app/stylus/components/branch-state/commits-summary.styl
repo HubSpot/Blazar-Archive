@@ -1,16 +1,21 @@
 @import '../../variables'
 
 .commits-summary
-  color $color-calypso
-  padding 0 5px
+  padding 0 5px !important
+  border none !important
+  font-size inherit
   white-space nowrap
+
+.commits-summary-icon
+  margin-right 5px
 
 .commits-summary-popover
   max-width 300px
   font-size 12px
-
+  color $color-heffalump
+  font-family "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif
   a
-    color $color-gypsum !important
+    color $color-calypso
 
 .commits-summary-popover__commit-list
   position relative
@@ -19,19 +24,20 @@
 
   &:not(.commits-summary-popover__commit-list--single-commit):before
     position absolute
-    top 30px
+    top 49 px
     bottom 0
-    left 12px
+    left 11px
     width 1px
     content ""
-    background-color $color-gypsum
+    background-color $color-eerie
     z-index -1
 
 .commits-summary-poverover__commit-icon
   width 24px
   text-align center
   vertical-align top
-  padding-top 6px
+  padding-top 7px
+  color $color-eerie
 
 .commits-summary-poverover__commit-icon--first
   vertical-align middle
@@ -39,22 +45,36 @@
 
 .commits-summary-poverover__branch-head-icon
   padding-bottom 2px
-  background-color $color-heffalump
+  position relative
+  left 0.5px
+
+  &:before
+    background-color $color-battleship
+    position absolute
+    left 1px
+    top -2px
+    width 21px
+    height 21px
+    z-index -1
+    transform rotate(45deg)
+    border-radius 4px
+    content ""
 
 .commits-summary-poverover__git-commit-icon
-  background-color $color-heffalump
+  background-color $color-calypso-light
   line-height 13px
 
 .commits-summary-popover__commit-message
   padding-left 10px
-  font-style italic
   padding-top 6px
   padding-bottom 6px
   max-width 225px
   overflow hidden
   text-overflow ellipsis
+  line-height 18px
+  font-size 12px
 
 .commits-summary-popover__footer
-  margin-top 14px
+  margin-top 8px
   margin-bottom 0
   text-align right

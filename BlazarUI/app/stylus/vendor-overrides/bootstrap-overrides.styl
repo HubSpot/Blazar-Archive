@@ -9,7 +9,9 @@ $pagination-hover-bg ?= $color-koala
 
 $tooltip-bg ?= $color-heffalump
 $tooltip-opacity ?= 1
-$popover-bg ?= $color-heffalump
+$popover-bg ?= $color-calypso-light
+$popover-border-color ?= $color-calypso-light
+$popover-arrow-outer-color ?= $color-calypso-light
 
 $text-muted ?= $color-eerie
 
@@ -56,3 +58,49 @@ label
 
 .tooltip-inner, .popover-content
   color $color-gypsum
+
+// For now, scope these overrides to new pages to avoid breaking existing
+// designs. This is not ideal because it causes some specificity issues
+// and we should settle on a consistent set of bootstrap overrides
+// across the entire app soon.
+.page-content--branch-state
+  a
+    color $color-calypso
+
+  .btn
+    radius 3px
+    padding: 0.75rem 1.5rem
+
+  .btn-link
+    color $color-calypso
+
+  .btn-lg
+    font-size 18px
+
+  .btn-default
+    color $color-button-secondary-text
+    background-color $color-olaf
+    border-color $color-lorax
+
+    &:hover,
+    &:focus
+      background-color $color-button-secondary-hover-fill
+      color $color-button-secondary-text
+
+    &:active
+      background-color $color-button-secondary-active-fill
+
+  .btn-primary
+    color $color-olaf
+    background-color $color-lorax
+    border-color $color-lorax
+
+    &:hover,
+    &:focus
+      background-color $color-button-primary-hover-fill
+      border-color $color-button-primary-hover-fill
+      color $color-olaf
+
+    &:active
+      background-color $color-lorax-dark
+      border-color $color-lorax-dark
