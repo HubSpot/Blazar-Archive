@@ -24,7 +24,7 @@ public interface MetricsDao {
       "WHERE state in ('QUEUED', 'LAUNCHING', 'IN_PROGRESS') GROUP BY state")
   Set<ActiveInterProjectBuildsInState> countActiveInterProjectBuildsByState();
 
-  @SqlQuery("SELECT * FROM repo_builds WHERE state in ('LAUNCHING', 'IN_PROGRESS') AND endTimestamp IS NULL AND :currentTimeMillis - startTimestamp > :maxAgeMillis ")
+  @SqlQuery("SELECT * FROM repo_builds WHERE state in ('LAUNCHING', 'IN_PROGRESS') AND endTimestamp IS NULL AND startTimestamp < :currentTimeMillis - :maxAgeMillis")
   Set<RepositoryBuild> getBuildsRunningForLongerThan(@Bind("currentTimeMillis") long currentTimeMillis, @Bind("maxAgeMillis") long maxAgeMillis);
 
 }
