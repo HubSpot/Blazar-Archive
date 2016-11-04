@@ -35,9 +35,9 @@ class Tabs extends Component {
   }
 
   render() {
-    const {id, children} = this.props;
+    const {id, className, children} = this.props;
     return (
-      <Tab.Container activeKey={this.state.key} onSelect={this.handleSelect} id={id}>
+      <Tab.Container activeKey={this.state.key} onSelect={this.handleSelect} className={className} id={id}>
         <div>
           <Nav bsClass="private-tabs">
             {children.map(this.renderTab)}
@@ -54,6 +54,7 @@ class Tabs extends Component {
 Tabs.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   defaultActiveKey: PropTypes.string.isRequired,
+  className: PropTypes.string,
   children: PropTypes.node
 };
 

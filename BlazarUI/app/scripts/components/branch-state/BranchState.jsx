@@ -14,6 +14,7 @@ import ModuleList from './ModuleList.jsx';
 import BranchStateHeadline from './BranchStateHeadline.jsx';
 import BetaFeatureAlert from './BetaFeatureAlert.jsx';
 import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
+import PendingBranchBuildAlert from './PendingBranchBuildAlert.jsx';
 import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
 
 import ModuleBuildStates from '../../constants/ModuleBuildStates';
@@ -120,6 +121,25 @@ class BranchState extends Component {
     }
   }
 
+  renderPendingBuilds() {
+    const {pendingBranchBuilds} = this.props;
+
+    if (pendingBranchBuilds.isEmpty()) {
+      return null;
+    }
+
+    return (
+      <section id="pending-branch-builds">
+        {pendingBranchBuilds.map((branchBuild) =>
+          <PendingBranchBuildAlert
+            branchBuild={branchBuild}
+            onCancelBuild={this.refreshBranchModuleStates}
+          />
+        )}
+      </section>
+    );
+  }
+
   renderModuleLists() {
     const {
       loadingModuleStates,
@@ -143,7 +163,8 @@ class BranchState extends Component {
       <div>
         {showBetaFeatureAlert && <BetaFeatureAlert branchId={branchId} onDismiss={dismissBetaNotification} />}
         {hasFailingModules && <FailingModuleBuildsAlert failingModuleBuildBlazarPaths={failingModuleBuildBlazarPaths} />}
-        <Tabs id="branch-state-tabs" defaultActiveKey="active-modules">
+        {this.renderPendingBuilds()}
+        <Tabs id="branch-state-tabs" className="branch-state-tabs" defaultActiveKey="active-modules">
           <Tab eventKey="active-modules" title="Active modules">
             <section id="active-modules">
               <ModuleList
@@ -210,6 +231,7 @@ BranchState.propTypes = {
   branchInfo: PropTypes.object,
   activeModules: ImmutablePropTypes.list,
   inactiveModules: ImmutablePropTypes.list,
+  pendingBranchBuilds: ImmutablePropTypes.list,
   router: routerShape,
   selectModule: PropTypes.func.isRequired,
   deselectModule: PropTypes.func.isRequired,
@@ -222,6 +244,37 @@ BranchState.propTypes = {
   branchNotFound: PropTypes.bool,
   showBetaFeatureAlert: PropTypes.bool,
   dismissBetaNotification: PropTypes.func.isRequired
+};
+
+BranchState.defaultProps = {
+  pendingBranchBuilds: Immutable.fromJS([{
+    branchId: 2,
+    buildNumber: 143,
+    id: 172,
+    buildTrigger: {
+      id: 'jgoodwin',
+      type: 'MANUAL'
+    },
+    state: 'PENDING'
+  }, {
+    branchId: 2,
+    buildNumber: 142,
+    id: 72,
+    buildTrigger: {
+      type: 'PUSH',
+      id: 'f2ffad8f0e44311051a6b8b2e1d814fbfa638a06'
+    },
+    state: 'PENDING'
+  }, {
+    branchId: 2,
+    buildNumber: 141,
+    id: 174,
+    buildTrigger: {
+      type: 'INTER_PROJECT',
+      id: '80'
+    },
+    state: 'LAUNCHING'
+  }])
 };
 
 export default BranchState;

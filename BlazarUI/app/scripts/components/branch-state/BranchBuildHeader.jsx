@@ -49,7 +49,7 @@ const BranchBuildHeader = ({branchBuild, completedModuleBuildCount, totalNonSkip
               onCancel={onCancelBuild}
               build={branchBuild.toJS()}
               btnStyle="link"
-              btnClassName="branch-build-header__cancel-build-button"
+              btnClassName="cancel-build-button-link"
             />
           </span>
         </div>

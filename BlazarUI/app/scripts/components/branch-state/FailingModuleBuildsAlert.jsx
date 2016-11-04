@@ -9,7 +9,7 @@ const FailingModuleBuildsAlert = ({failingModuleBuildBlazarPaths}) => {
     `${numberOfFailingModules} module builds are failing`;
 
   return (
-    <Alert className="failing-module-builds" type="danger" titleText={heading}>
+    <Alert className="failing-module-builds" type="danger" iconName="exclamation" titleText={heading}>
       <ul className="failing-module-builds__list">
         {failingModuleBuildBlazarPaths.map((blazarModuleBuildPath, moduleName) =>
           <li key={moduleName}><Link to={blazarModuleBuildPath}>{moduleName}</Link></li>

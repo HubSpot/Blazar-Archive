@@ -50,8 +50,17 @@
   a + a
     margin-left 20px
 
-.failing-module-builds
-  margin-bottom 30px
+.btn.cancel-build-button-link
+  color $color-candy-apple
+  font-weight 500
+  padding 0 !important
+  font-size 12px
+
+  &:hover, &:focus, &[disabled]:hover
+    color $color-candy-apple-dark
+
+.branch-state-tabs:not(:first-child)
+  margin-top 30px
 
 .failing-module-builds__list
   list-style none
