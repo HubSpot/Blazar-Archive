@@ -51,7 +51,7 @@ class SearchFilter extends Component {
 
   handleKeyup(e) {
     const notFocusedOnInputElement = e.target === document.body || e.target.tagName === 'A';
-    const modifierKey = e.metaKey || e.shiftKey || event.ctrlKey;
+    const modifierKey = e.metaKey || e.shiftKey || e.ctrlKey;
     const shortcutPressed = contains(FOCUS_SEARCH_BAR_SHORTCUTS, e.which);
     if (shortcutPressed && !modifierKey && notFocusedOnInputElement) {
       this.focusInput();
