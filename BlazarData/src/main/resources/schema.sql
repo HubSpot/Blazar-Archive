@@ -198,3 +198,19 @@ CREATE INDEX branch_active on branches (active DESC);
 
 -- changeset jgoodwin:13
 ALTER TABLE `malformed_files` MODIFY `details` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- changeset jhaber:14
+CREATE TABLE queue_items (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  type varchar(250) NOT NULL,
+  item mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  retryCount int(11) unsigned NOT NULL DEFAULT 0,
+  createdTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  desiredExecutionTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  completedTimestamp TIMESTAMP NULL,
+  PRIMARY KEY (id),
+  INDEX (completedTimestamp, desiredExecutionTimestamp)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=8;
+
+CREATE INDEX build_state_and_timestamps on repo_builds (state, endTimestamp, startTimestamp);
+DROP INDEX build_state on repo_builds;

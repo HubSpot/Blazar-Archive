@@ -1,5 +1,7 @@
 package com.hubspot.blazar.data.service;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,7 @@ public class InterProjectBuildService {
     return interProjectBuildDao.getWithId(id);
   }
 
+  @Transactional
   public long enqueue(InterProjectBuild interProjectBuild) {
     if (!(interProjectBuild.getState() == InterProjectBuild.State.QUEUED)) {
       throw new IllegalArgumentException("Cannot Queue Build with state that has progressed further than QUEUED");
@@ -36,6 +39,7 @@ public class InterProjectBuildService {
     return id;
   }
 
+  @Transactional
   public void start(InterProjectBuild build) {
     InterProjectBuild started = InterProjectBuild.getStarted(build);
     interProjectBuildDao.start(started);
@@ -46,6 +50,7 @@ public class InterProjectBuildService {
     interProjectBuildDao.finish(build);
   }
 
+  @Transactional
   public void cancel(InterProjectBuild build) {
     InterProjectBuild cancelled = new InterProjectBuild(
         build.getId(),

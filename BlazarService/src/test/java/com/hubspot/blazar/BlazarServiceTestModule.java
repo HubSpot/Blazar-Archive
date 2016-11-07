@@ -17,7 +17,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.google.common.io.Resources;
@@ -33,6 +32,8 @@ import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
+import com.hubspot.blazar.guice.BlazarEventBusModule;
+import com.hubspot.blazar.guice.BlazarQueueProcessorModule;
 import com.hubspot.blazar.listener.BuildVisitorModule;
 import com.hubspot.blazar.listener.GitHubStatusVisitor;
 import com.hubspot.blazar.listener.TestBuildLauncher;
@@ -49,13 +50,13 @@ public class BlazarServiceTestModule extends AbstractModule {
   public static List<Throwable> EVENT_BUS_EXCEPTION_COUNT = new ArrayList<>();
   @Override
   public void configure() {
-    EventBus eventBus = buildEventBus();
     install(new BlazarTestModule());
     install(new BlazarDataModule());
     install(new BuildVisitorModule(buildBlazarConfiguration()));
     install(new DiscoveryModule());
+    install(new BlazarQueueProcessorModule());
+    install(new BlazarEventBusModule());
     bind(GitHubStatusVisitor.class).toInstance(mock(GitHubStatusVisitor.class));
-    bind(EventBus.class).toInstance(eventBus);
     bind(BlazarConfiguration.class).toInstance(buildBlazarConfiguration());
     bind(SingularityClient.class).toInstance(mock(SingularityClient.class));
     bind(SlackSession.class).toInstance(mock(SlackSession.class));
@@ -110,16 +111,6 @@ public class BlazarServiceTestModule extends AbstractModule {
         throw new RuntimeException(e);
       }
     }
-  }
-
-  private EventBus buildEventBus() {
-    return new EventBus(makeSubscriberExceptionHandler(LOG)) {
-      @Override
-      public void post(Object event) {
-        LOG.info("Got event {}", event);
-        super.post(event);
-      }
-    };
   }
 
   private static SubscriberExceptionHandler makeSubscriberExceptionHandler(final Logger logger) {

@@ -70,7 +70,8 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
   @Override
   public void configure(Binder binder) {
-    binder.install(new BlazarZooKeeperModule(getConfiguration()));
+    binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());
+    binder.install(new BlazarEventBusModule());
     binder.bind(GitHubWebhookResource.class);
     binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
     binder.bind(XmlFactory.class).toInstance(new XmlFactory());
@@ -82,6 +83,8 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       return;
     }
 
+    binder.install(new BlazarQueueProcessorModule());
+    binder.install(new BlazarZooKeeperModule());
     binder.install(new BlazarDataModule());
     binder.install(new BlazarSingularityModule(getConfiguration()));
     binder.install(new BuildVisitorModule(getConfiguration()));
@@ -104,7 +107,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       binder.bind(SlackUtils.class);
     }
 
-    binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());
     binder.bind(PropertyFilteringMessageBodyWriter.class)
         .toConstructor(defaultConstructor(PropertyFilteringMessageBodyWriter.class))
         .in(Scopes.SINGLETON);
@@ -128,7 +130,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
   @Provides
   @Singleton
   public Optional<SlackSession> get(BlazarConfiguration configuration) throws IOException {
-    if (configuration.getSlackConfiguration().isPresent()) {
+    if (configuration.getSlackConfiguration().isPresent() && !configuration.isWebhookOnly()) {
       String token = configuration.getSlackConfiguration().get().getSlackApiToken();
       SlackSession session = SlackSessionFactory.createWebSocketSlackSession(token);
       session.connect();

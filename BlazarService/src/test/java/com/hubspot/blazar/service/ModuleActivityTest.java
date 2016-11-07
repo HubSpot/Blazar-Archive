@@ -27,7 +27,6 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.listener.BuildEventDispatcher;
 
 import io.dropwizard.db.ManagedDataSource;
 
@@ -35,8 +34,6 @@ import io.dropwizard.db.ManagedDataSource;
 @UseModules({BlazarServiceTestModule.class})
 public class ModuleActivityTest extends BlazarServiceTestBase {
 
-  @Inject
-  private BuildEventDispatcher buildEventDispatcher; // required to have event bus work
   @Inject
   private BranchService branchService;
   @Inject
@@ -47,16 +44,17 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
   private TestUtils testUtils;
   private GitInfo branch;
   private Module module;
-  private List<RepositoryBuild> launchedBuilds;
+  private List<RepositoryBuild> launchedBuilds = new ArrayList<>();
 
   @Before
   @Inject
   public void before(ManagedDataSource dataSource) throws Exception {
     runSql(dataSource, "InterProjectData.sql");
-    launchedBuilds = new ArrayList<>();
     module = moduleService.get(1).get();
     branch = branchService.get(moduleService.getBranchIdFromModuleId(module.getId().get())).get();
+  }
 
+  private void seedBuilds() {
     // Run 10 build of our module
     BuildTrigger trigger = BuildTrigger.forUser("bob");
     BuildOptions options = new BuildOptions(ImmutableSet.of(1), BuildOptions.BuildDownstreams.NONE, false);
@@ -67,6 +65,7 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
 
   @Test
   public void testGetsRightActivity() {
+    seedBuilds();
     ModuleActivityPage page = moduleBuildService.getModuleActivityPage(module.getId().get(), Optional.of(10), Optional.of(100));
     // check that we find the number of builds we started
     assertThat(page.getModuleBuildInfos().size()).isEqualTo(launchedBuilds.size());
@@ -84,6 +83,7 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
 
   @Test
   public void testGetsCorrectPageSize() {
+    seedBuilds();
     ModuleActivityPage page1 = moduleBuildService.getModuleActivityPage(module.getId().get(), Optional.of(10), Optional.of(100));
     // check that we find 10 (the number of builds we started)
     assertThat(page1.getModuleBuildInfos().size()).isEqualTo(10);
