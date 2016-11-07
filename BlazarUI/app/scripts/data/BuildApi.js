@@ -247,12 +247,11 @@ class BuildApi {
           type: 'GET'
         }).send();
 
-        return buildModulesPromise.then((buildModules) => {
-          const moduleBuild = buildModules.filter((module) => {
-            return module.module.id === repoBuildModule.id;
-          })[0];
+        return buildModulesPromise.then((moduleStates) => {
+          const matchingModuleState = moduleStates.find((moduleState) =>
+            moduleState.module.id === repoBuildModule.id);
 
-          const buildToUse = this._getBuildToUse(moduleBuild);
+          const buildToUse = this._getBuildToUse(matchingModuleState);
           const repoBuildId = findWhere(resp, {buildNumber: parseInt(buildToUse.buildNumber, 10)}).id;
 
           this.build.model = new Build({
@@ -268,14 +267,14 @@ class BuildApi {
     });
   }
 
-  _getBuildToUse(moduleBuild) {
-    const inProgressBuild = moduleBuild.inProgressBuild;
+  _getBuildToUse(moduleState) {
+    const inProgressModuleBuild = moduleState.inProgressModuleBuild;
 
-    if (inProgressBuild && contains(['QUEUED', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED', 'UNSTABLE'], inProgressBuild.state)) {
-      return inProgressBuild;
+    if (inProgressModuleBuild && contains(['QUEUED', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED', 'UNSTABLE'], inProgressModuleBuild.state)) {
+      return inProgressModuleBuild;
     }
 
-    return moduleBuild.lastBuild;
+    return moduleState.lastModuleBuild;
   }
 
   _getLog() {
