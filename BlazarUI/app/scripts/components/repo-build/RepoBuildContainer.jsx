@@ -30,7 +30,8 @@ const initialState = {
   branchInfo: {},
   upAndDownstreamModules: {},
   currentRepoBuild: null,
-  loadingUpAndDownstreamModules: true
+  loadingUpAndDownstreamModules: true,
+  error: null
 };
 
 class RepoBuildContainer extends Component {

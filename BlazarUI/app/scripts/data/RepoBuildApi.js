@@ -61,18 +61,28 @@ function _getRepoBuildByParam(params, resp) {
   return findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
 }
 
-function fetchRepoBuild(params, cb) {
-  return _fetchBranchBuildHistory(params).then((resp) => {
+function _fetchRepoBuildId(params) {
+  return Q(_fetchBranchBuildHistory(params)).then((resp) => {
     const repoBuild = _getRepoBuildByParam(params, resp);
-    const repoBuildPromise = new Resource({
-      url: `${window.config.apiRoot}/branches/builds/${repoBuild.id}`,
-      type: 'GET'
-    }).send();
 
-    return repoBuildPromise.then((repoBuilds) => {
-      return cb(_parse(repoBuilds));
-    });
+    if (!repoBuild) {
+      return Q.reject(`Build #${params.buildNumber} does not exist for this branch.`);
+    }
+
+    return repoBuild.id;
   });
+}
+
+function fetchRepoBuild(params) {
+  return _fetchRepoBuildId(params)
+    .then((repoBuildId) => {
+      const repoBuildPromise = new Resource({
+        url: `${window.config.apiRoot}/branches/builds/${repoBuildId}`,
+        type: 'GET'
+      }).send();
+
+      return repoBuildPromise;
+    }).then((repoBuilds) => _parse(repoBuilds));
 }
 
 function fetchRepoBuildById(repoBuildId, cb) {
@@ -86,28 +96,29 @@ function fetchRepoBuildById(repoBuildId, cb) {
   });
 }
 
-function fetchModuleBuilds(params, cb) {
-  return _fetchBranchBuildHistory(params).then((resp) => {
-    const repoBuild = _getRepoBuildByParam(params, resp);
+function fetchModuleBuilds(params) {
+  return _fetchRepoBuildId(params).then((repoBuildId) => {
+    const {branchId, buildNumber} = params;
+
+    const moduleInfoPromise = _fetchModuleNames(params);
     const moduleBuildsPromise = new Resource({
-      url: `${window.config.apiRoot}/branches/builds/${repoBuild.id}/modules`,
+      url: `${window.config.apiRoot}/branches/builds/${repoBuildId}/modules`,
       type: 'GET'
     }).send();
-    const moduleInfoPromise = _fetchModuleNames(params);
 
-    Q.spread([moduleInfoPromise, moduleBuildsPromise],
+    return Q.spread([moduleInfoPromise, moduleBuildsPromise],
       (moduleInfos, moduleBuilds) => {
         const moduleBuildsWithNames = map(moduleBuilds, (build) => {
           const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
           const moduleInfoExtended = {
             name: moduleInfo.name,
-            blazarPath: `/builds/branch/${params.branchId}/build/${repoBuild.buildNumber}/module/${moduleInfo.name}`
+            blazarPath: `/builds/branch/${branchId}/build/${buildNumber}/module/${moduleInfo.name}`
           };
 
           return extend(build, moduleInfoExtended);
         });
 
-        cb(moduleBuildsWithNames);
+        return moduleBuildsWithNames;
       });
   });
 }

@@ -25,19 +25,29 @@ const RepoBuildStore = Reflux.createStore({
       return;
     }
 
-    this.isRequestingRepoBuild = RepoBuildApi.fetchRepoBuild(params, (resp) => {
-      this.repoBuild = resp;
-      this.isRequestingRepoBuild = false;
+    this.isRequestingRepoBuild = true;
 
-      if (buildIsInactive(this.repoBuild.state)) {
+    RepoBuildApi.fetchRepoBuild(params)
+      .then((resp) => {
+        this.repoBuild = resp;
+        this.isRequestingRepoBuild = false;
+
+        if (buildIsInactive(this.repoBuild.state)) {
+          this.shouldPoll = false;
+        }
+
+        this.trigger({
+          currentRepoBuild: this.repoBuild,
+          loadingRepoBuild: false
+        });
+      }, (error) => {
+        this.isRequestingRepoBuild = false;
         this.shouldPoll = false;
-      }
-
-      this.trigger({
-        currentRepoBuild: this.repoBuild,
-        loadingRepoBuild: false
+        this.trigger({
+          error,
+          loadingRepoBuild: false
+        });
       });
-    });
   },
 
   onLoadRepoBuildById(repoBuildId) {
@@ -56,15 +66,23 @@ const RepoBuildStore = Reflux.createStore({
       return;
     }
 
-    this.isRequestingModuleBuilds = RepoBuildApi.fetchModuleBuilds(params, (resp) => {
-      this.moduleBuilds = resp;
-      this.isRequestingModuleBuilds = false;
+    this.isRequestingModuleBuilds = true;
+    RepoBuildApi.fetchModuleBuilds(params)
+      .then((resp) => {
+        this.moduleBuilds = resp;
+        this.isRequestingModuleBuilds = false;
 
-      this.trigger({
-        moduleBuilds: this.moduleBuilds,
-        loadingModuleBuilds: false
+        this.trigger({
+          moduleBuilds: this.moduleBuilds,
+          loadingModuleBuilds: false
+        });
+      }, (error) => {
+        this.isRequestingModuleBuilds = false;
+        this.trigger({
+          error,
+          loadingModuleBuilds: false
+        });
       });
-    });
   },
 
   onLoadModuleBuildsById(branchId, repoBuildId, buildNumber) {
