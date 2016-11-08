@@ -15,14 +15,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
+import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryState;
+import com.hubspot.blazar.base.branch.BranchStatus;
 import com.hubspot.blazar.cctray.CCTrayProject;
 import com.hubspot.blazar.cctray.CCTrayProjectFactory;
 import com.hubspot.blazar.cctray.CCTrayWrapper;
 import com.hubspot.blazar.data.cache.StateCache;
+import com.hubspot.blazar.data.service.BranchStatusService;
 import com.hubspot.blazar.data.service.StateService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
@@ -30,14 +34,17 @@ import com.hubspot.jackson.jaxrs.PropertyFiltering;
 @Produces(MediaType.APPLICATION_JSON)
 public class BranchStateResource {
   private final StateService stateService;
+  private BranchStatusService branchStatusService;
   private final StateCache stateCache;
   private final CCTrayProjectFactory ccTrayProjectFactory;
 
   @Inject
   public BranchStateResource(StateService stateService,
+                             BranchStatusService branchStatusService,
                              StateCache stateCache,
                              CCTrayProjectFactory ccTrayProjectFactory) {
     this.stateService = stateService;
+    this.branchStatusService = branchStatusService;
     this.stateCache = stateCache;
     this.ccTrayProjectFactory = ccTrayProjectFactory;
   }
@@ -68,6 +75,18 @@ public class BranchStateResource {
   @PropertyFiltering
   public Optional<RepositoryState> get(@PathParam("branchId") int branchId) {
     return stateService.getRepositoryState(branchId);
+  }
+
+  @GET
+  @Path("/{branchId}/modules")
+  @PropertyFiltering
+  public Set<ModuleState> getAllModuleStatesForBranch(@PathParam("branchId") int branchId) {
+    Optional<BranchStatus> status  = branchStatusService.getBranchStatusById(branchId);
+    if (status.isPresent()) {
+      return status.get().getModuleStates();
+    } else {
+      return ImmutableSet.of();
+    }
   }
 
   @GET

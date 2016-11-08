@@ -13,13 +13,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
 import com.hubspot.blazar.base.BranchSetting;
 import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.base.ModuleState;
 import com.hubspot.blazar.base.branch.BranchStatus;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
@@ -78,28 +76,18 @@ public class BranchResource {
     return branchService.get(branchId);
   }
 
-  @Path("/{branchId}/status")
-  public Optional<BranchStatus> getBranchStatusById(@PathParam("branchId") int branchId) {
-    return branchStatusService.getBranchStatusById(branchId);
-  }
-
-  @GET
-  @Path("/state/{branchId}/modules")
-  @PropertyFiltering
-  public Set<ModuleState> getAllModuleStatesForBranch(@PathParam("branchId") int branchId) {
-    Optional<BranchStatus> status  = getBranchStatusById(branchId);
-    if (status.isPresent()) {
-      return status.get().getModuleStates();
-    } else {
-      return ImmutableSet.of();
-    }
-  }
-
   @GET
   @Path("/{id}/modules")
   @PropertyFiltering
   public Set<Module> getModules(@PathParam("id") int branchId) {
     return moduleService.getByBranch(branchId);
+  }
+
+  @GET
+  @Path("/{branchId}/status")
+  @PropertyFiltering
+  public Optional<BranchStatus> getBranchStatusById(@PathParam("branchId") int branchId) {
+    return branchStatusService.getBranchStatusById(branchId);
   }
 
   @GET
