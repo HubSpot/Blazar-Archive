@@ -51,6 +51,9 @@ public class RepositoryBuildResource {
     if (!gitInfo.isPresent()) {
       throw new NotFoundException("No branch found with id: " + branchId);
     }
+    if (buildOptions.getModuleIds() == null || buildOptions.getModuleIds().isEmpty()) {
+      throw new IllegalArgumentException("Can not start build with `null` or emtpy moduleIds.");
+    }
     BuildTrigger buildTrigger = BuildTrigger.forUser(username.or("unknown"));
     long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), buildTrigger, buildOptions);
     return repositoryBuildService.get(repositoryBuildId).get();
