@@ -15,6 +15,8 @@ import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.RateLimitHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,6 +78,7 @@ import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import io.dropwizard.db.DataSourceFactory;
 
 public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfiguration> {
+  private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceModule.class);
 
   @Override
   public void configure(Binder binder) {
@@ -127,6 +130,8 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
         .toProvider(new ManagedScheduledExecutorServiceProvider(1, "SingularityBuildWatcher"))
         .in(Scopes.SINGLETON);
       binder.bind(SingularityTaskKiller.class);
+    } else {
+      LOG.info("Not enabling queue-processing or build event handlers because no zookeeper configuration is specified. We need to elect a leader to process events.");
     }
 
     // Set up property filtering
