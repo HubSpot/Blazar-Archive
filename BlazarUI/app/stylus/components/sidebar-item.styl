@@ -9,18 +9,11 @@
   position relative
   display block
   padding 5px 0 0 10px
-  border-bottom 1px solid #dadada
+  border-bottom 1px solid $color-koala
   font-weight 300
-  a
-    text-decoration none
-    color $link-color
-    
-    &:hover
-      text-decoration none
-      color $link-color
-  
+
 .sidebar-item__module-branch-name
-  color $gray-darker
+  color $color-eerie
   font-size 14px
   margin-left 3px
   text-overflow ellipsis
@@ -28,19 +21,19 @@
   width 210px
   display block
   white-space nowrap
-  
+
   & a
     padding-left 5px
-    
+
 .sidebar-item__module-repo-name
   font-size 14px
   margin-left 9px
-  
+
   & a
-    color $gray-darker
-    
+    color $color-heffalump
+
     &:hover
-      color $gray-darker
+      color $color-heffalump
 
 .sidebar__active-building-icon
   position absolute
@@ -57,7 +50,7 @@
 .sidebar-item__branch-link
   margin 8px 5px 8px 20px
   position relative
-  
+
 .sidebar-item__repo-link
   margin 5px 5px 1px 2px
 
@@ -80,7 +73,7 @@
   position absolute
   top 6px
   right 3px
-    
+
   .fa
     font-size 18px
 
@@ -88,12 +81,16 @@
   font-size 12px
   padding-right 10px
   padding-bottom 5px
-  color $link-color
+  color $color-calypso    // not sure why $link-color isn't working here
   text-align right
   cursor pointer
   position absolute
   top 12px
   right 0
-  
+
+  &:hover
+    text-decoration underline
+    color #007A8C   // same deal ... why doesn't $link-hover-color work?
+
 .repo-octicon // todo clean up this nonsense
-  color $gray-darker
+  color $color-heffalump

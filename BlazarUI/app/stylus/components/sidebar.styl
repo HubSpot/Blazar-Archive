@@ -2,6 +2,9 @@
 @import 'mixins'
 
 .sidebar
+  border-right 1px solid $color-battleship
+  background-color $color-gypsum
+
   .sidebar-loader
     margin-top 15px
 
@@ -13,20 +16,20 @@
 
 .sidebar__filter-search
   position relative
-  background $offwhite
+  background $color-olaf
   width 100%
-  border-top 1px solid $gray
+  border-top 1px solid $color-battleship
   top 0px
 
   & div
-    height 50px
-    background white
-    border-bottom 1px solid $gray
+    height 40px
+    border-bottom 1px solid $color-battleship
 
 .sidebar__filter-selector
-  height 3px
+  height 5px
+  border-radius 20px
   width 33.3%
-  background-color #FD8E5E
+  background $color-slinky
   -webkit-transition margin-left .15s
   transition margin-left .15s
 
@@ -42,15 +45,14 @@
   width 100%
 
 .sidebar__filter-buttons-btn
+  color $color-heffalump
   display inline-block
   position relative
   width 33.3%
   text-align center
   border-radius 0
-  background $offwhite
   padding 11px 10px 10px 10px
-  font-size 14px
-  font-weight $font-medium
+  font-weight $font-light
   z-index 2
 
   &:last-child
@@ -58,10 +60,12 @@
   &:hover
     cursor pointer
     text-decoration none
+    color $color-slinky
   &.btn-default:active
     outline none
   &.active
     transition height 1s
+    font-weight normal
 
 .sidebar__list>div
   &::-webkit-scrollbar
@@ -91,20 +95,17 @@
   -webkit-box-shadow: none
   -moz-box-shadow: none
   box-shadow: none
-  font-size 14px
+  font-size 16px
   font-weight $font-light
-  height 24px
-  border-radius 5px
-  position absolute
-  left 30px
-  top 12px
+  height 40px
+  color $color-heffalump
 
 .search-filter__icon
   position absolute
   font-size 16px
-  left 12px
-  top 15px
-  color $gray-dark
+  right 12px
+  top 12px
+  color $color-calypso  // $link-color??
 
 .sidebar__star
   margin-right 5px
@@ -113,8 +114,12 @@
   height 45px
   width 100%
   position relative
-  border-bottom 1px solid $gray
+  background $color-obsidian
   text-align center
 
   & .logo
     padding 8px 15px
+
+    & .logo-image
+      -webkit-filter invert(1)
+      filter invert(1)
