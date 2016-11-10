@@ -18,7 +18,7 @@ const RepoBuildStore = Reflux.createStore({
     this.isRequestingModuleBuilds = false;
   },
 
-  onLoadRepoBuild(params) {
+  onLoadRepoBuild(params, cacheRepoBuildId = false) {
     this.params = params;
 
     if (this.isRequestingRepoBuild) {
@@ -27,7 +27,11 @@ const RepoBuildStore = Reflux.createStore({
 
     this.isRequestingRepoBuild = true;
 
-    RepoBuildApi.fetchRepoBuild(params)
+    const fetchRepoBuildPromise = cacheRepoBuildId && this._isRepoBuildPreviouslyFetched() ?
+      RepoBuildApi.fetchRepoBuildById(this.repoBuild.id) :
+      RepoBuildApi.fetchRepoBuild(params);
+
+    fetchRepoBuildPromise
       .then((resp) => {
         this.repoBuild = resp;
         this.isRequestingRepoBuild = false;
@@ -60,7 +64,7 @@ const RepoBuildStore = Reflux.createStore({
       });
   },
 
-  onLoadModuleBuilds(params) {
+  onLoadModuleBuilds(params, cacheRepoBuildId = false) {
     this.params = params;
 
     if (this.isRequestingModuleBuilds) {
@@ -68,7 +72,13 @@ const RepoBuildStore = Reflux.createStore({
     }
 
     this.isRequestingModuleBuilds = true;
-    RepoBuildApi.fetchModuleBuilds(params)
+
+    const {branchId, buildNumber} = params;
+    const fetchModuleBuildsPromise = cacheRepoBuildId && this._isRepoBuildPreviouslyFetched() ?
+      RepoBuildApi.fetchModuleBuildsById(branchId, this.repoBuild.id, buildNumber) :
+      RepoBuildApi.fetchModuleBuilds(params);
+
+    fetchModuleBuildsPromise
       .then((resp) => {
         this.moduleBuilds = resp;
         this.isRequestingModuleBuilds = false;
@@ -112,13 +122,26 @@ const RepoBuildStore = Reflux.createStore({
     RepoBuildApi.cancelBuild(repoBuildId);
   },
 
-  _poll() {
-    this.onLoadModuleBuilds(this.params);
-    this.onLoadRepoBuild(this.params);
+  _poll(cacheRepoBuildId = false) {
+    // only cache the repoBuildId after the initial fetch each
+    // time we start polling
+    this.onLoadModuleBuilds(this.params, cacheRepoBuildId);
+    this.onLoadRepoBuild(this.params, cacheRepoBuildId);
 
     if (this.shouldPoll) {
-      setTimeout(this._poll, window.config.activeBuildModuleRefresh);
+      setTimeout(() => this._poll(true), window.config.activeBuildModuleRefresh);
     }
+  },
+
+  /**
+   * Helper function to avoid making extra api requests to
+   * redetermine the repoBuildId for the current buildNumber
+   */
+  _isRepoBuildPreviouslyFetched() {
+    const {branchId, buildNumber} = this.params;
+
+    return this.repoBuild.branchId === parseInt(branchId, 10) &&
+      this.repoBuild.buildNumber === parseInt(buildNumber, 10);
   }
 
 });
