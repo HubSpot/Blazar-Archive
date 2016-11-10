@@ -12,25 +12,14 @@ function _parse(resp) {
   return resp;
 }
 
-function _fetchModuleNames(params) {
-  const moduleNamesPromise = new Resource({
-    url: `${window.config.apiRoot}/branches/${params.branchId}/modules`,
-    type: 'GET'
-  }).send();
-
-  return moduleNamesPromise;
-}
-
-function _fetchModuleNamesById(branchId) {
-  const moduleNamesPromise = new Resource({
+function _fetchModuleNames(branchId) {
+  return new Resource({
     url: `${window.config.apiRoot}/branches/${branchId}/modules`,
     type: 'GET'
   }).send();
-
-  return moduleNamesPromise;
 }
 
-function _fetchBranchBuildHistory(params) {
+function _fetchBranchBuildHistory(branchId) {
   const inclusionOpts = {
     property: [
       'buildNumber',
@@ -39,87 +28,60 @@ function _fetchBranchBuildHistory(params) {
     ]
   };
 
-  const branchBuildHistoryPromise = new Resource({
-    url: `${window.config.apiRoot}/builds/history/branch/${params.branchId}`,
+  return new Resource({
+    url: `${window.config.apiRoot}/builds/history/branch/${branchId}`,
     type: 'GET',
     data: $.param(inclusionOpts, true)
   }).send();
-
-  return branchBuildHistoryPromise;
 }
 
-function _getRepoBuildByParam(params, resp) {
-  if (params.buildNumber === 'latest') {
-    resp = resp.filter((build) => {
+function _getRepoBuildByParam(buildNumber, repoBuilds) {
+  if (buildNumber === 'latest') {
+    const notStartedBuilds = repoBuilds.filter((build) => {
       return !contains(['QUEUED', 'LAUNCHING', 'WAITING_FOR_BUILD_SLOT', 'WAITING_FOR_UPSTREAM_BUILD'], build.state);
     });
-    return max(resp, (build) => {
-      return build.buildNumber;
-    });
+
+    return max(notStartedBuilds, (build) => build.buildNumber);
   }
 
-  return findWhere(resp, {buildNumber: parseInt(params.buildNumber, 10)});
+  return findWhere(repoBuilds, {buildNumber: parseInt(buildNumber, 10)});
 }
 
-function fetchRepoBuild(params, cb) {
-  return _fetchBranchBuildHistory(params).then((resp) => {
-    const repoBuild = _getRepoBuildByParam(params, resp);
-    const repoBuildPromise = new Resource({
-      url: `${window.config.apiRoot}/branches/builds/${repoBuild.id}`,
-      type: 'GET'
-    }).send();
+function _fetchRepoBuildId(branchId, buildNumber) {
+  return Q(_fetchBranchBuildHistory(branchId)).then((resp) => {
+    const repoBuild = _getRepoBuildByParam(buildNumber, resp);
 
-    return repoBuildPromise.then((repoBuilds) => {
-      return cb(_parse(repoBuilds));
-    });
+    if (!repoBuild) {
+      return Q.reject(`Build #${buildNumber} does not exist for this branch.`);
+    }
+
+    return repoBuild.id;
   });
 }
 
-function fetchRepoBuildById(repoBuildId, cb) {
+function fetchRepoBuildById(repoBuildId) {
   const repoBuildPromise = new Resource({
     url: `${window.config.apiRoot}/branches/builds/${repoBuildId}`,
     type: 'GET'
   }).send();
 
-  return repoBuildPromise.then((resp) => {
-    return cb(_parse(resp));
-  });
+  return repoBuildPromise.then((repoBuilds) => _parse(repoBuilds));
 }
 
-function fetchModuleBuilds(params, cb) {
-  return _fetchBranchBuildHistory(params).then((resp) => {
-    const repoBuild = _getRepoBuildByParam(params, resp);
-    const moduleBuildsPromise = new Resource({
-      url: `${window.config.apiRoot}/branches/builds/${repoBuild.id}/modules`,
-      type: 'GET'
-    }).send();
-    const moduleInfoPromise = _fetchModuleNames(params);
-
-    Q.spread([moduleInfoPromise, moduleBuildsPromise],
-      (moduleInfos, moduleBuilds) => {
-        const moduleBuildsWithNames = map(moduleBuilds, (build) => {
-          const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
-          const moduleInfoExtended = {
-            name: moduleInfo.name,
-            blazarPath: `/builds/branch/${params.branchId}/build/${repoBuild.buildNumber}/module/${moduleInfo.name}`
-          };
-
-          return extend(build, moduleInfoExtended);
-        });
-
-        cb(moduleBuildsWithNames);
-      });
-  });
+function fetchRepoBuild(params) {
+  const {branchId, buildNumber} = params;
+  return _fetchRepoBuildId(branchId, buildNumber)
+    .then(fetchRepoBuildById);
 }
 
-function fetchModuleBuildsById(branchId, repoBuildId, buildNumber, cb) {
+function fetchModuleBuildsById(branchId, repoBuildId, buildNumber) {
+  const moduleInfoPromise = _fetchModuleNames(branchId);
   const moduleBuildsPromise = new Resource({
     url: `${window.config.apiRoot}/branches/builds/${repoBuildId}/modules`,
     type: 'GET'
   }).send();
-  const moduleInfoPromise = _fetchModuleNamesById(branchId);
 
-  Q.spread([moduleInfoPromise, moduleBuildsPromise],
+  return Q.spread([moduleInfoPromise, moduleBuildsPromise],
     (moduleInfos, moduleBuilds) => {
       const moduleBuildsWithNames = map(moduleBuilds, (build) => {
         const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
@@ -131,8 +93,15 @@ function fetchModuleBuildsById(branchId, repoBuildId, buildNumber, cb) {
         return extend(build, moduleInfoExtended);
       });
 
-      cb(moduleBuildsWithNames);
+      return moduleBuildsWithNames;
     });
+}
+
+function fetchModuleBuilds(params) {
+  const {branchId, buildNumber} = params;
+  return _fetchRepoBuildId(branchId, buildNumber).then((repoBuildId) => {
+    return fetchModuleBuildsById(branchId, repoBuildId, buildNumber);
+  });
 }
 
 function cancelBuild(repoBuildId) {
