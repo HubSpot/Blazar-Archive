@@ -10,13 +10,18 @@ import store from './reduxStore';
 
 import { getUsernameFromCookie } from './components/Helpers.js';
 
+const username = getUsernameFromCookie();
+
 if (window.config.heapToken) {
-  const username = getUsernameFromCookie();
   window.heap.identify(`${username}-blazar`);
   window.heap.addUserProperties({
     'Name': username,
     'App': 'blazar'
   });
+}
+
+if (window.config.sentryDsn) {
+  window.Raven.setUserContext({username});
 }
 
 const browserHistory = useRouterHistory(createHistory)({
