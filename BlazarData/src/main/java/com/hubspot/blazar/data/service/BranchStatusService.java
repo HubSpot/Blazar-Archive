@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class BranchStatusService {
     }
     GitInfo branch = maybeBranch.get();
     Set<ModuleState> moduleStates = getAllModuleStatesForBranch(branchId);
-    Set<GitInfo> otherBranches = branchDao.getByRepository(branch.getRepositoryId());
+    Set<GitInfo> otherBranches = branchDao.getByRepository(branch.getRepositoryId()).stream().filter(GitInfo::isActive).collect(Collectors.toSet());
     otherBranches.remove(branch);
     Set<RepositoryBuild> queuedBuilds = repositoryBuildDao.getRepositoryBuildsByState(branchId, ImmutableList.of(RepositoryBuild.State.QUEUED));
     List<RepositoryBuild> queuedBuildsList = new ArrayList<>(queuedBuilds);
