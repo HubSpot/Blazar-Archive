@@ -75,4 +75,8 @@ MalformedFileNotification.propTypes = {
   loading: PropTypes.bool.isRequired
 };
 
+MalformedFileNotification.defaultProps = {
+  loading: false
+};
+
 export default MalformedFileNotification;

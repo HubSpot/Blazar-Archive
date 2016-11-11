@@ -12,6 +12,8 @@ const mapStateToProps = (state, ownProps) => {
     branchInfo: getSelectedBranch(state),
     loadingBranchStatus: state.branchState.get('loading'),
     selectedModuleId: state.branchState.get('selectedModuleId'),
+    pendingBranchBuilds: state.branchState.get('queuedBuilds'),
+    malformedFiles: state.branchState.get('malformedFiles'),
     branchNotFound: state.branchState.get('branchNotFound'),
     showBetaFeatureAlert: !state.dismissedBetaNotifications.get('branchStatePage'),
     errorMessage: state.branchState.getIn(['error', 'message'])

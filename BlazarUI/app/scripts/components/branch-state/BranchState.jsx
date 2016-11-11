@@ -16,6 +16,7 @@ import BetaFeatureAlert from './BetaFeatureAlert.jsx';
 import BuildBranchModalContainer from '../shared/BuildBranchModalContainer.jsx';
 import PendingBranchBuildAlert from './PendingBranchBuildAlert.jsx';
 import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
+import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 
 import ModuleBuildStates from '../../constants/ModuleBuildStates';
 import { getCurrentModuleBuild, getCurrentBranchBuild, getBlazarModuleBuildPath } from '../Helpers';
@@ -148,7 +149,8 @@ class BranchState extends Component {
       selectedModuleId,
       branchId,
       dismissBetaNotification,
-      showBetaFeatureAlert
+      showBetaFeatureAlert,
+      malformedFiles
     } = this.props;
 
     if (loadingBranchStatus) {
@@ -165,6 +167,7 @@ class BranchState extends Component {
     return (
       <div>
         {showBetaFeatureAlert && <BetaFeatureAlert branchId={branchId} onDismiss={dismissBetaNotification} />}
+        <MalformedFileNotification malformedFiles={malformedFiles.toJS()} />
         {hasFailingModules && <FailingModuleBuildsAlert failingModuleBuildBlazarPaths={failingModuleBuildBlazarPaths} />}
         {this.renderPendingBuilds()}
         <Tabs id="branch-state-tabs" className="branch-state-tabs" defaultActiveKey="active-modules">
@@ -237,6 +240,7 @@ BranchState.propTypes = {
   activeModules: ImmutablePropTypes.list,
   inactiveModules: ImmutablePropTypes.list,
   pendingBranchBuilds: ImmutablePropTypes.list,
+  malformedFiles: ImmutablePropTypes.list,
   router: routerShape,
   selectModule: PropTypes.func.isRequired,
   deselectModule: PropTypes.func.isRequired,
@@ -249,37 +253,6 @@ BranchState.propTypes = {
   showBetaFeatureAlert: PropTypes.bool,
   dismissBetaNotification: PropTypes.func.isRequired,
   errorMessage: PropTypes.string
-};
-
-BranchState.defaultProps = {
-  pendingBranchBuilds: Immutable.fromJS([{
-    branchId: 2,
-    buildNumber: 143,
-    id: 172,
-    buildTrigger: {
-      id: 'jgoodwin',
-      type: 'MANUAL'
-    },
-    state: 'PENDING'
-  }, {
-    branchId: 2,
-    buildNumber: 142,
-    id: 72,
-    buildTrigger: {
-      type: 'PUSH',
-      id: 'f2ffad8f0e44311051a6b8b2e1d814fbfa638a06'
-    },
-    state: 'PENDING'
-  }, {
-    branchId: 2,
-    buildNumber: 141,
-    id: 174,
-    buildTrigger: {
-      type: 'INTER_PROJECT',
-      id: '80'
-    },
-    state: 'LAUNCHING'
-  }])
 };
 
 export default BranchState;
