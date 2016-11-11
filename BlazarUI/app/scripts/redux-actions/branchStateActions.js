@@ -5,12 +5,18 @@ import Q from 'q';
 
 let pollingTimeoutId = null;
 
-export const loadBranchModuleStates = (branchId) => {
+export const loadBranchStatus = (branchId) => {
   return (dispatch) => {
-    return BranchStateApi.fetchModuleStates(branchId).then((moduleStates) => {
+    return BranchStateApi.fetchBranchStatus(branchId).then((branchStatus) => {
       dispatch({
-        type: ActionTypes.RECEIVE_MODULE_STATES,
-        payload: moduleStates
+        type: ActionTypes.RECEIVE_BRANCH_STATUS,
+        payload: branchStatus
+      });
+    }, (error) => {
+      dispatch({
+        type: ActionTypes.RECEIVE_BRANCH_STATUS,
+        error: true,
+        payload: error
       });
     });
   };
@@ -22,9 +28,9 @@ const shouldPollModuleBuildHistory = (getState) => {
   return selectedModuleId && state.moduleBuildHistoriesByModuleId.getIn([selectedModuleId, 'page']) === 1;
 };
 
-const _pollBranchModuleStates = (branchId) => {
+const _pollBranchStatus = (branchId) => {
   return (dispatch, getState) => {
-    const pollRequests = [dispatch(loadBranchModuleStates(branchId))];
+    const pollRequests = [dispatch(loadBranchStatus(branchId))];
 
     if (shouldPollModuleBuildHistory(getState)) {
       const selectedModuleId = getState().branchState.get('selectedModuleId');
@@ -35,26 +41,26 @@ const _pollBranchModuleStates = (branchId) => {
       const state = getState().branchState;
       if (state.get('isPolling') && state.get('branchId') === branchId) {
         pollingTimeoutId = setTimeout(() => {
-          dispatch(_pollBranchModuleStates(branchId));
+          dispatch(_pollBranchStatus(branchId));
         }, window.config.moduleStateRefresh);
       }
     });
   };
 };
 
-export const pollBranchModuleStates = (branchId) => {
+export const pollBranchStatus = (branchId) => {
   clearTimeout(pollingTimeoutId);
   return (dispatch) => {
     dispatch({
-      type: ActionTypes.START_POLLING_MODULE_STATES,
+      type: ActionTypes.START_POLLING_BRANCH_STATUS,
       payload: branchId
     });
-    dispatch(_pollBranchModuleStates(branchId));
+    dispatch(_pollBranchStatus(branchId));
   };
 };
 
-export const stopPollingBranchModuleStates = () => ({
-  type: ActionTypes.STOP_POLLING_MODULE_STATES
+export const stopPollingBranchStatus = () => ({
+  type: ActionTypes.STOP_POLLING_BRANCH_STATUS
 });
 
 export const selectModule = (moduleId) => {
@@ -76,9 +82,9 @@ export const dismissBetaNotification = () => ({
 });
 
 export default {
-  loadBranchModuleStates,
-  pollBranchModuleStates,
-  stopPollingBranchModuleStates,
+  loadBranchStatus,
+  pollBranchStatus,
+  stopPollingBranchStatus,
   selectModule,
   deselectModule,
   dismissBetaNotification

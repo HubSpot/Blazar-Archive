@@ -45,11 +45,16 @@ function moduleBuildHistory(state = initialState, action) {
 
 export default function moduleBuildHistoriesByModuleId(state = Immutable.Map(), action) {
   switch (action.type) {
-    case ActionTypes.RECEIVE_MODULE_STATES:
-      return Immutable.Map(action.payload.map((moduleState) => {
+    case ActionTypes.RECEIVE_BRANCH_STATUS: {
+      if (action.error) {
+        return Immutable.Map();
+      }
+
+      return Immutable.Map(action.payload.moduleStates.map((moduleState) => {
         const moduleId = moduleState.module.id;
         return [moduleId, state.get(moduleId, initialState)];
       }));
+    }
 
     case ActionTypes.SELECT_MODULE_BUILD_HISTORY_PAGE:
     case ActionTypes.REQUEST_MODULE_BUILD_HISTORY:

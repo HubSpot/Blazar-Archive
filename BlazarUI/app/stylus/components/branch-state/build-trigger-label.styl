@@ -1,21 +1,24 @@
 @import '../../variables'
 
 .build-trigger-label
-  padding 2px 5px
+  padding 1px 4px
   white-space nowrap
+  border-width 1px
+  border-style solid
+  border-radius 1px
+  font-weight 500
 
-.build-trigger-label--code-push
+.build-trigger-label--code-push, .build-trigger-label--new-branch
   color $color-sorbet
   background-color $color-sorbet-light
-
-.build-trigger-label--new-branch
-  color $color-sorbet
-  background-color $color-sorbet-light
+  border-color $color-sorbet-medium
 
 .build-trigger-label--manual
   color $color-heffalump
   background-color $color-koala
+  border-color $color-battleship
 
 .build-trigger-label--dependency
   color $color-thunderdome
   background-color $color-thunderdome-light
+  border-color $color-thunderdome-medium

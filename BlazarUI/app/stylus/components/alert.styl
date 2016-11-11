@@ -3,22 +3,35 @@
 .new-alert
   padding 10px
   border-radius 3px
+  border-width 1px
+  border-style solid
+  margin-bottom 10px
+  display flex
 
 .new-alert--danger
-  border 1px solid $color-norman-medium
+  border-color $color-norman-medium
   background-color $color-candy-apple-light
+
+.new-alert--info
+  border-color $color-calypso-medium
+  background-color $color-calypso-light
+
+.new-alert__icon-container
+  margin-right 15px
+  min-width 40px
+  text-align center
 
 .new-alert__icon
   font-size 36px
-  margin-left 20px
-  margin-right 30px
-  vertical-align top
 
 .new-alert__icon--danger
   color $color-candy-apple
 
+.new-alert__icon--info
+  color $color-calypso
+
 .new-alert__content
-  display inline-block
+  flex-grow 1
 
 .new-alert__title
   font-size 16px
