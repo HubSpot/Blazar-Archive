@@ -97,6 +97,12 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
     return new DiscoveryResult(modules, malformedFiles);
   }
 
+  // We always want changes to blazar configs to be picked up.
+  @Override
+  public boolean isEnabled(GitInfo gitInfo) {
+    return true;
+  }
+
   private boolean disabled(String blazarConfig, GHRepository repository, GitInfo gitInfo) throws IOException {
     return gitHubHelper.contentsFor(blazarConfig, repository, gitInfo).contains("enabled: false");
   }

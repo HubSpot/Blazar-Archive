@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,7 +33,7 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
   @Override
   public boolean shouldRediscover(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     for (ModuleDiscovery delegate : delegates) {
-      if (delegate.shouldRediscover(gitInfo, commitInfo)) {
+      if (delegate.isEnabled(gitInfo) && delegate.shouldRediscover(gitInfo, commitInfo)) {
         return true;
       }
     }
@@ -50,7 +51,7 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
       return new DiscoveryResult(ImmutableSet.of(), ImmutableSet.of(malformedBranchFile.get()));
     }
 
-    for (ModuleDiscovery delegate : delegates) {
+    for (ModuleDiscovery delegate : delegates.stream().filter(moduleDiscovery -> moduleDiscovery.isEnabled(gitInfo)).collect(Collectors.toList())) {
       DiscoveryResult result = delegate.discover(gitInfo);
       malformedFiles.addAll(result.getMalformedFiles());
       for (DiscoveredModule module : result.getModules()) {
@@ -84,6 +85,14 @@ public class CompositeModuleDiscovery implements ModuleDiscovery {
     }
 
     return new DiscoveryResult(modules, malformedFiles);
+  }
+
+  /**
+   * Composite discovery should be run for all modules, the delegates will figure out if they should be run.
+   */
+  @Override
+  public boolean isEnabled(GitInfo gitInfo) {
+    return true;
   }
 
   /**
