@@ -1,9 +1,9 @@
 import Resource from '../services/ResourceProvider';
 import $ from 'jquery';
 
-function fetchModuleStates(branchId) {
+function fetchBranchStatus(branchId) {
   return new Resource({
-    url: `${window.config.apiRoot}/branches/state/${branchId}/modules`,
+    url: `${window.config.apiRoot}/branches/${branchId}/status`,
   }).send();
 }
 
@@ -32,6 +32,6 @@ function fetchModuleBuildHistory(moduleId, offset, pageSize) {
 }
 
 export default {
-  fetchModuleStates,
+  fetchBranchStatus,
   fetchModuleBuildHistory
 };

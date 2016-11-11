@@ -27,22 +27,20 @@ class BranchState extends Component {
   }
 
   componentDidMount() {
-    const {pollBranchModuleStates, branchId, loadBranchInfo} = this.props;
-    pollBranchModuleStates(branchId);
-    loadBranchInfo(branchId);
+    const {pollBranchStatus, branchId} = this.props;
+    pollBranchStatus(branchId);
     window.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   componentWillReceiveProps(nextProps) {
-    const {pollBranchModuleStates, branchId, loadBranchInfo} = this.props;
+    const {pollBranchStatus, branchId} = this.props;
     if (nextProps.branchId !== branchId) {
-      pollBranchModuleStates(nextProps.branchId);
-      loadBranchInfo(nextProps.branchId);
+      pollBranchStatus(nextProps.branchId);
     }
   }
 
   componentWillUnmount() {
-    this.props.stopPollingBranchModuleStates();
+    this.props.stopPollingBranchStatus();
     window.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
@@ -95,12 +93,13 @@ class BranchState extends Component {
   }
 
   refreshBranchModuleStates() {
-    const {branchId, loadBranchModuleStates} = this.props;
-    loadBranchModuleStates(branchId);
+    const {branchId, loadBranchStatus} = this.props;
+    loadBranchStatus(branchId);
   }
 
   handleBranchSelect(selectedBranchId) {
     this.props.router.push(`/branches/${selectedBranchId}/state`);
+    window.document.activeElement.blur();
   }
 
   handleModuleItemClick(id) {
@@ -114,10 +113,10 @@ class BranchState extends Component {
 
   handleVisibilityChange() {
     if (document.hidden) {
-      this.props.stopPollingBranchModuleStates();
+      this.props.stopPollingBranchStatus();
     } else {
-      const {pollBranchModuleStates, branchId} = this.props;
-      pollBranchModuleStates(branchId);
+      const {pollBranchStatus, branchId} = this.props;
+      pollBranchStatus(branchId);
     }
   }
 
@@ -132,6 +131,7 @@ class BranchState extends Component {
       <section id="pending-branch-builds">
         {pendingBranchBuilds.map((branchBuild) =>
           <PendingBranchBuildAlert
+            key={branchBuild.get('id')}
             branchBuild={branchBuild}
             onCancelBuild={this.refreshBranchModuleStates}
           />
@@ -142,7 +142,7 @@ class BranchState extends Component {
 
   renderModuleLists() {
     const {
-      loadingModuleStates,
+      loadingBranchStatus,
       activeModules,
       inactiveModules,
       selectedModuleId,
@@ -151,9 +151,12 @@ class BranchState extends Component {
       showBetaFeatureAlert
     } = this.props;
 
-    const loadingHeader = !this.props.branchInfo.branch;
-    if (loadingModuleStates || loadingHeader) {
+    if (loadingBranchStatus) {
       return <Loader />;
+    }
+
+    if (!this.props.branchInfo) {
+      return null;
     }
 
     const failingModuleBuildBlazarPaths = this.getFailingModuleBuildBlazarPaths(activeModules);
@@ -199,10 +202,11 @@ class BranchState extends Component {
       activeModules,
       branchId,
       branchInfo,
-      branchNotFound
+      branchNotFound,
+      errorMessage
     } = this.props;
 
-    const title = branchInfo.branch ? `${branchInfo.repository}-${branchInfo.branch}` : 'Branch State';
+    const title = branchInfo ? `${branchInfo.repository}-${branchInfo.branch}` : 'Branch State';
 
     if (branchNotFound) {
       return (
@@ -215,6 +219,7 @@ class BranchState extends Component {
     return (
       <PageContainer classNames="page-content--branch-state" documentTitle={title}>
         <BranchStateHeadline branchId={branchId} branchInfo={branchInfo} onBranchSelect={this.handleBranchSelect} />
+        <GenericErrorMessage message={errorMessage} />
         {this.renderModuleLists()}
         <BuildBranchModalContainer
           branchId={branchId}
@@ -236,14 +241,14 @@ BranchState.propTypes = {
   selectModule: PropTypes.func.isRequired,
   deselectModule: PropTypes.func.isRequired,
   selectedModuleId: PropTypes.number,
-  loadBranchInfo: PropTypes.func.isRequired,
-  loadBranchModuleStates: PropTypes.func.isRequired,
-  pollBranchModuleStates: PropTypes.func.isRequired,
-  stopPollingBranchModuleStates: PropTypes.func.isRequired,
-  loadingModuleStates: PropTypes.bool.isRequired,
+  loadBranchStatus: PropTypes.func.isRequired,
+  pollBranchStatus: PropTypes.func.isRequired,
+  stopPollingBranchStatus: PropTypes.func.isRequired,
+  loadingBranchStatus: PropTypes.bool.isRequired,
   branchNotFound: PropTypes.bool,
   showBetaFeatureAlert: PropTypes.bool,
-  dismissBetaNotification: PropTypes.func.isRequired
+  dismissBetaNotification: PropTypes.func.isRequired,
+  errorMessage: PropTypes.string
 };
 
 BranchState.defaultProps = {

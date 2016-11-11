@@ -10,32 +10,28 @@ import PageHeader from '../shared/PageHeader.jsx';
 import Icon from '../shared/Icon.jsx';
 import Star from '../shared/Star.jsx';
 
-import { loadBranches } from '../../redux-actions/repoActions';
 import { showBuildBranchModal } from '../../redux-actions/buildBranchFormActions';
-
+import { getBranchesInRepository } from '../../selectors';
 
 class BranchStateHeadline extends Component {
-  componentWillReceiveProps(nextProps) {
-    const repositoryId = nextProps.branchInfo.repositoryId;
-    if (repositoryId && (this.props.branchInfo.repositoryId !== repositoryId)) {
-      this.props.loadBranches(repositoryId);
-    }
-  }
+  getFilteredBranchOptions() {
+    const {branchesInRepository, branchInfo} = this.props;
 
-  getFilteredBranches() {
-    const {branchesList, branchInfo} = this.props;
+    return branchesInRepository.toJS()
+      .filter((branch) => branch.branch !== branchInfo.branch)
+      .map((branch) => ({
+        label: branch.branch,
+        value: branch.id
+      }))
+      .sort((a, b) => {
+        if (a.label === 'master') {
+          return -1;
+        } else if (b.label === 'master') {
+          return 1;
+        }
 
-    return branchesList.toJS().filter((branch) => {
-      return branch.label !== branchInfo.branch;
-    }).sort((a, b) => {
-      if (a.label === 'master') {
-        return -1;
-      } else if (b.label === 'master') {
-        return 1;
-      }
-
-      return a.label.localeCompare(b.label);
-    });
+        return a.label.localeCompare(b.label);
+      });
   }
 
   renderActions() {
@@ -50,15 +46,20 @@ class BranchStateHeadline extends Component {
   }
 
   renderBranchSelect() {
+    // hack: set the key to force react to reinitialize the select component
+    // each time the value is changed. this prevents the select input from
+    // staying focused and having the focused styling after the value is changed
+    const value = this.props.branchInfo.branch;
     return (
       <div className="branch-state-headline__branch-select">
         <Icon type="octicon" name="git-branch" classNames="headline-icon" />
         <Select
+          key={value}
           className="branch-select-input"
           name="branchSelect"
           noResultsText="No other branches"
-          value={this.props.branchInfo.branch}
-          options={this.getFilteredBranches()}
+          value={value}
+          options={this.getFilteredBranchOptions()}
           onChange={this.props.onBranchSelect}
           searchable={true}
           clearable={false}
@@ -70,8 +71,8 @@ class BranchStateHeadline extends Component {
   }
 
   render() {
-    const {branchId, branchInfo: {branch, repository}} = this.props;
-    if (!branch) {
+    const {branchId, branchInfo} = this.props;
+    if (!branchInfo) {
       return null;
     }
 
@@ -81,7 +82,7 @@ class BranchStateHeadline extends Component {
           {this.renderActions()}
           <div>
             <PageHeader.PageTitle>
-              <Icon type="octicon" name="repo" classNames="branch-state-headline__repo-icon" />{repository}
+              <Icon type="octicon" name="repo" classNames="branch-state-headline__repo-icon" />{branchInfo.repository}
             </PageHeader.PageTitle>
             {this.renderBranchSelect()}
           </div>
@@ -104,18 +105,16 @@ class BranchStateHeadline extends Component {
 BranchStateHeadline.propTypes = {
   branchId: PropTypes.number.isRequired,
   branchInfo: PropTypes.object,
-  branchesList: ImmutablePropTypes.list.isRequired,
-  loadBranches: PropTypes.func.isRequired,
+  branchesInRepository: ImmutablePropTypes.set.isRequired,
   onBranchSelect: PropTypes.func.isRequired,
   showBuildBranchModal: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
-  branchesList: state.repo.get('branchesList')
+  branchesInRepository: getBranchesInRepository(state)
 });
 
 const mapDispatchToProps = {
-  loadBranches,
   showBuildBranchModal
 };
 
