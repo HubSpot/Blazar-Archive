@@ -10,7 +10,8 @@ const initialState = Immutable.Map({
   branchNotFound: false,
   error: null,
   malformedFiles: Immutable.List(),
-  queuedBuilds: Immutable.List()
+  queuedBranchBuilds: Immutable.List(),
+  activeBranchBuild: null
 });
 
 export default function branchState(state = initialState, action) {
@@ -37,14 +38,15 @@ export default function branchState(state = initialState, action) {
         });
       }
 
-      const {moduleStates, malformedFiles, queuedBuilds} = action.payload;
+      const {moduleStates, malformedFiles, queuedBuilds, activeBuild} = action.payload;
       return state.merge({
         moduleStates,
         loading: false,
         // stop polling if api returns an empty array if the branch does not exist
         isPolling: moduleStates && moduleStates.length && state.get('isPolling'),
         malformedFiles,
-        queuedBuilds
+        queuedBranchBuilds: queuedBuilds,
+        activeBranchBuild: activeBuild || null
       });
     }
     case ActionTypes.SELECT_MODULE:

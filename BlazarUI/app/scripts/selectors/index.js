@@ -1,5 +1,6 @@
 import Immutable from 'immutable';
 import { createSelector } from 'reselect';
+import BranchBuildStates from '../constants/BranchBuildStates';
 
 const getSelectedBranchId = (state) => state.branchState.get('branchId');
 const getBranches = (state) => state.branches;
@@ -36,4 +37,35 @@ export const getActiveModules = createSelector([getModuleStates],
 
 export const getInactiveModules = createSelector([getModuleStates],
   (moduleStates) => moduleStates.filter(moduleState => !moduleState.getIn(['module', 'active']))
+);
+
+
+const getQueuedBranchBuilds = (state) => state.branchState.get('queuedBranchBuilds');
+const getActiveBranchBuild = (state) => state.branchState.get('activeBranchBuild');
+
+const getBranchBuildsForActiveModuleBuilds = createSelector([getModuleStates],
+  (moduleStates) => moduleStates
+    .flatMap((moduleState) => [
+      moduleState.get('inProgressBranchBuild'),
+      moduleState.get('pendingBranchBuild')
+    ])
+    .filter(branchBuilds => branchBuilds) // remove undefined values
+    .toSet()
+);
+
+export const getPendingBranchBuilds = createSelector(
+  [getQueuedBranchBuilds, getActiveBranchBuild, getBranchBuildsForActiveModuleBuilds],
+  (queuedBranchBuilds, activeBranchBuild, branchBuildsForActiveModuleBuilds) => {
+    let pendingBranchBuilds = queuedBranchBuilds;
+
+    if (activeBranchBuild) {
+      const isLaunching = activeBranchBuild.get('state') === BranchBuildStates.LAUNCHING;
+      const activeBranchBuildHasNoModuleBuilds = !branchBuildsForActiveModuleBuilds.includes(activeBranchBuild);
+      if (isLaunching && activeBranchBuildHasNoModuleBuilds) {
+        pendingBranchBuilds = pendingBranchBuilds.push(activeBranchBuild);
+      }
+    }
+
+    return pendingBranchBuilds.sortBy((branchBuild) => -branchBuild.get('buildNumber'));
+  }
 );

@@ -8,7 +8,7 @@ import CommitsSummary from './shared/CommitsSummary.jsx';
 import BranchBuildProgress from './shared/BranchBuildProgress.jsx';
 import Icon from '../shared/Icon.jsx';
 
-import { buildIsInactive } from '../Helpers';
+import { isComplete } from '../../constants/BranchBuildStates';
 
 const BranchBuildHeader = ({branchBuild, completedModuleBuildCount, totalNonSkippedModuleBuildCount, onCancelBuild}) => {
   const buildNumber = branchBuild.get('buildNumber');
@@ -16,7 +16,7 @@ const BranchBuildHeader = ({branchBuild, completedModuleBuildCount, totalNonSkip
   const commitInfo = branchBuild.get('commitInfo');
   const buildId = branchBuild.get('id');
   const branchBuildState = branchBuild.get('state');
-  const isActiveBuild = !buildIsInactive(branchBuildState);
+  const isActiveBuild = !isComplete(branchBuildState);
 
   return (
     <div className="branch-build-header">

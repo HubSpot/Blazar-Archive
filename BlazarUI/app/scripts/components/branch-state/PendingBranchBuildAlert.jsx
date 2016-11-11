@@ -8,7 +8,6 @@ import BuildTriggerLabel from './shared/BuildTriggerLabel.jsx';
 const PendingBranchBuildsAlert = ({branchBuild, onCancelBuild}) => {
   const id = branchBuild.get('id');
   const buildNumber = branchBuild.get('buildNumber');
-  const state = branchBuild.get('state');
 
   return (
     <Alert className="pending-branch-build-alert" type="info" key={id}>
@@ -16,7 +15,7 @@ const PendingBranchBuildsAlert = ({branchBuild, onCancelBuild}) => {
         <span className="pending-branch-build-alert__build-number">#{buildNumber}</span>
         <BuildTriggerLabel buildTrigger={branchBuild.get('buildTrigger')} />
         <span className="pending-branch-build-alert__build-state">
-          is {state.toLowerCase()}
+          is pending
         </span>
         <CancelBuildButton
           onCancel={onCancelBuild}
