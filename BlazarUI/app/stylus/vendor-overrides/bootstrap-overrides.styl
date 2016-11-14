@@ -19,30 +19,13 @@ $link-color ?= $color-calypso
 $link-hover-color ?= #007A8C
 $text-color ?= $color-heffalump
 
-// // Override bootstrap colors w/ HS styling
-// $gray-base ?= $color-battleship
-// $gray-darker ?= $color-flint
-// $gray-dark ?= $color-eerie
-// $gray ?= $color-koala
-// $gray-light ?= $color-cirrus
-// $gray-lighter ?= $color-gypsum
-//
-// $brand-primary ?= $color-lorax-dark
-// $brand-success ?= $color-oz
-// $brand-info ?= $color-calypso
-// $brand-warning ?= $color-marigold
-// $brand-danger ?= $color-candy-apple
-
 
 // === Table overrides ===
 
 $table-cell-padding ?= 20px
 $table-condensed-cell-padding ?= 10px
 $table-bg ?= $color-olaf
-// No striped tables
-$table-bg-accent ?= $color-olaf
-// Calypso = link/clickable. Assuming table rows w/ background hover are
-// interactive. No other reason to give them a hover.
+$table-bg-accent ?= $color-gypsum
 $table-bg-hover ?= $color-gypsum
 $table-bg-active ?= $table-bg-hover
 $table-border-color ?= $color-koala
@@ -67,6 +50,21 @@ $state-danger-text ?= $color-heffalump
 $state-danger-border ?= #FAA9AC
 
 $alert-padding ?= 8px
+
+
+// === Button overrides ===
+
+$btn-border-radius-base ?= 3px
+$btn-border-radius-large ?= 3px
+$btn-border-radius-small ?= 3px
+
+$btn-default-color ?= $color-button-secondary-text
+$btn-default-bg ?= $color-olaf
+$btn-default-border ?= $color-lorax
+
+$btn-primary-color ?= $color-olaf
+$btn-primary-bg ?= $color-lorax
+$btn-primary-border ?= $color-lorax
 
 
 @import 'bootstrap'
@@ -113,15 +111,8 @@ label
 .tooltip-inner, .popover-content
   color $color-gypsum
 
-// For now, scope these overrides to new pages to avoid breaking existing
-// designs. This is not ideal because it causes some specificity issues
-// and we should settle on a consistent set of bootstrap overrides
-// across the entire app soon.
-//.page-content--branch-state
-
-.btn
-  radius 3px
-  padding: 0.75rem 1.5rem
+ .btn
+   padding: 0.75rem 1.5rem
 
 .btn-link
   color $color-calypso
@@ -130,10 +121,6 @@ label
   font-size 18px
 
 .btn-default
-  color $color-button-secondary-text
-  background-color $color-olaf
-  border-color $color-lorax
-
   &:hover,
   &:focus
     background-color $color-button-secondary-hover-fill
@@ -143,10 +130,6 @@ label
     background-color $color-button-secondary-active-fill
 
 .btn-primary
-  color $color-olaf
-  background-color $color-lorax
-  border-color $color-lorax
-
   &:hover,
   &:focus
     background-color $color-button-primary-hover-fill
