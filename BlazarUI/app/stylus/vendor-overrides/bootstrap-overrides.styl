@@ -33,6 +33,42 @@ $text-color ?= $color-heffalump
 // $brand-warning ?= $color-marigold
 // $brand-danger ?= $color-candy-apple
 
+
+// === Table overrides ===
+
+$table-cell-padding ?= 20px
+$table-condensed-cell-padding ?= 10px
+$table-bg ?= $color-olaf
+// No striped tables
+$table-bg-accent ?= $color-olaf
+// Calypso = link/clickable. Assuming table rows w/ background hover are
+// interactive. No other reason to give them a hover.
+$table-bg-hover ?= $color-gypsum
+$table-bg-active ?= $table-bg-hover
+$table-border-color ?= $color-koala
+
+
+// === Alert & state color overrides ===
+
+$state-success-bg ?= $color-oz-light
+$state-success-text ?= $color-heffalump
+$state-success-border ?= $color-oz-medium
+
+$state-info-bg ?= $color-calypso-light
+$state-info-text ?= $color-heffalump
+$state-info-border ?= $color-calypso-medium
+
+$state-warning-bg ?= #FDF3E1
+$state-warning-text ?= $color-heffalump
+$state-warning-border ?= #FBE1B2
+
+$state-danger-bg ?= $color-candy-apple-light
+$state-danger-text ?= $color-heffalump
+$state-danger-border ?= #FAA9AC
+
+$alert-padding ?= 8px
+
+
 @import 'bootstrap'
 
 .pagination > li > a
@@ -47,7 +83,7 @@ $text-color ?= $color-heffalump
   border-color #ccc
 
 .alert
-  border-radius $radius-standard
+  border-radius 0
   margin-bottom 10px
 
 .btn
@@ -120,3 +156,19 @@ label
   &:active
     background-color $color-lorax-dark
     border-color $color-lorax-dark
+
+
+// Table styling overrides
+table
+  border 1px solid $color-koala
+
+  thead
+    background $color-gypsum
+
+    th
+      text-transform uppercase
+      font-size 12px
+
+.table
+  th
+    color $color-heffalump

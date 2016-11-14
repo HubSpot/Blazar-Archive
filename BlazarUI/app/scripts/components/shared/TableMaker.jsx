@@ -49,7 +49,7 @@ function TableMaker(RenderedComponent, options) {
 
       return (
         <div className="table-wrapper">
-          <table className="fixed-table table table-hover table-striped">
+          <table className="fixed-table table table-hover table-condensed">
             <TableHead
               columnNames={columnNames}
             />
