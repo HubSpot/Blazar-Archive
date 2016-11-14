@@ -49,7 +49,7 @@ public interface RepositoryBuildDao {
   BuildNumbers getBuildNumbers(@Bind("branchId") int branchId);
 
   // Adding `ORDER BY buildNumber` here causes a filesort to occur
-  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND state in (<state>)")
+  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND state in (<states>)")
   Set<RepositoryBuild> getRepositoryBuildsByState(@Bind("branchId") int branchId, @BindIn("states") List<RepositoryBuild.State> states);
 
   @SingleValueResult
