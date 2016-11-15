@@ -11,10 +11,7 @@ class CommitDetails extends Component {
     const {commitInfo} = this.props;
 
     return classNames(
-      'commits__commit', {
-        'commits__commit--odd': commitInfo.oddRow,
-        'commits__commit--even': !commitInfo.oddRow
-      }
+      'commits__commit'
     );
   }
 
@@ -23,7 +20,6 @@ class CommitDetails extends Component {
 
     return classNames(
       'commits__picture', {
-        'commits__picture--odd': commitInfo.oddRow,
         'commits__picture--firstrow': commitInfo.firstRow,
         'commits__picture--lastrow': commitInfo.lastRow
       }

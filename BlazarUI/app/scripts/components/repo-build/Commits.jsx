@@ -19,8 +19,7 @@ class Commits extends Component {
     sortedCommits.forEach((commit, i) => {
       const day = moment(parseInt(commit.timestamp, 10)).format('M-DD-YY');
       let entry;
-
-      commit.oddRow = i % 2 === 0;
+      
       commit.firstRow = i === 0;
       commit.lastRow = i === sortedCommits.length - 1;
 
