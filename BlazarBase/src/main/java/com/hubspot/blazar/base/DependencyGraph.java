@@ -1,6 +1,7 @@
 package com.hubspot.blazar.base;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,8 @@ import java.util.Stack;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class DependencyGraph {
   private final Map<Integer, Set<Integer>> transitiveReduction;
@@ -66,6 +69,13 @@ public class DependencyGraph {
       }
     }
     return allIncoming;
+  }
+
+  public List<Module> orderByTopologicalSort(Set<Module> modules) {
+    List<Module> moduleList = Lists.newArrayList(modules);
+    // We want to sort by their build order (the topo-sort), so we compare their indices in that list
+    moduleList.sort(Comparator.comparingInt(module -> topologicalSort.indexOf(module.getId().get())));
+    return ImmutableList.copyOf(moduleList);
   }
 
   public Set<Integer> reachableVertices(int moduleId) {
