@@ -102,7 +102,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
       LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
       repositoryBuildService.update(build.withState(State.SUCCEEDED).withEndTimestamp(System.currentTimeMillis()));
     } else {
-      for (Module module : toBuild) {
+      for (Module module : build.getDependencyGraph().get().orderByTopologicalSort(toBuild)) {
         moduleBuildService.enqueue(build, module);
         if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
           interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(interProjectBuildId.get(), build.getBranchId(), build.getId(), module.getId().get()));
