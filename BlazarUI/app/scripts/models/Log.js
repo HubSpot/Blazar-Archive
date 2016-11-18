@@ -218,31 +218,27 @@ class Log extends Model {
     const NEW_LINE = '\n';
     const logData = this.data.data;
 
-    if (logData.match(WHITE_SPACE)) {
+    if (!logData || logData.match(WHITE_SPACE)) {
       return [];
     }
 
-    if (logData.length === 0) {
-      return [];
+    let splitLines = logData.split(NEW_LINE);
+
+    // Split results in an extra "" element if
+    // log data ends with a new line. Do not count
+    // this as an additional parsed line.
+    if (logData.endsWith(NEW_LINE)) {
+      splitLines = initial(splitLines);
     }
 
     let offsetRunningTotal = this.requestOffset;
 
-    const splitLines = logData.split(NEW_LINE);
-
     const formattedLogLines = splitLines.map((line, i) => {
+      const currentOffset = offsetRunningTotal;
+
       // store second line because we may chop off the first
       if (i === 1) {
-        this.pastOffsetLine = this.currentOffsetLine;
-        this.currentOffsetLine = offsetRunningTotal + getByteLength(line);
-      }
-
-      if (i === splitLines.length - 1) {
-        this.lastOffsetLine = offsetRunningTotal + getByteLength(length);
-      }
-
-      if (line.length === 0) {
-        return false;
+        this.currentOffsetLine = currentOffset;
       }
 
       try {
@@ -251,11 +247,12 @@ class Log extends Model {
         console.warn("We couldn't decode some UTF-8, so we're displaying this log line undecoded:\n", line);
       }
 
-      offsetRunningTotal += getByteLength(line);
+      // increment for next loop interation
+      offsetRunningTotal += getByteLength(line + NEW_LINE);
 
       return {
         text: line,
-        offset: offsetRunningTotal
+        offset: currentOffset
       };
     });
 
