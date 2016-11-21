@@ -40,7 +40,7 @@ class BuildLog extends Component {
     const nextLog = nextProps.log;
     const buildInProgress = nextProps.build.state === BuildStates.IN_PROGRESS;
     const buildCancelled = nextProps.build.state === BuildStates.CANCELLED;
-    // check if we navigated to another build 
+    // check if we navigated to another build
     const hasNavigatedAway = (this.props.build.id !== nextProps.build.id) && this.props.build.id !== -1;
     let stateUpdates = clone(hasNavigatedAway ? initialState : refreshedState);
 
@@ -60,20 +60,20 @@ class BuildLog extends Component {
     if (nextLog) {
       stateUpdates.fetchingNext = nextLog.fetchAction === 'next' && !nextLog.endOfLogLoaded;
     }
-    
+
     if (buildCancelled) {
       stateUpdates.isTailing = false;
       stateUpdates.fetchingNext = false;
     }
-  
+
     this.setState(stateUpdates);
   }
 
   componentDidUpdate() {
     const {log, build, positionChange} = this.props;
-    const buildCancelled = build.state === BuildStates.CANCELLED;    
+    const buildCancelled = build.state === BuildStates.CANCELLED;
     const initialFetch = log.fetchCount === 1 && !positionChange && !this.state.haveFetchedOnce;
-    
+
     // we fetch twice for cancelled builds to see if it is still processing
     const initialCancelledFetch = buildCancelled && log.fetchCount < 3;
 
@@ -82,7 +82,7 @@ class BuildLog extends Component {
     }
 
     // ignore any fetched data if we already processed
-    if (log.fetchCount > 1 && log.fetchTimestamp === this.state.lastFetchTimestamp) { 
+    if (log.fetchCount > 1 && log.fetchTimestamp === this.state.lastFetchTimestamp) {
       return;
     }
 
@@ -107,20 +107,20 @@ class BuildLog extends Component {
     }
 
     // initial fetch or tailing
-    else if (initialFetch || initialCancelledFetch || this.state.isTailing) {  
+    else if (initialFetch || initialCancelledFetch || this.state.isTailing) {
       this.scrollToBottom();
     }
 
     // updates based on scroll change
     else if (log.fetchCount > 1) {
       if (log.fetchAction === 'previous') {
-        this.scrollToOffsetLine();  
+        this.scrollToOffsetLine();
       }
     }
   }
 
   componentWillUnmount() {
-    $('#log').off('scroll', this.handleScroll)
+    $('#log').off('scroll', this.handleScroll);
   }
 
   scrollToTop() {
@@ -130,18 +130,24 @@ class BuildLog extends Component {
       $('#log').scrollTop(0);
     });
   }
-  
+
   scrollToBottom() {
     this.ignoreScrollEvents = true;
 
     window.requestAnimationFrame(() => {
-      $('#log').scrollTop($('#log')[0].scrollHeight);
-    });  
+      const log = $('#log');
+      // since this function is called asynchronously,
+      // verify that the element is still on the page
+      // before reading the scrollHeight
+      if (log.length) {
+        log.scrollTop(log[0].scrollHeight);
+      }
+    });
   }
 
   scrollToOffsetLine() {
     const buildInProgress = this.props.build.state === BuildStates.IN_PROGRESS;
-    
+
     const scrollToEl = document.getElementById(this.scrollId);
     scrollToEl.scrollIntoView();
 
@@ -161,7 +167,7 @@ class BuildLog extends Component {
       return;
     }
 
-    // `Debounce` on animation requests so we 
+    // `Debounce` on animation requests so we
     // only do this when the browser is ready for it
     if (this.frameRequest != null) {
       cancelAnimationFrame(this.frameRequest);
@@ -171,11 +177,11 @@ class BuildLog extends Component {
       const scrollTop = $log.scrollTop();
       const scrollDirection = this.pastScrollTop < scrollTop ? 'down' : 'up';
       this.pastScrollTop = scrollTop;
-      
+
       const scrollHeight = $log[0].scrollHeight;
       const contentsHeight = $log.outerHeight();
       const buildInProgress = this.props.build.state === BuildStates.IN_PROGRESS;
-      
+
       const bottomScrollBuffer = 1;
       const atBottom = scrollTop >= scrollHeight - contentsHeight - bottomScrollBuffer;
       const atTop = scrollTop === 0;
@@ -183,18 +189,18 @@ class BuildLog extends Component {
 
       // at top of page
       if (atTop && !atBottom && this.props.log.minOffsetLoaded > 0) {
-        
+
         this.setState({
           fetchingPrevious: true,
           haveFetchedOnce: true,
           lastFetchTimestamp: this.props.log.fetchTimestamp
         });
 
-        this.props.fetchPrevious();  
+        this.props.fetchPrevious();
       }
 
       // at bottom of page.
-      else if (atBottom && !atTop && scrollDirection !== 'up') {        
+      else if (atBottom && !atTop && scrollDirection !== 'up') {
         // check if we should fetchNext or start polling again
 
         if (buildInProgress && !this.state.isTailing && !shouldFetchNext) {
@@ -213,7 +219,7 @@ class BuildLog extends Component {
         this.setState({
           shouldSetTail: true
         });
-        
+
       }
 
       else {
@@ -229,20 +235,20 @@ class BuildLog extends Component {
 
     });
   }
-  
+
   getContainerClassNames() {
     return ClassNames([
       'build-log',
       {'expanded': this.state.logExpanded}
     ]);
   }
-  
+
   toggleLogSize() {
     this.setState({
       logExpanded: !this.state.logExpanded
     });
   }
-  
+
   renderFetchNextSpinner(){
     if (this.state.fetchingNext || (this.state.isTailing && this.props.build.state === BuildStates.IN_PROGRESS)) {
       return (
@@ -250,17 +256,17 @@ class BuildLog extends Component {
       );
     }
   }
-  
+
   renderFetchPreviousSpinner() {
     if (!this.state.fetchingPrevious) {
       return null;
     }
-    
+
     return (
       <Loader align='left' roomy={true} />
     );
   }
-  
+
   renderEndOfLogMessage() {
     const {build, log} = this.props;
     const buildInProgress = build.state === BuildStates.IN_PROGRESS;
@@ -276,11 +282,11 @@ class BuildLog extends Component {
     else if (buildCancelled && log.data.nextOffset !== -1 && log.fetchCount > 1) {
       message = 'Build cancelled. The build log may still be processing. Refresh for the latest updates.';
     }
-    
+
     else if (buildCancelled) {
       message = 'Build Cancelled';
     }
-  
+
     else if (log.endOfLogLoaded) {
       message = 'End of Log';
     }
@@ -294,7 +300,7 @@ class BuildLog extends Component {
         <BuildLogLine emphasis={true} text={message} />
       </div>
     );
-    
+
   }
 
   renderLogLines() {
@@ -308,13 +314,13 @@ class BuildLog extends Component {
         </div>
       );
     }
-    
+
     else if ((this.props.loading || !log.fetchCount) && !error) {
       return (
         <Loader align='left' roomy={true} />
       )
     }
-    
+
     else if (log.logLines && log.logLines.length === 0 || !log.logLines) {
       return (
         <BuildLogLine text='No log available' />
@@ -327,18 +333,18 @@ class BuildLog extends Component {
       );
     });
   }
-  
+
   renderError() {
     return (
-      <GenericErrorMessage 
+      <GenericErrorMessage
         message={this.props.error}
       />
     );
   }
-  
+
   render() {
     return (
-      <pre id='log' 
+      <pre id='log'
         ref='log'
         className={this.getContainerClassNames()}
       >
