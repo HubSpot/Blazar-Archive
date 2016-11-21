@@ -1,8 +1,10 @@
-import Resource from '../services/ResourceProvider';
+import $ from 'jquery';
 import Q from 'q';
 import { findWhere, map, extend, max, contains } from 'underscore';
 import humanizeDuration from 'humanize-duration';
-import $ from 'jquery';
+
+import { getErrorMessage } from './apiUtils';
+import Resource from '../services/ResourceProvider';
 
 function _parse(resp) {
   if (resp.startTimestamp && resp.endTimestamp) {
@@ -65,7 +67,10 @@ function fetchRepoBuildById(repoBuildId) {
     type: 'GET'
   }).send();
 
-  return repoBuildPromise.then((repoBuilds) => _parse(repoBuilds));
+  return Q(repoBuildPromise).then(
+    (repoBuilds) => _parse(repoBuilds),
+    (error) => Q.reject(`Unable to fetch branch build: ${getErrorMessage(error)}`)
+  );
 }
 
 function fetchRepoBuild(params) {
