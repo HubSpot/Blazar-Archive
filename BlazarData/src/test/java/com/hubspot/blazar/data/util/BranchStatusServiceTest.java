@@ -2,7 +2,8 @@ package com.hubspot.blazar.data.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Set;
 
@@ -65,7 +66,7 @@ public class BranchStatusServiceTest {
   public void before() {
     when(branchDao.get(eq(1))).thenReturn(Optional.of(branch1));
     when(branchDao.getByRepository(eq(1337))).thenReturn(Sets.newHashSet(branch1, branch2));
-    when(stateDao.getLastSuccessfulAndNonSkippedBuildInfos(eq(1)))
+    when(stateDao.getLastSuccessfulAndNonSkippedModuleBuilds(eq(1)))
         .thenReturn(ImmutableSet.of(module1Build1Info, module1Build3Info));
     when(branchBuildDao.getRepositoryBuildsByState(eq(1), eq(ImmutableList.of(RepositoryBuild.State.QUEUED))))
         .thenReturn(ImmutableSet.of(branch1Build5, branch1Build6));
@@ -77,7 +78,7 @@ public class BranchStatusServiceTest {
 
   @Test
   public void itReturnsTheExpectedBranchStatusWhenAModuleBuildIsPendingAndBranchBuildsAreQueued() {
-    when(stateDao.getPartialModuleStatesForBranch(eq(1)))
+    when(stateDao.getLastAndInProgressAndPendingBuildsForBranchAndIncludedModules(eq(1)))
         .thenReturn(ImmutableSet.of(ModuleState.newBuilder(module1)
             .setLastBranchBuild(Optional.of(branch1Build3))
             .setLastModuleBuild(Optional.of(module1Build3Failed))
@@ -109,7 +110,7 @@ public class BranchStatusServiceTest {
   @Test
   public void itReturnsTheExpectedBranchStatusWhenAModuleBuildIsLaunchingAndBranchBuildsAreQueued() {
 
-    when(stateDao.getPartialModuleStatesForBranch(eq(1)))
+    when(stateDao.getLastAndInProgressAndPendingBuildsForBranchAndIncludedModules(eq(1)))
         .thenReturn(ImmutableSet.of(ModuleState.newBuilder(module1)
             .setLastBranchBuild(Optional.of(branch1Build3))
             .setLastModuleBuild(Optional.of(module1Build3Failed))
