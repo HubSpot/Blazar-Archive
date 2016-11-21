@@ -1,14 +1,13 @@
 package com.hubspot.blazar.data.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -32,115 +31,115 @@ import com.hubspot.blazar.data.service.BranchStatusService;
 
 
 public class BranchStatusServiceTest {
-  private BuildTrigger manualTrigger = BuildTrigger.forUser("user");
-  private BuildOptions defaultOptions = BuildOptions.defaultOptions();
-  private GitInfo branch1 = new GitInfo(Optional.of(1), "git.example.com", "example", "example", 1337, "master", true, System.currentTimeMillis(), System.currentTimeMillis());
-  private GitInfo branch2 = new GitInfo(Optional.of(2), "git.example.com", "example", "example", 1337, "notMaster", true, System.currentTimeMillis(), System.currentTimeMillis());
-  private Module module1 = new Module(Optional.of(1), "module", "config", "/", "/*", true, System.currentTimeMillis(), System.currentTimeMillis(), Optional.absent());
-  private ModuleBuild moduleBuild1 = ModuleBuild.newBuilder(1, 1, 1, ModuleBuild.State.SUCCEEDED).build();
-  private ModuleBuild moduleBuild2 = ModuleBuild.newBuilder(2, 1, 2, ModuleBuild.State.SKIPPED).build();
-  private ModuleBuild moduleBuild3 = ModuleBuild.newBuilder(3, 1, 3, ModuleBuild.State.FAILED).build();
-  private ModuleBuild moduleBuild4pending = ModuleBuild.newBuilder(4, 1, 4, ModuleBuild.State.QUEUED).build();
-  private ModuleBuild moduleBuild4launching = ModuleBuild.newBuilder(4, 1, 4, ModuleBuild.State.LAUNCHING).build();
+  private static final BuildTrigger manualTrigger = BuildTrigger.forUser("user");
+  private static final BuildOptions defaultOptions = BuildOptions.defaultOptions();
+  private static final GitInfo branch1 = new GitInfo(Optional.of(1), "git.example.com", "example", "example", 1337, "master", true, System.currentTimeMillis(), System.currentTimeMillis());
+  private static final GitInfo branch2 = new GitInfo(Optional.of(2), "git.example.com", "example", "example", 1337, "notMaster", true, System.currentTimeMillis(), System.currentTimeMillis());
+  private static final Module module1 = new Module(Optional.of(1), "module", "config", "/", "/*", true, System.currentTimeMillis(), System.currentTimeMillis(), Optional.absent());
+  private static final ModuleBuild module1Build1Succeded = ModuleBuild.newBuilder(1, 1, 1, ModuleBuild.State.SUCCEEDED).build();
+  private static final ModuleBuild module1Build2Skipped = ModuleBuild.newBuilder(2, 1, 2, ModuleBuild.State.SKIPPED).build();
+  private static final ModuleBuild module1Build3Failed = ModuleBuild.newBuilder(3, 1, 3, ModuleBuild.State.FAILED).build();
+  private static final ModuleBuild module1Build4Queued = ModuleBuild.newBuilder(4, 1, 4, ModuleBuild.State.QUEUED).build();
+  private static final ModuleBuild module1Build4Launching = ModuleBuild.newBuilder(4, 1, 4, ModuleBuild.State.LAUNCHING).build();
   // #5 does not exist repo build #5 is queued
-  private RepositoryBuild branchBuild1 = RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.SUCCEEDED, manualTrigger, defaultOptions).build();
-  private ModuleBuildInfo moduleBuildInfo1 = new ModuleBuildInfo(moduleBuild1, branchBuild1);
-  private RepositoryBuild branchBuild2 = RepositoryBuild.newBuilder(1, 2, RepositoryBuild.State.SUCCEEDED, manualTrigger, defaultOptions).build();
-  private ModuleBuildInfo moduleBuildInfo2 = new ModuleBuildInfo(moduleBuild2, branchBuild2);
-  private RepositoryBuild branchBuild3 = RepositoryBuild.newBuilder(1, 3, RepositoryBuild.State.FAILED, manualTrigger, defaultOptions).build();
-  private ModuleBuildInfo moduleBuildInfo3 = new ModuleBuildInfo(moduleBuild3, branchBuild3);
-  private RepositoryBuild branchBuild4 = RepositoryBuild.newBuilder(1, 4, RepositoryBuild.State.LAUNCHING, manualTrigger, defaultOptions).build();
-  private ModuleBuildInfo moduleBuildInfo4 = new ModuleBuildInfo(moduleBuild4launching, branchBuild4);
-  private RepositoryBuild branchBuild5 = RepositoryBuild.newBuilder(1, 5, RepositoryBuild.State.QUEUED, manualTrigger, defaultOptions).build();
-  private RepositoryBuild branchBuild6 = RepositoryBuild.newBuilder(1, 6, RepositoryBuild.State.QUEUED, manualTrigger, defaultOptions).build();
+  private static final RepositoryBuild branch1Build1 = RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.SUCCEEDED, manualTrigger, defaultOptions).build();
+  private static final ModuleBuildInfo module1Build1Info = new ModuleBuildInfo(module1Build1Succeded, branch1Build1);
+  private static final RepositoryBuild branch1Build2 = RepositoryBuild.newBuilder(1, 2, RepositoryBuild.State.SUCCEEDED, manualTrigger, defaultOptions).build();
+  private static final ModuleBuildInfo module1Build2Info = new ModuleBuildInfo(module1Build2Skipped, branch1Build2);
+  private static final RepositoryBuild branch1Build3 = RepositoryBuild.newBuilder(1, 3, RepositoryBuild.State.FAILED, manualTrigger, defaultOptions).build();
+  private static final ModuleBuildInfo module1Build3Info = new ModuleBuildInfo(module1Build3Failed, branch1Build3);
+  private static final RepositoryBuild branch1Build4 = RepositoryBuild.newBuilder(1, 4, RepositoryBuild.State.LAUNCHING, manualTrigger, defaultOptions).build();
+  private static final ModuleBuildInfo module1Build4Info = new ModuleBuildInfo(module1Build4Launching, branch1Build4);
+  private static final RepositoryBuild branch1Build5 = RepositoryBuild.newBuilder(1, 5, RepositoryBuild.State.QUEUED, manualTrigger, defaultOptions).build();
+  private static final RepositoryBuild branch1Build6 = RepositoryBuild.newBuilder(1, 6, RepositoryBuild.State.QUEUED, manualTrigger, defaultOptions).build();
 
-  private BranchDao branchDao = mock(BranchDao.class);
-  private StateDao stateDao = mock(StateDao.class);
-  private RepositoryBuildDao branchBuildDao = mock(RepositoryBuildDao.class);
-  private MalformedFileDao malformedFileDao = mock(MalformedFileDao.class);
-  private BranchStatusService branchStatusService = new BranchStatusService(branchDao, stateDao, malformedFileDao, branchBuildDao);
+  private static final BranchDao branchDao = mock(BranchDao.class);
+  private static final StateDao stateDao = mock(StateDao.class);
+  private static final RepositoryBuildDao branchBuildDao = mock(RepositoryBuildDao.class);
+  private static final MalformedFileDao malformedFileDao = mock(MalformedFileDao.class);
+  private static final BranchStatusService branchStatusService = new BranchStatusService(branchDao, stateDao, malformedFileDao, branchBuildDao);
 
-  private Set<MalformedFile> malformedFiles = ImmutableSet.of(new MalformedFile(1, "config", "/broken/.blazar.yaml", "Testing 123"));
+  private static final Set<MalformedFile> malformedFiles = ImmutableSet.of(new MalformedFile(1, "config", "/broken/.blazar.yaml", "Testing 123"));
 
   @Before
   public void before() {
-    when(branchDao.get(Matchers.eq(1))).thenReturn(Optional.of(branch1));
-    when(branchDao.getByRepository(Matchers.eq(1337))).thenReturn(Sets.newHashSet(branch1, branch2));
-    when(stateDao.getLastSuccessfulAndNonSkippedBuildInfos(Matchers.eq(1)))
-        .thenReturn(ImmutableSet.of(moduleBuildInfo1, moduleBuildInfo3));
-    when(branchBuildDao.getRepositoryBuildsByState(Matchers.eq(1), Matchers.eq(ImmutableList.of(RepositoryBuild.State.QUEUED))))
-        .thenReturn(ImmutableSet.of(branchBuild5, branchBuild6));
-    when(branchBuildDao.getRepositoryBuildsByState(Matchers.eq(1), Matchers.eq(ImmutableList.of(RepositoryBuild.State.LAUNCHING, RepositoryBuild.State.IN_PROGRESS))))
-        .thenReturn(ImmutableSet.of(branchBuild4));
-    when(malformedFileDao.getMalformedFiles(Matchers.eq(1)))
+    when(branchDao.get(eq(1))).thenReturn(Optional.of(branch1));
+    when(branchDao.getByRepository(eq(1337))).thenReturn(Sets.newHashSet(branch1, branch2));
+    when(stateDao.getLastSuccessfulAndNonSkippedBuildInfos(eq(1)))
+        .thenReturn(ImmutableSet.of(module1Build1Info, module1Build3Info));
+    when(branchBuildDao.getRepositoryBuildsByState(eq(1), eq(ImmutableList.of(RepositoryBuild.State.QUEUED))))
+        .thenReturn(ImmutableSet.of(branch1Build5, branch1Build6));
+    when(branchBuildDao.getRepositoryBuildsByState(eq(1), eq(ImmutableList.of(RepositoryBuild.State.LAUNCHING, RepositoryBuild.State.IN_PROGRESS))))
+        .thenReturn(ImmutableSet.of(branch1Build4));
+    when(malformedFileDao.getMalformedFiles(eq(1)))
         .thenReturn(malformedFiles);
   }
 
   @Test
-  public void itReturnsTheRightDataWithPendingModule() {
-    when(stateDao.getPartialModuleStatesForBranch(Matchers.eq(1)))
+  public void itReturnsTheExpectedBranchStatusWhenABranchBuildIsQueued() {
+    when(stateDao.getPartialModuleStatesForBranch(eq(1)))
         .thenReturn(ImmutableSet.of(ModuleState.newBuilder(module1)
-        .setLastBranchBuild(Optional.of(branchBuild3))
-        .setLastModuleBuild(Optional.of(moduleBuild3))
-        .setPendingBranchBuild(Optional.of(branchBuild4))
-        .setPendingModuleBuild(Optional.of(moduleBuild4pending))
-        .build()));
+            .setLastBranchBuild(Optional.of(branch1Build3))
+            .setLastModuleBuild(Optional.of(module1Build3Failed))
+            .setPendingBranchBuild(Optional.of(branch1Build4))
+            .setPendingModuleBuild(Optional.of(module1Build4Queued))
+            .build()));
     ModuleState expectedState = ModuleState.newBuilder(module1)
-        .setLastBranchBuild(Optional.of(branchBuild3))
-        .setLastModuleBuild(Optional.of(moduleBuild3))
-        .setLastSuccessfulModuleBuild(Optional.of(moduleBuild1))
-        .setLastSuccessfulBranchBuild(Optional.of(branchBuild1))
-        .setLastNonSkippedModuleBuild(Optional.of(moduleBuild3))
-        .setLastNonSkippedBranchBuild(Optional.of(branchBuild3))
-        .setPendingBranchBuild(Optional.of(branchBuild4))
-        .setPendingModuleBuild(Optional.of(moduleBuild4pending))
+        .setLastBranchBuild(Optional.of(branch1Build3))
+        .setLastModuleBuild(Optional.of(module1Build3Failed))
+        .setLastSuccessfulModuleBuild(Optional.of(module1Build1Succeded))
+        .setLastSuccessfulBranchBuild(Optional.of(branch1Build1))
+        .setLastNonSkippedModuleBuild(Optional.of(module1Build3Failed))
+        .setLastNonSkippedBranchBuild(Optional.of(branch1Build3))
+        .setPendingBranchBuild(Optional.of(branch1Build4))
+        .setPendingModuleBuild(Optional.of(module1Build4Queued))
         .build();
 
 
     Optional<BranchStatus> status = branchStatusService.getBranchStatusById(1);
     assertThat(status.isPresent()).isTrue();
-    assertThat(status.get().getQueuedBuilds()).isEqualTo(ImmutableList.of(branchBuild5, branchBuild6));
+    assertThat(status.get().getQueuedBuilds()).isEqualTo(ImmutableList.of(branch1Build5, branch1Build6));
     assertThat(status.get().getOtherBranches()).doesNotContain(branch1).contains(branch2);
     assertThat(status.get().getModuleStates()).isEqualTo(ImmutableSet.of(expectedState));
-    assertThat(status.get().getActiveBuild()).isEqualTo(Optional.of(branchBuild4));
+    assertThat(status.get().getActiveBuild()).isEqualTo(Optional.of(branch1Build4));
     assertThat(status.get().getMalformedFiles()).isEqualTo(malformedFiles);
   }
 
 
   @Test
-  public void itReturnsTheRightDataWithLaunchingModule() {
+  public void itReturnsTheExpectedBranchStatusDataWhenABranchBuildIsLaunching() {
 
-    when(stateDao.getPartialModuleStatesForBranch(Matchers.eq(1)))
+    when(stateDao.getPartialModuleStatesForBranch(eq(1)))
         .thenReturn(ImmutableSet.of(ModuleState.newBuilder(module1)
-        .setLastBranchBuild(Optional.of(branchBuild3))
-        .setLastModuleBuild(Optional.of(moduleBuild3))
-        .setInProgressBranchBuild(Optional.of(branchBuild4))
-        .setInProgressModuleBuild(Optional.of(moduleBuild4launching))
-        .build()));
+            .setLastBranchBuild(Optional.of(branch1Build3))
+            .setLastModuleBuild(Optional.of(module1Build3Failed))
+            .setInProgressBranchBuild(Optional.of(branch1Build4))
+            .setInProgressModuleBuild(Optional.of(module1Build4Launching))
+            .build()));
     ModuleState expectedState = ModuleState.newBuilder(module1)
-        .setLastBranchBuild(Optional.of(branchBuild3))
-        .setLastModuleBuild(Optional.of(moduleBuild3))
-        .setLastSuccessfulModuleBuild(Optional.of(moduleBuild1))
-        .setLastSuccessfulBranchBuild(Optional.of(branchBuild1))
-        .setLastNonSkippedModuleBuild(Optional.of(moduleBuild3))
-        .setLastNonSkippedBranchBuild(Optional.of(branchBuild3))
-        .setInProgressBranchBuild(Optional.of(branchBuild4))
-        .setInProgressModuleBuild(Optional.of(moduleBuild4launching))
+        .setLastBranchBuild(Optional.of(branch1Build3))
+        .setLastModuleBuild(Optional.of(module1Build3Failed))
+        .setLastSuccessfulModuleBuild(Optional.of(module1Build1Succeded))
+        .setLastSuccessfulBranchBuild(Optional.of(branch1Build1))
+        .setLastNonSkippedModuleBuild(Optional.of(module1Build3Failed))
+        .setLastNonSkippedBranchBuild(Optional.of(branch1Build3))
+        .setInProgressBranchBuild(Optional.of(branch1Build4))
+        .setInProgressModuleBuild(Optional.of(module1Build4Launching))
         .build();
 
     Optional<BranchStatus> status = branchStatusService.getBranchStatusById(1);
     assertThat(status.isPresent()).isTrue();
-    assertThat(status.get().getQueuedBuilds()).isEqualTo(ImmutableList.of(branchBuild5, branchBuild6));
+    assertThat(status.get().getQueuedBuilds()).isEqualTo(ImmutableList.of(branch1Build5, branch1Build6));
     assertThat(status.get().getOtherBranches()).doesNotContain(branch1).contains(branch2);
     assertThat(status.get().getModuleStates()).isEqualTo(ImmutableSet.of(expectedState));
-    assertThat(status.get().getActiveBuild()).isEqualTo(Optional.of(branchBuild4));
+    assertThat(status.get().getActiveBuild()).isEqualTo(Optional.of(branch1Build4));
     assertThat(status.get().getMalformedFiles()).isEqualTo(malformedFiles);
   }
 
   @Test
   public void itReturnsAbsentForMissingBranch() {
     // there is no branch 2
-    when(branchDao.get(Matchers.eq(2))).thenReturn(Optional.absent());
+    when(branchDao.get(eq(2))).thenReturn(Optional.absent());
     Optional<BranchStatus> status = branchStatusService.getBranchStatusById(2);
     assertThat(status.isPresent()).isFalse();
   }
