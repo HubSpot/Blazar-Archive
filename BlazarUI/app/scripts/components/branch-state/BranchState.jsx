@@ -50,11 +50,15 @@ class BranchState extends Component {
       return modules;
     }
 
-    const topologicalSort = getCurrentBranchBuild(modules.first()).getIn(['dependencyGraph', 'topologicalSort']);
+    const currentBranchBuild = getCurrentBranchBuild(modules.first());
+    const topologicalSort = currentBranchBuild && currentBranchBuild.getIn(['dependencyGraph', 'topologicalSort']);
     return modules.sort((a, b) => {
+      const currentModuleBuildA = getCurrentModuleBuild(a);
+      const currentModuleBuildB = getCurrentModuleBuild(b);
+
       // first sort by descending build number to prioritize more recent builds
-      const buildNumberA = getCurrentModuleBuild(a).get('buildNumber');
-      const buildNumberB = getCurrentModuleBuild(b).get('buildNumber');
+      const buildNumberA = currentModuleBuildA ? currentModuleBuildA.get('buildNumber') : 0;
+      const buildNumberB = currentModuleBuildB ? currentModuleBuildB.get('buildNumber') : 0;
 
       if (buildNumberA > buildNumberB) {
         return -1;
@@ -82,7 +86,8 @@ class BranchState extends Component {
   getFailingModuleBuildBlazarPaths(moduleStates) {
     return moduleStates
       .filter((moduleState) => {
-        return getCurrentModuleBuild(moduleState).get('state') === ModuleBuildStates.FAILED;
+        const currentModuleBuild = getCurrentModuleBuild(moduleState);
+        return currentModuleBuild && currentModuleBuild.get('state') === ModuleBuildStates.FAILED;
       })
       .reduce((failingModuleBuildBlazarPaths, moduleState) => {
         const {branchId} = this.props;
