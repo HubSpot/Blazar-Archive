@@ -76,7 +76,7 @@ public class BranchStatusServiceTest {
   }
 
   @Test
-  public void itReturnsTheExpectedBranchStatusWhenABranchBuildIsQueued() {
+  public void itReturnsTheExpectedBranchStatusWhenAModuleBuildIsPendingAndBranchBuildsAreQueued() {
     when(stateDao.getPartialModuleStatesForBranch(eq(1)))
         .thenReturn(ImmutableSet.of(ModuleState.newBuilder(module1)
             .setLastBranchBuild(Optional.of(branch1Build3))
@@ -107,7 +107,7 @@ public class BranchStatusServiceTest {
 
 
   @Test
-  public void itReturnsTheExpectedBranchStatusDataWhenABranchBuildIsLaunching() {
+  public void itReturnsTheExpectedBranchStatusWhenAModuleBuildIsLaunchingAndBranchBuildsAreQueued() {
 
     when(stateDao.getPartialModuleStatesForBranch(eq(1)))
         .thenReturn(ImmutableSet.of(ModuleState.newBuilder(module1)

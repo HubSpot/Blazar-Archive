@@ -60,15 +60,12 @@ public class BranchStatusService {
     Set<MalformedFile> malformedFiles = malformedFileDao.getMalformedFiles(branchId);
 
     // We can only have up to 1 build in either of these states at a time
-    java.util.Optional<RepositoryBuild> maybeActiveBuild = repositoryBuildDao
+    java.util.Optional<RepositoryBuild> javaOptionalActiveBuild = repositoryBuildDao
         .getRepositoryBuildsByState(branchId, ImmutableList.of(RepositoryBuild.State.LAUNCHING, RepositoryBuild.State.IN_PROGRESS))
         .stream().findFirst();
 
-    if (maybeActiveBuild.isPresent()) {
-      return Optional.of(new BranchStatus(queuedBuildsList, Optional.of(maybeActiveBuild.get()), moduleStates, otherBranches, malformedFiles, branch));
-    } else {
-      return Optional.of(new BranchStatus(queuedBuildsList, Optional.absent(), moduleStates, otherBranches, malformedFiles, branch));
-    }
+    Optional<RepositoryBuild> activeBuild = javaOptionalActiveBuild.isPresent() ? Optional.of(javaOptionalActiveBuild.get()) : Optional.absent();
+    return Optional.of(new BranchStatus(queuedBuildsList, activeBuild, moduleStates, otherBranches, malformedFiles, branch));
   }
 
   private Set<ModuleState> getAllModuleStatesForBranch(int branchId) {
