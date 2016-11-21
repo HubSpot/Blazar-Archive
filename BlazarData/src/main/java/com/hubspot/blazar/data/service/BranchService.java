@@ -51,7 +51,7 @@ public class BranchService {
   public GitInfo upsert(GitInfo gitInfo) {
     Optional<GitInfo> existing = getByRepositoryAndBranch(gitInfo.getRepositoryId(), gitInfo.getBranch());
     if (existing.isPresent()) {
-      gitInfo = gitInfo.withId(existing.get().getId().get());
+      gitInfo = gitInfo.toBuilder().setId(Optional.of(existing.get().getId().get())).build();
 
       if (!existing.get().equals(gitInfo)) {
         int updated = branchDao.update(gitInfo);
@@ -62,7 +62,7 @@ public class BranchService {
     } else {
       try {
         int id = branchDao.insert(gitInfo);
-        return gitInfo.withId(id);
+        return gitInfo.toBuilder().setId(Optional.of(id)).build();
       } catch (UnableToExecuteStatementException e) {
         if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
           return getByRepositoryAndBranch(gitInfo.getRepositoryId(), gitInfo.getBranch()).get();

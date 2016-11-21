@@ -83,12 +83,92 @@ public class GitInfo {
     return getOrganization() + '/' + getRepository();
   }
 
-  public GitInfo withId(int id) {
-    return new GitInfo(Optional.of(id), host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp);
+  public Builder toBuilder() {
+    return new Builder(this);
   }
 
-  public GitInfo withBranch(String branch) {
-    return new GitInfo(id, host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp);
+  public class Builder {
+    private Optional<Integer> id;
+    private String host;
+    private String organization;
+    private String repository;
+    private int repositoryId;
+    private String branch;
+    private boolean active;
+    private long createdTimestamp;
+    private long updatedTimestamp;
+
+    public Builder() {
+      this.id = Optional.absent();
+      this.host = "";
+      this.organization = "";
+      this.repository = "";
+      this.repositoryId = 0;
+      this.active = true;
+      this.createdTimestamp = System.currentTimeMillis();
+      this.updatedTimestamp = System.currentTimeMillis();
+    }
+
+    private Builder(GitInfo gitInfo) {
+      id = gitInfo.getId();
+      host = gitInfo.getHost();
+      organization = gitInfo.getOrganization();
+      repository = gitInfo.getRepository();
+      repositoryId = gitInfo.getRepositoryId();
+      branch = gitInfo.getBranch();
+      active = gitInfo.isActive();
+      createdTimestamp = gitInfo.getCreatedTimestamp();
+      updatedTimestamp = gitInfo.getUpdatedTimestamp();
+    }
+
+    public Builder setId(Optional<Integer> id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder setHost(String host) {
+      this.host = host;
+      return this;
+    }
+
+    public Builder setOrganization(String organization) {
+      this.organization = organization;
+      return this;
+    }
+
+    public Builder setRepository(String repository) {
+      this.repository = repository;
+      return this;
+    }
+
+    public Builder setRepositoryId(int repositoryId) {
+      this.repositoryId = repositoryId;
+      return this;
+    }
+
+    public Builder setBranch(String branch) {
+      this.branch = branch;
+      return this;
+    }
+
+    public Builder setActive(boolean active) {
+      this.active = active;
+      return this;
+    }
+
+    public Builder setCreatedTimestamp(long createdTimestamp) {
+      this.createdTimestamp = createdTimestamp;
+      return this;
+    }
+
+    public Builder setUpdatedTimestamp(long updatedTimestamp) {
+      this.updatedTimestamp = updatedTimestamp;
+      return this;
+    }
+
+    public GitInfo build() {
+      return new GitInfo(id, host, organization, repository, repositoryId, branch, active, createdTimestamp, updatedTimestamp);
+    }
   }
 
   @Override
