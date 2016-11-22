@@ -1,17 +1,19 @@
 package com.hubspot.blazar.listener;
 
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Set;
 
 @Singleton
 public class RepositoryBuildCompleter implements ModuleBuildVisitor {
@@ -45,9 +47,10 @@ public class RepositoryBuildCompleter implements ModuleBuildVisitor {
       LOG.info("All module builds complete, going to complete repository build {}", build.getRepoBuildId());
       RepositoryBuild.State finalState = determineRepositoryBuildState(builds);
       LOG.info("Final state for repository build {} is {}", build.getRepoBuildId(), finalState);
-      RepositoryBuild completed = repositoryBuild
-          .withState(finalState)
-          .withEndTimestamp(System.currentTimeMillis());
+      RepositoryBuild completed = repositoryBuild.toBuilder()
+          .setState(finalState)
+          .setEndTimestamp(Optional.of(System.currentTimeMillis()))
+          .build();
       repositoryBuildService.update(completed);
     }
   }

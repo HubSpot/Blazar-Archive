@@ -1,9 +1,11 @@
 package com.hubspot.blazar.zookeeper;
 
-import com.google.common.base.Preconditions;
-import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.ZooKeeperConfiguration;
-import io.dropwizard.lifecycle.Managed;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionStateListener;
@@ -11,10 +13,12 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.ZooKeeperConfiguration;
+
+import io.dropwizard.lifecycle.Managed;
 
 public class BlazarCuratorProvider implements Provider<CuratorFramework>, Managed {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarCuratorProvider.class);
@@ -25,8 +29,11 @@ public class BlazarCuratorProvider implements Provider<CuratorFramework>, Manage
 
   @Inject
   public BlazarCuratorProvider(BlazarConfiguration configuration, Set<ConnectionStateListener> listeners) {
-    ZooKeeperConfiguration zooKeeperConfiguration = configuration.getZooKeeperConfiguration();
-
+    Optional<ZooKeeperConfiguration> maybeZooKeeperConfiguration = configuration.getZooKeeperConfiguration();
+    if (!maybeZooKeeperConfiguration.isPresent()) {
+      throw new IllegalArgumentException("Can not create a CuratorProvider with no zookeeper connection info in BlazarConfiguration");
+    }
+    ZooKeeperConfiguration zooKeeperConfiguration = maybeZooKeeperConfiguration.get();
     this.curatorFramework = CuratorFrameworkFactory.builder()
         .connectString(zooKeeperConfiguration.getQuorum())
         .sessionTimeoutMs(zooKeeperConfiguration.getSessionTimeoutMillis())

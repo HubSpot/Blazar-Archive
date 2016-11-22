@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.hubspot.rosetta.annotations.StoredAsJson;
 
@@ -60,16 +61,11 @@ public class RepositoryBuild {
     this.sha = sha;
     this.commitInfo = commitInfo;
     this.dependencyGraph = dependencyGraph;
-    this.buildOptions = com.google.common.base.Objects.firstNonNull(buildOptions, BuildOptions.defaultOptions());
+    this.buildOptions = MoreObjects.firstNonNull(buildOptions, BuildOptions.defaultOptions());
   }
 
   public static RepositoryBuild queuedBuild(GitInfo gitInfo, BuildTrigger trigger, int buildNumber, BuildOptions buildOptions) {
-    Optional<Long> absentLong = Optional.absent();
-    Optional<String> absentString = Optional.absent();
-    Optional<CommitInfo> commitInfo = Optional.absent();
-    Optional<DependencyGraph> dependencyGraph = Optional.absent();
-
-    return new RepositoryBuild(absentLong, gitInfo.getId().get(), buildNumber, State.QUEUED, trigger, absentLong, absentLong, absentString, commitInfo, dependencyGraph, buildOptions);
+    return newBuilder(gitInfo.getId().get(), buildNumber, State.QUEUED, trigger, buildOptions).build();
   }
 
   public Optional<Long> getId() {
@@ -116,31 +112,6 @@ public class RepositoryBuild {
     return buildOptions;
   }
 
-  public RepositoryBuild withId(long id) {
-    return new RepositoryBuild(Optional.of(id), branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph, buildOptions);
-  }
-
-  public RepositoryBuild withState(State state) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph, buildOptions);
-  }
-
-  public RepositoryBuild withStartTimestamp(long startTimestamp) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, Optional.of(startTimestamp), endTimestamp, sha, commitInfo, dependencyGraph, buildOptions);
-  }
-
-  public RepositoryBuild withEndTimestamp(long endTimestamp) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, Optional.of(endTimestamp), sha, commitInfo, dependencyGraph, buildOptions);
-  }
-
-  public RepositoryBuild withCommitInfo(CommitInfo commitInfo) {
-    Optional<String> sha = Optional.of(commitInfo.getCurrent().getId());
-    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, Optional.of(commitInfo), dependencyGraph, buildOptions);
-  }
-
-  public RepositoryBuild withDependencyGraph(DependencyGraph dependencyGraph) {
-    return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, Optional.of(dependencyGraph), buildOptions);
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -167,5 +138,101 @@ public class RepositoryBuild {
   @Override
   public int hashCode() {
     return Objects.hash(branchId, buildNumber);
+  }
+
+  public Builder toBuilder() {
+    return new Builder(branchId, buildNumber, state, buildTrigger, buildOptions)
+        .setId(id)
+        .setStartTimestamp(startTimestamp)
+        .setEndTimestamp(endTimestamp)
+        .setSha(sha)
+        .setCommitInfo(commitInfo)
+        .setDependencyGraph(dependencyGraph);
+  }
+
+  public static Builder newBuilder(int branchId, int buildNumber, State state, BuildTrigger buildTrigger, BuildOptions buildOptions) {
+    return new Builder(branchId, buildNumber, state, buildTrigger, buildOptions);
+  }
+
+  public static class Builder {
+    private Optional<Long> id = Optional.absent();
+    private int branchId;
+    private int buildNumber;
+    private State state;
+    private BuildTrigger buildTrigger;
+    private Optional<Long> startTimestamp = Optional.absent();
+    private Optional<Long> endTimestamp = Optional.absent();
+    private Optional<String> sha = Optional.absent();
+    private Optional<CommitInfo> commitInfo = Optional.absent();
+    private Optional<DependencyGraph> dependencyGraph = Optional.absent();
+    private BuildOptions buildOptions;
+
+
+    Builder(int branchId, int buildNumber, State state, BuildTrigger buildTrigger, BuildOptions buildOptions) {
+      this.branchId = branchId;
+      this.buildNumber = buildNumber;
+      this.state = state;
+      this.buildTrigger = buildTrigger;
+      this.buildOptions = buildOptions;
+    }
+
+    public Builder setId(Optional<Long> id) {
+      this.id = id;
+      return this;
+    }
+
+    public Builder setBranchId(int branchId) {
+      this.branchId = branchId;
+      return this;
+    }
+
+    public Builder setBuildNumber(int buildNumber) {
+      this.buildNumber = buildNumber;
+      return this;
+    }
+
+    public Builder setState(State state) {
+      this.state = state;
+      return this;
+    }
+
+    public Builder setBuildTrigger(BuildTrigger buildTrigger) {
+      this.buildTrigger = buildTrigger;
+      return this;
+    }
+
+    public Builder setStartTimestamp(Optional<Long> startTimestamp) {
+      this.startTimestamp = startTimestamp;
+      return this;
+    }
+
+    public Builder setEndTimestamp(Optional<Long> endTimestamp) {
+      this.endTimestamp = endTimestamp;
+      return this;
+    }
+
+    public Builder setSha(Optional<String> sha) {
+      this.sha = sha;
+      return this;
+    }
+
+    public Builder setCommitInfo(Optional<CommitInfo> commitInfo) {
+      this.commitInfo = commitInfo;
+      return this;
+    }
+
+    public Builder setDependencyGraph(Optional<DependencyGraph> dependencyGraph) {
+      this.dependencyGraph = dependencyGraph;
+      return this;
+    }
+
+    public Builder setBuildOptions(BuildOptions buildOptions) {
+      this.buildOptions = buildOptions;
+      return this;
+    }
+
+    public RepositoryBuild build() {
+      return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph, buildOptions);
+    }
   }
 }

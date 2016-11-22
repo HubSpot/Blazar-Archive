@@ -18,8 +18,10 @@ import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.branch.BranchStatus;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
+import com.hubspot.blazar.data.service.BranchStatusService;
 import com.hubspot.blazar.data.service.MalformedFileService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
@@ -30,7 +32,8 @@ import com.hubspot.jackson.jaxrs.PropertyFiltering;
 @Produces(MediaType.APPLICATION_JSON)
 public class BranchResource {
   private final BranchService branchService;
-  private BranchSettingsService branchSettingsService;
+  private final BranchStatusService branchStatusService;
+  private final BranchSettingsService branchSettingsService;
   private final ModuleService moduleService;
   private final MalformedFileService malformedFileService;
   private final ModuleDiscoveryService moduleDiscoveryService;
@@ -38,12 +41,14 @@ public class BranchResource {
 
   @Inject
   public BranchResource(BranchService branchService,
+                        BranchStatusService branchStatusService,
                         BranchSettingsService branchSettingsService,
                         ModuleService moduleService,
                         MalformedFileService malformedFileService,
                         ModuleDiscoveryService moduleDiscoveryService,
                         ModuleDiscovery moduleDiscovery) {
     this.branchService = branchService;
+    this.branchStatusService = branchStatusService;
     this.branchSettingsService = branchSettingsService;
     this.moduleService = moduleService;
     this.malformedFileService = malformedFileService;
@@ -76,6 +81,13 @@ public class BranchResource {
   @PropertyFiltering
   public Set<Module> getModules(@PathParam("id") int branchId) {
     return moduleService.getByBranch(branchId);
+  }
+
+  @GET
+  @Path("/{branchId}/status")
+  @PropertyFiltering
+  public Optional<BranchStatus> getBranchStatusById(@PathParam("branchId") int branchId) {
+    return branchStatusService.getBranchStatusById(branchId);
   }
 
   @GET

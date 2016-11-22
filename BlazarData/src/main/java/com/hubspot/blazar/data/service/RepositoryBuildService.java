@@ -8,13 +8,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
-import com.google.common.primitives.Ints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
+import com.google.common.primitives.Ints;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.GitInfo;
@@ -89,7 +89,7 @@ public class RepositoryBuildService {
   @Transactional
   protected RepositoryBuild enqueue(RepositoryBuild build, int expectedUpdateCount) {
     long id = repositoryBuildDao.enqueue(build);
-    build = build.withId(id);
+    build = build.toBuilder().setId(Optional.of(id)).build();
 
     checkAffectedRowCount(branchDao.updatePendingBuild(build), expectedUpdateCount);
 
@@ -144,10 +144,10 @@ public class RepositoryBuildService {
     }
 
     if (build.getState() == State.QUEUED) {
-      beginNoPublish(build.withState(State.LAUNCHING).withStartTimestamp(System.currentTimeMillis()));
+      beginNoPublish(build.toBuilder().setState(State.LAUNCHING).setStartTimestamp(Optional.of(System.currentTimeMillis())).build());
     }
 
-    update(build.withState(State.FAILED).withEndTimestamp(System.currentTimeMillis()));
+    update(build.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
   }
 
   public void cancel(RepositoryBuild build) {
@@ -158,7 +158,7 @@ public class RepositoryBuildService {
     if (build.getState() == State.QUEUED) {
       deleteQueuedBuild(build);
     } else {
-      update(build.withState(State.CANCELLED).withEndTimestamp(System.currentTimeMillis()));
+      update(build.toBuilder().setState(State.CANCELLED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
     }
   }
 

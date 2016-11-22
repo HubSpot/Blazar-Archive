@@ -44,22 +44,22 @@ public interface StateDao {
   /**
    * @param branchId The branch we are fetching module state for
    * @return Optional(ModuleState) (partial)
-   *
+   * <p>
    * Complete state of a module is a very complex thing spanning many different builds
    * - lastSuccessful
    * - lastNonSkipped
    * - lastCompleted
    * - pending
    * - inProgress
-   *
-   * To enhance performance, #getPartialModuleStatesForBranch retrieves the following data for each module on a branch:
+   * <p>
+   * To enhance performance, #getLastAndInProgressAndPendingBuildsForBranchAndIncludedModules retrieves the following data for each module on a branch:
    * - the module
    * - lastCompleted
    * - pending
    * - inProgress
-   *
+   * <p>
    * It returns these in the form of a partially filled ModuleState object, A set of ModuleBuildInfo for
-   * lastSuccessful and lastNonSkipped can be fetched with #getLastSuccessfulAndNonSkippedBuildInfos.
+   * lastSuccessful and lastNonSkipped can be fetched with #getLastSuccessfulAndNonSkippedModuleBuilds.
    */
   @SqlQuery("" +
       "SELECT * " +
@@ -75,7 +75,7 @@ public interface StateDao {
       "     LEFT OUTER JOIN module_builds AS pendingModuleBuild ON (module.pendingBuildId = pendingModuleBuild.id) " +
       "     LEFT OUTER JOIN repo_builds AS pendingBranchBuild ON (pendingModuleBuild.repoBuildId = pendingBranchBuild.id) " +
       "  WHERE branches.id = :branchId")
-  Set<ModuleState> getPartialModuleStatesForBranch(@Bind("branchId") int branchId);
+  Set<ModuleState> getLastAndInProgressAndPendingBuildsForBranchAndIncludedModules(@Bind("branchId") int branchId);
 
   /**
    * This query fetches build information for the lastSuccessful and lastNonSkipped builds for a module.
@@ -87,6 +87,6 @@ public interface StateDao {
       "UNION " +
       "(SELECT * FROM module_builds  as lastSuccessful WHERE moduleId = :moduleId AND lastSuccessful.state = 'SUCCEEDED' ORDER BY lastSuccessful.buildNumber DESC LIMIT 1)) AS moduleBuild " +
       "JOIN repo_builds AS branchBuild ON (branchBuild.id = moduleBuild.repoBuildId)")
-  Set<ModuleBuildInfo> getLastSuccessfulAndNonSkippedBuildInfos(@Bind("moduleId") int moduleId);
+  Set<ModuleBuildInfo> getLastSuccessfulAndNonSkippedModuleBuilds(@Bind("moduleId") int moduleId);
 }
 

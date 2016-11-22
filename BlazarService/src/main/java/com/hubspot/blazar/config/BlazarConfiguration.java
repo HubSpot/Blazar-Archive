@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
+
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 
@@ -30,10 +31,8 @@ public class BlazarConfiguration extends Configuration {
   @JsonProperty("executor")
   private ExecutorConfiguration executorConfiguration = ExecutorConfiguration.defaultConfiguration();
 
-  @Valid
-  @NotNull
   @JsonProperty("zookeeper")
-  private ZooKeeperConfiguration zooKeeperConfiguration;
+  private Optional<ZooKeeperConfiguration> zooKeeperConfiguration = Optional.absent();
 
   @Valid
   @NotNull
@@ -83,12 +82,12 @@ public class BlazarConfiguration extends Configuration {
     return this;
   }
 
-  public ZooKeeperConfiguration getZooKeeperConfiguration() {
+  public Optional<ZooKeeperConfiguration> getZooKeeperConfiguration() {
     return zooKeeperConfiguration;
   }
 
   public BlazarConfiguration setZooKeeperConfiguration(ZooKeeperConfiguration zooKeeperConfiguration) {
-    this.zooKeeperConfiguration = zooKeeperConfiguration;
+    this.zooKeeperConfiguration = Optional.of(zooKeeperConfiguration);
     return this;
   }
 
