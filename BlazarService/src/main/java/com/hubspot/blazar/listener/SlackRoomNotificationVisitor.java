@@ -119,8 +119,9 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor, Mod
     boolean shouldSend = false;
     final String logBase = String.format("Will send slack notification: RepoBuild %s,", String.valueOf(build.getId()));
     // OnChange
-    if (instantMessageConfiguration.getOnChange() && previous.isPresent() && previous.get().getState() != state) {
-      LOG.info("{} OnChange {}, changedState {}", logBase, instantMessageConfiguration.getOnChange(), previous.get().getState() == state);
+    boolean isChanged = previous.isPresent() && previous.get().getState() != state;
+    if (instantMessageConfiguration.getOnChange() && isChanged) {
+      LOG.info("{} OnChange {}, State has changed from {} to {}", logBase, instantMessageConfiguration.getOnChange(), previous.get().getState(), state);
       shouldSend = true;
     }
     // OnSuccess
