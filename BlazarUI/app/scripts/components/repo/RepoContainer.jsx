@@ -64,7 +64,9 @@ class RepoContainer extends Component {
       state.loading = false;
     }
 
-    state.builds = this.getFilteredBuilds(this.props, state.builds.all);
+    if (state.builds) {
+      state.builds = this.getFilteredBuilds(this.props, state.builds.all);
+    }
 
     this.setState(state);
   }
