@@ -30,12 +30,20 @@ const ModuleList = ({modules, onItemClick, selectedModuleId, onCancelBuild}) => 
               totalNonSkippedModuleBuildCount={moduleStates.size}
               onCancelBuild={onCancelBuild}
             />
-            <CardStack className="module-list-card-stack" key={buildNumber}>
+            <CardStack className="module-list-card-stack" condensed={true} key={buildNumber}>
               {moduleStates.map(moduleState => {
                 const id = moduleState.getIn(['module', 'id']);
                 const moduleName = moduleState.getIn(['module', 'name']);
                 const isSelected = selectedModuleId === id;
-                const summary = <ModuleItem moduleState={moduleState} isExpanded={isSelected} onClick={() => onItemClick(id)} />;
+                const summary = (
+                  <ModuleItem
+                    module={moduleState.get('module')}
+                    currentModuleBuild={getCurrentModuleBuild(moduleState)}
+                    currentBranchBuild={getCurrentBranchBuild(moduleState)}
+                    isExpanded={isSelected}
+                    onClick={() => onItemClick(id)}
+                  />
+                );
                 const details = <ModuleBuildHistory moduleName={moduleName} moduleId={id} />;
                 return (
                   <Card

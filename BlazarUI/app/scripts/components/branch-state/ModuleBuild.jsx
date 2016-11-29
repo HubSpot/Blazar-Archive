@@ -36,9 +36,9 @@ const ModuleBuild = ({module, moduleBuild, branchBuild, isExpanded, onClick}) =>
   };
   return (
     <div className={`module-build  module-build--${colorModifier}`} onClick={handleClick}>
+      <Icon name={expandIndicatorIcon} classNames={expandIndicatorClassNames} />
       <h3 className="module-build__module-name">{getModuleName(module, moduleBuild, branchBuild)}</h3>
       <ModuleBuildStatus moduleBuild={moduleBuild} />
-      <Icon name={expandIndicatorIcon} classNames={expandIndicatorClassNames} />
     </div>
   );
 };
