@@ -53,7 +53,7 @@ public interface RepositoryBuildDao {
   Set<RepositoryBuild> getRepositoryBuildsByState(@Bind("branchId") int branchId, @BindIn("states") List<RepositoryBuild.State> states);
 
   @SingleValueResult
-  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND buildNumber < :buildNumber ORDER BY buildNumber DESC limit 1")
+  @SqlQuery("SELECT * FROM repo_builds WHERE branchId = :branchId AND buildNumber \\< :buildNumber ORDER BY buildNumber DESC limit 1")
   Optional<RepositoryBuild> getPreviousBuild(@BindWithRosetta RepositoryBuild build);
 
   @GetGeneratedKeys
