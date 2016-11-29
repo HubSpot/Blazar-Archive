@@ -3,7 +3,8 @@ import {Link} from 'react-router';
 import BuildStates from '../../constants/BuildStates.js';
 import moment from 'moment';
 import classNames from 'classnames';
-import {timestampFormatted, timestampDuration, tableRowBuildState, truncate, buildResultIcon, getTableDurationText} from '../Helpers';
+import BuildStateIcon from '../shared/BuildStateIcon.jsx';
+import {timestampFormatted, timestampDuration, tableRowBuildState, truncate, getTableDurationText} from '../Helpers';
 
 class RepoBuildModulesTableRow extends Component {
 
@@ -99,7 +100,7 @@ class RepoBuildModulesTableRow extends Component {
     return (
       <tr onClick={this.onTableClick} className={this.getRowClassNames(data.state)}>
         <td className="build-status">
-          {buildResultIcon(data.state)}
+          <BuildStateIcon buildState={data.state} />
         </td>
         <td className="table-cell-link">
           {this.renderBuildLink()}

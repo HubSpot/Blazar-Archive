@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import {truncate} from '../Helpers.js';
 import Icon from '../shared/Icon.jsx';
 import BuildStates from '../../constants/BuildStates.js';
-import {buildResultIcon} from '../Helpers.js';
+import BuildStateIcon from '../shared/BuildStateIcon.jsx';
 
 class SidebarItem extends Component {
 
@@ -115,7 +115,7 @@ class SidebarItem extends Component {
     return (
       <Link to={buildToUse.blazarPath}>
         <div className="sidebar-item__building-icon-link">
-          {buildResultIcon(buildToUse.state)}
+          <BuildStateIcon buildState={buildToUse.state} />
         </div>
       </Link>
     );

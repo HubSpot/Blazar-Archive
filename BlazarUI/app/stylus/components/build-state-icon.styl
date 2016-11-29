@@ -1,0 +1,32 @@
+@import 'variables'
+
+.build-state-icon
+  font-size .75em
+
+.build-status .build-state-icon
+  position absolute
+  left 27px
+
+.build-state-icon--inner
+  color $color-olaf
+
+.build-state-icon--QUEUED, .build-state-icon--LAUNCHING, .build-state-icon--WAITING_FOR_UPSTREAM_BUILD, .build-state-icon--WAITING_FOR_BUILD_SLOT
+  color $default
+
+.build-state-icon--IN_PROGRESS
+  color $info
+
+.build-state-icon--CANCELLED, .build-state-icon--UNSTABLE
+  color $warning
+
+.build-state-icon--SUCCEEDED
+  color $success
+
+.build-state-icon--FAILED
+  color $danger
+
+.build-state-icon--SKIPPED
+  color $skipped
+
+.build-state-icon--never-built
+  color $default

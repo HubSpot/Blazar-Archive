@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import classNames from 'classnames';
-
-import {tableRowBuildState, timestampFormatted, buildResultIcon} from '../Helpers';
+import BuildStateIcon from '../shared/BuildStateIcon.jsx';
+import {tableRowBuildState, timestampFormatted} from '../Helpers';
 
 class OrgTableRow extends Component {
 
@@ -42,7 +42,7 @@ class OrgTableRow extends Component {
     return (
       <tr onClick={(e) => this.onTableClick(build.blazarPath, e)} className={this.getRowClassNames(build.state)}>
         <td className="build-status">
-          {buildResultIcon(build.state)}
+          <BuildStateIcon buildState={build.state} />
         </td>
         <td>
           <Link className="repo-link" to={this.props.data.get('blazarRepositoryPath')}>
