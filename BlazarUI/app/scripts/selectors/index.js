@@ -31,11 +31,20 @@ export const getBranchesInRepository = createSelector(
 
 const getModuleStates = (state) => state.branchState.get('moduleStates');
 
-export const getActiveModules = createSelector([getModuleStates],
+// For now, only display modules with builds on the branch state page
+const getModulesWithBuilds = createSelector([getModuleStates],
+  (moduleStates) => moduleStates.filter(moduleState =>
+    moduleState.has('inProgressBranchBuild') ||
+    moduleState.has('pendingBranchBuild') ||
+    moduleState.has('lastBranchBuild')
+  )
+);
+
+export const getActiveModules = createSelector([getModulesWithBuilds],
   (moduleStates) => moduleStates.filter(moduleState => moduleState.getIn(['module', 'active']))
 );
 
-export const getInactiveModules = createSelector([getModuleStates],
+export const getInactiveModules = createSelector([getModulesWithBuilds],
   (moduleStates) => moduleStates.filter(moduleState => !moduleState.getIn(['module', 'active']))
 );
 
