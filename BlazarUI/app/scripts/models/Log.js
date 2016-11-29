@@ -188,11 +188,15 @@ class Log extends Model {
     if (this.requestOffset !== 0 || removeFirstLine) {
       this.newLogLines = rest(this.newLogLines);
     }
-    // append extra text to last log line that is incomplete
-    this.newLogLines[this.newLogLines.length - 1].text = this.newLogLines[this.newLogLines.length - 1].text + this.firstLine.text;
-    // prepend new logLines to existing logLines
+
+    if (this.firstLine) {
+      // append extra text to last log line that is incomplete
+      const lastIndex = this.newLogLines.length - 1;
+      this.newLogLines[lastIndex].text += this.firstLine.text;
+    }
     this.firstLine = tempFirst;
 
+    // prepend new logLines to existing logLines
     this.logLines = [...this.newLogLines, ...this.logLines];
   }
 
