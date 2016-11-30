@@ -185,11 +185,6 @@ $build-and-status-width = 80px
   color $color-heffalump
   transition background $bg-transition-duration
 
-  & span
-    overflow-y hidden
-    text-overflow ellipsis
-    white-space nowrap
-
   &:hover
     background-color #eaf1f7
 
@@ -200,6 +195,11 @@ $build-and-status-width = 80px
   padding-left 25px
   float left
   max-width 70%
+  position relative
+
+.repo-branch-card__building-icon-link
+  position absolute
+  left -4px
 
 .repo-branch-card__expanded-timestamp
   float right

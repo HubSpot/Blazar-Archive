@@ -2,7 +2,8 @@ import React, {Component, PropTypes} from 'react';
 import BuildStates from '../../constants/BuildStates.js';
 import {Link} from 'react-router';
 import {has} from 'underscore';
-import {tableRowBuildState, timestampFormatted, buildResultIcon, timestampDuration} from '../Helpers';
+import BuildStateIcon from '../shared/BuildStateIcon.jsx';
+import {tableRowBuildState, timestampFormatted, timestampDuration} from '../Helpers';
 import moment from 'moment';
 import classNames from 'classnames';
 
@@ -110,7 +111,7 @@ class BranchesTableRow extends Component {
     return (
       <tr onClick={(e) => this.onTableClick(build.blazarPath, e)} className={this.getRowClassNames(build.state)}>
         <td className="build-status">
-          {buildResultIcon(build.state)}
+          <BuildStateIcon buildState={build.state} />
         </td>
         <td>
           {this.renderBranchLink()}

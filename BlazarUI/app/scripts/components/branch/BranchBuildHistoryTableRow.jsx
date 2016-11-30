@@ -4,9 +4,10 @@ import {Link} from 'react-router';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import {tableRowBuildState, timestampFormatted, buildResultIcon, getTableDurationText, buildIsOnDeck, timestampDuration} from '../Helpers';
+import {tableRowBuildState, timestampFormatted, getTableDurationText, buildIsOnDeck, timestampDuration} from '../Helpers';
 
 import Sha from '../shared/Sha.jsx';
+import BuildStateIcon from '../shared/BuildStateIcon.jsx';
 
 class BranchBuildHistoryTableRow extends Component {
 
@@ -98,7 +99,7 @@ class BranchBuildHistoryTableRow extends Component {
     return (
       <tr onClick={(e) => this.onTableClick(data.blazarPath, e)} className={this.getRowClassNames(data.state)}>
         <td className="build-status">
-          {buildResultIcon(data.state)}
+          <BuildStateIcon buildState={data.state} />
         </td>
         <td className="build-result-link">
           <span>{this.renderBuildLink()}</span>

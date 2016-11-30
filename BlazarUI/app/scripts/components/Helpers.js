@@ -1,4 +1,3 @@
-import React from 'react';
 import {uniq, contains} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import moment from 'moment';
@@ -7,10 +6,7 @@ import FINAL_BUILD_STATES from '../constants/finalBuildStates';
 import ACTIVE_BUILD_STATES from '../constants/ActiveBuildStates';
 import QUEUED_BUILD_STATES from '../constants/QueuedBuildStates';
 import MODULE_BUILD_STATES from '../constants/ModuleBuildStates';
-import {iconStatus} from './constants';
-import IconStack from './shared/IconStack.jsx';
 import Immutable from 'immutable';
-import classNames from 'classnames';
 import Cookies from 'js-cookie';
 
 export const getUsernameFromCookie = () => {
@@ -162,29 +158,6 @@ export const scrollTo = (direction) => {
 
 export const getPathname = () => {
   return window.location.pathname;
-};
-
-export const getBuildStatusIconClassNames = (result) => {
-  return classNames([
-    'building-icon',
-    `building-icon--${result}`
-  ]);
-};
-
-// To do: move these out as components in components/shared
-export const buildResultIcon = (result) => {
-  const iconClassNames = getBuildStatusIconClassNames(result);
-  const iconNames = Immutable.List.of(iconStatus[result]);
-
-  return (
-    <div className="table-icon-container">
-      <IconStack
-        iconStackBase="circle"
-        iconNames={iconNames}
-        classNames={iconClassNames}
-      />
-    </div>
-  );
 };
 
 export const getPreviousBuildState = (builds) => {

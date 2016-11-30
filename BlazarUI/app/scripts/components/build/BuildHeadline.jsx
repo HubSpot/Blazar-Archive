@@ -2,7 +2,8 @@ import React, {Component, PropTypes} from 'react';
 import Headline from '../shared/headline/Headline.jsx';
 import HeadlineDetail from '../shared/headline/HeadlineDetail.jsx';
 import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
-import {buildResultIcon, humanizeText, timestampDuration, buildIsInactive} from '../Helpers';
+import BuildStateIcon from '../shared/BuildStateIcon.jsx';
+import {humanizeText, timestampDuration, buildIsInactive} from '../Helpers';
 
 class BuildHeadline extends Component {
 
@@ -33,7 +34,7 @@ class BuildHeadline extends Component {
           {...this.props}
         />
         <Headline className="build__headline">
-          {buildResultIcon(this.props.data.build.state)}
+          <BuildStateIcon buildState={this.props.data.build.state} className="build-headline--build-state-icon" />
           <div className="build-headline">
             {moduleName}
             <HeadlineDetail>

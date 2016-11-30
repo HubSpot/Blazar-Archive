@@ -1,7 +1,7 @@
 import moment from 'moment';
 import humanizeDuration from 'humanize-duration';
 import { Link } from 'react-router';
-import { buildResultIcon } from '../Helpers';
+import BuildStateIcon from '../shared/BuildStateIcon.jsx';
 
 import React, { PropTypes } from 'react';
 import BuildStates from '../../constants/BuildStates';
@@ -45,7 +45,7 @@ const ModuleRow = ({module}) => {
     <div className={rowClassName}>
       <span className="repo-branch-card__expanded-status">
         <div className="repo-branch-card__building-icon-link">
-          {buildResultIcon(state)}
+          <BuildStateIcon buildState={state} />
         </div> {module.name} {statusText}
       </span>
       <span className="repo-branch-card__expanded-timestamp">
