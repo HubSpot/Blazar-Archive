@@ -15,6 +15,58 @@ $popover-arrow-outer-color ?= $color-calypso-light
 
 $text-muted ?= $color-eerie
 
+$link-color ?= $color-calypso
+$link-hover-color ?= #007A8C
+$text-color ?= $color-heffalump
+
+
+// === Table overrides ===
+
+$table-cell-padding ?= 20px
+$table-condensed-cell-padding ?= 10px
+$table-bg ?= $color-olaf
+$table-bg-accent ?= $color-gypsum
+$table-bg-hover ?= $color-gypsum
+$table-bg-active ?= $table-bg-hover
+$table-border-color ?= $color-koala
+
+
+// === Alert & state color overrides ===
+
+$state-success-bg ?= $color-oz-light
+$state-success-text ?= $color-heffalump
+$state-success-border ?= $color-oz-medium
+
+$state-info-bg ?= $color-calypso-light
+$state-info-text ?= $color-heffalump
+$state-info-border ?= $color-calypso-medium
+
+$state-warning-bg ?= #FDF3E1
+$state-warning-text ?= $color-heffalump
+$state-warning-border ?= #FBE1B2
+
+$state-danger-bg ?= $color-candy-apple-light
+$state-danger-text ?= $color-heffalump
+$state-danger-border ?= #FAA9AC
+
+$alert-padding ?= 8px
+
+
+// === Button overrides ===
+
+$btn-border-radius-base ?= 3px
+$btn-border-radius-large ?= 3px
+$btn-border-radius-small ?= 3px
+
+$btn-default-color ?= $color-button-secondary-text
+$btn-default-bg ?= $color-olaf
+$btn-default-border ?= $color-lorax
+
+$btn-primary-color ?= $color-olaf
+$btn-primary-bg ?= $color-lorax
+$btn-primary-border ?= $color-lorax
+
+
 @import 'bootstrap'
 
 .pagination > li > a
@@ -29,7 +81,7 @@ $text-muted ?= $color-eerie
   border-color #ccc
 
 .alert
-  border-radius $radius-standard
+  border-radius 0
   margin-bottom 10px
 
 .btn
@@ -59,48 +111,47 @@ label
 .tooltip-inner, .popover-content
   color $color-gypsum
 
-// For now, scope these overrides to new pages to avoid breaking existing
-// designs. This is not ideal because it causes some specificity issues
-// and we should settle on a consistent set of bootstrap overrides
-// across the entire app soon.
-.page-content--branch-state
-  a
-    color $color-calypso
+ .btn
+   padding: 0.75rem 1.5rem
 
-  .btn
-    radius 3px
-    padding: 0.75rem 1.5rem
+.btn-link
+  color $color-calypso
 
-  .btn-link
-    color $color-calypso
+.btn-lg
+  font-size 18px
 
-  .btn-lg
-    font-size 18px
-
-  .btn-default
+.btn-default
+  &:hover,
+  &:focus
+    background-color $color-button-secondary-hover-fill
     color $color-button-secondary-text
-    background-color $color-olaf
-    border-color $color-lorax
 
-    &:hover,
-    &:focus
-      background-color $color-button-secondary-hover-fill
-      color $color-button-secondary-text
+  &:active
+    background-color $color-button-secondary-active-fill
 
-    &:active
-      background-color $color-button-secondary-active-fill
-
-  .btn-primary
+.btn-primary
+  &:hover,
+  &:focus
+    background-color $color-button-primary-hover-fill
+    border-color $color-button-primary-hover-fill
     color $color-olaf
-    background-color $color-lorax
-    border-color $color-lorax
 
-    &:hover,
-    &:focus
-      background-color $color-button-primary-hover-fill
-      border-color $color-button-primary-hover-fill
-      color $color-olaf
+  &:active
+    background-color $color-lorax-dark
+    border-color $color-lorax-dark
 
-    &:active
-      background-color $color-lorax-dark
-      border-color $color-lorax-dark
+
+// Table styling overrides
+table
+  border 1px solid $color-koala
+
+  thead
+    background $color-gypsum
+
+    th
+      text-transform uppercase
+      font-size 12px
+
+.table
+  th
+    color $color-heffalump
