@@ -40,7 +40,8 @@ const initialState = {
 
 class BranchContainer extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
     this.state = initialState;
     bindAll(this, 'onStatusChange', 'refreshBranches');
   }

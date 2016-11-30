@@ -5,6 +5,7 @@ import ModuleBuildStatus from '../shared/ModuleBuildStatus.jsx';
 import BuildTriggerLabel from '../shared/BuildTriggerLabel.jsx';
 import UsersForBuild from '../shared/UsersForBuild.jsx';
 import CommitsSummary from '../shared/CommitsSummary.jsx';
+import ModuleBuildListItemWrapper from '../shared/ModuleBuildListItemWrapper.jsx';
 
 import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../../Helpers';
 
@@ -19,25 +20,27 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
 
   return (
     <li>
-      <div className={"module-build-history-item"}>
-        <div className="module-build-history-item__build-number">
-          {canViewDetailedModuleBuildInfo(moduleBuild) ?
-            <Link to={linkPath}>{formattedBuildNumber}</Link> : formattedBuildNumber
-          }
+      <ModuleBuildListItemWrapper moduleBuild={moduleBuild}>
+        <div className={"module-build-history-item"}>
+          <div className="module-build-history-item__build-number">
+            {canViewDetailedModuleBuildInfo(moduleBuild) ?
+              <Link to={linkPath}>{formattedBuildNumber}</Link> : formattedBuildNumber
+            }
+          </div>
+          <div className="module-build-history-item__status">
+            <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} />
+          </div>
+          <div className="module-build-history-item__build-trigger-label">
+            <BuildTriggerLabel buildTrigger={branchBuild.get('buildTrigger')} />
+          </div>
+          <div className="module-build-history-item__users-for-build-wrapper">
+            <UsersForBuild branchBuild={branchBuild} />
+          </div>
+          <div className="module-build-history-item__commits-wrapper">
+            <CommitsSummary commitInfo={commitInfo} buildId={branchBuild.get('id')} popoverPlacement="left" />
+          </div>
         </div>
-        <div className="module-build-history-item__status">
-          <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} />
-        </div>
-        <div className="module-build-history-item__build-trigger-label">
-          <BuildTriggerLabel buildTrigger={branchBuild.get('buildTrigger')} />
-        </div>
-        <div className="module-build-history-item__users-for-build-wrapper">
-          <UsersForBuild branchBuild={branchBuild} />
-        </div>
-        <div className="module-build-history-item__commits-wrapper">
-          <CommitsSummary commitInfo={commitInfo} buildId={branchBuild.get('id')} popoverPlacement="left" />
-        </div>
-      </div>
+      </ModuleBuildListItemWrapper>
     </li>
   );
 };

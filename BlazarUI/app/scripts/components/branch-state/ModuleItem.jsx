@@ -1,15 +1,15 @@
 import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import ModuleBuild from './ModuleBuild.jsx';
+import ModuleItemSummary from './ModuleItemSummary.jsx';
 
 const ModuleItem = ({module, currentModuleBuild, currentBranchBuild, isExpanded, onClick}) => {
   return (
     <li className="module-item">
-      <ModuleBuild
+      <ModuleItemSummary
         module={module}
-        moduleBuild={currentModuleBuild}
-        branchBuild={currentBranchBuild}
+        currentModuleBuild={currentModuleBuild}
+        currentBranchBuild={currentBranchBuild}
         isExpanded={isExpanded}
         onClick={onClick}
       />

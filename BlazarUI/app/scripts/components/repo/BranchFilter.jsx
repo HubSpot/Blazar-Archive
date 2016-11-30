@@ -5,7 +5,8 @@ import {getUniqueBranches} from '../Helpers';
 
 class BranchFilter extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
     bindAll(this, 'handleBranchFilterChange', 'handleModuleFilterChange', 'handleFilterFocus', 'handleFilterBlur');
 
     this.filters = {

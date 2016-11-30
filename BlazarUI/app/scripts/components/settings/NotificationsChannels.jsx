@@ -9,7 +9,8 @@ import SettingsActions from '../../actions/settingsActions';
 
 class NotificationsChannels extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
     this.state = {
       channelDeleted: undefined,
       showToast: false,

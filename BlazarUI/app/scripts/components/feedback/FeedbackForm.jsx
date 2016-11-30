@@ -12,7 +12,8 @@ import { getUsernameFromCookie } from '../Helpers.js';
 
 class FeedbackForm extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
     bindAll(this, 'toggleShow', 'submitFeedback', 'handleNameChange', 'handleMessageChange', 'resetForm', 'onStatusChange');
     this.state = {
       sendError: false,

@@ -1,59 +1,49 @@
 @import '../../variables'
 
-.module-build
+.module-item-summary
   padding 12px 20px
   display flex
   cursor pointer
   height 45px
   align-items center
-  border-left-width 5px
-  border-left-style solid
 
-.module-build--success
-  border-left-color $color-oz
-
-.module-build--info
-  border-left-color $color-calypso
-
-.module-build--success, .module-build--info
   &:hover
     background-color $color-gypsum
 
-    .module-build__expand-indicator
+    .module-item-summary__expand-indicator
       color $color-calypso-medium
 
-.module-build--failed
-  border-left-color $color-candy-apple
+.module-item-summary--danger
   background-color $color-norman-light
 
   &:hover
     background-color #fcd4e1
 
-    .module-build__expand-indicator
+    .module-item-summary__expand-indicator
       color $color-flint
 
-  .module-build__expand-indicator
+  .module-item-summary__expand-indicator
     color $color-battleship
 
-  .module-build__expand-indicator--expanded
+  .module-item-summary__expand-indicator--expanded
     color $color-flint
 
-.module-build--warning
+.module-item-summary--warning
   background-color $color-marigold-light
 
   &:hover
     background-color #ffedd6
 
-    .module-build__expand-indicator
+    .module-item-summary__expand-indicator
       color $color-calypso-medium
 
-  .module-build__expand-indicator
+  .module-item-summary__expand-indicator
     color $color-battleship
 
-  .module-build__expand-indicator--expanded
+  .module-item-summary__expand-indicator--expanded
     color $color-calypso-medium
 
-.module-build__module-name
+.module-item-summary__module-name
   font-size 18px
   font-weight normal
   color $color-calypso
@@ -61,12 +51,12 @@
   min-width 30%
   margin-right 10px
 
-.module-build__expand-indicator
+.module-item-summary__expand-indicator
   flex-shrink 0
   width 60px
   transform scaleY(0.85)
   color $color-koala
   transition color 0.5s
 
-.module-build__expand-indicator--expanded
+.module-item-summary__expand-indicator--expanded
   color $color-calypso-medium

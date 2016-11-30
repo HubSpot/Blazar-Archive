@@ -9,7 +9,8 @@ const FOCUS_SEARCH_BAR_SHORTCUTS = [83, 84]; // s, t
 // To do: Typeahead in input box
 class SearchFilter extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
     bindAll(this, 'handleChange', 'onStoreChange', 'handleKeyup');
     this.state = {
       searchValue: ''

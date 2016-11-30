@@ -20,15 +20,13 @@ const ModuleBuildStates = keyMirror({
 export const getClassNameColorModifier = (state) => {
   switch (state) {
     case ModuleBuildStates.FAILED:
-      return 'failed';
+      return 'danger';
     case ModuleBuildStates.SUCCEEDED:
       return 'success';
     case ModuleBuildStates.CANCELLED:
       return 'warning';
-    case ModuleBuildStates.SKIPPED:
-      return 'muted';
     default:
-      return 'info';
+      return '';
   }
 };
 
