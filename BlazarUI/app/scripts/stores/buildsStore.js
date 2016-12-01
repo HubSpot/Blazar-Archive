@@ -8,6 +8,10 @@ import {isEmpty} from 'underscore';
 
 import reduxStore from '../reduxStore';
 
+// since we are polling, handle errors more gracefully by only reporting
+// them if we have failed multiple times
+const NUMBER_OF_ALLOWED_RETRIES = 1;
+
 const BuildsStore = Reflux.createStore({
 
   listenables: BuildsActions,
@@ -18,6 +22,7 @@ const BuildsStore = Reflux.createStore({
       building: [],
       starred: []
     };
+    this.failedAttempts = 0;
   },
 
   getBuilds() {
@@ -29,6 +34,22 @@ const BuildsStore = Reflux.createStore({
     this.trigger({builds: this.builds});
   },
 
+  handleFetchBuildsError(err) {
+    this.failedAttempts++;
+    const hasPreviouslyFetchedData = this.builds.all.length > 0;
+    const exhaustedAllRetries = this.failedAttempts > NUMBER_OF_ALLOWED_RETRIES;
+
+    if (!hasPreviouslyFetchedData || exhaustedAllRetries) {
+      this.trigger({
+        loading: false,
+        error: {
+          status: err.status,
+          statusText: err.statusText
+        }
+      });
+    }
+  },
+
   onStopPollingBuilds() {
     BuildsApi.stopPolling();
   },
@@ -37,20 +58,16 @@ const BuildsStore = Reflux.createStore({
     const extraData = isEmpty(params);
     BuildsApi.fetchBuilds(extraData, (err, resp) => {
       if (err) {
-        this.trigger({
-          loading: false,
-          error: {
-            status: err.status,
-            statusText: err.statusText
-          }
-        });
+        this.handleFetchBuildsError(err);
         return;
       }
-      this.builds = resp;
 
+      this.builds = resp;
+      this.failedAttempts = 0;
       this.trigger({
         builds: this.builds,
-        loading: false
+        loading: false,
+        error: null
       });
     });
   }

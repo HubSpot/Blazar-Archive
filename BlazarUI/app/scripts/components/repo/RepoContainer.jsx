@@ -59,16 +59,19 @@ class RepoContainer extends Component {
     });
   }
 
-  onStatusChange(state) {
-    if (state.error) {
-      state.loading = false;
+  onStatusChange(status) {
+    if (status.error && this.state.loading) {
+      this.setState({
+        loading: false,
+        error: 'Unable to load builds.'
+      });
+    } else if (status.builds) {
+      this.setState({
+        loading: false,
+        builds: this.getFilteredBuilds(this.props, status.builds.all),
+        error: null
+      });
     }
-
-    if (state.builds) {
-      state.builds = this.getFilteredBuilds(this.props, state.builds.all);
-    }
-
-    this.setState(state);
   }
 
   updateFilters(newFilters) {
@@ -95,9 +98,7 @@ class RepoContainer extends Component {
                 Branches
               </HeadlineDetail>
             </Headline>
-            <GenericErrorMessage
-              message={this.state.error}
-            />
+            <GenericErrorMessage message={this.state.error} />
             <BranchFilter
               hide={this.state.error}
               updateFilters={this.updateFilters}
