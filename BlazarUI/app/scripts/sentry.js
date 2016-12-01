@@ -7,6 +7,12 @@ const captureAjaxError = (event, xhr, ajaxSettings) => {
   const {status, statusText, responseText, responseJSON} = xhr;
   const {type, url} = ajaxSettings;
 
+  // only report errors returned by api requests, not browser level
+  // errors (e.g. when the user is not connected to the internet)
+  if (status === 0) {
+    return;
+  }
+
   window.Raven.captureMessage('Ajax Error', {
     extra: {
       status,
