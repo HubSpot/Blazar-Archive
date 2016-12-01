@@ -170,7 +170,7 @@ class Log extends Model {
       this.newLogLines = initial(this.newLogLines);
     }
     // prepend the rest of the first line that was cutoff last fetch
-    if (this.lastLine) {
+    if (this.lastLine && this.newLogLines.length) {
       this.newLogLines[0].text = this.lastLine.text + this.newLogLines[0].text;
     }
     this.lastLine = tempLast;
@@ -189,7 +189,7 @@ class Log extends Model {
       this.newLogLines = rest(this.newLogLines);
     }
 
-    if (this.firstLine) {
+    if (this.firstLine && this.newLogLines.length) {
       // append extra text to last log line that is incomplete
       const lastIndex = this.newLogLines.length - 1;
       this.newLogLines[lastIndex].text += this.firstLine.text;
