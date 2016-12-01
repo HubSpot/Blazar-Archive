@@ -98,12 +98,7 @@ function stopPolling() {
   this.buildsPoller.disconnect();
 }
 
-function fetchBuild() {
-
-}
-
 export default {
   fetchBuilds,
-  fetchBuild,
   stopPolling
 };
