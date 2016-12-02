@@ -44,7 +44,16 @@ const ModuleList = ({modules, onItemClick, selectedModuleId, onCancelBuild}) => 
                     onClick={() => onItemClick(id)}
                   />
                 );
-                const details = <ModuleBuildHistory moduleName={moduleName} moduleId={id} />;
+
+                const lastSuccessfulBuildNumber = moduleState.getIn(['lastSuccessfulModuleBuild', 'buildNumber']);
+                const details = (
+                  <ModuleBuildHistory
+                    moduleName={moduleName}
+                    moduleId={id}
+                    lastSuccessfulBuildNumber={lastSuccessfulBuildNumber}
+                  />
+                );
+
                 return (
                   <Card
                     key={id}
