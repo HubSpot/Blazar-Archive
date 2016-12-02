@@ -1,6 +1,5 @@
 package com.hubspot.blazar.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 
@@ -56,7 +55,7 @@ public class RepositoryBuildLauncher {
     this.gitHubHelper = gitHubHelper;
   }
 
-  public void launch(RepositoryBuild queued, Optional<RepositoryBuild> previous) throws Exception {
+  public void launch(RepositoryBuild queued, Optional<RepositoryBuild> previous) {
     GitInfo gitInfo = branchService.get(queued.getBranchId()).get();
     CommitInfo commitInfo = commitInfo(gitInfo, commit(previous));
     Set<Module> modules = updateModules(gitInfo, commitInfo);
@@ -71,24 +70,26 @@ public class RepositoryBuildLauncher {
     repositoryBuildService.begin(launching);
   }
 
-  Set<Module> updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
-    if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
-      DiscoveryResult result = moduleDiscovery.discover(gitInfo);
-      return moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
-    } else {
-      return moduleService.getByBranch(gitInfo.getId().get());
+  Set<Module> updateModules(GitInfo gitInfo, CommitInfo commitInfo) {
+    try {
+      if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
+        DiscoveryResult result = moduleDiscovery.discover(gitInfo);
+        return moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
+      } else {
+        return moduleService.getByBranch(gitInfo.getId().get());
+      }
+    } catch (IOException e) {
+      String message = String.format("Failure during discovery of %s, %s can not proceed with build", gitInfo, commitInfo);
+      LOG.warn(message);
+      throw new NonRetryableBuildException(message, e);
     }
   }
 
-  private CommitInfo commitInfo(GitInfo gitInfo, Optional<Commit> previousCommit) throws IOException, NonRetryableBuildException {
+  private CommitInfo commitInfo(GitInfo gitInfo, Optional<Commit> previousCommit) {
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
 
     final GHRepository repository;
-    try {
-      repository = gitHubHelper.repositoryFor(gitInfo);
-    } catch (FileNotFoundException e) {
-      throw new NonRetryableBuildException("Couldn't find repository " + gitInfo.getFullRepositoryName(), e);
-    }
+    repository = gitHubHelper.repositoryFor(gitInfo);
 
     Optional<String> sha = gitHubHelper.shaFor(repository, gitInfo);
     if (!sha.isPresent()) {
@@ -97,7 +98,7 @@ public class RepositoryBuildLauncher {
     } else {
       LOG.info("Found sha {} for branch {}/{}", sha.get(), gitInfo.getRepository(), gitInfo.getBranch());
 
-      Commit currentCommit = gitHubHelper.toCommit(repository.getCommit(sha.get()));
+      Commit currentCommit = gitHubHelper.toCommitFromRepoAndSha(repository, sha.get());
       return gitHubHelper.commitInfoFor(repository, currentCommit, previousCommit);
     }
   }

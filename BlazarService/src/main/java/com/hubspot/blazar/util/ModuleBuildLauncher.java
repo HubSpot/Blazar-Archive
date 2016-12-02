@@ -1,7 +1,5 @@
 package com.hubspot.blazar.util;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,7 +12,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -33,7 +30,6 @@ import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.exception.NonRetryableBuildException;
 
 @Singleton
 public class ModuleBuildLauncher {
@@ -58,7 +54,7 @@ public class ModuleBuildLauncher {
     this.executorConfiguration = blazarConfiguration.getExecutorConfiguration();
   }
 
-  public void launch(RepositoryBuild repositoryBuild, ModuleBuild build) throws Exception {
+  public void launch(RepositoryBuild repositoryBuild, ModuleBuild build) {
     GitInfo gitInfo = branchService.get(repositoryBuild.getBranchId()).get().withBranch(repositoryBuild.getSha().get());
     Module module = moduleService.get(build.getModuleId()).get();
 
@@ -75,7 +71,7 @@ public class ModuleBuildLauncher {
     moduleBuildService.begin(launching);
   }
 
-  private BuildConfig resolveConfig(BuildConfig buildConfig, Module module) throws IOException, NonRetryableBuildException {
+  private BuildConfig resolveConfig(BuildConfig buildConfig, Module module) {
     if (buildConfig.getBuildpack().isPresent()) {
       BuildConfig buildpackConfig = fetchBuildpack(buildConfig.getBuildpack().get());
       return mergeConfig(buildConfig, buildpackConfig);
@@ -89,7 +85,7 @@ public class ModuleBuildLauncher {
     }
   }
 
-  private BuildConfig fetchBuildpack(GitInfo gitInfo) throws IOException, NonRetryableBuildException {
+  private BuildConfig fetchBuildpack(GitInfo gitInfo) {
     return configAtSha(gitInfo, ".blazar-buildpack.yaml");
   }
 
@@ -126,26 +122,18 @@ public class ModuleBuildLauncher {
     return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, depends, provides);
   }
 
-  private BuildConfig configAtSha(GitInfo gitInfo, Module module) throws IOException, NonRetryableBuildException {
+  private BuildConfig configAtSha(GitInfo gitInfo, Module module) {
     String folder = module.getFolder();
     String configPath = folder + (folder.isEmpty() ? "" : "/") + ".blazar.yaml";
 
     return configAtSha(gitInfo, configPath);
   }
 
-  private BuildConfig configAtSha(GitInfo gitInfo, String configPath) throws IOException, NonRetryableBuildException {
+  private BuildConfig configAtSha(GitInfo gitInfo, String configPath) {
     String repositoryName = gitInfo.getFullRepositoryName();
     LOG.info("Going to fetch config for path {} in repo {}@{}", configPath, repositoryName, gitInfo.getBranch());
 
-    try {
-      Optional<BuildConfig> buildConfig = gitHubHelper.configFor(configPath, gitInfo);
-      return buildConfig.or(BuildConfig.makeDefaultBuildConfig());
-    } catch (JsonProcessingException e) {
-      String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", configPath, repositoryName, gitInfo.getBranch());
-      throw new NonRetryableBuildException(message, e);
-    } catch (FileNotFoundException e) {
-      String message = String.format("No repository found for %s", gitInfo.getFullRepositoryName());
-      throw new NonRetryableBuildException(message, e);
-    }
+    Optional<BuildConfig> buildConfig = gitHubHelper.configFor(configPath, gitInfo);
+    return buildConfig.or(BuildConfig.makeDefaultBuildConfig());
   }
 }

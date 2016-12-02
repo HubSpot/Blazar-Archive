@@ -13,7 +13,6 @@ import org.kohsuke.github.GHTreeEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.hubspot.blazar.base.BuildConfig;
@@ -23,6 +22,7 @@ import com.hubspot.blazar.base.DiscoveredModule;
 import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
+import com.hubspot.blazar.exception.NonRetryableBuildException;
 import com.hubspot.blazar.util.GitHubHelper;
 
 @Singleton
@@ -81,7 +81,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
       final BuildConfig buildConfig;
       try {
         buildConfig = gitHubHelper.configFor(blazarConfig, repository, gitInfo).get();
-      } catch (JsonProcessingException e) {
+      } catch (NonRetryableBuildException e) {
         LOG.warn("Error parsing config at path {} for repository {}@{}", blazarConfig, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
         malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "config", blazarConfig, Throwables.getStackTraceAsString(e)));
         continue;

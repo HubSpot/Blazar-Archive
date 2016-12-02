@@ -23,6 +23,8 @@ import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 import com.hubspot.blazar.data.dao.QueueItemDao;
 import com.hubspot.blazar.data.queue.QueueItem;
+import com.hubspot.blazar.data.service.InterProjectBuildService;
+import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 
 import io.dropwizard.lifecycle.Managed;
@@ -32,6 +34,8 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(QueueProcessor.class);
 
   private final ScheduledExecutorService executorService;
+  private final RepositoryBuildService repositoryBuildService;
+  private final InterProjectBuildService interProjectBuildService;
   private final Map<String, ScheduledExecutorService> queueExecutors;
   private final QueueItemDao queueItemDao;
   private final SqlEventBus eventBus;
@@ -44,9 +48,13 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   @Inject
   public QueueProcessor(@Named("QueueProcessor") ScheduledExecutorService executorService,
                         QueueItemDao queueItemDao,
+                        RepositoryBuildService repositoryBuildService,
+                        InterProjectBuildService interProjectBuildService,
                         SqlEventBus eventBus,
                         Set<Object> erroredItems) {
     this.executorService = executorService;
+    this.repositoryBuildService = repositoryBuildService;
+    this.interProjectBuildService = interProjectBuildService;
     this.queueExecutors = new ConcurrentHashMap<>();
     this.queueItemDao = queueItemDao;
     this.eventBus = eventBus;
