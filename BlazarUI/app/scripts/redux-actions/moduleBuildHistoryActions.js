@@ -10,9 +10,10 @@ const computeBuildNumberOffset = (buildHistory, page) => {
 
 export const loadModuleBuildHistory = (moduleId, maybePage) => {
   return (dispatch, getState) => {
+    const requestStartTime = Date.now();
     dispatch({
       type: ActionTypes.REQUEST_MODULE_BUILD_HISTORY,
-      payload: {moduleId}
+      payload: {moduleId, requestStartTime}
     });
 
     const buildHistory = getState().moduleBuildHistoriesByModuleId.get(moduleId);

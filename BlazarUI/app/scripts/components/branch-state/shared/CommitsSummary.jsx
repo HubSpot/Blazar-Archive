@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Immutable from 'immutable';
-import classNames from 'classnames';
 
 import Button from 'react-bootstrap/lib/Button';
 import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
@@ -11,7 +10,7 @@ import Icon from '../../shared/Icon.jsx';
 import CommitsSummaryPopover from './CommitsSummaryPopover.jsx';
 import { getCompareUrl } from '../../../utils/commitInfoHelpers';
 
-const CommitsSummary = ({commitInfo, className, popoverPlacement, buildId}) => {
+const CommitsSummary = ({commitInfo, popoverPlacement, buildId}) => {
   const currentCommit = commitInfo.get('current');
   const newCommits = commitInfo.get('newCommits');
 
@@ -43,11 +42,7 @@ const CommitsSummary = ({commitInfo, className, popoverPlacement, buildId}) => {
   return (
     <span>
       <OverlayTrigger trigger="click" rootClose={true} placement={popoverPlacement} overlay={popover}>
-        <Button
-          bsStyle="link"
-          className={classNames('commits-summary', className)}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <Button bsStyle="link" className="commits-summary">
           <Icon type="octicon" name="git-commit" classNames="commits-summary-icon" />{text}
         </Button>
       </OverlayTrigger>
@@ -60,7 +55,6 @@ CommitsSummary.propTypes = {
     current: ImmutablePropTypes.map,
     newCommits: ImmutablePropTypes.list
   }),
-  className: PropTypes.string,
   popoverPlacement: PropTypes.string,
   buildId: PropTypes.number.isRequired
 };

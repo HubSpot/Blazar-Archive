@@ -24,7 +24,7 @@ import { getCurrentModuleBuild, getCurrentBranchBuild, getBlazarModuleBuildPath 
 class BranchState extends Component {
   constructor(props) {
     super(props);
-    bindAll(this, 'handleBranchSelect', 'handleModuleItemClick', 'handleVisibilityChange', 'refreshBranchModuleStates');
+    bindAll(this, 'handleBranchSelect', 'handleVisibilityChange', 'refreshBranchModuleStates');
   }
 
   componentDidMount() {
@@ -108,15 +108,6 @@ class BranchState extends Component {
     window.document.activeElement.blur();
   }
 
-  handleModuleItemClick(id) {
-    const {selectModule, deselectModule, selectedModuleId} = this.props;
-    if (id === selectedModuleId) {
-      deselectModule();
-    } else {
-      selectModule(id);
-    }
-  }
-
   handleVisibilityChange() {
     if (document.hidden) {
       this.props.stopPollingBranchStatus();
@@ -180,8 +171,6 @@ class BranchState extends Component {
             <section id="active-modules">
               <ModuleList
                 modules={this.sortModules(activeModules)}
-                onItemClick={this.handleModuleItemClick}
-                selectedModuleId={selectedModuleId}
                 onCancelBuild={this.refreshBranchModuleStates}
               />
             </section>
@@ -193,8 +182,6 @@ class BranchState extends Component {
                 <p className="text-muted">Showing previous builds of modules no longer contained in this branch.</p>
                 <ModuleList
                   modules={this.sortModules(inactiveModules)}
-                  onItemClick={this.handleModuleItemClick}
-                  selectedModuleId={selectedModuleId}
                   onCancelBuild={this.refreshBranchModuleStates}
                 />
               </section>
@@ -247,8 +234,6 @@ BranchState.propTypes = {
   pendingBranchBuilds: ImmutablePropTypes.list,
   malformedFiles: ImmutablePropTypes.list,
   router: routerShape,
-  selectModule: PropTypes.func.isRequired,
-  deselectModule: PropTypes.func.isRequired,
   selectedModuleId: PropTypes.number,
   loadBranchStatus: PropTypes.func.isRequired,
   pollBranchStatus: PropTypes.func.isRequired,

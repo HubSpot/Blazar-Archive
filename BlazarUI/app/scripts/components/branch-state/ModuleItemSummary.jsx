@@ -10,14 +10,18 @@ import ModuleBuildListItemWrapper from './shared/ModuleBuildListItemWrapper.jsx'
 import { getClassNameColorModifier } from '../../constants/ModuleBuildStates';
 import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../Helpers';
 
-const getModuleName = (module, moduleBuild, branchBuild) => {
-  const moduleName = module.get('name');
+const getBuildLogLink = (module, moduleBuild, branchBuild) => {
   if (canViewDetailedModuleBuildInfo(moduleBuild)) {
+    const moduleName = module.get('name');
     const linkPath = getBlazarModuleBuildPath(branchBuild.get('branchId'), moduleBuild.get('buildNumber'), moduleName);
-    return <Link to={linkPath}>{moduleName}</Link>;
+    return (
+      <div className="module-item-summary__build-log-link-container">
+        <Link to={linkPath}>View build log</Link>
+      </div>
+    );
   }
 
-  return moduleName;
+  return null;
 };
 
 const ModuleItemSummary = ({module, currentModuleBuild, currentBranchBuild, isExpanded, onClick}) => {
@@ -44,8 +48,9 @@ const ModuleItemSummary = ({module, currentModuleBuild, currentBranchBuild, isEx
     <ModuleBuildListItemWrapper moduleBuild={currentModuleBuild}>
       <div className={divClassName} onClick={handleClick}>
         <Icon name={expandIndicatorIcon} classNames={expandIndicatorClassName} />
-        <h3 className="module-item-summary__module-name">{getModuleName(module, currentModuleBuild, currentBranchBuild)}</h3>
+        <h3 className="module-item-summary__module-name">{module.get('name')}</h3>
         <ModuleBuildStatus moduleBuild={currentModuleBuild} />
+        {getBuildLogLink(module, currentModuleBuild, currentBranchBuild)}
       </div>
     </ModuleBuildListItemWrapper>
   );

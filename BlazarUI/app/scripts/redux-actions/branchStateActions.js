@@ -1,6 +1,7 @@
 import ActionTypes from './ActionTypes';
 import BranchStateApi from '../data/BranchStateApi';
 import { loadModuleBuildHistory } from './moduleBuildHistoryActions';
+import { isModuleItemSelected } from '../selectors/moduleBuildHistorySelectors';
 import Q from 'q';
 
 let pollingTimeoutId = null;
@@ -63,7 +64,7 @@ export const stopPollingBranchStatus = () => ({
   type: ActionTypes.STOP_POLLING_BRANCH_STATUS
 });
 
-export const selectModule = (moduleId) => {
+const selectModule = (moduleId) => {
   return (dispatch) => {
     dispatch({
       type: ActionTypes.SELECT_MODULE,
@@ -73,9 +74,17 @@ export const selectModule = (moduleId) => {
   };
 };
 
-export const deselectModule = () => ({
+const deselectModule = () => ({
   type: ActionTypes.DESELECT_MODULE
 });
+
+export const handleModuleItemClick = (moduleId) => {
+  return (dispatch, getState) => {
+    const isModuleSelected = isModuleItemSelected(getState(), {moduleId});
+    const action = isModuleSelected ? deselectModule() : selectModule(moduleId);
+    dispatch(action);
+  };
+};
 
 export const dismissBetaNotification = () => ({
   type: ActionTypes.DISMISS_BRANCH_STATE_PAGE_BETA_NOTIFICATION
@@ -85,7 +94,6 @@ export default {
   loadBranchStatus,
   pollBranchStatus,
   stopPollingBranchStatus,
-  selectModule,
-  deselectModule,
+  handleModuleItemClick,
   dismissBetaNotification
 };
