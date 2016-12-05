@@ -43,7 +43,7 @@ const _pollBranchStatus = (branchId) => {
       if (state.get('isPolling') && state.get('branchId') === branchId) {
         pollingTimeoutId = setTimeout(() => {
           dispatch(_pollBranchStatus(branchId));
-        }, window.config.moduleStateRefresh);
+        }, window.config.branchStateRefresh);
       }
     });
   };
