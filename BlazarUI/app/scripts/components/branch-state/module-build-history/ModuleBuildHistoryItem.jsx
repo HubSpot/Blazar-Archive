@@ -9,23 +9,30 @@ import ModuleBuildListItemWrapper from '../shared/ModuleBuildListItemWrapper.jsx
 
 import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../../Helpers';
 
-const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
+const renderBuildNumber = (moduleName, moduleBuild, branchBuild) => {
   const branchId = branchBuild.get('branchId');
   const buildNumber = moduleBuild.get('buildNumber');
   const formattedBuildNumber = `#${buildNumber}`;
 
-  const linkPath = getBlazarModuleBuildPath(branchId, buildNumber, moduleName);
+  if (canViewDetailedModuleBuildInfo(moduleBuild)) {
+    const linkPath = getBlazarModuleBuildPath(branchId, buildNumber, moduleName);
+    return (
+      <Link to={linkPath} className="module-build-history-item__build-log-link">
+        {formattedBuildNumber}
+      </Link>
+    );
+  }
 
-  const commitInfo = branchBuild.get('commitInfo');
+  return formattedBuildNumber;
+};
 
+const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
   return (
     <li>
       <ModuleBuildListItemWrapper moduleBuild={moduleBuild}>
         <div className={"module-build-history-item"}>
           <div className="module-build-history-item__build-number">
-            {canViewDetailedModuleBuildInfo(moduleBuild) ?
-              <Link to={linkPath}>{formattedBuildNumber}</Link> : formattedBuildNumber
-            }
+            {renderBuildNumber(moduleName, moduleBuild, branchBuild)}
           </div>
           <div className="module-build-history-item__status">
             <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} />
@@ -37,7 +44,11 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
             <UsersForBuild branchBuild={branchBuild} />
           </div>
           <div className="module-build-history-item__commits-wrapper">
-            <CommitsSummary commitInfo={commitInfo} buildId={branchBuild.get('id')} popoverPlacement="left" />
+            <CommitsSummary
+              commitInfo={branchBuild.get('commitInfo')}
+              buildId={branchBuild.get('id')}
+              popoverPlacement="left"
+            />
           </div>
         </div>
       </ModuleBuildListItemWrapper>

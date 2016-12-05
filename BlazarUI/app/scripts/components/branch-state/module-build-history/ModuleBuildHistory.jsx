@@ -63,8 +63,8 @@ class ModuleBuildHistory extends Component {
 
     return (
       <OverlayTrigger placement="bottom" overlay={tooltip}>
-        <div className="pull-right module-build-history__last-successful-build-number">
-          #{this.props.lastSuccessfulBuildNumber}
+        <div className="module-build-history__last-successful-build-number">
+          {formattedBuildNumber}
         </div>
       </OverlayTrigger>
     );

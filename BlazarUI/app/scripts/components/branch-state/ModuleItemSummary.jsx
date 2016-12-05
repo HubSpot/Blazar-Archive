@@ -16,7 +16,7 @@ const getBuildLogLink = (module, moduleBuild, branchBuild) => {
     const linkPath = getBlazarModuleBuildPath(branchBuild.get('branchId'), moduleBuild.get('buildNumber'), moduleName);
     return (
       <div className="module-item-summary__build-log-link-container">
-        <Link to={linkPath}>View build log</Link>
+        <Link to={linkPath} className="module-item-summary__build-log-link">View build log</Link>
       </div>
     );
   }
