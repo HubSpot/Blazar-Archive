@@ -7,16 +7,23 @@ const buildDurationHumanizer = humanizeDuration.humanizer({
   round: true
 });
 
-const formatShort = (duration) => {
-  const seconds = Math.floor(duration / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const formattedSeconds = `${seconds % 60}s`;
-  return minutes ? `${minutes}m ${formattedSeconds}` : formattedSeconds;
-};
+const shortEnglishHumanizer = humanizeDuration.humanizer({
+  language: 'shortEn',
+  languages: {
+    shortEn: {
+      m: () => 'm',
+      s: () => 's',
+    }
+  },
+  delimiter: ' ',
+  spacer: '',
+  units: ['m', 's'],
+  round: true
+});
 
 const BuildDuration = ({startTimestamp, endTimestamp, abbreviateUnits}) => {
   const duration = endTimestamp - startTimestamp;
-  const formattedDuration = abbreviateUnits ? formatShort(duration) : buildDurationHumanizer(duration);
+  const formattedDuration = abbreviateUnits ? shortEnglishHumanizer(duration) : buildDurationHumanizer(duration);
   return <strong>{formattedDuration}</strong>;
 };
 
