@@ -8,19 +8,28 @@ module.exports.getConfig = function(type) {
       path: __dirname,
       filename: 'main.js'
     },
-    debug : isDev,
+    debug: isDev,
     module: {
       loaders: [{
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        loader: 'babel-loader',
+        query: {
+          presets: [
+            'es2015',
+            'react'
+          ],
+          plugins: [
+            'transform-object-rest-spread'
+          ]
+        }
       }]
     }
   };
 
-  if(isDev){
+  if (isDev) {
     config.devtool = 'eval';
   }
 
   return config;
-}
+};

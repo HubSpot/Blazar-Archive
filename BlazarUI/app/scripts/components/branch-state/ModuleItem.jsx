@@ -1,65 +1,42 @@
-import React, { PropTypes, Component } from 'react';
+import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import { connect } from 'react-redux';
 
-import ModuleBuildTabs from './ModuleBuildTabs.jsx';
-import ModuleBuild from './ModuleBuild.jsx';
-import { getCurrentModuleBuild, getCurrentBranchBuild } from '../Helpers';
+import Collapse from 'react-bootstrap/lib/Collapse';
+import ModuleItemSummary from './ModuleItemSummary.jsx';
+import ModuleBuildHistory from './module-build-history/ModuleBuildHistory.jsx';
 
-class ModuleItem extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {selectedBuild: getCurrentModuleBuild(props.moduleState)};
-    this.handleSelectModuleBuild = this.handleSelectModuleBuild.bind(this);
-  }
+import { shouldExpandModuleBuildHistory } from '../../selectors/moduleBuildHistorySelectors';
+import { handleModuleItemClick } from '../../redux-actions/branchStateActions';
 
-  componentWillReceiveProps(nextProps) {
-    const currentBuild = getCurrentModuleBuild(this.props.moduleState);
-    const nextCurrentBuild = getCurrentModuleBuild(nextProps.moduleState);
-    if (!currentBuild.equals(nextCurrentBuild)) {
-      this.setState({selectedBuild: nextCurrentBuild});
-    }
-  }
+import { getCurrentBranchBuild, getCurrentModuleBuild } from '../Helpers';
 
-  handleSelectModuleBuild(moduleBuild) {
-    this.setState({selectedBuild: moduleBuild});
-  }
 
-  getSelectedBranchBuild() {
-    const selectedRepoBuildId = this.state.selectedBuild.get('repoBuildId');
-    const currentBranchBuild = getCurrentBranchBuild(this.props.moduleState);
-    const lastSuccessfulBranchBuild = this.props.moduleState.get('lastSuccessfulBranchBuild');
+const ModuleItem = ({moduleState, isExpanded, onClick}) => {
+  const module = moduleState.get('module');
+  const lastSuccessfulBuildNumber = moduleState.getIn(['lastSuccessfulModuleBuild', 'buildNumber']);
 
-    if (currentBranchBuild.get('id') === selectedRepoBuildId) {
-      return currentBranchBuild;
-    } else if (lastSuccessfulBranchBuild.get('id') === selectedRepoBuildId) {
-      return lastSuccessfulBranchBuild;
-    }
-
-    return null;
-  }
-
-  render() {
-    const {moduleState, isExpanded, onClick} = this.props;
-    const {selectedBuild} = this.state;
-    return (
-      <li className="module-item" id={moduleState.getIn(['module', 'name'])}>
-        <ModuleBuildTabs
-          currentBuild={getCurrentModuleBuild(moduleState)}
-          lastSuccessfulBuild={moduleState.get('lastSuccessfulModuleBuild')}
-          selectedBuildNumber={selectedBuild.get('buildNumber')}
-          onSelectModuleBuild={this.handleSelectModuleBuild}
-        />
-        <ModuleBuild
-          module={moduleState.get('module')}
-          moduleBuild={selectedBuild}
-          branchBuild={this.getSelectedBranchBuild()}
-          isExpanded={isExpanded}
-          onClick={onClick}
-        />
-      </li>
-    );
-  }
-}
+  return (
+    <li className="module-item">
+      <ModuleItemSummary
+        module={module}
+        currentModuleBuild={getCurrentModuleBuild(moduleState)}
+        currentBranchBuild={getCurrentBranchBuild(moduleState)}
+        isExpanded={isExpanded}
+        onClick={onClick}
+      />
+      <Collapse in={isExpanded}>
+        <div className="module-item__details">
+          <ModuleBuildHistory
+            moduleName={module.get('name')}
+            moduleId={module.get('id')}
+            lastSuccessfulBuildNumber={lastSuccessfulBuildNumber}
+          />
+        </div>
+      </Collapse>
+    </li>
+  );
+};
 
 ModuleItem.propTypes = {
   moduleState: ImmutablePropTypes.map,
@@ -67,4 +44,18 @@ ModuleItem.propTypes = {
   onClick: PropTypes.func.isRequired
 };
 
-export default ModuleItem;
+const mapStateToProps = (state, ownProps) => {
+  const moduleId = ownProps.moduleState.getIn(['module', 'id']);
+  return {
+    isExpanded: shouldExpandModuleBuildHistory(state, {moduleId})
+  };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  const moduleId = ownProps.moduleState.getIn(['module', 'id']);
+  return {
+    onClick: () => dispatch(handleModuleItemClick(moduleId))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ModuleItem);

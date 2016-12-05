@@ -7,7 +7,8 @@ import Button from 'react-bootstrap/lib/Button';
 
 class JSONModal extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
     bindAll(this, 'handleTriggerJsonModal', 'modal', 'closeModal', 'openModal');
 
     this.state = {

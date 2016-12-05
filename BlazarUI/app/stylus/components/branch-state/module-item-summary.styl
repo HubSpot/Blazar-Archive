@@ -1,0 +1,69 @@
+@import '../../variables'
+
+.module-item-summary
+  padding 12px 20px
+  display flex
+  cursor pointer
+  height 45px
+  align-items center
+  white-space nowrap
+
+  &:hover
+    background-color $color-gypsum
+
+    .module-item-summary__expand-indicator
+      color $color-calypso-medium
+
+.module-item-summary--danger
+  background-color $color-norman-light
+
+  &:hover
+    background-color #fcd4e1
+
+    .module-item-summary__expand-indicator
+      color $color-flint
+
+  .module-item-summary__expand-indicator
+    color $color-battleship
+
+  .module-item-summary__expand-indicator--expanded
+    color $color-flint
+
+.module-item-summary--warning
+  background-color $color-marigold-light
+
+  &:hover
+    background-color #ffedd6
+
+    .module-item-summary__expand-indicator
+      color $color-calypso-medium
+
+  .module-item-summary__expand-indicator
+    color $color-battleship
+
+  .module-item-summary__expand-indicator--expanded
+    color $color-calypso-medium
+
+.module-item-summary__module-name
+  font-size 18px
+  font-weight normal
+  color $color-calypso
+  margin 0
+  width 30%
+  margin-right 10px
+  overflow hidden
+  text-overflow ellipsis
+
+.module-item-summary__expand-indicator
+  flex-shrink 0
+  width 60px
+  transform scaleY(0.85)
+  color $color-koala
+  transition color 0.5s
+
+.module-item-summary__expand-indicator--expanded
+  color $color-calypso-medium
+
+.module-item-summary__build-log-link-container
+  margin-left 10px
+  font-size 12px

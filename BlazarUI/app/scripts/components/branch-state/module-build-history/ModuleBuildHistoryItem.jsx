@@ -1,33 +1,41 @@
 import React, { PropTypes } from 'react';
-import classNames from 'classnames';
-import { withRouter, routerShape } from 'react-router';
+import {Link} from 'react-router';
 
-import ModuleBuildNumber from '../shared/ModuleBuildNumber.jsx';
 import ModuleBuildStatus from '../shared/ModuleBuildStatus.jsx';
 import BuildTriggerLabel from '../shared/BuildTriggerLabel.jsx';
 import UsersForBuild from '../shared/UsersForBuild.jsx';
 import CommitsSummary from '../shared/CommitsSummary.jsx';
+import ModuleBuildListItemWrapper from '../shared/ModuleBuildListItemWrapper.jsx';
 
 import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../../Helpers';
 
-const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild, router}) => {
-  let onClick = null;
+const renderBuildNumber = (moduleName, moduleBuild, branchBuild) => {
+  const branchId = branchBuild.get('branchId');
+  const buildNumber = moduleBuild.get('buildNumber');
+  const formattedBuildNumber = `#${buildNumber}`;
 
   if (canViewDetailedModuleBuildInfo(moduleBuild)) {
-    const branchId = branchBuild.get('branchId');
-    const linkPath = getBlazarModuleBuildPath(branchId, moduleBuild.get('buildNumber'), moduleName);
-    onClick = () => {router.push(linkPath);};
+    const linkPath = getBlazarModuleBuildPath(branchId, buildNumber, moduleName);
+    return (
+      <Link to={linkPath} className="module-build-history-item__build-log-link">
+        {formattedBuildNumber}
+      </Link>
+    );
   }
 
-  const commitInfo = branchBuild.get('commitInfo');
+  return formattedBuildNumber;
+};
 
-  const classes = classNames('module-build-history-item', {'module-build-history-item--clickable': !!onClick});
+const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
   return (
     <li>
-      <div className={classes} onClick={onClick}>
-        <ModuleBuildNumber moduleBuild={moduleBuild} className="module-build-history-item__build-number" />
+      <ModuleBuildListItemWrapper moduleBuild={moduleBuild}>
+        <div className={"module-build-history-item"}>
+          <div className="module-build-history-item__build-number">
+            {renderBuildNumber(moduleName, moduleBuild, branchBuild)}
+          </div>
           <div className="module-build-history-item__status">
-            <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} />
+            <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} abbreviateUnitsBreakpoint={250} />
           </div>
           <div className="module-build-history-item__build-trigger-label">
             <BuildTriggerLabel buildTrigger={branchBuild.get('buildTrigger')} />
@@ -36,9 +44,14 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild, router}) 
             <UsersForBuild branchBuild={branchBuild} />
           </div>
           <div className="module-build-history-item__commits-wrapper">
-            <CommitsSummary commitInfo={commitInfo} buildId={branchBuild.get('id')} popoverPlacement="left" />
+            <CommitsSummary
+              commitInfo={branchBuild.get('commitInfo')}
+              buildId={branchBuild.get('id')}
+              popoverPlacement="left"
+            />
           </div>
-      </div>
+        </div>
+      </ModuleBuildListItemWrapper>
     </li>
   );
 };
@@ -46,8 +59,7 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild, router}) 
 ModuleBuildHistoryItem.propTypes = {
   moduleBuild: PropTypes.object.isRequired,
   moduleName: PropTypes.string.isRequired,
-  branchBuild: PropTypes.object.isRequired,
-  router: routerShape.isRequired
+  branchBuild: PropTypes.object.isRequired
 };
 
-export default withRouter(ModuleBuildHistoryItem);
+export default ModuleBuildHistoryItem;

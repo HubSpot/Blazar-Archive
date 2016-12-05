@@ -12,7 +12,14 @@ class BuildDurationStopWatch extends Component {
   }
 
   render() {
-    return <BuildDuration startTimestamp={this.props.startTimestamp} endTimestamp={+moment()} />;
+    const {startTimestamp, abbreviateUnits} = this.props;
+    return (
+      <BuildDuration
+        startTimestamp={startTimestamp}
+        endTimestamp={+moment()}
+        abbreviateUnits={abbreviateUnits}
+      />
+    );
   }
 }
 
@@ -21,7 +28,12 @@ BuildDurationStopWatch.propTypes = {
     PropTypes.string,
     PropTypes.number,
     PropTypes.instanceOf(Date)
-  ])
+  ]),
+  abbreviateUnits: PropTypes.bool
+};
+
+BuildDurationStopWatch.defaultProps = {
+  abbreviateUnits: false
 };
 
 export default BuildDurationStopWatch;

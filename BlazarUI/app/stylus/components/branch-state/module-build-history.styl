@@ -13,19 +13,28 @@
 
 .module-build-history__list
   padding-left 0
-  box-shadow 0 3px 6px rgba(0,0,0,0.20)
+  list-style none
 
-  li
-    display block
+  li + li
+    border-top 1px solid $color-koala
+
+.module-build-history__last-successful-build-number
+  color $color-oz
+  background-color $color-oz-light
+  border solid 1px $color-oz-medium
+  border-radius 1px
+  padding 6px 10px
+  font-weight 500
+  float right
 
 .module-build-history-item
   display flex
   align-items center
-  height 30px
+  height 35px
   margin-bottom -1px
-  border 1px solid $color-battleship
   position relative
   font-size 12px
+  padding-left 10px
 
 .module-build-history-item__build-number
   width 50px
@@ -34,9 +43,8 @@
 
 .module-build-history-item__status
   margin 0
-  padding-left 20px
   flex-grow 1
-  min-width 270px
+  min-width 185px
   white-space nowrap
   text-overflow ellipsis
   overflow hidden
@@ -56,9 +64,3 @@
 .module-build-history-item__commits-wrapper
   width 15%
   min-width 110px
-
-.module-build-history-item--clickable
-  cursor pointer
-
-  &:hover
-    background-color $color-gypsum

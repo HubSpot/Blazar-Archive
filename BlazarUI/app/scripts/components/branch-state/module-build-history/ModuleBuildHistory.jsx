@@ -2,6 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
+import Tooltip from 'react-bootstrap/lib/Tooltip';
+import OverlayTrigger from 'react-bootstrap/lib/OverlayTrigger';
+
 import Loader from '../../shared/Loader.jsx';
 import ModuleBuildHistoryItem from './ModuleBuildHistoryItem.jsx';
 import ModuleBuildHistoryPagination from './ModuleBuildHistoryPagination.jsx';
@@ -46,9 +49,31 @@ class ModuleBuildHistory extends Component {
     );
   }
 
+  renderLastSuccessfulBuildNumber() {
+    const {moduleName, lastSuccessfulBuildNumber} = this.props;
+    const formattedBuildNumber = `#${lastSuccessfulBuildNumber}`;
+
+    if (!lastSuccessfulBuildNumber) {
+      return null;
+    }
+
+    const tooltipId = `${moduleName}-last-successful-build`;
+    const tooltipMessage = `Version ${formattedBuildNumber} of this module was the last successful build`;
+    const tooltip = <Tooltip id={tooltipId}>{tooltipMessage}</Tooltip>;
+
+    return (
+      <OverlayTrigger placement="bottom" overlay={tooltip}>
+        <div className="module-build-history__last-successful-build-number">
+          {formattedBuildNumber}
+        </div>
+      </OverlayTrigger>
+    );
+  }
+
   render() {
     return (
       <div className="module-build-history">
+        {this.renderLastSuccessfulBuildNumber()}
         <h5>Build activity</h5>
         {this.renderMainContent()}
         {this.renderPagination()}
@@ -62,7 +87,8 @@ ModuleBuildHistory.propTypes = {
   moduleId: PropTypes.number.isRequired,
   hasMorePages: PropTypes.bool,
   moduleBuildInfos: ImmutablePropTypes.list,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  lastSuccessfulBuildNumber: PropTypes.number
 };
 
 const mapStateToProps = (state, ownProps) => {

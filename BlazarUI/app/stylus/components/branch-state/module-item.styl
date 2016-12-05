@@ -1,16 +1,8 @@
-@import '../../variables'
-
 .module-item
-  height 73px
-  list-style none
-  display flex
+  border solid 1px $color-battleship
 
-.module-item-summary__build-number
-  width 75px
-  font-size 18px
+  + .module-item
+    border-top none
 
-.module-build-tabs
-  font-size 18px
-
-.module-build-tabs + .module-build
-  padding-left 29px
+.module-item__details
+  border-top solid 1px $color-battleship

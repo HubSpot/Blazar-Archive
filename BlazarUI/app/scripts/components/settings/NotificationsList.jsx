@@ -7,7 +7,8 @@ import Icon from '../shared/Icon.jsx';
 import SettingsActions from '../../actions/settingsActions';
 
 class NotificationsList extends Component {
-  constructor() {
+  constructor(props) {
+    super(props);
     bindAll(this, 'toggleNotificationSetting');
   }
 

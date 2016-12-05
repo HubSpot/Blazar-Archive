@@ -15,7 +15,8 @@ import {LABELS} from '../constants';
 
 class RepoBuildDetail extends Component {
 
-  constructor() {
+  constructor(props) {
+    super(props);
     bindAll(this, 'flipShowCommits', 'handleCancelBuild');
 
     this.state = {

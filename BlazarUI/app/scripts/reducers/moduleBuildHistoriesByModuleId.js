@@ -7,7 +7,8 @@ const initialState = Immutable.Map({
   totalPages: 0,
   moduleBuildInfos: Immutable.List(),
   loading: false,
-  startingBuildNumber: null
+  startingBuildNumber: null,
+  lastRequestStartTime: null
 });
 
 function moduleBuildHistory(state = initialState, action) {
@@ -16,7 +17,10 @@ function moduleBuildHistory(state = initialState, action) {
       return state.set('page', action.payload.page);
 
     case ActionTypes.REQUEST_MODULE_BUILD_HISTORY:
-      return state.set('loading', true);
+      return state.merge({
+        loading: true,
+        lastRequestStartTime: action.payload.requestStartTime
+      });
 
     case ActionTypes.RECEIVE_MODULE_BUILD_HISTORY: {
       const {page, moduleActivityPage: {moduleBuildInfos, remaining}} = action.payload;
