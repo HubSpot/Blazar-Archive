@@ -53,6 +53,7 @@
     "react-document-title": "^2.0.1",
     "react-dom": "15.0.1",
     "react-immutable-proptypes": "^2.1.0",
+    "react-measure": "^1.4.2",
     "react-redux": "^4.4.5",
     "react-router": "^2.0.0",
     "react-select": "git://github.com/impleri/react-select.git#v0.9.x",

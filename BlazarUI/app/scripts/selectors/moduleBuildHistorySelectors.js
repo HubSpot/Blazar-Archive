@@ -24,6 +24,6 @@ export const shouldExpandModuleBuildHistory = (state, {moduleId}) => {
 
   // initial fetch was started but data has not been loaded yet
   // adding a delay smooths out the expansion of the module item details
-  const initialFetchTakingToLong = Date.now() - lastRequestStartTime > 500;
+  const initialFetchTakingToLong = Date.now() - lastRequestStartTime > 300;
   return initialFetchTakingToLong;
 };

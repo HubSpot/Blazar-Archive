@@ -35,7 +35,7 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
             {renderBuildNumber(moduleName, moduleBuild, branchBuild)}
           </div>
           <div className="module-build-history-item__status">
-            <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} />
+            <ModuleBuildStatus moduleBuild={moduleBuild} noIcon={true} abbreviateUnitsBreakpoint={250} />
           </div>
           <div className="module-build-history-item__build-trigger-label">
             <BuildTriggerLabel buildTrigger={branchBuild.get('buildTrigger')} />

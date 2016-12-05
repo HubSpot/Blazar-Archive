@@ -49,7 +49,7 @@ const ModuleItemSummary = ({module, currentModuleBuild, currentBranchBuild, isEx
       <div className={divClassName} onClick={handleClick}>
         <Icon name={expandIndicatorIcon} classNames={expandIndicatorClassName} />
         <h3 className="module-item-summary__module-name">{module.get('name')}</h3>
-        <ModuleBuildStatus moduleBuild={currentModuleBuild} />
+        <ModuleBuildStatus moduleBuild={currentModuleBuild} abbreviateUnitsBreakpoint={325} />
         {getBuildLogLink(module, currentModuleBuild, currentBranchBuild)}
       </div>
     </ModuleBuildListItemWrapper>
