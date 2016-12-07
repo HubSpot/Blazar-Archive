@@ -142,7 +142,6 @@ class BranchState extends Component {
       loadingBranchStatus,
       activeModules,
       inactiveModules,
-      selectedModuleId,
       branchId,
       dismissBetaNotification,
       showBetaFeatureAlert,
@@ -169,6 +168,7 @@ class BranchState extends Component {
         <Tabs id="branch-state-tabs" className="branch-state-tabs" defaultActiveKey="active-modules">
           <Tab eventKey="active-modules" title="Active modules">
             <section id="active-modules">
+              <p className="text-muted">Showing the current build state for each module in this branch.</p>
               <ModuleList
                 modules={this.sortModules(activeModules)}
                 onCancelBuild={this.refreshBranchModuleStates}
