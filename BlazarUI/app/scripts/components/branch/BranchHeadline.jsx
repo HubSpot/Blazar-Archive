@@ -1,12 +1,14 @@
 /* global config */
 import React, {Component, PropTypes} from 'react';
 import Select from 'react-select';
+import moment from 'moment';
+
 import Image from '../shared/Image.jsx';
 import Headline from '../shared/headline/Headline.jsx';
 import Star from '../shared/Star.jsx';
 import Icon from '../shared/Icon.jsx';
 import SimpleBreadcrumbs from '../shared/SimpleBreadcrumbs.jsx';
-import moment from 'moment';
+import { getBranchBuildHistoryPath } from '../../utils/blazarPaths';
 
 class BranchHeadline extends Component {
 
@@ -43,11 +45,7 @@ class BranchHeadline extends Component {
       return;
     }
 
-    const branchLink = `/builds/branch/${selected}`;
-    this.context.router.push({
-      pathname: branchLink,
-      state: {handlingBranchSelect: true}
-    });
+    this.context.router.push(getBranchBuildHistoryPath(selected));
   }
 
   getFilteredBranches() {

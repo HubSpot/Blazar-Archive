@@ -23,6 +23,7 @@ import RepoActions from '../../actions/repoActions';
 import { showBuildBranchModal } from '../../redux-actions/buildBranchFormActions';
 
 import {getPreviousBuildState} from '../Helpers.js';
+import {getBranchSettingsPath} from '../../utils/blazarPaths';
 
 const initialState = {
   builds: null,
@@ -171,7 +172,7 @@ class BranchContainer extends Component {
       return null;
     }
 
-    const buildSettingsLink = `/settings/branch/${this.props.params.branchId}`;
+    const buildSettingsLink = getBranchSettingsPath(this.props.params.branchId);
 
     return (
       <Link to={buildSettingsLink}>

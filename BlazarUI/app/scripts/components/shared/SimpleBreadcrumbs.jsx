@@ -2,17 +2,14 @@ import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 
 import Icon from './Icon.jsx';
+import { getRepoPath, getBranchStatePath, getBranchBuildPath } from '../../utils/blazarPaths';
 
 class SimpleBreadcrumbs extends Component {
 
   getBuildNumber() {
     const {params, data} = this.props;
-
-    if (params.buildNumber !== 'latest') {
-      return params.buildNumber;
-    }
-
-    return data.build.buildNumber;
+    const getLatestBuildNumber = params.buildNumber === 'latest';
+    return getLatestBuildNumber ? data.build.buildNumber : params.buildNumber;
   }
 
   renderRepoCrumb() {
@@ -22,7 +19,7 @@ class SimpleBreadcrumbs extends Component {
       return null;
     }
 
-    const repoLink = `/builds/repo/${branchInfo.repository}`;
+    const repoLink = getRepoPath(branchInfo.repository);
 
     return (
       <span className="simple-breadcrumbs__repo">
@@ -38,7 +35,7 @@ class SimpleBreadcrumbs extends Component {
       return null;
     }
 
-    const branchLink = `/builds/branch/${params.branchId}`;
+    const branchLink = getBranchStatePath(params.branchId);
 
     return (
       <span className="simple-breadcrumbs__branch">
@@ -56,7 +53,7 @@ class SimpleBreadcrumbs extends Component {
     }
 
     const buildNumber = this.getBuildNumber();
-    const buildLink = `/builds/branch/${params.branchId}/build/${buildNumber}`;
+    const buildLink = getBranchBuildPath(params.branchId, buildNumber);
 
     return (
       <span className="simple-breadcrumbs__build">

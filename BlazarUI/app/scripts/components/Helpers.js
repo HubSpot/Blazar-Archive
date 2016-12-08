@@ -268,9 +268,6 @@ export const canViewDetailedModuleBuildInfo = (module) => {
     && moduleState !== MODULE_BUILD_STATES.SKIPPED;
 };
 
-export const getBlazarModuleBuildPath = (branchId, buildNumber, moduleName) => {
-  return `/builds/branch/${branchId}/build/${buildNumber}/module/${moduleName}`;
-};
 
 export const getCurrentModuleBuild = (moduleState) => {
   return moduleState.get('inProgressModuleBuild') ||

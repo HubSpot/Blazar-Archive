@@ -5,6 +5,7 @@ import humanizeDuration from 'humanize-duration';
 
 import { getErrorMessage } from './apiUtils';
 import Resource from '../services/ResourceProvider';
+import { getModuleBuildPath } from '../utils/blazarPaths';
 
 function _parse(resp) {
   if (resp.startTimestamp && resp.endTimestamp) {
@@ -92,7 +93,7 @@ function fetchModuleBuildsById(branchId, repoBuildId, buildNumber) {
         const moduleInfo = findWhere(moduleInfos, {id: build.moduleId});
         const moduleInfoExtended = {
           name: moduleInfo.name,
-          blazarPath: `/builds/branch/${branchId}/build/${buildNumber}/module/${moduleInfo.name}`
+          blazarPath: getModuleBuildPath(branchId, buildNumber, moduleInfo.name)
         };
 
         return extend(build, moduleInfoExtended);

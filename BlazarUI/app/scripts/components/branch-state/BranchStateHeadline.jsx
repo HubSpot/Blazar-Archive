@@ -12,6 +12,7 @@ import Star from '../shared/Star.jsx';
 
 import { showBuildBranchModal } from '../../redux-actions/buildBranchFormActions';
 import { getBranchesInRepository } from '../../selectors';
+import { getBranchBuildHistoryPath, getBranchSettingsPath } from '../../utils/blazarPaths';
 
 class BranchStateHeadline extends Component {
   getFilteredBranchOptions() {
@@ -89,10 +90,10 @@ class BranchStateHeadline extends Component {
         </PageHeader>
         <div className="page-header__sub-header">
           <p className="branch-state-headline__sub-header-links">
-            <Link to={`/branches/${branchId}/builds`} className="build-history-link">
+            <Link to={getBranchBuildHistoryPath(branchId)} className="build-history-link">
               <Icon name="history" /> Branch build history
             </Link>
-            <Link to={`/settings/branch/${branchId}`} className="build-settings-link">
+            <Link to={getBranchSettingsPath(branchId)} className="build-settings-link">
               <Icon name="cog" /> Settings
             </Link>
           </p>

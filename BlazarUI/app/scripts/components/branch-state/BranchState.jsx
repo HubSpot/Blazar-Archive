@@ -19,7 +19,8 @@ import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 
 import ModuleBuildStates from '../../constants/ModuleBuildStates';
-import { getCurrentModuleBuild, getCurrentBranchBuild, getBlazarModuleBuildPath } from '../Helpers';
+import { getCurrentModuleBuild, getCurrentBranchBuild } from '../Helpers';
+import { getBranchStatePath, getModuleBuildPath } from '../../utils/blazarPaths';
 
 class BranchState extends Component {
   constructor(props) {
@@ -93,7 +94,7 @@ class BranchState extends Component {
         const {branchId} = this.props;
         const moduleBuildNumber = getCurrentModuleBuild(moduleState).get('buildNumber');
         const moduleName = moduleState.getIn(['module', 'name']);
-        const blazarPath = getBlazarModuleBuildPath(branchId, moduleBuildNumber, moduleName);
+        const blazarPath = getModuleBuildPath(branchId, moduleBuildNumber, moduleName);
         return failingModuleBuildBlazarPaths.set(moduleName, blazarPath);
       }, Immutable.Map());
   }
@@ -104,7 +105,7 @@ class BranchState extends Component {
   }
 
   handleBranchSelect(selectedBranchId) {
-    this.props.router.push(`/branches/${selectedBranchId}/state`);
+    this.props.router.push(getBranchStatePath(selectedBranchId));
     window.document.activeElement.blur();
   }
 

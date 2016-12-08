@@ -1,12 +1,14 @@
 import Resource from '../services/ResourceProvider';
 import { fromJS } from 'immutable';
 import humanizeDuration from 'humanize-duration';
-import { getUsernameFromCookie } from '../components/Helpers.js';
 import $ from 'jquery';
+
+import { getUsernameFromCookie } from '../components/Helpers.js';
+import { getBranchBuildPath } from '../utils/blazarPaths';
 
 function _parse(params, resp) {
   const builds = resp.map((build) => {
-    build.blazarPath = `/builds/branch/${params.branchId}/build/${build.buildNumber}`;
+    build.blazarPath = getBranchBuildPath(params.branchId, build.buildNumber);
     if (build.endTimestamp && build.startTimestamp) {
       build.duration = humanizeDuration(build.endTimestamp - build.startTimestamp, {round: true});
     }
