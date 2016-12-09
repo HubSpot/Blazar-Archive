@@ -19,6 +19,13 @@ const FeedbackStore = Reflux.createStore({
       sent: false,
       sendError: error
     });
+  },
+
+  onShowFeedbackForm() {
+    this.trigger({
+      visible: true,
+      submitted: false
+    });
   }
 
 });
