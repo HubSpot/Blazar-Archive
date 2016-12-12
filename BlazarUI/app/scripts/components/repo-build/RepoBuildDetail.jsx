@@ -13,6 +13,8 @@ import BuildStates from '../../constants/BuildStates';
 import FINAL_BUILD_STATES from '../../constants/finalBuildStates';
 import {LABELS} from '../constants';
 
+import { getBranchStatePath } from '../../utils/blazarPaths';
+
 class RepoBuildDetail extends Component {
 
   constructor(props) {
@@ -32,8 +34,7 @@ class RepoBuildDetail extends Component {
 
   handleCancelBuild() {
     const {router, params: {branchId}} = this.props;
-    const branchHistoryPagePath = `/builds/branch/${branchId}`;
-    router.push(branchHistoryPagePath);
+    router.push(getBranchStatePath(branchId));
   }
 
   renderCommits() {

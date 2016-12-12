@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, IndexRoute } from 'react-router';
+import { Route, IndexRoute, Redirect } from 'react-router';
 import $ from 'jquery';
 
 // Pages
@@ -14,7 +14,7 @@ import RepoBuild from './pages/repoBuild.jsx';
 import NotFound from './pages/notFound.jsx';
 import BranchState from './components/branch-state/BranchStateContainer.jsx';
 
-import { isBetaUser } from './utils/user.js';
+import { getBranchBuildPath } from './utils/blazarPaths';
 
 function redirectRepoBuildShortlink(nextState, replace, callback) {
   const data = $.ajax({
@@ -24,7 +24,7 @@ function redirectRepoBuildShortlink(nextState, replace, callback) {
   });
 
   data.then((resp) => {
-    replace(`/builds/branch/${resp.branchId}/build/${resp.buildNumber}`);
+    replace(getBranchBuildPath(resp.branchId, resp.buildNumber));
     callback();
   }, () => {
     replace('/not-found');
@@ -32,19 +32,14 @@ function redirectRepoBuildShortlink(nextState, replace, callback) {
   });
 }
 
-function redirectBetaUsersToBranchStatePage(nextState, replace) {
-  const locationState = nextState.location.state || {};
-  if (isBetaUser && !locationState.handlingBranchSelect) {
-    replace(`/branches/${nextState.params.branchId}/state`);
-  }
-}
-
 const routes = (
   <Route name="app" path="/" component={App}>
     <IndexRoute name="dashboard" component={ Dashboard } />
+
     <Route name="host" path="/builds/org/:org" component={ Org } />
     <Route name="repo" path="/builds/repo/:repo" component={ Repo } />
-    <Route name="branch" path="/builds/branch/:branchId" component={ Branch } onEnter={redirectBetaUsersToBranchStatePage} />
+    <Redirect from="/builds/branch/:branchId" to="/branches/:branchId/state" />
+
     <Route name="settings" path="/settings/branch/:branchId" component={ Settings } />
     <Route name="repoBuild" path="/builds/branch/:branchId/build/:buildNumber" component={ RepoBuild } />
     <Route name="build" path="/builds/branch/:branchId/build/:buildNumber/module/:moduleName" component={ Build } />

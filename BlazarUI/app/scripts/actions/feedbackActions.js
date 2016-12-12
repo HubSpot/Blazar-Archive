@@ -2,7 +2,8 @@ import Reflux from 'reflux';
 import Feedback from '../models/Feedback';
 
 const FeedbackActions = Reflux.createActions([
-  { 'sendFeedback': {children: ['completed', 'failed']} }
+  { 'sendFeedback': {children: ['completed', 'failed']} },
+  'showFeedbackForm'
 ]);
 
 FeedbackActions.sendFeedback.listen(function onSendFeedback(payload) {

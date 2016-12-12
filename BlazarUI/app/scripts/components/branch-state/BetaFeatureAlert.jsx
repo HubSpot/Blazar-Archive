@@ -1,18 +1,24 @@
 import React, { PropTypes } from 'react';
 import Alert from 'react-bootstrap/lib/Alert';
+import FeedbackActions from '../../actions/feedbackActions';
 
 const BetaFeatureAlert = ({onDismiss}) => {
+  const feedbackFormLink = <a onClick={FeedbackActions.showFeedbackForm}>get in touch</a>;
   return (
     <Alert bsStyle="info" onDismiss={onDismiss}>
-      <h4>Beta - tell us what you think!</h4>
+      <h4>A new perspective on your project</h4>
       <p>
-        Your team has been selected as part of the initial rollout of a new
-        module-centric builds page. This page combines information from the
-        branch build history and build details pages to provide you with a
-        more relevant view of the current state of a branch. It will eventually
-        become the main page for accessing your builds.
+        This new  page combines information previously split among several other views
+        to give you a concise, live view of the current build state for this branch.
+        Below <strong>you'll find the latest build information for each module</strong>,
+        along with information about any pending or in-progress builds and a historical
+        record of past module builds.
       </p>
-      <p>We'd love to hear any feedback you have using the link at the bottom of this page.</p>
+      <p>
+        Give it a spin! And as always if you have feedback
+        please {feedbackFormLink} using the link at the bottom
+        of this page.
+      </p>
     </Alert>
   );
 };

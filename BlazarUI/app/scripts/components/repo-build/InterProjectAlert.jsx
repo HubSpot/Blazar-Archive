@@ -5,6 +5,7 @@ import Alert from 'react-bootstrap/lib/Alert';
 import classNames from 'classnames';
 
 import {getInterProjectClassName, InterProjectBuildTypes} from '../../constants/InterProjectConstants';
+import { getBranchBuildByIdPath } from '../../utils/blazarPaths';
 
 class InterProjectAlert extends Component {
 
@@ -83,7 +84,7 @@ class InterProjectAlert extends Component {
     const repoBuildNodes = map(repoBuilds, (name, id) => {
       return (
         <li key={id}>
-          <Link to={`/builds/repo-build/${id}`}>
+          <Link to={getBranchBuildByIdPath(id)}>
             {this.filterHostAndOrg(name)}
           </Link>
         </li>
@@ -176,7 +177,7 @@ class InterProjectAlert extends Component {
     const {interProjectBuildId, rootRepoBuilds} = this.props.upAndDownstreamModules;
 
     const rootRepoBuildId = Object.keys(rootRepoBuilds)[0];
-    const triggeredBy = rootRepoBuildId ? <Link to={`/builds/repo-build/${rootRepoBuildId}`}>{this.filterHostAndOrg(rootRepoBuilds[rootRepoBuildId])}</Link> : 'this build';
+    const triggeredBy = rootRepoBuildId ? <Link to={getBranchBuildByIdPath(rootRepoBuildId)}>{this.filterHostAndOrg(rootRepoBuilds[rootRepoBuildId])}</Link> : 'this build';
 
     return (
       <div className="inter-project-alert__root-info">

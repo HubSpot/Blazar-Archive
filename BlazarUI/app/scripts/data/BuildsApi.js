@@ -3,6 +3,7 @@ import {has} from 'underscore';
 import humanizeDuration from 'humanize-duration';
 import PollingProvider from '../services/PollingProvider';
 import store from '../reduxStore';
+import { getRepoPath, getBranchBuildPath, getBranchStatePath } from '../utils/blazarPaths';
 
 function _groupBuilds(builds) {
   const starredBranchIds = store.getState().starredBranches;
@@ -21,18 +22,20 @@ function _parse(data) {
       inProgressBuild
     } = item;
 
+    const branchId = gitInfo.id;
+
     if (has(item, 'inProgressBuild')) {
       item.inProgressBuild.duration = humanizeDuration(Date.now() - item.inProgressBuild.startTimestamp, {round: true});
-      item.inProgressBuild.blazarPath = `/builds/branch/${gitInfo.id}/build/${inProgressBuild.buildNumber}`;
+      item.inProgressBuild.blazarPath = getBranchBuildPath(branchId, inProgressBuild.buildNumber);
     }
 
     if (has(item, 'lastBuild')) {
       item.lastBuild.duration = humanizeDuration(item.lastBuild.endTimestamp - item.lastBuild.startTimestamp, {round: true});
-      item.lastBuild.blazarPath = `/builds/branch/${gitInfo.id}/build/${lastBuild.buildNumber}`;
+      item.lastBuild.blazarPath = getBranchBuildPath(branchId, lastBuild.buildNumber);
     }
 
-    item.gitInfo.blazarRepositoryPath = `/builds/repo/${gitInfo.repository}`;
-    item.gitInfo.blazarBranchPath = `/builds/branch/${gitInfo.id}`;
+    item.gitInfo.blazarRepositoryPath = getRepoPath(gitInfo.repository);
+    item.gitInfo.blazarBranchPath = getBranchStatePath(branchId);
 
     return item;
   });

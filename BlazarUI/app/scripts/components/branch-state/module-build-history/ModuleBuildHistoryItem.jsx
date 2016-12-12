@@ -7,7 +7,8 @@ import UsersForBuild from '../shared/UsersForBuild.jsx';
 import CommitsSummary from '../shared/CommitsSummary.jsx';
 import ModuleBuildListItemWrapper from '../shared/ModuleBuildListItemWrapper.jsx';
 
-import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../../Helpers';
+import { canViewDetailedModuleBuildInfo } from '../../Helpers';
+import { getModuleBuildPath } from '../../../utils/blazarPaths';
 
 const renderBuildNumber = (moduleName, moduleBuild, branchBuild) => {
   const branchId = branchBuild.get('branchId');
@@ -15,7 +16,7 @@ const renderBuildNumber = (moduleName, moduleBuild, branchBuild) => {
   const formattedBuildNumber = `#${buildNumber}`;
 
   if (canViewDetailedModuleBuildInfo(moduleBuild)) {
-    const linkPath = getBlazarModuleBuildPath(branchId, buildNumber, moduleName);
+    const linkPath = getModuleBuildPath(branchId, buildNumber, moduleName);
     return (
       <Link to={linkPath} className="module-build-history-item__build-log-link">
         {formattedBuildNumber}

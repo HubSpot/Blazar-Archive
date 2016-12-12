@@ -1,10 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 import classnames from 'classnames';
-import {truncate} from '../Helpers.js';
+
 import Icon from '../shared/Icon.jsx';
-import BuildStates from '../../constants/BuildStates.js';
 import BuildStateIcon from '../shared/BuildStateIcon.jsx';
+import {truncate} from '../Helpers.js';
+
+import BuildStates from '../../constants/BuildStates.js';
+import { getRepoPath } from '../../utils/blazarPaths';
 
 class SidebarItem extends Component {
 
@@ -79,7 +82,7 @@ class SidebarItem extends Component {
 
   renderRepoLink() {
     const {repository} = this.props;
-    const blazarRepositoryPath = `/builds/repo/${repository}`;
+    const blazarRepositoryPath = getRepoPath(repository);
 
     return (
       <div className="sidebar-item__repo-link">

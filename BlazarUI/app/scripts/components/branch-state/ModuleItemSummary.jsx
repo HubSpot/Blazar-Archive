@@ -8,12 +8,13 @@ import Icon from '../shared/Icon.jsx';
 import ModuleBuildListItemWrapper from './shared/ModuleBuildListItemWrapper.jsx';
 
 import { getClassNameColorModifier } from '../../constants/ModuleBuildStates';
-import { canViewDetailedModuleBuildInfo, getBlazarModuleBuildPath } from '../Helpers';
+import { canViewDetailedModuleBuildInfo } from '../Helpers';
+import { getModuleBuildPath } from '../../utils/blazarPaths';
 
 const getBuildLogLink = (module, moduleBuild, branchBuild) => {
   if (canViewDetailedModuleBuildInfo(moduleBuild)) {
     const moduleName = module.get('name');
-    const linkPath = getBlazarModuleBuildPath(branchBuild.get('branchId'), moduleBuild.get('buildNumber'), moduleName);
+    const linkPath = getModuleBuildPath(branchBuild.get('branchId'), moduleBuild.get('buildNumber'), moduleName);
     return (
       <div className="module-item-summary__build-log-link-container">
         <Link to={linkPath} className="module-item-summary__build-log-link">View build log</Link>
