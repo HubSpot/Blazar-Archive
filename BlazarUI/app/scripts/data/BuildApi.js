@@ -7,6 +7,56 @@ import Log from '../models/Log';
 import LogSize from '../models/LogSize';
 import Resource from '../services/ResourceProvider';
 
+const _getModuleId = (branchId, moduleName) => {
+  const getAllModules = new Resource({
+    url: `${window.config.apiRoot}/branches/${branchId}/modules`,
+    type: 'GET'
+  }).send();
+
+  return getAllModules.then((modules) => findWhere(modules, {name: moduleName}).id);
+};
+
+const _getBranchBuildHistory = (branchId) => {
+  return new Resource({
+    url: `${window.config.apiRoot}/builds/history/branch/${branchId}`,
+    type: 'GET'
+  }).send();
+};
+
+const _getRepoBuildId = (branchId, buildNumber) => {
+  return _getBranchBuildHistory(branchId).then((branchBuilds) =>
+    findWhere(branchBuilds, {buildNumber: parseInt(buildNumber, 10)}).id
+  );
+};
+
+const _getModuleBuilds = (repoBuildId) => {
+  return new Resource({
+    url: `${window.config.apiRoot}/branches/builds/${repoBuildId}/modules`,
+    type: 'GET'
+  }).send();
+};
+
+const _getModuleState = (branchId, moduleName) => {
+  const getModuleStates = new Resource({
+    url: `${window.config.apiRoot}/branches/state/${branchId}/modules`,
+    type: 'GET'
+  }).send();
+
+  return getModuleStates.then((moduleStates) =>
+    moduleStates.find((moduleState) => moduleState.module.name === moduleName)
+  );
+};
+
+const _getLatestModuleBuild = (moduleState) => {
+  const {inProgressModuleBuild} = moduleState;
+
+  if (inProgressModuleBuild && contains(['QUEUED', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED', 'UNSTABLE'], inProgressModuleBuild.state)) {
+    return inProgressModuleBuild;
+  }
+
+  return moduleState.lastModuleBuild;
+};
+
 class BuildApi {
 
   constructor(params) {
@@ -204,77 +254,30 @@ class BuildApi {
     this._pollBuild();
   }
 
+  _getModuleBuildFromParams() {
+    const {branchId, buildNumber, moduleName} = this.params;
+
+    if (buildNumber !== 'latest') {
+      return Promise.all([
+        _getModuleId(branchId, moduleName),
+        _getRepoBuildId(branchId, buildNumber).then(_getModuleBuilds)
+      ]).then(([moduleId, moduleBuilds]) => findWhere(moduleBuilds, {moduleId}));
+    }
+
+    return _getModuleState(branchId, moduleName).then(_getLatestModuleBuild);
+  }
+
   _getBuild() {
-    const branchHistoryPromise = new Resource({
-      url: `${window.config.apiRoot}/builds/history/branch/${this.params.branchId}`,
-      type: 'GET'
-    }).send();
-
-    return branchHistoryPromise.then((resp) => {
-      // now get modules so we can get the moduleId by the module name
-      const repoBuildModules = new Resource({
-        url: `${window.config.apiRoot}/branches/${this.params.branchId}/modules`,
-        type: 'GET'
-      }).send();
-
-      return repoBuildModules.then((modules) => {
-        const repoBuildModule = findWhere(modules, {name: this.params.moduleName, active: true});
-
-        let buildModulesPromise;
-
-        if (this.params.buildNumber !== 'latest') {
-          const repoBuildId = findWhere(resp, {buildNumber: parseInt(this.params.buildNumber, 10)}).id;
-          // last get module build based on module id
-          buildModulesPromise = new Resource({
-            url: `${window.config.apiRoot}/branches/builds/${repoBuildId}/modules`,
-            type: 'GET'
-          }).send();
-
-          return buildModulesPromise.then((buildModules) => {
-            const moduleBuild = findWhere(buildModules, {moduleId: repoBuildModule.id});
-
-            this.build.model = new Build({
-              id: moduleBuild.id,
-              repoBuildId: moduleBuild.repoBuildId
-            });
-
-            return this._fetchBuild();
-          });
-        }
-
-        buildModulesPromise = new Resource({
-          url: `${window.config.apiRoot}/branches/state/${this.params.branchId}/modules`,
-          type: 'GET'
-        }).send();
-
-        return buildModulesPromise.then((moduleStates) => {
-          const matchingModuleState = moduleStates.find((moduleState) =>
-            moduleState.module.id === repoBuildModule.id);
-
-          const buildToUse = this._getBuildToUse(matchingModuleState);
-          const repoBuildId = findWhere(resp, {buildNumber: parseInt(buildToUse.buildNumber, 10)}).id;
-
-          this.build.model = new Build({
-            id: buildToUse.id,
-            repoBuildId
-          });
-
-          return this._fetchBuild();
-        });
+    return this._getModuleBuildFromParams().then((moduleBuild) => {
+      this.build.model = new Build({
+        id: moduleBuild.id,
+        repoBuildId: moduleBuild.repoBuildId
       });
+
+      return this._fetchBuild();
     }, (error) => {
       this.cb(error);
     });
-  }
-
-  _getBuildToUse(moduleState) {
-    const inProgressModuleBuild = moduleState.inProgressModuleBuild;
-
-    if (inProgressModuleBuild && contains(['QUEUED', 'LAUNCHING', 'IN_PROGRESS', 'SUCCEEDED', 'CANCELLED', 'FAILED', 'UNSTABLE'], inProgressModuleBuild.state)) {
-      return inProgressModuleBuild;
-    }
-
-    return moduleState.lastModuleBuild;
   }
 
   _getLog() {
