@@ -1,4 +1,5 @@
 import {extend, findWhere, contains} from 'underscore';
+import Q from 'q';
 import BuildStates from '../constants/BuildStates';
 import {buildIsOnDeck} from '../components/Helpers';
 
@@ -13,7 +14,10 @@ const _getModuleId = (branchId, moduleName) => {
     type: 'GET'
   }).send();
 
-  return getAllModules.then((modules) => findWhere(modules, {name: moduleName}).id);
+  return Q(getAllModules).then((modules) => {
+    const module = findWhere(modules, {name: moduleName});
+    return module ? module.id : Q.reject(`Module ${moduleName} not found.`);
+  });
 };
 
 const _getBranchBuildHistory = (branchId) => {
@@ -24,9 +28,10 @@ const _getBranchBuildHistory = (branchId) => {
 };
 
 const _getRepoBuildId = (branchId, buildNumber) => {
-  return _getBranchBuildHistory(branchId).then((branchBuilds) =>
-    findWhere(branchBuilds, {buildNumber: parseInt(buildNumber, 10)}).id
-  );
+  return Q(_getBranchBuildHistory(branchId)).then((branchBuilds) => {
+    const branchBuild = findWhere(branchBuilds, {buildNumber: parseInt(buildNumber, 10)});
+    return branchBuild ? branchBuild.id : Q.reject(`Build #${buildNumber} does not exist for this branch.`);
+  });
 };
 
 const _getModuleBuilds = (repoBuildId) => {
@@ -332,6 +337,10 @@ class BuildApi {
   }
 
   _assignBuildProcessing() {
+    if (!this.build.model) {
+      return;
+    }
+
     const buildState = this.build.model.data.state;
 
     switch (buildState) {
