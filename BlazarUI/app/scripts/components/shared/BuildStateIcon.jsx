@@ -11,7 +11,7 @@ const BuildStateIcon = ({buildState, className}) => {
     className
   ]);
 
-  const iconName = iconStatus[buildState];
+  const iconName = iconStatus[buildState] || 'question';
 
   // do not wrap in a circle
   if (iconName === 'clock-o') {
@@ -32,7 +32,7 @@ const BuildStateIcon = ({buildState, className}) => {
 };
 
 BuildStateIcon.propTypes = {
-  buildState: PropTypes.oneOf(Object.keys(iconStatus)).isRequired,
+  buildState: PropTypes.oneOf(Object.keys(iconStatus)),
   className: PropTypes.string
 };
 
