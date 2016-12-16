@@ -50,7 +50,7 @@ class MalformedFileNotification extends Component {
       `${numberOfFiles} malformed configuration files`;
 
     const toggleExpandLink = (
-      <a onClick={this.toggleExpanded}>
+      <a onClick={this.toggleExpanded} className="malformed-files__expand-details-link">
         {this.state.expanded ? 'hide' : 'show'} details
       </a>
     );
