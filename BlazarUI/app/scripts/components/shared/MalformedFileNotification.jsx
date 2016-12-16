@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
-import Alert from 'react-bootstrap/lib/Alert';
+import Alert from './Alert.jsx';
+import Collapse from 'react-bootstrap/lib/Collapse';
 import json2html from 'json-to-html';
-import classNames from 'classnames';
 
 class MalformedFileNotification extends Component {
 
@@ -35,38 +35,38 @@ class MalformedFileNotification extends Component {
     });
   }
 
-  renderDetails() {
-    const numberOfFiles = this.props.malformedFiles.length;
-
-    return (
-      <div className="malformed-files__details">
-        This branch contains {numberOfFiles} malformed configuration file{numberOfFiles !== 1 && 's'}. You''ll need to correct these errors:
-        {this.renderConfigInfo()}
-      </div>
-    );
-  }
-
-  renderAlert() {
-    return (
-      <Alert bsStyle="danger" className={classNames('malformed-files__alert', {expanded: this.state.expanded})}>
-        One or more of your config files for this branch is malformed.
-        <a onClick={this.toggleExpanded} className="pull-right">{this.state.expanded ? 'hide' : 'show'} details</a>
-        {this.state.expanded && this.renderDetails()}
-      </Alert>
-    );
-  }
-
   render() {
-    if (this.props.loading || this.props.malformedFiles.length === 0) {
-      return (
-        <div />
-      );
+    const {loading, malformedFiles} = this.props;
+
+    if (loading || malformedFiles.length === 0) {
+      return null;
     }
 
+    const numberOfFiles = malformedFiles.length;
+    const singular = numberOfFiles === 1;
+    const alertTitle = `Malformed build configuration file${singular ? '' : 's'}`;
+    const pluralizedFiles = singular ?
+      'a malformed configuration file' :
+      `${numberOfFiles} malformed configuration files`;
+
+    const toggleExpandLink = (
+      <a onClick={this.toggleExpanded} className="malformed-files__expand-details-link">
+        {this.state.expanded ? 'hide' : 'show'} details
+      </a>
+    );
+
     return (
-      <div className="malformed-files">
-        {this.renderAlert()}
-      </div>
+      <Alert type="danger" iconName="exclamation" titleText={alertTitle} className="malformed-files__alert">
+        <p>
+          Some modules in this branch are not being correctly detected by Blazar due
+          to {pluralizedFiles}. {toggleExpandLink}
+        </p>
+        <Collapse in={this.state.expanded}>
+          <div className="malformed-files__details">
+            {this.renderConfigInfo()}
+          </div>
+        </Collapse>
+      </Alert>
     );
   }
 }
