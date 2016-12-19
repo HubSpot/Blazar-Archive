@@ -5,16 +5,16 @@
 
 .roomy-x
   margin 0 5px
-  
+
 .roomy-xy
   margin 10px 10px
 
 .hoverable
   cursor pointer
-  
+
 .code
   font-family $monospace
-  
+
 .plain-list
   margin 0
   padding 0
@@ -22,7 +22,7 @@
   li
     margin 5px 0
     word-break: break-all
-    
+
 .pre-text
   font-family $monospace
   font-size 10px
@@ -38,3 +38,13 @@
 
 .text-right
   text-align right
+
+@keyframes fa-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.fa-blink {
+  animation fa-blink 1.5s linear infinite
+}

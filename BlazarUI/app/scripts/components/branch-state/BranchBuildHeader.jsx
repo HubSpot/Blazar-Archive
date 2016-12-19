@@ -21,7 +21,7 @@ const BranchBuildHeader = ({branchBuild, completedModuleBuildCount, totalNonSkip
   return (
     <div className="branch-build-header">
       <div className="branch-build-header__build-number">
-        {isActiveBuild && <Icon for="spinner" classNames="branch-build-header__active-build-icon" />} #{buildNumber}
+        {isActiveBuild && <Icon for="in-progress" classNames="branch-build-header__active-build-icon" />} #{buildNumber}
       </div>
       <div className="branch-build-header__build-summary">
         <BranchBuildProgress
