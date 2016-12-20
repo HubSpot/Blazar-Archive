@@ -37,8 +37,7 @@ export const ICON_LIST = {
   'dashboard': 'fa fa-tachometer',
   'scroll-down': 'fa fa-arrow-circle-down',
   'scroll-up': 'fa fa-arrow-circle-up',
-  'circle-check': 'fa fa-check-circle',
-  'in-progress': 'fa fa-circle fa-blink'
+  'circle-check': 'fa fa-check-circle'
 };
 
 export const NO_MATCH_MESSAGES = {

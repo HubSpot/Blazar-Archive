@@ -15,8 +15,17 @@
 .branch-build-header__active-build-icon
   position absolute
   left -20px
-  font-size 16px
-  color $color-calypso
+  height 16px
+  width 16px
+  border-radius 100%
+  background-color $color-calypso
+  animation active-build-icon-blink 1.5s linear infinite
+
+@keyframes active-build-icon-blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
 
 .branch-build-header__build-summary
   flex-grow 1

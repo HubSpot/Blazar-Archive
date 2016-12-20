@@ -6,7 +6,6 @@ import UsersForBuild from './shared/UsersForBuild.jsx';
 import CancelBuildButton from '../shared/branch-build/CancelBuildButton.jsx';
 import CommitsSummary from './shared/CommitsSummary.jsx';
 import BranchBuildProgress from './shared/BranchBuildProgress.jsx';
-import Icon from '../shared/Icon.jsx';
 
 import { isComplete } from '../../constants/BranchBuildStates';
 
@@ -21,7 +20,7 @@ const BranchBuildHeader = ({branchBuild, completedModuleBuildCount, totalNonSkip
   return (
     <div className="branch-build-header">
       <div className="branch-build-header__build-number">
-        {isActiveBuild && <Icon for="in-progress" classNames="branch-build-header__active-build-icon" />} #{buildNumber}
+        {isActiveBuild && <span className="branch-build-header__active-build-icon" />} #{buildNumber}
       </div>
       <div className="branch-build-header__build-summary">
         <BranchBuildProgress
