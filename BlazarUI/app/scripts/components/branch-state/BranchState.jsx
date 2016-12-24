@@ -19,7 +19,7 @@ import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 
 import ModuleBuildStates from '../../constants/ModuleBuildStates';
-import { getCurrentModuleBuild, getCurrentBranchBuild } from '../Helpers';
+import { getCurrentModuleBuild } from '../Helpers';
 import { getBranchStatePath, getModuleBuildPath } from '../../utils/blazarPaths';
 
 class BranchState extends Component {
@@ -44,44 +44,6 @@ class BranchState extends Component {
   componentWillUnmount() {
     this.props.stopPollingBranchStatus();
     window.removeEventListener('visibilitychange', this.handleVisibilityChange);
-  }
-
-  sortModules(modules) {
-    if (modules.isEmpty()) {
-      return modules;
-    }
-
-    const currentBranchBuild = getCurrentBranchBuild(modules.first());
-    const topologicalSort = currentBranchBuild && currentBranchBuild.getIn(['dependencyGraph', 'topologicalSort']);
-    return modules.sort((a, b) => {
-      const currentModuleBuildA = getCurrentModuleBuild(a);
-      const currentModuleBuildB = getCurrentModuleBuild(b);
-
-      // first sort by descending build number to prioritize more recent builds
-      const buildNumberA = currentModuleBuildA ? currentModuleBuildA.get('buildNumber') : 0;
-      const buildNumberB = currentModuleBuildB ? currentModuleBuildB.get('buildNumber') : 0;
-
-      if (buildNumberA > buildNumberB) {
-        return -1;
-      } else if (buildNumberA < buildNumberB) {
-        return 1;
-      }
-
-      // then sort by dependency order so that module builds proceed from top to bottom
-      // gracefully handling old builds without topological sort info
-      if (!topologicalSort) {
-        return 1;
-      }
-
-      const indexA = topologicalSort.indexOf(a.getIn(['module', 'id']));
-      const indexB = topologicalSort.indexOf(b.getIn(['module', 'id']));
-
-      if (indexA < indexB) {
-        return -1;
-      }
-
-      return 1;
-    });
   }
 
   getFailingModuleBuildBlazarPaths(moduleStates) {
@@ -171,7 +133,7 @@ class BranchState extends Component {
             <section id="active-modules">
               <p className="text-muted">Showing the current build state for each module in this branch.</p>
               <ModuleList
-                modules={this.sortModules(activeModules)}
+                modules={activeModules}
                 onCancelBuild={this.refreshBranchModuleStates}
               />
             </section>
@@ -182,7 +144,7 @@ class BranchState extends Component {
               <section id="inactive-modules">
                 <p className="text-muted">Showing previous builds of modules no longer contained in this branch.</p>
                 <ModuleList
-                  modules={this.sortModules(inactiveModules)}
+                  modules={inactiveModules}
                   onCancelBuild={this.refreshBranchModuleStates}
                 />
               </section>
