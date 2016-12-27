@@ -5,6 +5,7 @@ import moment from 'moment';
 import Measure from 'react-measure';
 import ModuleBuildStates from '../../../constants/ModuleBuildStates';
 import Icon from '../../shared/Icon.jsx';
+import ProgressSpinner from '../../shared/ProgressSpinner.jsx';
 import BuildDuration from './BuildDuration.jsx';
 import BuildDurationStopwatch from './BuildDurationStopwatch.jsx';
 
@@ -16,7 +17,7 @@ const getIcon = (moduleBuildState) => {
 
     case ModuleBuildStates.LAUNCHING:
     case ModuleBuildStates.IN_PROGRESS:
-      return <Icon for="spinner" classNames="module-build-status__icon module-build-status__icon--info" />;
+      return <span className="module-build-status__icon"><ProgressSpinner /></span>;
 
     case ModuleBuildStates.SUCCEEDED:
       return <Icon name="check-circle" classNames="module-build-status__icon module-build-status__icon--success" />;
