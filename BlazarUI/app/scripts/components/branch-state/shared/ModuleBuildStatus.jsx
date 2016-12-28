@@ -5,6 +5,7 @@ import moment from 'moment';
 import Measure from 'react-measure';
 import ModuleBuildStates from '../../../constants/ModuleBuildStates';
 import Icon from '../../shared/Icon.jsx';
+import ProgressSpinner from '../../shared/ProgressSpinner.jsx';
 import BuildDuration from './BuildDuration.jsx';
 import BuildDurationStopwatch from './BuildDurationStopwatch.jsx';
 
@@ -12,19 +13,20 @@ const getIcon = (moduleBuildState) => {
   switch (moduleBuildState) {
     case ModuleBuildStates.QUEUED:
     case ModuleBuildStates.WAITING_FOR_UPSTREAM_BUILD:
-      return <Icon name="clock-o" classNames="module-build-icon--info" />;
+      return <Icon name="clock-o" classNames="module-build-status__icon module-build-status__icon--info" />;
 
     case ModuleBuildStates.LAUNCHING:
     case ModuleBuildStates.IN_PROGRESS:
-      return <Icon for="spinner" classNames="module-build-icon--info" />;
+      return <span className="module-build-status__icon"><ProgressSpinner /></span>;
 
     case ModuleBuildStates.SUCCEEDED:
-      return <span className="status-circle status-circle--success" />;
+      return <Icon name="check-circle" classNames="module-build-status__icon module-build-status__icon--success" />;
+
     case ModuleBuildStates.FAILED:
-      return <span className="status-circle status-circle--failed" />;
+      return <Icon name="times-circle" classNames="module-build-status__icon module-build-status__icon--danger" />;
 
     case ModuleBuildStates.CANCELLED:
-      return <Icon name="ban" classNames="module-build-icon--warning" />;
+      return <Icon name="ban" classNames="module-build-status__icon module-build-status__icon--warning" />;
 
     default:
       return null;
