@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import {Link} from 'react-router';
+import classNames from 'classnames';
 
 import ModuleBuildStatus from '../shared/ModuleBuildStatus.jsx';
 import BuildTriggerLabel from '../shared/BuildTriggerLabel.jsx';
@@ -9,6 +10,7 @@ import ModuleBuildListItemWrapper from '../shared/ModuleBuildListItemWrapper.jsx
 
 import { canViewDetailedModuleBuildInfo } from '../../Helpers';
 import { getModuleBuildPath } from '../../../utils/blazarPaths';
+import { getClassNameColorModifier } from '../../../constants/ModuleBuildStates';
 
 const renderBuildNumber = (moduleName, moduleBuild, branchBuild) => {
   const branchId = branchBuild.get('branchId');
@@ -28,10 +30,15 @@ const renderBuildNumber = (moduleName, moduleBuild, branchBuild) => {
 };
 
 const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
+  const colorModifier = getClassNameColorModifier(moduleBuild.get('state'));
+  const divClassName = classNames('module-build-history-item', {
+    [`module-build-history-item--${colorModifier}`]: colorModifier
+  });
+
   return (
     <li>
       <ModuleBuildListItemWrapper moduleBuild={moduleBuild}>
-        <div className={"module-build-history-item"}>
+        <div className={divClassName}>
           <div className="module-build-history-item__build-number">
             {renderBuildNumber(moduleName, moduleBuild, branchBuild)}
           </div>
