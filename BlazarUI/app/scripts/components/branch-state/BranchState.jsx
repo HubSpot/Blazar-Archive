@@ -48,12 +48,12 @@ class BranchState extends Component {
   getFailingModuleBuilds(moduleStates) {
     return moduleStates
       .filter((moduleState) => {
-        const lastModuleBuild = moduleState.get('lastModuleBuild');
-        return lastModuleBuild && lastModuleBuild.get('state') === ModuleBuildStates.FAILED;
+        const lastNonSkippedModuleBuild = moduleState.get('lastNonSkippedModuleBuild');
+        return lastNonSkippedModuleBuild && lastNonSkippedModuleBuild.get('state') === ModuleBuildStates.FAILED;
       })
       .map((moduleState) => {
         const {branchId} = this.props;
-        const moduleBuildNumber = moduleState.getIn(['lastModuleBuild', 'buildNumber']);
+        const moduleBuildNumber = moduleState.getIn(['lastNonSkippedModuleBuild', 'buildNumber']);
         const moduleName = moduleState.getIn(['module', 'name']);
         const blazarModuleBuildPath = getModuleBuildPath(branchId, moduleBuildNumber, moduleName);
         return Immutable.Map({moduleName, moduleBuildNumber, blazarModuleBuildPath});
