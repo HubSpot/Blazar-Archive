@@ -1,26 +1,34 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Link } from 'react-router';
 import Alert from '../shared/Alert.jsx';
 
-const FailingModuleBuildsAlert = ({failingModuleBuildBlazarPaths}) => {
-  const numberOfFailingModules = failingModuleBuildBlazarPaths.size;
-  const heading = numberOfFailingModules === 1 ? 'A module build is failing' :
-    `${numberOfFailingModules} module builds are failing`;
+const FailingModuleBuildsAlert = ({failingModuleBuilds}) => {
+  const numberOfFailingModules = failingModuleBuilds.size;
+  const heading = numberOfFailingModules === 1 ? 'A module build has failed' :
+    `${numberOfFailingModules} module builds have failed`;
 
   return (
     <Alert className="failing-module-builds" type="danger" iconName="exclamation" titleText={heading}>
       <ul className="failing-module-builds__list">
-        {failingModuleBuildBlazarPaths.map((blazarModuleBuildPath, moduleName) =>
-          <li key={moduleName}><Link to={blazarModuleBuildPath}>{moduleName}</Link></li>
-        ).toArray()}
+        {failingModuleBuilds.toJS().map(({blazarModuleBuildPath, moduleName, moduleBuildNumber}) =>
+          <li key={moduleName}>
+            <Link to={blazarModuleBuildPath}>{moduleName} #{moduleBuildNumber}</Link>
+          </li>
+        )}
       </ul>
     </Alert>
   );
 };
 
 FailingModuleBuildsAlert.propTypes = {
-  failingModuleBuildBlazarPaths: ImmutablePropTypes.map
+  failingModuleBuilds: ImmutablePropTypes.listOf(
+    ImmutablePropTypes.contains({
+      moduleName: PropTypes.string,
+      moduleBuildNumber: PropTypes.number,
+      blazarModuleBuildPath: PropTypes.string
+    })
+  )
 };
 
 export default FailingModuleBuildsAlert;

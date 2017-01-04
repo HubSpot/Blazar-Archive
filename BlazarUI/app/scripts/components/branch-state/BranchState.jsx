@@ -19,7 +19,6 @@ import FailingModuleBuildsAlert from './FailingModuleBuildsAlert.jsx';
 import MalformedFileNotification from '../shared/MalformedFileNotification.jsx';
 
 import ModuleBuildStates from '../../constants/ModuleBuildStates';
-import { getCurrentModuleBuild } from '../Helpers';
 import { getBranchStatePath, getModuleBuildPath } from '../../utils/blazarPaths';
 
 class BranchState extends Component {
@@ -46,19 +45,19 @@ class BranchState extends Component {
     window.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
-  getFailingModuleBuildBlazarPaths(moduleStates) {
+  getFailingModuleBuilds(moduleStates) {
     return moduleStates
       .filter((moduleState) => {
-        const currentModuleBuild = getCurrentModuleBuild(moduleState);
-        return currentModuleBuild && currentModuleBuild.get('state') === ModuleBuildStates.FAILED;
+        const lastModuleBuild = moduleState.get('lastModuleBuild');
+        return lastModuleBuild && lastModuleBuild.get('state') === ModuleBuildStates.FAILED;
       })
-      .reduce((failingModuleBuildBlazarPaths, moduleState) => {
+      .map((moduleState) => {
         const {branchId} = this.props;
-        const moduleBuildNumber = getCurrentModuleBuild(moduleState).get('buildNumber');
+        const moduleBuildNumber = moduleState.getIn(['lastModuleBuild', 'buildNumber']);
         const moduleName = moduleState.getIn(['module', 'name']);
-        const blazarPath = getModuleBuildPath(branchId, moduleBuildNumber, moduleName);
-        return failingModuleBuildBlazarPaths.set(moduleName, blazarPath);
-      }, Immutable.Map());
+        const blazarModuleBuildPath = getModuleBuildPath(branchId, moduleBuildNumber, moduleName);
+        return Immutable.Map({moduleName, moduleBuildNumber, blazarModuleBuildPath});
+      });
   }
 
   refreshBranchModuleStates() {
@@ -119,14 +118,14 @@ class BranchState extends Component {
       return null;
     }
 
-    const failingModuleBuildBlazarPaths = this.getFailingModuleBuildBlazarPaths(activeModules);
-    const hasFailingModules = !!failingModuleBuildBlazarPaths.size;
+    const failingModuleBuilds = this.getFailingModuleBuilds(activeModules);
+    const hasFailingModules = !!failingModuleBuilds.size;
 
     return (
       <div>
         {showBetaFeatureAlert && <BetaFeatureAlert branchId={branchId} onDismiss={dismissBetaNotification} />}
         <MalformedFileNotification malformedFiles={malformedFiles.toJS()} />
-        {hasFailingModules && <FailingModuleBuildsAlert failingModuleBuildBlazarPaths={failingModuleBuildBlazarPaths} />}
+        {hasFailingModules && <FailingModuleBuildsAlert failingModuleBuilds={failingModuleBuilds} />}
         {this.renderPendingBuilds()}
         <Tabs id="branch-state-tabs" className="branch-state-tabs" defaultActiveKey="active-modules">
           <Tab eventKey="active-modules" title="Active modules">
