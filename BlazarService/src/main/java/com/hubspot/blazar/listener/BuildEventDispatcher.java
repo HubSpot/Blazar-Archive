@@ -5,7 +5,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
@@ -20,11 +19,12 @@ import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.hubspot.blazar.data.util.LogUtils;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
 
 @Singleton
 public class BuildEventDispatcher {
-  private static final Logger LOG = LoggerFactory.getLogger(BuildEventDispatcher.class);
+  private static final LogUtils LOG = new LogUtils(LoggerFactory.getLogger(BuildEventDispatcher.class));
 
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
@@ -63,14 +63,16 @@ public class BuildEventDispatcher {
     } else {
       build = current.get();
     }
-
-    try {
-      for (RepositoryBuildVisitor visitor : repositoryVisitors) {
-        visitor.visit(build);
+    for (RepositoryBuildVisitor visitor : repositoryVisitors) {
+      try {
+          visitor.visit(build);
+      } catch (NonRetryableBuildException e) {
+        LOG.warn(build, "Visitor {} failed, it cannot be retried. Failing build.", visitor.getClass(), e);
+        repositoryBuildService.fail(build);
+      } catch (RuntimeException e) {
+        LOG.error(build, "Visitor {} failed. {}", visitor.getClass(), e);
+        throw e; // So that the SQL event bus can retry
       }
-    } catch (NonRetryableBuildException e) {
-      LOG.warn("Failing build {}", build.getId().get(), e);
-      repositoryBuildService.fail(build);
     }
   }
 
@@ -84,15 +86,19 @@ public class BuildEventDispatcher {
       build = current;
     }
 
-    try {
-      for (ModuleBuildVisitor visitor : moduleVisitors) {
+    for (ModuleBuildVisitor visitor : moduleVisitors) {
+      try {
         visitor.visit(build);
+      } catch (NonRetryableBuildException e) {
+        LOG.warn(build, "Visitor {} failed, it cannot be retried. Failing build.", visitor.getClass(), e);
+        moduleBuildService.fail(build);
+      } catch (RuntimeException e) {
+        LOG.error(build, "Visitor {} failed. {}", visitor.getClass(), e);
+        throw e; // So that the SQL event bus can retry
       }
-    } catch (NonRetryableBuildException e) {
-      LOG.warn("Failing build {}", build.getId().get(), e);
-      moduleBuildService.fail(build);
     }
   }
+
 
   private boolean matchingState(ModuleBuild.State current, ModuleBuild.State other) {
     if (current == other) {
@@ -114,13 +120,16 @@ public class BuildEventDispatcher {
       build = current;
     }
 
-    try {
-      for (InterProjectBuildVisitor visitor : interProjectBuildVisitors) {
+    for (InterProjectBuildVisitor visitor : interProjectBuildVisitors) {
+      try {
         visitor.visit(build);
+      } catch (NonRetryableBuildException e) {
+        LOG.warn(build, "Visitor {} failed and it cannot be retried. Failing build.", visitor.getClass(), e);
+        interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(build, InterProjectBuild.State.FAILED));
+      } catch (RuntimeException e) {
+        LOG.error(build, "Visitor {} failed. {}", visitor.getClass(), e);
+        throw e; // So that the SQL event bus can retry
       }
-    } catch (NonRetryableBuildException e) {
-      LOG.warn("Got non Retryable Exception in InterProjectBuild {}, marking as Finished", build.getId().get());
-      interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(build, InterProjectBuild.State.FAILED));
     }
   }
 }
