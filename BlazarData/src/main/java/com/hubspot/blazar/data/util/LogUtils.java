@@ -1,6 +1,9 @@
 package com.hubspot.blazar.data.util;
 
-import static org.slf4j.event.Level.*;
+import static org.slf4j.event.Level.DEBUG;
+import static org.slf4j.event.Level.INFO;
+import static org.slf4j.event.Level.WARN;
+import static org.slf4j.event.Level.ERROR;
 
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
