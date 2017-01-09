@@ -51,7 +51,7 @@ export default function moduleBuildHistoriesByModuleId(state = Immutable.Map(), 
   switch (action.type) {
     case ActionTypes.RECEIVE_BRANCH_STATUS: {
       if (action.error) {
-        return Immutable.Map();
+        return state;
       }
 
       return Immutable.Map(action.payload.moduleStates.map((moduleState) => {
