@@ -6,18 +6,23 @@ import classNames from 'classnames';
 import ModuleBuildStatus from './shared/ModuleBuildStatus.jsx';
 import Icon from '../shared/Icon.jsx';
 import ModuleBuildListItemWrapper from './shared/ModuleBuildListItemWrapper.jsx';
+import SingularityLink from './shared/SingularityLink.jsx';
 
 import { getClassNameColorModifier } from '../../constants/ModuleBuildStates';
 import { canViewDetailedModuleBuildInfo } from '../Helpers';
 import { getModuleBuildPath } from '../../utils/blazarPaths';
+import isDebugMode from '../../utils/isDebugMode';
 
 const getBuildLogLink = (module, moduleBuild, branchBuild) => {
   if (canViewDetailedModuleBuildInfo(moduleBuild)) {
     const moduleName = module.get('name');
     const linkPath = getModuleBuildPath(branchBuild.get('branchId'), moduleBuild.get('buildNumber'), moduleName);
+    const showSingularityLink = isDebugMode();
     return (
       <div className="module-item-summary__build-log-link-container">
         <Link to={linkPath} className="module-item-summary__build-log-link">View build log</Link>
+        {showSingularityLink && ' | '}
+        {showSingularityLink && <SingularityLink taskId={moduleBuild.get('taskId')} />}
       </div>
     );
   }

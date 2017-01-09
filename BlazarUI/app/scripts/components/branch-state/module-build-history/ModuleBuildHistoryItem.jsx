@@ -6,10 +6,12 @@ import ModuleBuildStatus from '../shared/ModuleBuildStatus.jsx';
 import BuildTriggerLabel from '../shared/BuildTriggerLabel.jsx';
 import UsersForBuild from '../shared/UsersForBuild.jsx';
 import CommitsSummary from '../shared/CommitsSummary.jsx';
+import SingularityLink from '../shared/SingularityLink.jsx';
 import ModuleBuildListItemWrapper from '../shared/ModuleBuildListItemWrapper.jsx';
 
 import { canViewDetailedModuleBuildInfo } from '../../Helpers';
 import { getModuleBuildPath } from '../../../utils/blazarPaths';
+import isDebugMode from '../../../utils/isDebugMode';
 import { getClassNameColorModifier } from '../../../constants/ModuleBuildStates';
 
 const renderBuildNumber = (moduleName, moduleBuild, branchBuild) => {
@@ -27,6 +29,20 @@ const renderBuildNumber = (moduleName, moduleBuild, branchBuild) => {
   }
 
   return formattedBuildNumber;
+};
+
+const renderSingularityLink = (moduleBuild) => {
+  if (!isDebugMode()) {
+    return null;
+  }
+
+  const taskId = moduleBuild.get('taskId');
+  return (
+    <div className="module-build-history-items__singularity-link-wrapper">
+      {taskId && ' | '}
+      {taskId && <SingularityLink taskId={taskId} />}
+    </div>
+  );
 };
 
 const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
@@ -51,12 +67,15 @@ const ModuleBuildHistoryItem = ({moduleBuild, moduleName, branchBuild}) => {
           <div className="module-build-history-item__users-for-build-wrapper">
             <UsersForBuild branchBuild={branchBuild} />
           </div>
-          <div className="module-build-history-item__commits-wrapper">
-            <CommitsSummary
-              commitInfo={branchBuild.get('commitInfo')}
-              buildId={branchBuild.get('id')}
-              popoverPlacement="left"
-            />
+          <div className="module-build-history-item__actions">
+            <div className="module-build-history-item__commits-wrapper">
+              <CommitsSummary
+                commitInfo={branchBuild.get('commitInfo')}
+                buildId={branchBuild.get('id')}
+                popoverPlacement="left"
+              />
+            </div>
+            {renderSingularityLink(moduleBuild)}
           </div>
         </div>
       </ModuleBuildListItemWrapper>

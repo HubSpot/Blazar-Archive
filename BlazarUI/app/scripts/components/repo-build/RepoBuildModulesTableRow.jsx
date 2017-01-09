@@ -4,7 +4,10 @@ import BuildStates from '../../constants/BuildStates.js';
 import moment from 'moment';
 import classNames from 'classnames';
 import BuildStateIcon from '../shared/BuildStateIcon.jsx';
-import {timestampFormatted, timestampDuration, tableRowBuildState, truncate, getTableDurationText} from '../Helpers';
+import SingularityLink from '../branch-state/shared/SingularityLink.jsx';
+import {timestampFormatted, timestampDuration, tableRowBuildState, getTableDurationText} from '../Helpers';
+import isDebugMode from '../../utils/isDebugMode';
+
 
 class RepoBuildModulesTableRow extends Component {
 
@@ -12,10 +15,6 @@ class RepoBuildModulesTableRow extends Component {
     super(props, context);
 
     this.onTableClick = this.onTableClick.bind(this);
-  }
-
-  isDebugMode() {
-    return window.location.href.indexOf('?debug') > -1;
   }
 
   getRowClassNames(state) {
@@ -33,7 +32,7 @@ class RepoBuildModulesTableRow extends Component {
     const {data} = this.props;
     const link = e.target.className;
 
-    if (link === 'build-link' || link === 'singularity-link') {
+    if (link === 'build-link') {
       return;
     } else if ([BuildStates.SKIPPED, BuildStates.CANCELLED].indexOf(data.state) === -1) {
       if (!e.metaKey) {
@@ -62,26 +61,16 @@ class RepoBuildModulesTableRow extends Component {
   }
 
   renderSingularityLink() {
-    if (!this.isDebugMode()) {
-      return null;
-    }
-
     const {taskId} = this.props.data;
-
-    if (!taskId) {
-      return null;
+    if (isDebugMode() && taskId) {
+      return (
+        <td>
+          <SingularityLink taskId={taskId} />
+        </td>
+      );
     }
 
-    //
-    // to do: surface singularity env
-    //
-    const singularityPath = `https://tools.hubteamqa.com/singularity/task/${taskId}`;
-
-    return (
-      <td>
-        <a className="singularity-link" href={singularityPath} target="_blank">{truncate(taskId, 30, true)}</a>
-      </td>
-    );
+    return null;
   }
 
   renderDuration() {
