@@ -33,7 +33,7 @@ class ModuleSelectWrapper extends Component {
           clearAllText="None"
           noResultsText="All modules have been selected."
           multi={true}
-          value={this.props.selectedModuleIds}
+          value={this.props.selectedModuleIds.join(',')}
           options={this.createModuleSelectOptions(this.props.modules)}
           onChange={this.handleChange}
         />
