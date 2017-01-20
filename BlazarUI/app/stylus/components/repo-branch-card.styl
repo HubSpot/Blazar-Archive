@@ -10,7 +10,7 @@ $bg-transition-duration = .15s
 $build-and-status-width = 80px
 
 .repo-branch-card-stack__zero-state
-  font-family HelveticaNeue-light
+  font-weight $font-light
   color $color-heffalump
   text-align center
   max-width 560px
@@ -20,7 +20,7 @@ $build-and-status-width = 80px
     margin-top 30px
     margin-bottom 20px
     font-size 20px
-    font-family HelveticaNeue-medium
+    font-weight $font-medium
 
   & p
     font-size 16px
@@ -33,7 +33,7 @@ $build-and-status-width = 80px
   border $border
   border-bottom 0
   color $color-heffalump
-  font-family HelveticaNeue-medium
+  font-weight $font-medium
   padding-left $build-and-status-width
   text-transform uppercase
 
@@ -102,7 +102,6 @@ $build-and-status-width = 80px
 
 .repo-branch-card__branch-and-build
   padding-top 4px
-  font-family HelveticaNeue-Light
   color $color-eerie
   overflow hidden
   white-space nowrap
@@ -110,7 +109,6 @@ $build-and-status-width = 80px
   max-width calc(100% - 15px)
 
 .repo-branch-card__branch
-  font-family HelveticaNeue
   color $color-heffalump
   background-color #eceef1
   padding 3px 7px
@@ -123,7 +121,7 @@ $build-and-status-width = 80px
     content '\f020  '
 
 .repo-branch-card__build-number
-  font-family HelveticaNeue-light
+  font-weight $font-light
   color $color-heffalump
 
 .repo-branch-card__last-build
@@ -137,13 +135,13 @@ $build-and-status-width = 80px
 
 .repo-branch-card__last-build-time
   color $color-heffalump
-  font-family HelveticaNeue-bold
+  font-weight $font-heavy
 
 .repo-branch-card__triggered-by
   width $details-width
   height 100%
   vertical-align middle
-  font-family HelveticaNeue-light
+  font-weight $font-light
   color $color-heffalump
   overflow hidden
   white-space nowrap
@@ -156,16 +154,16 @@ $build-and-status-width = 80px
   position relative
 
 .repo-branch-card__details-header
-  font-family HelveticaNeue-light
+  font-weight $font-light
   font-size 18px
   color $color-heffalump
 
   & .repo-branch-card__build-number
-    font-family HelveticaNeue
+    font-weight $font-normal
 
 .repo-branch-card__author
   color #425b76
-  font-family HelveticaNeue-medium
+  font-weight $font-medium
 
 .repo-branch-card__module-rows
   margin-top 20px
@@ -174,7 +172,7 @@ $build-and-status-width = 80px
 .repo-branch-card__expanded-author
   font-size 14px
   color #2965a8
-  font-family HelveticaNeue
+  font-weight $font-normal
   padding-left 20px
 
 .repo-branch-card__expanded-module-row
