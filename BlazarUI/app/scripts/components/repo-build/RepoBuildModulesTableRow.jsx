@@ -64,9 +64,7 @@ class RepoBuildModulesTableRow extends Component {
     const {taskId} = this.props.data;
     if (isDebugMode() && taskId) {
       return (
-        <td>
-          <SingularityLink taskId={taskId} />
-        </td>
+        <SingularityLink taskId={taskId} />
       );
     }
 
@@ -100,8 +98,8 @@ class RepoBuildModulesTableRow extends Component {
         <td>
           {this.renderDuration()}
         </td>
-        {this.renderSingularityLink()}
         <td>
+          {this.renderSingularityLink()}
         </td>
       </tr>
     );
