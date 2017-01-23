@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import { sortBy } from 'underscore';
 import BuildBranchModal from '../shared/BuildBranchModal.jsx';
 import {
   hideBranchBuildModal,
@@ -9,14 +10,15 @@ import {
   triggerBuild
 } from '../../redux-actions/buildBranchFormActions';
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   const buildBranchForm = state.buildBranchForm;
   return {
     showModal: buildBranchForm.get('showModal'),
     selectedModuleIds: buildBranchForm.get('selectedModuleIds').toArray(),
     buildDownstreamModules: buildBranchForm.get('buildDownstreamModules'),
     triggerInterProjectBuild: buildBranchForm.get('triggerInterProjectBuild'),
-    resetCache: buildBranchForm.get('resetCache')
+    resetCache: buildBranchForm.get('resetCache'),
+    modules: sortBy(ownProps.modules, (module) => module.name)
   };
 };
 
