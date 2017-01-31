@@ -1,4 +1,4 @@
-![Blazar](https://github.com/HubSpot/Blazar/blob/master/BlazarUI/app/images/blazar-logo.png?raw=true)
+![Blazar](BlazarUI/app/images/blazar-logo.png)
 
 ## Overview ##
 
