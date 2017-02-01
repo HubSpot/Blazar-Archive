@@ -1,6 +1,5 @@
 package com.hubspot.blazar.listener;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -59,13 +58,7 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
     String sha = build.getSha().get();
     String description = getStateDescription(build.getState());
 
-    final GHRepository repository;
-    try {
-      repository = gitHubHelper.repositoryFor(gitInfo);
-    } catch (FileNotFoundException e) {
-      LOG.warn("Couldn't find repository {}", gitInfo.getFullRepositoryName(), e);
-      return;
-    }
+    GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
 
     LOG.info("Setting status of commit {} to {} for build {}", sha, state, build.getId().get());
     try {

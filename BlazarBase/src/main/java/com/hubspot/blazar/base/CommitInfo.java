@@ -1,12 +1,13 @@
 package com.hubspot.blazar.base;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Optional;
-import com.hubspot.blazar.github.GitHubProtos.Commit;
-
 import java.util.List;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Optional;
+import com.hubspot.blazar.github.GitHubProtos.Commit;
 
 public class CommitInfo {
   private final Commit current;
@@ -39,6 +40,16 @@ public class CommitInfo {
 
   public boolean isTruncated() {
     return truncated;
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("current", current)
+        .add("previous", previous)
+        .add("newCommits", newCommits)
+        .add("truncated", truncated)
+        .toString();
   }
 
   @Override

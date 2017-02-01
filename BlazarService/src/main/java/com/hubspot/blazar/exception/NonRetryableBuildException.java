@@ -1,12 +1,12 @@
 package com.hubspot.blazar.exception;
 
-public class NonRetryableBuildException extends Exception {
+public class NonRetryableBuildException extends RuntimeException {
 
   public NonRetryableBuildException(String message) {
     super(message);
   }
 
-  public NonRetryableBuildException(String message, Exception e) {
-    super(message, e);
+  public NonRetryableBuildException(String message, Throwable t) {
+    super(message, t);
   }
 }

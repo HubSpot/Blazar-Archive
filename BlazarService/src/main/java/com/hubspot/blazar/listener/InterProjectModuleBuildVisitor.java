@@ -26,7 +26,6 @@ import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.exception.NonRetryableBuildException;
 
 public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(InterProjectModuleBuildVisitor.class);
@@ -143,7 +142,7 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
   }
 
   // Canceling
-  private void cancelSubTree(ModuleBuild build) throws NonRetryableBuildException {
+  private void cancelSubTree(ModuleBuild build) {
     InterProjectBuildMapping mapping = interProjectBuildMappingService.getByModuleBuildId(build.getId().get()).get();
     LOG.info("Found mapping {} corresponding to moduleBuild {}", mapping, build.getId());
     InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mapping.getInterProjectBuildId()).get();

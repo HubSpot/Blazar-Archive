@@ -1,7 +1,5 @@
 package com.hubspot.blazar.command;
 
-import java.io.IOException;
-
 import net.sourceforge.argparse4j.inf.Namespace;
 
 import org.kohsuke.github.GHRepository;
@@ -63,14 +61,7 @@ public class GitBranchUpdater implements Runnable {
     }
 
     GitHubConfiguration githubConfiguration = configuration.getGitHubConfiguration().get(oldBranch.getHost());
-    GHRepository ghRepository;
-    try {
-      ghRepository = gitHubHelper.repositoryFor(oldBranch);
-    } catch (IOException e) {
-      LOG.error("Caught exception while trying to find {} in github", oldBranch, e);
-      throw new RuntimeException(e);
-    }
-
+    GHRepository ghRepository = gitHubHelper.repositoryFor(oldBranch);
     if (ghRepository.getId() != oldBranch.getRepositoryId()) {
       LOG.warn("A repository with a different github id {} has replaced {}. Considering {}#{} as deleted ", ghRepository.getId(), oldBranch, oldBranch.getFullRepositoryName(), oldBranch.getBranch());
       branchService.delete(oldBranch);

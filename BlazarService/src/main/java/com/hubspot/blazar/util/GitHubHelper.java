@@ -24,6 +24,7 @@ import org.kohsuke.github.GitUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.base.Optional;
@@ -32,12 +33,15 @@ import com.google.common.net.UrlEscapers;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.exception.NonRetryableBuildException;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.User;
 
 @Singleton
 public class GitHubHelper {
   private static final Logger LOG = LoggerFactory.getLogger(GitHubHelper.class);
+  private static final String MAINTENANCE_MESSAGE = "GitHub Enterprise is currently down for maintenance";
+  private static final String GIT_HUB_MAINTENANCE_LOG_MESSAGE = "GitHub Enterprise is down for maintenance. Can not proceed with the build.";
 
   private final Map<String, GitHub> gitHubByHost;
   private final ObjectMapper mapper;
@@ -50,8 +54,19 @@ public class GitHubHelper {
     this.yamlFactory = yamlFactory;
   }
 
-  public Optional<String> shaFor(GHRepository repository, GitInfo gitInfo) throws IOException {
-    GHBranch branch = repository.getBranches().get(gitInfo.getBranch());
+  public Optional<String> shaFor(GHRepository repository, GitInfo gitInfo) {
+    final GHBranch branch;
+    try {
+        branch = repository.getBranches().get(gitInfo.getBranch());
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)) {
+        LOG.warn(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+      }
+      LOG.warn("Caught exception trying to find sha for {}", gitInfo, e);
+      throw new RuntimeException(e);
+    }
+
     if (branch == null) {
       return Optional.absent();
     } else {
@@ -59,49 +74,65 @@ public class GitHubHelper {
     }
   }
 
-  public CommitInfo commitInfoFor(GHRepository repository, Commit current, Optional<Commit> previous) throws IOException {
+  public CommitInfo commitInfoFor(GHRepository repository, Commit current, Optional<Commit> previous) {
     final List<Commit> newCommits;
     boolean truncated = false;
-    if (previous.isPresent()) {
-      newCommits = new ArrayList<>();
 
-      List<GHCompare.Commit> commits = Collections.emptyList();
-      try {
+    try {
+      if (previous.isPresent()) {
+        newCommits = new ArrayList<>();
+
         GHCompare compare = repository.getCompare(previous.get().getId(), current.getId());
-        commits = Arrays.asList(compare.getCommits());
-      } catch (FileNotFoundException e) {
-        LOG.warn("Error generating compare from sha {} to sha {}", previous.get().getId(), current.getId(), e);
-      }
+        List<GHCompare.Commit> commits = Arrays.asList(compare.getCommits());
 
-      if (commits.size() > 10) {
-        commits = commits.subList(commits.size() - 10, commits.size());
+
+        if (commits.size() > 10) {
+          commits = commits.subList(commits.size() - 10, commits.size());
+          truncated = true;
+        }
+
+        for (GHCompare.Commit newCommit : commits) {
+          newCommits.add(toCommit(repository.getCommit(newCommit.getSHA1())));
+        }
+      } else {
+        newCommits = Collections.emptyList();
         truncated = true;
       }
 
-      for (GHCompare.Commit newCommit : commits) {
-        newCommits.add(toCommit(repository.getCommit(newCommit.getSHA1())));
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)) {
+        LOG.warn(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
       }
-    } else {
-      newCommits = Collections.emptyList();
-      truncated = true;
+      LOG.warn("Caught exception while processing diff commits on {} between {} and {}", repository, current, previous);
+      throw new RuntimeException(e);
     }
 
     return new CommitInfo(current, previous, newCommits, truncated);
   }
 
-  public Optional<BuildConfig> configFor(String path, GitInfo gitInfo) throws IOException {
+  public Optional<BuildConfig> configFor(String path, GitInfo gitInfo) {
     return configFor(path, repositoryFor(gitInfo), gitInfo);
   }
 
-  public Optional<BuildConfig> configFor(String path, GHRepository repository, GitInfo gitInfo) throws IOException {
-    final String config;
+  public Optional<BuildConfig> configFor(String path, GHRepository repository, GitInfo gitInfo) {
     try {
-      config = contentsFor(path, repository, gitInfo);
+      String config = contentsFor(path, repository, gitInfo);
+      return Optional.of(mapper.readValue(yamlFactory.createParser(config), BuildConfig.class));
     } catch (FileNotFoundException e) {
-      return Optional.absent();
+      String message = String.format("No repository found for %s", gitInfo.getFullRepositoryName());
+      throw new NonRetryableBuildException(message, e);
+    } catch (JsonProcessingException e) {
+      String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", path, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+      throw new NonRetryableBuildException(message, e);
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)){
+        LOG.error(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+      }
+      LOG.warn("Caught exception while trying to read config {} in repo {} from GitHub", path, gitInfo, e);
+      throw new RuntimeException(e);
     }
-
-    return Optional.of(mapper.readValue(yamlFactory.createParser(config), BuildConfig.class));
   }
 
   public String contentsFor(String file, GHRepository repository, GitInfo gitInfo) throws IOException {
@@ -109,13 +140,34 @@ public class GitHubHelper {
     return content.getContent();
   }
 
-  public GHTree treeFor(GHRepository repository, GitInfo gitInfo) throws IOException {
+  public GHTree treeFor(GHRepository repository, GitInfo gitInfo) {
     String escapedBranch = UrlEscapers.urlPathSegmentEscaper().escape(gitInfo.getBranch());
-    return repository.getTreeRecursive(escapedBranch, 1);
+    try {
+      return repository.getTreeRecursive(escapedBranch, 1);
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)) {
+        LOG.error(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+      }
+      LOG.warn("Caught exception while trying to get repository tree for {} from GitHub", gitInfo, e);
+      throw new RuntimeException(e);
+    }
   }
 
-  public GHRepository repositoryFor(GitInfo gitInfo) throws IOException {
-    return gitHubFor(gitInfo).getRepository(gitInfo.getFullRepositoryName());
+  public GHRepository repositoryFor(GitInfo gitInfo) {
+    try {
+      return gitHubFor(gitInfo).getRepository(gitInfo.getFullRepositoryName());
+    } catch (FileNotFoundException e) {
+      LOG.warn("Repository {} not found", gitInfo, e);
+      throw new NonRetryableBuildException("Repository not found", e);
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)) {
+        LOG.error(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+      }
+      LOG.warn("Caught exception while trying to get repository data for {} from GitHub", gitInfo, e);
+      throw new RuntimeException(e);
+    }
   }
 
   public GitHub gitHubFor(GitInfo gitInfo) {
@@ -135,7 +187,21 @@ public class GitHubHelper {
     return affectedPaths;
   }
 
-  public Commit toCommit(GHCommit commit) throws IOException {
+  public Commit toCommitFromRepoAndSha(GHRepository repository, String sha) {
+    try {
+      return toCommit(repository.getCommit(sha));
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)) {
+        LOG.warn(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+      }
+      LOG.warn("Caught exception while processing diff commits");
+      throw new RuntimeException(e);
+    }
+  }
+
+
+  public Commit toCommit(GHCommit commit) {
     Commit.Builder builder = Commit.newBuilder()
         .setId(commit.getSHA1())
         .setMessage(commit.getCommitShortInfo().getMessage())
@@ -144,7 +210,19 @@ public class GitHubHelper {
         .setAuthor(toAuthor(commit))
         .setCommitter(toCommitter(commit));
 
-    for (GHCommit.File file : commit.getFiles()) {
+    final List<GHCommit.File> commitFiles;
+    try {
+       commitFiles = commit.getFiles();
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)) {
+        LOG.warn(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+      }
+      LOG.warn("Caught exception while reading list of changed files in commit {}", commit, e);
+      throw new RuntimeException(e);
+    }
+
+    for (GHCommit.File file : commitFiles) {
       switch (file.getStatus()) {
         case "added":
           builder.addAdded(file.getFileName());
@@ -165,21 +243,37 @@ public class GitHubHelper {
     return builder.build();
   }
 
-  private static User toAuthor(GHCommit commit) throws IOException {
+  private static User toAuthor(GHCommit commit) {
     User.Builder builder = toUser(commit.getCommitShortInfo().getAuthor());
-
-    if (commit.getAuthor() != null && commit.getAuthor().getLogin() != null) {
-      builder.setUsername(commit.getAuthor().getLogin());
+    try {
+      if (commit.getAuthor() != null && commit.getAuthor().getLogin() != null) {
+        builder.setUsername(commit.getAuthor().getLogin());
+      }
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)) {
+        LOG.warn(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+      }
+      LOG.warn("Caught exception while getting author info for {}", commit, e);
+      throw new RuntimeException(e);
     }
 
     return builder.build();
   }
 
-  private static User toCommitter(GHCommit commit) throws IOException {
+  private static User toCommitter(GHCommit commit) {
     User.Builder builder = toUser(commit.getCommitShortInfo().getCommitter());
-
-    if (commit.getCommitter() != null && commit.getCommitter().getLogin() != null) {
-      builder.setUsername(commit.getCommitter().getLogin());
+    try {
+      if (commit.getCommitter() != null && commit.getCommitter().getLogin() != null) {
+        builder.setUsername(commit.getCommitter().getLogin());
+      }
+    } catch (IOException e) {
+      if (githubIsInMaintenanceMode(e)) {
+        LOG.warn(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+        throw new NonRetryableBuildException(GIT_HUB_MAINTENANCE_LOG_MESSAGE, e);
+      }
+      LOG.warn("Caught exception while getting committer info for {}", commit, e);
+      throw new RuntimeException(e);
     }
 
     return builder.build();
@@ -188,5 +282,9 @@ public class GitHubHelper {
   private static User.Builder toUser(GitUser user) {
     return User.newBuilder().setName(user.getName()).setEmail(user.getEmail());
 
+  }
+
+  private static boolean githubIsInMaintenanceMode(IOException e) {
+    return e.getMessage().contains(MAINTENANCE_MESSAGE);
   }
 }
