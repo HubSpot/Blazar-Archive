@@ -124,7 +124,7 @@ public class GitBranchUpdaterTest extends BlazarServiceTestBase {
   }
 
   private GitBranchUpdater buildUpdater(GitInfo gitInfo) {
-    return new GitBranchUpdater(gitInfo, gitHubHelper, blazarConfiguration, branchService);
+    return new GitBranchUpdater(gitInfo, gitHubHelper, blazarConfiguration, branchService, false);
   }
 
   private GitInfo buildGitInfo(String uri) {
