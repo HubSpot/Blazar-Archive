@@ -1,8 +1,13 @@
 package com.hubspot.blazar.resources;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -24,12 +29,16 @@ import com.google.common.base.Optional;
 import com.hubspot.blazar.base.LogChunk;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
+import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpRequest;
 import com.hubspot.horizon.HttpResponse;
 import com.hubspot.mesos.json.MesosFileChunkObject;
 import com.hubspot.singularity.SingularityS3Log;
+import com.hubspot.singularity.SingularitySandbox;
+import com.hubspot.singularity.SingularitySandboxFile;
 import com.hubspot.singularity.SingularityTaskHistory;
 import com.hubspot.singularity.SingularityTaskHistoryUpdate;
 import com.hubspot.singularity.SingularityTaskHistoryUpdate.SimplifiedTaskState;
@@ -39,17 +48,21 @@ import com.hubspot.singularity.client.SingularityClient;
 @Produces(MediaType.APPLICATION_JSON)
 public class ModuleBuildResource {
   private static final Logger LOG = LoggerFactory.getLogger(ModuleBuildResource.class);
+  private static final String BUILD_LOG_NAME = "service.log";
 
   private final ModuleBuildService moduleBuildService;
   private final SingularityClient singularityClient;
+  private SingularityConfiguration singularityConfiguration;
   private final AsyncHttpClient asyncHttpClient;
 
   @Inject
   public ModuleBuildResource(ModuleBuildService moduleBuildService,
                              SingularityClient singularityClient,
+                             BlazarConfiguration blazarConfiguration,
                              AsyncHttpClient asyncHttpClient) {
     this.moduleBuildService = moduleBuildService;
     this.singularityClient = singularityClient;
+    this.singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
     this.asyncHttpClient = asyncHttpClient;
   }
 
@@ -105,7 +118,7 @@ public class ModuleBuildResource {
       throw new NotFoundException("No taskId found for build: " + moduleBuildId);
     }
 
-    String path = taskId.get() + "/service.log";
+    String path = taskId.get() + "/" + BUILD_LOG_NAME;
     Optional<String> grep = Optional.absent();
 
     Optional<MesosFileChunkObject> chunk = singularityClient.readSandBoxFile(taskId.get(), path, grep, Optional.of(offset), Optional.of(length));
@@ -135,7 +148,7 @@ public class ModuleBuildResource {
       throw new NotFoundException("No taskId found for build: " + moduleBuildId);
     }
 
-    String path = taskId.get() + "/service.log";
+    String path = taskId.get() + BUILD_LOG_NAME;
     Optional<Long> absent = Optional.absent();
     Optional<String> grep = Optional.absent();
 
@@ -153,6 +166,39 @@ public class ModuleBuildResource {
         return size;
       }
     };
+  }
+
+  @GET
+  @Path("{id}/log/download")
+  public Response getLog(@PathParam("id") long moduleBuildId) throws URISyntaxException {
+    ModuleBuild build = getBuildWithError(moduleBuildId);
+
+    Optional<String> taskId = build.getTaskId();
+    if (!taskId.isPresent()) {
+      throw new NotFoundException("No taskId found for build: " + moduleBuildId);
+    }
+
+
+    Optional<SingularitySandbox> sandboxOptional = singularityClient.browseTaskSandBox(taskId.get(), taskId.get());
+    java.util.Optional<SingularitySandboxFile> buildLogFile = sandboxOptional.get().getFiles().stream().filter(l -> Objects.equals(l.getName(), BUILD_LOG_NAME)).findFirst();
+    if (buildLogFile.isPresent()) {
+      String host = sandboxOptional.get().getSlaveHostname();
+      int port = singularityConfiguration.getSlaveHttpPort();
+      String path = sandboxOptional.get().getFullPathToRoot() + "/" + sandboxOptional.get().getCurrentDirectory() + "/" + buildLogFile.get().getName();
+      String downloadEndpointPath = "/files/download.json";
+      URI uri = new URI("http", null, host, port, downloadEndpointPath, "?path=" + path, null);
+      return Response.temporaryRedirect(uri)
+          .build();
+    }
+    try {
+      SingularityS3Log urlData = findS3ServiceLog(taskId.get());
+      String logUrl = urlData.getDownloadUrl();
+      URI uri = new URI(logUrl);
+      return Response.temporaryRedirect(uri)
+          .build();
+    } catch (NotFoundException e) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
   }
 
   private SingularityS3Log findS3ServiceLog(String taskId) {
