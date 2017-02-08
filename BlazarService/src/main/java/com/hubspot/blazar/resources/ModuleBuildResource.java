@@ -182,7 +182,7 @@ public class ModuleBuildResource {
 
     java.util.Optional<SingularitySandboxFile> buildLogFile = java.util.Optional.empty();
     if (sandboxOptional.isPresent()) {
-      sandboxOptional.get().getFiles().stream().filter(l -> Objects.equals(l.getName(), BUILD_LOG_NAME)).findFirst();
+      buildLogFile = sandboxOptional.get().getFiles().stream().filter(l -> Objects.equals(l.getName(), BUILD_LOG_NAME)).findFirst();
     }
 
     if (buildLogFile.isPresent()) {
