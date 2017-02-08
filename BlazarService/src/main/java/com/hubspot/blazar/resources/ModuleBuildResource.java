@@ -178,7 +178,6 @@ public class ModuleBuildResource {
       throw new NotFoundException("No taskId found for build: " + moduleBuildId);
     }
 
-
     Optional<SingularitySandbox> sandboxOptional = singularityClient.browseTaskSandBox(taskId.get(), taskId.get());
 
     java.util.Optional<SingularitySandboxFile> buildLogFile = java.util.Optional.empty();
