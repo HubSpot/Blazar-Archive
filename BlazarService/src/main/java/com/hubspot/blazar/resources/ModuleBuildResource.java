@@ -169,8 +169,8 @@ public class ModuleBuildResource {
   }
 
   @GET
-  @Path("{id}/log/download")
-  public Object getLog(@PathParam("id") long moduleBuildId) {
+  @Path("{id}/log/download-url")
+  public Object getLogDownloadUrl(@PathParam("id") long moduleBuildId) {
     ModuleBuild build = getBuildWithError(moduleBuildId);
 
     Optional<String> taskId = build.getTaskId();
@@ -182,7 +182,7 @@ public class ModuleBuildResource {
 
     java.util.Optional<SingularitySandboxFile> buildLogFile = java.util.Optional.empty();
     if (sandboxOptional.isPresent()) {
-      buildLogFile = sandboxOptional.get().getFiles().stream().filter(l -> Objects.equals(l.getName(), BUILD_LOG_NAME)).findFirst();
+      buildLogFile = sandboxOptional.get().getFiles().stream().filter(l -> BUILD_LOG_NAME.equals(l.getName())).findFirst();
     }
 
     final String buildLogUrl;
