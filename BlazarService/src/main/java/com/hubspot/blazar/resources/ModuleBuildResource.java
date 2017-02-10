@@ -170,7 +170,7 @@ public class ModuleBuildResource {
 
   @GET
   @Path("{id}/log/download")
-  public Response getLog(@PathParam("id") long moduleBuildId) throws URISyntaxException {
+  public Object getLog(@PathParam("id") long moduleBuildId) {
     ModuleBuild build = getBuildWithError(moduleBuildId);
 
     Optional<String> taskId = build.getTaskId();
@@ -185,23 +185,23 @@ public class ModuleBuildResource {
       buildLogFile = sandboxOptional.get().getFiles().stream().filter(l -> Objects.equals(l.getName(), BUILD_LOG_NAME)).findFirst();
     }
 
+    final String buildLogUrl;
+
     if (buildLogFile.isPresent()) {
       String host = sandboxOptional.get().getSlaveHostname();
       int port = singularityConfiguration.getSlaveHttpPort();
       String path = sandboxOptional.get().getFullPathToRoot() + "/" + sandboxOptional.get().getCurrentDirectory() + "/" + buildLogFile.get().getName();
-      String downloadEndpointPath = "/files/download.json";
-      URI uri = new URI("http", null, host, port, downloadEndpointPath, "?path=" + path, null);
-      return Response.temporaryRedirect(uri).build();
+      buildLogUrl = String.format("http://%s:%d/files/download.json?path=%s", host, port, path);
+    } else {
+      SingularityS3Log urlData = findS3ServiceLog(taskId.get());
+      buildLogUrl = urlData.getDownloadUrl();
     }
 
-    try {
-      SingularityS3Log urlData = findS3ServiceLog(taskId.get());
-      String logUrl = urlData.getDownloadUrl();
-      URI uri = new URI(logUrl);
-      return Response.temporaryRedirect(uri).build();
-    } catch (NotFoundException e) {
-      return Response.status(Response.Status.NOT_FOUND).build();
-    }
+    return new Object() {
+      public String getDownloadUrl() {
+        return buildLogUrl;
+      }
+    };
   }
 
   private SingularityS3Log findS3ServiceLog(String taskId) {
