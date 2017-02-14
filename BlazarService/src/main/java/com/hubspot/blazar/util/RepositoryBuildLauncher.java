@@ -1,5 +1,7 @@
 package com.hubspot.blazar.util;
 
+import static com.hubspot.blazar.base.BuildTrigger.Type.INTER_PROJECT;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
@@ -11,6 +13,7 @@ import org.kohsuke.github.GHRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveryResult;
@@ -58,10 +61,11 @@ public class RepositoryBuildLauncher {
 
   public void launch(RepositoryBuild queued, Optional<RepositoryBuild> previous) throws Exception {
     GitInfo gitInfo = branchService.get(queued.getBranchId()).get();
-    CommitInfo commitInfo = commitInfo(gitInfo, commit(previous));
+    CommitInfo commitInfo = commitInfo(gitInfo, queued, previous);
     Set<Module> modules = updateModules(gitInfo, commitInfo);
 
-    RepositoryBuild launching = queued.toBuilder().setStartTimestamp(Optional.of(System.currentTimeMillis()))
+    RepositoryBuild launching = queued.toBuilder()
+        .setStartTimestamp(Optional.of(System.currentTimeMillis()))
         .setState(State.LAUNCHING)
         .setCommitInfo(Optional.of(commitInfo))
         .setSha(Optional.of(commitInfo.getCurrent().getId()))
@@ -71,7 +75,7 @@ public class RepositoryBuildLauncher {
     repositoryBuildService.begin(launching);
   }
 
-  Set<Module> updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
+  private Set<Module> updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
       DiscoveryResult result = moduleDiscovery.discover(gitInfo);
       return moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
@@ -80,7 +84,8 @@ public class RepositoryBuildLauncher {
     }
   }
 
-  private CommitInfo commitInfo(GitInfo gitInfo, Optional<Commit> previousCommit) throws IOException, NonRetryableBuildException {
+  @VisibleForTesting
+  CommitInfo commitInfo(GitInfo gitInfo, RepositoryBuild currentBuild, Optional<RepositoryBuild> previousBuild) throws IOException, NonRetryableBuildException {
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
 
     final GHRepository repository;
@@ -90,6 +95,15 @@ public class RepositoryBuildLauncher {
       throw new NonRetryableBuildException("Couldn't find repository " + gitInfo.getFullRepositoryName(), e);
     }
 
+    Optional<Commit> previousCommit = getCommitFromRepositoryBuild(previousBuild);
+
+    // Inter project builds re-build the project using the commit of the last build if available
+    // otherwise we fall back to using the newest commit available
+    if (currentBuild.getBuildTrigger().getType() == INTER_PROJECT && previousCommit.isPresent()) {
+      return gitHubHelper.commitInfoFor(repository, previousCommit.get(), previousCommit);
+    }
+
+    // Resolve newest sha
     Optional<String> sha = gitHubHelper.shaFor(repository, gitInfo);
     if (!sha.isPresent()) {
       String message = String.format("Couldn't find branch %s for repository %s", gitInfo.getBranch(), gitInfo.getFullRepositoryName());
@@ -102,7 +116,7 @@ public class RepositoryBuildLauncher {
     }
   }
 
-  private static Optional<Commit> commit(Optional<RepositoryBuild> build) {
+  private static Optional<Commit> getCommitFromRepositoryBuild(Optional<RepositoryBuild> build) {
     if (build.isPresent() && build.get().getCommitInfo() != null && build.get().getCommitInfo().isPresent()) {
       return Optional.of(build.get().getCommitInfo().get().getCurrent());
     } else {

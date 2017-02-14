@@ -1,9 +1,9 @@
 package com.hubspot.blazar.base;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.Objects;
 
 public class BuildTrigger {
   public enum Type {
@@ -31,9 +31,8 @@ public class BuildTrigger {
     return new BuildTrigger(Type.BRANCH_CREATION, branch);
   }
 
-  public static BuildTrigger forInterProjectBuild(InterProjectBuild build) {
-    String rootRepoBranch = String.format("%d", build.getId().get());
-    return new BuildTrigger(Type.INTER_PROJECT, rootRepoBranch);
+  public static BuildTrigger forInterProjectBuild(long interProjectBuildId) {
+    return new BuildTrigger(Type.INTER_PROJECT, String.valueOf(interProjectBuildId));
   }
 
   public Type getType() {
