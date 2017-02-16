@@ -148,7 +148,7 @@ public class ModuleBuildResource {
       throw new NotFoundException("No taskId found for build: " + moduleBuildId);
     }
 
-    String path = taskId.get() + BUILD_LOG_NAME;
+    String path = taskId.get() + "/" + BUILD_LOG_NAME;
     Optional<Long> absent = Optional.absent();
     Optional<String> grep = Optional.absent();
 
