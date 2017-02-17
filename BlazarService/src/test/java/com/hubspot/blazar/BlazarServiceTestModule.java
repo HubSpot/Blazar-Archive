@@ -26,7 +26,9 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
+import com.hubspot.blazar.base.visitor.InterProjectBuildVisitor;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
+import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
@@ -50,9 +52,13 @@ public class BlazarServiceTestModule extends AbstractModule {
   public static List<Throwable> EVENT_BUS_EXCEPTION_COUNT = new ArrayList<>();
   @Override
   public void configure() {
+    Multibinder<RepositoryBuildVisitor> repositoryBuildVisitorMultibinder = Multibinder.newSetBinder(binder(), RepositoryBuildVisitor.class);
+    Multibinder<ModuleBuildVisitor> moduleBuildVisitorMultibinder = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
+    Multibinder<InterProjectBuildVisitor> interProjectBuildVisitorMultibinder = Multibinder.newSetBinder(binder(), InterProjectBuildVisitor.class);
+
     install(new BlazarTestModule());
     install(new BlazarDataModule());
-    install(new BuildVisitorModule(buildBlazarConfiguration()));
+    install(new BuildVisitorModule(repositoryBuildVisitorMultibinder, moduleBuildVisitorMultibinder, interProjectBuildVisitorMultibinder));
     install(new DiscoveryModule());
     install(new BlazarQueueProcessorModule());
     install(new BlazarEventBusModule());
