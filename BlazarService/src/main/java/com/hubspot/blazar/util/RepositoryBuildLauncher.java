@@ -61,8 +61,8 @@ public class RepositoryBuildLauncher {
 
   public void launch(RepositoryBuild queued, Optional<RepositoryBuild> previous) throws Exception {
     GitInfo gitInfo = branchService.get(queued.getBranchId()).get();
-    CommitInfo commitInfo = commitInfo(gitInfo, queued, previous);
-    Set<Module> modules = updateModules(gitInfo, commitInfo);
+    CommitInfo commitInfo = calculateCommitInfoForBuild(gitInfo, queued, previous);
+    Set<Module> modules = getAndUpdateModules(gitInfo, commitInfo);
 
     RepositoryBuild launching = queued.toBuilder()
         .setStartTimestamp(Optional.of(System.currentTimeMillis()))
@@ -75,7 +75,11 @@ public class RepositoryBuildLauncher {
     repositoryBuildService.begin(launching);
   }
 
-  private Set<Module> updateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
+  // Runs discovery if the commitInfo has changed any of the modules so we build our graph with the most
+  // up to date dependency data.
+  // If there are 10 or more commits in a compare between 2 shas it is truncated. In this case Blazar re-builds
+  // All modules (on a push) and re-discovers all modules just to be sure that everything is as up to date as possible.
+  private Set<Module> getAndUpdateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
       DiscoveryResult result = moduleDiscovery.discover(gitInfo);
       return moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
@@ -85,7 +89,11 @@ public class RepositoryBuildLauncher {
   }
 
   @VisibleForTesting
-  CommitInfo commitInfo(GitInfo gitInfo, RepositoryBuild currentBuild, Optional<RepositoryBuild> previousBuild) throws IOException, NonRetryableBuildException {
+  CommitInfo calculateCommitInfoForBuild(
+      GitInfo gitInfo,
+      RepositoryBuild currentBuild,
+      Optional<RepositoryBuild> previousBuild) throws IOException, NonRetryableBuildException {
+
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
 
     final GHRepository repository;

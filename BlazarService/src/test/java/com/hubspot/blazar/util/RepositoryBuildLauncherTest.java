@@ -70,7 +70,7 @@ public class RepositoryBuildLauncherTest {
 
     when(gitHubHelper.shaFor(any(), any())).thenThrow(new IllegalStateException("Previous build is present this should not be called"));
 
-    launcher.commitInfo(branch, currentBuild, previousBuildOptional);
+    launcher.calculateCommitInfoForBuild(branch, currentBuild, previousBuildOptional);
   }
 
   @Test
@@ -124,6 +124,6 @@ public class RepositoryBuildLauncherTest {
     }).when(gitHubHelper).commitInfoFor(any(), any(), any());
 
 
-    launcher.commitInfo(branch, currentBuild, previousBuildOptional);
+    launcher.calculateCommitInfoForBuild(branch, currentBuild, previousBuildOptional);
   }
 }
