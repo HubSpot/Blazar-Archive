@@ -18,7 +18,7 @@ import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
-@Path("/instant-message")
+@Path("/instant-message-configurations")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class InstantMessageResource {
@@ -33,40 +33,38 @@ public class InstantMessageResource {
 
   @GET
   @PropertyFiltering
-  @Path("/configurations")
   public Set<InstantMessageConfiguration> getAll() {
     return instantMessageConfigurationService.getAll();
   }
 
-  @POST
-  @Path("/configurations")
-  public InstantMessageConfiguration insert(InstantMessageConfiguration instantMessageConfiguration) {
-    return instantMessageConfigurationService.insert(instantMessageConfiguration);
-  }
-
-  @PUT
-  @Path("/configurations/{id}")
-  public void update(InstantMessageConfiguration instantMessageConfiguration, @PathParam("id") long id) {
-    instantMessageConfigurationService.update(instantMessageConfiguration.withNewId(id));
-  }
-
-  @DELETE
-  @Path("/configurations/{id}")
-  public void delete(@PathParam("id") long id) {
-    instantMessageConfigurationService.delete(id);
-  }
-
   @GET
-  @Path("/configurations/{id}")
+  @Path("/{id}")
   @PropertyFiltering
   public Optional<InstantMessageConfiguration> get(@PathParam("id") long id) {
     return instantMessageConfigurationService.get(id);
   }
 
+  @PUT
+  @Path("/{id}")
+  public void update(InstantMessageConfiguration instantMessageConfiguration, @PathParam("id") long id) {
+    instantMessageConfigurationService.update(instantMessageConfiguration.withNewId(id));
+  }
+
+  @POST
+  public InstantMessageConfiguration insert(InstantMessageConfiguration instantMessageConfiguration) {
+    return instantMessageConfigurationService.insert(instantMessageConfiguration);
+  }
+
+  @DELETE
+  @Path("/{id}")
+  public void delete(@PathParam("id") long id) {
+    instantMessageConfigurationService.delete(id);
+  }
+
   @GET
-  @Path("/configurations/branches/{branchId}")
+  @Path("/branch/{branchId}")
   @PropertyFiltering
-  public Set<InstantMessageConfiguration> getAllWithBranchId(@PathParam("branchId") long branchId) {
+  public Set<InstantMessageConfiguration> getAllByBranchId(@PathParam("branchId") long branchId) {
     return instantMessageConfigurationService.getAllWithBranchId(branchId);
   }
 }

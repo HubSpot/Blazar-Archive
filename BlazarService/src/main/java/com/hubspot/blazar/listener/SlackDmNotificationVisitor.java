@@ -18,7 +18,7 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.BlazarSlackConfiguration;
-import com.hubspot.blazar.util.SlackClientWrapper;
+import com.hubspot.blazar.util.BlazarSlackClient;
 import com.hubspot.blazar.util.SlackMessageBuildingUtils;
 
 /**
@@ -31,14 +31,14 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
   private final BlazarSlackConfiguration blazarSlackConfig;
 
   private final SlackMessageBuildingUtils slackMessageBuildingUtils;
-  private final SlackClientWrapper slackClientWrapper;
+  private final BlazarSlackClient blazarSlackClient;
 
   @Inject
   public SlackDmNotificationVisitor(BlazarConfiguration blazarConfiguration,
                                     SlackMessageBuildingUtils slackMessageBuildingUtils,
-                                    SlackClientWrapper slackClientWrapper) {
+                                    BlazarSlackClient blazarSlackClient) {
     this.slackMessageBuildingUtils = slackMessageBuildingUtils;
-    this.slackClientWrapper = slackClientWrapper;
+    this.blazarSlackClient = blazarSlackClient;
     this.blazarSlackConfig = blazarConfiguration.getSlackConfiguration().get();
   }
 
@@ -48,7 +48,8 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
     boolean shouldSendMessage = shouldSendMessage(build, userEmailsToSendMessagesTo);
     if (shouldSendMessage) {
       for (String email : userEmailsToSendMessagesTo) {
-        slackClientWrapper.sendMessageToUserByEmail(email, "", slackMessageBuildingUtils.buildSlackAttachment(build));
+        String message = "A build started by your code push was not successful";
+        blazarSlackClient.sendMessageToUser(email, message, slackMessageBuildingUtils.buildSlackAttachment(build));
       }
     }
   }

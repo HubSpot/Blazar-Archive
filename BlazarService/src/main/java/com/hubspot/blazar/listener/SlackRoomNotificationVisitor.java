@@ -13,7 +13,7 @@ import com.hubspot.blazar.base.notifications.InstantMessageConfiguration;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.InstantMessageConfigurationService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.util.SlackClientWrapper;
+import com.hubspot.blazar.util.BlazarSlackClient;
 import com.hubspot.blazar.util.SlackMessageBuildingUtils;
 
 @Singleton
@@ -22,19 +22,19 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(SlackRoomNotificationVisitor.class);
 
   private InstantMessageConfigurationService instantMessageConfigurationService;
-  private SlackClientWrapper slackClientWrapper;
+  private BlazarSlackClient blazarSlackClient;
   private final SlackMessageBuildingUtils slackMessageBuildingUtils;
   private final RepositoryBuildService repositoryBuildService;
 
   @Inject
   public SlackRoomNotificationVisitor(
       InstantMessageConfigurationService instantMessageConfigurationService,
-      SlackClientWrapper slackClientWrapper,
+      BlazarSlackClient blazarSlackClient,
       SlackMessageBuildingUtils slackMessageBuildingUtils,
       RepositoryBuildService repositoryBuildService) {
 
     this.instantMessageConfigurationService = instantMessageConfigurationService;
-    this.slackClientWrapper = slackClientWrapper;
+    this.blazarSlackClient = blazarSlackClient;
     this.slackMessageBuildingUtils = slackMessageBuildingUtils;
     this.repositoryBuildService = repositoryBuildService;
   }
@@ -48,7 +48,7 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor {
     Optional<RepositoryBuild> previous = repositoryBuildService.getPreviousBuild(build);
     for (InstantMessageConfiguration instantMessageConfiguration : configurationSet) {
       if (shouldSendMessage(instantMessageConfiguration, build.getState(), previous, build)) {
-        slackClientWrapper.sendMessageToChannelByName(instantMessageConfiguration.getChannelName(), "", slackMessageBuildingUtils.buildSlackAttachment(build));
+        blazarSlackClient.sendMessageToChannel(instantMessageConfiguration.getChannelName(), "", slackMessageBuildingUtils.buildSlackAttachment(build));
       }
     }
   }

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -16,6 +17,7 @@ import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
 
+@Singleton
 public class SlackMessageBuildingUtils {
 
   private BranchService branchService;

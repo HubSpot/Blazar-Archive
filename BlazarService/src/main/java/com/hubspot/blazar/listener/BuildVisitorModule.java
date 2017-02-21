@@ -11,23 +11,12 @@ import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
  * Binds all visitors except Slack Visitors which are bound in the BlazarSlackModule
  */
 public class BuildVisitorModule implements Module {
-  private final Multibinder<RepositoryBuildVisitor> repositoryBuildVisitors;
-  private final Multibinder<ModuleBuildVisitor> moduleBuildVisitors;
-  private Multibinder<InterProjectBuildVisitor> interProjectBuildVisitors;
-
-  public BuildVisitorModule(Multibinder<RepositoryBuildVisitor> repositoryBuildVisitors,
-                            Multibinder<ModuleBuildVisitor> moduleBuildVisitors,
-                            Multibinder<InterProjectBuildVisitor> interProjectBuildVisitors) {
-    this.repositoryBuildVisitors = repositoryBuildVisitors;
-    this.moduleBuildVisitors = moduleBuildVisitors;
-    this.interProjectBuildVisitors = interProjectBuildVisitors;
-  }
 
   @Override
   public void configure(Binder binder) {
     binder.bind(BuildEventDispatcher.class);
 
-
+    Multibinder<RepositoryBuildVisitor> repositoryBuildVisitors = Multibinder.newSetBinder(binder, RepositoryBuildVisitor.class);
     // launch the queued build if nothing in progress
     repositoryBuildVisitors.addBinding().to(QueuedRepositoryBuildVisitor.class);
     // queue builds for the affected modules
@@ -42,7 +31,7 @@ public class BuildVisitorModule implements Module {
     repositoryBuildVisitors.addBinding().to(InterProjectRepositoryBuildVisitor.class);
 
 
-
+    Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder, ModuleBuildVisitor.class);
     // launch the queued build if nothing upstream
     moduleBuildVisitors.addBinding().to(QueuedModuleBuildVisitor.class);
     // kick off the singularity task eagerly
@@ -58,7 +47,7 @@ public class BuildVisitorModule implements Module {
     // launch interProjectChildren for completed Modules
     moduleBuildVisitors.addBinding().to(InterProjectModuleBuildVisitor.class);
 
-    //
+    Multibinder<InterProjectBuildVisitor> interProjectBuildVisitors = Multibinder.newSetBinder(binder, InterProjectBuildVisitor.class);
     interProjectBuildVisitors.addBinding().to(InterProjectBuildHandler.class);
   }
 }

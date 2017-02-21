@@ -15,7 +15,7 @@ import com.google.inject.Inject;
 import com.hubspot.blazar.externalservice.slack.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 
-@Path("/instant-message/slack")
+@Path("/slack")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class SlackResource {
@@ -29,7 +29,7 @@ public class SlackResource {
   }
 
   @GET
-  @Path("/list-channels")
+  @Path("/channels")
   public Set<SlackChannel> getChannels() throws IOException {
     Collection<com.ullink.slack.simpleslackapi.SlackChannel> channels = slackSession.getChannels();
     return channels.stream().map(channel ->  new SlackChannel(channel.getId(), channel.getName())).collect(Collectors.toSet());

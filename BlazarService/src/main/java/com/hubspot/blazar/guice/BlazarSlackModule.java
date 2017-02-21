@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
@@ -17,7 +19,7 @@ import com.hubspot.blazar.listener.SlackDmNotificationVisitor;
 import com.hubspot.blazar.listener.SlackRoomNotificationVisitor;
 import com.hubspot.blazar.resources.SlackResource;
 import com.hubspot.blazar.resources.UserFeedbackResource;
-import com.hubspot.blazar.util.SlackClientWrapper;
+import com.hubspot.blazar.util.BlazarSlackClient;
 import com.hubspot.blazar.util.SlackMessageBuildingUtils;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
@@ -28,14 +30,12 @@ import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
  */
 public class BlazarSlackModule implements Module {
 
-  public static final String SLACK_FEEDBACK_ROOM = "SLACK_FEDBACK_ROOM";
+  public static final String SLACK_FEEDBACK_ROOM = "SLACK_FEEDBACK_ROOM";
   private static final Logger LOG = LoggerFactory.getLogger(BlazarSlackModule.class);
   private final Optional<BlazarSlackConfiguration> slackConfiguration;
-  private final Multibinder<RepositoryBuildVisitor> repositoryBuildVisitorMultibinder;
 
-  public BlazarSlackModule(BlazarConfiguration configuration, Multibinder<RepositoryBuildVisitor> repositoryBuildVisitorMultibinder) {
+  public BlazarSlackModule(BlazarConfiguration configuration) {
     this.slackConfiguration = configuration.getSlackConfiguration();
-    this.repositoryBuildVisitorMultibinder = repositoryBuildVisitorMultibinder;
   }
 
   @Override
@@ -46,13 +46,13 @@ public class BlazarSlackModule implements Module {
       return;
     }
 
-    binder.bind(SlackSession.class).toInstance(makeNewSlackSession());
-    binder.bind(SlackMessageBuildingUtils.class);
+    Multibinder<RepositoryBuildVisitor> repositoryBuildVisitorMultibinder = Multibinder.newSetBinder(binder, RepositoryBuildVisitor.class);
     repositoryBuildVisitorMultibinder.addBinding().to(SlackDmNotificationVisitor.class);
     repositoryBuildVisitorMultibinder.addBinding().to(SlackRoomNotificationVisitor.class);
 
     binder.bind(UserFeedbackResource.class);
-    binder.bind(SlackClientWrapper.class);
+    binder.bind(BlazarSlackClient.class);
+    binder.bind(SlackMessageBuildingUtils.class);
     binder.bind(SlackResource.class);
 
     if (slackConfiguration.get().getFeedbackRoom().isPresent()) {
@@ -64,7 +64,9 @@ public class BlazarSlackModule implements Module {
 
   }
 
-  private SlackSession makeNewSlackSession() {
+  @Provides
+  @Singleton
+  private SlackSession providesSlackSession() {
     try {
       SlackSession session = SlackSessionFactory.createWebSocketSlackSession(slackConfiguration.get().getSlackApiToken());
       session.connect();

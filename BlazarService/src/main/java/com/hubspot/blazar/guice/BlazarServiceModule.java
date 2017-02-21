@@ -30,9 +30,6 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.GitHubNamingFilter;
-import com.hubspot.blazar.base.visitor.InterProjectBuildVisitor;
-import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
-import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.cctray.CCTrayProjectFactory;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
@@ -88,17 +85,13 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(ObjectMapper.class).toInstance(getEnvironment().getObjectMapper());
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 
-    Multibinder<RepositoryBuildVisitor> repositoryBuildVisitorMultibinder = Multibinder.newSetBinder(binder, RepositoryBuildVisitor.class);
-    Multibinder<ModuleBuildVisitor> moduleBuildVisitorMultibinder = Multibinder.newSetBinder(binder, ModuleBuildVisitor.class);
-    Multibinder<InterProjectBuildVisitor> interProjectBuildVisitorMultibinder = Multibinder.newSetBinder(binder, InterProjectBuildVisitor.class);
-
     if (getConfiguration().isWebhookOnly()) {
       return;
     }
 
     binder.install(new BlazarDataModule());
     binder.install(new DiscoveryModule());
-    binder.install(new BlazarSlackModule(getConfiguration(), repositoryBuildVisitorMultibinder));
+    binder.install(new BlazarSlackModule(getConfiguration()));
 
     binder.bind(IllegalArgumentExceptionMapper.class);
     binder.bind(IllegalStateExceptionMapper.class);
@@ -114,7 +107,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
     // Only configure leader-based activities like processing events etc. if you are connected to zookeeper
     if (getConfiguration().getZooKeeperConfiguration().isPresent()) {
-      binder.install(new BuildVisitorModule(repositoryBuildVisitorMultibinder, moduleBuildVisitorMultibinder, interProjectBuildVisitorMultibinder));
+      binder.install(new BuildVisitorModule());
       binder.install(new BlazarQueueProcessorModule());
       binder.install(new BlazarZooKeeperModule());
 

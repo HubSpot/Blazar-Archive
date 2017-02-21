@@ -13,6 +13,7 @@ import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackMessageHandle;
@@ -24,20 +25,20 @@ import com.ullink.slack.simpleslackapi.replies.SlackMessageReply;
 /**
  * This class handles all the details of sending a slack message, and verifying that it did send.
  */
-public class SlackClientWrapper {
-  private static final Logger LOG = LoggerFactory.getLogger(SlackClientWrapper.class);
+@Singleton
+public class BlazarSlackClient {
+  private static final Logger LOG = LoggerFactory.getLogger(BlazarSlackClient.class);
 
   private SlackSession session;
   private MetricRegistry metricRegistry;
 
   @Inject
-  public SlackClientWrapper(SlackSession session, MetricRegistry metricRegistry) {
+  public BlazarSlackClient(SlackSession session, MetricRegistry metricRegistry) {
     this.session = session;
     this.metricRegistry = metricRegistry;
   }
 
-  public void sendMessageToChannelByName(String channelName, String message, SlackAttachment attachment) {
-
+  public void sendMessageToChannel(String channelName, String message, SlackAttachment attachment) {
     Optional<SlackChannel> slackChannel = Optional.fromNullable(session.findChannelByName(channelName));
     if (!slackChannel.isPresent()) {
       LOG.warn("No slack channel found for name {}", channelName);
@@ -51,16 +52,18 @@ public class SlackClientWrapper {
     try {
       makeSlackMessageSendingRetryer().call(() -> sendMessage(channel, message, attachment));
       metricRegistry.counter("successful-slack-channel-sends").inc();
+      // Here we swallow exceptions that might be thrown by our retryer or #sendMessage().
+      // We don't catch and retry any exceptions because the slack session doesn't throw us any, (it swallows them and returns null)
     } catch (Exception e) {
       metricRegistry.counter("failed-slack-channel-sends").inc();
       LOG.error("Could not send slack message {}", attachment, e);
     }
   }
 
-  public void sendMessageToUserByEmail(String email, String message, SlackAttachment attachment) {
+  public void sendMessageToUser(String email, String message, SlackAttachment attachment) {
     Optional<SlackUser> user = Optional.fromNullable(session.findUserByEmail(email));
     if (!user.isPresent()) {
-      LOG.error("Could not find user with email {} ", email);
+      LOG.warn("Could not find user with email {} ", email);
       return;
     }
     sendMessageToUser(user.get(), message, attachment);
@@ -70,11 +73,12 @@ public class SlackClientWrapper {
     try {
       makeSlackMessageSendingRetryer().call(() -> sendMessage(user, message, attachment));
       metricRegistry.counter("successful-slack-dm-sends").inc();
+      // Here we swallow exceptions that might be thrown by our retryer or #sendMessage().
+      // We don't catch and retry any exceptions because the slack session doesn't throw us any, (it swallows them and returns null)
     } catch (Exception e) {
       LOG.error("Could not send slack message {}", attachment, e);
       metricRegistry.counter("failed-slack-dm-sends").inc();
     }
-
   }
 
   private boolean sendMessage(SlackUser user, String message, SlackAttachment attachment) {
@@ -90,12 +94,11 @@ public class SlackClientWrapper {
       return false;
     }
     return true;
-
   }
 
   private boolean sendMessage(SlackChannel channel, String message, SlackAttachment attachment) {
     Optional<SlackMessageHandle<SlackMessageReply>> result = Optional.fromNullable(session.sendMessage(channel, message, attachment));
-
+    // This slack library does not throw us back any exceptions it just calls `e.printStackTrace()` and returns null
     if (!result.isPresent()) {
       LOG.warn("Failed to send slack message to channel: {} message: {} slack result was null", channel.getName(), attachment.toString());
       return false;
@@ -116,7 +119,6 @@ public class SlackClientWrapper {
     }
     return true;
   }
-
 
   private static Retryer<Boolean> makeSlackMessageSendingRetryer() {
     return RetryerBuilder.<Boolean>newBuilder()

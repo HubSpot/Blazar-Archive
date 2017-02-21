@@ -11,7 +11,6 @@ import org.kohsuke.github.BlazarGHRepository;
 import org.kohsuke.github.BlazarGitHub;
 import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.base.Optional;
@@ -26,9 +25,7 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
-import com.hubspot.blazar.base.visitor.InterProjectBuildVisitor;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
-import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
@@ -48,17 +45,12 @@ import com.hubspot.singularity.client.SingularityClient;
 import com.ullink.slack.simpleslackapi.SlackSession;
 
 public class BlazarServiceTestModule extends AbstractModule {
-  private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceTestModule.class);
   public static List<Throwable> EVENT_BUS_EXCEPTION_COUNT = new ArrayList<>();
   @Override
   public void configure() {
-    Multibinder<RepositoryBuildVisitor> repositoryBuildVisitorMultibinder = Multibinder.newSetBinder(binder(), RepositoryBuildVisitor.class);
-    Multibinder<ModuleBuildVisitor> moduleBuildVisitorMultibinder = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
-    Multibinder<InterProjectBuildVisitor> interProjectBuildVisitorMultibinder = Multibinder.newSetBinder(binder(), InterProjectBuildVisitor.class);
-
     install(new BlazarTestModule());
     install(new BlazarDataModule());
-    install(new BuildVisitorModule(repositoryBuildVisitorMultibinder, moduleBuildVisitorMultibinder, interProjectBuildVisitorMultibinder));
+    install(new BuildVisitorModule());
     install(new DiscoveryModule());
     install(new BlazarQueueProcessorModule());
     install(new BlazarEventBusModule());

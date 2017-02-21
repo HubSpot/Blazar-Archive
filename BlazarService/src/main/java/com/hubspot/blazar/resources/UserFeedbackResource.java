@@ -10,17 +10,17 @@ import javax.ws.rs.Path;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.hubspot.blazar.base.feedback.Feedback;
-import com.hubspot.blazar.util.SlackClientWrapper;
+import com.hubspot.blazar.util.BlazarSlackClient;
 import com.ullink.slack.simpleslackapi.SlackAttachment;
 
 @Path("/user-feedback")
 public class UserFeedbackResource {
-  private final SlackClientWrapper slackClientWrapper;
+  private final BlazarSlackClient blazarSlackClient;
   private final String feedbackRoom;
 
   @Inject
-  public UserFeedbackResource(SlackClientWrapper slackClientWrapper, @Named(SLACK_FEEDBACK_ROOM) String feedbackRoom) {
-    this.slackClientWrapper = slackClientWrapper;
+  public UserFeedbackResource(BlazarSlackClient blazarSlackClient, @Named(SLACK_FEEDBACK_ROOM) String feedbackRoom) {
+    this.blazarSlackClient = blazarSlackClient;
     this.feedbackRoom = feedbackRoom;
   }
 
@@ -32,6 +32,6 @@ public class UserFeedbackResource {
     SlackAttachment attachment = new SlackAttachment(title, fallback, "", "");
     attachment.addField("Feedback:", feedback.getMessage(), false);
     attachment.setTitleLink(feedback.getPage());
-    slackClientWrapper.sendMessageToChannelByName(feedbackRoom, "", attachment);
+    blazarSlackClient.sendMessageToChannel(feedbackRoom, "", attachment);
   }
 }
