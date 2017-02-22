@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
@@ -91,7 +92,7 @@ public class RepositoryBuildLauncher {
   @VisibleForTesting
   CommitInfo calculateCommitInfoForBuild(
       GitInfo gitInfo,
-      RepositoryBuild currentBuild,
+      RepositoryBuild queuedBuild,
       Optional<RepositoryBuild> previousBuild) throws IOException, NonRetryableBuildException {
 
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
@@ -103,12 +104,12 @@ public class RepositoryBuildLauncher {
       throw new NonRetryableBuildException("Couldn't find repository " + gitInfo.getFullRepositoryName(), e);
     }
 
-    Optional<Commit> previousCommit = getCommitFromRepositoryBuild(previousBuild);
+    Optional<Commit> lastCommitInPreviousBuild = getCommitFromRepositoryBuild(previousBuild);
 
     // Inter project builds re-build the project using the commit of the last build if available
     // otherwise we fall back to using the newest commit available
-    if (currentBuild.getBuildTrigger().getType() == INTER_PROJECT && previousCommit.isPresent()) {
-      return gitHubHelper.commitInfoFor(repository, previousCommit.get(), previousCommit);
+    if (queuedBuild.getBuildTrigger().getType() == INTER_PROJECT && lastCommitInPreviousBuild.isPresent()) {
+      return new CommitInfo(lastCommitInPreviousBuild.get(), lastCommitInPreviousBuild, ImmutableList.of(), false);
     }
 
     // Resolve newest sha
@@ -120,7 +121,7 @@ public class RepositoryBuildLauncher {
       LOG.info("Found sha {} for branch {}/{}", sha.get(), gitInfo.getRepository(), gitInfo.getBranch());
 
       Commit currentCommit = gitHubHelper.toCommit(repository.getCommit(sha.get()));
-      return gitHubHelper.commitInfoFor(repository, currentCommit, previousCommit);
+      return gitHubHelper.commitInfoFor(repository, currentCommit, lastCommitInPreviousBuild);
     }
   }
 

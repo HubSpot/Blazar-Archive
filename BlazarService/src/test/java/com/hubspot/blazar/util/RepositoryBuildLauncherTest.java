@@ -16,6 +16,7 @@ import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHRepository;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
@@ -59,18 +60,13 @@ public class RepositoryBuildLauncherTest {
 
     RepositoryBuildLauncher launcher = new RepositoryBuildLauncher(repositoryBuildService, branchService, moduleService, dependenciesService, moduleDiscoveryService, moduleDiscovery, gitHubHelper);
 
-    doAnswer(invocation -> {
-      Commit currentCommit = (Commit) invocation.getArguments()[1];
-      Optional<Commit> previousCommit = (Optional<Commit>) invocation.getArguments()[2];
-      assertThat(currentCommit.getId()).isEqualTo(commitSha);
-      assertThat(previousCommit.isPresent()).isTrue();
-      assertThat(previousCommit.get().getId()).isEqualTo(commitSha);
-      return null;
-    }).when(gitHubHelper).commitInfoFor(any(), any(), any());
-
+    when(gitHubHelper.commitInfoFor(any(), any(), any())).thenThrow(new IllegalStateException("Previous build is present this should not be called"));
     when(gitHubHelper.shaFor(any(), any())).thenThrow(new IllegalStateException("Previous build is present this should not be called"));
 
-    launcher.calculateCommitInfoForBuild(branch, currentBuild, previousBuildOptional);
+    CommitInfo result = launcher.calculateCommitInfoForBuild(branch, currentBuild, previousBuildOptional);
+    assertThat(result.getCurrent().getId()).isEqualTo(commitSha);
+    assertThat(result.getPrevious().isPresent()).isTrue();
+    assertThat(result.getPrevious().get().getId()).isEqualTo(commitSha);
   }
 
   @Test
@@ -81,6 +77,7 @@ public class RepositoryBuildLauncherTest {
     String secondCommitSha = "1111111111111111111111111111111111111111";
 
     Commit initialCommit = Commit.newBuilder().setId(initialCommitSha).build();
+    Commit secondCommit = Commit.newBuilder().setId(secondCommitSha).build();
 
     CommitInfo previousCommitInfo = new CommitInfo(initialCommit, Optional.absent(), Collections.emptyList(), false);
     RepositoryBuild previousBuild = RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.SUCCEEDED, BuildTrigger.forCommit(initialCommitSha), BuildOptions.defaultOptions())
@@ -112,18 +109,18 @@ public class RepositoryBuildLauncherTest {
       return Commit.newBuilder().setId(commit.getSHA1()).build();
     }).when(gitHubHelper).toCommit(any());
 
-
     // Test that the method was called with the expected arguments.
     doAnswer(invocation -> {
       Commit currentCommit = (Commit) invocation.getArguments()[1];
       Optional<Commit> previousCommit = (Optional<Commit>) invocation.getArguments()[2];
-      assertThat(currentCommit.getId()).isEqualTo(secondCommitSha);
-      assertThat(previousCommit.isPresent()).isTrue();
-      assertThat(previousCommit.get().getId()).isEqualTo(initialCommitSha);
-      return null;
+      return new CommitInfo(currentCommit, previousCommit, ImmutableList.of(currentCommit), false);
     }).when(gitHubHelper).commitInfoFor(any(), any(), any());
 
-
-    launcher.calculateCommitInfoForBuild(branch, currentBuild, previousBuildOptional);
+    CommitInfo result = launcher.calculateCommitInfoForBuild(branch, currentBuild, previousBuildOptional);
+    assertThat(result.getCurrent().getId()).isEqualTo(secondCommitSha);
+    assertThat(result.getPrevious().isPresent()).isTrue();
+    assertThat(result.getPrevious().get().getId()).isEqualTo(initialCommitSha);
+    assertThat(result.getNewCommits().isEmpty()).isFalse();
+    assertThat(result.getNewCommits()).isEqualTo(ImmutableList.of(secondCommit));
   }
 }
