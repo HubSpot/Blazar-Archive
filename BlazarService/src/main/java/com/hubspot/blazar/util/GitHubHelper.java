@@ -32,6 +32,7 @@ import com.google.common.net.UrlEscapers;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.github.GitHubErrorResponse;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 import com.hubspot.blazar.github.GitHubProtos.User;
 
@@ -163,6 +164,15 @@ public class GitHubHelper {
     }
 
     return builder.build();
+  }
+
+
+  public Optional<GitHubErrorResponse> extractErrorResponseFromException(Throwable t) {
+    try {
+      return Optional.of(mapper.readValue(t.getMessage(), GitHubErrorResponse.class));
+    } catch (IOException e){
+      return Optional.absent();
+    }
   }
 
   private static User toAuthor(GHCommit commit) throws IOException {
