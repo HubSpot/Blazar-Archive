@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
@@ -50,6 +48,7 @@ public class BlazarSlackModule implements Module {
     repositoryBuildVisitorMultibinder.addBinding().to(SlackDmNotificationVisitor.class);
     repositoryBuildVisitorMultibinder.addBinding().to(SlackRoomNotificationVisitor.class);
 
+    binder.bind(SlackSession.class).toInstance(makeSlackSession());
     binder.bind(UserFeedbackResource.class);
     binder.bind(BlazarSlackClient.class);
     binder.bind(SlackMessageBuildingUtils.class);
@@ -61,12 +60,9 @@ public class BlazarSlackModule implements Module {
     } else {
       LOG.info("Not configuring feedback endpoint -- no room configured");
     }
-
   }
 
-  @Provides
-  @Singleton
-  private SlackSession providesSlackSession() {
+  private SlackSession makeSlackSession() {
     try {
       SlackSession session = SlackSessionFactory.createWebSocketSlackSession(slackConfiguration.get().getSlackApiToken());
       session.connect();
