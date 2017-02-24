@@ -104,7 +104,7 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     for (Map.Entry<Integer, Set<Integer>> entry : Multimaps.asMap(launchableBranchToModuleMap).entrySet()) {
       Set<Integer> launchableModules = entry.getValue();
       GitInfo gitInfo = branchService.get(entry.getKey()).get();
-      BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(interProjectBuild);
+      BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(interProjectBuild.getId().get());
       BuildOptions buildOptions = new BuildOptions(launchableModules, BuildOptions.BuildDownstreams.NONE, false);
       long buildId = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
       for (Integer moduleId : launchableModules) {

@@ -98,7 +98,7 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
 
     for (Map.Entry<Integer, Collection<Integer>> entry : branchToLaunchableModules.entrySet()) {
       Set<Integer> moduleIds = ImmutableSet.copyOf(entry.getValue());
-      BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(build);
+      BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(build.getId().get());
       BuildOptions buildOptions = new BuildOptions(moduleIds, BuildOptions.BuildDownstreams.NONE, false);
       GitInfo gitInfo = branchService.get(entry.getKey()).get();
       long buildId = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
