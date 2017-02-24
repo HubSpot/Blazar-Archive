@@ -81,7 +81,7 @@ public class GitHubStatusVisitor implements RepositoryBuildVisitor {
       if (gitHubErrorResponse.isPresent()) {
         List<GitHubApiError> errors = gitHubErrorResponse.get().getErrors();
         if (errors.stream().filter(er -> er.getMessage().contains(GITHUB_TOO_MANY_STATUSES_MESSAGE)).count() > 0) {
-          LOG.info("Commit {}#{} has too many statuses status posting failed.", gitInfo.getFullRepositoryName(), sha);
+          LOG.warn("Commit {}#{} has the maximum number of statuses GitHub allows, cannot post status.", gitInfo.getFullRepositoryName(), sha);
           return;
         }
       }
