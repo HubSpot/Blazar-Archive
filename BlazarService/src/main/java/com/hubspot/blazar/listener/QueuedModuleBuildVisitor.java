@@ -40,7 +40,7 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
   protected void visitQueued(ModuleBuild build) throws Exception {
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
     if (upstreamsComplete(repositoryBuild, build)) {
-      moduleBuildLauncher.launch(repositoryBuild, build);
+      moduleBuildLauncher.launch(build);
     } else {
       moduleBuildService.update(build.toBuilder().setState(State.WAITING_FOR_UPSTREAM_BUILD).build());
     }
@@ -50,7 +50,7 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
   protected void visitWaitingForUpstreamBuild(ModuleBuild build) throws Exception {
     RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
     if (upstreamsComplete(repositoryBuild, build)) {
-      moduleBuildLauncher.launch(repositoryBuild, build);
+      moduleBuildLauncher.launch( build);
     }
   }
 
