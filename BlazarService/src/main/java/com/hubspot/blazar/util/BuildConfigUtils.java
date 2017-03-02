@@ -31,6 +31,7 @@ import com.hubspot.blazar.external.models.singularity.Resources;
 @Singleton
 public class BuildConfigUtils {
 
+  public static final String BUILDPACK_FILE = ".blazar-buildpack.yaml";
   private static final Logger LOG = LoggerFactory.getLogger(BuildConfigUtils.class);
   private final ExecutorConfiguration executorConfiguration;
   private final GitHubHelper gitHubHelper;
@@ -43,7 +44,7 @@ public class BuildConfigUtils {
   }
 
   public BuildConfig getConfigForBuildpackOnBranch(GitInfo gitInfo) throws IOException, NonRetryableBuildException {
-    return getConfigAtRefOrDefault(gitInfo, ".blazar-buildpack.yaml", gitInfo.getBranch());
+    return getConfigAtRefOrDefault(gitInfo, BUILDPACK_FILE, gitInfo.getBranch());
   }
 
   public BuildConfig ensureDefaultConfigurationForBuild(BuildConfig buildConfig) {
@@ -58,22 +59,22 @@ public class BuildConfigUtils {
     return buildConfigWithDefaults.build();
   }
 
-
   public BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
     List<BuildStep> steps = primary.getSteps().isEmpty() ? secondary.getSteps() : primary.getSteps();
     List<BuildStep> before = primary.getBefore().isEmpty() ? secondary.getBefore() : primary.getBefore();
     Optional<PostBuildSteps> after = (!primary.getAfter().isPresent()) ? secondary.getAfter() : primary.getAfter();
+    Optional<GitInfo> buildpack = (!primary.getBuildpack().isPresent() ? secondary.getBuildpack() : primary.getBuildpack());
     Map<String, String> env = new LinkedHashMap<>();
     env.putAll(secondary.getEnv());
     env.putAll(primary.getEnv());
     List<String> buildDeps = Lists.newArrayList(Iterables.concat(secondary.getBuildDeps(), primary.getBuildDeps()));
     List<String> webhooks = Lists.newArrayList(Iterables.concat(secondary.getWebhooks(), primary.getWebhooks()));
     List<String> cache = Lists.newArrayList(Iterables.concat(secondary.getCache(), primary.getCache()));
-    final String user;
+    final Optional<String> user;
     if (primary.getUser().isPresent()) {
-      user = primary.getUser().get();
+      user = primary.getUser();
     } else {
-      user = secondary.getUser().get();
+      user = secondary.getUser();
     }
 
     Map<String, StepActivationCriteria> stepActivation = new LinkedHashMap<>();
@@ -92,21 +93,21 @@ public class BuildConfigUtils {
     depends.addAll(secondary.getDepends());
 
     Set<Dependency> provides = new HashSet<>();
-    provides.addAll(primary.getDepends());
-    provides.addAll(secondary.getDepends());
+    provides.addAll(primary.getProvides());
+    provides.addAll(secondary.getProvides());
 
-    return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, Optional.<GitInfo>absent(), Optional.of(user), stepActivation, buildResources, depends, provides);
+    return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation, buildResources, depends, provides);
   }
 
   public BuildConfig getConfigAtRefOrDefault(GitInfo gitInfo, String configPath, String ref) throws IOException, NonRetryableBuildException {
 
     String repositoryName = gitInfo.getFullRepositoryName();
-    LOG.info("Going to fetch config for path {} in repo {}@{}", configPath, repositoryName, gitInfo.getBranch());
+    LOG.info("Going to fetch config for path {} in repo {}@{}", configPath, repositoryName, ref);
 
     try {
       return gitHubHelper.configAtSha(configPath, gitInfo, ref).or(BuildConfig.makeDefaultBuildConfig());
     } catch (JsonProcessingException e) {
-      String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", configPath, repositoryName, gitInfo.getBranch());
+      String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", configPath, repositoryName, ref);
       throw new NonRetryableBuildException(message, e);
     } catch (FileNotFoundException e) {
       String message = String.format("No repository found for %s", gitInfo.getFullRepositoryName());
