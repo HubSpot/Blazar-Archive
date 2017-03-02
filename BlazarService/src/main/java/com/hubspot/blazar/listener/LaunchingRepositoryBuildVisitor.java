@@ -29,6 +29,7 @@ import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
+import com.hubspot.blazar.data.service.MalformedFileService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
@@ -40,6 +41,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
+  private MalformedFileService malformedFileService;
   private InterProjectBuildService interProjectBuildService;
   private InterProjectBuildMappingService interProjectBuildMappingService;
   private final ModuleService moduleService;
@@ -49,6 +51,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
   @Inject
   public LaunchingRepositoryBuildVisitor(RepositoryBuildService repositoryBuildService,
                                          ModuleBuildService moduleBuildService,
+                                         MalformedFileService malformedFileService,
                                          InterProjectBuildService interProjectBuildService,
                                          InterProjectBuildMappingService interProjectBuildMappingService,
                                          ModuleService moduleService,
@@ -56,6 +59,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
                                          GitHubHelper gitHubHelper) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
+    this.malformedFileService = malformedFileService;
     this.interProjectBuildService = interProjectBuildService;
     this.interProjectBuildMappingService = interProjectBuildMappingService;
     this.moduleService = moduleService;
@@ -67,64 +71,93 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
   protected void visitLaunching(RepositoryBuild build) throws Exception {
     LOG.info("Going to enqueue module builds for repository build {}", build.getId().get());
 
-    Set<Module> modules = filterActive(moduleService.getByBranch(build.getBranchId()));
-    Set<Module> toBuild = findModulesToBuild(build, modules);
+    final Set<Module> activeModules = filterActive(moduleService.getByBranch(build.getBranchId()));
 
-    Optional<Long> interProjectBuildId = Optional.absent();
+    if (!malformedFileService.getMalformedFiles(build.getBranchId()).isEmpty()) {
+      failBranchAndModuleBuilds(build, activeModules);
+      return;
+    }
+
+    if (activeModules.isEmpty()) {
+      LOG.info("No active modules to build in branch {} - failing build", build.getId().get());
+      repositoryBuildService.fail(build);
+    }
+
+    final Optional<Long> interProjectBuildId;
+    final Set<Module> toBuild;
     if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
-      Set<Integer> allModuleIds = getIds(modules);
-      Set<Module> realToBuildModules = new HashSet<>();
-      DependencyGraph interProjectGraph = dependenciesService.buildInterProjectDependencyGraph(toBuild);
-      for (Module rootModule : toBuild)  {
-        Set<Integer> upstreams = interProjectGraph.getAllUpstreamNodes(rootModule.getId().get());
-        // this module has no incoming modules outside this repo, so we're building it in this repoBuild
-        if (allModuleIds.containsAll(upstreams)) {
-          realToBuildModules.add(rootModule);
-        }
-        // find all downstream this root module would trigger
-        // if they (and their upstreams) are in this repo we can also build them now
-        for (int downstream : interProjectGraph.reachableVertices(rootModule.getId().get())) {
-          boolean sameBranch = moduleService.getBranchIdFromModuleId(downstream) == build.getBranchId();
-          boolean noExternalUpstreams = allModuleIds.containsAll(interProjectGraph.getAllUpstreamNodes(downstream));
-          if (sameBranch && noExternalUpstreams) {
-            realToBuildModules.add(moduleService.get(downstream).get());
-          }
-        }
-      }
-      toBuild = realToBuildModules;
-      InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.copyOf(getIds(realToBuildModules)), build.getBuildTrigger());
+      toBuild = determineModulesToBuildUsingInterProjectBuildGraph(build, activeModules);
+      InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.copyOf(getIds(toBuild)), build.getBuildTrigger());
       interProjectBuildId = Optional.of(interProjectBuildService.enqueue(ipb));
-    }
-    // Only calculate skipped modules after we know what modules will build
-    Set<Module> skipped = Sets.difference(modules, toBuild);
-
-    if (modules.isEmpty()) {
-      LOG.info("No module builds for repository build {}, setting status to success", build.getId().get());
-      repositoryBuildService.update(build.toBuilder().setState(State.SUCCEEDED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
     } else {
-      for (Module module : build.getDependencyGraph().get().orderByTopologicalSort(toBuild)) {
-        moduleBuildService.enqueue(build, module);
-        if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
-          interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(interProjectBuildId.get(), build.getBranchId(), build.getId(), module.getId().get()));
-        }
-      }
-      for (Module module : skipped) {
-        moduleBuildService.skip(build, module);
-      }
-      repositoryBuildService.update(build.toBuilder().setState(State.IN_PROGRESS).build());
+      interProjectBuildId = Optional.absent();
+      toBuild = findModulesToBuild(build, activeModules);
     }
+
+    for (Module module : build.getDependencyGraph().get().orderByTopologicalSort(toBuild)) {
+      moduleBuildService.enqueue(build, module);
+      if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
+        interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(interProjectBuildId.get(), build.getBranchId(), build.getId(), module.getId().get()));
+      }
+    }
+
+    // Only calculate skipped modules after we know what modules will build
+    Set<Module> skipped = Sets.difference(activeModules, toBuild);
+    for (Module module : skipped) {
+      moduleBuildService.skip(build, module);
+    }
+    repositoryBuildService.update(build.toBuilder().setState(State.IN_PROGRESS).build());
   }
 
-  private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> allModules) {
+  private void failBranchAndModuleBuilds(RepositoryBuild build, Set<Module> activeModules) {
+    LOG.info("Malformed file on branch {} -- failing build {}", build.getBranchId(), build.getId().get());
+    for (Module module : activeModules) {
+      moduleBuildService.createFailedBuild(build, module);
+    }
+    repositoryBuildService.fail(build);
+  }
+
+  /**
+   * Because there can be dependency chains between projects' modules that go back and forth.
+   * InterProjectBuilds can require that a single repository is triggered more than one time.
+   * This method determines which modules can be built in the first build of an inter-project graph.
+   */
+  private Set<Module> determineModulesToBuildUsingInterProjectBuildGraph(RepositoryBuild build, Set<Module> activeModules) {
+    Set<Integer> allModuleIds = getIds(activeModules);
+    Set<Module> toBuild = findModulesToBuild(build, activeModules);
+
+    Set<Module> interProjectModulesToBuild = new HashSet<>();
+    DependencyGraph interProjectGraph = dependenciesService.buildInterProjectDependencyGraph(toBuild);
+    for (Module rootModule : toBuild) {
+      Set<Integer> upstreams = interProjectGraph.getAllUpstreamNodes(rootModule.getId().get());
+      // this module has no incoming modules outside this repo, so we're building it in this repoBuild
+      if (allModuleIds.containsAll(upstreams)) {
+        interProjectModulesToBuild.add(rootModule);
+      }
+      // find all downstream this root module would trigger
+      // if they (and their upstreams) are in this repo we can also build them now
+      for (int downstream : interProjectGraph.reachableVertices(rootModule.getId().get())) {
+        boolean sameBranch = moduleService.getBranchIdFromModuleId(downstream) == build.getBranchId();
+        boolean noExternalUpstreams = allModuleIds.containsAll(interProjectGraph.getAllUpstreamNodes(downstream));
+        if (sameBranch && noExternalUpstreams) {
+          interProjectModulesToBuild.add(moduleService.get(downstream).get());
+        }
+      }
+    }
+    return interProjectModulesToBuild;
+  }
+
+
+  private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> buildableModules) {
     CommitInfo commitInfo = build.getCommitInfo().get();
 
     final Set<Module> toBuild = new HashSet<>();
     if (build.getBuildTrigger().getType() == Type.PUSH) {
       if (commitInfo.isTruncated()) {
-        toBuild.addAll(allModules);
+        toBuild.addAll(buildableModules);
       } else {
         for (String path : gitHubHelper.affectedPaths(commitInfo)) {
-          for (Module module : allModules) {
+          for (Module module : buildableModules) {
             if (module.contains(FileSystems.getDefault().getPath(path))) {
               toBuild.add(module);
             } else if (!lastBuildSucceeded(module)) {
@@ -134,10 +167,10 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
         }
       }
     } else if (build.getBuildOptions().getModuleIds().isEmpty()) {
-      toBuild.addAll(allModules);
+      toBuild.addAll(buildableModules);
     } else {
       final Set<Integer> requestedModuleIds = build.getBuildOptions().getModuleIds();
-      for (Module module : allModules) {
+      for (Module module : buildableModules) {
         if (requestedModuleIds.contains(module.getId().get())) {
           toBuild.add(module);
         }
@@ -145,7 +178,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     }
 
     if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.WITHIN_REPOSITORY) {
-      addDownstreamModules(build, allModules, toBuild);
+      addDownstreamModules(build, buildableModules, toBuild);
     }
 
     return toBuild;

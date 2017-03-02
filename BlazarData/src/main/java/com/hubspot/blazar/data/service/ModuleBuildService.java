@@ -64,7 +64,7 @@ public class ModuleBuildService {
     } else {
       builds = moduleBuildDao.getLatestLimitedModuleBuildHistory(moduleId, pageSize);
     }
-    LOG.debug("Got {} builds of activity for module {} in {}", builds.size(), moduleId,  System.currentTimeMillis() - start);
+    LOG.debug("Got {} builds of activity for module {} in {}", builds.size(), moduleId, System.currentTimeMillis() - start);
 
     // calculate remaining
     if (builds.isEmpty()) {
@@ -104,18 +104,19 @@ public class ModuleBuildService {
     LOG.info("Skipped build for module {} with id {}", module.getId().get(), build.getId().get());
   }
 
-  public void enqueue(RepositoryBuild repositoryBuild, Module module) {
+  public ModuleBuild enqueue(RepositoryBuild repositoryBuild, Module module) {
     int nextBuildNumber = repositoryBuild.getBuildNumber();
     LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
     ModuleBuild build = ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber);
     build = enqueue(build);
     LOG.info("Enqueued build for module {} with id {}", module.getId().get(), build.getId().get());
+    return build;
   }
 
   @Transactional
   protected ModuleBuild skip(ModuleBuild build) {
     long id = moduleBuildDao.skip(build);
-    build = build.toBuilder().setId(Optional.of(id)).build();;
+    build = build.toBuilder().setId(Optional.of(id)).build();
 
     eventBus.post(build);
 
@@ -125,7 +126,7 @@ public class ModuleBuildService {
   @Transactional
   protected ModuleBuild enqueue(ModuleBuild build) {
     long id = moduleBuildDao.enqueue(build);
-    build = build.toBuilder().setId(Optional.of(id)).build();;
+    build = build.toBuilder().setId(Optional.of(id)).build();
 
     checkAffectedRowCount(moduleDao.updatePendingBuild(build));
 
@@ -177,16 +178,43 @@ public class ModuleBuildService {
   }
 
   @Transactional
-  public void fail(ModuleBuild build) {
+  public ModuleBuild fail(ModuleBuild build) {
     if (build.getState().isComplete()) {
       throw new IllegalStateException(String.format("Build %d has already completed", build.getId().get()));
     }
 
     if (build.getState().isWaiting()) {
-      beginNoPublish(build.toBuilder().setState(State.LAUNCHING).setStartTimestamp(Optional.of(System.currentTimeMillis())).build());
+      beginNoPublish(build.toBuilder()
+          .setState(State.LAUNCHING)
+          .setStartTimestamp(Optional.of(System.currentTimeMillis()))
+          .build());
     }
 
-    update(build.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
+    ModuleBuild failed = build.toBuilder()
+        .setState(State.FAILED)
+        .setEndTimestamp(Optional.of(System.currentTimeMillis()))
+        .build();
+    update(failed);
+    return failed;
+  }
+
+  /**
+   * This creates a failed module build without posting a `queued` build event. This allows us to fail module builds
+   * for in branch builds without them ever launching containers. This means that we skip all the visitors for
+   * ModuleBuilds except the ones that trigger on `State.FAILED`
+   */
+  @Transactional
+  public ModuleBuild createFailedBuild(RepositoryBuild repositoryBuild, Module module) {
+    int nextBuildNumber = repositoryBuild.getBuildNumber();
+    LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
+    ModuleBuild queued = ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber);
+    long id = moduleBuildDao.enqueue(queued);
+    checkAffectedRowCount(moduleDao.updatePendingBuild(queued));
+    ModuleBuild queuedWithId = queued.toBuilder().setId(Optional.of(id)).build();
+    LOG.info("Enqueued build for module {} with id {}", module.getId().get(), id);
+    ModuleBuild failed = fail(queuedWithId);
+    eventBus.post(failed);
+    return failed;
   }
 
   private static void checkAffectedRowCount(int affectedRows) {

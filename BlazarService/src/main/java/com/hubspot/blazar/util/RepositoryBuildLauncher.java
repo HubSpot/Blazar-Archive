@@ -94,7 +94,6 @@ public class RepositoryBuildLauncher {
       GitInfo gitInfo,
       RepositoryBuild queuedBuild,
       Optional<RepositoryBuild> previousBuild) throws IOException, NonRetryableBuildException {
-
     LOG.info("Trying to fetch current sha for branch {}/{}", gitInfo.getRepository(), gitInfo.getBranch());
 
     final GHRepository repository;
