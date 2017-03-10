@@ -74,7 +74,7 @@ public interface StateDao {
       // pending build
       "     LEFT OUTER JOIN module_builds AS pendingModuleBuild ON (module.pendingBuildId = pendingModuleBuild.id) " +
       "     LEFT OUTER JOIN repo_builds AS pendingBranchBuild ON (pendingModuleBuild.repoBuildId = pendingBranchBuild.id) " +
-      "  WHERE branches.id = :branchId")
+      "  WHERE branches.id = :branchId AND module.id IS NOT NULL")
   Set<ModuleState> getLastAndInProgressAndPendingBuildsForBranchAndIncludedModules(@Bind("branchId") int branchId);
 
   /**
