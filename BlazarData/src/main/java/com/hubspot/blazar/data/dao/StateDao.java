@@ -64,7 +64,7 @@ public interface StateDao {
   @SqlQuery("" +
       "SELECT * " +
       "  FROM branches " +
-      "     LEFT OUTER JOIN modules as module on (branches.id = module.branchId) " +
+      "     JOIN modules as module on (branches.id = module.branchId) " +
       // last build
       "     LEFT OUTER JOIN module_builds AS lastModuleBuild ON (module.lastBuildId = lastModuleBuild.id) " +
       "     LEFT OUTER JOIN repo_builds AS lastBranchBuild ON (lastModuleBuild.repoBuildId = lastBranchBuild.id) " +
@@ -74,7 +74,7 @@ public interface StateDao {
       // pending build
       "     LEFT OUTER JOIN module_builds AS pendingModuleBuild ON (module.pendingBuildId = pendingModuleBuild.id) " +
       "     LEFT OUTER JOIN repo_builds AS pendingBranchBuild ON (pendingModuleBuild.repoBuildId = pendingBranchBuild.id) " +
-      "  WHERE branches.id = :branchId AND module.id IS NOT NULL")
+      "  WHERE branches.id = :branchId")
   Set<ModuleState> getLastAndInProgressAndPendingBuildsForBranchAndIncludedModules(@Bind("branchId") int branchId);
 
   /**
