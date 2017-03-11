@@ -68,6 +68,9 @@ public class InterProjectBuildResource {
   @POST
   @Path("/")
   public InterProjectBuild triggerWithOptions(BuildOptions buildOptions, @QueryParam("username") Optional<String> username) {
+    if (buildOptions.getModuleIds() == null || buildOptions.getModuleIds().isEmpty()) {
+      throw new IllegalArgumentException("Can not start a build with `null` or empty modules.");
+    }
     InterProjectBuild build = InterProjectBuild.getQueuedBuild(buildOptions.getModuleIds(), BuildTrigger.forUser(username.or("unknown")));
     long id = interProjectBuildService.enqueue(build);
     return interProjectBuildService.getWithId(id).get();
