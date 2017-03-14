@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
-import com.hubspot.blazar.external.models.singularity.Resources;
+import com.hubspot.blazar.external.models.singularity.BuildCGroupResources;
 
 public class ExecutorConfiguration {
 
@@ -20,20 +20,20 @@ public class ExecutorConfiguration {
   private final long buildTimeoutMillis;
   // This is left as optional because the request that you configure in
   // is the last set of default options
-  private final Optional<Resources> defaultBuildResources;
+  private final Optional<BuildCGroupResources> defaultBuildResources;
 
   @JsonCreator
   public ExecutorConfiguration(@JsonProperty("defaultBuildUser") Optional<String> defaultBuildUser,
-                               @JsonProperty("defaultBuildResources") Optional<Resources> defaultBuildResources,
+                               @JsonProperty("defaultBuildResources") Optional<BuildCGroupResources> defaultBuildResources,
                                @JsonProperty("buildTimeoutMillis") Optional<Long> buildTimeoutMillis) {
 
-    this.defaultBuildResources = MoreObjects.firstNonNull(defaultBuildResources, Optional.<Resources>absent());
+    this.defaultBuildResources = MoreObjects.firstNonNull(defaultBuildResources, Optional.<BuildCGroupResources>absent());
     this.defaultBuildUser = MoreObjects.firstNonNull(defaultBuildUser, Optional.<String>absent()).or("root");
     this.buildTimeoutMillis = MoreObjects.firstNonNull(buildTimeoutMillis, Optional.<Long>absent()).or(TimeUnit.MINUTES.toMillis(20));
   }
 
   public static ExecutorConfiguration defaultConfiguration() {
-    return new ExecutorConfiguration(null, null, null);
+    return new ExecutorConfiguration(Optional.absent(), Optional.absent(), Optional.absent());
   }
 
   public String getDefaultBuildUser() {
@@ -44,7 +44,7 @@ public class ExecutorConfiguration {
     return buildTimeoutMillis;
   }
 
-  public Optional<Resources> getDefaultBuildResources() {
+  public Optional<BuildCGroupResources> getDefaultBuildResources() {
     return defaultBuildResources;
   }
 }

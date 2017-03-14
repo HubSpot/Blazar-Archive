@@ -215,19 +215,19 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     String sha = branchBuild.getCommitInfo().get().getCurrent().getId();
     String folder = module.getFolder();
     String configPath = folder + (folder.isEmpty() ? "" : "/") + ".blazar.yaml";
-    BuildConfig baseConfig = buildConfigUtils.getConfigAtRefOrDefault(branch, configPath, sha);
+    BuildConfig buildConfig = buildConfigUtils.getConfigAtRefOrDefault(branch, configPath, sha);
 
     final BuildConfig mergedConfig;
-    if (baseConfig.getBuildpack().isPresent()) {
-      BuildConfig buildpackConfig = buildConfigUtils.getConfigForBuildpackOnBranch(baseConfig.getBuildpack().get());
-      mergedConfig = buildConfigUtils.mergeConfig(baseConfig, buildpackConfig);
+    if (buildConfig.getBuildpack().isPresent()) {
+      BuildConfig buildpackConfig = buildConfigUtils.getConfigForBuildpackOnBranch(buildConfig.getBuildpack().get());
+      mergedConfig = buildConfigUtils.mergeConfig(buildConfig, buildpackConfig);
     } else if (module.getBuildpack().isPresent()) {
       BuildConfig buildpackConfig = buildConfigUtils.getConfigForBuildpackOnBranch(module.getBuildpack().get());
-      mergedConfig = buildConfigUtils.mergeConfig(baseConfig, buildpackConfig);
+      mergedConfig = buildConfigUtils.mergeConfig(buildConfig, buildpackConfig);
     } else {
-      mergedConfig = baseConfig;
+      mergedConfig = buildConfig;
     }
 
-    moduleBuildService.enqueue(branchBuild, module, baseConfig, buildConfigUtils.ensureDefaultConfigurationForBuild(mergedConfig));
+    moduleBuildService.enqueue(branchBuild, module, buildConfig, buildConfigUtils.addMissingBuildConfigSettings(mergedConfig));
   }
 }

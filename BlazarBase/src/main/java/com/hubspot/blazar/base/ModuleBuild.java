@@ -81,8 +81,11 @@ public class ModuleBuild {
     this.resolvedConfig = resolvedConfig;
   }
 
-  public static ModuleBuild queuedBuild(RepositoryBuild repositoryBuild, Module module, int buildNumber) {
-    return newBuilder(repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.QUEUED).build();
+  public static ModuleBuild queuedBuild(RepositoryBuild repositoryBuild, Module module, int buildNumber, BuildConfig buildConfig, BuildConfig resolvedBuildConfig) {
+    return newBuilder(repositoryBuild.getId().get(), module.getId().get(), buildNumber, State.QUEUED)
+        .setBuildConfig(Optional.of(buildConfig))
+        .setResolvedConfig(Optional.of(resolvedBuildConfig))
+        .build();
   }
 
   public static ModuleBuild skippedBuild(RepositoryBuild repositoryBuild, Module module, int buildNumber) {

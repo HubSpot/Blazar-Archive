@@ -105,16 +105,10 @@ public class ModuleBuildService {
     LOG.info("Skipped build for module {} with id {}", module.getId().get(), build.getId().get());
   }
 
-  public void enqueue(RepositoryBuild repositoryBuild, Module module, BuildConfig baseConfig, BuildConfig resolvedConfig) {
+  public void enqueue(RepositoryBuild repositoryBuild, Module module, BuildConfig buildConfig, BuildConfig resolvedBuildConfig) {
     int nextBuildNumber = repositoryBuild.getBuildNumber();
     LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
-    ModuleBuild build =
-        ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber)
-        .toBuilder()
-        .setBuildConfig(Optional.of(baseConfig))
-        .setResolvedConfig(Optional.of(resolvedConfig))
-        .build();
-    build = enqueue(build);
+    ModuleBuild build = enqueue(ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber, buildConfig, resolvedBuildConfig));
     LOG.info("Enqueued build for module {} with id {}", module.getId().get(), build.getId().get());
   }
 

@@ -8,10 +8,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
-import org.jukito.JukitoRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -25,20 +23,20 @@ import com.hubspot.blazar.base.StepActivationCriteria;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
-import com.hubspot.blazar.external.models.singularity.Resources;
+import com.hubspot.blazar.external.models.singularity.BuildCGroupResources;
 
-@RunWith(JukitoRunner.class)
 public class BlazarConfigUtilsTest {
 
   private static final String DEFAULT_BUILD_USER = "DefaultBuildUser";
-  private static final Resources DEFAULT_BUILD_RESOURCES = new Resources(2, 2560);
+  private static final BuildCGroupResources DEFAULT_BUILD_BUILD_CGROUP_RESOURCES = new BuildCGroupResources(2, 2560);
   private static final long DEFAULT_BUILD_TIMEOUT = 1000L;
   private static final GitInfo PRIMARY_BRANCH = GitInfo.fromString("git.example.com/TestOrg/repo.git#primary");
   private static final GitInfo SECONDARY_BRANCH = GitInfo.fromString("git.example.com/TestOrg/repo.git#secondary");
 
-  private final GitHubHelper gitHubHelper = mock(GitHubHelper.class);
-  private final BlazarConfiguration blazarConfiguration = mock(BlazarConfiguration.class);
-  private final ExecutorConfiguration exexutorConfiguration = new ExecutorConfiguration(Optional.of(DEFAULT_BUILD_USER), Optional.of(DEFAULT_BUILD_RESOURCES), Optional.of(DEFAULT_BUILD_TIMEOUT));
+  private static final GitHubHelper gitHubHelper = mock(GitHubHelper.class);
+  private static final BlazarConfiguration blazarConfiguration = mock(BlazarConfiguration.class);
+  private static final ExecutorConfiguration exexutorConfiguration = new ExecutorConfiguration(Optional.of(DEFAULT_BUILD_USER), Optional.of(DEFAULT_BUILD_BUILD_CGROUP_RESOURCES), Optional.of(DEFAULT_BUILD_TIMEOUT));
+  private static final BuildConfigUtils configUtils = new BuildConfigUtils(blazarConfiguration, gitHubHelper);
 
   private static final BuildConfig primaryConfig = BuildConfig.newBuilder()
       .setSteps(ImmutableList.of(BuildStep.fromString("echo hi")))
@@ -50,7 +48,7 @@ public class BlazarConfigUtilsTest {
       .setBuildpack(Optional.of(PRIMARY_BRANCH))
       .setUser(Optional.of("primary-build-user"))
       .setStepActivation(ImmutableMap.of("step-one", new StepActivationCriteria(ImmutableSet.of("master"))))
-      .setBuildResources(Optional.of(new Resources(100, 100L)))
+      .setBuildResources(Optional.of(new BuildCGroupResources(100, 100L)))
       .setDepends(ImmutableSet.of(Dependency.fromString("primary-dep")))
       .setProvides(ImmutableSet.of(Dependency.fromString("primary")))
       .build();
@@ -65,7 +63,7 @@ public class BlazarConfigUtilsTest {
       .setBuildpack(Optional.of(SECONDARY_BRANCH))
       .setUser(Optional.of("secondary-build-user"))
       .setStepActivation(ImmutableMap.of("step-one", new StepActivationCriteria(ImmutableSet.of("not-master")), "step-two", new StepActivationCriteria(ImmutableSet.of("master"))))
-      .setBuildResources(Optional.of(new Resources(200, 200L)))
+      .setBuildResources(Optional.of(new BuildCGroupResources(200, 200L)))
       .setDepends(ImmutableSet.of(Dependency.fromString("secondary-dep")))
       .setProvides(ImmutableSet.of(Dependency.fromString("secondary")))
       .build();
@@ -79,7 +77,6 @@ public class BlazarConfigUtilsTest {
 
   @Test
   public void itPrefersPrimaryConfigForNonMergableFieldsWhenMergingConfigs() {
-    BuildConfigUtils configUtils = new BuildConfigUtils(blazarConfiguration, gitHubHelper);
     BuildConfig mergedConfig = configUtils.mergeConfig(primaryConfig, secondaryConfig);
     assertThat(mergedConfig.getSteps()).isEqualTo(primaryConfig.getSteps());
     assertThat(mergedConfig.getBefore()).isEqualTo(primaryConfig.getBefore());
@@ -91,7 +88,6 @@ public class BlazarConfigUtilsTest {
 
   @Test
   public void itFallsBackToSecondaryConfigWhenOptionNotPresentInPrimary() {
-    BuildConfigUtils configUtils = new BuildConfigUtils(blazarConfiguration, gitHubHelper);
     BuildConfig mergedConfig = configUtils.mergeConfig(primaryConfigWithoutOptions, secondaryConfig);
     assertThat(mergedConfig).isEqualTo(secondaryConfig);
   }
@@ -99,7 +95,6 @@ public class BlazarConfigUtilsTest {
   @Test
   public void itMergesCollectionFieldsPresentInBothConfigs() {
     // Caveat we don't merge `steps` or `before` and they are collections.
-    BuildConfigUtils configUtils = new BuildConfigUtils(blazarConfiguration, gitHubHelper);
     BuildConfig mergedConfig = configUtils.mergeConfig(primaryConfig, secondaryConfig);
 
     // Union different keys, prefer primary for same keys
@@ -131,7 +126,6 @@ public class BlazarConfigUtilsTest {
   @Test
   public void itReturnsDefaultConfigIfConfigNotFound() throws IOException, NonRetryableBuildException {
     when(gitHubHelper.configAtSha(anyString(), any(), anyString())).thenReturn(Optional.absent());
-    BuildConfigUtils configUtils = new BuildConfigUtils(blazarConfiguration, gitHubHelper);
     BuildConfig config = configUtils.getConfigAtRefOrDefault(PRIMARY_BRANCH, BuildConfigUtils.BUILDPACK_FILE, "master");
     assertThat(config).isEqualTo(BuildConfig.makeDefaultBuildConfig());
   }

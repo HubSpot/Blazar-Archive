@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
-import com.hubspot.blazar.external.models.singularity.Resources;
+import com.hubspot.blazar.external.models.singularity.BuildCGroupResources;
 
 public class BuildConfig {
   private final List<BuildStep> steps;
@@ -23,7 +23,7 @@ public class BuildConfig {
   private final Optional<GitInfo> buildpack;
   private final Optional<String> user;
   private final Map<String, StepActivationCriteria> stepActivation;
-  private final Optional<Resources> buildResources;
+  private final Optional<BuildCGroupResources> buildResources;
   private final Set<Dependency> depends;
   private final Set<Dependency> provides;
 
@@ -38,7 +38,7 @@ public class BuildConfig {
                      @JsonProperty("buildpack") Optional<GitInfo> buildpack,
                      @JsonProperty("user") Optional<String> user,
                      @JsonProperty("stepActivation") Map<String, StepActivationCriteria> stepActivation,
-                     @JsonProperty("buildResources") Optional<Resources> buildResources,
+                     @JsonProperty("buildResources") Optional<BuildCGroupResources> buildResources,
                      @JsonProperty("depends") Set<Dependency> depends,
                      @JsonProperty("provides") Set<Dependency> provides) {
     this.steps = MoreObjects.firstNonNull(steps, Collections.<BuildStep>emptyList());
@@ -51,7 +51,7 @@ public class BuildConfig {
     this.cache = MoreObjects.firstNonNull(cache, Collections.<String>emptyList());
     this.user = MoreObjects.firstNonNull(user, Optional.<String>absent());
     this.stepActivation = MoreObjects.firstNonNull(stepActivation, Collections.<String, StepActivationCriteria>emptyMap());
-    this.buildResources = MoreObjects.firstNonNull(buildResources, Optional.<Resources>absent());
+    this.buildResources = MoreObjects.firstNonNull(buildResources, Optional.<BuildCGroupResources>absent());
     this.depends = MoreObjects.firstNonNull(depends, Collections.<Dependency>emptySet());
     this.provides = MoreObjects.firstNonNull(provides, Collections.<Dependency>emptySet());
   }
@@ -100,7 +100,7 @@ public class BuildConfig {
     return stepActivation;
   }
 
-  public Optional<Resources> getBuildResources() {
+  public Optional<BuildCGroupResources> getBuildResources() {
     return buildResources;
   }
 
@@ -194,64 +194,12 @@ public class BuildConfig {
     private Optional<GitInfo> buildpack;
     private Optional<String> user;
     private Map<String, StepActivationCriteria> stepActivation;
-    private Optional<Resources> buildResources;
+    private Optional<BuildCGroupResources> buildResources;
     private Set<Dependency> depends;
     private Set<Dependency> provides;
 
     public BuildConfig build() {
       return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation, buildResources, depends, provides);
-    }
-
-    public List<BuildStep> getSteps() {
-      return steps;
-    }
-
-    public List<BuildStep> getBefore() {
-      return before;
-    }
-
-    public Optional<PostBuildSteps> getAfter() {
-      return after;
-    }
-
-    public Map<String, String> getEnv() {
-      return env;
-    }
-
-    public List<String> getBuildDeps() {
-      return buildDeps;
-    }
-
-    public List<String> getWebhooks() {
-      return webhooks;
-    }
-
-    public List<String> getCache() {
-      return cache;
-    }
-
-    public Optional<GitInfo> getBuildpack() {
-      return buildpack;
-    }
-
-    public Optional<String> getUser() {
-      return user;
-    }
-
-    public Map<String, StepActivationCriteria> getStepActivation() {
-      return stepActivation;
-    }
-
-    public Optional<Resources> getBuildResources() {
-      return buildResources;
-    }
-
-    public Set<Dependency> getDepends() {
-      return depends;
-    }
-
-    public Set<Dependency> getProvides() {
-      return provides;
     }
 
     public Builder setSteps(List<BuildStep> steps) {
@@ -304,7 +252,7 @@ public class BuildConfig {
       return this;
     }
 
-    public Builder setBuildResources(Optional<Resources> buildResources) {
+    public Builder setBuildResources(Optional<BuildCGroupResources> buildResources) {
       this.buildResources = buildResources;
       return this;
     }

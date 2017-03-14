@@ -26,7 +26,7 @@ import com.hubspot.blazar.base.StepActivationCriteria;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
-import com.hubspot.blazar.external.models.singularity.Resources;
+import com.hubspot.blazar.external.models.singularity.BuildCGroupResources;
 
 @Singleton
 public class BuildConfigUtils {
@@ -47,18 +47,65 @@ public class BuildConfigUtils {
     return getConfigAtRefOrDefault(gitInfo, BUILDPACK_FILE, gitInfo.getBranch());
   }
 
-  public BuildConfig ensureDefaultConfigurationForBuild(BuildConfig buildConfig) {
+  public BuildConfig addMissingBuildConfigSettings(BuildConfig buildConfig) {
     BuildConfig.Builder buildConfigWithDefaults = buildConfig.toBuilder();
-    if (!buildConfigWithDefaults.getUser().isPresent()) {
+    if (!buildConfig.getUser().isPresent()) {
       buildConfigWithDefaults = buildConfigWithDefaults.setUser(Optional.of(executorConfiguration.getDefaultBuildUser()));
     }
 
-    if (!buildConfigWithDefaults.getBuildResources().isPresent()) {
+    if (!buildConfig.getBuildResources().isPresent()) {
       buildConfigWithDefaults = buildConfigWithDefaults.setBuildResources(executorConfiguration.getDefaultBuildResources());
     }
     return buildConfigWithDefaults.build();
   }
 
+  /**
+   * This merges 2 configurations (primary, secondary) into 1 resolved configuration that is used by a Blazar Executor to build
+   *
+   * Collections of `BuildSteps` are overridden.
+   * List<BuildStep> steps
+   *  Overridden so that child builds can define a new build.
+   *
+   * List<BuildStep> before
+   *  Overridden, buildpacks should not define this so child builds can insert their own steps before the 'core' section of the build (`steps` section)
+   *
+   * Optional<PostBuildSteps> after
+   *  Overridden, buildpacks should not define this so child builds can insert their own steps after the 'core' section of the build
+   *
+   * Map<String, String> env
+   *  Merged preferring `primary` when there are duplicate values, this lets child builds decide how the build
+   *  tools execute without having to replicate the whole build
+   *
+   * List<String> buildDeps
+   *  Merged putting `primary` before `secondary`, We turn `buildDeps` into additional values on the $PATH,
+   *  putting primary before secondary effectively overrides secondary values that provide binaries of the same name.
+   *
+   * List<String> webhooks
+   *  Merged putting `primary` before `secondary`, This is not currently used by anything as Blazar does not have Webhooks.
+   *
+   * List<String> cache
+   *  Merged putting `primary` before `secondary`, Primary caches will be stored first.
+   *
+   * Optional<GitInfo> buildpack
+   *  We override because the child build should be able to specify its own buildpack.
+   *
+   * Optional<String> user
+   *  We override because the child build should be able to specify its own user
+   *
+   * Map<String, StepActivationCriteria> stepActivation
+   *  Merged preferring `primary` when there are duplicate values, duplicate values, this lets child builds decide when
+   *  the build tools execute without having to replicate the whole build
+   *
+   * Optional<BuildCGroupResources> buildResources
+   *  Overridden allows child builds to specify different resource limits
+   *
+   * Set<Dependency> depends
+   *  Merged allows child builds to specify their own additional dependencies
+   *
+   * Set<Dependency> provides
+   *  Merged allows child builds to specify their own names to depend on
+   *
+   */
   public BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
     List<BuildStep> steps = primary.getSteps().isEmpty() ? secondary.getSteps() : primary.getSteps();
     List<BuildStep> before = primary.getBefore().isEmpty() ? secondary.getBefore() : primary.getBefore();
@@ -81,7 +128,7 @@ public class BuildConfigUtils {
     stepActivation.putAll(secondary.getStepActivation());
     stepActivation.putAll(primary.getStepActivation());
 
-    final Optional<Resources> buildResources;
+    final Optional<BuildCGroupResources> buildResources;
     if (primary.getBuildResources().isPresent()) {
       buildResources = primary.getBuildResources();
     } else {
