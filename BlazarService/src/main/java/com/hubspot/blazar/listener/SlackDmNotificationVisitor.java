@@ -44,7 +44,7 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
 
   @Override
   public void visit(RepositoryBuild build) throws Exception {
-    Set<String> userEmailsToSendMessagesTo = getOptedInUserEmailsForBuild(build);
+    Set<String> userEmailsToSendMessagesTo = getUserEmailsToDirectlyNotify(build);
     boolean shouldSendMessage = shouldSendMessage(build, userEmailsToSendMessagesTo);
     if (shouldSendMessage) {
       for (String email : userEmailsToSendMessagesTo) {
@@ -54,20 +54,24 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
     }
   }
 
-  private Set<String> getOptedInUserEmailsForBuild(RepositoryBuild build) {
+  private Set<String> getUserEmailsToDirectlyNotify(RepositoryBuild build) {
     if (build.getCommitInfo().isPresent()) {
       LOG.info("No commit info present cannot determine user to slack");
       return Collections.emptySet();
     }
-    String authorEmail = build.getCommitInfo().get().getCurrent().getAuthor().getEmail();
-    String committerEmail = build.getCommitInfo().get().getCurrent().getAuthor().getEmail();
 
-    // If the white list is empty we send to whoever pushed
-    // Else we ensure they're also in the whitelist before sending messages
+    Set<String> directNotifyEmails = Sets.newHashSet(
+        build.getCommitInfo().get().getCurrent().getAuthor().getEmail(), // Author Email
+        build.getCommitInfo().get().getCurrent().getAuthor().getEmail()); // Committer Email
+
+    directNotifyEmails.removeAll(blazarSlackConfig.getImBlacklist());
+
+    // If the white list is empty we send to author/committer
+    // else we only send to the whitelisted members
     if (blazarSlackConfig.getImWhitelist().isEmpty()) {
-      return ImmutableSet.of(authorEmail, committerEmail);
+      return directNotifyEmails;
     } else {
-      return Sets.intersection(ImmutableSet.of(authorEmail, committerEmail), blazarSlackConfig.getImWhitelist());
+      return Sets.intersection(directNotifyEmails, blazarSlackConfig.getImWhitelist());
     }
   }
 

@@ -1,5 +1,6 @@
 package com.hubspot.blazar.util;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -97,6 +98,13 @@ public class BlazarSlackClient {
   }
 
   private boolean sendMessage(SlackChannel channel, String message, SlackAttachment attachment) {
+    if (!session.isConnected()) {
+      try {
+        session.connect();
+      } catch (IOException e) {
+        LOG.error("Could not re-connect to slack {} -- not sending message {} ({}) to {}", e, message, attachment, channel);
+      }
+    }
     Optional<SlackMessageHandle<SlackMessageReply>> result = Optional.fromNullable(session.sendMessage(channel, message, attachment));
     // This slack library does not throw us back any exceptions it just calls `e.printStackTrace()` and returns null
     if (!result.isPresent()) {
