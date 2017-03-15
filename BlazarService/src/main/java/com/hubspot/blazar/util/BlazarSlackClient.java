@@ -29,6 +29,11 @@ import com.ullink.slack.simpleslackapi.replies.SlackMessageReply;
 @Singleton
 public class BlazarSlackClient {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarSlackClient.class);
+  private static final Retryer<Boolean> RETRYER = RetryerBuilder.<Boolean>newBuilder()
+        .retryIfResult(Predicates.equalTo(Boolean.FALSE))
+        .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+        .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+        .build();
 
   private SlackSession session;
   private MetricRegistry metricRegistry;
@@ -51,7 +56,7 @@ public class BlazarSlackClient {
 
   public void sendMessageToChannel(SlackChannel channel, String message, SlackAttachment attachment) {
     try {
-      makeSlackMessageSendingRetryer().call(() -> sendMessage(channel, message, attachment));
+      RETRYER.call(() -> sendMessage(channel, message, attachment));
       metricRegistry.counter("successful-slack-channel-sends").inc();
       // Here we swallow exceptions that might be thrown by our retryer or #sendMessage().
       // We don't catch and retry any exceptions because the slack session doesn't throw us any, (it swallows them and returns null)
@@ -72,7 +77,7 @@ public class BlazarSlackClient {
 
   public void sendMessageToUser(SlackUser user, String message, SlackAttachment attachment) {
     try {
-      makeSlackMessageSendingRetryer().call(() -> sendMessage(user, message, attachment));
+      RETRYER.call(() -> sendMessage(user, message, attachment));
       metricRegistry.counter("successful-slack-dm-sends").inc();
       // Here we swallow exceptions that might be thrown by our retryer or #sendMessage().
       // We don't catch and retry any exceptions because the slack session doesn't throw us any, (it swallows them and returns null)
@@ -126,14 +131,6 @@ public class BlazarSlackClient {
       return false;
     }
     return true;
-  }
-
-  private static Retryer<Boolean> makeSlackMessageSendingRetryer() {
-    return RetryerBuilder.<Boolean>newBuilder()
-        .retryIfResult(Predicates.equalTo(Boolean.FALSE))
-        .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-        .withStopStrategy(StopStrategies.stopAfterAttempt(3))
-        .build();
   }
 }
 
