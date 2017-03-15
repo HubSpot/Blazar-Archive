@@ -37,6 +37,17 @@ public class SlackMessageBuildingUtils {
     this.blazarUrlHelper = blazarUrlHelper;
   }
 
+
+  /**
+   * This constructs a slack attachment to send along with a message so that users
+   * can get a visual for the state of the build in addition to text.
+   *
+   * The information contained in the attachment is:
+   * - Color: Red for failure, Green success, and Yellow for states with less clear Failure / Success connotations
+   * - A link to the build history page for the build
+   * - A list of the modules that failed or were "unstable".
+   *
+   */
   public SlackAttachment buildSlackAttachment(RepositoryBuild build) {
     String title = buildNormalStateMessage(build);
     SlackAttachment attachment = makeAttachmentJustWithTitle(title);
