@@ -49,7 +49,7 @@ public class SlackMessageBuildingUtils {
    *
    */
   public SlackAttachment buildSlackAttachment(RepositoryBuild build) {
-    String title = buildNormalStateMessage(build);
+    String title = buildTitle(build);
     SlackAttachment attachment = makeAttachmentJustWithTitle(title);
     attachment.setTitleLink(blazarUrlHelper.getBlazarUiLink(build));
     attachment.setColor(getColor(build.getState()));
@@ -88,7 +88,7 @@ public class SlackMessageBuildingUtils {
     return attachment;
   }
 
-  private String buildNormalStateMessage(RepositoryBuild build) {
+  private String buildTitle(RepositoryBuild build) {
     GitInfo gitInfo = branchService.get(build.getBranchId()).get();
     return String.format("Repository Build %s-%s#%d finished with state %s", gitInfo.getRepository(), gitInfo.getBranch(), build.getBuildNumber(), build.getState().toString().toLowerCase());
   }
