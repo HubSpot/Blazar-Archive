@@ -14,8 +14,6 @@ import com.hubspot.blazar.listener.SlackDmNotificationVisitor;
 import com.hubspot.blazar.listener.SlackRoomNotificationVisitor;
 import com.hubspot.blazar.resources.SlackResource;
 import com.hubspot.blazar.resources.UserFeedbackResource;
-import com.hubspot.blazar.util.BlazarSlackClient;
-import com.hubspot.blazar.util.SlackMessageBuildingUtils;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 
@@ -45,8 +43,6 @@ public class BlazarSlackModule implements Module {
     repositoryBuildVisitorMultibinder.addBinding().to(SlackRoomNotificationVisitor.class);
 
     binder.bind(SlackSession.class).toInstance(SlackSessionFactory.createWebSocketSlackSession(slackConfiguration.get().getSlackApiToken()));
-    binder.bind(BlazarSlackClient.class);
-    binder.bind(SlackMessageBuildingUtils.class);
     binder.bind(SlackResource.class);
     binder.bind(UserFeedbackResource.class);
   }

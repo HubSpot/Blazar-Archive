@@ -1,7 +1,11 @@
 package com.hubspot.blazar.util;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +46,15 @@ public class BlazarSlackClient {
   public BlazarSlackClient(SlackSession session, MetricRegistry metricRegistry) {
     this.session = session;
     this.metricRegistry = metricRegistry;
+  }
+
+  public Set<com.hubspot.blazar.externalservice.slack.SlackChannel> getChannels() {
+    if (!ensureConnected()) {
+      LOG.warn("Unable to get list of slack channels because our slack session is not connected");
+      return Collections.emptySet();
+    }
+    Collection<SlackChannel> channels = session.getChannels();
+    return channels.stream().map(channel -> new com.hubspot.blazar.externalservice.slack.SlackChannel(channel.getId(), channel.getName())).collect(Collectors.toSet());
   }
 
   public void sendMessageToChannel(String channelName, String message, SlackAttachment attachment) {
@@ -103,13 +116,11 @@ public class BlazarSlackClient {
   }
 
   private boolean sendMessage(SlackChannel channel, String message, SlackAttachment attachment) {
-    if (!session.isConnected()) {
-      try {
-        session.connect();
-      } catch (IOException e) {
-        LOG.error("Could not re-connect to slack {} -- not sending message {} ({}) to {}", e, message, attachment, channel);
-      }
+    if (!ensureConnected()) {
+      LOG.error("Could not connect to slack -- not sending message {} ({}) to {}", message, attachment, channel);
+      return false;
     }
+
     Optional<SlackMessageHandle<SlackMessageReply>> result = Optional.fromNullable(session.sendMessage(channel, message, attachment));
     // This slack library does not throw us back any exceptions it just calls `e.printStackTrace()` and returns null
     if (!result.isPresent()) {
@@ -129,6 +140,19 @@ public class BlazarSlackClient {
 
       LOG.warn("Failed to send slack message to channel: {} message: {} error: {}", channel.getName(), attachment.toString(), reply.getErrorMessage());
       return false;
+    }
+    return true;
+  }
+
+  private boolean ensureConnected() {
+    if (!session.isConnected()) {
+      try {
+        session.connect();
+        return true;
+      } catch (IOException e) {
+        LOG.error("Could not connect to slack: {}", e);
+        return false;
+      }
     }
     return true;
   }
