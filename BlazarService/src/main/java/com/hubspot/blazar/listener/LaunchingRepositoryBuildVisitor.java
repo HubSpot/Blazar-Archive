@@ -67,17 +67,28 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     this.gitHubHelper = gitHubHelper;
   }
 
+  /**
+   * This method launches a branch build this involves:
+   * 1. Checking that there are no malformed files (We fail the build in this case)
+   * 2. Checking that there are any modules to build (We fail the build in this case)
+   * 3. Calculate which modules to build (Depends on what kind of build it is)
+   * 4. Enqueue builds (If this is a InterProject build create the InterProjectBuild mappings)
+   * 5. Mark any modules that are not Enqueued to build as `Skipped`
+   * 6. Update the state of this branch build
+   */
   @Override
   protected void visitLaunching(RepositoryBuild build) throws Exception {
     LOG.info("Going to enqueue module builds for repository build {}", build.getId().get());
 
     final Set<Module> activeModules = filterActive(moduleService.getByBranch(build.getBranchId()));
 
+    // 1. Check for malformed files
     if (!malformedFileService.getMalformedFiles(build.getBranchId()).isEmpty()) {
       failBranchAndModuleBuilds(build, activeModules);
       return;
     }
 
+    // 2. Check for buildable modules
     if (activeModules.isEmpty()) {
       LOG.info("No active modules to build in branch {} - failing build", build.getId().get());
       repositoryBuildService.fail(build);
@@ -85,6 +96,9 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
     final Optional<Long> interProjectBuildId;
     final Set<Module> toBuild;
+
+    // 3. The modules we choose to build depends on if this is an InterProject build or not
+    //    If this is an InterProject build we enqueue one of those as well.
     if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
       toBuild = determineModulesToBuildUsingInterProjectBuildGraph(build, activeModules);
       InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.copyOf(getIds(toBuild)), build.getBuildTrigger());
@@ -94,6 +108,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
       toBuild = findModulesToBuild(build, activeModules);
     }
 
+    // 4. Launch the modules we want to build
     for (Module module : build.getDependencyGraph().get().orderByTopologicalSort(toBuild)) {
       moduleBuildService.enqueue(build, module);
       if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
@@ -101,11 +116,13 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
       }
     }
 
-    // Only calculate skipped modules after we know what modules will build
+    // 5. Only calculate skipped modules after we know what modules will build
     Set<Module> skipped = Sets.difference(activeModules, toBuild);
     for (Module module : skipped) {
       moduleBuildService.skip(build, module);
     }
+
+    // 6. Update the state of this branch build.
     repositoryBuildService.update(build.toBuilder().setState(State.IN_PROGRESS).build());
   }
 

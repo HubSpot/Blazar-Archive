@@ -199,20 +199,24 @@ public class ModuleBuildService {
   }
 
   /**
-   * This creates a failed module build without posting a `queued` build event. This allows us to fail module builds
-   * for in branch builds without them ever launching containers. This means that we skip all the visitors for
-   * ModuleBuilds except the ones that trigger on `State.FAILED`
+   * This creates a failed module build without posting any build events. This allows us to fail module builds
+   * without having visitors do things for build states that this module is essentially skipping:
+   * For example we can avoid launching containers into singularity {@Link LaunchSingularityTaskBuildVisitor}.
+   * This means that we skip all the visitors for ModuleBuilds except the ones that trigger on `State.FAILED`
    */
   @Transactional
   public ModuleBuild createFailedBuild(RepositoryBuild repositoryBuild, Module module) {
     int nextBuildNumber = repositoryBuild.getBuildNumber();
+
     LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
     ModuleBuild queued = ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber);
     long id = moduleBuildDao.enqueue(queued);
     checkAffectedRowCount(moduleDao.updatePendingBuild(queued));
+
     ModuleBuild queuedWithId = queued.toBuilder().setId(Optional.of(id)).build();
     LOG.info("Enqueued build for module {} with id {}", module.getId().get(), id);
     ModuleBuild failed = fail(queuedWithId);
+
     eventBus.post(failed);
     return failed;
   }
