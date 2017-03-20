@@ -21,6 +21,12 @@ public class RepositoryBuild {
     public boolean isComplete() {
       return completed;
     }
+
+    public boolean isFailed() {
+      return equals(CANCELLED) ||
+          equals(FAILED) ||
+          equals(UNSTABLE);
+    }
   }
 
   private final Optional<Long> id;

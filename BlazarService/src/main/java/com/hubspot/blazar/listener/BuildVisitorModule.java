@@ -6,21 +6,17 @@ import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.base.visitor.InterProjectBuildVisitor;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
-import com.hubspot.blazar.config.BlazarConfiguration;
 
+/**
+ * Binds all visitors except Slack Visitors which are bound in the BlazarSlackModule
+ */
 public class BuildVisitorModule implements Module {
-  private final BlazarConfiguration configuration;
-
-  public BuildVisitorModule(BlazarConfiguration configuration) {
-    this.configuration = configuration;
-  }
 
   @Override
   public void configure(Binder binder) {
     binder.bind(BuildEventDispatcher.class);
 
     Multibinder<RepositoryBuildVisitor> repositoryBuildVisitors = Multibinder.newSetBinder(binder, RepositoryBuildVisitor.class);
-
     // launch the queued build if nothing in progress
     repositoryBuildVisitors.addBinding().to(QueuedRepositoryBuildVisitor.class);
     // queue builds for the affected modules
@@ -34,15 +30,8 @@ public class BuildVisitorModule implements Module {
     // Make note of launched module Builds for IPR builds
     repositoryBuildVisitors.addBinding().to(InterProjectRepositoryBuildVisitor.class);
 
-    if (configuration.getSlackConfiguration().isPresent()) {
-      // send Slack notifications
-      repositoryBuildVisitors.addBinding().to(SlackImNotificationVisitor.class);
-      repositoryBuildVisitors.addBinding().to(SlackRoomNotificationVisitor.class);
-
-    }
 
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder, ModuleBuildVisitor.class);
-
     // launch the queued build if nothing upstream
     moduleBuildVisitors.addBinding().to(QueuedModuleBuildVisitor.class);
     // kick off the singularity task eagerly
@@ -57,13 +46,8 @@ public class BuildVisitorModule implements Module {
     moduleBuildVisitors.addBinding().to(RepositoryBuildCompleter.class);
     // launch interProjectChildren for completed Modules
     moduleBuildVisitors.addBinding().to(InterProjectModuleBuildVisitor.class);
-    if (configuration.getSlackConfiguration().isPresent()) {
-      // send Slack notifications
-      moduleBuildVisitors.addBinding().to(SlackRoomNotificationVisitor.class);
-    }
 
     Multibinder<InterProjectBuildVisitor> interProjectBuildVisitors = Multibinder.newSetBinder(binder, InterProjectBuildVisitor.class);
-
     interProjectBuildVisitors.addBinding().to(InterProjectBuildHandler.class);
   }
 }

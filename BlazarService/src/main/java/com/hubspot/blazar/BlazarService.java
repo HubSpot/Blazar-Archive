@@ -43,7 +43,9 @@ public class BlazarService<T extends BlazarConfiguration> extends Application<T>
   public void run(final T configuration, final Environment environment) {}
 
   private ConfiguredBundle<BlazarConfiguration> buildGuiceBundle() {
-    return GuiceBundle.defaultBuilder(BlazarConfiguration.class).modules(new BlazarServiceModule()).build();
+    return GuiceBundle.defaultBuilder(BlazarConfiguration.class)
+        .enableGuiceEnforcer(false)
+        .modules(new BlazarServiceModule()).build();
   }
 
   public static void main(String... args) throws Exception {

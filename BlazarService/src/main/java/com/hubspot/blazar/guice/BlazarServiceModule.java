@@ -22,7 +22,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
@@ -31,7 +30,6 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.GitHubNamingFilter;
-import com.hubspot.blazar.cctray.CCTrayProjectFactory;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.config.SingularityConfiguration;
@@ -49,18 +47,10 @@ import com.hubspot.blazar.resources.InstantMessageResource;
 import com.hubspot.blazar.resources.InterProjectBuildResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
-import com.hubspot.blazar.resources.UiResource;
-import com.hubspot.blazar.resources.UserFeedbackResource;
-import com.hubspot.blazar.util.BlazarUrlHelper;
-import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.LoggingHandler;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
-import com.hubspot.blazar.util.ModuleBuildLauncher;
-import com.hubspot.blazar.util.RepositoryBuildLauncher;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
 import com.hubspot.blazar.util.SingularityBuildWatcher;
-import com.hubspot.blazar.util.SlackUtils;
 import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpClient;
@@ -72,8 +62,6 @@ import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.horizon.ning.NingHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
 import com.hubspot.singularity.client.SingularityClientModule;
-import com.ullink.slack.simpleslackapi.SlackSession;
-import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 
 import io.dropwizard.db.DataSourceFactory;
 
@@ -82,9 +70,8 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
   @Override
   public void configure(Binder binder) {
-    binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());
     binder.install(new BlazarEventBusModule());
-    binder.bind(GitHubWebhookResource.class);
+    binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());
     binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
     binder.bind(XmlFactory.class).toInstance(new XmlFactory());
     binder.bind(MetricRegistry.class).toInstance(getEnvironment().metrics());
@@ -97,11 +84,13 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
     binder.install(new BlazarDataModule());
     binder.install(new DiscoveryModule());
+    binder.install(new BlazarSlackModule(getConfiguration()));
 
     binder.bind(IllegalArgumentExceptionMapper.class);
     binder.bind(IllegalStateExceptionMapper.class);
 
-    // Resources
+    // Bind resources
+    binder.bind(GitHubWebhookResource.class);
     binder.bind(BranchResource.class);
     binder.bind(BranchStateResource.class);
     binder.bind(ModuleBuildResource.class);
@@ -109,16 +98,10 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(BuildHistoryResource.class);
     binder.bind(InstantMessageResource.class);
     binder.bind(InterProjectBuildResource.class);
-    binder.bind(UiResource.class);
-
-    if (getConfiguration().getSlackConfiguration().isPresent()) {
-      binder.bind(UserFeedbackResource.class);
-      binder.bind(SlackUtils.class);
-    }
 
     // Only configure leader-based activities like processing events etc. if you are connected to zookeeper
     if (getConfiguration().getZooKeeperConfiguration().isPresent()) {
-      binder.install(new BuildVisitorModule(getConfiguration()));
+      binder.install(new BuildVisitorModule());
       binder.install(new BlazarQueueProcessorModule());
       binder.install(new BlazarZooKeeperModule());
 
@@ -142,12 +125,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     // Bind various Service level classes
     binder.bind(GitHubWebhookHandler.class);
     binder.bind(LoggingHandler.class);
-    binder.bind(GitHubHelper.class);
-    binder.bind(RepositoryBuildLauncher.class);
-    binder.bind(ModuleBuildLauncher.class);
-    binder.bind(SingularityBuildLauncher.class);
-    binder.bind(BlazarUrlHelper.class);
-    binder.bind(CCTrayProjectFactory.class);
 
     // Bind and configure Singularity client
     SingularityConfiguration singularityConfiguration = getConfiguration().getSingularityConfiguration();
@@ -164,19 +141,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     for (Entry<String, GitHubConfiguration> entry : getConfiguration().getGitHubConfiguration().entrySet()) {
       String host = entry.getKey();
       mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
-    }
-  }
-
-  @Provides
-  @Singleton
-  public Optional<SlackSession> get(BlazarConfiguration configuration) throws IOException {
-    if (configuration.getSlackConfiguration().isPresent() && !configuration.isWebhookOnly()) {
-      String token = configuration.getSlackConfiguration().get().getSlackApiToken();
-      SlackSession session = SlackSessionFactory.createWebSocketSlackSession(token);
-      session.connect();
-      return Optional.of(session);
-    } else {
-      return Optional.absent();
     }
   }
 
