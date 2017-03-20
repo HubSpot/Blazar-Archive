@@ -166,10 +166,10 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
   }
 
   private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> buildableModules) {
-    CommitInfo commitInfo = build.getCommitInfo().get();
-
     final Set<Module> toBuild = new HashSet<>();
+
     if (build.getBuildTrigger().getType() == Type.PUSH) {
+      CommitInfo commitInfo = build.getCommitInfo().get();
       if (commitInfo.isTruncated()) {
         toBuild.addAll(buildableModules);
       } else {
