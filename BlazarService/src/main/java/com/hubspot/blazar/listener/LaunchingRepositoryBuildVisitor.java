@@ -92,6 +92,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     if (activeModules.isEmpty()) {
       LOG.info("No active modules to build in branch {} - failing build", build.getId().get());
       repositoryBuildService.fail(build);
+      return;
     }
 
     final Optional<Long> interProjectBuildId;
@@ -163,7 +164,6 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     }
     return interProjectModulesToBuild;
   }
-
 
   private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> buildableModules) {
     CommitInfo commitInfo = build.getCommitInfo().get();
