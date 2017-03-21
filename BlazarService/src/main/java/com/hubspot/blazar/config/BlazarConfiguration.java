@@ -7,13 +7,16 @@ import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 
 import io.dropwizard.db.DataSourceFactory;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+/**
+ * The configuration for Blazar.
+ * All options that control how the BlazarService behaves are configured here. These are wrapped by {@Link BlazarWrapperConfiguration}
+ * so that there is 1 top level key in the dropwizard yaml which contains all the Blazar properties.
+ */
 public class BlazarConfiguration {
 
   @NotNull

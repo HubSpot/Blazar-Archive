@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.Configuration;
 
+/**
+ * This wraps {@Link BlazarConfiguration} so that all the Blazar configuration
+ * options are available under a single key in the dropwizard yaml.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BlazarWrapperConfiguration extends Configuration {
 
