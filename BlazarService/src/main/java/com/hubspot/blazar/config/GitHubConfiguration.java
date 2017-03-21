@@ -15,6 +15,13 @@ public class GitHubConfiguration {
   private final Optional<String> oauthToken;
   private final List<String> organizations;
 
+  /**
+   * @param user The username to use when interacting with GitHub.
+   * @param password The password to use.
+   * @param setCommitStatus We don't want to post build statuses to all GitHub instances we configure.
+   * @param oauthToken Alternate option to having a user/password you can use a user/token.
+   * @param organizations A list of all the organizations that Blazar will pay attention to pushes from.
+   */
   @JsonCreator
   public GitHubConfiguration(@JsonProperty("user") Optional<String> user,
                              @JsonProperty("password") Optional<String> password,

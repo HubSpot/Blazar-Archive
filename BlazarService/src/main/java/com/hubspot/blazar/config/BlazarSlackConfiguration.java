@@ -22,6 +22,14 @@ public class BlazarSlackConfiguration {
   private Set<String> imWhitelist;
   private String username;
 
+  /**
+   * @param slackApiBaseUrl The slack api to point at
+   * @param slackApiToken Auth token for connecting
+   * @param username The username to post in slack as
+   * @param feedbackRoom The room to push feedback from our in-app feedback box to
+   * @param imWhitelist The list of users to directly slack when a build they pushed build fails
+   * @param imBlacklist The list of users not to slack when a build they pushed build fails
+   */
   @Inject
   public BlazarSlackConfiguration(@JsonProperty("slackApiBaseUrl") String slackApiBaseUrl,
                                   @JsonProperty("slackApiToken") String slackApiToken,
