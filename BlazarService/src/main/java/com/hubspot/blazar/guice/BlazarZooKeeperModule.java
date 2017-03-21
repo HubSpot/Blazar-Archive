@@ -13,7 +13,7 @@ import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
-import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BlazarWrapperConfiguration;
 import com.hubspot.blazar.queue.QueueProcessor;
 import com.hubspot.blazar.util.HostUtils;
 import com.hubspot.blazar.util.HostUtils.Host;
@@ -57,7 +57,7 @@ public class BlazarZooKeeperModule implements Module {
   @Provides
   @Singleton
   @Port
-  public int providesPort(BlazarConfiguration configuration) {
+  public int providesPort(BlazarWrapperConfiguration configuration) {
     SimpleServerFactory serverFactory = (SimpleServerFactory) configuration.getServerFactory();
     HttpConnectorFactory connector = (HttpConnectorFactory) serverFactory.getConnector();
     return connector.getPort();

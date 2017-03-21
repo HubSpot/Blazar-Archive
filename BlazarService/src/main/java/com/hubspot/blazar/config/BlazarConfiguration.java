@@ -11,11 +11,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 
-import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BlazarConfiguration extends Configuration {
+public class BlazarConfiguration {
 
   @NotNull
   @JsonProperty("github")

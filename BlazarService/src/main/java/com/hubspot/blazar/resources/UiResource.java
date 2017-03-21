@@ -6,7 +6,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.google.inject.Inject;
-import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BlazarWrapperConfiguration;
 
 import io.dropwizard.server.SimpleServerFactory;
 import io.dropwizard.views.View;
@@ -17,7 +17,7 @@ public class UiResource {
     private final String basePath;
 
     @Inject
-    public UiResource(BlazarConfiguration configuration) {
+    public UiResource(BlazarWrapperConfiguration configuration) {
         this.basePath = ((SimpleServerFactory) configuration.getServerFactory()).getApplicationContextPath();
     }
 
