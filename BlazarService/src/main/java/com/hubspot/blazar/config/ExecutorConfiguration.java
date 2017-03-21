@@ -1,13 +1,14 @@
 package com.hubspot.blazar.config;
 
+import java.util.concurrent.TimeUnit;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import java.util.concurrent.TimeUnit;
 
 public class ExecutorConfiguration {
 
@@ -17,6 +18,10 @@ public class ExecutorConfiguration {
   @Min(0)
   private final long buildTimeoutMillis;
 
+  /**
+   * @param defaultBuildUser The default user for builds to run as
+   * @param buildTimeoutMillis The time to wait before considering a running build to be stuck and for it to be killed.
+   */
   @JsonCreator
   public ExecutorConfiguration(@JsonProperty("defaultBuildUser") Optional<String> defaultBuildUser,
                                @JsonProperty("buildTimeoutMillis") Optional<Long> buildTimeoutMillis) {

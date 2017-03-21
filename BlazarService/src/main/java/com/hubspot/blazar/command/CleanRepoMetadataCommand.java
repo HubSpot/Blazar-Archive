@@ -22,7 +22,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.guice.BaseCommandModule;
 import com.hubspot.blazar.util.GitHubHelper;
@@ -30,7 +30,7 @@ import com.hubspot.blazar.util.GitHubHelper;
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.setup.Bootstrap;
 
-public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfiguration> {
+public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfigurationWrapper> {
   private static final String COMMAND_NAME = "clean_repo_metadata";
   private static final String COMMAND_DESC = "Finds repos no longer in the managed organizations and marks all branches as inactive";
   private static final Logger LOG = LoggerFactory.getLogger(CleanRepoMetadataCommand.class);
@@ -56,9 +56,9 @@ public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfigurat
 
   @Override
   protected void run(
-      Bootstrap<BlazarConfiguration> bootstrap,
+      Bootstrap<BlazarConfigurationWrapper> bootstrap,
       Namespace namespace,
-      BlazarConfiguration configuration) throws Exception {
+      BlazarConfigurationWrapper configuration) throws Exception {
 
     boolean noop = namespace.getBoolean(NOOP_FLAG);
     Injector injector = Guice.createInjector(new BaseCommandModule(bootstrap, configuration));
@@ -73,7 +73,7 @@ public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfigurat
 
       while (!branchStack.isEmpty()) {
         GitInfo branch = branchStack.pop();
-        GitBranchUpdater updater = new GitBranchUpdater(branch, gitHubHelper, configuration, branchService, noop);
+        GitBranchUpdater updater = new GitBranchUpdater(branch, gitHubHelper, configuration.getBlazarConfiguration(), branchService, noop);
         try {
           futures.put(branch, CompletableFuture.runAsync(updater, executorService));
         } catch (RejectedExecutionException e) {

@@ -31,6 +31,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
@@ -65,26 +66,28 @@ import com.hubspot.singularity.client.SingularityClientModule;
 
 import io.dropwizard.db.DataSourceFactory;
 
-public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfiguration> {
+public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurationWrapper> {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceModule.class);
 
   @Override
   public void configure(Binder binder) {
+    BlazarConfiguration blazarConfiguration = getConfiguration().getBlazarConfiguration();
+
     binder.install(new BlazarEventBusModule());
-    binder.bind(DataSourceFactory.class).toInstance(getConfiguration().getDatabaseConfiguration());
+    binder.bind(DataSourceFactory.class).toInstance(blazarConfiguration.getDatabaseConfiguration());
     binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
     binder.bind(XmlFactory.class).toInstance(new XmlFactory());
     binder.bind(MetricRegistry.class).toInstance(getEnvironment().metrics());
     binder.bind(ObjectMapper.class).toInstance(getEnvironment().getObjectMapper());
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
 
-    if (getConfiguration().isWebhookOnly()) {
+    if (blazarConfiguration.isWebhookOnly()) {
       return;
     }
 
     binder.install(new BlazarDataModule());
     binder.install(new DiscoveryModule());
-    binder.install(new BlazarSlackModule(getConfiguration()));
+    binder.install(new BlazarSlackModule(blazarConfiguration));
 
     binder.bind(IllegalArgumentExceptionMapper.class);
     binder.bind(IllegalStateExceptionMapper.class);
@@ -100,7 +103,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(InterProjectBuildResource.class);
 
     // Only configure leader-based activities like processing events etc. if you are connected to zookeeper
-    if (getConfiguration().getZooKeeperConfiguration().isPresent()) {
+    if (blazarConfiguration.getZooKeeperConfiguration().isPresent()) {
       binder.install(new BuildVisitorModule());
       binder.install(new BlazarQueueProcessorModule());
       binder.install(new BlazarZooKeeperModule());
@@ -127,7 +130,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(LoggingHandler.class);
 
     // Bind and configure Singularity client
-    SingularityConfiguration singularityConfiguration = getConfiguration().getSingularityConfiguration();
+    SingularityConfiguration singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
     binder.install(new SingularityClientModule(ImmutableList.of(singularityConfiguration.getHost())));
     if (singularityConfiguration.getPath().isPresent()) {
       SingularityClientModule.bindContextPath(binder).toInstance(singularityConfiguration.getPath().get());
@@ -138,7 +141,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
     // Bind GitHub configurations
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
-    for (Entry<String, GitHubConfiguration> entry : getConfiguration().getGitHubConfiguration().entrySet()) {
+    for (Entry<String, GitHubConfiguration> entry : blazarConfiguration.getGitHubConfiguration().entrySet()) {
       String host = entry.getKey();
       mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
     }
@@ -146,16 +149,22 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
   @Provides
   @Singleton
+  public BlazarConfiguration getBlazarConfiguration() {
+    return getConfiguration().getBlazarConfiguration();
+  }
+
+  @Provides
+  @Singleton
   @Named("whitelist")
-  public Set<String> providesWhitelist(BlazarConfiguration configuration) {
-    return configuration.getWhitelist();
+  public Set<String> providesWhitelist() {
+    return getConfiguration().getBlazarConfiguration().getWhitelist();
   }
 
   @Provides
   @Singleton
   @Named("blacklist")
-  public Set<String> providesBlacklist(BlazarConfiguration configuration) {
-    return configuration.getBlacklist();
+  public Set<String> providesBlacklist() {
+    return getConfiguration().getBlazarConfiguration().getBlacklist();
   }
 
   @Provides

@@ -7,52 +7,72 @@ import java.util.Set;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Optional;
 
-import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class BlazarConfiguration extends Configuration {
+/**
+ * The configuration for Blazar.
+ * All options that control how the BlazarService behaves are configured here. These are wrapped by {@Link BlazarWrapperConfiguration}
+ * so that there is 1 top level key in the dropwizard yaml which contains all the Blazar properties.
+ */
+public class BlazarConfiguration {
 
+
+  // Defines the deployments of GitHub that Blazar can connect to.
   @NotNull
   @JsonProperty("github")
   private Map<String, GitHubConfiguration> gitHubConfiguration;
 
+  // The configuration required for Blazar to connect to Singularity
   @Valid
   @NotNull
   @JsonProperty("singularity")
   private SingularityConfiguration singularityConfiguration;
 
+  // Default options we pass to the executor
   @Valid
   @NotNull
   @JsonProperty("executor")
   private ExecutorConfiguration executorConfiguration = ExecutorConfiguration.defaultConfiguration();
 
+  // Configuration for Blazar to connect to Zookeeper
+  // Required for leader election, and for Blazar to enable the buildVisitors (only the master handles build events).
   @JsonProperty("zookeeper")
   private Optional<ZooKeeperConfiguration> zooKeeperConfiguration = Optional.absent();
 
+  /* The configuration for Blazar's mysql database
+   * database:
+   *   driverClass: com.mysql.jdbc.Driver
+   *   user: user
+   *   password: "password"
+   *   url: jdbc:mysql://host:3306/BlazarV2
+   */
   @Valid
   @NotNull
   @JsonProperty("database")
   private DataSourceFactory databaseConfiguration;
 
+  // Configuration for Blazar's Ui so the backend can correctly generate links to the UI.
   @Valid
   @NotNull
   @JsonProperty("ui")
   private UiConfiguration uiConfiguration;
 
+  // Optional Configuration for Slack.
+  // Blazar uses this configuration to send messages to channels and individuals about builds
   @Valid
   @JsonProperty("slack_blazar")
   private Optional<BlazarSlackConfiguration> slackConfiguration = Optional.absent();
 
   // allows you to opt-in whole repositories by name
   private Set<String> whitelist = Collections.emptySet();
+
   // allows you to opt out whole repositories by name
   private Set<String> blacklist = Collections.emptySet();
 
+  // Controls whether this instance of blazar is configured to only accept webhooks or not.
   private boolean webhookOnly = false;
 
   public Map<String, GitHubConfiguration> getGitHubConfiguration() {
