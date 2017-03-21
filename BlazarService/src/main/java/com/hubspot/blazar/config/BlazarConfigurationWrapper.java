@@ -12,12 +12,12 @@ import io.dropwizard.Configuration;
  * options are available under a single key in the dropwizard yaml.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BlazarWrapperConfiguration extends Configuration {
+public class BlazarConfigurationWrapper extends Configuration {
 
   private BlazarConfiguration blazarConfiguration;
 
   @JsonCreator
-  public BlazarWrapperConfiguration(@JsonProperty("blazarConfiguration") BlazarConfiguration blazarConfiguration) {
+  public BlazarConfigurationWrapper(@JsonProperty("blazarConfiguration") BlazarConfiguration blazarConfiguration) {
 
     this.blazarConfiguration = blazarConfiguration;
   }

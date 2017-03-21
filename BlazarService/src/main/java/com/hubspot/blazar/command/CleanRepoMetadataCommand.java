@@ -22,7 +22,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.config.BlazarWrapperConfiguration;
+import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.guice.BaseCommandModule;
 import com.hubspot.blazar.util.GitHubHelper;
@@ -30,7 +30,7 @@ import com.hubspot.blazar.util.GitHubHelper;
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.setup.Bootstrap;
 
-public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarWrapperConfiguration> {
+public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarConfigurationWrapper> {
   private static final String COMMAND_NAME = "clean_repo_metadata";
   private static final String COMMAND_DESC = "Finds repos no longer in the managed organizations and marks all branches as inactive";
   private static final Logger LOG = LoggerFactory.getLogger(CleanRepoMetadataCommand.class);
@@ -56,9 +56,9 @@ public class CleanRepoMetadataCommand extends ConfiguredCommand<BlazarWrapperCon
 
   @Override
   protected void run(
-      Bootstrap<BlazarWrapperConfiguration> bootstrap,
+      Bootstrap<BlazarConfigurationWrapper> bootstrap,
       Namespace namespace,
-      BlazarWrapperConfiguration configuration) throws Exception {
+      BlazarConfigurationWrapper configuration) throws Exception {
 
     boolean noop = namespace.getBoolean(NOOP_FLAG);
     Injector injector = Guice.createInjector(new BaseCommandModule(bootstrap, configuration));

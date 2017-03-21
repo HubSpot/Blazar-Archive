@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.hubspot.blazar.command.CleanRepoMetadataCommand;
 import com.hubspot.blazar.command.VersionBackFillCommand;
-import com.hubspot.blazar.config.BlazarWrapperConfiguration;
+import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.guice.BlazarServiceModule;
 import com.hubspot.dropwizard.guicier.GuiceBundle;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
@@ -18,15 +18,15 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 
-public class BlazarService<T extends BlazarWrapperConfiguration> extends Application<T> {
+public class BlazarService<T extends BlazarConfigurationWrapper> extends Application<T> {
 
   @Override
   public void initialize(final Bootstrap<T> bootstrap) {
     bootstrap.addBundle(buildGuiceBundle());
-    bootstrap.addBundle(new MigrationsBundle<BlazarWrapperConfiguration>() {
+    bootstrap.addBundle(new MigrationsBundle<BlazarConfigurationWrapper>() {
 
       @Override
-      public DataSourceFactory getDataSourceFactory(final BlazarWrapperConfiguration configuration) {
+      public DataSourceFactory getDataSourceFactory(final BlazarConfigurationWrapper configuration) {
         return configuration.getBlazarConfiguration().getDatabaseConfiguration();
       }
     });
@@ -42,8 +42,8 @@ public class BlazarService<T extends BlazarWrapperConfiguration> extends Applica
   @Override
   public void run(final T configuration, final Environment environment) {}
 
-  private ConfiguredBundle<BlazarWrapperConfiguration> buildGuiceBundle() {
-    return GuiceBundle.defaultBuilder(BlazarWrapperConfiguration.class)
+  private ConfiguredBundle<BlazarConfigurationWrapper> buildGuiceBundle() {
+    return GuiceBundle.defaultBuilder(BlazarConfigurationWrapper.class)
         .enableGuiceEnforcer(false)
         .modules(new BlazarServiceModule()).build();
   }

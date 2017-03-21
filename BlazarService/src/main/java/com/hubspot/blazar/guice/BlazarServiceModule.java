@@ -31,7 +31,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.BlazarWrapperConfiguration;
+import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
@@ -66,7 +66,7 @@ import com.hubspot.singularity.client.SingularityClientModule;
 
 import io.dropwizard.db.DataSourceFactory;
 
-public class BlazarServiceModule extends DropwizardAwareModule<BlazarWrapperConfiguration> {
+public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurationWrapper> {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceModule.class);
 
   @Override
