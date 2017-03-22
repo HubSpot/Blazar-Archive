@@ -43,6 +43,11 @@ public class ModuleBuild {
     public SimpleState getSimpleState() {
       return simpleState;
     }
+
+    public boolean isFailed() {
+      return equals(CANCELLED) ||
+          equals(FAILED);
+    }
   }
 
   private final Optional<Long> id;

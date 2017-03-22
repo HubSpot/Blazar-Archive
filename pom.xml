@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot</groupId>
     <artifactId>basepom</artifactId>
-    <version>15.5</version>
+    <version>15.11</version>
   </parent>
 
   <artifactId>Blazar</artifactId>
@@ -113,7 +113,7 @@
       <dependency>
         <groupId>com.hubspot.dropwizard</groupId>
         <artifactId>dropwizard-guicier</artifactId>
-        <version>1.0.0.1</version>
+        <version>1.0.6.0</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
@@ -229,12 +229,12 @@
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
-        <version>2.3.7</version>
+        <version>2.4.7</version>
       </dependency>
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.19.0-GA</version>
+        <version>3.20.0-GA</version>
       </dependency>
       <dependency>
         <groupId>com.getsentry.raven</groupId>

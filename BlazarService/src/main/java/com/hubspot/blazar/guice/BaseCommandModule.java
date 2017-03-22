@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
-import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
@@ -21,10 +21,10 @@ import io.dropwizard.setup.Bootstrap;
 
 public class BaseCommandModule extends AbstractModule {
 
-  private final Bootstrap<BlazarConfiguration> bootstrap;
-  private final BlazarConfiguration configuration;
+  private final Bootstrap<BlazarConfigurationWrapper> bootstrap;
+  private final BlazarConfigurationWrapper configuration;
 
-  public BaseCommandModule(Bootstrap<BlazarConfiguration> bootstrap, BlazarConfiguration configuration) {
+  public BaseCommandModule(Bootstrap<BlazarConfigurationWrapper> bootstrap, BlazarConfigurationWrapper configuration) {
     this.bootstrap = bootstrap;
     this.configuration = configuration;
   }
@@ -35,13 +35,13 @@ public class BaseCommandModule extends AbstractModule {
     bootstrap.getObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     bootstrap.getObjectMapper().registerModule(new ProtobufModule());
     binder().bind(ObjectMapper.class).toInstance(bootstrap.getObjectMapper());
-    binder().bind(DataSourceFactory.class).toInstance(configuration.getDatabaseConfiguration());
+    binder().bind(DataSourceFactory.class).toInstance(configuration.getBlazarConfiguration().getDatabaseConfiguration());
     binder().install(new BlazarDataModule());
     binder().install(new DiscoveryModule());
     binder().bind(GitHubHelper.class);
 
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder(), String.class, GitHub.class);
-    for (Map.Entry<String, GitHubConfiguration> entry : configuration.getGitHubConfiguration().entrySet()) {
+    for (Map.Entry<String, GitHubConfiguration> entry : configuration.getBlazarConfiguration().getGitHubConfiguration().entrySet()) {
       String host = entry.getKey();
       mapBinder.addBinding(host).toInstance(BlazarServiceModule.toGitHub(host, entry.getValue()));
     }

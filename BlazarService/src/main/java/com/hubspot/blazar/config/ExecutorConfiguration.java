@@ -22,6 +22,10 @@ public class ExecutorConfiguration {
   // is the last set of default options
   private final Optional<BuildCGroupResources> defaultBuildResources;
 
+  /**
+   * @param defaultBuildUser The default user for builds to run as
+   * @param buildTimeoutMillis The time to wait before considering a running build to be stuck and for it to be killed.
+   */
   @JsonCreator
   public ExecutorConfiguration(@JsonProperty("defaultBuildUser") Optional<String> defaultBuildUser,
                                @JsonProperty("defaultBuildResources") Optional<BuildCGroupResources> defaultBuildResources,

@@ -11,7 +11,6 @@ import org.kohsuke.github.BlazarGHRepository;
 import org.kohsuke.github.BlazarGitHub;
 import org.kohsuke.github.GitHub;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.base.Optional;
@@ -46,13 +45,12 @@ import com.hubspot.singularity.client.SingularityClient;
 import com.ullink.slack.simpleslackapi.SlackSession;
 
 public class BlazarServiceTestModule extends AbstractModule {
-  private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceTestModule.class);
   public static List<Throwable> EVENT_BUS_EXCEPTION_COUNT = new ArrayList<>();
   @Override
   public void configure() {
     install(new BlazarTestModule());
     install(new BlazarDataModule());
-    install(new BuildVisitorModule(buildBlazarConfiguration()));
+    install(new BuildVisitorModule());
     install(new DiscoveryModule());
     install(new BlazarQueueProcessorModule());
     install(new BlazarEventBusModule());
