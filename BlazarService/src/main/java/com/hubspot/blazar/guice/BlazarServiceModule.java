@@ -2,7 +2,7 @@ package com.hubspot.blazar.guice;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -48,8 +48,6 @@ import com.hubspot.blazar.resources.InstantMessageResource;
 import com.hubspot.blazar.resources.InterProjectBuildResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
-import com.hubspot.blazar.util.GitHubWebhookHandler;
-import com.hubspot.blazar.util.LoggingHandler;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 import com.hubspot.blazar.util.SingularityBuildWatcher;
 import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
@@ -72,6 +70,23 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
   @Override
   public void configure(Binder binder) {
     BlazarConfiguration blazarConfiguration = getConfiguration().getBlazarConfiguration();
+    configureBase(binder, blazarConfiguration);
+
+    // Bind this here so that its available for webhook only instances
+    if (blazarConfiguration.isWebhookOnly()) {
+      configureWebhookOnly(binder);
+    } else {
+      configureAll(binder, blazarConfiguration);
+    }
+  }
+
+  private void configureBase(Binder binder, BlazarConfiguration blazarConfiguration) {
+    // Bind GitHub configurations
+    MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
+    for (Map.Entry<String, GitHubConfiguration> entry : blazarConfiguration.getGitHubConfiguration().entrySet()) {
+      String host = entry.getKey();
+      mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
+    }
 
     binder.install(new BlazarEventBusModule());
     binder.bind(DataSourceFactory.class).toInstance(blazarConfiguration.getDatabaseConfiguration());
@@ -80,17 +95,24 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(MetricRegistry.class).toInstance(getEnvironment().metrics());
     binder.bind(ObjectMapper.class).toInstance(getEnvironment().getObjectMapper());
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
-
-    if (blazarConfiguration.isWebhookOnly()) {
-      return;
-    }
-
     binder.install(new BlazarDataModule());
-    binder.install(new DiscoveryModule());
-    binder.install(new BlazarSlackModule(blazarConfiguration));
-
     binder.bind(IllegalArgumentExceptionMapper.class);
     binder.bind(IllegalStateExceptionMapper.class);
+
+    // Set up property filtering
+    binder.bind(PropertyFilteringMessageBodyWriter.class)
+        .toConstructor(defaultConstructor(PropertyFilteringMessageBodyWriter.class))
+        .in(Scopes.SINGLETON);
+
+  }
+
+  private void configureWebhookOnly(Binder binder) {
+    binder.bind(GitHubWebhookResource.class);
+  }
+
+  private void configureAll(Binder binder, BlazarConfiguration blazarConfiguration) {
+    binder.install(new DiscoveryModule());
+    binder.install(new BlazarSlackModule(blazarConfiguration));
 
     // Bind resources
     binder.bind(GitHubWebhookResource.class);
@@ -108,7 +130,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       binder.install(new BlazarQueueProcessorModule());
       binder.install(new BlazarZooKeeperModule());
 
-
       // Bind Singularity related watchers
       Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(SingularityBuildWatcher.class);
       binder.bind(ScheduledExecutorService.class)
@@ -120,15 +141,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       LOG.info("Not enabling queue-processing or build event handlers because no zookeeper configuration is specified. We need to elect a leader to process events.");
     }
 
-    // Set up property filtering
-    binder.bind(PropertyFilteringMessageBodyWriter.class)
-        .toConstructor(defaultConstructor(PropertyFilteringMessageBodyWriter.class))
-        .in(Scopes.SINGLETON);
-
-    // Bind various Service level classes
-    binder.bind(GitHubWebhookHandler.class);
-    binder.bind(LoggingHandler.class);
-
     // Bind and configure Singularity client
     SingularityConfiguration singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
     binder.install(new SingularityClientModule(ImmutableList.of(singularityConfiguration.getHost())));
@@ -137,13 +149,6 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     }
     if (singularityConfiguration.getCredentials().isPresent()) {
       SingularityClientModule.bindCredentials(binder).toInstance(singularityConfiguration.getCredentials().get());
-    }
-
-    // Bind GitHub configurations
-    MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
-    for (Entry<String, GitHubConfiguration> entry : blazarConfiguration.getGitHubConfiguration().entrySet()) {
-      String host = entry.getKey();
-      mapBinder.addBinding(host).toInstance(toGitHub(host, entry.getValue()));
     }
   }
 
