@@ -89,21 +89,15 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     }
 
     binder.install(new BlazarEventBusModule());
+    binder.install(new BlazarDataModule());
+
     binder.bind(DataSourceFactory.class).toInstance(blazarConfiguration.getDatabaseConfiguration());
-    binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
-    binder.bind(XmlFactory.class).toInstance(new XmlFactory());
     binder.bind(MetricRegistry.class).toInstance(getEnvironment().metrics());
     binder.bind(ObjectMapper.class).toInstance(getEnvironment().getObjectMapper());
-    Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
-    binder.install(new BlazarDataModule());
     binder.bind(IllegalArgumentExceptionMapper.class);
     binder.bind(IllegalStateExceptionMapper.class);
 
-    // Set up property filtering
-    binder.bind(PropertyFilteringMessageBodyWriter.class)
-        .toConstructor(defaultConstructor(PropertyFilteringMessageBodyWriter.class))
-        .in(Scopes.SINGLETON);
-
+    Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
   }
 
   private void configureWebhookOnly(Binder binder) {
@@ -113,6 +107,12 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
   private void configureAll(Binder binder, BlazarConfiguration blazarConfiguration) {
     binder.install(new DiscoveryModule());
     binder.install(new BlazarSlackModule(blazarConfiguration));
+    binder.bind(PropertyFilteringMessageBodyWriter.class)
+        .toConstructor(defaultConstructor(PropertyFilteringMessageBodyWriter.class))
+        .in(Scopes.SINGLETON);
+    binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
+    binder.bind(XmlFactory.class).toInstance(new XmlFactory());
+
 
     // Bind resources
     binder.bind(GitHubWebhookResource.class);
