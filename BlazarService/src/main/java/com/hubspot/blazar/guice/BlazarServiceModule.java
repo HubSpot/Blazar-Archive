@@ -39,7 +39,6 @@ import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
 import com.hubspot.blazar.exception.IllegalStateExceptionMapper;
 import com.hubspot.blazar.listener.BuildVisitorModule;
-import com.hubspot.blazar.listener.SingularityTaskKiller;
 import com.hubspot.blazar.resources.BranchResource;
 import com.hubspot.blazar.resources.BranchStateResource;
 import com.hubspot.blazar.resources.BuildHistoryResource;
@@ -48,6 +47,7 @@ import com.hubspot.blazar.resources.InstantMessageResource;
 import com.hubspot.blazar.resources.InterProjectBuildResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
+import com.hubspot.blazar.util.GitHubWebhookHandler;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 import com.hubspot.blazar.util.SingularityBuildWatcher;
 import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
@@ -68,26 +68,27 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
   private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceModule.class);
 
   /**
-   *  Blazar has an option to enable "webhook only" mode. This is because you may wish to have
-   *  a public facing Blazar instance that does not have the ability to start builds etc. But can still
-   *  receive and process webhooks from external GitHub installations (like GitHub.Com).
+   * Blazar has an option to enable "webhook only" mode. This is because you may wish to have
+   * a public facing Blazar instance that does not have the ability to start builds etc. But can still
+   * receive and process webhooks from external GitHub installations (like GitHub.Com).
    *
    * In webhook only mode we configure only the bare minimum required resources for Blazar to be able
    * to accept web-hook events and send them into our SQL backed event bus. Other Blazar instances running
-   * against the same database are then able to process those events using the SQL backed event bus.
-   *
+   * against the same database are then able to process those events using the SQL backed event bus. These
+   * instances are also configured to accept webhooks, but also have the rest of Blazar's API enabled.
    */
   @Override
   public void configure(Binder binder) {
     BlazarConfiguration blazarConfiguration = getConfiguration().getBlazarConfiguration();
     configureBase(binder, blazarConfiguration);
+    configureWebhooks(binder);
 
     // Bind this here so that its available for webhook only instances
     if (blazarConfiguration.isWebhookOnly()) {
-      configureWebhookOnly(binder);
-    } else {
-      configureAll(binder, blazarConfiguration);
+      return;
     }
+
+    configureRemaining(binder, blazarConfiguration);
   }
 
   private void configureBase(Binder binder, BlazarConfiguration blazarConfiguration) {
@@ -110,11 +111,11 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
   }
 
-  private void configureWebhookOnly(Binder binder) {
+  private void configureWebhooks(Binder binder) {
     binder.bind(GitHubWebhookResource.class);
   }
 
-  private void configureAll(Binder binder, BlazarConfiguration blazarConfiguration) {
+  private void configureRemaining(Binder binder, BlazarConfiguration blazarConfiguration) {
     binder.install(new DiscoveryModule());
     binder.install(new BlazarSlackModule(blazarConfiguration));
     binder.bind(PropertyFilteringMessageBodyWriter.class)
@@ -123,9 +124,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(YAMLFactory.class).toInstance(new YAMLFactory());
     binder.bind(XmlFactory.class).toInstance(new XmlFactory());
 
-
     // Bind resources
-    binder.bind(GitHubWebhookResource.class);
     binder.bind(BranchResource.class);
     binder.bind(BranchStateResource.class);
     binder.bind(ModuleBuildResource.class);
@@ -136,17 +135,16 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
 
     // Only configure leader-based activities like processing events etc. if you are connected to zookeeper
     if (blazarConfiguration.getZooKeeperConfiguration().isPresent()) {
-      binder.install(new BuildVisitorModule());
+      binder.bind(GitHubWebhookHandler.class); // Event processing for GitHub webhook events.
+      binder.install(new BuildVisitorModule()); // Configures event processors for all build events.
       binder.install(new BlazarQueueProcessorModule());
       binder.install(new BlazarZooKeeperModule());
 
-      // Bind Singularity related watchers
       Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(SingularityBuildWatcher.class);
       binder.bind(ScheduledExecutorService.class)
         .annotatedWith(Names.named("SingularityBuildWatcher"))
         .toProvider(new ManagedScheduledExecutorServiceProvider(1, "SingularityBuildWatcher"))
         .in(Scopes.SINGLETON);
-      binder.bind(SingularityTaskKiller.class);
     } else {
       LOG.info("Not enabling queue-processing or build event handlers because no zookeeper configuration is specified. We need to elect a leader to process events.");
     }

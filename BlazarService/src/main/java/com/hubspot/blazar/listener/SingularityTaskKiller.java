@@ -1,17 +1,21 @@
 package com.hubspot.blazar.listener;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
 import com.hubspot.singularity.SingularityTaskCleanupResult;
 import com.hubspot.singularity.api.SingularityKillTaskRequest;
 import com.hubspot.singularity.client.SingularityClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+/**
+ * This class handles the cancellation of builds in Singularity by killing the task.
+ */
 @Singleton
 public class SingularityTaskKiller extends AbstractModuleBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(SingularityTaskKiller.class);

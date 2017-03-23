@@ -44,6 +44,10 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
 
   @Override
   public void visit(RepositoryBuild build) throws Exception {
+    if (!build.getState().isComplete()) {
+      return;
+    }
+
     Set<String> userEmailsToSendMessagesTo = getUserEmailsToDirectlyNotify(build);
     boolean shouldSendMessage = shouldSendMessage(build, userEmailsToSendMessagesTo);
     if (shouldSendMessage) {

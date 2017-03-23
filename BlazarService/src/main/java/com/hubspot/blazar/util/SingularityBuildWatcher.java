@@ -28,6 +28,16 @@ import com.hubspot.singularity.SingularityTaskIdHistory;
 import com.hubspot.singularity.client.SingularityClient;
 import io.dropwizard.lifecycle.Managed;
 
+/**
+ * Watches Singularity for builds that have completed without BlazarService's knowledge.
+ * This can happen when a build container is killed by mesos because of an OOM, or is lost
+ * due to slave disconnections etc. When we find out that a build container has finished
+ * running without reporting SUCCESS back to Blazar we consider that build failed.
+ *
+ * We also watch for builds that have been running for longer than the maximum time configured.
+ * If we find a build container that has been running for longer than the configured time we kill
+ * the container and fail the build.
+ */
 @Singleton
 public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
   private static final Logger LOG = LoggerFactory.getLogger(SingularityBuildWatcher.class);
