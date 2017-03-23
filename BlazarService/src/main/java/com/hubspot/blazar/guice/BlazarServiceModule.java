@@ -80,10 +80,9 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
   @Override
   public void configure(Binder binder) {
     BlazarConfiguration blazarConfiguration = getConfiguration().getBlazarConfiguration();
-    configureBase(binder, blazarConfiguration);
-    configureWebhooks(binder);
+    configureWebhooks(binder, blazarConfiguration);
 
-    // Bind this here so that its available for webhook only instances
+    // Stop here for webhook instances so that they only have the Webhook API enabled.
     if (blazarConfiguration.isWebhookOnly()) {
       return;
     }
@@ -91,7 +90,7 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     configureRemaining(binder, blazarConfiguration);
   }
 
-  private void configureBase(Binder binder, BlazarConfiguration blazarConfiguration) {
+  private void configureWebhooks(Binder binder, BlazarConfiguration blazarConfiguration) {
     // Bind GitHub configurations
     MapBinder<String, GitHub> mapBinder = MapBinder.newMapBinder(binder, String.class, GitHub.class);
     for (Map.Entry<String, GitHubConfiguration> entry : blazarConfiguration.getGitHubConfiguration().entrySet()) {
@@ -107,11 +106,8 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
     binder.bind(ObjectMapper.class).toInstance(getEnvironment().getObjectMapper());
     binder.bind(IllegalArgumentExceptionMapper.class);
     binder.bind(IllegalStateExceptionMapper.class);
-
     Multibinder.newSetBinder(binder, ContainerRequestFilter.class).addBinding().to(GitHubNamingFilter.class).in(Scopes.SINGLETON);
-  }
-
-  private void configureWebhooks(Binder binder) {
+    // the webhook resource that lets you post webhooks
     binder.bind(GitHubWebhookResource.class);
   }
 
