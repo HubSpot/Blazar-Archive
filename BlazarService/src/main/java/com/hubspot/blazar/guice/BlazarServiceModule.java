@@ -67,6 +67,16 @@ import io.dropwizard.db.DataSourceFactory;
 public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurationWrapper> {
   private static final Logger LOG = LoggerFactory.getLogger(BlazarServiceModule.class);
 
+  /**
+   *  Blazar has an option to enable "webhook only" mode. This is because you may wish to have
+   *  a public facing Blazar instance that does not have the ability to start builds etc. But can still
+   *  receive and process webhooks from external GitHub installations (like GitHub.Com).
+   *
+   * In webhook only mode we configure only the bare minimum required resources for Blazar to be able
+   * to accept web-hook events and send them into our SQL backed event bus. Other Blazar instances running
+   * against the same database are then able to process those events using the SQL backed event bus.
+   *
+   */
   @Override
   public void configure(Binder binder) {
     BlazarConfiguration blazarConfiguration = getConfiguration().getBlazarConfiguration();
