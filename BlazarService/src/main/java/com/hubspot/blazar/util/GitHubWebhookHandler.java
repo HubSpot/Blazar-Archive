@@ -58,6 +58,8 @@ public class GitHubWebhookHandler {
     eventBus.register(this);
   }
 
+  //TODO: Probably this is redundant since we also register the branch through the push event
+  // leaving it here for now and may remove at some point
   @Subscribe
   public void handleCreateEvent(CreateEvent createEvent) throws IOException {
     if (!createEvent.hasRepository()) {
@@ -106,11 +108,7 @@ public class GitHubWebhookHandler {
 
     if (!pushEvent.getRef().startsWith("refs/tags/") && !pushEvent.getDeleted()) {
       GitInfo gitInfo = gitInfo(pushEvent);
-      if (!gitInfo.isActive()) {
-        String message = "Ignoring push event for inactive branch {}-{}@{}";
-        LOG.warn(message, gitInfo.getFullRepositoryName(), gitInfo.getBranch(), pushEvent.getAfter());
-        return;
-      }
+
       if (!isOptedIn(gitInfo)) {
         LOG.debug("Not {}#{} is not opted in to Blazar", gitInfo.getFullRepositoryName(), gitInfo.getBranch());
         return;
@@ -154,11 +152,8 @@ public class GitHubWebhookHandler {
   }
 
   private GitInfo gitInfo(PushEvent pushEvent) {
-    int repositoryId = pushEvent.getRepository().getId();
-    String branch = branchFromRef(pushEvent.getRef());
-    Optional<GitInfo> gitInfo = branchService.getByRepositoryAndBranch(repositoryId, branch);
-    boolean active = !gitInfo.isPresent() || gitInfo.get().isActive();
-    return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), active);
+    // We always send active = true to reactivate branches that have been deleted and deactivated
+    return gitInfo(pushEvent.getRepository(), pushEvent.getRef(), true);
   }
 
   private GitInfo gitInfo(Repository repository, String ref, boolean active) {
