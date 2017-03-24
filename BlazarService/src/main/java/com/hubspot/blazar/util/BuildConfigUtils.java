@@ -157,8 +157,7 @@ public class BuildConfigUtils {
       String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", configPath, repositoryName, ref);
       throw new NonRetryableBuildException(message, e);
     } catch (FileNotFoundException e) {
-      String message = String.format("No repository found for %s", gitInfo.getFullRepositoryName());
-      throw new NonRetryableBuildException(message, e);
+      return BuildConfig.makeDefaultBuildConfig();
     }
   }
 }
