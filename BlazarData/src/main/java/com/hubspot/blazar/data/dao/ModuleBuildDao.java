@@ -69,10 +69,10 @@ public interface ModuleBuildDao {
   long skip(@BindWithRosetta ModuleBuild build);
 
   @GetGeneratedKeys
-  @SqlUpdate("INSERT INTO module_builds (repoBuildId, moduleId, buildNumber, state) VALUES (:repoBuildId, :moduleId, :buildNumber, :state)")
+  @SqlUpdate("INSERT INTO module_builds (repoBuildId, moduleId, buildNumber, state, buildConfig, resolvedConfig) VALUES (:repoBuildId, :moduleId, :buildNumber, :state, :buildConfig, :resolvedConfig)")
   long enqueue(@BindWithRosetta ModuleBuild build);
 
-  @SqlUpdate("UPDATE module_builds SET startTimestamp = :startTimestamp, state = :state, buildConfig = :buildConfig, resolvedConfig = :resolvedConfig WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD')")
+  @SqlUpdate("UPDATE module_builds SET startTimestamp = :startTimestamp, state = :state WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD')")
   int begin(@BindWithRosetta ModuleBuild build);
 
   @SqlUpdate("UPDATE module_builds SET taskId = :taskId, state = :state WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS')")

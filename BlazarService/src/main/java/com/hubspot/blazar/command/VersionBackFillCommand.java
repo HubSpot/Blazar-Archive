@@ -21,7 +21,7 @@ import com.google.inject.Injector;
 import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
-import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
@@ -30,7 +30,7 @@ import com.hubspot.blazar.guice.BaseCommandModule;
 import io.dropwizard.cli.ConfiguredCommand;
 import io.dropwizard.setup.Bootstrap;
 
-public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfiguration> {
+public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfigurationWrapper> {
   private static String COMMAND_NAME = "version_backfill";
   private static String COMMAND_DESC = "Finds projects with no version data for their dependencies, and updates their versions";
   private static final Logger LOG = LoggerFactory.getLogger(VersionBackFillCommand.class);
@@ -43,9 +43,9 @@ public class VersionBackFillCommand extends ConfiguredCommand<BlazarConfiguratio
   }
 
   @Override
-  protected void run(Bootstrap<BlazarConfiguration> bootstrap,
+  protected void run(Bootstrap<BlazarConfigurationWrapper> bootstrap,
                      Namespace namespace,
-                     BlazarConfiguration configuration) throws Exception {
+                     BlazarConfigurationWrapper configuration) throws Exception {
     Injector injector = Guice.createInjector(new BaseCommandModule(bootstrap, configuration));
 
     try {

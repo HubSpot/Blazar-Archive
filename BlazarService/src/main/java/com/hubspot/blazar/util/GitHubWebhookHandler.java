@@ -55,6 +55,7 @@ public class GitHubWebhookHandler {
     this.whitelist = whitelist;
     this.blacklist = blacklist;
 
+    LOG.debug("Registering to event bus {}", eventBus);
     eventBus.register(this);
   }
 

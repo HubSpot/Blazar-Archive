@@ -29,12 +29,16 @@ public class SingularityBuildLauncher {
 
   private SingularityRunNowRequest buildRequest(ModuleBuild build) {
     String buildId = Long.toString(build.getId().get());
+    Optional<com.hubspot.mesos.Resources> buildResources = Optional.absent();
+    if (build.getResolvedConfig().isPresent() && build.getResolvedConfig().get().getBuildResources().isPresent()) {
+      buildResources = Optional.of(build.getResolvedConfig().get().getBuildResources().get().toMesosResources());
+    }
 
     return new SingularityRunNowRequest(
         Optional.of("Running Blazar module build " + buildId),
         Optional.of(false),
         Optional.of(buildId),
         Optional.of(Arrays.asList("--buildId", buildId)),
-        Optional.absent());
+        buildResources);
   }
 }

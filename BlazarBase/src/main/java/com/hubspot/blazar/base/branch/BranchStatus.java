@@ -109,30 +109,6 @@ public class BranchStatus {
       this.branch = branch;
     }
 
-    public List<RepositoryBuild> getQueuedBuilds() {
-      return queuedBuilds;
-    }
-
-    public Optional<RepositoryBuild> getActiveBuild() {
-      return activeBuild;
-    }
-
-    public Set<ModuleState> getModuleStates() {
-      return moduleStates;
-    }
-
-    public Set<GitInfo> getOtherBranches() {
-      return otherBranches;
-    }
-
-    public Set<MalformedFile> getMalformedFiles() {
-      return malformedFiles;
-    }
-
-    public GitInfo getBranch() {
-      return branch;
-    }
-
     public Builder setQueuedBuilds(List<RepositoryBuild> queuedBuilds) {
       this.queuedBuilds = queuedBuilds;
       return this;
