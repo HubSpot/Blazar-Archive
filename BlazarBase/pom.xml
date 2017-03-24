@@ -27,6 +27,10 @@
       <groupId>com.hubspot.rosetta</groupId>
       <artifactId>RosettaAnnotations</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.hubspot</groupId>
+      <artifactId>SingularityBase</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

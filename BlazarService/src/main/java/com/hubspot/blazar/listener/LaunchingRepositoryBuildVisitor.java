@@ -1,5 +1,6 @@
 package com.hubspot.blazar.listener;
 
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,10 +16,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildOptions.BuildDownstreams;
 import com.hubspot.blazar.base.BuildTrigger.Type;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
+import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.base.Module;
@@ -26,12 +29,15 @@ import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
 import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;
+import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.hubspot.blazar.exception.NonRetryableBuildException;
+import com.hubspot.blazar.util.BuildConfigUtils;
 import com.hubspot.blazar.util.GitHubHelper;
 
 @Singleton
@@ -39,22 +45,28 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
   private static final Logger LOG = LoggerFactory.getLogger(LaunchingRepositoryBuildVisitor.class);
 
   private final RepositoryBuildService repositoryBuildService;
+  private final BranchService branchService;
   private final ModuleBuildService moduleBuildService;
-  private InterProjectBuildService interProjectBuildService;
-  private InterProjectBuildMappingService interProjectBuildMappingService;
+  private final BuildConfigUtils buildConfigUtils;
+  private final InterProjectBuildService interProjectBuildService;
+  private final InterProjectBuildMappingService interProjectBuildMappingService;
   private final ModuleService moduleService;
-  private DependenciesService dependenciesService;
+  private final DependenciesService dependenciesService;
   private final GitHubHelper gitHubHelper;
 
   @Inject
   public LaunchingRepositoryBuildVisitor(RepositoryBuildService repositoryBuildService,
+                                         BuildConfigUtils buildConfigUtils,
+                                         BranchService branchService,
                                          ModuleBuildService moduleBuildService,
                                          InterProjectBuildService interProjectBuildService,
                                          InterProjectBuildMappingService interProjectBuildMappingService,
                                          ModuleService moduleService,
                                          DependenciesService dependenciesService,
                                          GitHubHelper gitHubHelper) {
+    this.buildConfigUtils = buildConfigUtils;
     this.repositoryBuildService = repositoryBuildService;
+    this.branchService = branchService;
     this.moduleBuildService = moduleBuildService;
     this.interProjectBuildService = interProjectBuildService;
     this.interProjectBuildMappingService = interProjectBuildMappingService;
@@ -69,6 +81,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
 
     Set<Module> modules = filterActive(moduleService.getByBranch(build.getBranchId()));
     Set<Module> toBuild = findModulesToBuild(build, modules);
+    GitInfo branchForBuild = branchService.get(build.getBranchId()).get();
 
     Optional<Long> interProjectBuildId = Optional.absent();
     if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
@@ -103,7 +116,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
       repositoryBuildService.update(build.toBuilder().setState(State.SUCCEEDED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
     } else {
       for (Module module : build.getDependencyGraph().get().orderByTopologicalSort(toBuild)) {
-        moduleBuildService.enqueue(build, module);
+        enqueueModuleBuild(branchForBuild, build, module);
         if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
           interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(interProjectBuildId.get(), build.getBranchId(), build.getId(), module.getId().get()));
         }
@@ -196,5 +209,25 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     }
 
     return moduleMap;
+  }
+
+  private void enqueueModuleBuild(GitInfo branch, RepositoryBuild branchBuild, Module module) throws IOException, NonRetryableBuildException {
+    String sha = branchBuild.getCommitInfo().get().getCurrent().getId();
+    String folder = module.getFolder();
+    String configPath = folder + (folder.isEmpty() ? "" : "/") + ".blazar.yaml";
+    BuildConfig buildConfig = buildConfigUtils.getConfigAtRefOrDefault(branch, configPath, sha);
+
+    final BuildConfig mergedConfig;
+    if (buildConfig.getBuildpack().isPresent()) {
+      BuildConfig buildpackConfig = buildConfigUtils.getConfigForBuildpackOnBranch(buildConfig.getBuildpack().get());
+      mergedConfig = buildConfigUtils.mergeConfig(buildConfig, buildpackConfig);
+    } else if (module.getBuildpack().isPresent()) {
+      BuildConfig buildpackConfig = buildConfigUtils.getConfigForBuildpackOnBranch(module.getBuildpack().get());
+      mergedConfig = buildConfigUtils.mergeConfig(buildConfig, buildpackConfig);
+    } else {
+      mergedConfig = buildConfig;
+    }
+
+    moduleBuildService.enqueue(branchBuild, module, buildConfig, buildConfigUtils.addMissingBuildConfigSettings(mergedConfig));
   }
 }

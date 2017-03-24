@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
+import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleActivityPage;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -104,11 +105,10 @@ public class ModuleBuildService {
     LOG.info("Skipped build for module {} with id {}", module.getId().get(), build.getId().get());
   }
 
-  public void enqueue(RepositoryBuild repositoryBuild, Module module) {
+  public void enqueue(RepositoryBuild repositoryBuild, Module module, BuildConfig buildConfig, BuildConfig resolvedBuildConfig) {
     int nextBuildNumber = repositoryBuild.getBuildNumber();
     LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
-    ModuleBuild build = ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber);
-    build = enqueue(build);
+    ModuleBuild build = enqueue(ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber, buildConfig, resolvedBuildConfig));
     LOG.info("Enqueued build for module {} with id {}", module.getId().get(), build.getId().get());
   }
 

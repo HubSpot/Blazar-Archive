@@ -1,10 +1,11 @@
 package com.hubspot.blazar.base;
 
+import java.util.Objects;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Predicate;
-
-import java.util.Set;
 
 public class StepActivationCriteria implements Predicate<GitInfo> {
   private final Set<String> branches;
@@ -21,5 +22,22 @@ public class StepActivationCriteria implements Predicate<GitInfo> {
 
   public Set<String> getBranches() {
     return branches;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    StepActivationCriteria that = (StepActivationCriteria) o;
+    return Objects.equals(branches, that.branches);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(branches);
   }
 }
