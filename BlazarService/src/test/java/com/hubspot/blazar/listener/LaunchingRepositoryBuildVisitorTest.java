@@ -5,28 +5,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
+import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
+import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
@@ -34,10 +42,15 @@ import com.hubspot.blazar.data.service.MalformedFileService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
+import com.hubspot.blazar.exception.NonRetryableBuildException;
+import com.hubspot.blazar.github.GitHubProtos;
+import com.hubspot.blazar.util.BuildConfigUtils;
 import com.hubspot.blazar.util.GitHubHelper;
 
 public class LaunchingRepositoryBuildVisitorTest {
 
+  private static final BranchService branchService = mock(BranchService.class);
+  private static final BuildConfigUtils buildConfigUtils = mock(BuildConfigUtils.class);
   private static final RepositoryBuildService repositoryBuildService = mock(RepositoryBuildService.class);
   private static final ModuleBuildService moduleBuildService = mock(ModuleBuildService.class);
   private static final MalformedFileService malformedFileService = mock(MalformedFileService.class);
@@ -47,19 +60,24 @@ public class LaunchingRepositoryBuildVisitorTest {
   private static final DependenciesService dependenciesService = mock(DependenciesService.class);
   private static final GitHubHelper gitHubHelper = mock(GitHubHelper.class);
 
-  private static final Module activeModule = new Module(Optional.of(1), "activeModule", "config", "/activeModule", "/activeModule/*", true, System.currentTimeMillis(), System.currentTimeMillis(), Optional.absent());
-  private static final Module inActiveModule = new Module(Optional.of(2), "inActiveModule", "config", "/inActiveModule", "/inActiveModule/*", false, System.currentTimeMillis(), System.currentTimeMillis(), Optional.absent());
+  private static final GitInfo branch = new GitInfo(Optional.of(1), "git.example.com", "example", "test", 1337, "master", true, 100L, 100L);
+  private static final Module activeModule = new Module(Optional.of(1), "activeModule", "config", "/activeModule", "/activeModule/*", true, 100L, 100L, Optional.absent());
+  private static final Module inActiveModule = new Module(Optional.of(2), "inActiveModule", "config", "/inActiveModule", "/inActiveModule/*", false, 100L, 100L, Optional.absent());
   private static final Map<Integer, Set<Integer>> dependencyMap = ImmutableMap.of(
       1, ImmutableSet.of(),
       2, ImmutableSet.of());
+  private static final CommitInfo commitInfo = new CommitInfo(GitHubProtos.Commit.newBuilder().setId("0000000000000000000000000000000000000000").build(), Optional.absent(), Collections.emptyList(), false);
   private static final RepositoryBuild launchingBuild =
         RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.LAUNCHING, BuildTrigger.forUser("example"), new BuildOptions(ImmutableSet.of(1), BuildOptions.BuildDownstreams.WITHIN_REPOSITORY, false))
             .setId(Optional.of(1L))
             .setDependencyGraph(Optional.of(new DependencyGraph(dependencyMap, ImmutableList.of(1, 2))))
+            .setCommitInfo(Optional.of(commitInfo))
         .build();
 
   private static final LaunchingRepositoryBuildVisitor buildVisitor = new LaunchingRepositoryBuildVisitor(
       repositoryBuildService,
+      buildConfigUtils,
+      branchService,
       moduleBuildService,
       malformedFileService,
       interProjectBuildService,
@@ -67,6 +85,12 @@ public class LaunchingRepositoryBuildVisitorTest {
       moduleService,
       dependenciesService,
       gitHubHelper);
+
+  @Before
+  public void before() throws IOException, NonRetryableBuildException {
+    when(branchService.get(anyInt())).thenReturn(Optional.of(branch));
+    when(buildConfigUtils.getConfigAtRefOrDefault(anyObject(), anyString(), anyString())).thenReturn(BuildConfig.makeDefaultBuildConfig());
+  }
 
   @Test
   public void itFailsBuildOfBranchWhenItHasMalformedFiles() throws Exception {
@@ -135,7 +159,7 @@ public class LaunchingRepositoryBuildVisitorTest {
     doAnswer(invocation -> {
       modulesThatWereEnqueued.add((Module) invocation.getArguments()[1]);
       return null;
-    }).when(moduleBuildService).enqueue(anyObject(), anyObject());
+    }).when(moduleBuildService).enqueue(anyObject(), anyObject(), anyObject(), anyObject());
 
     RepositoryBuild expectedRepositoryBuild = launchingBuild.toBuilder().setState(RepositoryBuild.State.IN_PROGRESS).build();
 
