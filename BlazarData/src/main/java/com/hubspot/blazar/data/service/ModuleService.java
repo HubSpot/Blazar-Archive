@@ -61,9 +61,9 @@ public class ModuleService {
       dependenciesService.delete(module.getId().get());
     }
 
-    for (ModuleKey updatedModule : Sets.intersection(oldModulesByName.keySet(), updatedModulesByName.keySet())) {
-      Module old = oldModulesByName.get(updatedModule);
-      DiscoveredModule updated = updatedModulesByName.get(updatedModule).withId(old.getId().get());
+    for (ModuleKey existingUpdatedModule : Sets.intersection(oldModulesByName.keySet(), updatedModulesByName.keySet())) {
+      Module old = oldModulesByName.get(existingUpdatedModule);
+      DiscoveredModule updated = updatedModulesByName.get(existingUpdatedModule).withId(old.getId().get());
       if (!old.equals(updated)) {
         checkAffectedRowCount(moduleDao.update(updated));
       }
