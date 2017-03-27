@@ -62,7 +62,7 @@ public class LaunchingRepositoryBuildVisitorTest {
 
   private static final GitInfo branch = new GitInfo(Optional.of(1), "git.example.com", "example", "test", 1337, "master", true, 100L, 100L);
   private static final Module activeModule = new Module(Optional.of(1), "activeModule", "config", "/activeModule", "/activeModule/*", true, 100L, 100L, Optional.absent());
-  private static final Module inActiveModule = new Module(Optional.of(2), "inActiveModule", "config", "/inActiveModule", "/inActiveModule/*", false, 100L, 100L, Optional.absent());
+  private static final Module inactiveModule = new Module(Optional.of(2), "inactiveModule", "config", "/inactiveModule", "/inactiveModule/*", false, 100L, 100L, Optional.absent());
   private static final Map<Integer, Set<Integer>> dependencyMap = ImmutableMap.of(
       1, ImmutableSet.of(),
       2, ImmutableSet.of());
@@ -96,7 +96,7 @@ public class LaunchingRepositoryBuildVisitorTest {
   public void itFailsBuildOfBranchWhenItHasMalformedFiles() throws Exception {
     when(malformedFileService.getMalformedFiles(anyInt()))
         .thenReturn(ImmutableSet.of(new MalformedFile(1, "config", "/.blazar.yaml", "this is a test malformed file")));
-    when(moduleService.getByBranch(1)).thenReturn(ImmutableSet.of(activeModule, inActiveModule));
+    when(moduleService.getByBranch(1)).thenReturn(ImmutableSet.of(activeModule, inactiveModule));
 
     boolean[] moduleBuildFailed = {false};
     doAnswer(invocation ->  {
@@ -127,7 +127,7 @@ public class LaunchingRepositoryBuildVisitorTest {
   public void itFailsBuildOfBranchWithNoActiveModules() throws Exception {
     // no malformed files no active modules
     when(malformedFileService.getMalformedFiles(anyInt())).thenReturn(ImmutableSet.of());
-    when(moduleService.getByBranch(1)).thenReturn(ImmutableSet.of(inActiveModule));
+    when(moduleService.getByBranch(1)).thenReturn(ImmutableSet.of(inactiveModule));
 
     boolean[] repoBuildFailed = {false};
     doAnswer(invocation -> {
@@ -145,7 +145,7 @@ public class LaunchingRepositoryBuildVisitorTest {
   @Test
   public void itEnqueuesModuleBuildsAndUpdatesRepositoryBuildToLaunching() throws Exception {
     when(malformedFileService.getMalformedFiles(anyInt())).thenReturn(ImmutableSet.of());
-    when(moduleService.getByBranch(1)).thenReturn(ImmutableSet.of(activeModule, inActiveModule));
+    when(moduleService.getByBranch(1)).thenReturn(ImmutableSet.of(activeModule, inactiveModule));
 
     doThrow(new RuntimeException("Build should not have been failed")).when(repositoryBuildService).fail(any());
 
@@ -168,7 +168,7 @@ public class LaunchingRepositoryBuildVisitorTest {
     assertThat(savedRepositoryBuild).isNotNull();
     assertThat(savedRepositoryBuild[0]).isEqualTo(expectedRepositoryBuild);
 
-    assertThat(modulesThatWereEnqueued).doesNotContain(inActiveModule);
+    assertThat(modulesThatWereEnqueued).doesNotContain(inactiveModule);
     assertThat(modulesThatWereEnqueued).isEqualTo(ImmutableList.of(activeModule));
   }
 }
