@@ -213,9 +213,9 @@ public class ModuleBuildService {
     ModuleBuild queued =
         ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber, BuildConfig.makeDefaultBuildConfig(), BuildConfig.makeDefaultBuildConfig());
     long id = moduleBuildDao.enqueue(queued);
-    checkAffectedRowCount(moduleDao.updatePendingBuild(queued));
-
     ModuleBuild queuedWithId = queued.toBuilder().setId(Optional.of(id)).build();
+    checkAffectedRowCount(moduleDao.updatePendingBuild(queuedWithId));
+
     LOG.info("Enqueued build for module {} with id {}", module.getId().get(), id);
     ModuleBuild failed = fail(queuedWithId);
     LOG.info("Failed build for module {} with id {}", module.getId().get(), id);
