@@ -214,3 +214,8 @@ CREATE TABLE queue_items (
 
 CREATE INDEX build_state_and_timestamps on repo_builds (state, endTimestamp, startTimestamp);
 DROP INDEX build_state on repo_builds;
+
+-- changeset gchomatas:15
+ALTER TABLE branches MODIFY `branch` varchar(250) NOT NULL CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE branches MODIFY `repository` varchar(250) NOT NULL CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE branches MODIFY `organization` varchar(250) NOT NULL CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
