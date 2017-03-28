@@ -63,12 +63,16 @@ public class SlackRoomNotificationVisitor implements RepositoryBuildVisitor {
     final String logBase = String.format("Will send slack notification: RepoBuild %s,", String.valueOf(build.getId()));
     // OnChange
     boolean isChanged = previous.isPresent() && previous.get().getState() != state;
+    boolean builtNewCode = build.getCommitInfo().isPresent() && !build.getCommitInfo().get().getNewCommits().isEmpty();
+
     if (instantMessageConfiguration.getOnChange() && isChanged) {
       LOG.info("{} OnChange {}, State has changed from {} to {}", logBase, instantMessageConfiguration.getOnChange(), previous.get().getState(), state);
       shouldSend = true;
     }
     // OnSuccess
-    if (instantMessageConfiguration.getOnFinish() && state.equals(RepositoryBuild.State.SUCCEEDED)) {
+    // We don't notify OnSuccess if we didn't build new code because developers care
+    // more about changes _they_ made than upstream changes being propagated etc.
+    if (instantMessageConfiguration.getOnFinish() && state.equals(RepositoryBuild.State.SUCCEEDED) && builtNewCode) {
       LOG.info("{} OnSuccess {}", logBase, instantMessageConfiguration.getOnFinish());
       shouldSend = true;
     }
