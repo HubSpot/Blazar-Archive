@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -49,21 +50,16 @@ public class BlazarSlackClient {
   }
 
   public Set<com.hubspot.blazar.externalservice.slack.SlackChannel> getChannels() {
-    if (!ensureConnected()) {
-      LOG.warn("Unable to get list of slack channels because our slack session is not connected");
-      return Collections.emptySet();
-    }
-    Collection<SlackChannel> channels = session.getChannels();
+    Collection<SlackChannel> channels = ensureSlackSessionConnectedAndFetchData(() -> session.getChannels(), Collections.emptyList());
     return channels.stream().map(channel -> new com.hubspot.blazar.externalservice.slack.SlackChannel(channel.getId(), channel.getName())).collect(Collectors.toSet());
   }
 
   public void sendMessageToChannel(String channelName, String message, SlackAttachment attachment) {
-    Optional<SlackChannel> slackChannel = Optional.fromNullable(session.findChannelByName(channelName));
+    Optional<SlackChannel> slackChannel = ensureSlackSessionConnectedAndFetchData(() -> session.findChannelByName(channelName));
     if (!slackChannel.isPresent()) {
       LOG.warn("No slack channel found for name {}", channelName);
       return;
     }
-
     sendMessageToChannel(slackChannel.get(), message, attachment);
   }
 
@@ -80,7 +76,7 @@ public class BlazarSlackClient {
   }
 
   public void sendMessageToUser(String email, String message, SlackAttachment attachment) {
-    Optional<SlackUser> user = Optional.fromNullable(session.findUserByEmail(email));
+    Optional<SlackUser> user = ensureSlackSessionConnectedAndFetchData(() -> session.findUserByEmail(email));
     if (!user.isPresent()) {
       LOG.warn("Could not find user with email {} ", email);
       return;
@@ -101,7 +97,7 @@ public class BlazarSlackClient {
   }
 
   private boolean sendMessage(SlackUser user, String message, SlackAttachment attachment) {
-    Optional<SlackMessageHandle<SlackMessageReply>> result = Optional.fromNullable(session.sendMessageToUser(user, message, attachment));
+    Optional<SlackMessageHandle<SlackMessageReply>> result = ensureSlackSessionConnectedAndFetchData(() -> session.sendMessageToUser(user, message, attachment));
     if (!result.isPresent()) {
       LOG.warn("Failed to send slack message to user: {} message: {} slack result was null", user.getRealName(), attachment.toString());
       return false;
@@ -116,12 +112,7 @@ public class BlazarSlackClient {
   }
 
   private boolean sendMessage(SlackChannel channel, String message, SlackAttachment attachment) {
-    if (!ensureConnected()) {
-      LOG.error("Could not connect to slack -- not sending message {} ({}) to {}", message, attachment, channel);
-      return false;
-    }
-
-    Optional<SlackMessageHandle<SlackMessageReply>> result = Optional.fromNullable(session.sendMessage(channel, message, attachment));
+    Optional<SlackMessageHandle<SlackMessageReply>> result = ensureSlackSessionConnectedAndFetchData(() -> session.sendMessage(channel, message, attachment));
     // This slack library does not throw us back any exceptions it just calls `e.printStackTrace()` and returns null
     if (!result.isPresent()) {
       LOG.warn("Failed to send slack message to channel: {} message: {} slack result was null", channel.getName(), attachment.toString());
@@ -144,17 +135,21 @@ public class BlazarSlackClient {
     return true;
   }
 
-  private boolean ensureConnected() {
-    if (!session.isConnected()) {
+  private <T> T ensureSlackSessionConnectedAndFetchData(Supplier<T> slackDataSupplier, T emptyValue) {
+     if (!session.isConnected()) {
       try {
         session.connect();
-        return true;
+        return slackDataSupplier.get();
       } catch (IOException e) {
         LOG.error("Could not connect to slack: {}", e);
-        return false;
+        return emptyValue;
       }
     }
-    return true;
+    return slackDataSupplier.get();
+  }
+
+  private <T> Optional<T> ensureSlackSessionConnectedAndFetchData(Supplier<T> slackDataSupplier) {
+    return ensureSlackSessionConnectedAndFetchData(() -> Optional.fromNullable(slackDataSupplier.get()), Optional.absent());
   }
 }
 
