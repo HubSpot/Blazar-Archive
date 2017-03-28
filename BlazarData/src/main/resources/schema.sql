@@ -214,3 +214,6 @@ CREATE TABLE queue_items (
 
 CREATE INDEX build_state_and_timestamps on repo_builds (state, endTimestamp, startTimestamp);
 DROP INDEX build_state on repo_builds;
+
+-- changeset jgoodwin:15
+ALTER TABLE `branches` MODIFY `branch` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;

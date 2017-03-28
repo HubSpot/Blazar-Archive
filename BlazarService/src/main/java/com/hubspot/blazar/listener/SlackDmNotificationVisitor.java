@@ -59,7 +59,7 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
   }
 
   private Set<String> getUserEmailsToDirectlyNotify(RepositoryBuild build) {
-    if (build.getCommitInfo().isPresent()) {
+    if (!build.getCommitInfo().isPresent()) {
       LOG.info("No commit info present cannot determine user to slack");
       return Collections.emptySet();
     }
