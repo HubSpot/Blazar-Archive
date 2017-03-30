@@ -61,17 +61,14 @@ public class BranchService {
       if (!existing.get().equals(gitInfo)) {
         int updated = branchDao.update(gitInfo);
         Preconditions.checkState(updated == 1, "Expected to update 1 row but updated %s", updated);
-      }
-
-      for (GitInfo conflicting : branchDao.getConflictingBranches(gitInfo)) {
-        LOG.warn("Found {} which conflicts with updated {} marking the former as inactive");
-        branchDao.delete(conflicting);
+        handleConflictingBranches(gitInfo);
       }
 
       return gitInfo;
     } else {
       try {
         int id = branchDao.insert(gitInfo);
+        handleConflictingBranches(gitInfo);
         return gitInfo.withId(id);
       } catch (UnableToExecuteStatementException e) {
         if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
@@ -83,8 +80,15 @@ public class BranchService {
     }
   }
 
+  private void handleConflictingBranches(GitInfo gitInfo) {
+    for (GitInfo conflicting : branchDao.getConflictingBranches(gitInfo)) {
+      LOG.warn("Found {} which conflicts with updated {} marking the former as inactive", conflicting, gitInfo);
+      deactivate(conflicting);
+    }
+  }
 
-  public void delete(GitInfo gitInfo) {
-    branchDao.delete(gitInfo);
+
+  public void deactivate(GitInfo gitInfo) {
+    branchDao.deactivate(gitInfo);
   }
 }

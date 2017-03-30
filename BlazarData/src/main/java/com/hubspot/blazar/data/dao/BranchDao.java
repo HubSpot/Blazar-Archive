@@ -62,7 +62,7 @@ public interface BranchDao {
   int update(@BindWithRosetta GitInfo gitInfo);
 
   @SqlUpdate("UPDATE branches SET active = 0 WHERE repositoryId = :repositoryId AND branch = :branch")
-  int delete(@BindWithRosetta GitInfo gitInfo);
+  int deactivate(@BindWithRosetta GitInfo gitInfo);
 
   @SqlUpdate("UPDATE branches SET pendingBuildId = :id WHERE id = :branchId AND pendingBuildId IS NULL")
   int updatePendingBuild(@BindWithRosetta RepositoryBuild build);

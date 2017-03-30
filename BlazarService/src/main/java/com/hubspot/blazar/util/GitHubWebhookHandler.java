@@ -92,7 +92,7 @@ public class GitHubWebhookHandler {
     }
 
     if ("branch".equalsIgnoreCase(deleteEvent.getRefType())) {
-      branchService.delete(gitInfo(deleteEvent));
+      branchService.deactivate(gitInfo(deleteEvent));
     }
   }
 
