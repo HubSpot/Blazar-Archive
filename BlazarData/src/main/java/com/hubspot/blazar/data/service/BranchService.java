@@ -3,9 +3,12 @@ package com.hubspot.blazar.data.service;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Set;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
 
 import org.skife.jdbi.v2.exceptions.UnableToExecuteStatementException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -14,6 +17,7 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.dao.BranchDao;
 
 public class BranchService {
+  private static final Logger LOG = LoggerFactory.getLogger(BranchService.class);
   private final BranchDao branchDao;
 
   @Inject
@@ -48,6 +52,7 @@ public class BranchService {
     }
   }
 
+  @Transactional
   public GitInfo upsert(GitInfo gitInfo) {
     Optional<GitInfo> existing = getByRepositoryAndBranch(gitInfo.getRepositoryId(), gitInfo.getBranch());
     if (existing.isPresent()) {
@@ -56,6 +61,11 @@ public class BranchService {
       if (!existing.get().equals(gitInfo)) {
         int updated = branchDao.update(gitInfo);
         Preconditions.checkState(updated == 1, "Expected to update 1 row but updated %s", updated);
+      }
+
+      for (GitInfo conflicting : branchDao.getConflictingBranches(gitInfo)) {
+        LOG.warn("Found {} which conflicts with updated {} marking the former as inactive");
+        branchDao.delete(conflicting);
       }
 
       return gitInfo;
@@ -73,8 +83,8 @@ public class BranchService {
     }
   }
 
+
   public void delete(GitInfo gitInfo) {
     branchDao.delete(gitInfo);
   }
-
 }

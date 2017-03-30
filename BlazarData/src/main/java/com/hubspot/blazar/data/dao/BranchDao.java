@@ -32,6 +32,28 @@ public interface BranchDao {
   @SqlQuery("SELECT * FROM branches WHERE repositoryId = :repositoryId AND branch = :branch")
   Optional<GitInfo> getByRepositoryAndBranch(@Bind("repositoryId") int repositoryId, @Bind("branch") String branch);
 
+  /**
+   * When repositories are re-named or moved between organizations Blazar does not get a webhook.
+   * This means that there can be a discrepancy between the namespace that Blazar thinks a repository
+   * lives in, and the namespace that it currently occupies on GitHub.
+   *
+   * When a repository is pushed to, after its name (host, org, repo) are changed Blazar can update
+   * its database accordingly because the GitHub repositoryId does not change. However if a new
+   * repository takes on the name of the old repository then searches by name will return branches
+   * from both repositories.
+   *
+   * This query returns all the (conflicting) active branches Blazar knows of that have the same host,
+   * org and repositoryName but have different GitHub repositoryIds than the GitInfo argument.
+   *
+   */
+  @SqlQuery("" +
+      "SELECT * FROM branches WHERE active = 1 AND " +
+      "repositoryId != :repositoryId AND " +
+      "host = :host AND " +
+      "organization = :organization AND " +
+      "repository = :repository")
+  Set<GitInfo> getConflictingBranches(@BindWithRosetta GitInfo gitInfo);
+
   @GetGeneratedKeys
   @SqlUpdate("INSERT INTO branches (host, organization, repository, repositoryId, branch, active) VALUES (:host, :organization, :repository, :repositoryId, :branch, :active)")
   int insert(@BindWithRosetta GitInfo gitInfo);
