@@ -19,7 +19,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.hubspot.blazar.base.BranchSetting;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
@@ -118,9 +118,9 @@ public class GitHubWebhookHandler {
       Optional<BranchSetting> branchSetting = branchSettingsService.getByBranchId(gitInfo.getId().get());
       if (branchSetting.isPresent() && branchSetting.get().isTriggerInterProjectBuilds()) {
         BuildOptions options = new BuildOptions(ImmutableSet.<Integer>of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
-        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), options);
+        repositoryBuildService.enqueue(gitInfo, BuildMetadata.push(pushEvent.getPusher().getEmail()), options);
       } else {
-        repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit(pushEvent.getAfter()), BuildOptions.defaultOptions());
+        repositoryBuildService.enqueue(gitInfo, BuildMetadata.push(pushEvent.getPusher().getEmail()), BuildOptions.defaultOptions());
       }
     }
   }

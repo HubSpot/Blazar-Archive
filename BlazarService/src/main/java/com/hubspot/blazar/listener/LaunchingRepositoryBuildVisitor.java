@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildOptions.BuildDownstreams;
-import com.hubspot.blazar.base.BuildTrigger.Type;
+import com.hubspot.blazar.base.BuildMetadata.TriggeringEvent;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
@@ -114,7 +114,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
     //    If this is an InterProject build we enqueue one of those as well.
     if (build.getBuildOptions().getBuildDownstreams() == BuildDownstreams.INTER_PROJECT) {
       toBuild = determineModulesToBuildUsingInterProjectBuildGraph(build, activeModules);
-      InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.copyOf(getIds(toBuild)), build.getBuildTrigger());
+      InterProjectBuild ipb = InterProjectBuild.getQueuedBuild(ImmutableSet.copyOf(getIds(toBuild)), build.getBuildMetadata());
       interProjectBuildId = Optional.of(interProjectBuildService.enqueue(ipb));
     } else {
       interProjectBuildId = Optional.absent();
@@ -181,7 +181,7 @@ public class LaunchingRepositoryBuildVisitor extends AbstractRepositoryBuildVisi
   private Set<Module> findModulesToBuild(RepositoryBuild build, Set<Module> buildableModules) {
     final Set<Module> toBuild = new HashSet<>();
 
-    if (build.getBuildTrigger().getType() == Type.PUSH) {
+    if (build.getBuildMetadata().getTriggeringEvent() == TriggeringEvent.PUSH) {
       CommitInfo commitInfo = build.getCommitInfo().get();
       if (commitInfo.isTruncated()) {
         toBuild.addAll(buildableModules);

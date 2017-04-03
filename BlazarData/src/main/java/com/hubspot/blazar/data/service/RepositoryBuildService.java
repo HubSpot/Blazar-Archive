@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import com.google.common.primitives.Ints;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.RepositoryBuild.State;
@@ -59,7 +59,7 @@ public class RepositoryBuildService {
     return repositoryBuildDao.getPreviousBuild(build);
   }
 
-  public long enqueue(GitInfo gitInfo, BuildTrigger trigger, BuildOptions buildOptions) {
+  public long enqueue(GitInfo gitInfo, BuildMetadata trigger, BuildOptions buildOptions) {
     int branchId = gitInfo.getId().get();
 
     // determine build number first (unique index will prevent concurrent modification)
@@ -67,9 +67,9 @@ public class RepositoryBuildService {
     int nextBuildNumber = determineNextBuildNumber(branchId, queuedBuilds);
 
     // check for existing queued build triggered by push event
-    if (trigger.getType() == BuildTrigger.Type.PUSH) {
+    if (trigger.getTriggeringEvent() == BuildMetadata.TriggeringEvent.PUSH) {
       for (RepositoryBuild build : queuedBuilds) {
-        if (build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
+        if (build.getBuildMetadata().getTriggeringEvent() == BuildMetadata.TriggeringEvent.PUSH) {
           long existingBuildId = build.getId().get();
           LOG.info("Not enqueuing build for push to {}, pending build {} already exists", branchId, existingBuildId);
           return existingBuildId;

@@ -20,8 +20,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
-import com.hubspot.blazar.base.BuildTrigger;
-import com.hubspot.blazar.base.BuildTrigger.Type;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.guice.BlazarEventBusModule;
 import com.hubspot.blazar.guice.BlazarQueueProcessorModule;
 import com.hubspot.blazar.test.base.service.BlazarTestModule;
@@ -58,7 +57,7 @@ public class QueueProcessorTest extends DatabaseBackedTest {
 
   @Test
   public void itProcessesEvents() {
-    BuildTrigger event = new BuildTrigger(Type.PUSH, "abc");
+    BuildMetadata event = BuildMetadata.push("testUser");
     eventBus.post(event);
 
     waitForEvent();
@@ -78,7 +77,7 @@ public class QueueProcessorTest extends DatabaseBackedTest {
       }
     });
 
-    BuildTrigger event = new BuildTrigger(Type.PUSH, "abc");
+    BuildMetadata event = BuildMetadata.push("testUser");
     eventBus.post(event);
 
     waitForEvent();
@@ -102,7 +101,7 @@ public class QueueProcessorTest extends DatabaseBackedTest {
       }
     });
 
-    BuildTrigger event = new BuildTrigger(Type.PUSH, "abc");
+    BuildMetadata event = BuildMetadata.push("testUser");
     eventBus.post(event);
 
     Uninterruptibles.awaitUninterruptibly(latch);

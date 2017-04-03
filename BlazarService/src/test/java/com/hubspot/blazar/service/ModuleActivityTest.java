@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 import com.hubspot.blazar.BlazarServiceTestBase;
 import com.hubspot.blazar.BlazarServiceTestModule;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleActivityPage;
@@ -56,7 +56,7 @@ public class ModuleActivityTest extends BlazarServiceTestBase {
 
   private void seedBuilds() {
     // Run 10 build of our module
-    BuildTrigger trigger = BuildTrigger.forUser("bob");
+    BuildMetadata trigger = BuildMetadata.manual(Optional.of("testUser"));
     BuildOptions options = new BuildOptions(ImmutableSet.of(1), BuildOptions.BuildDownstreams.NONE, false);
     for (int i=0; i < 10; i++) {
       launchedBuilds.add(testUtils.runAndWaitForRepositoryBuild(branch, trigger, options));

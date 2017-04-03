@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
@@ -82,10 +82,10 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
   protected void visitRunning(InterProjectBuild build) throws Exception {
     DependencyGraph d = build.getDependencyGraph().get();
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
-    if (mappings.size() != 0 && build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
+    if (mappings.size() != 0 && build.getBuildMetadata().getTriggeringEvent() == BuildMetadata.TriggeringEvent.PUSH) {
       LOG.info("InterProjectBuild was triggered by push, no need to launch builds, mappings exist");
       return;
-    } else if (mappings.size() == 0 && build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
+    } else if (mappings.size() == 0 && build.getBuildMetadata().getTriggeringEvent() == BuildMetadata.TriggeringEvent.PUSH) {
       LOG.info("InterProjectBuild was triggered by push, with no child builds triggered, marking as success");
       interProjectBuildService.finish(InterProjectBuild.getFinishedBuild(build, InterProjectBuild.State.SUCCEEDED));
       return;
@@ -98,10 +98,10 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
 
     for (Map.Entry<Integer, Collection<Integer>> entry : branchToLaunchableModules.entrySet()) {
       Set<Integer> moduleIds = ImmutableSet.copyOf(entry.getValue());
-      BuildTrigger buildTrigger = BuildTrigger.forInterProjectBuild(build.getId().get());
+      BuildMetadata buildMetadata = BuildMetadata.interProjectBuild();
       BuildOptions buildOptions = new BuildOptions(moduleIds, BuildOptions.BuildDownstreams.NONE, false);
       GitInfo gitInfo = branchService.get(entry.getKey()).get();
-      long buildId = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
+      long buildId = repositoryBuildService.enqueue(gitInfo, buildMetadata, buildOptions);
       for (int moduleId : moduleIds) {
         interProjectBuildMappingService.insert(InterProjectBuildMapping.makeNewMapping(build.getId().get(), gitInfo.getId().get(), Optional.of(buildId), moduleId));
       }

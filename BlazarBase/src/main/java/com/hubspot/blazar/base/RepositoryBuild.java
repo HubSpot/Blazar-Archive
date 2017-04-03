@@ -34,7 +34,7 @@ public class RepositoryBuild {
   private final int buildNumber;
   private final State state;
   @StoredAsJson
-  private final BuildTrigger buildTrigger;
+  private final BuildMetadata buildMetadata;
   private final Optional<Long> startTimestamp;
   private final Optional<Long> endTimestamp;
   private final Optional<String> sha;
@@ -50,7 +50,7 @@ public class RepositoryBuild {
                          @JsonProperty("branchId") int branchId,
                          @JsonProperty("buildNumber") int buildNumber,
                          @JsonProperty("state") State state,
-                         @JsonProperty("buildTrigger") BuildTrigger buildTrigger,
+                         @JsonProperty("buildTrigger") BuildMetadata buildMetadata,
                          @JsonProperty("startTimestamp") Optional<Long> startTimestamp,
                          @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
                          @JsonProperty("sha") Optional<String> sha,
@@ -61,7 +61,7 @@ public class RepositoryBuild {
     this.branchId = branchId;
     this.buildNumber = buildNumber;
     this.state = state;
-    this.buildTrigger = buildTrigger;
+    this.buildMetadata = buildMetadata;
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.sha = sha;
@@ -70,7 +70,7 @@ public class RepositoryBuild {
     this.buildOptions = MoreObjects.firstNonNull(buildOptions, BuildOptions.defaultOptions());
   }
 
-  public static RepositoryBuild queuedBuild(GitInfo gitInfo, BuildTrigger trigger, int buildNumber, BuildOptions buildOptions) {
+  public static RepositoryBuild queuedBuild(GitInfo gitInfo, BuildMetadata trigger, int buildNumber, BuildOptions buildOptions) {
     return newBuilder(gitInfo.getId().get(), buildNumber, State.QUEUED, trigger, buildOptions).build();
   }
 
@@ -90,8 +90,8 @@ public class RepositoryBuild {
     return state;
   }
 
-  public BuildTrigger getBuildTrigger() {
-    return buildTrigger;
+  public BuildMetadata getBuildMetadata() {
+    return buildMetadata;
   }
 
   public Optional<Long> getStartTimestamp() {
@@ -147,7 +147,7 @@ public class RepositoryBuild {
   }
 
   public Builder toBuilder() {
-    return new Builder(branchId, buildNumber, state, buildTrigger, buildOptions)
+    return new Builder(branchId, buildNumber, state, buildMetadata, buildOptions)
         .setId(id)
         .setStartTimestamp(startTimestamp)
         .setEndTimestamp(endTimestamp)
@@ -156,8 +156,8 @@ public class RepositoryBuild {
         .setDependencyGraph(dependencyGraph);
   }
 
-  public static Builder newBuilder(int branchId, int buildNumber, State state, BuildTrigger buildTrigger, BuildOptions buildOptions) {
-    return new Builder(branchId, buildNumber, state, buildTrigger, buildOptions);
+  public static Builder newBuilder(int branchId, int buildNumber, State state, BuildMetadata buildMetadata, BuildOptions buildOptions) {
+    return new Builder(branchId, buildNumber, state, buildMetadata, buildOptions);
   }
 
   public static class Builder {
@@ -165,7 +165,7 @@ public class RepositoryBuild {
     private int branchId;
     private int buildNumber;
     private State state;
-    private BuildTrigger buildTrigger;
+    private BuildMetadata buildMetadata;
     private Optional<Long> startTimestamp = Optional.absent();
     private Optional<Long> endTimestamp = Optional.absent();
     private Optional<String> sha = Optional.absent();
@@ -174,11 +174,11 @@ public class RepositoryBuild {
     private BuildOptions buildOptions;
 
 
-    Builder(int branchId, int buildNumber, State state, BuildTrigger buildTrigger, BuildOptions buildOptions) {
+    Builder(int branchId, int buildNumber, State state, BuildMetadata buildMetadata, BuildOptions buildOptions) {
       this.branchId = branchId;
       this.buildNumber = buildNumber;
       this.state = state;
-      this.buildTrigger = buildTrigger;
+      this.buildMetadata = buildMetadata;
       this.buildOptions = buildOptions;
     }
 
@@ -202,8 +202,8 @@ public class RepositoryBuild {
       return this;
     }
 
-    public Builder setBuildTrigger(BuildTrigger buildTrigger) {
-      this.buildTrigger = buildTrigger;
+    public Builder setBuildMetadata(BuildMetadata buildMetadata) {
+      this.buildMetadata = buildMetadata;
       return this;
     }
 
@@ -238,7 +238,7 @@ public class RepositoryBuild {
     }
 
     public RepositoryBuild build() {
-      return new RepositoryBuild(id, branchId, buildNumber, state, buildTrigger, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph, buildOptions);
+      return new RepositoryBuild(id, branchId, buildNumber, state, buildMetadata, startTimestamp, endTimestamp, sha, commitInfo, dependencyGraph, buildOptions);
     }
   }
 }

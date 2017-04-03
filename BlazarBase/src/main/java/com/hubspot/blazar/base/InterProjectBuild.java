@@ -14,7 +14,7 @@ public class InterProjectBuild {
   @StoredAsJson
   private Set<Integer> moduleIds;
   @StoredAsJson
-  private final BuildTrigger buildTrigger;
+  private final BuildMetadata buildMetadata;
   private final Optional<Long> startTimestamp;
   private final Optional<Long> endTimestamp;
   @StoredAsJson
@@ -42,37 +42,37 @@ public class InterProjectBuild {
   public InterProjectBuild(@JsonProperty("id") Optional<Long> id,
                            @JsonProperty("state") State state,
                            @JsonProperty("moduleIds") Set<Integer> moduleIds,
-                           @JsonProperty("buildTrigger") BuildTrigger buildTrigger,
+                           @JsonProperty("buildTrigger") BuildMetadata buildMetadata,
                            @JsonProperty("startTimestamp") Optional<Long> startTimestamp,
                            @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
                            @JsonProperty("dependencyGraph") Optional<DependencyGraph> dependencyGraph) {
     this.id = id;
     this.state = state;
     this.moduleIds = moduleIds;
-    this.buildTrigger = buildTrigger;
+    this.buildMetadata = buildMetadata;
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.dependencyGraph = dependencyGraph;
   }
 
-  public static InterProjectBuild getQueuedBuild(Set<Integer> moduleIds, BuildTrigger buildTrigger) {
-    return new InterProjectBuild(Optional.<Long>absent(), State.QUEUED, moduleIds, buildTrigger, Optional.of(System.currentTimeMillis()), Optional.<Long>absent(),Optional.<DependencyGraph>absent());
+  public static InterProjectBuild getQueuedBuild(Set<Integer> moduleIds, BuildMetadata buildMetadata) {
+    return new InterProjectBuild(Optional.<Long>absent(), State.QUEUED, moduleIds, buildMetadata, Optional.of(System.currentTimeMillis()), Optional.<Long>absent(),Optional.<DependencyGraph>absent());
   }
 
   public static InterProjectBuild getStarted(InterProjectBuild build) {
-    return new InterProjectBuild(build.getId(), State.IN_PROGRESS, build.getModuleIds(), build.getBuildTrigger(), build.getStartTimestamp(), build.getEndTimestamp(), build.getDependencyGraph());
+    return new InterProjectBuild(build.getId(), State.IN_PROGRESS, build.getModuleIds(), build.getBuildMetadata(), build.getStartTimestamp(), build.getEndTimestamp(), build.getDependencyGraph());
   }
 
   public static InterProjectBuild getFinishedBuild(InterProjectBuild old, State state) {
-    return new InterProjectBuild(old.getId(), state, old.getModuleIds(), old.getBuildTrigger(), old.getStartTimestamp(), Optional.of(System.currentTimeMillis()), old.getDependencyGraph());
+    return new InterProjectBuild(old.getId(), state, old.getModuleIds(), old.getBuildMetadata(), old.getStartTimestamp(), Optional.of(System.currentTimeMillis()), old.getDependencyGraph());
   }
 
   public InterProjectBuild withDependencyGraph(DependencyGraph d){
-    return new InterProjectBuild(id, state, moduleIds, buildTrigger, startTimestamp, endTimestamp, Optional.of(d));
+    return new InterProjectBuild(id, state, moduleIds, buildMetadata, startTimestamp, endTimestamp, Optional.of(d));
   }
 
   public InterProjectBuild withModuleIds(Set<Integer> ids) {
-    return new InterProjectBuild(id, state, ids, buildTrigger, startTimestamp, endTimestamp, dependencyGraph);
+    return new InterProjectBuild(id, state, ids, buildMetadata, startTimestamp, endTimestamp, dependencyGraph);
   }
 
 
@@ -88,8 +88,8 @@ public class InterProjectBuild {
     return moduleIds;
   }
 
-  public BuildTrigger getBuildTrigger() {
-    return buildTrigger;
+  public BuildMetadata getBuildMetadata() {
+    return buildMetadata;
   }
 
   public Optional<Long> getStartTimestamp() {

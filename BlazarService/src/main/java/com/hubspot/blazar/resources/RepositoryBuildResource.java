@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -51,8 +51,8 @@ public class RepositoryBuildResource {
     if (!gitInfo.isPresent()) {
       throw new NotFoundException("No branch found with id: " + branchId);
     }
-    BuildTrigger buildTrigger = BuildTrigger.forUser(username.or("unknown"));
-    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), buildTrigger, buildOptions);
+    BuildMetadata buildMetadata = BuildMetadata.manual(username);
+    long repositoryBuildId = repositoryBuildService.enqueue(gitInfo.get(), buildMetadata, buildOptions);
     return repositoryBuildService.get(repositoryBuildId).get();
   }
 

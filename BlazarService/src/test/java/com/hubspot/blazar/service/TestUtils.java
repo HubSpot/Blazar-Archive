@@ -9,7 +9,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -31,12 +31,12 @@ public class TestUtils {
     this.repositoryBuildService = repositoryBuildService;
   }
 
-  public InterProjectBuild runInterProjectBuild(int rootModuleId, Optional<BuildTrigger> triggerOptional) throws InterruptedException {
-    BuildTrigger trigger;
+  public InterProjectBuild runInterProjectBuild(int rootModuleId, Optional<BuildMetadata> triggerOptional) throws InterruptedException {
+    BuildMetadata trigger;
     if (triggerOptional.isPresent()) {
       trigger = triggerOptional.get();
     } else {
-      trigger = new BuildTrigger(BuildTrigger.Type.MANUAL, String.format("Test inter-project build root: %d", rootModuleId));
+      trigger = BuildMetadata.manual(Optional.of("testUser"));
     }
     LOG.info("Starting inter-project-build for id {}", rootModuleId);
     InterProjectBuild build = InterProjectBuild.getQueuedBuild(Sets.newHashSet(rootModuleId), trigger);
@@ -45,13 +45,13 @@ public class TestUtils {
   }
 
   public RepositoryBuild runDefaultRepositoryBuild(GitInfo gitInfo) throws InterruptedException {
-    long id = repositoryBuildService.enqueue(gitInfo, BuildTrigger.forCommit("1111111111111111111111111111111111111111"), BuildOptions.defaultOptions());
+    long id = repositoryBuildService.enqueue(gitInfo, BuildMetadata.push("testUser"), BuildOptions.defaultOptions());
     RepositoryBuild build = repositoryBuildService.get(id).get();
     return waitForRepositoryBuild(build);
   }
 
-  public RepositoryBuild runAndWaitForRepositoryBuild(GitInfo gitInfo, BuildTrigger buildTrigger, BuildOptions buildOptions) {
-    long id = repositoryBuildService.enqueue(gitInfo, buildTrigger, buildOptions);
+  public RepositoryBuild runAndWaitForRepositoryBuild(GitInfo gitInfo, BuildMetadata buildMetadata, BuildOptions buildOptions) {
+    long id = repositoryBuildService.enqueue(gitInfo, buildMetadata, buildOptions);
     RepositoryBuild build = repositoryBuildService.get(id).get();
     return waitForRepositoryBuild(build);
   }

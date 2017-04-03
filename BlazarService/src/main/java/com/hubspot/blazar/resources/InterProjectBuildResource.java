@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.D3GraphData;
 import com.hubspot.blazar.base.D3GraphLink;
 import com.hubspot.blazar.base.D3GraphNode;
@@ -68,7 +68,7 @@ public class InterProjectBuildResource {
   @POST
   @Path("/")
   public InterProjectBuild triggerWithOptions(BuildOptions buildOptions, @QueryParam("username") Optional<String> username) {
-    InterProjectBuild build = InterProjectBuild.getQueuedBuild(buildOptions.getModuleIds(), BuildTrigger.forUser(username.or("unknown")));
+    InterProjectBuild build = InterProjectBuild.getQueuedBuild(buildOptions.getModuleIds(), BuildMetadata.manual(username));
     long id = interProjectBuildService.enqueue(build);
     return interProjectBuildService.getWithId(id).get();
   }

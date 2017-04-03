@@ -33,7 +33,7 @@ import com.google.inject.Inject;
 import com.hubspot.blazar.BlazarServiceTestBase;
 import com.hubspot.blazar.BlazarServiceTestModule;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.InterProjectBuild;
@@ -97,7 +97,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   public void itRunsASuccessfulInterProjectBuild() throws Exception {
     ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
     // Trigger interProjectBuild
-    InterProjectBuild testableBuild = testUtils.runInterProjectBuild(1, Optional.<BuildTrigger>absent());
+    InterProjectBuild testableBuild = testUtils.runInterProjectBuild(1, Optional.<BuildMetadata>absent());
     long buildId = testableBuild.getId().get();
     assertThat(Sets.newHashSet(1)).isEqualTo(testableBuild.getModuleIds());
     assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(testableBuild.getState());
@@ -121,7 +121,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   public void itGroupsModulesWhenBuildingOnManualTrigger() throws InterruptedException {
     ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
     // Trigger interProjectBuild
-    InterProjectBuild testableBuild = testUtils.runInterProjectBuild(7, Optional.<BuildTrigger>absent());
+    InterProjectBuild testableBuild = testUtils.runInterProjectBuild(7, Optional.<BuildMetadata>absent());
     long buildId = testableBuild.getId().get();
     assertThat(Sets.newHashSet(7)).isEqualTo(testableBuild.getModuleIds());
     assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(testableBuild.getState());
@@ -156,9 +156,9 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     BlazarGHChange change = new BlazarGHChange(commit, ImmutableList.of(entry), "master");
     repo.applyChange(change);
 
-    BuildTrigger buildTrigger = BuildTrigger.forCommit(sha);
+    BuildMetadata buildMetadata = BuildMetadata.push("testUser");
     BuildOptions buildOptions = new BuildOptions(ImmutableSet.<Integer>of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
-    RepositoryBuild repositoryBuild = testUtils.runAndWaitForRepositoryBuild(gitInfo, buildTrigger, buildOptions);
+    RepositoryBuild repositoryBuild = testUtils.runAndWaitForRepositoryBuild(gitInfo, buildMetadata, buildOptions);
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repositoryBuild.getId().get());
     // Here the mappings we have are only for the 1 repo we triggered (and queried on), have to get them all before we can test.
     InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mappings.iterator().next().getInterProjectBuildId()).get();
@@ -181,9 +181,9 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     int repoId = 1;
     String sha = "0000000000000000000000000000000000000000";
     GitInfo gitInfo = branchService.get(repoId).get();
-    BuildTrigger buildTrigger = BuildTrigger.forCommit(sha);
+    BuildMetadata buildMetadata = BuildMetadata.push("testUser");
     BuildOptions buildOptions = new BuildOptions(ImmutableSet.of(), BuildOptions.BuildDownstreams.INTER_PROJECT, false);
-    RepositoryBuild repositoryBuild = testUtils.runAndWaitForRepositoryBuild(gitInfo, buildTrigger, buildOptions);
+    RepositoryBuild repositoryBuild = testUtils.runAndWaitForRepositoryBuild(gitInfo, buildMetadata, buildOptions);
     Set<InterProjectBuildMapping> interProjectBuildMappings = interProjectBuildMappingService.getByRepoBuildId(repositoryBuild.getId().get());
     if (interProjectBuildMappings.isEmpty()) {
       fail(String.format("Expected to have mappings for repo build %s", repositoryBuild));
