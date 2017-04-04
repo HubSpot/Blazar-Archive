@@ -1,13 +1,8 @@
 package com.hubspot.blazar.resources;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -30,7 +25,7 @@ import com.hubspot.blazar.base.LogChunk;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.SingularityConfiguration;
+import com.hubspot.blazar.config.SingularityClusterConfiguration;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpRequest;
@@ -52,7 +47,7 @@ public class ModuleBuildResource {
 
   private final ModuleBuildService moduleBuildService;
   private final SingularityClient singularityClient;
-  private SingularityConfiguration singularityConfiguration;
+  private SingularityClusterConfiguration singularityClusterConfiguration;
   private final AsyncHttpClient asyncHttpClient;
 
   @Inject
@@ -62,7 +57,7 @@ public class ModuleBuildResource {
                              AsyncHttpClient asyncHttpClient) {
     this.moduleBuildService = moduleBuildService;
     this.singularityClient = singularityClient;
-    this.singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
+    this.singularityClusterConfiguration = blazarConfiguration.getSingularityConfiguration();
     this.asyncHttpClient = asyncHttpClient;
   }
 
@@ -189,7 +184,7 @@ public class ModuleBuildResource {
 
     if (buildLogFile.isPresent()) {
       String host = sandboxOptional.get().getSlaveHostname();
-      int port = singularityConfiguration.getSlaveHttpPort();
+      int port = singularityClusterConfiguration.getSlaveHttpPort();
       String path = sandboxOptional.get().getFullPathToRoot() + "/" + sandboxOptional.get().getCurrentDirectory() + "/" + buildLogFile.get().getName();
       buildLogUrl = String.format("http://%s:%d/files/download.json?path=%s", host, port, path);
     } else {

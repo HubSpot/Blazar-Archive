@@ -22,10 +22,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
@@ -33,7 +33,6 @@ import com.hubspot.blazar.GitHubNamingFilter;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.config.GitHubConfiguration;
-import com.hubspot.blazar.config.SingularityConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.exception.IllegalArgumentExceptionMapper;
@@ -60,6 +59,7 @@ import com.hubspot.horizon.RetryStrategy;
 import com.hubspot.horizon.ning.NingAsyncHttpClient;
 import com.hubspot.horizon.ning.NingHttpClient;
 import com.hubspot.jackson.jaxrs.PropertyFilteringMessageBodyWriter;
+import com.hubspot.singularity.client.SingularityClient;
 import com.hubspot.singularity.client.SingularityClientModule;
 
 import io.dropwizard.db.DataSourceFactory;
@@ -145,15 +145,10 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       LOG.info("Not enabling queue-processing or build event handlers because no zookeeper configuration is specified. We need to elect a leader to process events.");
     }
 
-    // Bind and configure Singularity client
-    SingularityConfiguration singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
-    binder.install(new SingularityClientModule(ImmutableList.of(singularityConfiguration.getHost())));
-    if (singularityConfiguration.getPath().isPresent()) {
-      SingularityClientModule.bindContextPath(binder).toInstance(singularityConfiguration.getPath().get());
-    }
-    if (singularityConfiguration.getCredentials().isPresent()) {
-      SingularityClientModule.bindCredentials(binder).toInstance(singularityConfiguration.getCredentials().get());
-    }
+    // Bind and configure Singularity clients for the available clusters
+    binder.install(new SingularityClientModule());
+    binder.bind(new TypeLiteral<Map<String, SingularityClient>>() {}).toProvider(SingularityClusterClientsProvider.class);
+
   }
 
   @Provides

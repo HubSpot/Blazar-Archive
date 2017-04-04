@@ -217,3 +217,6 @@ DROP INDEX build_state on repo_builds;
 
 -- changeset jgoodwin:15
 ALTER TABLE `branches` MODIFY `branch` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+
+-- changeset gchomatas:16
+ALTER TABLE `module_builds` ADD COLUMN `buildClusterName` varchar(64);

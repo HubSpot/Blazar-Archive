@@ -224,6 +224,10 @@ public class ModuleBuildService {
     return failed;
   }
 
+  public int updateBuildClusterName(int moduleId, String buildClusterName) {
+    return moduleBuildDao.updateBuildClusterName(moduleId, buildClusterName);
+  }
+
   private static void checkAffectedRowCount(int affectedRows) {
     Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
   }

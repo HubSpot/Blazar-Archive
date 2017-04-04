@@ -78,6 +78,9 @@ public interface ModuleBuildDao {
   @SqlUpdate("UPDATE module_builds SET taskId = :taskId, state = :state WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS')")
   int update(@BindWithRosetta ModuleBuild build);
 
+  @SqlUpdate("UPDATE module_builds SET buildClusterName = :buildClusterName WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING')")
+  int updateBuildClusterName(@Bind("moduleId") int moduleId, @Bind("buildClusterName") String buildClusterName);
+
   @SqlUpdate("UPDATE module_builds SET endTimestamp = :endTimestamp, taskId = :taskId, state = :state WHERE id = :id AND state IN ('QUEUED', 'WAITING_FOR_UPSTREAM_BUILD', 'LAUNCHING', 'IN_PROGRESS')")
   int complete(@BindWithRosetta ModuleBuild build);
 }

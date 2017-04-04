@@ -215,6 +215,10 @@
       <groupId>com.github.Ullink</groupId>
       <artifactId>simple-slack-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.reactivex.rxjava2</groupId>
+      <artifactId>rxjava</artifactId>
+    </dependency>
 
     <!-- tests -->
     <dependency>

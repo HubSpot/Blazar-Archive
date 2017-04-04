@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 import com.hubspot.blazar.data.dao.QueueItemDao;
 import com.hubspot.blazar.data.queue.QueueItem;
+import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 
 import io.dropwizard.lifecycle.Managed;
@@ -39,12 +40,14 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private final Set<QueueItem> processingItems;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
+  private final BuildClusterHealthChecker buildClusterHealthChecker;
   private Optional<ScheduledFuture<?>> processingTask;
 
   @Inject
   public QueueProcessor(@Named("QueueProcessor") ScheduledExecutorService executorService,
                         QueueItemDao queueItemDao,
                         SqlEventBus eventBus,
+                        BuildClusterHealthChecker buildClusterHealthChecker,
                         Set<Object> erroredItems) {
     this.executorService = executorService;
     this.queueExecutors = new ConcurrentHashMap<>();
@@ -52,6 +55,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     this.eventBus = eventBus;
     this.erroredItems = erroredItems;
     this.processingItems = Sets.newConcurrentHashSet();
+    this.buildClusterHealthChecker = buildClusterHealthChecker;
 
     this.running = new AtomicBoolean();
     this.leader = new AtomicBoolean();
@@ -99,7 +103,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   @Override
   public void run() {
     try {
-      if (running.get() && leader.get()) {
+      if (running.get() && leader.get() && buildClusterHealthChecker.isClusterAvailable()) {
         List<QueueItem> queueItemsSorted = sort(queueItemDao.getItemsReadyToExecute());
         queueItemsSorted.removeAll(processingItems);
         processingItems.addAll(queueItemsSorted);

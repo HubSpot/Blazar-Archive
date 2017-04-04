@@ -18,7 +18,7 @@ import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.ExecutorConfiguration;
-import com.hubspot.blazar.config.SingularityConfiguration;
+import com.hubspot.blazar.config.SingularityClusterConfiguration;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.listener.SingularityTaskKiller;
 import com.hubspot.singularity.ExtendedTaskState;
@@ -47,7 +47,7 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
   private final SingularityClient singularityClient;
   private final SingularityTaskKiller singularityTaskKiller;
   private final MetricRegistry metricRegistry;
-  private final SingularityConfiguration singularityConfiguration;
+  private final SingularityClusterConfiguration singularityClusterConfiguration;
   private final ExecutorConfiguration executorConfiguration;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
@@ -64,7 +64,7 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
     this.singularityClient = singularityClient;
     this.singularityTaskKiller = singularityTaskKiller;
     this.metricRegistry = metricRegistry;
-    this.singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
+    this.singularityClusterConfiguration = blazarConfiguration.getSingularityConfiguration();
     this.executorConfiguration = blazarConfiguration.getExecutorConfiguration();
 
     this.running = new AtomicBoolean();
@@ -104,7 +104,7 @@ public class SingularityBuildWatcher implements LeaderLatchListener, Managed {
               continue;
             }
 
-            String requestId = singularityConfiguration.getRequest();
+            String requestId = singularityClusterConfiguration.getRequest();
             String runId =  String.valueOf(build.getId().get());
             Optional<SingularityTaskIdHistory> task = singularityClient.getHistoryForTask(requestId, runId);
             if (task.isPresent()) {

@@ -8,23 +8,23 @@ import javax.inject.Singleton;
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.SingularityConfiguration;
+import com.hubspot.blazar.config.SingularityClusterConfiguration;
 import com.hubspot.singularity.api.SingularityRunNowRequest;
 import com.hubspot.singularity.client.SingularityClient;
 
 @Singleton
 public class SingularityBuildLauncher {
   private final SingularityClient singularityClient;
-  private final SingularityConfiguration singularityConfiguration;
+  private final SingularityClusterConfiguration singularityClusterConfiguration;
 
   @Inject
   public SingularityBuildLauncher(SingularityClient singularityClient, BlazarConfiguration blazarConfiguration) {
     this.singularityClient = singularityClient;
-    this.singularityConfiguration = blazarConfiguration.getSingularityConfiguration();
+    this.singularityClusterConfiguration = blazarConfiguration.getSingularityConfiguration();
   }
 
   public synchronized void launchBuild(ModuleBuild build) throws Exception {
-    singularityClient.runSingularityRequest(singularityConfiguration.getRequest(), Optional.of(buildRequest(build)));
+    singularityClient.runSingularityRequest(singularityClusterConfiguration.getRequest(), Optional.of(buildRequest(build)));
   }
 
   private SingularityRunNowRequest buildRequest(ModuleBuild build) {
