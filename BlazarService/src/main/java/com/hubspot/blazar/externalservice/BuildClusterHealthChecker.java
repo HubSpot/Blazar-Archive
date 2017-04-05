@@ -57,7 +57,10 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
   public void stop() throws Exception {
     running.compareAndSet(true, false);
     LOG.info("We have been stopped. Stopping build clusters health checks");
-    clusterHealthObserver.get().dispose();
+    Disposable clusterHealthCheckObserver = clusterHealthObserver.get();
+    if (clusterHealthCheckObserver != null) {
+      clusterHealthObserver.get().dispose();
+    }
   }
 
   @Override
