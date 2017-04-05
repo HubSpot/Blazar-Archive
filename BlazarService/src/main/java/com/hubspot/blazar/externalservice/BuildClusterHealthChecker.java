@@ -28,7 +28,7 @@ import io.reactivex.schedulers.Schedulers;
 public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
   private static final int HEALTH_CHECK_INTERVAL_SECONDS = 30;
 
-  private final static Logger LOG = LoggerFactory.getLogger(BuildClusterHealthChecker.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BuildClusterHealthChecker.class);
 
   private final AtomicBoolean leader;
   private final AtomicBoolean running;
