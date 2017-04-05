@@ -6,7 +6,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -18,14 +17,13 @@ import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.exception.BuildClusterException;
 import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
 import com.hubspot.blazar.externalservice.BuildClusterService;
-import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.singularity.client.SingularityClient;
 
 @Singleton
 public class TestBuildClusterService extends BuildClusterService {
   private static final Logger LOG = LoggerFactory.getLogger(TestBuildClusterService.class);
-  private final ModuleBuildResource moduleBuildResource;
+  private final ModuleBuildService moduleBuildService;
   private Set<Integer> failingModules;
 
   @Inject
@@ -35,13 +33,13 @@ public class TestBuildClusterService extends BuildClusterService {
                                  ModuleBuildService moduleBuildService,
                                  BranchService branchService,
                                  BuildClusterHealthChecker buildClusterHealthChecker,
-                                 ModuleBuildResource moduleBuildResource,
                                  AsyncHttpClient asyncHttpClient) {
+
     super(singularityClusterClients, blazarConfiguration, moduleService, moduleBuildService, branchService, buildClusterHealthChecker, asyncHttpClient);
-    this.moduleBuildResource = moduleBuildResource;
+
+    this.moduleBuildService = moduleBuildService;
     this.failingModules = ImmutableSet.of();
   }
-
 
   public void clearModulesToFail() {
     failingModules = ImmutableSet.of();
@@ -66,17 +64,17 @@ public class TestBuildClusterService extends BuildClusterService {
 
   private void failBuild(ModuleBuild build) {
     LOG.info("Pretending to launch {} calling start", build);
-    ModuleBuild inProgress = moduleBuildResource.start(build.getId().get(), Optional.of(build.toString()));
+    ModuleBuild inProgress = moduleBuildService.setStateToLaunching(build.getId().get(), build.toString());
     LOG.info("Build {} now in progress, publishing failure", inProgress);
-    ModuleBuild failure = moduleBuildResource.completeFailure(inProgress.getId().get());
+    ModuleBuild failure = moduleBuildService.setStateToFailed(inProgress.getId().get());
     LOG.info("Build {} Failed", failure);
   }
 
   private void passBuild(ModuleBuild build) {
     LOG.info("Pretending to launch {} calling start", build);
-    ModuleBuild inProgress = moduleBuildResource.start(build.getId().get(), Optional.of(build.toString()));
+    ModuleBuild inProgress = moduleBuildService.setStateToLaunching(build.getId().get(), build.toString());
     LOG.info("Build {} now in progress, publishing success", inProgress);
-    ModuleBuild success = moduleBuildResource.completeSuccess(inProgress.getId().get());
+    ModuleBuild success = moduleBuildService.setStateToSucceded(inProgress.getId().get());
     LOG.info("Build {} succeed", success);
   }
 

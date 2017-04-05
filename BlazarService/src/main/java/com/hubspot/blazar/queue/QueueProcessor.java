@@ -103,16 +103,22 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   @Override
   public void run() {
     try {
-      if (running.get() && leader.get() && buildClusterHealthChecker.isSomeClusterAvailable()) {
+      if (running.get() && leader.get()) {
         List<QueueItem> queueItemsSorted = sort(queueItemDao.getItemsReadyToExecute());
         queueItemsSorted.removeAll(processingItems);
         processingItems.addAll(queueItemsSorted);
 
         for (QueueItem queueItem : queueItemsSorted) {
           LOG.debug("Processing Item: {}", queueItem);
-          String queueName = queueItem.getType().getSimpleName();
-          queueExecutors.computeIfAbsent(queueName, k -> {
-            return new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor-" + queueName).get();
+          String eventType = queueItem.getType().getSimpleName();
+
+          if (!canDequeueEvent(eventType)) {
+            LOG.warn("Will not dequeue event %s because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down");
+            return;
+          }
+
+          queueExecutors.computeIfAbsent(eventType, k -> {
+            return new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor-" + eventType).get();
           }).execute(new ProcessItemRunnable(queueItem));
         }
       }
@@ -125,6 +131,11 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     return queueItems.stream()
         .sorted(Comparator.comparing(item -> item.getId().get()))
         .collect(Collectors.toList());
+  }
+
+  private boolean canDequeueEvent(String eventType) {
+    return buildClusterHealthChecker.isSomeClusterAvailable() ||
+        (!buildClusterHealthChecker.isSomeClusterAvailable() && eventType == "PushEvent");
   }
 
   private class ProcessItemRunnable implements Runnable {

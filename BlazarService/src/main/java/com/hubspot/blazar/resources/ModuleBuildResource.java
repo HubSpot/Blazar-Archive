@@ -54,35 +54,23 @@ public class ModuleBuildResource {
   @PUT
   @Path("/{id}/start")
   public ModuleBuild start(@PathParam("id") long moduleBuildId, @QueryParam("taskId") Optional<String> taskId) {
-    ModuleBuild build = getBuildWithExpectedState(moduleBuildId, State.LAUNCHING);
-
     if (!taskId.isPresent()) {
       throw new IllegalArgumentException("Task ID is required");
     }
 
-    ModuleBuild inProgress = build.toBuilder().setState(State.IN_PROGRESS).setTaskId(Optional.of(taskId.get())).build();
-    moduleBuildService.update(inProgress);
-    return inProgress;
+    return moduleBuildService.setStateToLaunching(moduleBuildId, taskId.get());
   }
 
   @PUT
   @Path("/{id}/success")
   public ModuleBuild completeSuccess(@PathParam("id") long moduleBuildId) {
-    ModuleBuild build = getBuildWithExpectedState(moduleBuildId, State.IN_PROGRESS);
-
-    ModuleBuild succeeded = build.toBuilder().setState(State.SUCCEEDED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build();
-    moduleBuildService.update(succeeded);
-    return succeeded;
+    return moduleBuildService.setStateToSucceded(moduleBuildId);
   }
 
   @PUT
   @Path("/{id}/failure")
   public ModuleBuild completeFailure(@PathParam("id") long moduleBuildId) {
-    ModuleBuild build = getBuildWithExpectedState(moduleBuildId, State.IN_PROGRESS);
-
-    ModuleBuild failed = build.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build();
-    moduleBuildService.update(failed);
-    return failed;
+    return moduleBuildService.setStateToFailed(moduleBuildId);
   }
 
   @GET
