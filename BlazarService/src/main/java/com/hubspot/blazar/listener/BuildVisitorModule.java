@@ -39,7 +39,7 @@ public class BuildVisitorModule implements Module {
     // launch downstream builds if all upstreams succeeded
     moduleBuildVisitors.addBinding().to(DownstreamModuleBuildVisitor.class);
     // kill the singularity task
-    moduleBuildVisitors.addBinding().to(SingularityTaskKiller.class);
+    moduleBuildVisitors.addBinding().to(BuildContainerKiller.class);
     // cancel all downstream builds
     moduleBuildVisitors.addBinding().to(DownstreamModuleBuildCanceller.class);
     // complete the repository build once all of the module builds have finished

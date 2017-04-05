@@ -31,6 +31,7 @@ import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
+import com.hubspot.blazar.externalservice.BuildClusterService;
 import com.hubspot.blazar.guice.BlazarEventBusModule;
 import com.hubspot.blazar.guice.BlazarQueueProcessorModule;
 import com.hubspot.blazar.listener.BuildVisitorModule;
@@ -38,8 +39,7 @@ import com.hubspot.blazar.listener.GitHubStatusVisitor;
 import com.hubspot.blazar.listener.TestBuildLauncher;
 import com.hubspot.blazar.test.base.service.BlazarGitTestConfiguration;
 import com.hubspot.blazar.test.base.service.BlazarTestModule;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
-import com.hubspot.blazar.util.TestSingularityBuildLauncher;
+import com.hubspot.blazar.util.TestBuildClusterService;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.singularity.client.SingularityClient;
 import com.ullink.slack.simpleslackapi.SlackSession;
@@ -67,8 +67,8 @@ public class BlazarServiceTestModule extends AbstractModule {
 
   @Singleton
   @Provides
-  public SingularityBuildLauncher providesSingularityBuildLauncher(TestSingularityBuildLauncher testSingularityBuildLauncher) {
-    return testSingularityBuildLauncher;
+  public BuildClusterService providesBuildClusterService(TestBuildClusterService testBuildClusterService) {
+    return testBuildClusterService;
   }
 
   private BlazarConfiguration buildBlazarConfiguration() {

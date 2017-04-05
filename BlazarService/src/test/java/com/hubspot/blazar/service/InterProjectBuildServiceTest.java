@@ -45,8 +45,8 @@ import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.InterProjectBuildMappingService;
 import com.hubspot.blazar.data.service.InterProjectBuildService;
 import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
-import com.hubspot.blazar.util.TestSingularityBuildLauncher;
+import com.hubspot.blazar.externalservice.BuildClusterService;
+import com.hubspot.blazar.util.TestBuildClusterService;
 
 import io.dropwizard.db.ManagedDataSource;
 
@@ -67,7 +67,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
   @Inject
   private InterProjectBuildMappingService interProjectBuildMappingService;
   @Inject
-  private SingularityBuildLauncher singularityBuildLauncher;
+  private BuildClusterService buildClusterService;
   @Inject
   private TestUtils testUtils;
   @Inject
@@ -95,7 +95,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
   @Test
   public void itRunsASuccessfulInterProjectBuild() throws Exception {
-    ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
+    ((TestBuildClusterService) buildClusterService).clearModulesToFail();
     // Trigger interProjectBuild
     InterProjectBuild testableBuild = testUtils.runInterProjectBuild(1, Optional.<BuildTrigger>absent());
     long buildId = testableBuild.getId().get();
@@ -119,7 +119,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
 
   @Test
   public void itGroupsModulesWhenBuildingOnManualTrigger() throws InterruptedException {
-    ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
+    ((TestBuildClusterService) buildClusterService).clearModulesToFail();
     // Trigger interProjectBuild
     InterProjectBuild testableBuild = testUtils.runInterProjectBuild(7, Optional.<BuildTrigger>absent());
     long buildId = testableBuild.getId().get();
@@ -205,7 +205,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     Set<Integer> expectedFailures = Sets.newHashSet(7);
     Set<Integer> expectedSuccess  = Sets.newHashSet(1, 4);
     Set<Integer> expectedCancel = Sets.newHashSet(8, 9, 10, 11, 13);
-    ((TestSingularityBuildLauncher) singularityBuildLauncher).setModulesToFail(expectedFailures);
+    ((TestBuildClusterService) buildClusterService).setModulesToFail(expectedFailures);
     // Cause module #10 to fail, causing 13 to be cancelled
 
     InterProjectBuild testableBuild = testUtils.runInterProjectBuild(1, Optional.absent());
@@ -221,6 +221,6 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
         assertThat(mapping.getState().equals(InterProjectBuild.State.SUCCEEDED));
       }
     }
-    ((TestSingularityBuildLauncher) singularityBuildLauncher).clearModulesToFail();
+    ((TestBuildClusterService) buildClusterService).clearModulesToFail();
   }
 }

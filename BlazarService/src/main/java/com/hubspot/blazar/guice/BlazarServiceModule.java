@@ -47,8 +47,8 @@ import com.hubspot.blazar.resources.InterProjectBuildResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
+import com.hubspot.blazar.util.LostBuildCleaner;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
-import com.hubspot.blazar.util.SingularityBuildWatcher;
 import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
 import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.horizon.HttpClient;
@@ -136,10 +136,10 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
       binder.install(new BlazarQueueProcessorModule());
       binder.install(new BlazarZooKeeperModule());
 
-      Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(SingularityBuildWatcher.class);
+      Multibinder.newSetBinder(binder, LeaderLatchListener.class).addBinding().to(LostBuildCleaner.class);
       binder.bind(ScheduledExecutorService.class)
-        .annotatedWith(Names.named("SingularityBuildWatcher"))
-        .toProvider(new ManagedScheduledExecutorServiceProvider(1, "SingularityBuildWatcher"))
+        .annotatedWith(Names.named("LostBuildCleaner"))
+        .toProvider(new ManagedScheduledExecutorServiceProvider(1, "LostBuildCleaner"))
         .in(Scopes.SINGLETON);
     } else {
       LOG.info("Not enabling queue-processing or build event handlers because no zookeeper configuration is specified. We need to elect a leader to process events.");

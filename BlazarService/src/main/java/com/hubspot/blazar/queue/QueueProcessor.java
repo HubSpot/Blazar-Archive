@@ -103,7 +103,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   @Override
   public void run() {
     try {
-      if (running.get() && leader.get() && buildClusterHealthChecker.isClusterAvailable()) {
+      if (running.get() && leader.get() && buildClusterHealthChecker.isSomeClusterAvailable()) {
         List<QueueItem> queueItemsSorted = sort(queueItemDao.getItemsReadyToExecute());
         queueItemsSorted.removeAll(processingItems);
         processingItems.addAll(queueItemsSorted);

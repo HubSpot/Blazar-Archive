@@ -1,5 +1,6 @@
 package com.hubspot.blazar.util;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -11,25 +12,32 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.config.BlazarConfiguration;
+import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.ModuleBuildService;
+import com.hubspot.blazar.data.service.ModuleService;
+import com.hubspot.blazar.exception.BuildClusterException;
+import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
+import com.hubspot.blazar.externalservice.BuildClusterService;
 import com.hubspot.blazar.resources.ModuleBuildResource;
+import com.hubspot.horizon.AsyncHttpClient;
 import com.hubspot.singularity.client.SingularityClient;
 
 @Singleton
-public class TestSingularityBuildLauncher extends SingularityBuildLauncher {
-  private static final Logger LOG = LoggerFactory.getLogger(TestSingularityBuildLauncher.class);
-  private final ModuleBuildService moduleBuildService;
+public class TestBuildClusterService extends BuildClusterService {
+  private static final Logger LOG = LoggerFactory.getLogger(TestBuildClusterService.class);
   private final ModuleBuildResource moduleBuildResource;
   private Set<Integer> failingModules;
 
-
   @Inject
-  public TestSingularityBuildLauncher(SingularityClient singularityClient,
-                                      BlazarConfiguration blazarConfiguration,
-                                      ModuleBuildService moduleBuildService,
-                                      ModuleBuildResource moduleBuildResource) {
-    super(singularityClient, blazarConfiguration);
-    this.moduleBuildService = moduleBuildService;
+  public TestBuildClusterService(Map<String, SingularityClient> singularityClusterClients,
+                                 BlazarConfiguration blazarConfiguration,
+                                 ModuleService moduleService,
+                                 ModuleBuildService moduleBuildService,
+                                 BranchService branchService,
+                                 BuildClusterHealthChecker buildClusterHealthChecker,
+                                 ModuleBuildResource moduleBuildResource,
+                                 AsyncHttpClient asyncHttpClient) {
+    super(singularityClusterClients, blazarConfiguration, moduleService, moduleBuildService, branchService, buildClusterHealthChecker, asyncHttpClient);
     this.moduleBuildResource = moduleBuildResource;
     this.failingModules = ImmutableSet.of();
   }
@@ -44,7 +52,7 @@ public class TestSingularityBuildLauncher extends SingularityBuildLauncher {
   }
 
   @Override
-  public synchronized void launchBuild(ModuleBuild build) throws Exception {
+  public synchronized void launchBuildContainer(ModuleBuild build) throws BuildClusterException {
     build = moduleBuildService.get(build.getId().get()).get();
     if (build.getState().isWaiting()) {
       return;
