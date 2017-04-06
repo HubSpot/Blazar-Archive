@@ -86,8 +86,8 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
       // gracefully allow processing to stop.
       boolean success = processingTask.get().cancel(false);
       if (!success && (processingTask.get().isCancelled() || processingTask.get().isDone())) {
-        RuntimeException scheduledExectuorShutdownError = new RuntimeException("Failed to successfully shut down scheduled queue polling task");
-        LOG.error("Error stopping QueueProcessor", scheduledExectuorShutdownError);
+        RuntimeException scheduledExecutorShutdownError = new RuntimeException("Failed to successfully shut down scheduled queue polling task");
+        LOG.error("Error stopping QueueProcessor", scheduledExecutorShutdownError);
       }
     }
     LOG.info("Queue Processor Stopped");
@@ -120,6 +120,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
           if (!canDequeueEvent(queuedItem)) {
             LOG.warn("Will not dequeue event {}(id: {}) because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down)",
                 eventType, queuedItem.getId().get());
+            processingItems.remove(queuedItem);
             return;
           }
 
