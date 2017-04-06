@@ -103,12 +103,13 @@ public class BuildClusterService {
    * @throws NonRetryableBuildException
    */
   public synchronized void launchBuildContainer(ModuleBuild moduleBuild) throws BuildClusterException {
-    Optional<String> clusterToUse = pickClusterToLaunchBuild(moduleBuild, new HashSet<>());
-    if (!clusterToUse.isPresent()) {
+    Optional<String> clusterToUseOptional = pickClusterToLaunchBuild(moduleBuild, new HashSet<>());
+    if (!clusterToUseOptional.isPresent()) {
       String message = String.format("Could not find a cluster to launch module build %d", moduleBuild.getId().get());
       LOG.warn(message);
       throw new BuildClusterException(message);
     }
+    final String clusterToUse = clusterToUseOptional.get();
     SingularityClient singularityClient = singularityClusterClients.get(clusterToUse);
     SingularityClusterConfiguration singularityClusterConfiguration = blazarConfiguration.getSingularityClusterConfigurations().get(clusterToUse);
     try {
