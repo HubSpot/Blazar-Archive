@@ -118,7 +118,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
 
 
         for (QueueItem queuedItem : queueItemsSorted) {
-          LOG.debug("Processing Item: {}", queuedItem);
+          LOG.debug("Processing Item: {}", queuedItem.getId());
           String eventType = queuedItem.getType().getSimpleName();
 
           if (!canDequeueEvent(queuedItem)) {
