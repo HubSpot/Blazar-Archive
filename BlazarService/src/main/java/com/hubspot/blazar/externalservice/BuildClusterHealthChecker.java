@@ -129,7 +129,7 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
 
   private boolean singularityClusterHasAvailableResources(SingularityState singularityState) {
     // if overdue tasks are more than more than 10% of active tasks we consider the cluster overloaded and we will not send builds
-    return getRatioOfOverdueOverActiveTasks(singularityState) < 0.1;
+    return getRatioOfOverdueOverActiveTasks(singularityState) < 10;
   }
 
   private double getRatioOfOverdueOverActiveTasks(SingularityState singularityState) {
