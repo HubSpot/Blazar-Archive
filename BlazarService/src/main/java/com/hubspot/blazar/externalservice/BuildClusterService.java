@@ -385,7 +385,7 @@ public class BuildClusterService {
   }
 
   private Optional<String> pickClusterToLaunchBuild(ModuleBuild moduleBuild, Set<String> examinedClusters) throws BuildClusterException {
-    if (examinedClusters.equals(availableClusters)) {
+    if (examinedClusters.containsAll(availableClusters)) {
       return Optional.absent();
     }
 
