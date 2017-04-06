@@ -110,7 +110,7 @@ public class GitBranchUpdater implements Runnable {
     if (noopMode) {
       LOG.info("Not Deleting {} -- running in noop mode", branch);
     } else {
-      branchService.delete(branch);
+      branchService.deactivate(branch);
     }
   }
 

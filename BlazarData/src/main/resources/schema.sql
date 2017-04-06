@@ -218,5 +218,8 @@ DROP INDEX build_state on repo_builds;
 -- changeset jgoodwin:15
 ALTER TABLE `branches` MODIFY `branch` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
--- changeset gchomatas:16
+-- changeset jgoodwin:16
+CREATE INDEX host_org_repo_repoId ON branches (active, host, organization, repository, repositoryId)
+
+-- changeset gchomatas:17
 ALTER TABLE `module_builds` ADD COLUMN `buildClusterName` varchar(64) NOT NULL DEFAULT 'Singularity3x3';

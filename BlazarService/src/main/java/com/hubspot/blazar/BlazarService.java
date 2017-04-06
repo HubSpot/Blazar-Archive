@@ -26,6 +26,11 @@ public class BlazarService<T extends BlazarConfigurationWrapper> extends Applica
     bootstrap.addBundle(new MigrationsBundle<BlazarConfigurationWrapper>() {
 
       @Override
+      public String getMigrationsFileName() {
+        return "schema.sql";
+      }
+
+      @Override
       public DataSourceFactory getDataSourceFactory(final BlazarConfigurationWrapper configuration) {
         return configuration.getBlazarConfiguration().getDatabaseConfiguration();
       }
