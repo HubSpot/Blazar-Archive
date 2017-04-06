@@ -461,7 +461,7 @@ public class BuildClusterService {
     } catch (Exception e) { // in the almost improbable case we have reached the max int we reset the counter;
       clusterIndex = nextClusterIndex.getAndSet(0);
     }
-    return availableClusters.get((clusterIndex % availableClusters.size()) - 1);
+    return availableClusters.get(clusterIndex % availableClusters.size());
   }
 
   public static class BuildContainerInfo {
