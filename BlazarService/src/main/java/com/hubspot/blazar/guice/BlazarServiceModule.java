@@ -141,13 +141,13 @@ public class BlazarServiceModule extends DropwizardAwareModule<BlazarConfigurati
         .annotatedWith(Names.named("LostBuildCleaner"))
         .toProvider(new ManagedScheduledExecutorServiceProvider(1, "LostBuildCleaner"))
         .in(Scopes.SINGLETON);
+
+      // Bind and configure Singularity clients for the available clusters
+      binder.install(new SingularityClientModule());
+      binder.bind(new TypeLiteral<Map<String, SingularityClient>>() {}).toProvider(SingularityClusterClientsProvider.class);
     } else {
       LOG.info("Not enabling queue-processing or build event handlers because no zookeeper configuration is specified. We need to elect a leader to process events.");
     }
-
-    // Bind and configure Singularity clients for the available clusters
-    binder.install(new SingularityClientModule());
-    binder.bind(new TypeLiteral<Map<String, SingularityClient>>() {}).toProvider(SingularityClusterClientsProvider.class);
 
   }
 

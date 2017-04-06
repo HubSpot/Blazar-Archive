@@ -16,7 +16,7 @@ import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.singularity.SingularityRequestParent;
+import com.hubspot.singularity.SingularityState;
 import com.hubspot.singularity.client.SingularityClient;
 
 import io.dropwizard.lifecycle.Managed;
@@ -26,7 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
-  private static final int HEALTH_CHECK_INTERVAL_SECONDS = 30;
+  private static final int HEALTH_CHECK_INTERVAL_SECONDS = 10;
 
   private static final Logger LOG = LoggerFactory.getLogger(BuildClusterHealthChecker.class);
 
@@ -67,19 +67,24 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
   public void isLeader() {
     LOG.info("We are the leader. Starting build cluster health check monitoring");
     leader.set(true);
-    if (running.get()) {
-      Disposable disposable = getObservableOfAllClustersHealth().subscribe(clusterHealthCheck -> {
-        clusterHealthCheckMap.put(clusterHealthCheck.getClusterName(), clusterHealthCheck);
-      });
-      clusterHealthObserver.getAndSet(disposable);
-    }
+
+    Disposable disposable = getObservableOfAllClustersHealth()
+        .subscribeOn(Schedulers.io())
+        .observeOn(Schedulers.computation())
+        .subscribe(clusterHealthCheck -> {
+      clusterHealthCheckMap.put(clusterHealthCheck.getClusterName(), clusterHealthCheck);
+    });
+    clusterHealthObserver.getAndSet(disposable);
   }
 
   @Override
   public void notLeader() {
     LOG.info("We are not the leader. Stopping build cluster health check monitoring");
     leader.set(false);
-    clusterHealthObserver.get().dispose();
+    Disposable clusterHealthCheckObserver = clusterHealthObserver.get();
+    if (clusterHealthCheckObserver != null) {
+      clusterHealthObserver.get().dispose();
+    }
   }
 
   public boolean isSomeClusterAvailable() {
@@ -93,25 +98,43 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
   private Observable<ClusterHealthCheck> getObservableOfAllClustersHealth() {
     List<Observable<ClusterHealthCheck>> clusterHealthCheckObservables = singularityClusterClients.keySet().stream()
         .map(clusterName -> getObservableSingularityClusterHealth(clusterName)).collect(Collectors.toList());
-    return Observable.merge(clusterHealthCheckObservables);
+    return Observable.merge(clusterHealthCheckObservables).subscribeOn(Schedulers.io()).observeOn(Schedulers.computation());
   }
 
   private Observable<ClusterHealthCheck> getObservableSingularityClusterHealth(String clusterName) {
-    return Observable.timer(HEALTH_CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS).map(tick -> {
+    return Observable.interval(0, HEALTH_CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS).map(tick -> {
       SingularityClient singularityClient = singularityClusterClients.get(clusterName);
       String singularityRequestForBuilds = blazarConfiguration.getSingularityClusterConfigurations().get(clusterName).getRequest();
-      Optional<SingularityRequestParent> singularityRequestParentOptional;
+      SingularityState singularityState;
       try {
-        singularityRequestParentOptional = singularityClient.getSingularityRequest(singularityRequestForBuilds);
-        if (singularityRequestParentOptional.isPresent()) {
-          return new ClusterHealthCheck(clusterName, true);
+        singularityState = singularityClient.getState(Optional.of(false), Optional.of(false));
+        if (singularityState != null) {
+          if (singularityClusterHasAvailableResources(singularityState)) {
+            LOG.debug("Cluster {} is healthy", clusterName);
+            return new ClusterHealthCheck(clusterName, true);
+          } else {
+            LOG.warn("Cluster {} has not enough resources and will not be used for running builds in this cycle. The ratio of overdue tasks over active tasks is greater than 10% ({}%)",
+                clusterName, getRatioOfOverdueOverActiveTasks(singularityState));
+            return new ClusterHealthCheck(clusterName, false);
+          }
         }
+        LOG.warn("Could not retrieve cluster state for cluster {}. It will not be used for running builds in this cycle. ", clusterName);
         return new ClusterHealthCheck(clusterName, false);
       } catch (Exception e) {
+        LOG.warn("An error occurred while checking health of cluster {}. It will be marked as not healthy and will retry in next cycle.", clusterName);
         return new ClusterHealthCheck(clusterName,false);
       }
 
     }).subscribeOn(Schedulers.io()).observeOn(Schedulers.computation());
+  }
+
+  private boolean singularityClusterHasAvailableResources(SingularityState singularityState) {
+    // if overdue tasks are more than more than 10% of active tasks we consider the cluster overloaded and we will not send builds
+    return getRatioOfOverdueOverActiveTasks(singularityState) < 0.1;
+  }
+
+  private double getRatioOfOverdueOverActiveTasks(SingularityState singularityState) {
+    return singularityState.getLateTasks() / singularityState.getActiveTasks() * 100;
   }
 
   private static final class ClusterHealthCheck {

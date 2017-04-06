@@ -108,18 +108,19 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
         queueItemsSorted.removeAll(processingItems);
         processingItems.addAll(queueItemsSorted);
 
-        for (QueueItem queueItem : queueItemsSorted) {
-          LOG.debug("Processing Item: {}", queueItem);
-          String eventType = queueItem.getType().getSimpleName();
+        for (QueueItem queuedItem : queueItemsSorted) {
+          LOG.debug("Processing Item: {}", queuedItem);
+          String eventType = queuedItem.getType().getSimpleName();
 
           if (!canDequeueEvent(eventType)) {
-            LOG.warn("Will not dequeue event %s because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down");
+            LOG.warn("Will not dequeue event {}(id: {}) because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down)",
+                eventType, queuedItem.getId().get());
             return;
           }
 
           queueExecutors.computeIfAbsent(eventType, k -> {
             return new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor-" + eventType).get();
-          }).execute(new ProcessItemRunnable(queueItem));
+          }).execute(new ProcessItemRunnable(queuedItem));
         }
       }
     } catch (Throwable t) {
