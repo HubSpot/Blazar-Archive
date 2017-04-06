@@ -110,8 +110,12 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     try {
       if (running.get() && leader.get()) {
         List<QueueItem> queueItemsSorted = sort(queueItemDao.getItemsReadyToExecute());
+        LOG.debug("Found {} items ready to execute", queueItemsSorted.size());
+        LOG.debug("Found {} items currently processing", processingItems.size());
         queueItemsSorted.removeAll(processingItems);
+        LOG.debug("Processing {} more items", queueItemsSorted.size());
         processingItems.addAll(queueItemsSorted);
+
 
         for (QueueItem queuedItem : queueItemsSorted) {
           LOG.debug("Processing Item: {}", queuedItem);
