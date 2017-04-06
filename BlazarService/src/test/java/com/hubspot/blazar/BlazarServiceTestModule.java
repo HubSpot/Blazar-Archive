@@ -85,6 +85,8 @@ public class BlazarServiceTestModule extends AbstractModule {
     bind(new TypeLiteral<Map<String, SingularityClient>>() {}).toInstance(ImmutableMap.of(
         "SingularityCluster1", singularityClientForCluster1,
         "SingularityCluster2", singularityClientForCluster2));
+
+    System.setProperty("kill-delay", "10000");
   }
 
   @Singleton
