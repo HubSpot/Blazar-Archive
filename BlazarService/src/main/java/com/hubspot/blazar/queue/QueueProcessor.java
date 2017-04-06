@@ -19,11 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 import com.hubspot.blazar.data.dao.QueueItemDao;
 import com.hubspot.blazar.data.queue.QueueItem;
 import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
+import com.hubspot.blazar.github.GitHubProtos;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 
 import io.dropwizard.lifecycle.Managed;
@@ -31,6 +33,9 @@ import io.dropwizard.lifecycle.Managed;
 @Singleton
 public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(QueueProcessor.class);
+  private static final List<Class> PROCESSED_EVENTS_WHEN_CLUSTERS_DOWN  = ImmutableList.of(
+      GitHubProtos.PushEvent.class, GitHubProtos.DeleteEvent.class, GitHubProtos.CreateEvent.class);
+
 
   private final ScheduledExecutorService executorService;
   private final Map<String, ScheduledExecutorService> queueExecutors;
@@ -112,7 +117,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
           LOG.debug("Processing Item: {}", queuedItem);
           String eventType = queuedItem.getType().getSimpleName();
 
-          if (!canDequeueEvent(eventType)) {
+          if (!canDequeueEvent(queuedItem)) {
             LOG.warn("Will not dequeue event {}(id: {}) because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down)",
                 eventType, queuedItem.getId().get());
             return;
@@ -134,9 +139,10 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
         .collect(Collectors.toList());
   }
 
-  private boolean canDequeueEvent(String eventType) {
+  private boolean canDequeueEvent(QueueItem queueItem) {
     return buildClusterHealthChecker.isSomeClusterAvailable() ||
-        (!buildClusterHealthChecker.isSomeClusterAvailable() && eventType == "PushEvent");
+        (!buildClusterHealthChecker.isSomeClusterAvailable() &&
+            PROCESSED_EVENTS_WHEN_CLUSTERS_DOWN.contains(queueItem.getType()));
   }
 
   private class ProcessItemRunnable implements Runnable {
