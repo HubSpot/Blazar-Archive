@@ -34,8 +34,6 @@ public class BuildVisitorModule implements Module {
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder, ModuleBuildVisitor.class);
     // launch the queued build if nothing upstream
     moduleBuildVisitors.addBinding().to(QueuedModuleBuildVisitor.class);
-    // kick off the singularity task eagerly
-    moduleBuildVisitors.addBinding().to(LaunchSingularityTaskBuildVisitor.class);
     // launch downstream builds if all upstreams succeeded
     moduleBuildVisitors.addBinding().to(DownstreamModuleBuildVisitor.class);
     // kill the singularity task
