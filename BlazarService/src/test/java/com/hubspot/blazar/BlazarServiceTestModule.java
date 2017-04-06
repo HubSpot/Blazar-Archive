@@ -61,13 +61,20 @@ public class BlazarServiceTestModule extends AbstractModule {
     install(new DiscoveryModule());
     install(new BlazarQueueProcessorModule());
     install(new BlazarEventBusModule());
+
     bind(GitHubStatusVisitor.class).toInstance(mock(GitHubStatusVisitor.class));
+
     bind(BlazarConfiguration.class).toInstance(buildBlazarConfiguration());
+
     bind(SlackSession.class).toInstance(mock(SlackSession.class));
+
     bind(AsyncHttpClient.class).toInstance(mock(AsyncHttpClient.class));
+
     bind(Integer.class).annotatedWith(Names.named("")).toInstance(0);
+
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
     moduleBuildVisitors.addBinding().to(TestBuildLauncher.class);
+
     bindGitHubMap(); // does its own binding
 
     // Bind and configure Singularity clients for the available clusters

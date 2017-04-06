@@ -32,7 +32,7 @@ public class LaunchSingularityTaskBuildVisitor extends AbstractModuleBuildVisito
     try {
       buildClusterService.launchBuildContainer(moduleBuild);
     } catch (Exception e) {
-      throw new NonRetryableBuildException(String.format("An error occurred while launching docker container for build {}. Will not retry the build", moduleBuild), e);
+      throw new NonRetryableBuildException(String.format("An error occurred while launching docker container for build %s. Will not retry the build", moduleBuild), e);
     }
   }
 }

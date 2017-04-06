@@ -446,7 +446,7 @@ public class BuildClusterService {
                                                               ModuleBuild moduleBuild,
                                                               Set<String> examinedClusters) throws BuildClusterException {
     if (buildClusterHealthChecker.isClusterAvailable(clusterToUse)) {
-      moduleBuildService.updateBuildClusterName(moduleBuild.getModuleId(), clusterToUse);
+      moduleBuildService.updateBuildClusterName(moduleBuild.getId().get(), clusterToUse);
       return Optional.of(clusterToUse);
     } else {
       LOG.warn("Build cluster {} is unavailable. Will look for another cluster", clusterToUse);

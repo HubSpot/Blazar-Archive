@@ -252,8 +252,8 @@ public class ModuleBuildService {
     return failed;
   }
 
-  public int updateBuildClusterName(int moduleId, String buildClusterName) {
-    return moduleBuildDao.updateBuildClusterName(moduleId, buildClusterName);
+  public int updateBuildClusterName(long moduleBuildId, String buildClusterName) {
+    return moduleBuildDao.updateBuildClusterName(moduleBuildId, buildClusterName);
   }
 
   private static void checkAffectedRowCount(int affectedRows) {
