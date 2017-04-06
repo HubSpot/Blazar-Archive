@@ -104,7 +104,6 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
   private Observable<ClusterHealthCheck> getObservableSingularityClusterHealth(String clusterName) {
     return Observable.interval(0, HEALTH_CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS).map(tick -> {
       SingularityClient singularityClient = singularityClusterClients.get(clusterName);
-      String singularityRequestForBuilds = blazarConfiguration.getSingularityClusterConfigurations().get(clusterName).getRequest();
       SingularityState singularityState;
       try {
         singularityState = singularityClient.getState(Optional.of(false), Optional.of(false));
