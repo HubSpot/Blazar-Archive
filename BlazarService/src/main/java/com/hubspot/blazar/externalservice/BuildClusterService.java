@@ -405,7 +405,11 @@ public class BuildClusterService {
         if (!moduleRepository.isPresent()) {
           throw new BuildClusterException(String.format("Could not get the repository for module %d", moduleBuild.getModuleId()));
         }
-        if (singularityClusterConfiguration.getRepositories().contains(moduleRepository.get())) {
+
+        boolean moduleRepositoryIsWhitelisted = singularityClusterConfiguration.getRepositories().stream()
+            .anyMatch(whitelistedRepo -> whitelistedRepo.toLowerCase().equals(moduleRepository.get().toLowerCase()));
+
+        if (moduleRepositoryIsWhitelisted) {
           return checkAvailabilityAndPersistCluster(clusterToUse, moduleBuild, examinedClusters);
         }
         return pickClusterToLaunchBuild(moduleBuild, examinedClusters);
@@ -438,7 +442,8 @@ public class BuildClusterService {
     Optional<GitInfo> moduleBranchMaybe = branchService.get(branchId);
     if (moduleBranchMaybe.isPresent()) {
       GitInfo moduleBranch = moduleBranchMaybe.get();
-      return Optional.of(String.format("%s-%s-%s", moduleBranch.getHost(), moduleBranch.getOrganization(), moduleBranch.getRepository()));
+      return Optional.of(String.format("%s-%s-%s",
+          moduleBranch.getHost(), moduleBranch.getOrganization(), moduleBranch.getRepository()));
     }
     return Optional.absent();
   }
