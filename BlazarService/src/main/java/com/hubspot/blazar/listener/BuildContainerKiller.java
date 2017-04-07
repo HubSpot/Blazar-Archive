@@ -28,6 +28,10 @@ public class BuildContainerKiller extends AbstractModuleBuildVisitor {
   @Override
   protected void visitCancelled(ModuleBuild moduleBuild) throws NonRetryableBuildException {
     try {
+      if (!moduleBuild.getTaskId().isPresent()) {
+        LOG.debug("Cancelled module build {} doesn't contain a container id (taskId) so we will not try to kill its container.", moduleBuild.getId().get());
+        return;
+      }
       buildClusterService.killBuildContainer(moduleBuild);
     } catch (Exception e) {
       throw new NonRetryableBuildException(String.format("A problem encountered while trying to kill the container of cancelled module build %d", moduleBuild.getId().get()), e);

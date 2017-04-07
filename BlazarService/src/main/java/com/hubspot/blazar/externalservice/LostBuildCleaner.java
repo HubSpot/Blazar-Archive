@@ -1,4 +1,4 @@
-package com.hubspot.blazar.util;
+package com.hubspot.blazar.externalservice;
 
 import static com.hubspot.blazar.externalservice.BuildClusterService.BuildContainerInfo.BuildContainerState.FINISHED;
 import static com.hubspot.blazar.externalservice.BuildClusterService.BuildContainerInfo.BuildContainerState.NOT_STARTED;
@@ -23,7 +23,6 @@ import com.hubspot.blazar.base.ModuleBuild.State;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.data.service.ModuleBuildService;
-import com.hubspot.blazar.externalservice.BuildClusterService;
 import com.hubspot.blazar.externalservice.BuildClusterService.BuildContainerInfo;
 import com.hubspot.blazar.externalservice.BuildClusterService.BuildContainerInfo.BuildContainerState;
 import com.hubspot.blazar.listener.BuildContainerKiller;

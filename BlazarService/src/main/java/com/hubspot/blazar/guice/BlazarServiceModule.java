@@ -47,7 +47,7 @@ import com.hubspot.blazar.resources.InterProjectBuildResource;
 import com.hubspot.blazar.resources.ModuleBuildResource;
 import com.hubspot.blazar.resources.RepositoryBuildResource;
 import com.hubspot.blazar.util.GitHubWebhookHandler;
-import com.hubspot.blazar.util.LostBuildCleaner;
+import com.hubspot.blazar.externalservice.LostBuildCleaner;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 import com.hubspot.dropwizard.guicier.DropwizardAwareModule;
 import com.hubspot.horizon.AsyncHttpClient;
