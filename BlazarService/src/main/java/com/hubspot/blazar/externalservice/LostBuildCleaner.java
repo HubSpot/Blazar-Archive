@@ -164,8 +164,10 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
         // ask the build cluster service to kill the container.
         boolean buildExceededMaxAllowedRunningTime = buildContainerState == RUNNING && age > maxAge;
         if (buildContainerState == NOT_STARTED) {
-          LOG.info("Failing module build {} because the build is registered in Blazar db as 'in progress' but the build cluster reports it as NOT STARTED", moduleBuild.getId().get());
-          moduleBuildService.update(moduleBuild.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(buildContainerInfo.getUpdatedAtMillis())).build());
+          LOG.warn("Container for Module build {} has not been started yet.");
+          // Todo actually fail things that are not started after 1 minute
+          // LOG.info("Failing module build {} because the build is registered in Blazar db as 'in progress' but the build cluster reports it as NOT STARTED", moduleBuild.getId().get());
+          // moduleBuildService.update(moduleBuild.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(buildContainerInfo.getUpdatedAtMillis())).build());
         } else if (buildContainerState == UNKNOWN) {
           LOG.info("Failing module build {} because the build is registered in Blazar db as 'in progress' but the build cluster reports its state as UNKNOWN", moduleBuild.getId().get());
           moduleBuildService.update(moduleBuild.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(buildContainerInfo.getUpdatedAtMillis())).build());
