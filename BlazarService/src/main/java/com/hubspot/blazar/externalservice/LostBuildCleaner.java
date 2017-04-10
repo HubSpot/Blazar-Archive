@@ -26,8 +26,6 @@ import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.externalservice.BuildClusterService.BuildContainerInfo;
 import com.hubspot.blazar.externalservice.BuildClusterService.BuildContainerInfo.BuildContainerState;
 import com.hubspot.blazar.listener.BuildContainerKiller;
-import com.hubspot.singularity.SingularityTaskHistory;
-import com.hubspot.singularity.SingularityTaskHistoryUpdate;
 
 import io.dropwizard.lifecycle.Managed;
 
@@ -144,7 +142,7 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
     // they haven't reported back to signal that the build finished after waiting for executorConfiguration.getBuildTimeoutMillis()
     private void handleLongRunningBuilds() {
       for (ModuleBuild moduleBuild : moduleBuildService.getByState(State.IN_PROGRESS)) {
-
+        handleLongRunningBuild(moduleBuild);
       }
     }
 
@@ -187,20 +185,6 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
       } catch (Throwable t) {
         LOG.error("An error occurred while checking module build {}. The error is: {}. Will try again to check the module in the next cycle", moduleBuild.getId().get(), t.getMessage(), t);
       }
-    }
-
-    private Optional<Long> completedTimestamp(Optional<SingularityTaskHistory> taskHistory) {
-      if (!taskHistory.isPresent()) {
-        return Optional.absent();
-      }
-
-      for (SingularityTaskHistoryUpdate taskUpdate : taskHistory.get().getTaskUpdates()) {
-        if (taskUpdate.getTaskState().isDone()) {
-          return Optional.of(taskUpdate.getTimestamp());
-        }
-      }
-
-      return Optional.absent();
     }
   }
 }
