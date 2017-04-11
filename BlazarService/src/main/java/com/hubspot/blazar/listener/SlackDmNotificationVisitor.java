@@ -29,7 +29,7 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
   // Cancelled requires a user action - likely the user who would be slacked anyway so it is not worth messaging about
   private static final Set<RepositoryBuild.State> SLACK_WORTHY_FAILING_STATES = ImmutableSet.of(FAILED, UNSTABLE);
   private static final Logger LOG = LoggerFactory.getLogger(SlackDmNotificationVisitor.class);
-  private final BlazarSlackDirectMessageConfiguration slackConfig;
+  private final BlazarSlackDirectMessageConfiguration slackDirectMessageConfig;
 
   private final BranchService branchService;
   private final SlackMessageBuildingUtils slackMessageBuildingUtils;
@@ -43,7 +43,7 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
     this.branchService = branchService;
     this.slackMessageBuildingUtils = slackMessageBuildingUtils;
     this.blazarSlackClient = blazarSlackClient;
-    this.slackConfig = blazarConfiguration.getSlackConfiguration().get().getDirectMessageConfiguration();
+    this.slackDirectMessageConfig = blazarConfiguration.getSlackConfiguration().get().getDirectMessageConfiguration();
   }
 
   @Override
@@ -72,14 +72,14 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
         build.getCommitInfo().get().getCurrent().getAuthor().getEmail(), // Author Email
         build.getCommitInfo().get().getCurrent().getAuthor().getEmail()); // Committer Email
 
-    directNotifyEmails.removeAll(slackConfig.getBlacklistedUserEmails());
+    directNotifyEmails.removeAll(slackDirectMessageConfig.getBlacklistedUserEmails());
 
     // If the white list is empty we send to author/committer
     // else we only send to the whitelisted members
-    if (slackConfig.getWhitelistedUserEmails().isEmpty()) {
+    if (slackDirectMessageConfig.getWhitelistedUserEmails().isEmpty()) {
       return directNotifyEmails;
     } else {
-      return Sets.intersection(directNotifyEmails, slackConfig.getWhitelistedUserEmails());
+      return Sets.intersection(directNotifyEmails, slackDirectMessageConfig.getWhitelistedUserEmails());
     }
   }
 
@@ -90,8 +90,8 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
 
     // Do not send notifications for builds of branches that are explicitly ignored
     String branchName = branchService.get(build.getBranchId()).get().getBranch();
-    if (slackConfig.getIgnoredBranches().contains(branchName)) {
-      LOG.info("Not sending messages for build {} because the branch is in the list of ignored branches {}", build, slackConfig.getIgnoredBranches());
+    if (slackDirectMessageConfig.getIgnoredBranches().contains(branchName)) {
+      LOG.info("Not sending messages for build {} because the branch is in the list of ignored branches {}", build, slackDirectMessageConfig.getIgnoredBranches());
       return false;
     }
 
