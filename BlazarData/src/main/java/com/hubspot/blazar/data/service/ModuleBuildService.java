@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import javax.ws.rs.NotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +113,33 @@ public class ModuleBuildService {
     ModuleBuild build = enqueue(ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber, buildConfig, resolvedBuildConfig));
     LOG.info("Enqueued build for module {} with id {}", module.getId().get(), build.getId().get());
     return build;
+  }
+
+  @Transactional
+  public ModuleBuild setStateToLaunching(long moduleBuildId, String buildContainerId) {
+    ModuleBuild moduleBuild = getBuildWithExpectedState(moduleBuildId, State.LAUNCHING);
+
+    ModuleBuild inProgress = moduleBuild.toBuilder().setState(State.IN_PROGRESS).setTaskId(Optional.of(buildContainerId)).build();
+    update(inProgress);
+    return inProgress;
+  }
+
+  @Transactional
+  public ModuleBuild setStateToSucceded(long moduleBuildId) {
+    ModuleBuild moduleBuild = getBuildWithExpectedState(moduleBuildId, State.IN_PROGRESS);
+
+    ModuleBuild succeeded = moduleBuild.toBuilder().setState(State.SUCCEEDED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build();
+    update(succeeded);
+    return succeeded;
+  }
+
+  @Transactional
+  public ModuleBuild setStateToFailed(long moduleBuildId) {
+    ModuleBuild moduleBuild = getBuildWithExpectedState(moduleBuildId, State.IN_PROGRESS);
+
+    ModuleBuild failed = moduleBuild.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build();
+    update(failed);
+    return failed;
   }
 
   @Transactional
@@ -224,7 +252,29 @@ public class ModuleBuildService {
     return failed;
   }
 
+  public int updateBuildClusterName(long moduleBuildId, String buildClusterName) {
+    return moduleBuildDao.updateBuildClusterName(moduleBuildId, buildClusterName);
+  }
+
   private static void checkAffectedRowCount(int affectedRows) {
     Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
+  }
+
+  private ModuleBuild getBuildWithError(long moduleBuildId) {
+    Optional<ModuleBuild> maybeBuild = get(moduleBuildId);
+    if (maybeBuild.isPresent()) {
+      return maybeBuild.get();
+    } else {
+      throw new NotFoundException("No module build found with id: " + moduleBuildId);
+    }
+  }
+
+  private ModuleBuild getBuildWithExpectedState(long moduleBuildId, State expected) {
+    ModuleBuild build = getBuildWithError(moduleBuildId);
+    if (build.getState() == expected) {
+      return build;
+    } else {
+      throw new IllegalStateException(String.format("Module Build is in state %s, expected %s", build.getState(), expected));
+    }
   }
 }

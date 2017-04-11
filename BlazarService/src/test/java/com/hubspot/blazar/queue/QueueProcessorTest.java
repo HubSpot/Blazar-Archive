@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,16 +19,14 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
+import com.hubspot.blazar.BlazarServiceTestBase;
+import com.hubspot.blazar.BlazarServiceTestModule;
 import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.BuildTrigger.Type;
-import com.hubspot.blazar.guice.BlazarEventBusModule;
-import com.hubspot.blazar.guice.BlazarQueueProcessorModule;
-import com.hubspot.blazar.test.base.service.BlazarTestModule;
-import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
 
 @RunWith(JukitoRunner.class)
-@UseModules({BlazarQueueProcessorModule.class, BlazarEventBusModule.class, BlazarTestModule.class})
-public class QueueProcessorTest extends DatabaseBackedTest {
+@UseModules({BlazarServiceTestModule.class})
+public class QueueProcessorTest extends BlazarServiceTestBase {
   private List<Object> received = new ArrayList<>();
 
   @Inject
@@ -46,15 +43,8 @@ public class QueueProcessorTest extends DatabaseBackedTest {
         received.add(event);
       }
     });
-    queueProcessor.start();
-    queueProcessor.isLeader();
   }
 
-  @After
-  public void cleanup() throws Exception {
-    queueProcessor.stop();
-    queueProcessor.notLeader();
-  }
 
   @Test
   public void itProcessesEvents() {

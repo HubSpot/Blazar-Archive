@@ -62,6 +62,10 @@ public class ModuleBuild {
   private final Optional<BuildConfig> buildConfig;
   @StoredAsJson
   private final Optional<BuildConfig> resolvedConfig;
+  /**
+   * The name of the cluster into which the module was build
+   */
+  private final Optional<String> buildClusterName;
 
   @JsonCreator
   public ModuleBuild(@JsonProperty("id") Optional<Long> id,
@@ -73,7 +77,8 @@ public class ModuleBuild {
                      @JsonProperty("endTimestamp") Optional<Long> endTimestamp,
                      @JsonProperty("taskId") Optional<String> taskId,
                      @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig,
-                     @JsonProperty("resolvedConfig") Optional<BuildConfig> resolvedConfig) {
+                     @JsonProperty("resolvedConfig") Optional<BuildConfig> resolvedConfig,
+                     @JsonProperty("buildClusterName") Optional<String> buildClusterName) {
     this.id = id;
     this.repoBuildId = repoBuildId;
     this.moduleId = moduleId;
@@ -84,6 +89,7 @@ public class ModuleBuild {
     this.taskId = taskId;
     this.buildConfig = buildConfig;
     this.resolvedConfig = resolvedConfig;
+    this.buildClusterName = buildClusterName;
   }
 
   public static ModuleBuild queuedBuild(RepositoryBuild repositoryBuild, Module module, int buildNumber, BuildConfig buildConfig, BuildConfig resolvedBuildConfig) {
@@ -142,6 +148,10 @@ public class ModuleBuild {
     return resolvedConfig;
   }
 
+  public Optional<String> getBuildClusterName() {
+    return buildClusterName;
+  }
+
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
@@ -149,6 +159,7 @@ public class ModuleBuild {
         .add("moduleId", moduleId)
         .add("repoBuildId", repoBuildId)
         .add("state", state)
+        .add("buildClusterName", buildClusterName)
         .toString();
   }
 
@@ -178,7 +189,8 @@ public class ModuleBuild {
         .setEndTimestamp(endTimestamp)
         .setTaskId(taskId)
         .setBuildConfig(buildConfig)
-        .setResolvedConfig(resolvedConfig);
+        .setResolvedConfig(resolvedConfig)
+        .setBuildClusterName(buildClusterName);
   }
 
 
@@ -198,6 +210,7 @@ public class ModuleBuild {
     private Optional<String> taskId = Optional.absent();
     private Optional<BuildConfig> buildConfig = Optional.absent();
     private Optional<BuildConfig> resolvedConfig = Optional.absent();
+    private Optional<String> buildClusterName = Optional.absent();
 
     public Builder(long repoBuildId, int moduleId, int buildNumber, State intialState) {
       this.repoBuildId = repoBuildId;
@@ -256,8 +269,13 @@ public class ModuleBuild {
       return this;
     }
 
+    public Builder setBuildClusterName(Optional<String> buildClusterName) {
+      this.buildClusterName = buildClusterName;
+      return this;
+    }
+
     public ModuleBuild build() {
-      return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, resolvedConfig);
+      return new ModuleBuild(id, repoBuildId, moduleId, buildNumber, state, startTimestamp, endTimestamp, taskId, buildConfig, resolvedConfig, buildClusterName);
     }
   }
 }

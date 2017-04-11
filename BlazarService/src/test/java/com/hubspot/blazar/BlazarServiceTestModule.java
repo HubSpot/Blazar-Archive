@@ -1,9 +1,11 @@
 package com.hubspot.blazar;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,15 +24,19 @@ import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
 import com.hubspot.blazar.config.GitHubConfiguration;
+import com.hubspot.blazar.config.SingularityClusterConfiguration;
+import com.hubspot.blazar.config.SingularityClusterConfiguration.BuildStrategy;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
 import com.hubspot.blazar.discovery.DiscoveryModule;
+import com.hubspot.blazar.externalservice.BuildClusterService;
 import com.hubspot.blazar.guice.BlazarEventBusModule;
 import com.hubspot.blazar.guice.BlazarQueueProcessorModule;
 import com.hubspot.blazar.listener.BuildVisitorModule;
@@ -38,9 +44,10 @@ import com.hubspot.blazar.listener.GitHubStatusVisitor;
 import com.hubspot.blazar.listener.TestBuildLauncher;
 import com.hubspot.blazar.test.base.service.BlazarGitTestConfiguration;
 import com.hubspot.blazar.test.base.service.BlazarTestModule;
-import com.hubspot.blazar.util.SingularityBuildLauncher;
-import com.hubspot.blazar.util.TestSingularityBuildLauncher;
+import com.hubspot.blazar.util.TestBuildClusterService;
 import com.hubspot.horizon.AsyncHttpClient;
+import com.hubspot.singularity.SingularityHostState;
+import com.hubspot.singularity.SingularityState;
 import com.hubspot.singularity.client.SingularityClient;
 import com.ullink.slack.simpleslackapi.SlackSession;
 
@@ -54,21 +61,38 @@ public class BlazarServiceTestModule extends AbstractModule {
     install(new DiscoveryModule());
     install(new BlazarQueueProcessorModule());
     install(new BlazarEventBusModule());
+
     bind(GitHubStatusVisitor.class).toInstance(mock(GitHubStatusVisitor.class));
+
     bind(BlazarConfiguration.class).toInstance(buildBlazarConfiguration());
-    bind(SingularityClient.class).toInstance(mock(SingularityClient.class));
+
     bind(SlackSession.class).toInstance(mock(SlackSession.class));
+
     bind(AsyncHttpClient.class).toInstance(mock(AsyncHttpClient.class));
+
     bind(Integer.class).annotatedWith(Names.named("")).toInstance(0);
+
     Multibinder<ModuleBuildVisitor> moduleBuildVisitors = Multibinder.newSetBinder(binder(), ModuleBuildVisitor.class);
     moduleBuildVisitors.addBinding().to(TestBuildLauncher.class);
+
     bindGitHubMap(); // does its own binding
+
+    // Bind and configure Singularity clients for the available clusters
+    SingularityClient singularityClientForCluster1 = mock(SingularityClient.class);
+    when(singularityClientForCluster1.getState(Optional.of(false), Optional.of(false))).thenReturn(getSingularityState());
+    SingularityClient singularityClientForCluster2 = mock(SingularityClient.class);
+    when(singularityClientForCluster2.getState(Optional.of(false), Optional.of(false))).thenReturn(getSingularityState());
+    bind(new TypeLiteral<Map<String, SingularityClient>>() {}).toInstance(ImmutableMap.of(
+        "SingularityCluster1", singularityClientForCluster1,
+        "SingularityCluster2", singularityClientForCluster2));
+
+    System.setProperty("kill-delay", "10000");
   }
 
   @Singleton
   @Provides
-  public SingularityBuildLauncher providesSingularityBuildLauncher(TestSingularityBuildLauncher testSingularityBuildLauncher) {
-    return testSingularityBuildLauncher;
+  public BuildClusterService providesBuildClusterService(TestBuildClusterService testBuildClusterService) {
+    return testBuildClusterService;
   }
 
   private BlazarConfiguration buildBlazarConfiguration() {
@@ -79,6 +103,21 @@ public class BlazarServiceTestModule extends AbstractModule {
       private Map<String, GitHubConfiguration> buildGitHubConfiguration() {
         GitHubConfiguration gitHubConfiguration = new GitHubConfiguration(Optional.absent(), Optional.absent(), Optional.of(false), Optional.absent(), ImmutableList.of("test"));
         return ImmutableMap.of("git.example.com", gitHubConfiguration);
+      }
+
+      @Override
+      public Map<String, SingularityClusterConfiguration> getSingularityClusterConfigurations() {
+        SingularityClusterConfiguration singularityClusterConfiguration = new SingularityClusterConfiguration(
+            "host",
+            "request",
+            Optional.of("path"),
+            Optional.absent(),
+            5000,
+            BuildStrategy.ALWAYS, Collections.emptySet());
+
+        return ImmutableMap.of(
+            "SingularityCluster1", singularityClusterConfiguration,
+            "SingularityCluster2", singularityClusterConfiguration);
       }
 
       @Override
@@ -119,6 +158,42 @@ public class BlazarServiceTestModule extends AbstractModule {
         EVENT_BUS_EXCEPTION_COUNT.add(exception);
       }
     };
+  }
+
+  private SingularityState getSingularityState() {
+    return new SingularityState(
+        1842,
+        3849,
+        10,
+        67,
+        551,
+        1,
+        0,
+        0,
+        0,
+        10,
+        3,
+        0,
+        10,
+        1,
+        0,
+        10,
+        Collections.<SingularityHostState>emptyList(),
+        0L,
+        10,
+        10,
+        10,
+        10,
+        1491433225641L,
+        Collections.<String>emptyList(),
+        Collections.<String>emptyList(),
+        0,
+        0,
+        0,
+        0,
+        0,
+        Optional.absent(),
+        Optional.absent());
   }
 }
 

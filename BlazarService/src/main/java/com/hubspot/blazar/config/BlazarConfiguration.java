@@ -25,11 +25,12 @@ public class BlazarConfiguration {
   @JsonProperty("github")
   private Map<String, GitHubConfiguration> gitHubConfiguration;
 
-  // The configuration required for Blazar to connect to Singularity
+  // The configurations for connecting to the available Singularity clusters
+  // The map key is the name of the cluster and the value the respective configuration.
   @Valid
   @NotNull
-  @JsonProperty("singularity")
-  private SingularityConfiguration singularityConfiguration;
+  @JsonProperty("singularityClusters")
+  private Map<String, SingularityClusterConfiguration> singularityClusterConfigurations;
 
   // Default options we pass to the executor
   @Valid
@@ -84,12 +85,12 @@ public class BlazarConfiguration {
     return this;
   }
 
-  public SingularityConfiguration getSingularityConfiguration() {
-    return singularityConfiguration;
+  public Map<String, SingularityClusterConfiguration> getSingularityClusterConfigurations() {
+    return singularityClusterConfigurations;
   }
 
-  public BlazarConfiguration setSingularityConfiguration(SingularityConfiguration singularityConfiguration) {
-    this.singularityConfiguration = singularityConfiguration;
+  public BlazarConfiguration setSingularityClusterConfigurations(Map<String, SingularityClusterConfiguration> singularityClusterConfigurations) {
+    this.singularityClusterConfigurations = singularityClusterConfigurations;
     return this;
   }
 

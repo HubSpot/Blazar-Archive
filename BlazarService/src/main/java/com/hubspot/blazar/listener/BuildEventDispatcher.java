@@ -69,8 +69,12 @@ public class BuildEventDispatcher {
         visitor.visit(build);
       }
     } catch (NonRetryableBuildException e) {
-      LOG.warn("Failing build {}", build.getId().get(), e);
-      repositoryBuildService.fail(build);
+      if (build.getState().isComplete()) {
+        LOG.error("Caught error while processing completed build {} will not fail the build because it is already complete.", build, e);
+      } else {
+        LOG.warn("Failing build {}", build.getId().get(), e);
+        repositoryBuildService.fail(build);
+      }
     }
   }
 
@@ -89,8 +93,12 @@ public class BuildEventDispatcher {
         visitor.visit(build);
       }
     } catch (NonRetryableBuildException e) {
-      LOG.warn("Failing build {}", build.getId().get(), e);
-      moduleBuildService.fail(build);
+      if (build.getState().isComplete()) {
+        LOG.error("Caught error while processing completed build {} will not fail the build because it is already complete.", build, e);
+      } else {
+        LOG.warn("Failing build {}", build.getId().get(), e);
+        moduleBuildService.fail(build);
+      }
     }
   }
 
