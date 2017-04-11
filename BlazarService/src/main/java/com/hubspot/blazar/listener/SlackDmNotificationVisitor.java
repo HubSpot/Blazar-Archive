@@ -43,7 +43,7 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
     this.branchService = branchService;
     this.slackMessageBuildingUtils = slackMessageBuildingUtils;
     this.blazarSlackClient = blazarSlackClient;
-    this.slackConfig = blazarConfiguration.getSlackConfiguration().get().getBlazarSlackDirectMessageConfiguration();
+    this.slackConfig = blazarConfiguration.getSlackConfiguration().get().getDirectMessageConfiguration();
   }
 
   @Override

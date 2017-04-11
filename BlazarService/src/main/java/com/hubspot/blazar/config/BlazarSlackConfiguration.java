@@ -14,27 +14,27 @@ public class BlazarSlackConfiguration {
   private final String slackApiBaseUrl;
   private final String slackApiToken;
   private final Optional<String> feedbackRoom;
-  private BlazarSlackDirectMessageConfiguration blazarSlackDirectMessageConfiguration;
+  private BlazarSlackDirectMessageConfiguration directMessageConfiguration;
   private String username;
 
   /**
-   * @param slackApiBaseUrl The slack api to point at
-   * @param slackApiToken Auth token for connecting
-   * @param username The username to post in slack as
-   * @param feedbackRoom The room to push feedback from our in-app feedback box to
-   * @param blazarSlackDirectMessageConfiguration The configuration for blazar's direct-message functionality
+   * @param slackApiBaseUrl            The slack api to point at
+   * @param slackApiToken              Auth token for connecting
+   * @param username                   The username to post in slack as
+   * @param feedbackRoom               The room to push feedback from our in-app feedback box to
+   * @param directMessageConfiguration The configuration for blazar's direct-message functionality
    */
   @Inject
   public BlazarSlackConfiguration(@JsonProperty("slackApiBaseUrl") String slackApiBaseUrl,
                                   @JsonProperty("slackApiToken") String slackApiToken,
                                   @JsonProperty("username") String username,
                                   @JsonProperty("feedbackRoom") Optional<String> feedbackRoom,
-                                  @JsonProperty("directMessageConfiguration") BlazarSlackDirectMessageConfiguration blazarSlackDirectMessageConfiguration) {
+                                  @JsonProperty("directMessageConfiguration") BlazarSlackDirectMessageConfiguration directMessageConfiguration) {
     this.slackApiBaseUrl = slackApiBaseUrl;
     this.slackApiToken = slackApiToken;
     this.username = username;
     this.feedbackRoom = feedbackRoom;
-    this.blazarSlackDirectMessageConfiguration = blazarSlackDirectMessageConfiguration;
+    this.directMessageConfiguration = directMessageConfiguration;
   }
 
   public String getSlackApiBaseUrl() {
@@ -53,7 +53,8 @@ public class BlazarSlackConfiguration {
     return feedbackRoom;
   }
 
-  public BlazarSlackDirectMessageConfiguration getBlazarSlackDirectMessageConfiguration() {
-    return blazarSlackDirectMessageConfiguration;
+  public BlazarSlackDirectMessageConfiguration getDirectMessageConfiguration() {
+    return directMessageConfiguration;
   }
 }
+
