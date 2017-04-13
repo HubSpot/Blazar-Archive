@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import com.google.inject.Inject;
+import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
 import com.hubspot.blazar.listener.BuildEventDispatcher;
 import com.hubspot.blazar.queue.QueueProcessor;
 import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
@@ -17,16 +18,22 @@ public class BlazarServiceTestBase extends DatabaseBackedTest {
   @Inject
   QueueProcessor queueProcessor;
   @Inject
+  BuildClusterHealthChecker buildClusterHealthChecker;
+  @Inject
   BuildEventDispatcher buildEventDispatcher;
 
   @Before
-  public void startEventBus() {
+  public void startEventBus() throws Exception {
+    buildClusterHealthChecker.start();
+    buildClusterHealthChecker.isLeader();
     queueProcessor.isLeader();
     queueProcessor.startProcessorWithCustomPollingRate(50, TimeUnit.MILLISECONDS);
   }
 
   @After
-  public void stopEventBus() {
+  public void stopEventBus() throws Exception {
+    buildClusterHealthChecker.notLeader();
+    buildClusterHealthChecker.stop();
     queueProcessor.notLeader();
     queueProcessor.stop();
   }

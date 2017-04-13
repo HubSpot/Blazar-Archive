@@ -19,10 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
 import com.hubspot.blazar.data.dao.QueueItemDao;
 import com.hubspot.blazar.data.queue.QueueItem;
+import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
+import com.hubspot.blazar.github.GitHubProtos;
 import com.hubspot.blazar.util.ManagedScheduledExecutorServiceProvider;
 
 import io.dropwizard.lifecycle.Managed;
@@ -30,6 +33,9 @@ import io.dropwizard.lifecycle.Managed;
 @Singleton
 public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(QueueProcessor.class);
+  private static final List<Class> PROCESSED_EVENTS_WHEN_CLUSTERS_DOWN  = ImmutableList.of(
+      GitHubProtos.PushEvent.class, GitHubProtos.DeleteEvent.class, GitHubProtos.CreateEvent.class);
+
 
   private final ScheduledExecutorService executorService;
   private final Map<String, ScheduledExecutorService> queueExecutors;
@@ -39,12 +45,14 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
   private final Set<QueueItem> processingItems;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
+  private final BuildClusterHealthChecker buildClusterHealthChecker;
   private Optional<ScheduledFuture<?>> processingTask;
 
   @Inject
   public QueueProcessor(@Named("QueueProcessor") ScheduledExecutorService executorService,
                         QueueItemDao queueItemDao,
                         SqlEventBus eventBus,
+                        BuildClusterHealthChecker buildClusterHealthChecker,
                         Set<Object> erroredItems) {
     this.executorService = executorService;
     this.queueExecutors = new ConcurrentHashMap<>();
@@ -52,6 +60,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     this.eventBus = eventBus;
     this.erroredItems = erroredItems;
     this.processingItems = Sets.newConcurrentHashSet();
+    this.buildClusterHealthChecker = buildClusterHealthChecker;
 
     this.running = new AtomicBoolean();
     this.leader = new AtomicBoolean();
@@ -77,8 +86,8 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
       // gracefully allow processing to stop.
       boolean success = processingTask.get().cancel(false);
       if (!success && (processingTask.get().isCancelled() || processingTask.get().isDone())) {
-        RuntimeException scheduledExectuorShutdownError = new RuntimeException("Failed to successfully shut down scheduled queue polling task");
-        LOG.error("Error stopping QueueProcessor", scheduledExectuorShutdownError);
+        RuntimeException scheduledExecutorShutdownError = new RuntimeException("Failed to successfully shut down scheduled queue polling task");
+        LOG.error("Error stopping QueueProcessor", scheduledExecutorShutdownError);
       }
     }
     LOG.info("Queue Processor Stopped");
@@ -101,15 +110,27 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     try {
       if (running.get() && leader.get()) {
         List<QueueItem> queueItemsSorted = sort(queueItemDao.getItemsReadyToExecute());
+        LOG.debug("Found {} items ready to execute", queueItemsSorted.size());
+        LOG.debug("Found {} items currently processing", processingItems.size());
         queueItemsSorted.removeAll(processingItems);
+        LOG.debug("Processing {} more items", queueItemsSorted.size());
         processingItems.addAll(queueItemsSorted);
 
-        for (QueueItem queueItem : queueItemsSorted) {
-          LOG.debug("Processing Item: {}", queueItem);
-          String queueName = queueItem.getType().getSimpleName();
-          queueExecutors.computeIfAbsent(queueName, k -> {
-            return new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor-" + queueName).get();
-          }).execute(new ProcessItemRunnable(queueItem));
+
+        for (QueueItem queuedItem : queueItemsSorted) {
+          LOG.debug("Processing Item: {}", queuedItem.getId().get());
+          String eventType = queuedItem.getType().getSimpleName();
+
+          if (!canDequeueEvent(queuedItem)) {
+            LOG.warn("Will not dequeue event {}(id: {}) because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down)",
+                eventType, queuedItem.getId().get());
+            processingItems.remove(queuedItem);
+            return;
+          }
+
+          queueExecutors.computeIfAbsent(eventType, k -> {
+            return new ManagedScheduledExecutorServiceProvider(1, "QueueProcessor-" + eventType).get();
+          }).execute(new ProcessItemRunnable(queuedItem));
         }
       }
     } catch (Throwable t) {
@@ -121,6 +142,12 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     return queueItems.stream()
         .sorted(Comparator.comparing(item -> item.getId().get()))
         .collect(Collectors.toList());
+  }
+
+  private boolean canDequeueEvent(QueueItem queueItem) {
+    return buildClusterHealthChecker.isSomeClusterAvailable() ||
+        (!buildClusterHealthChecker.isSomeClusterAvailable() &&
+            PROCESSED_EVENTS_WHEN_CLUSTERS_DOWN.contains(queueItem.getType()));
   }
 
   private class ProcessItemRunnable implements Runnable {

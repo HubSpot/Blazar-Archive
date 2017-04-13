@@ -220,3 +220,6 @@ ALTER TABLE `branches` MODIFY `branch` varchar(190) CHARACTER SET utf8mb4 COLLAT
 
 -- changeset jgoodwin:16
 CREATE INDEX host_org_repo_repoId ON branches (active, host, organization, repository, repositoryId)
+
+-- changeset gchomatas:17
+ALTER TABLE `module_builds` ADD COLUMN `buildClusterName` varchar(64) NOT NULL DEFAULT 'Singularity3x3';

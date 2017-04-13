@@ -14,6 +14,7 @@ import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.config.BlazarConfigurationWrapper;
+import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
 import com.hubspot.blazar.queue.QueueProcessor;
 import com.hubspot.blazar.util.HostUtils;
 import com.hubspot.blazar.util.HostUtils.Host;
@@ -35,6 +36,7 @@ public class BlazarZooKeeperModule implements Module {
     Multibinder<LeaderLatchListener> leaderLatchListeners = Multibinder.newSetBinder(binder, LeaderLatchListener.class);
     leaderLatchListeners.addBinding().to(QueueProcessor.class);
     leaderLatchListeners.addBinding().to(LeaderMetricManager.class);
+    leaderLatchListeners.addBinding().to(BuildClusterHealthChecker.class);
   }
 
   @Provides

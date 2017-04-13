@@ -17,7 +17,8 @@ import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
-import com.hubspot.blazar.config.BlazarSlackConfiguration;
+import com.hubspot.blazar.config.BlazarSlackDirectMessageConfiguration;
+import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.util.BlazarSlackClient;
 import com.hubspot.blazar.util.SlackMessageBuildingUtils;
 
@@ -28,18 +29,21 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
   // Cancelled requires a user action - likely the user who would be slacked anyway so it is not worth messaging about
   private static final Set<RepositoryBuild.State> SLACK_WORTHY_FAILING_STATES = ImmutableSet.of(FAILED, UNSTABLE);
   private static final Logger LOG = LoggerFactory.getLogger(SlackDmNotificationVisitor.class);
-  private final BlazarSlackConfiguration blazarSlackConfig;
+  private final BlazarSlackDirectMessageConfiguration slackDirectMessageConfig;
 
+  private final BranchService branchService;
   private final SlackMessageBuildingUtils slackMessageBuildingUtils;
   private final BlazarSlackClient blazarSlackClient;
 
   @Inject
   public SlackDmNotificationVisitor(BlazarConfiguration blazarConfiguration,
+                                    BranchService branchService,
                                     SlackMessageBuildingUtils slackMessageBuildingUtils,
                                     BlazarSlackClient blazarSlackClient) {
+    this.branchService = branchService;
     this.slackMessageBuildingUtils = slackMessageBuildingUtils;
     this.blazarSlackClient = blazarSlackClient;
-    this.blazarSlackConfig = blazarConfiguration.getSlackConfiguration().get();
+    this.slackDirectMessageConfig = blazarConfiguration.getSlackConfiguration().get().getDirectMessageConfiguration();
   }
 
   @Override
@@ -66,14 +70,14 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
 
     Set<String> directNotifyEmails = build.getBuildMetadata().getUser().asSet();
 
-    directNotifyEmails.removeAll(blazarSlackConfig.getImBlacklist());
+    directNotifyEmails.removeAll(slackDirectMessageConfig.getBlacklistedUserEmails());
 
     // If the white list is empty we send to author/committer
     // else we only send to the whitelisted members
-    if (blazarSlackConfig.getImWhitelist().isEmpty()) {
+    if (slackDirectMessageConfig.getWhitelistedUserEmails().isEmpty()) {
       return directNotifyEmails;
     } else {
-      return Sets.intersection(directNotifyEmails, blazarSlackConfig.getImWhitelist());
+      return Sets.intersection(directNotifyEmails, slackDirectMessageConfig.getWhitelistedUserEmails());
     }
   }
 
@@ -82,6 +86,14 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
     if (!SLACK_WORTHY_FAILING_STATES.contains(build.getState())) {
       LOG.info("Build {} with state {} not in {} not sending message", build.getId().get(), build.getState(), SLACK_WORTHY_FAILING_STATES);
     }
+
+    // Do not send notifications for builds of branches that are explicitly ignored
+    String branchName = branchService.get(build.getBranchId()).get().getBranch();
+    if (slackDirectMessageConfig.getIgnoredBranches().contains(branchName)) {
+      LOG.info("Not sending messages for build {} because the branch is in the list of ignored branches {}", build, slackDirectMessageConfig.getIgnoredBranches());
+      return false;
+    }
+
 
     if (build.getBuildMetadata().getTriggeringEvent() != BuildMetadata.TriggeringEvent.PUSH) {
       LOG.info("Build {} was not a push build. Not sending messages directly to users for non-push triggered builds", build.getId().get());
