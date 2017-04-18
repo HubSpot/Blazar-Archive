@@ -17,13 +17,17 @@ import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.CachingMetricsService;
 import com.hubspot.blazar.data.service.MetricsService;
+import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
 import com.hubspot.blazar.github.GitHubProtos;
+import com.hubspot.singularity.client.SingularityClient;
 
 @Singleton
 public class LeaderMetricManager implements LeaderLatchListener {
   private static final Logger LOG = LoggerFactory.getLogger(LeaderMetricManager.class);
   private final MetricRegistry metricRegistry;
   private MetricsService metricsService;
+  private BuildClusterHealthChecker buildClusterHealthChecker;
+  private Map<String, SingularityClient> singularityClusterClients;
   private final CachingMetricsService cachingMetricsService;
   private static final Set<Class<?>> EXPECTED_EVENT_TYPES = ImmutableSet.of(ModuleBuild.class,
       RepositoryBuild.class, InterProjectBuild.class, GitHubProtos.DeleteEvent.class, GitHubProtos.PushEvent.class, GitHubProtos.CreateEvent.class);
@@ -31,9 +35,13 @@ public class LeaderMetricManager implements LeaderLatchListener {
   @Inject
   public LeaderMetricManager(MetricRegistry metricRegistry,
                              MetricsService metricsService,
+                             BuildClusterHealthChecker buildClusterHealthChecker,
+                             Map<String, SingularityClient> singularityClusterClients,
                              CachingMetricsService cachingMetricsService)  {
     this.metricRegistry = metricRegistry;
     this.metricsService = metricsService;
+    this.buildClusterHealthChecker = buildClusterHealthChecker;
+    this.singularityClusterClients = singularityClusterClients;
     this.cachingMetricsService = cachingMetricsService;
   }
 
@@ -90,6 +98,14 @@ public class LeaderMetricManager implements LeaderLatchListener {
 
     Gauge<String> hungBuildDataGauge = cachingMetricsService::getCachedHungBuildData;
     metricRegistry.register(getClass().getName() + ".RepositoryBuild.hung.data", hungBuildDataGauge);
+
+    for (String clusterName : singularityClusterClients.keySet()) {
+      Gauge<Boolean> clusterStatusGauge = () -> buildClusterHealthChecker.isClusterAvailable(clusterName);
+      String name = getClass().getName() + String.format(".%s.ClusterHealthy", clusterName);
+
+      LOG.info(name);
+      metricRegistry.register(name, clusterStatusGauge);
+    }
   }
 
   private String queuedEventTypeToMetricName(Class<?> eventType) {
