@@ -133,7 +133,7 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
   }
 
   private double getRatioOfOverdueOverActiveTasks(SingularityState singularityState) {
-    return singularityState.getLateTasks() / singularityState.getActiveTasks() * 100;
+    return (double) singularityState.getLateTasks()/ singularityState.getActiveTasks() * 100;
   }
 
   private static final class ClusterHealthCheck {
