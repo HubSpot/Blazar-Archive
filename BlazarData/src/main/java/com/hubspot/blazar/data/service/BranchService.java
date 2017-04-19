@@ -72,7 +72,11 @@ public class BranchService {
         return gitInfo.withId(id);
       } catch (UnableToExecuteStatementException e) {
         if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-          return getByRepositoryAndBranch(gitInfo.getRepositoryId(), gitInfo.getBranch()).get();
+          Optional<GitInfo> maybeBranch = getByRepositoryAndBranch(gitInfo.getRepositoryId(), gitInfo.getBranch());
+          if (!maybeBranch.isPresent()) {
+            throw new RuntimeException(String.format("Unable to upsert gitInfo %s", gitInfo));
+          }
+          return maybeBranch.get();
         } else {
           throw e;
         }
