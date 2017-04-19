@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
@@ -32,7 +32,7 @@ import com.hubspot.blazar.data.service.BranchStatusService;
 
 
 public class BranchStatusServiceTest {
-  private static final BuildTrigger manualTrigger = BuildTrigger.forUser("user");
+  private static final BuildMetadata manualTrigger = BuildMetadata.manual(Optional.of("user"));
   private static final BuildOptions defaultOptions = BuildOptions.defaultOptions();
   private static final GitInfo branch1 = new GitInfo(Optional.of(1), "git.example.com", "example", "example", 1337, "master", true, System.currentTimeMillis(), System.currentTimeMillis());
   private static final GitInfo branch2 = new GitInfo(Optional.of(2), "git.example.com", "example", "example", 1337, "notMaster", true, System.currentTimeMillis(), System.currentTimeMillis());

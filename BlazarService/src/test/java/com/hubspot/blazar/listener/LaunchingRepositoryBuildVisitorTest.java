@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
@@ -68,7 +68,7 @@ public class LaunchingRepositoryBuildVisitorTest {
       2, ImmutableSet.of());
   private static final CommitInfo commitInfo = new CommitInfo(GitHubProtos.Commit.newBuilder().setId("0000000000000000000000000000000000000000").build(), Optional.absent(), Collections.emptyList(), false);
   private static final RepositoryBuild launchingBuild =
-        RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.LAUNCHING, BuildTrigger.forUser("example"), new BuildOptions(ImmutableSet.of(1), BuildOptions.BuildDownstreams.WITHIN_REPOSITORY, false))
+        RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.LAUNCHING, BuildMetadata.push("testUser"), new BuildOptions(ImmutableSet.of(1), BuildOptions.BuildDownstreams.WITHIN_REPOSITORY, false))
             .setId(Optional.of(1L))
             .setDependencyGraph(Optional.of(new DependencyGraph(dependencyMap, ImmutableList.of(1, 2))))
             .setCommitInfo(Optional.of(commitInfo))

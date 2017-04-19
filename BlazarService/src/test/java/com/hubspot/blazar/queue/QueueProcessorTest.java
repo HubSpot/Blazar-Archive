@@ -21,8 +21,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
 import com.hubspot.blazar.BlazarServiceTestBase;
 import com.hubspot.blazar.BlazarServiceTestModule;
-import com.hubspot.blazar.base.BuildTrigger;
-import com.hubspot.blazar.base.BuildTrigger.Type;
+import com.hubspot.blazar.base.BuildMetadata;
 
 @RunWith(JukitoRunner.class)
 @UseModules({BlazarServiceTestModule.class})
@@ -48,7 +47,7 @@ public class QueueProcessorTest extends BlazarServiceTestBase {
 
   @Test
   public void itProcessesEvents() {
-    BuildTrigger event = new BuildTrigger(Type.PUSH, "abc");
+    BuildMetadata event = BuildMetadata.push("testUser");
     eventBus.post(event);
 
     waitForEvent();
@@ -68,7 +67,7 @@ public class QueueProcessorTest extends BlazarServiceTestBase {
       }
     });
 
-    BuildTrigger event = new BuildTrigger(Type.PUSH, "abc");
+    BuildMetadata event = BuildMetadata.push("testUser");
     eventBus.post(event);
 
     waitForEvent();
@@ -92,7 +91,7 @@ public class QueueProcessorTest extends BlazarServiceTestBase {
       }
     });
 
-    BuildTrigger event = new BuildTrigger(Type.PUSH, "abc");
+    BuildMetadata event = BuildMetadata.push("testUser");
     eventBus.post(event);
 
     Uninterruptibles.awaitUninterruptibly(latch);

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
@@ -53,11 +53,11 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
     }
 
     Set<String> userEmailsToSendMessagesTo = getUserEmailsToDirectlyNotify(build);
+
     boolean shouldSendMessage = shouldSendMessage(build, userEmailsToSendMessagesTo);
     if (shouldSendMessage) {
       for (String email : userEmailsToSendMessagesTo) {
-        String message = "A build started by your code push was not successful";
-        blazarSlackClient.sendMessageToUser(email, message, slackMessageBuildingUtils.buildSlackAttachment(build));
+        blazarSlackClient.sendMessageToUser(email, "A build started by your code push failed", slackMessageBuildingUtils.buildSlackAttachment(build));
       }
     }
   }
@@ -68,9 +68,7 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
       return Collections.emptySet();
     }
 
-    Set<String> directNotifyEmails = Sets.newHashSet(
-        build.getCommitInfo().get().getCurrent().getAuthor().getEmail(), // Author Email
-        build.getCommitInfo().get().getCurrent().getAuthor().getEmail()); // Committer Email
+    Set<String> directNotifyEmails = build.getBuildMetadata().getUser().asSet();
 
     directNotifyEmails.removeAll(slackDirectMessageConfig.getBlacklistedUserEmails());
 
@@ -84,8 +82,9 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
   }
 
   private boolean shouldSendMessage(RepositoryBuild build, Set<String> userEmailsToSendMessagesTo) {
-    if (userEmailsToSendMessagesTo.isEmpty()) {
-      return false;
+
+    if (!SLACK_WORTHY_FAILING_STATES.contains(build.getState())) {
+      LOG.info("Build {} with state {} not in {} not sending message", build.getId().get(), build.getState(), SLACK_WORTHY_FAILING_STATES);
     }
 
     // Do not send notifications for builds of branches that are explicitly ignored
@@ -95,17 +94,17 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
       return false;
     }
 
-    boolean wasPush = build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH;
-    boolean wasBranchCreation = build.getBuildTrigger().getType() == BuildTrigger.Type.BRANCH_CREATION;
-    if (!(wasPush || wasBranchCreation)) {
-      LOG.info("Not sending messages for triggers other than push or branch creation at this time.");
+
+    if (build.getBuildMetadata().getTriggeringEvent() != BuildMetadata.TriggeringEvent.PUSH) {
+      LOG.info("Build {} was not a push build. Not sending messages directly to users for non-push triggered builds", build.getId().get());
       return false;
     }
 
-    if (!SLACK_WORTHY_FAILING_STATES.contains(build.getState())) {
-      LOG.info("Build {} in state {} does not merit direct-slack-message", build.getId().get(), build.getState());
+    if (userEmailsToSendMessagesTo.isEmpty()) {
+      LOG.info("Build {} had no users to send messages to, not sending message", build.getId().get());
       return false;
     }
+
     return true;
   }
 }

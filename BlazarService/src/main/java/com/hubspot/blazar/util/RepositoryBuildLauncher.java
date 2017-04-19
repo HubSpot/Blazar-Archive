@@ -1,6 +1,6 @@
 package com.hubspot.blazar.util;
 
-import static com.hubspot.blazar.base.BuildTrigger.Type.INTER_PROJECT;
+import static com.hubspot.blazar.base.BuildMetadata.TriggeringEvent.INTER_PROJECT;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -107,7 +107,7 @@ public class RepositoryBuildLauncher {
 
     // Inter project builds re-build the project using the commit of the last build if available
     // otherwise we fall back to using the newest commit available
-    if (queuedBuild.getBuildTrigger().getType() == INTER_PROJECT && lastCommitInPreviousBuild.isPresent()) {
+    if (queuedBuild.getBuildMetadata().getTriggeringEvent() == INTER_PROJECT && lastCommitInPreviousBuild.isPresent()) {
       return new CommitInfo(lastCommitInPreviousBuild.get(), lastCommitInPreviousBuild, ImmutableList.of(), false);
     }
 

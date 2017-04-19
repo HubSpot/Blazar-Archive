@@ -56,7 +56,7 @@ public class InterProjectBuildService {
         build.getId(),
         InterProjectBuild.State.CANCELLED,
         build.getModuleIds(),
-        build.getBuildTrigger(),
+        build.getBuildMetadata(),
         build.getStartTimestamp(),
         Optional.of(System.currentTimeMillis()),
         build.getDependencyGraph());

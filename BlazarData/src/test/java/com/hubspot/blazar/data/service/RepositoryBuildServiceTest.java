@@ -16,7 +16,7 @@ import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildOptions;
 import com.hubspot.blazar.base.BuildOptions.BuildDownstreams;
-import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.GitInfo;
@@ -39,8 +39,8 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
   private GitInfo branchTwo;
   private long buildIdOne;
   private long buildIdTwo;
-  private BuildTrigger buildTriggerOne;
-  private BuildTrigger buildTriggerTwo;
+  private BuildMetadata buildMetadataOne;
+  private BuildMetadata buildMetadataTwo;
   private BuildOptions buildOptionsOne;
   private BuildOptions buildOptionsTwo;
   private CommitInfo commitInfoOne;
@@ -58,15 +58,15 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
     List<Commit> emptyCommits = Collections.emptyList();
     Set<Integer> emptyIntegers = Collections.emptySet();
 
-    buildTriggerOne = BuildTrigger.forCommit("abc");
+    buildMetadataOne = BuildMetadata.push("a-github-user");
     buildOptionsOne = new BuildOptions(Collections.singleton(123), BuildDownstreams.NONE, true);
-    buildIdOne = repositoryBuildService.enqueue(branchOne, buildTriggerOne, buildOptionsOne);
+    buildIdOne = repositoryBuildService.enqueue(branchOne, buildMetadataOne, buildOptionsOne);
     commitInfoOne = new CommitInfo(Commit.newBuilder().setId("abc").build(), absentCommit, emptyCommits, false);
     dependencyGraphOne = new DependencyGraph(Collections.singletonMap(123, emptyIntegers), Collections.singletonList(123));
 
-    buildTriggerTwo = BuildTrigger.forCommit("def");
+    buildMetadataTwo = BuildMetadata.push("a-github-user");
     buildOptionsTwo = new BuildOptions(Collections.singleton(456), BuildDownstreams.NONE, false);
-    buildIdTwo = repositoryBuildService.enqueue(branchTwo, buildTriggerTwo, buildOptionsTwo);
+    buildIdTwo = repositoryBuildService.enqueue(branchTwo, buildMetadataTwo, buildOptionsTwo);
     commitInfoTwo = new CommitInfo(Commit.newBuilder().setId("def").build(), absentCommit, emptyCommits, false);
     dependencyGraphTwo = new DependencyGraph(Collections.singletonMap(456, emptyIntegers), Collections.singletonList(456));
   }
@@ -75,7 +75,7 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
   public void itEnqueuesNewBuildWhenNonePresent() {
     RepositoryBuild repositoryBuild = repositoryBuildService.get(buildIdOne).get();
 
-    validateBuild(RepositoryBuild.queuedBuild(branchOne, buildTriggerOne, 1, buildOptionsOne), repositoryBuild);
+    validateBuild(RepositoryBuild.queuedBuild(branchOne, buildMetadataOne, 1, buildOptionsOne), repositoryBuild);
 
     BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(branchOne.getId().get());
     assertThat(buildNumbers.getPendingBuildId().get()).isEqualTo(buildIdOne);
@@ -84,13 +84,13 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
 
   @Test
   public void itReturnsPendingBuildForSecondPushEvent() {
-    long newBuildId = repositoryBuildService.enqueue(branchOne, buildTriggerTwo, buildOptionsTwo);
+    long newBuildId = repositoryBuildService.enqueue(branchOne, buildMetadataTwo, buildOptionsTwo);
     assertThat(newBuildId).isEqualTo(buildIdOne);
   }
 
   @Test
   public void itEnqueuesNewBuildForManualTrigger() {
-    BuildTrigger manualTrigger = BuildTrigger.forUser("test");
+    BuildMetadata manualTrigger = BuildMetadata.manual(Optional.of("a-user-name"));
     long newBuildId = repositoryBuildService.enqueue(branchOne, manualTrigger, buildOptionsOne);
     assertThat(newBuildId).isNotEqualTo(buildIdOne);
 
@@ -109,7 +109,7 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
 
     RepositoryBuild repositoryBuild = repositoryBuildService.get(buildIdTwo).get();
 
-    validateBuild(RepositoryBuild.queuedBuild(branchTwo, buildTriggerTwo, 1, buildOptionsTwo), repositoryBuild);
+    validateBuild(RepositoryBuild.queuedBuild(branchTwo, buildMetadataTwo, 1, buildOptionsTwo), repositoryBuild);
 
     BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(branchTwo.getId().get());
     assertThat(buildNumbers.getPendingBuildId().get()).isEqualTo(buildIdTwo);
@@ -142,7 +142,7 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
 
   @Test
   public void itMovesNextQueuedBuildIntoPendingSlotWhenBuildBegins() {
-    BuildTrigger manualTrigger = BuildTrigger.forUser("test");
+    BuildMetadata manualTrigger = BuildMetadata.manual(Optional.of("a-user-name"));
     long newBuildId = repositoryBuildService.enqueue(branchOne, manualTrigger, buildOptionsOne);
     assertThat(newBuildId).isNotEqualTo(buildIdOne);
 
@@ -183,7 +183,7 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
 
   @Test
   public void itCancelsExtraQueuedBuildProperly() {
-    BuildTrigger manualTrigger = BuildTrigger.forUser("test");
+    BuildMetadata manualTrigger = BuildMetadata.manual(Optional.of("a-user-name"));
     long newBuildId = repositoryBuildService.enqueue(branchOne, manualTrigger, buildOptionsOne);
     assertThat(newBuildId).isNotEqualTo(buildIdOne);
 
@@ -200,7 +200,7 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
 
   @Test
   public void itMovesNextQueuedBuildIntoPendingSlotProperly() {
-    BuildTrigger manualTrigger = BuildTrigger.forUser("test");
+    BuildMetadata manualTrigger = BuildMetadata.manual(Optional.of("a-user-name"));
     long newBuildId = repositoryBuildService.enqueue(branchOne, manualTrigger, buildOptionsOne);
     assertThat(newBuildId).isNotEqualTo(buildIdOne);
 
@@ -219,7 +219,7 @@ public class RepositoryBuildServiceTest extends DatabaseBackedTest {
     assertThat(actual.getBranchId()).isEqualTo(expected.getBranchId());
     assertThat(actual.getBuildNumber()).isEqualTo(expected.getBuildNumber());
     assertThat(actual.getState()).isEqualTo(expected.getState());
-    assertThat(actual.getBuildTrigger()).isEqualTo(expected.getBuildTrigger());
+    assertThat(actual.getBuildMetadata()).isEqualTo(expected.getBuildMetadata());
     assertThat(actual.getBuildOptions()).isEqualTo(expected.getBuildOptions());
     assertThat(actual.getStartTimestamp()).isEqualTo(expected.getStartTimestamp());
     assertThat(actual.getEndTimestamp()).isEqualTo(expected.getEndTimestamp());

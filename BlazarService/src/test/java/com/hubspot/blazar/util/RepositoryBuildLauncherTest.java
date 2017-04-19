@@ -18,8 +18,8 @@ import org.kohsuke.github.GHRepository;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.hubspot.blazar.base.BuildMetadata;
 import com.hubspot.blazar.base.BuildOptions;
-import com.hubspot.blazar.base.BuildTrigger;
 import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -50,13 +50,13 @@ public class RepositoryBuildLauncherTest {
     Commit commit = Commit.newBuilder().setId(commitSha).build();
     CommitInfo commitInfo = new CommitInfo(commit, Optional.absent(), Collections.emptyList(), false);
 
-    RepositoryBuild previousBuild = RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.SUCCEEDED, BuildTrigger.forCommit(commitSha), BuildOptions.defaultOptions())
+    RepositoryBuild previousBuild = RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.SUCCEEDED, BuildMetadata.push("testUser"), BuildOptions.defaultOptions())
         .setCommitInfo(Optional.of(commitInfo))
         .build();
     Optional<RepositoryBuild> previousBuildOptional = Optional.of(previousBuild);
 
     BuildOptions ipbBuildOptions = new BuildOptions(ImmutableSet.of(1), BuildOptions.BuildDownstreams.NONE, false);
-    RepositoryBuild currentBuild = RepositoryBuild.queuedBuild(branch, BuildTrigger.forInterProjectBuild(1), 2, ipbBuildOptions);
+    RepositoryBuild currentBuild = RepositoryBuild.queuedBuild(branch, BuildMetadata.interProjectBuild(), 2, ipbBuildOptions);
 
     RepositoryBuildLauncher launcher = new RepositoryBuildLauncher(repositoryBuildService, branchService, moduleService, dependenciesService, moduleDiscoveryService, moduleDiscovery, gitHubHelper);
 
@@ -80,13 +80,13 @@ public class RepositoryBuildLauncherTest {
     Commit secondCommit = Commit.newBuilder().setId(secondCommitSha).build();
 
     CommitInfo previousCommitInfo = new CommitInfo(initialCommit, Optional.absent(), Collections.emptyList(), false);
-    RepositoryBuild previousBuild = RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.SUCCEEDED, BuildTrigger.forCommit(initialCommitSha), BuildOptions.defaultOptions())
+    RepositoryBuild previousBuild = RepositoryBuild.newBuilder(1, 1, RepositoryBuild.State.SUCCEEDED, BuildMetadata.push("testUser"), BuildOptions.defaultOptions())
         .setCommitInfo(Optional.of(previousCommitInfo))
         .build();
     Optional<RepositoryBuild> previousBuildOptional = Optional.of(previousBuild);
 
 
-    RepositoryBuild currentBuild = RepositoryBuild.queuedBuild(branch, BuildTrigger.forCommit(secondCommitSha), 2, BuildOptions.defaultOptions());
+    RepositoryBuild currentBuild = RepositoryBuild.queuedBuild(branch, BuildMetadata.push("testUser"), 2, BuildOptions.defaultOptions());
     RepositoryBuildLauncher launcher = new RepositoryBuildLauncher(repositoryBuildService, branchService, moduleService, dependenciesService, moduleDiscoveryService, moduleDiscovery, gitHubHelper);
 
     GHRepository repository = mock(GHRepository.class);

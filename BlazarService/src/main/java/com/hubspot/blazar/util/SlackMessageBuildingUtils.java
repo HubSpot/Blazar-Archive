@@ -1,12 +1,11 @@
 package com.hubspot.blazar.util;
 
-import static com.hubspot.blazar.base.ModuleBuild.State.CANCELLED;
-import static com.hubspot.blazar.base.ModuleBuild.State.SKIPPED;
-import static com.hubspot.blazar.base.ModuleBuild.State.SUCCEEDED;
-
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.google.common.base.Optional;
+import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.hubspot.blazar.base.GitInfo;
@@ -57,34 +56,16 @@ public class SlackMessageBuildingUtils {
     if (build.getState().equals(RepositoryBuild.State.SUCCEEDED)) {
       return attachment;
     }
-    attachment.setText("The failing modules were:");
 
     Set<ModuleBuild> builtModules = moduleBuildService.getByRepositoryBuild(build.getId().get());
-    for (ModuleBuild b : builtModules) {
-      ModuleBuild.State moduleBuildState = b.getState();
+    List<String> moduleNames = builtModules.stream()
+        .filter(mb -> mb.getState().isFailed())
+        .map(mb -> moduleService.get(mb.getModuleId()).get().getName())
+        .collect(Collectors.toList());
+    moduleNames.sort(Comparator.naturalOrder());
 
-      // SUCCEEDED & Skipped & CANCELLED are not states we highlight in slack attachment fields
-      if (moduleBuildState == SUCCEEDED || moduleBuildState == CANCELLED || moduleBuildState == SKIPPED) {
-        continue;
-      }
-
-      String moduleName = moduleService.get(b.getModuleId()).get().getName();
-      boolean repoBuildWasUnstable = build.getState() == RepositoryBuild.State.UNSTABLE;
-      boolean repoBuildFailed = build.getState().isFailed();
-
-      if (repoBuildFailed && !repoBuildWasUnstable) {
-        attachment.addField(moduleName, b.getState().name().toLowerCase(), true);
-        continue;
-      }
-
-      Optional<ModuleBuild> maybePrevious = moduleBuildService.getPreviousBuild(b);
-      if (maybePrevious.isPresent()) {
-        String unstableMessage = String.format("Unstable, last attempted build was in branch build #%d", maybePrevious.get().getBuildNumber());
-        attachment.addField(moduleName, unstableMessage, false);
-      } else {
-        attachment.addField(moduleName, "This module has never built.", true);
-      }
-    }
+    String attachmentText = String.format("There were %d failing modules:\n", moduleNames.size());
+    attachment.setText(attachmentText + Joiner.on("  |  ").join(moduleNames));
     return attachment;
   }
 
