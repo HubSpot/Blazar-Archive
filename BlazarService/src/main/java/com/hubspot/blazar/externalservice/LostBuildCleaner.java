@@ -25,7 +25,6 @@ import com.hubspot.blazar.config.ExecutorConfiguration;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.externalservice.BuildClusterService.BuildContainerInfo;
 import com.hubspot.blazar.externalservice.BuildClusterService.BuildContainerInfo.BuildContainerState;
-import com.hubspot.blazar.listener.BuildContainerKiller;
 
 import io.dropwizard.lifecycle.Managed;
 
@@ -46,7 +45,6 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
   private final ScheduledExecutorService executorService;
   private final ModuleBuildService moduleBuildService;
   private final BuildClusterService buildClusterService;
-  private final BuildContainerKiller buildContainerKiller;
   private final ExecutorConfiguration executorConfiguration;
   private final AtomicBoolean running;
   private final AtomicBoolean leader;
@@ -55,12 +53,10 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
   public LostBuildCleaner(@Named("QueueProcessor") ScheduledExecutorService executorService,
                           ModuleBuildService moduleBuildService,
                           BuildClusterService buildClusterService,
-                          BuildContainerKiller buildContainerKiller,
                           BlazarConfiguration blazarConfiguration) {
     this.executorService = executorService;
     this.moduleBuildService = moduleBuildService;
     this.buildClusterService = buildClusterService;
-    this.buildContainerKiller = buildContainerKiller;
     this.executorConfiguration = blazarConfiguration.getExecutorConfiguration();
 
     this.running = new AtomicBoolean();
@@ -118,7 +114,7 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
 
         BuildContainerInfo buildContainerInfo = buildClusterService.getBuildContainerInfo(moduleBuild);
         BuildContainerState buildContainerState = buildContainerInfo.getState();
-        //If the container has not yet started, it is running, or we don't know its state we will wait to check again in the nest cycle
+        //If the container has not yet started, it is running, or we don't know its state we will wait to check again in the next cycle
         if (buildContainerState == NOT_STARTED || buildContainerState == RUNNING || buildContainerState == UNKNOWN) {
           return;
         }
@@ -147,6 +143,7 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
     }
 
     private void handleLongRunningBuild(ModuleBuild moduleBuild) {
+      LOG.debug("Checking state of build container for module build: {}", moduleBuild.getId().get());
       try {
         long age = System.currentTimeMillis() - moduleBuild.getStartTimestamp().get();
         long maxAge = executorConfiguration.getBuildTimeoutMillis();
@@ -158,13 +155,13 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
         BuildContainerState buildContainerState = buildContainerInfo.getState();
         //The fact that the module build has state IN_PROGRESS means that its container started and it reported back
         // to blazar once to tell us that it has started but it has not yet reported back to tell us that it has finished.
-        // So if it is reported as NOT_STARTED (i.e. not container could be found with the provided container id)
+        // So if it is reported as NOT_STARTED (i.e. no container could be found with the provided container id)
         // or the container state is UNKNOWN or the container has finished (and didn't reported back) or the container
         // is running for longer than maxAge we will mark the module build as failed. In the latter case we will also
         // ask the build cluster service to kill the container.
         boolean buildExceededMaxAllowedRunningTime = buildContainerState == RUNNING && age > maxAge;
         if (buildContainerState == NOT_STARTED) {
-          LOG.warn("Container for Module build {} has not been started yet.");
+          LOG.warn("Module build {} is in progress for {}ms but could not find its container in build cluster. Will try again in the next cycle.", moduleBuild.getId().get(), age);
           // Todo actually fail things that are not started after 1 minute
           // LOG.info("Failing module build {} because the build is registered in Blazar db as 'in progress' but the build cluster reports it as NOT STARTED", moduleBuild.getId().get());
           // moduleBuildService.update(moduleBuild.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(buildContainerInfo.getUpdatedAtMillis())).build());
@@ -172,7 +169,7 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
           LOG.info("Failing module build {} because the build is registered in Blazar db as 'in progress' but the build cluster reports its state as UNKNOWN", moduleBuild.getId().get());
           moduleBuildService.update(moduleBuild.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(buildContainerInfo.getUpdatedAtMillis())).build());
         } else if (buildContainerState == FINISHED) {
-          LOG.info("Failing module build {} because the build is registered in Blazar db as 'in progress' but the build cluster reports that the container has FINISHED", moduleBuild.getId().get());
+          LOG.info("Failing module build {} because the build is registered in Blazar db as 'in progress' but the build cluster reports that the container has FINISHED (failed/succeded/killed/lost)", moduleBuild.getId().get());
           moduleBuildService.update(moduleBuild.toBuilder().setState(State.FAILED).setEndTimestamp(Optional.of(buildContainerInfo.getUpdatedAtMillis())).build());
         } else if (buildExceededMaxAllowedRunningTime) {
           LOG.info("Terminating container of module build {} because it is running for {} milliseconds which exceeds the max allowed running time of {} milliseconds. The build will be marked as failed", moduleBuild.getId().get(), age, maxAge);
@@ -183,9 +180,12 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
             LOG.error("Failed to kill running container of module build {}. The problem was: {}",
                 moduleBuild.getId().get(), e.getMessage(), e);
           }
+        } else {
+          LOG.info("Build container for module build {} has state {}. The container is running for {}ms which doesn't exceed the max allowed running time of {}ms. No need to initiate cleanup",
+              moduleBuild.getId().get(), buildContainerState, age, maxAge);
         }
       } catch (Throwable t) {
-        LOG.error("An error occurred while checking module build {}. The error is: {}. Will try again to check the module in the next cycle", moduleBuild.getId().get(), t.getMessage(), t);
+        LOG.error("An error occurred while checking the build container state for module build {}. The error is: {}. Will try again to check the module in the next cycle", moduleBuild.getId().get(), t.getMessage(), t);
       }
     }
   }
