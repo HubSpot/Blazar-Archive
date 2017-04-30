@@ -39,7 +39,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
   @Override
   public boolean shouldRediscover(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     for (String path : gitHubHelper.affectedPaths(commitInfo)) {
-      if (isBlazarConfig(path)) {
+      if (isBuildConfig(path)) {
         return true;
       }
     }
@@ -52,22 +52,32 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
     GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
     GHTree tree = gitHubHelper.treeFor(repository, gitInfo);
 
-    Set<String> blazarConfigs = new HashSet<>();
+    Set<String> buildConfigFilePaths = new HashSet<>();
     for (GHTreeEntry entry : tree.getTree()) {
-      if (isBlazarConfig(entry.getPath())) {
-        blazarConfigs.add(entry.getPath());
+      if (isBuildConfig(entry.getPath())) {
+        buildConfigFilePaths.add(entry.getPath());
       }
     }
 
     Set<DiscoveredModule> modules = new HashSet<>();
     Set<MalformedFile> malformedFiles = new HashSet<>();
-    for (String blazarConfig : blazarConfigs) {
-      if (disabled(blazarConfig, repository, gitInfo)) {
+
+    for (String buildConfigFilePath : buildConfigFilePaths) {
+      final BuildConfig buildConfig;
+      try {
+        buildConfig = gitHubHelper.configFor(buildConfigFilePath, repository, gitInfo).get();
+      } catch (JsonProcessingException e) {
+        LOG.warn("Error parsing config at path {} for repository {}@{}", buildConfigFilePath, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
+        malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "config", buildConfigFilePath, Throwables.getStackTraceAsString(e)));
+        continue;
+      }
+
+      if (buildConfig.isDisabled()) {
         modules.add(new DiscoveredModule(
             Optional.<Integer>absent(),
             "disabled",
             "config",
-            blazarConfig,
+            buildConfigFilePath,
             "",
             false,
             System.currentTimeMillis(),
@@ -78,19 +88,10 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
         continue;
       }
 
-      final BuildConfig buildConfig;
-      try {
-        buildConfig = gitHubHelper.configFor(blazarConfig, repository, gitInfo).get();
-      } catch (JsonProcessingException e) {
-        LOG.warn("Error parsing config at path {} for repository {}@{}", blazarConfig, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
-        malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "config", blazarConfig, Throwables.getStackTraceAsString(e)));
-        continue;
-      }
-
       if (canBuild(buildConfig)) {
-        String moduleName = moduleName(gitInfo, blazarConfig);
-        String glob = (blazarConfig.contains("/") ? blazarConfig.substring(0, blazarConfig.lastIndexOf('/') + 1) : "") + "**";
-        modules.add(new DiscoveredModule(moduleName, "config", blazarConfig, glob, buildConfig.getBuildpack(), new DependencyInfo(buildConfig.getDepends(), buildConfig.getProvides())));
+        String moduleName = moduleName(gitInfo, buildConfigFilePath);
+        String glob = (buildConfigFilePath.contains("/") ? buildConfigFilePath.substring(0, buildConfigFilePath.lastIndexOf('/') + 1) : "") + "**";
+        modules.add(new DiscoveredModule(moduleName, "config", buildConfigFilePath, glob, buildConfig.getBuildpack(), new DependencyInfo(buildConfig.getDepends(), buildConfig.getProvides())));
       }
     }
 
@@ -101,10 +102,6 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
   @Override
   public boolean isEnabled(GitInfo gitInfo) {
     return true;
-  }
-
-  private boolean disabled(String blazarConfig, GHRepository repository, GitInfo gitInfo) throws IOException {
-    return gitHubHelper.contentsFor(blazarConfig, repository, gitInfo).contains("enabled: false");
   }
 
   private boolean canBuild(BuildConfig buildConfig) {
@@ -120,7 +117,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
     return folderPath.contains("/") ? folderPath.substring(folderPath.lastIndexOf('/') + 1) : folderPath;
   }
 
-  private static boolean isBlazarConfig(String path) {
+  private static boolean isBuildConfig(String path) {
     return ".blazar.yaml".equals(path) || path.endsWith("/.blazar.yaml");
   }
 }

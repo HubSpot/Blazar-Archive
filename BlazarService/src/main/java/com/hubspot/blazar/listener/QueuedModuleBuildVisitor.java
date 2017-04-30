@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import com.hubspot.blazar.base.DependencyGraph;
 import com.hubspot.blazar.base.ModuleBuild;
@@ -18,39 +19,42 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.AbstractModuleBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.util.ModuleBuildLauncher;
+import com.hubspot.blazar.exception.NonRetryableBuildException;
+import com.hubspot.blazar.externalservice.BuildClusterService;
 
 @Singleton
 public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
   private static final Logger LOG = LoggerFactory.getLogger(QueuedModuleBuildVisitor.class);
   private final RepositoryBuildService repositoryBuildService;
   private final ModuleBuildService moduleBuildService;
-  private final ModuleBuildLauncher moduleBuildLauncher;
+  private final BuildClusterService buildClusterService;
 
   @Inject
   public QueuedModuleBuildVisitor(RepositoryBuildService repositoryBuildService,
                                   ModuleBuildService moduleBuildService,
-                                  ModuleBuildLauncher moduleBuildLauncher) {
+                                  BuildClusterService buildClusterService) {
     this.repositoryBuildService = repositoryBuildService;
     this.moduleBuildService = moduleBuildService;
-    this.moduleBuildLauncher = moduleBuildLauncher;
+    this.buildClusterService = buildClusterService;
   }
 
   @Override
-  protected void visitQueued(ModuleBuild build) throws Exception {
-    RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
-    if (upstreamsComplete(repositoryBuild, build)) {
-      moduleBuildLauncher.launch(build);
+  protected void visitQueued(ModuleBuild moduleBuild) throws Exception {
+    RepositoryBuild repositoryBuild = repositoryBuildService.get(moduleBuild.getRepoBuildId()).get();
+    // we eagerly launch the build containers without waiting for upstreams to finish
+    launchBuildContainer(moduleBuild);
+    if (upstreamsComplete(repositoryBuild, moduleBuild)) {
+      setModuleBuildStateToLaunching(moduleBuild);
     } else {
-      moduleBuildService.update(build.toBuilder().setState(State.WAITING_FOR_UPSTREAM_BUILD).build());
+      moduleBuildService.update(moduleBuild.toBuilder().setState(State.WAITING_FOR_UPSTREAM_BUILD).build());
     }
   }
 
   @Override
-  protected void visitWaitingForUpstreamBuild(ModuleBuild build) throws Exception {
-    RepositoryBuild repositoryBuild = repositoryBuildService.get(build.getRepoBuildId()).get();
-    if (upstreamsComplete(repositoryBuild, build)) {
-      moduleBuildLauncher.launch( build);
+  protected void visitWaitingForUpstreamBuild(ModuleBuild moduleBuild) throws Exception {
+    RepositoryBuild repositoryBuild = repositoryBuildService.get(moduleBuild.getRepoBuildId()).get();
+    if (upstreamsComplete(repositoryBuild, moduleBuild)) {
+      setModuleBuildStateToLaunching(moduleBuild);
     }
   }
 
@@ -82,6 +86,35 @@ public class QueuedModuleBuildVisitor extends AbstractModuleBuildVisitor {
       LOG.info("{} is waiting for ModuleBuilds: {}", buildingStatusLogPrefix, runningUpstreamModuleBuildIds);
       return false;
     }
+  }
+
+  // Here we will eagerly launch the build container in the cluster before we check whether there are upstreams
+  // that will need to finish before this build can commence.
+  // We start the build containers eagerly since it takes quite long to spin up the docker images and we want
+  // to take advantage of the time upstreams may be building to launch the container.
+  // So despite launching the containers here we are NOT YET setting the state of the module build
+  // to LAUNCHING because this would signal the build container to start building.
+  private void launchBuildContainer(ModuleBuild moduleBuild) throws Exception {
+    final String buildCluster;
+    try {
+      buildCluster = buildClusterService.launchBuildContainer(moduleBuild);
+      LOG.info("Docker container was successfully launched in cluster {} for module build {}",
+          buildCluster, moduleBuild.getId().get());
+    } catch (Exception e) {
+      throw new NonRetryableBuildException(String.format("An error occurred while launching docker container for module build %s. Will fail the build", moduleBuild), e);
+    }
+  }
+
+  // when a module is ready to start building we signal the build container to start the build by setting the
+  // state of the module build to LAUNCHING
+  private void setModuleBuildStateToLaunching(ModuleBuild moduleBuild) throws Exception {
+    ModuleBuild launching = moduleBuild.toBuilder()
+        .setStartTimestamp(Optional.of(System.currentTimeMillis()))
+        .setState(State.LAUNCHING)
+        .build();
+
+    moduleBuildService.setToLaunching(launching);
+    LOG.info("Updated status of Module Build {} to {}", launching.getId().get(), launching.getState());
   }
 
   private static Set<ModuleBuild> filterSucceeded(Set<ModuleBuild> builds) {
