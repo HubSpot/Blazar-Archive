@@ -165,14 +165,14 @@ public class ModuleBuildService {
   }
 
   @Transactional
-  public void begin(ModuleBuild build) {
-    beginNoPublish(build);
+  public void setToLaunching(ModuleBuild build) {
+    updateModuleBuildAndModuleInfo(build);
 
     eventBus.post(build);
   }
 
   @Transactional
-  void beginNoPublish(ModuleBuild build) {
+  void updateModuleBuildAndModuleInfo(ModuleBuild build) {
     Preconditions.checkArgument(build.getStartTimestamp().isPresent());
 
     checkAffectedRowCount(moduleBuildDao.begin(build));
@@ -200,7 +200,7 @@ public class ModuleBuildService {
     }
 
     if (build.getState().isWaiting()) {
-      beginNoPublish(build.toBuilder().setState(State.LAUNCHING).setStartTimestamp(Optional.of(System.currentTimeMillis())).build());
+      updateModuleBuildAndModuleInfo(build.toBuilder().setState(State.LAUNCHING).setStartTimestamp(Optional.of(System.currentTimeMillis())).build());
     }
 
     update(build.toBuilder().setState(State.CANCELLED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
@@ -213,7 +213,7 @@ public class ModuleBuildService {
     }
 
     if (build.getState().isWaiting()) {
-      beginNoPublish(build.toBuilder()
+      updateModuleBuildAndModuleInfo(build.toBuilder()
           .setState(State.LAUNCHING)
           .setStartTimestamp(Optional.of(System.currentTimeMillis()))
           .build());

@@ -15,8 +15,11 @@ public class DiscoveredModule extends Module {
                           String path,
                           String glob,
                           Optional<GitInfo> buildpack,
-                          DependencyInfo dependencyInfo) {
-    this(Optional.<Integer>absent(), name, type, path, glob, true, System.currentTimeMillis(), System.currentTimeMillis(), buildpack, dependencyInfo);
+                          DependencyInfo dependencyInfo,
+                          Optional<BuildConfig> buildConfig,
+                          Optional<BuildConfig> resolvedBuildConfig) {
+    this(Optional.<Integer>absent(), name, type, path, glob, true, System.currentTimeMillis(),
+        System.currentTimeMillis(), buildpack, dependencyInfo, buildConfig, resolvedBuildConfig);
   }
 
   public DiscoveredModule(Optional<Integer> id,
@@ -28,8 +31,10 @@ public class DiscoveredModule extends Module {
                           long createdTimestamp,
                           long updatedTimestamp,
                           Optional<GitInfo> buildpack,
-                          DependencyInfo dependencyInfo) {
-    super(id, name, type, path, glob, active, createdTimestamp, updatedTimestamp, buildpack);
+                          DependencyInfo dependencyInfo,
+                          Optional<BuildConfig> buildConfig,
+                          Optional<BuildConfig> resolvedBuildConfig) {
+    super(id, name, type, path, glob, active, createdTimestamp, updatedTimestamp, buildpack, buildConfig, resolvedBuildConfig);
     this.dependencyInfo = dependencyInfo;
   }
 
@@ -69,8 +74,9 @@ public class DiscoveredModule extends Module {
         getCreatedTimestamp(),
         getUpdatedTimestamp(),
         getBuildpack(),
-        getDependencyInfo()
-    );
+        getDependencyInfo(),
+        getBuildConfig(),
+        getResolvedBuildConfig());
   }
 
   @Override

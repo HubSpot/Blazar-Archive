@@ -9,7 +9,7 @@ import org.junit.Before;
 
 import com.google.inject.Inject;
 import com.hubspot.blazar.externalservice.BuildClusterHealthChecker;
-import com.hubspot.blazar.listener.BuildEventDispatcher;
+import com.hubspot.blazar.visitor.BuildEventDispatcher;
 import com.hubspot.blazar.queue.QueueProcessor;
 import com.hubspot.blazar.test.base.service.DatabaseBackedTest;
 

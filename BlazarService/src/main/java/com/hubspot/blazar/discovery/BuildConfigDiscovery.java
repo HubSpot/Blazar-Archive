@@ -14,29 +14,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.hubspot.blazar.base.BuildConfig;
+import com.hubspot.blazar.base.BuildConfigDiscoveryResult;
 import com.hubspot.blazar.base.CommitInfo;
-import com.hubspot.blazar.base.DependencyInfo;
-import com.hubspot.blazar.base.DiscoveredModule;
-import com.hubspot.blazar.base.DiscoveryResult;
+import com.hubspot.blazar.base.DiscoveredBuildConfig;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.util.GitHubHelper;
 
 @Singleton
-public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
-  private static final Logger LOG = LoggerFactory.getLogger(BlazarConfigModuleDiscovery.class);
+public class BuildConfigDiscovery {
+  private static final Logger LOG = LoggerFactory.getLogger(BuildConfigDiscovery.class);
 
   private final GitHubHelper gitHubHelper;
 
   @Inject
-  public BlazarConfigModuleDiscovery(GitHubHelper gitHubHelper) {
+  public BuildConfigDiscovery(GitHubHelper gitHubHelper) {
     this.gitHubHelper = gitHubHelper;
   }
 
-  @Override
   public boolean shouldRediscover(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     for (String path : gitHubHelper.affectedPaths(commitInfo)) {
       if (isBuildConfig(path)) {
@@ -47,8 +44,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
     return false;
   }
 
-  @Override
-  public DiscoveryResult discover(GitInfo gitInfo) throws IOException {
+  public BuildConfigDiscoveryResult discover(GitInfo gitInfo) throws IOException {
     GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
     GHTree tree = gitHubHelper.treeFor(repository, gitInfo);
 
@@ -59,7 +55,7 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
       }
     }
 
-    Set<DiscoveredModule> modules = new HashSet<>();
+    Set<DiscoveredBuildConfig> discoveredBuildConfigs = new HashSet<>();
     Set<MalformedFile> malformedFiles = new HashSet<>();
 
     for (String buildConfigFilePath : buildConfigFilePaths) {
@@ -72,49 +68,18 @@ public class BlazarConfigModuleDiscovery implements ModuleDiscovery {
         continue;
       }
 
-      if (buildConfig.isDisabled()) {
-        modules.add(new DiscoveredModule(
-            Optional.<Integer>absent(),
-            "disabled",
-            "config",
-            buildConfigFilePath,
-            "",
-            false,
-            System.currentTimeMillis(),
-            System.currentTimeMillis(),
-            Optional.<GitInfo>absent(),
-            DependencyInfo.unknown()
-        ));
-        continue;
-      }
+      String glob = (buildConfigFilePath.contains("/") ?
+          buildConfigFilePath.substring(0, buildConfigFilePath.lastIndexOf('/') + 1) : "") + "**";
 
-      if (canBuild(buildConfig)) {
-        String moduleName = moduleName(gitInfo, buildConfigFilePath);
-        String glob = (buildConfigFilePath.contains("/") ? buildConfigFilePath.substring(0, buildConfigFilePath.lastIndexOf('/') + 1) : "") + "**";
-        modules.add(new DiscoveredModule(moduleName, "config", buildConfigFilePath, glob, buildConfig.getBuildpack(), new DependencyInfo(buildConfig.getDepends(), buildConfig.getProvides())));
-      }
+      discoveredBuildConfigs.add(new DiscoveredBuildConfig(buildConfig, buildConfigFilePath, glob));
     }
 
-    return new DiscoveryResult(modules, malformedFiles);
+    return new BuildConfigDiscoveryResult(discoveredBuildConfigs, malformedFiles);
   }
 
   // We always want changes to blazar configs to be picked up.
-  @Override
   public boolean isEnabled(GitInfo gitInfo) {
     return true;
-  }
-
-  private boolean canBuild(BuildConfig buildConfig) {
-    return (buildConfig.getSteps().size() > 0 || buildConfig.getBuildpack().isPresent());
-  }
-
-  private static String moduleName(GitInfo gitInfo, String path) {
-    return path.contains("/") ? folderName(path) : gitInfo.getRepository();
-  }
-
-  private static String folderName(String path) {
-    String folderPath = path.substring(0, path.lastIndexOf('/'));
-    return folderPath.contains("/") ? folderPath.substring(folderPath.lastIndexOf('/') + 1) : folderPath;
   }
 
   private static boolean isBuildConfig(String path) {

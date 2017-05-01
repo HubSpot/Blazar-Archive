@@ -223,3 +223,7 @@ CREATE INDEX host_org_repo_repoId ON branches (active, host, organization, repos
 
 -- changeset gchomatas:17
 ALTER TABLE `module_builds` ADD COLUMN `buildClusterName` varchar(64) NOT NULL DEFAULT 'Singularity3x3';
+
+-- changeset gchomatas:18
+ALTER TABLE `modules` ADD COLUMN `buildConfig` mediumtext;
+ALTER TABLE `modules` ADD COLUMN `resolvedBuildConfig` mediumtext;

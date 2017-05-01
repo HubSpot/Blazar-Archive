@@ -24,7 +24,7 @@ import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
-import com.hubspot.blazar.listener.BuildEventDispatcher;
+import com.hubspot.blazar.visitor.BuildEventDispatcher;
 
 import io.dropwizard.db.ManagedDataSource;
 

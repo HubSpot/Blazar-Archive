@@ -1,4 +1,4 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.guice;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -6,6 +6,20 @@ import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.base.visitor.InterProjectBuildVisitor;
 import com.hubspot.blazar.base.visitor.ModuleBuildVisitor;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
+import com.hubspot.blazar.visitor.modulebuild.BuildContainerKiller;
+import com.hubspot.blazar.visitor.BuildEventDispatcher;
+import com.hubspot.blazar.visitor.repositorybuild.CancelledRepositoryBuildVisitor;
+import com.hubspot.blazar.visitor.repositorybuild.CompletedRepositoryBuildVisitor;
+import com.hubspot.blazar.visitor.modulebuild.DownstreamModuleBuildCanceller;
+import com.hubspot.blazar.visitor.modulebuild.DownstreamModuleBuildVisitor;
+import com.hubspot.blazar.visitor.repositorybuild.GitHubStatusVisitor;
+import com.hubspot.blazar.visitor.InterProjectBuildHandler;
+import com.hubspot.blazar.visitor.modulebuild.InterProjectModuleBuildVisitor;
+import com.hubspot.blazar.visitor.repositorybuild.InterProjectRepositoryBuildVisitor;
+import com.hubspot.blazar.visitor.repositorybuild.LaunchingRepositoryBuildVisitor;
+import com.hubspot.blazar.visitor.modulebuild.QueuedModuleBuildVisitor;
+import com.hubspot.blazar.visitor.repositorybuild.QueuedRepositoryBuildVisitor;
+import com.hubspot.blazar.visitor.modulebuild.RepositoryBuildCompleter;
 
 /**
  * Binds all visitors except Slack Visitors which are bound in the BlazarSlackModule

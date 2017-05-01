@@ -12,7 +12,6 @@ import com.google.inject.multibindings.MapBinder;
 import com.hubspot.blazar.config.BlazarConfigurationWrapper;
 import com.hubspot.blazar.config.GitHubConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
-import com.hubspot.blazar.discovery.DiscoveryModule;
 import com.hubspot.blazar.util.GitHubHelper;
 import com.hubspot.jackson.datatype.protobuf.ProtobufModule;
 

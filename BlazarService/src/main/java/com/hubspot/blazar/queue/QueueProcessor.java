@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.inject.name.Named;
@@ -110,20 +112,22 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     try {
       if (running.get() && leader.get()) {
         List<QueueItem> queueItemsSorted = sort(queueItemDao.getItemsReadyToExecute());
-        LOG.debug("Found {} items ready to execute", queueItemsSorted.size());
-        LOG.debug("Found {} items currently processing", processingItems.size());
+
+        LOG.debug("Out of the total {} events in the queue, {} events have already been scheduled for processing", queueItemsSorted.size(), processingItems.size());
+        printItemsInProcessingQueues();
+
         queueItemsSorted.removeAll(processingItems);
-        LOG.debug("Processing {} more items", queueItemsSorted.size());
+        LOG.debug("Will schedule for processing the remaining {} events", queueItemsSorted.size());
         processingItems.addAll(queueItemsSorted);
 
 
         for (QueueItem queuedItem : queueItemsSorted) {
-          LOG.debug("Processing Item: {}", queuedItem.getId().get());
           String eventType = queuedItem.getType().getSimpleName();
+          LOG.debug("Processing event {}: {}", getEventName(eventType), queuedItem.getId().get());
 
           if (!canDequeueEvent(queuedItem)) {
-            LOG.warn("Will not dequeue event {}(id: {}) because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down)",
-                eventType, queuedItem.getId().get());
+            LOG.warn("Will not schedule event {}(id: {}) for processing because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down)",
+                getEventName(eventType), queuedItem.getId().get());
             processingItems.remove(queuedItem);
             return;
           }
@@ -134,7 +138,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
         }
       }
     } catch (Throwable t) {
-      LOG.error("Error processing queue", t);
+      LOG.error("An error occurred while scheduling events in the queue for processing.", t);
     }
   }
 
@@ -159,23 +163,27 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
 
     @Override
     public void run() {
+      Stopwatch timer = Stopwatch.createStarted();
+      String eventName = getEventName(queueItem.getType().getSimpleName());
       try {
         if (!queueItemDao.isItemStillQueued(queueItem)) {
-          LOG.info("Queue item {} was already completed, skipping", queueItem.getId().get());
+          LOG.info("Queued event {}(id: {}) was already completed, will not schedule for processing", eventName, queueItem.getId().get());
         } else if (process(queueItem.getItem())) {
-          LOG.debug("Queue item {} was successfully processed, deleting", queueItem.getId().get());
+          LOG.debug("Queued event {}(id: {}) was successfully processed, will be marked as completed", eventName, queueItem.getId().get());
           checkResult(queueItemDao.complete(queueItem), queueItem);
         } else if (queueItem.getRetryCount() < 9) {
-          LOG.warn("Queue item {} failed to process, retrying", queueItem.getId().get());
-          checkResult(queueItemDao.retry(queueItem), queueItem);
+          LOG.warn("Queued event {}(id: {}) failed to process, will increase its retry counter and will leave it in the queue to be scheduled for processing in the next cycle", eventName, queueItem.getId().get());
+          checkResult(queueItemDao.increaseRetryCounter(queueItem), queueItem);
         } else {
-          LOG.warn("Queue item {} failed to process 10 times, not retrying", queueItem.getId().get());
+          LOG.warn("Queued event {}(id: {}) failed to process 10 times, will be marked as completed and will not be retried", eventName, queueItem.getId().get());
           checkResult(queueItemDao.complete(queueItem), queueItem);
         }
       } catch (Throwable t) {
-        LOG.error("Unexpected error processing queue item: {}", queueItem.getId().get(), t);
+        LOG.error("Unexpected error while processing queued event: {}(id: {})", eventName, queueItem.getId().get(), t);
       } finally {
         processingItems.remove(queueItem);
+        timer.stop();
+        LOG.debug("Processing of event {}(id: {}) took {}ms", eventName, queueItem.getId(), timer.elapsed(TimeUnit.MILLISECONDS));
       }
     }
 
@@ -190,5 +198,16 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
         LOG.warn("Could not find queue item with id {} to update", queueItem.getId().get());
       }
     }
+  }
+
+  private String getEventName(String eventClassSimpleName) {
+    return eventClassSimpleName.substring(0, eventClassSimpleName.length() - 6);
+  }
+
+  private void printItemsInProcessingQueues() {
+    LOG.debug("Status of event processing queues (one of the listed events in each queue is currently running and the other are waiting)):\n");
+    queueExecutors.forEach((eventClass, scheduledExecutorService) -> {
+      LOG.debug("Event Queue {} has {} events scheduled for processing\n", getEventName(eventClass), ((ScheduledThreadPoolExecutor)scheduledExecutorService).getQueue().size());
+    });
   }
 }

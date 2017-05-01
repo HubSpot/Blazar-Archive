@@ -1,4 +1,4 @@
-package com.hubspot.blazar.discovery;
+package com.hubspot.blazar.guice;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
+import com.hubspot.blazar.discovery.BuildConfigDiscovery;
+import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
+import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.util.BlazarServiceLoader;
 
 public class DiscoveryModule implements Module {
@@ -19,7 +22,7 @@ public class DiscoveryModule implements Module {
       multibinder.addBinding().to(moduleDiscovery);
     }
 
-    binder.bind(BlazarConfigModuleDiscovery.class);
+    binder.bind(BuildConfigDiscovery.class);
     binder.bind(ModuleDiscovery.class).to(CompositeModuleDiscovery.class);
   }
 }

@@ -78,8 +78,8 @@ public class RepositoryBuildLauncher {
 
   // Runs discovery if the commitInfo has changed any of the modules so we build our graph with the most
   // up to date dependency data.
-  // If there are 10 or more commits in a compare between 2 shas it is truncated. In this case Blazar re-builds
-  // All modules (on a push) and re-discovers all modules just to be sure that everything is as up to date as possible.
+  // If there are 10 or more commits the compare between 2 shas is truncated. In this case Blazar re-builds
+  // all modules (on a push) and re-discovers all modules just to be sure that everything is as up to date as possible.
   private Set<Module> getAndUpdateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
     if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
       DiscoveryResult result = moduleDiscovery.discover(gitInfo);

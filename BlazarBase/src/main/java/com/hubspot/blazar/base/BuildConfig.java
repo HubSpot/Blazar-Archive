@@ -26,6 +26,21 @@ public class BuildConfig {
   private final Optional<BuildCGroupResources> buildResources;
   private final Set<Dependency> depends;
   private final Set<Dependency> provides;
+  /**
+   * When a build config that resides in a folder is disabled
+   * all modules that have been auto-discovered are disabled, i.e. nothing under this folder will be built
+   */
+  private final boolean disabled;
+  /**
+   * The default behavior for each folder is to get the Union of the auto-discovered module dependencies
+   * (i.e. those discovered by plugins) with the dependencies specified in the build configuration file that
+   * resides inside the folder. "ignoreAutoDiscoveredDependencies" can be set to true to keep only the dependencies
+   * specified in the build configuration file.
+   *
+   * If there is no build configuration file in the folder this setting will be ignored, i.e. if only auto-discovered
+   * dependencies exist those will always be used.
+   */
+  private final boolean ignoreAutoDiscoveredDependencies;
 
   @JsonCreator
   public BuildConfig(@JsonProperty("steps") List<BuildStep> steps,
@@ -40,7 +55,9 @@ public class BuildConfig {
                      @JsonProperty("stepActivation") Map<String, StepActivationCriteria> stepActivation,
                      @JsonProperty("buildResources") Optional<BuildCGroupResources> buildResources,
                      @JsonProperty("depends") Set<Dependency> depends,
-                     @JsonProperty("provides") Set<Dependency> provides) {
+                     @JsonProperty("provides") Set<Dependency> provides,
+                     @JsonProperty("disabled") boolean disabled,
+                     @JsonProperty("ignoreAutoDiscoveredDependencies") boolean ignoreAutoDiscoveredDependencies) {
     this.steps = MoreObjects.firstNonNull(steps, Collections.<BuildStep>emptyList());
     this.before = MoreObjects.firstNonNull(before, Collections.<BuildStep>emptyList());
     this.after = MoreObjects.firstNonNull(after, Optional.<PostBuildSteps>absent());
@@ -54,10 +71,14 @@ public class BuildConfig {
     this.buildResources = MoreObjects.firstNonNull(buildResources, Optional.<BuildCGroupResources>absent());
     this.depends = MoreObjects.firstNonNull(depends, Collections.<Dependency>emptySet());
     this.provides = MoreObjects.firstNonNull(provides, Collections.<Dependency>emptySet());
+    this.disabled = disabled;
+    this.ignoreAutoDiscoveredDependencies = ignoreAutoDiscoveredDependencies;
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
-    return new BuildConfig(null, null, null, null, null, null, null, null, null, null, null, null, null);
+    return new BuildConfig(null, null, null, null, null, null,
+        null, null, null, null, null, null,
+        null, false, false);
   }
 
   public List<BuildStep> getSteps() {
@@ -112,6 +133,13 @@ public class BuildConfig {
     return depends;
   }
 
+  public boolean isDisabled() {
+    return disabled;
+  }
+
+  public boolean isIgnoreAutoDiscoveredDependencies() {
+    return ignoreAutoDiscoveredDependencies;
+  }
 
   @Override
   public boolean equals(Object o) {
@@ -134,12 +162,15 @@ public class BuildConfig {
         Objects.equals(stepActivation, that.stepActivation) &&
         Objects.equals(buildResources, that.buildResources) &&
         Objects.equals(depends, that.depends) &&
-        Objects.equals(provides, that.provides);
+        Objects.equals(provides, that.provides) &&
+        Objects.equals(disabled, that.disabled) &&
+        Objects.equals(ignoreAutoDiscoveredDependencies, that.ignoreAutoDiscoveredDependencies);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation, buildResources, depends, provides);
+    return Objects.hash(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation,
+        buildResources, depends, provides, disabled, ignoreAutoDiscoveredDependencies);
   }
 
   @Override
@@ -158,6 +189,7 @@ public class BuildConfig {
         .add("buildResources", buildResources)
         .add("depends", depends)
         .add("provides", provides)
+        .add("disabled", disabled)
         .toString();
   }
 
@@ -175,7 +207,8 @@ public class BuildConfig {
         .setStepActivation(stepActivation)
         .setBuildResources(buildResources)
         .setDepends(depends)
-        .setProvides(provides);
+        .setProvides(provides)
+        .setDisabled(disabled);
   }
 
   public static Builder newBuilder() {
@@ -197,9 +230,12 @@ public class BuildConfig {
     private Optional<BuildCGroupResources> buildResources;
     private Set<Dependency> depends;
     private Set<Dependency> provides;
+    private boolean disabled;
+    private boolean ignoreAutoDiscoveredDependencies;
 
     public BuildConfig build() {
-      return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation, buildResources, depends, provides);
+      return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation,
+          buildResources, depends, provides, disabled, ignoreAutoDiscoveredDependencies);
     }
 
     public Builder setSteps(List<BuildStep> steps) {
@@ -264,6 +300,16 @@ public class BuildConfig {
 
     public Builder setProvides(Set<Dependency> provides) {
       this.provides = provides;
+      return this;
+    }
+
+    public Builder setDisabled(boolean disabled) {
+      this.disabled = disabled;
+      return this;
+    }
+
+    public Builder setIgnoreAutoDiscoveredDependencies(boolean ignoreAutoDiscoveredDependencies) {
+      this.ignoreAutoDiscoveredDependencies = ignoreAutoDiscoveredDependencies;
       return this;
     }
   }

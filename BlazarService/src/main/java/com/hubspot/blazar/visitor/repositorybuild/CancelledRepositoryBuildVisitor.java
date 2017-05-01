@@ -1,13 +1,14 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.visitor.repositorybuild;
+
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import com.hubspot.blazar.base.ModuleBuild;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.AbstractRepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.ModuleBuildService;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Set;
 
 @Singleton
 public class CancelledRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor {

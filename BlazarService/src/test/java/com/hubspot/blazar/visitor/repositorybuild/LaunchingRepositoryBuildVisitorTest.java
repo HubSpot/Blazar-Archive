@@ -1,4 +1,4 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.visitor.repositorybuild;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,8 +76,6 @@ public class LaunchingRepositoryBuildVisitorTest {
 
   private static final LaunchingRepositoryBuildVisitor buildVisitor = new LaunchingRepositoryBuildVisitor(
       repositoryBuildService,
-      buildConfigUtils,
-      branchService,
       moduleBuildService,
       malformedFileService,
       interProjectBuildService,
@@ -89,7 +87,7 @@ public class LaunchingRepositoryBuildVisitorTest {
   @Before
   public void before() throws IOException, NonRetryableBuildException {
     when(branchService.get(anyInt())).thenReturn(Optional.of(branch));
-    when(buildConfigUtils.getConfigAtRefOrDefault(anyObject(), anyString(), anyString())).thenReturn(BuildConfig.makeDefaultBuildConfig());
+    when(buildConfigUtils.getConfigAtRef(anyObject(), anyString(), anyString())).thenReturn(BuildConfig.makeDefaultBuildConfig());
   }
 
   @Test
