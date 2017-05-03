@@ -9,14 +9,13 @@ import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.SingleValueResult;
 
 import com.google.common.base.Optional;
-import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
 public interface InterProjectBuildMappingDao {
 
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :id")
-  Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(@BindWithRosetta InterProjectBuild interProjectBuild);
+  Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(@Bind("id") long interProjectBuild);
 
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :interProjectBuildId and branchId = :branchId")
   Set<InterProjectBuildMapping> getMappingsForRepo(@Bind("interProjectBuildId") long interProjectBuildId, @Bind("branchId") int branchId);

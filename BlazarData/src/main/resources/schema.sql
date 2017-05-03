@@ -223,3 +223,10 @@ CREATE INDEX host_org_repo_repoId ON branches (active, host, organization, repos
 
 -- changeset gchomatas:17
 ALTER TABLE `module_builds` ADD COLUMN `buildClusterName` varchar(64) NOT NULL DEFAULT 'Singularity3x3';
+
+-- changeset jgoodwin:18
+CREATE TABLE inter_project_build_mappings_new LIKE inter_project_build_mappings;
+ALTER TABLE inter_project_build_mappings ADD UNIQUE INDEX (interProjectBuildId, moduleId);
+INSERT IGNORE INTO inter_project_build_mappings_new SELECT * FROM inter_project_build_mappings;
+DROP TABLE inter_project_build_mappings;
+RENAME TABLE inter_project_build_mappings_new TO inter_project_build_mappings;

@@ -81,7 +81,7 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
   @Override
   protected void visitRunning(InterProjectBuild build) throws Exception {
     DependencyGraph d = build.getDependencyGraph().get();
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build.getId().get());
     if (mappings.size() != 0 && build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
       LOG.info("InterProjectBuild was triggered by push, no need to launch builds, mappings exist");
       return;
@@ -112,7 +112,7 @@ public class InterProjectBuildHandler extends AbstractInterProjectBuildVisitor {
   @Override
   protected void visitCancelled(InterProjectBuild build) throws Exception {
     // Cancelling in-progress repository Builds will cause the cancellation of modules which will cancel the rest of the tree in InterProjectModuleBuildVisitor
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build.getId().get());
     for (InterProjectBuildMapping mapping : mappings) {
       if (!mapping.getState().isFinished()) {
         RepositoryBuild repositoryBuild = repositoryBuildService.get(mapping.getRepoBuildId().get()).get();
