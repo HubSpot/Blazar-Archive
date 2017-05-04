@@ -7,6 +7,6 @@ before:
 
 stepActivation:
   upload:
-    branches: [hs-master, handle_singularity_outage]
+    branches: [hs-master, hs-staging]
   notify:
-    branches: [hs-master, handle_singularity_outage]
+    branches: [hs-master, hs-staging]
