@@ -15,7 +15,7 @@ import com.hubspot.rosetta.jdbi.BindWithRosetta;
 public interface InterProjectBuildMappingDao {
 
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :id")
-  Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(@Bind("id") long interProjectBuild);
+  Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(@Bind("id") long id);
 
   @SqlQuery("SELECT * FROM inter_project_build_mappings WHERE interProjectBuildId = :interProjectBuildId and branchId = :branchId")
   Set<InterProjectBuildMapping> getMappingsForRepo(@Bind("interProjectBuildId") long interProjectBuildId, @Bind("branchId") int branchId);
