@@ -4,10 +4,11 @@ import static com.hubspot.blazar.base.InterProjectBuild.State.CANCELLED;
 import static com.hubspot.blazar.base.InterProjectBuild.State.FAILED;
 import static com.hubspot.blazar.base.InterProjectBuild.State.SUCCEEDED;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -76,12 +77,7 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     if (!mapping.isPresent()) {
       return;
     }
-    InterProjectBuildMapping updatedMapping = mapping.get().withModuleBuildId(CANCELLED);
-    interProjectBuildMappingService.updateBuilds(updatedMapping);
-    LOG.info("ModuleBuild {} with IPB mapping {} was cancelled looking for child nodes to cancel", build.getId(), mapping);
-    cancelSubTree(build, updatedMapping);
-    LOG.info("Checking if module build {} was las build in IPB with mapping {}", build.getId().get(), mapping);
-    checkAndCompleteInterProjectBuild(build, mapping.get().getInterProjectBuildId());
+    visitCancelledOrFailed(CANCELLED, build, mapping.get());
   }
 
   @Override
@@ -90,12 +86,16 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
     if (!mapping.isPresent()) {
       return;
     }
-    InterProjectBuildMapping updatedMapping = mapping.get().withModuleBuildId(FAILED);
+    visitCancelledOrFailed(FAILED, build, mapping.get());
+  }
+
+  private void visitCancelledOrFailed(InterProjectBuild.State state, ModuleBuild build, InterProjectBuildMapping mapping) throws Exception {
+    InterProjectBuildMapping updatedMapping = mapping.withModuleBuildId(state);
     interProjectBuildMappingService.updateBuilds(updatedMapping);
     LOG.info("ModuleBuild {} with IPB mapping {} {} looking for child nodes to cancel", build.getId(), updatedMapping.getState(), mapping);
     cancelSubTree(build, updatedMapping);
-    LOG.info("Checking if module build {} was las build in IPB with mapping {}", build.getId().get(), mapping);
-    checkAndCompleteInterProjectBuild(build, mapping.get().getInterProjectBuildId());
+    LOG.info("Checking if module build {} was last build in IPB with mapping {}", build.getId().get(), mapping);
+    checkAndCompleteInterProjectBuild(build, mapping.getInterProjectBuildId());
   }
 
   /**
@@ -174,16 +174,16 @@ public class InterProjectModuleBuildVisitor extends AbstractModuleBuildVisitor {
         interProjectBuildMappingService.getMappingsForInterProjectBuildByModuleId(interProjectBuildId);
 
     DependencyGraph graph = interProjectBuild.getDependencyGraph().get();
-    Stack<Integer> s = new Stack<>();
+    Deque<Integer> deque = new ArrayDeque<>();
     Set<Integer> visited = new HashSet<>();
-    s.addAll(graph.outgoingVertices(build.getModuleId()));
-    while (!s.empty()) {
-      int moduleId = s.pop();
+    deque.addAll(graph.outgoingVertices(build.getModuleId()));
+    while (!deque.isEmpty()) {
+      int moduleId = deque.pop();
       boolean mappingExists = mappingsForInterProjectBuildByModuleId.containsKey(moduleId);
       if (visited.add(moduleId) && !mappingExists) {
         LOG.info("Module {} was downstream of {} module {} in IPB {} creating cancelled mapping");
         interProjectBuildMappingService.insert(new InterProjectBuildMapping(Optional.<Long>absent(), interProjectBuild.getId().get(), moduleService.getBranchIdFromModuleId(moduleId), Optional.<Long>absent(), moduleId, Optional.<Long>absent(), CANCELLED));
-        s.addAll(Sets.difference(graph.outgoingVertices(moduleId), visited));
+        deque.addAll(Sets.difference(graph.outgoingVertices(moduleId), visited));
       }
     }
   }
