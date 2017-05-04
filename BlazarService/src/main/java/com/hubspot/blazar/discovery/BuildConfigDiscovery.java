@@ -17,7 +17,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Throwables;
 import com.hubspot.blazar.base.BuildConfig;
 import com.hubspot.blazar.base.BuildConfigDiscoveryResult;
-import com.hubspot.blazar.base.CommitInfo;
 import com.hubspot.blazar.base.DiscoveredBuildConfig;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
@@ -34,19 +33,9 @@ public class BuildConfigDiscovery {
     this.gitHubHelper = gitHubHelper;
   }
 
-  public boolean shouldRediscover(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
-    for (String path : gitHubHelper.affectedPaths(commitInfo)) {
-      if (isBuildConfig(path)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public BuildConfigDiscoveryResult discover(GitInfo gitInfo) throws IOException {
-    GHRepository repository = gitHubHelper.repositoryFor(gitInfo);
-    GHTree tree = gitHubHelper.treeFor(repository, gitInfo);
+  public BuildConfigDiscoveryResult discover(GitInfo branch) throws IOException {
+    GHRepository repository = gitHubHelper.repositoryFor(branch);
+    GHTree tree = gitHubHelper.treeFor(repository, branch);
 
     Set<String> buildConfigFilePaths = new HashSet<>();
     for (GHTreeEntry entry : tree.getTree()) {
@@ -61,10 +50,10 @@ public class BuildConfigDiscovery {
     for (String buildConfigFilePath : buildConfigFilePaths) {
       final BuildConfig buildConfig;
       try {
-        buildConfig = gitHubHelper.configFor(buildConfigFilePath, repository, gitInfo).get();
+        buildConfig = gitHubHelper.configFor(buildConfigFilePath, repository, branch).get();
       } catch (JsonProcessingException e) {
-        LOG.warn("Error parsing config at path {} for repository {}@{}", buildConfigFilePath, gitInfo.getFullRepositoryName(), gitInfo.getBranch());
-        malformedFiles.add(new MalformedFile(gitInfo.getId().get(), "config", buildConfigFilePath, Throwables.getStackTraceAsString(e)));
+        LOG.warn("Error parsing config at path {} for repository {}@{}", buildConfigFilePath, branch.getFullRepositoryName(), branch.getBranch());
+        malformedFiles.add(new MalformedFile(branch.getId().get(), "config", buildConfigFilePath, Throwables.getStackTraceAsString(e)));
         continue;
       }
 
@@ -75,11 +64,6 @@ public class BuildConfigDiscovery {
     }
 
     return new BuildConfigDiscoveryResult(discoveredBuildConfigs, malformedFiles);
-  }
-
-  // We always want changes to blazar configs to be picked up.
-  public boolean isEnabled(GitInfo gitInfo) {
-    return true;
   }
 
   private static boolean isBuildConfig(String path) {

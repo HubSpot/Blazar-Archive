@@ -12,6 +12,7 @@ import org.skife.jdbi.v2.unstable.BindIn;
 import com.hubspot.blazar.base.Dependency;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.ModuleDependency;
+import com.hubspot.blazar.base.ModuleDependency.Source;
 import com.hubspot.blazar.base.graph.Edge;
 import com.hubspot.rosetta.jdbi.BindWithRosetta;
 
@@ -48,15 +49,21 @@ public interface DependenciesDao {
             "GROUP BY gitInfo.id")
   Set<GitInfo> getBranchesWithNonVersionedDependencies();
 
-  @SqlBatch("INSERT INTO module_provides (moduleId, name, version) VALUES (:moduleId, :name, :version)")
-  void insertProvides(@BindWithRosetta Set<ModuleDependency> dependencies);
+  @SqlBatch("INSERT INTO module_provides (moduleId, name, version, source) VALUES (:moduleId, :name, :version, :source)")
+  void insertProvidedDependencies(@BindWithRosetta Set<ModuleDependency> dependencies);
 
-  @SqlBatch("INSERT INTO module_depends (moduleId, name, version) VALUES (:moduleId, :name, :version)")
-  void insertDepends(@BindWithRosetta Set<ModuleDependency> dependencies);
+  @SqlBatch("INSERT INTO module_depends (moduleId, name, version, source) VALUES (:moduleId, :name, :version, :source)")
+  void insertDependencies(@BindWithRosetta Set<ModuleDependency> dependencies);
 
   @SqlUpdate("DELETE FROM module_provides WHERE moduleId = :moduleId")
-  void deleteProvides(@Bind("moduleId") int moduleId);
+  void deleteProvidedDependencies(@Bind("moduleId") int moduleId);
+
+  @SqlUpdate("DELETE FROM module_provides WHERE moduleId = :moduleId AND source = :source")
+  void deleteProvidedDependenciesBySource(@Bind("moduleId") int moduleId, Source source);
 
   @SqlUpdate("DELETE FROM module_depends WHERE moduleId = :moduleId")
-  void deleteDepends(@Bind("moduleId") int moduleId);
+  void deleteDependencies(@Bind("moduleId") int moduleId);
+
+  @SqlUpdate("DELETE FROM module_depends WHERE moduleId = :moduleId AND source = :source")
+  void deleteDependenciesBySource(@Bind("moduleId") int moduleId, Source source);
 }

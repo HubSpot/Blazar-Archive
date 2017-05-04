@@ -1,16 +1,18 @@
 package com.hubspot.blazar.data.service;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.DiscoveredModule;
@@ -19,6 +21,7 @@ import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.data.dao.ModuleDao;
 
 public class ModuleService {
+  private static final Logger LOG = LoggerFactory.getLogger(ModuleService.class);
   private final ModuleDao moduleDao;
   private final DependenciesService dependenciesService;
 
@@ -47,80 +50,80 @@ public class ModuleService {
     }
   }
 
+  /**
+   * The updated modules are all the active modules that have been updated during the module discovery phase.
+   * The list contains all modules that were (re)discovered (they are in a DiscoveredModule
+   * subclass of the Module class) + all the registered modules that were not deactivated or
+   * deleted during the discovery check (they are in a Module class, for those we just updated their build configs).
+   * Essentially the list of updated modules is the list of all modules that are
+   * eligible for building. We use the list to identify which modules were deleted/deactivated in order to deactivate
+   * them in the db and then we persist the changes in each updated module. The DiscoveredModule entries in the list
+   * may have updated build configs and updated dependencies. The Module entries have only their build configs updated.
+   * @param branch
+   * @param updatedModules
+   * @return
+   */
   @Transactional
-  public Set<Module> setModules(GitInfo gitInfo, Set<DiscoveredModule> updatedModules) {
-    Set<Module> oldModules = getByBranch(gitInfo.getId().get());
-    Set<Module> newModules = new HashSet<>();
+  public void persistModulesAndDependencies(GitInfo branch, Set<Module> updatedModules) {
+    Set<Module> registeredActiveModules = getByBranch(branch.getId().get()).stream().filter(Module::isActive).collect(Collectors.toSet());
 
-    Map<ModuleKey, DiscoveredModule> updatedModulesByName = mapByName(updatedModules);
-    Map<ModuleKey, Module> oldModulesByName = mapByName(oldModules);
+    Map<String, Module> updatedModulesByName = Maps.uniqueIndex(updatedModules, Module::getName);
+    Map<String, Module> registeredActiveModulesByName = Maps.uniqueIndex(registeredActiveModules, Module::getName);
 
-    for (ModuleKey deletedModule : Sets.difference(oldModulesByName.keySet(), updatedModulesByName.keySet())) {
-      Module module = oldModulesByName.get(deletedModule);
-      checkAffectedRowCount(moduleDao.delete(module.getId().get()));
+    for (String deletedModule : Sets.difference(registeredActiveModulesByName.keySet(), updatedModulesByName.keySet())) {
+      Module module = registeredActiveModulesByName.get(deletedModule);
+      checkAffectedRowCount(moduleDao.deactivate(module.getId().get()));
       dependenciesService.delete(module.getId().get());
     }
 
-    for (ModuleKey existingUpdatedModule : Sets.intersection(oldModulesByName.keySet(), updatedModulesByName.keySet())) {
-      Module old = oldModulesByName.get(existingUpdatedModule);
-      DiscoveredModule updated = updatedModulesByName.get(existingUpdatedModule).withId(old.getId().get());
-      if (!old.equals(updated)) {
-        checkAffectedRowCount(moduleDao.update(updated));
+    // For already registered modules that were not rediscovered we will just update the module in db if the
+    // build config has been refreshed
+    Set<Module> alreadyRegisteredAndNotRediscovedModules = updatedModules.stream()
+        .filter(module -> module.getClass() == Module.class).collect(Collectors.toSet());
+
+    alreadyRegisteredAndNotRediscovedModules.forEach(existingModule -> {
+      Module previousModuleInstance = registeredActiveModulesByName.get(existingModule.getName());
+      if (!previousModuleInstance.equals(existingModule)) {
+        LOG.debug("Existing module {}:{}(id:{}) has a changed build config. We will persist it.", existingModule.getName(), existingModule.getType(), existingModule.getId());
+        checkAffectedRowCount(moduleDao.update(existingModule));
       }
-      dependenciesService.update(updated);
-      newModules.add(updated);
-    }
+      LOG.debug("Existing module {}:{}(id:{}) has no changes in its build config", existingModule.getName(), existingModule.getType(), existingModule.getId());
+    });
 
-    for (ModuleKey addedModule : Sets.difference(updatedModulesByName.keySet(), oldModulesByName.keySet())) {
-      DiscoveredModule added = updatedModulesByName.get(addedModule);
-      int id = moduleDao.insert(gitInfo.getId().get(), added);
-      added = added.withId(id);
-      dependenciesService.insert(added);
-      newModules.add(added);
-    }
+    // For newly discovered modules we will create module entries and will also create entries in the dependencies
+    // tables.
+    Set<Module> newlyDiscoveredModules = updatedModules.stream()
+        .filter(module -> module.getClass() == DiscoveredModule.class && !registeredActiveModulesByName.containsKey(module.getName())).collect(Collectors.toSet());
+    newlyDiscoveredModules.forEach(newModule -> {
+      LOG.debug("Persisting newly discovered module {}:{}", newModule.getName(), newModule.getType());
+      int moduleId = moduleDao.insert(branch.getId().get(), newModule);
+      LOG.debug("Persisted newly discovered module {}:{} with id:{})", newModule.getName(), newModule.getType(), moduleId);
+      LOG.debug("Persisting dependencies for newly discovered module {}:{}(id:{})", newModule.getName(), newModule.getType(), moduleId);
+      DiscoveredModule persistedModule = (DiscoveredModule) newModule.withId(moduleId);
+      dependenciesService.insert(persistedModule);
+    });
 
-    return newModules;
+    // For re-discovered modules we will update their module entries in db if the
+    // build config has been refreshed and also update the relevant entries in the dependencies
+    // tables.
+    Set<Module> rediscoveredModules = updatedModules.stream()
+        .filter(module -> module.getClass() == DiscoveredModule.class && registeredActiveModulesByName.containsKey(module.getName())).collect(Collectors.toSet());
+    rediscoveredModules.forEach(rediscoveredModule -> {
+      Module previousModuleInstance = registeredActiveModulesByName.get(rediscoveredModule.getName());
+      // get a Module class with id added so we can compare and persist
+      Module rediscoveredModuleWithId = rediscoveredModule.withId(previousModuleInstance.getId().get());
+      if (!previousModuleInstance.equals(rediscoveredModule)) {
+        LOG.debug("Rediscovered module {}:{}(id:{}) has a changed build config. We will persist it.", rediscoveredModuleWithId.getName(), rediscoveredModuleWithId.getType(), rediscoveredModuleWithId.getId());
+        checkAffectedRowCount(moduleDao.update(rediscoveredModuleWithId));
+      }
+      // for the dependencies update we used the rediscoveredModule which has class DiscoveredModule and provides
+      // access to the DependencyInfo
+      dependenciesService.update((DiscoveredModule) rediscoveredModule);
+    });
   }
 
   private static void checkAffectedRowCount(int affectedRows) {
     Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
   }
 
-  private static <T extends Module> Map<ModuleKey, T> mapByName(Set<T> modules) {
-    Map<ModuleKey, T> modulesByName = new HashMap<>();
-    for (T module : modules) {
-      modulesByName.put(new ModuleKey(module.getName().toLowerCase(), module.getType()), module);
-    }
-
-    return modulesByName;
-  }
-
-  private static class ModuleKey {
-    private final String name;
-    private final String type;
-
-    public ModuleKey(String name, String type) {
-      this.name = name;
-      this.type = type;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-
-      ModuleKey moduleKey = (ModuleKey) o;
-      return Objects.equals(name, moduleKey.name) && Objects.equals(type, moduleKey.type);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(name, type);
-    }
-  }
 }

@@ -32,15 +32,15 @@ public class BuildConfig {
    */
   private final boolean disabled;
   /**
-   * The default behavior for each folder is to get the Union of the auto-discovered module dependencies
-   * (i.e. those discovered by plugins) with the dependencies specified in the build configuration file that
-   * resides inside the folder. "ignoreAutoDiscoveredDependencies" can be set to true to keep only the dependencies
-   * specified in the build configuration file.
+   * The default behavior for each folder is to get the Union of the plugin-discovered module dependencies
+   * with the dependencies specified in the build configuration file that resides inside the folder.
+   * "ignorePluginDiscoveredDependencies" can be set to true to keep only the dependencies specified in the
+   * build configuration file.
    *
-   * If there is no build configuration file in the folder this setting will be ignored, i.e. if only auto-discovered
+   * If there is no build configuration file in the folder this setting will be ignored, i.e. if only plugin-discovered
    * dependencies exist those will always be used.
    */
-  private final boolean ignoreAutoDiscoveredDependencies;
+  private final boolean ignorePluginDiscoveredDependencies;
 
   @JsonCreator
   public BuildConfig(@JsonProperty("steps") List<BuildStep> steps,
@@ -57,7 +57,7 @@ public class BuildConfig {
                      @JsonProperty("depends") Set<Dependency> depends,
                      @JsonProperty("provides") Set<Dependency> provides,
                      @JsonProperty("disabled") boolean disabled,
-                     @JsonProperty("ignoreAutoDiscoveredDependencies") boolean ignoreAutoDiscoveredDependencies) {
+                     @JsonProperty("ignorePluginDiscoveredDependencies") boolean ignorePluginDiscoveredDependencies) {
     this.steps = MoreObjects.firstNonNull(steps, Collections.<BuildStep>emptyList());
     this.before = MoreObjects.firstNonNull(before, Collections.<BuildStep>emptyList());
     this.after = MoreObjects.firstNonNull(after, Optional.<PostBuildSteps>absent());
@@ -72,7 +72,7 @@ public class BuildConfig {
     this.depends = MoreObjects.firstNonNull(depends, Collections.<Dependency>emptySet());
     this.provides = MoreObjects.firstNonNull(provides, Collections.<Dependency>emptySet());
     this.disabled = disabled;
-    this.ignoreAutoDiscoveredDependencies = ignoreAutoDiscoveredDependencies;
+    this.ignorePluginDiscoveredDependencies = ignorePluginDiscoveredDependencies;
   }
 
   public static BuildConfig makeDefaultBuildConfig(){
@@ -137,8 +137,8 @@ public class BuildConfig {
     return disabled;
   }
 
-  public boolean isIgnoreAutoDiscoveredDependencies() {
-    return ignoreAutoDiscoveredDependencies;
+  public boolean isIgnorePluginDiscoveredDependencies() {
+    return ignorePluginDiscoveredDependencies;
   }
 
   @Override
@@ -164,13 +164,13 @@ public class BuildConfig {
         Objects.equals(depends, that.depends) &&
         Objects.equals(provides, that.provides) &&
         Objects.equals(disabled, that.disabled) &&
-        Objects.equals(ignoreAutoDiscoveredDependencies, that.ignoreAutoDiscoveredDependencies);
+        Objects.equals(ignorePluginDiscoveredDependencies, that.ignorePluginDiscoveredDependencies);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation,
-        buildResources, depends, provides, disabled, ignoreAutoDiscoveredDependencies);
+        buildResources, depends, provides, disabled, ignorePluginDiscoveredDependencies);
   }
 
   @Override

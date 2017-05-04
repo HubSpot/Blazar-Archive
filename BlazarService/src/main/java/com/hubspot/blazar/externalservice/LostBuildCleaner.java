@@ -184,6 +184,8 @@ public class LostBuildCleaner implements LeaderLatchListener, Managed {
           LOG.info("Build container for module build {} has state {}. The container is running for {}ms which doesn't exceed the max allowed running time of {}ms. No need to initiate cleanup",
               moduleBuild.getId().get(), buildContainerState, age, maxAge);
         }
+      } catch (IllegalStateException e) {
+        LOG.warn("Failed to update the state of module build {} in db. The error is: {}. This can happen if the build container terminates very close to the time the module build state is sampled.", moduleBuild.getId().get(), e.getMessage(), e);
       } catch (Throwable t) {
         LOG.error("An error occurred while checking the build container state for module build {}. The error is: {}. Will try again to check the module in the next cycle", moduleBuild.getId().get(), t.getMessage(), t);
       }

@@ -1,13 +1,11 @@
 package com.hubspot.blazar.data.service;
 
-import com.hubspot.blazar.base.DiscoveryResult;
-import com.hubspot.blazar.base.GitInfo;
-import com.hubspot.blazar.base.Module;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
-import java.util.Set;
+
+import com.hubspot.blazar.base.GitInfo;
+import com.hubspot.blazar.base.ModuleDiscoveryResult;
 
 @Singleton
 public class ModuleDiscoveryService {
@@ -20,10 +18,15 @@ public class ModuleDiscoveryService {
     this.malformedFileService = malformedFileService;
   }
 
+  /**
+   * It return
+   * @param branch
+   * @param moduleDiscoveryResult
+   * @return
+   */
   @Transactional
-  public Set<Module> handleDiscoveryResult(GitInfo gitInfo, DiscoveryResult result) {
-    Set<Module> modules = moduleService.setModules(gitInfo, result.getModules());
-    malformedFileService.setMalformedFiles(gitInfo, result.getMalformedFiles());
-    return modules;
+  public void persistDiscoveryResult(GitInfo branch, ModuleDiscoveryResult moduleDiscoveryResult) {
+    moduleService.persistModulesAndDependencies(branch, moduleDiscoveryResult.getModules());
+    malformedFileService.setMalformedFiles(branch, moduleDiscoveryResult.getMalformedFiles());
   }
 }

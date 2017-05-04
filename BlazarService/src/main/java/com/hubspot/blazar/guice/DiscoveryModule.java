@@ -7,7 +7,6 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.multibindings.Multibinder;
 import com.hubspot.blazar.discovery.BuildConfigDiscovery;
-import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
 import com.hubspot.blazar.discovery.ModuleDiscovery;
 import com.hubspot.blazar.util.BlazarServiceLoader;
 
@@ -23,6 +22,5 @@ public class DiscoveryModule implements Module {
     }
 
     binder.bind(BuildConfigDiscovery.class);
-    binder.bind(ModuleDiscovery.class).to(CompositeModuleDiscovery.class);
   }
 }

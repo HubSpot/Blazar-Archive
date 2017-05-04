@@ -1,5 +1,8 @@
 package com.hubspot.blazar.base;
 
+import static com.hubspot.blazar.base.ModuleDependency.Source.BUILD_CONFIG;
+import static com.hubspot.blazar.base.ModuleDependency.Source.PLUGIN;
+
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -20,6 +23,16 @@ public class DiscoveredModule extends Module {
                           Optional<BuildConfig> resolvedBuildConfig) {
     this(Optional.<Integer>absent(), name, type, path, glob, true, System.currentTimeMillis(),
         System.currentTimeMillis(), buildpack, dependencyInfo, buildConfig, resolvedBuildConfig);
+  }
+
+  public DiscoveredModule(String name,
+                          String type,
+                          String path,
+                          String glob,
+                          Optional<GitInfo> buildpack,
+                          DependencyInfo dependencyInfo) {
+    this(Optional.<Integer>absent(), name, type, path, glob, true, System.currentTimeMillis(),
+        System.currentTimeMillis(), buildpack, dependencyInfo, Optional.absent(), Optional.absent());
   }
 
   public DiscoveredModule(Optional<Integer> id,
@@ -43,20 +56,40 @@ public class DiscoveredModule extends Module {
   }
 
   @JsonIgnore
-  public Set<ModuleDependency> getProvides() {
+  public Set<ModuleDependency> getBuildConfigProvidedDependencies() {
     Set<ModuleDependency> provides = new HashSet<>();
-    for (Dependency provided : dependencyInfo.getProvides()) {
-      provides.add(new ModuleDependency(getId().get(), provided.getName(), provided.getVersion()));
+    for (Dependency provided : dependencyInfo.getBuildConfigProvidedDependencies()) {
+      provides.add(new ModuleDependency(getId().get(), provided.getName(), provided.getVersion(), BUILD_CONFIG));
     }
 
     return provides;
   }
 
   @JsonIgnore
-  public Set<ModuleDependency> getDepends() {
+  public Set<ModuleDependency> getBuildConfigDependencies() {
     Set<ModuleDependency> dependencies = new HashSet<>();
-    for (Dependency dependency : dependencyInfo.getDepends()) {
-      dependencies.add(new ModuleDependency(getId().get(), dependency.getName(), dependency.getVersion()));
+    for (Dependency dependency : dependencyInfo.getBuildConfigDependencies()) {
+      dependencies.add(new ModuleDependency(getId().get(), dependency.getName(), dependency.getVersion(), BUILD_CONFIG));
+    }
+
+    return dependencies;
+  }
+
+  @JsonIgnore
+  public Set<ModuleDependency> getPluginDiscoveredProvidedDependencies() {
+    Set<ModuleDependency> provides = new HashSet<>();
+    for (Dependency provided : dependencyInfo.getPluginDiscoveredProvidedDependencies()) {
+      provides.add(new ModuleDependency(getId().get(), provided.getName(), provided.getVersion(), PLUGIN));
+    }
+
+    return provides;
+  }
+
+  @JsonIgnore
+  public Set<ModuleDependency> getPluginDiscoveredDependencies() {
+    Set<ModuleDependency> dependencies = new HashSet<>();
+    for (Dependency dependency : dependencyInfo.getPluginDiscoveredDependencies()) {
+      dependencies.add(new ModuleDependency(getId().get(), dependency.getName(), dependency.getVersion(), PLUGIN));
     }
 
     return dependencies;

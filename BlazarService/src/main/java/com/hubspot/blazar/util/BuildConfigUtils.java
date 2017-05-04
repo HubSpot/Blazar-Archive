@@ -171,18 +171,18 @@ public class BuildConfigUtils {
 
     Set<Dependency> depends = new HashSet<>();
     depends.addAll(primaryConfig.getDepends());
-    if (!primaryConfig.isIgnoreAutoDiscoveredDependencies()) {
+    if (!primaryConfig.isIgnorePluginDiscoveredDependencies()) {
       depends.addAll(buildpackConfig.getDepends());
     }
 
     Set<Dependency> provides = new HashSet<>();
     provides.addAll(primaryConfig.getProvides());
-    if (!primaryConfig.isIgnoreAutoDiscoveredDependencies()) {
+    if (!primaryConfig.isIgnorePluginDiscoveredDependencies()) {
       provides.addAll(buildpackConfig.getProvides());
     }
 
     return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation,
-        buildResources, depends, provides, primaryConfig.isDisabled(), primaryConfig.isIgnoreAutoDiscoveredDependencies());
+        buildResources, depends, provides, primaryConfig.isDisabled(), primaryConfig.isIgnorePluginDiscoveredDependencies());
   }
 
   public BuildConfig getConfigAtRef(GitInfo gitInfo, String configPath, String ref) throws IOException, NonRetryableBuildException {

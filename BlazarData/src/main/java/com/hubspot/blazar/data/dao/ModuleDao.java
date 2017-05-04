@@ -33,7 +33,7 @@ public interface ModuleDao {
   int update(@BindWithRosetta Module module);
 
   @SqlUpdate("UPDATE modules SET active = 0 WHERE id = :id")
-  int delete(@Bind("id") int id);
+  int deactivate(@Bind("id") int id);
 
   @SqlUpdate("UPDATE modules SET pendingBuildId = :id WHERE id = :moduleId AND pendingBuildId IS NULL")
   int updatePendingBuild(@BindWithRosetta ModuleBuild build);
