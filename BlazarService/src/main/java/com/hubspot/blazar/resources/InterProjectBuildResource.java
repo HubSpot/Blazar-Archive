@@ -84,20 +84,20 @@ public class InterProjectBuildResource {
   public InterProjectBuildStatus getMappingsForRepoBuild(@PathParam("repoBuildId") long repoBuildId) {
     InterProjectBuildStatus empty = new InterProjectBuildStatus(repoBuildId, Optional.<Long>absent(), Optional.<InterProjectBuild.State>absent(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableMap.<Long, String>of(), ImmutableSet.<Module>of());
     Optional<RepositoryBuild> repoBuild = repositoryBuildService.get(repoBuildId);
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
+    Set<InterProjectBuildMapping> interProjectBuildMappingsForRepoBuild = interProjectBuildMappingService.getByRepoBuildId(repoBuildId);
 
-    if (mappings.isEmpty() || !repoBuild.isPresent()) {
+    if (interProjectBuildMappingsForRepoBuild.isEmpty() || !repoBuild.isPresent()) {
       return empty;
     }
 
-    InterProjectBuildMapping mapping = mappings.iterator().next();
+    InterProjectBuildMapping mapping = interProjectBuildMappingsForRepoBuild.iterator().next();
     Optional<InterProjectBuild> build = interProjectBuildService.getWithId(mapping.getInterProjectBuildId());
 
     if (!build.isPresent()) {
       return empty;
     }
 
-    mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build.get());
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build.get().getId().get());
 
     Set<Integer> rootBuildModuleIds = build.get().getModuleIds();
     Set<Integer> downstreamModuleIds = new HashSet<>();
@@ -176,7 +176,7 @@ public class InterProjectBuildResource {
   @Path("/drawableGraph/{id}")
   public D3GraphData getDrawableGraphForBuild(@PathParam("id") long interProjectBuildId) {
     InterProjectBuild build = interProjectBuildService.getWithId(interProjectBuildId).get();
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(build);
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuildId);
     Map<Integer, InterProjectBuild.State> moduleIdToState = new HashMap<>();
     for (InterProjectBuildMapping mapping : mappings) {
       moduleIdToState.put(mapping.getModuleId(), mapping.getState());
