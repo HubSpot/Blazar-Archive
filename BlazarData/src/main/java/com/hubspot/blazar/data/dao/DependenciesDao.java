@@ -35,10 +35,24 @@ public interface DependenciesDao {
   Set<Edge> getEdges(@Bind("branchId") int branchId, @BindIn("moduleIds") Set<Integer> moduleIds);
 
   @SqlQuery("SELECT * FROM module_provides WHERE moduleId = :moduleId")
-  Set<Dependency> getProvided(@Bind("moduleId") int moduleId);
+  Set<Dependency> getProvidedDependencies(@Bind("moduleId") int moduleId);
+
+  @SqlQuery("" +
+      "SELECT COUNT(*) FROM module_provides " +
+      "INNER JOIN modules ON (module_provides.moduleId = modules.id) " +
+      "INNER JOIN branches ON (modules.branchId = branches.id) " +
+      "WHERE branches.id = :branchId AND modules.active=1 AND module_provides.source = 'UNKNOWN'")
+  int getCountOfProvidedDependenciesWithoutSourceByBranchId(@Bind("branchId") int branchId);
 
   @SqlQuery("SELECT * FROM module_depends WHERE moduleId = :moduleId")
   Set<Dependency> getDependencies(@Bind("moduleId") int moduleId);
+
+  @SqlQuery("" +
+      "SELECT COUNT(*) FROM module_depends " +
+      "INNER JOIN modules ON (module_depends.moduleId = modules.id) " +
+      "INNER JOIN branches ON (modules.branchId = branches.id) " +
+      "WHERE branches.id = :branchId AND modules.active=1 AND module_depends.source = 'UNKNOWN'")
+  int getCountOfDependenciesWithoutSourceByBranchId(@Bind("branchId") int branchId);
 
   @SqlQuery("SELECT gitInfo.* " +
             "FROM modules AS module " +
@@ -59,11 +73,11 @@ public interface DependenciesDao {
   void deleteProvidedDependencies(@Bind("moduleId") int moduleId);
 
   @SqlUpdate("DELETE FROM module_provides WHERE moduleId = :moduleId AND source = :source")
-  void deleteProvidedDependenciesBySource(@Bind("moduleId") int moduleId, Source source);
+  void deleteProvidedDependenciesBySource(@Bind("moduleId") int moduleId, @Bind("source") Source source);
 
   @SqlUpdate("DELETE FROM module_depends WHERE moduleId = :moduleId")
   void deleteDependencies(@Bind("moduleId") int moduleId);
 
   @SqlUpdate("DELETE FROM module_depends WHERE moduleId = :moduleId AND source = :source")
-  void deleteDependenciesBySource(@Bind("moduleId") int moduleId, Source source);
+  void deleteDependenciesBySource(@Bind("moduleId") int moduleId, @Bind("source") Source source);
 }

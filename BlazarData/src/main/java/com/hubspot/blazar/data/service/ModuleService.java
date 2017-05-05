@@ -84,10 +84,11 @@ public class ModuleService {
     alreadyRegisteredAndNotRediscovedModules.forEach(existingModule -> {
       Module previousModuleInstance = registeredActiveModulesByName.get(existingModule.getName());
       if (!previousModuleInstance.equals(existingModule)) {
-        LOG.debug("Existing module {}:{}(id:{}) has a changed build config. We will persist it.", existingModule.getName(), existingModule.getType(), existingModule.getId());
+        LOG.debug("Existing module {}(type:{}, id:{}) has a changed build config. We will persist it.", existingModule.getName(), existingModule.getType(), existingModule.getId().get());
         checkAffectedRowCount(moduleDao.update(existingModule));
+      } else {
+        LOG.debug("Existing module {}(type:{}, id:{}) has no changes in its build config, will not persist it", existingModule.getName(), existingModule.getType(), existingModule.getId().get());
       }
-      LOG.debug("Existing module {}:{}(id:{}) has no changes in its build config", existingModule.getName(), existingModule.getType(), existingModule.getId());
     });
 
     // For newly discovered modules we will create module entries and will also create entries in the dependencies
@@ -95,11 +96,11 @@ public class ModuleService {
     Set<Module> newlyDiscoveredModules = updatedModules.stream()
         .filter(module -> module.getClass() == DiscoveredModule.class && !registeredActiveModulesByName.containsKey(module.getName())).collect(Collectors.toSet());
     newlyDiscoveredModules.forEach(newModule -> {
-      LOG.debug("Persisting newly discovered module {}:{}", newModule.getName(), newModule.getType());
+      LOG.debug("Persisting newly discovered module {}(type:{})", newModule.getName(), newModule.getType());
       int moduleId = moduleDao.insert(branch.getId().get(), newModule);
       LOG.debug("Persisted newly discovered module {}:{} with id:{})", newModule.getName(), newModule.getType(), moduleId);
-      LOG.debug("Persisting dependencies for newly discovered module {}:{}(id:{})", newModule.getName(), newModule.getType(), moduleId);
-      DiscoveredModule persistedModule = (DiscoveredModule) newModule.withId(moduleId);
+      LOG.debug("Persisting dependencies for newly discovered module {}(type:{}, id:{})", newModule.getName(), newModule.getType(), moduleId);
+      DiscoveredModule persistedModule = ((DiscoveredModule) newModule).withId(moduleId);
       dependenciesService.insert(persistedModule);
     });
 
@@ -109,21 +110,32 @@ public class ModuleService {
     Set<Module> rediscoveredModules = updatedModules.stream()
         .filter(module -> module.getClass() == DiscoveredModule.class && registeredActiveModulesByName.containsKey(module.getName())).collect(Collectors.toSet());
     rediscoveredModules.forEach(rediscoveredModule -> {
+
       Module previousModuleInstance = registeredActiveModulesByName.get(rediscoveredModule.getName());
-      // get a Module class with id added so we can compare and persist
-      Module rediscoveredModuleWithId = rediscoveredModule.withId(previousModuleInstance.getId().get());
-      if (!previousModuleInstance.equals(rediscoveredModule)) {
-        LOG.debug("Rediscovered module {}:{}(id:{}) has a changed build config. We will persist it.", rediscoveredModuleWithId.getName(), rediscoveredModuleWithId.getType(), rediscoveredModuleWithId.getId());
+
+      int moduleId = previousModuleInstance.getId().get();
+
+      DiscoveredModule rediscoveredModuleWithId = ((DiscoveredModule)rediscoveredModule).withId(moduleId);
+
+      if (buildConfigChanged(previousModuleInstance, rediscoveredModule)) {
+        LOG.debug("Rediscovered module {}(type:{}, id:{}) has a changed build config. We will persist it.", rediscoveredModule.getName(), rediscoveredModule.getType(), moduleId);
         checkAffectedRowCount(moduleDao.update(rediscoveredModuleWithId));
+      } else {
+        LOG.debug("Rediscovered module {}(type:{}, id:{}) has no changes in its build config, will not persist it", rediscoveredModule.getName(), rediscoveredModule.getType(), moduleId);
       }
-      // for the dependencies update we used the rediscoveredModule which has class DiscoveredModule and provides
-      // access to the DependencyInfo
-      dependenciesService.update((DiscoveredModule) rediscoveredModule);
+
+      LOG.debug("Persisting dependencies for rediscovered module {}(type:{}, id:{})", rediscoveredModule.getName(), rediscoveredModule.getType(), moduleId);
+      dependenciesService.update(rediscoveredModuleWithId);
     });
   }
 
   private static void checkAffectedRowCount(int affectedRows) {
     Preconditions.checkState(affectedRows == 1, "Expected to update 1 row but updated %s", affectedRows);
+  }
+
+  private boolean buildConfigChanged(Module previousModuleInstance, Module rediscoveredModule) {
+    return !previousModuleInstance.getBuildConfig().equals(rediscoveredModule.getBuildConfig()) ||
+        !previousModuleInstance.getResolvedBuildConfig().equals(rediscoveredModule.getResolvedBuildConfig());
   }
 
 }

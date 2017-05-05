@@ -227,3 +227,5 @@ ALTER TABLE `module_builds` ADD COLUMN `buildClusterName` varchar(64) NOT NULL D
 -- changeset gchomatas:18
 ALTER TABLE `modules` ADD COLUMN `buildConfig` mediumtext;
 ALTER TABLE `modules` ADD COLUMN `resolvedBuildConfig` mediumtext;
+ALTER TABLE `module_provides` ADD COLUMN `source` VARCHAR(40) NOT NULL DEFAULT 'UNKNOWN';
+ALTER TABLE `module_depends` ADD COLUMN `source` VARCHAR(40) NOT NULL DEFAULT 'UNKNOWN';

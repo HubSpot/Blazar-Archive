@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
@@ -26,29 +29,36 @@ import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.ModuleDiscoveryResult;
+import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
 
 @Singleton
 public class ModuleDiscoveryHandler {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ModuleDiscoveryHandler.class);
+
   private final Set<ModuleDiscovery> moduleDiscoveryPlugins;
   private final BuildConfigDiscovery buildConfigDiscovery;
   private final BuildConfigurationResolver buildConfigurationResolver;
   private final ModuleDiscoveryService moduleDiscoveryService;
   private final ModuleService moduleService;
+  private final DependenciesService dependenciesService;
 
   @Inject
   public ModuleDiscoveryHandler(Set<ModuleDiscovery> moduleDiscoveryPlugins,
                                 BuildConfigDiscovery buildConfigDiscovery,
                                 BuildConfigurationResolver buildConfigurationResolver,
                                 ModuleDiscoveryService moduleDiscoveryService,
-                                ModuleService moduleService) {
+                                ModuleService moduleService,
+                                DependenciesService dependenciesService) {
 
     this.moduleDiscoveryPlugins = moduleDiscoveryPlugins;
     this.buildConfigDiscovery = buildConfigDiscovery;
     this.buildConfigurationResolver = buildConfigurationResolver;
     this.moduleDiscoveryService = moduleDiscoveryService;
     this.moduleService = moduleService;
+    this.dependenciesService = dependenciesService;
   }
 
   public ModuleDiscoveryResult updateModules(GitInfo branch, boolean persistUpdatedModules) throws IOException {
@@ -138,7 +148,16 @@ public class ModuleDiscoveryHandler {
                                            Multimap<String, Module> discoveredModulesByFolder,
                                            Set<MalformedFile> malformedFiles) throws IOException {
 
-    boolean rediscoverAllModules = !commitInfo.isPresent() || commitInfo.get().isTruncated();
+    // if the dependency source is missing in existing dependency entries we rediscover the modules so the entries will
+    // be updated with the source info
+    boolean dependencySourceIsMissingInBranchModules =
+        dependenciesService.getCountOfDependenciesWithoutSourceByBranchId(branch.getId().get()) > 0 ||
+            dependenciesService.getCountOfProvidedDependenciesWithoutSourceByBranchId(branch.getId().get()) > 0;
+    LOG.debug("Dependency source is missing for modules in branch {}/{}: {}", branch.getFullRepositoryName(), branch.getBranch(), dependencySourceIsMissingInBranchModules);
+    LOG.debug("Commit info was provided for module discovery in branch {}/{}: {}", branch.getFullRepositoryName(), branch.getBranch(), commitInfo.isPresent());
+    LOG.debug("Commit info for branch {} is truncated: {}", branch.getFullRepositoryName(), branch.getBranch(), commitInfo.isPresent() && commitInfo.get().isTruncated());
+    boolean rediscoverAllModules = !commitInfo.isPresent() || commitInfo.get().isTruncated() || dependencySourceIsMissingInBranchModules;
+    LOG.debug("Modules for branch {} will be truncated: {}", branch.getFullRepositoryName(), branch.getBranch(), rediscoverAllModules);
     Set<ModuleDiscovery> moduleDiscoveryPluginsToUse = new HashSet<>();
     for (ModuleDiscovery moduleDiscoveryPlugin : moduleDiscoveryPlugins) {
       if (moduleDiscoveryPlugin.isEnabled(branch) && (rediscoverAllModules || (commitInfo.isPresent() && moduleDiscoveryPlugin.shouldRediscover(branch, commitInfo.get())))) {

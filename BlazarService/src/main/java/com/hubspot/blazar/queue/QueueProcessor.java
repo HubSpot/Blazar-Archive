@@ -112,22 +112,30 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     try {
       if (running.get() && leader.get()) {
         List<QueueItem> queueItemsSorted = sort(queueItemDao.getItemsReadyToExecute());
+        LOG.debug("{} events found in db", queueItemsSorted.size());
 
-        LOG.debug("Out of the total {} events in the queue, {} events have already been scheduled for processing", queueItemsSorted.size(), processingItems.size());
-        printItemsInProcessingQueues();
+        if (processingItems.size() > 0) {
+          LOG.debug("{} events of those in db are in the following event thread pools (ONLY one event in each thread pool is currently running and the other are waiting)):", processingItems.size());
+          printItemsInProcessingQueues();
+        } else {
+          LOG.debug("No events exist in the event processing thread pools", queueItemsSorted.size(), processingItems.size());
+        }
 
         queueItemsSorted.removeAll(processingItems);
-        LOG.debug("Will schedule for processing the remaining {} events", queueItemsSorted.size());
+        if (queueItemsSorted.size() > 0) {
+          LOG.debug("Will schedule {} events for processing (i.e. those found in db minus those already processing)", queueItemsSorted.size());
+        }
+
         processingItems.addAll(queueItemsSorted);
 
 
         for (QueueItem queuedItem : queueItemsSorted) {
           String eventType = queuedItem.getType().getSimpleName();
-          LOG.debug("Processing event {}: {}", getEventName(eventType), queuedItem.getId().get());
+          LOG.debug("Processing event {}: eventId:{}", eventType, queuedItem.getId().get());
 
           if (!canDequeueEvent(queuedItem)) {
             LOG.warn("Will not schedule event {}(id: {}) for processing because there is no healthy cluster available at the moment (only git push events are dequeued when all build clusters are down)",
-                getEventName(eventType), queuedItem.getId().get());
+                eventType, queuedItem.getId().get());
             processingItems.remove(queuedItem);
             return;
           }
@@ -164,7 +172,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     @Override
     public void run() {
       Stopwatch timer = Stopwatch.createStarted();
-      String eventName = getEventName(queueItem.getType().getSimpleName());
+      String eventName = queueItem.getType().getSimpleName();
       try {
         if (!queueItemDao.isItemStillQueued(queueItem)) {
           LOG.info("Queued event {}(id: {}) was already completed, will not schedule for processing", eventName, queueItem.getId().get());
@@ -183,7 +191,7 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
       } finally {
         processingItems.remove(queueItem);
         timer.stop();
-        LOG.debug("Processing of event {}(id: {}) took {}ms", eventName, queueItem.getId(), timer.elapsed(TimeUnit.MILLISECONDS));
+        LOG.debug("Processing of event {}(id: {}) took {}ms", eventName, queueItem.getId().get(), timer.elapsed(TimeUnit.MILLISECONDS));
       }
     }
 
@@ -200,14 +208,9 @@ public class QueueProcessor implements LeaderLatchListener, Managed, Runnable {
     }
   }
 
-  private String getEventName(String eventClassSimpleName) {
-    return eventClassSimpleName.substring(0, eventClassSimpleName.length() - 6);
-  }
-
   private void printItemsInProcessingQueues() {
-    LOG.debug("Status of event processing queues (one of the listed events in each queue is currently running and the other are waiting)):\n");
     queueExecutors.forEach((eventClass, scheduledExecutorService) -> {
-      LOG.debug("Event Queue {} has {} events scheduled for processing\n", getEventName(eventClass), ((ScheduledThreadPoolExecutor)scheduledExecutorService).getQueue().size());
+      LOG.debug("Event processing thread pool:'{}' has {} events queued and 1 processing", eventClass, ((ScheduledThreadPoolExecutor)scheduledExecutorService).getQueue().size());
     });
   }
 }

@@ -27,7 +27,7 @@ public class BlazarServiceTestBase extends DatabaseBackedTest {
     buildClusterHealthChecker.start();
     buildClusterHealthChecker.isLeader();
     queueProcessor.isLeader();
-    queueProcessor.startProcessorWithCustomPollingRate(50, TimeUnit.MILLISECONDS);
+    queueProcessor.startProcessorWithCustomPollingRate(100, TimeUnit.MILLISECONDS);
   }
 
   @After

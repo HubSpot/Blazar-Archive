@@ -9,7 +9,8 @@ import com.google.common.base.MoreObjects;
 public class ModuleDependency {
   public enum Source {
     PLUGIN,
-    BUILD_CONFIG
+    BUILD_CONFIG,
+    UNKNOWN
   }
   private final int moduleId;
   private final String name;

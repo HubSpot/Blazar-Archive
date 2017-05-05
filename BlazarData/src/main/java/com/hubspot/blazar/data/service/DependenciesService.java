@@ -2,6 +2,7 @@ package com.hubspot.blazar.data.service;
 
 import static com.hubspot.blazar.base.ModuleDependency.Source.BUILD_CONFIG;
 import static com.hubspot.blazar.base.ModuleDependency.Source.PLUGIN;
+import static com.hubspot.blazar.base.ModuleDependency.Source.UNKNOWN;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -176,11 +177,19 @@ public class DependenciesService {
   }
 
   public Set<Dependency> getProvided(int moduleId) {
-    return dependenciesDao.getProvided(moduleId);
+    return dependenciesDao.getProvidedDependencies(moduleId);
   }
 
   public Set<Dependency> getDependencies(int moduleId) {
     return dependenciesDao.getDependencies(moduleId);
+  }
+
+  public int getCountOfDependenciesWithoutSourceByBranchId(int branchId) {
+    return dependenciesDao.getCountOfDependenciesWithoutSourceByBranchId(branchId);
+  }
+
+  public int getCountOfProvidedDependenciesWithoutSourceByBranchId(int branchId) {
+    return dependenciesDao.getCountOfProvidedDependenciesWithoutSourceByBranchId(branchId);
   }
 
   public Set<GitInfo> getBranchesWithNonVersionedDependencies() {
@@ -188,6 +197,9 @@ public class DependenciesService {
   }
 
   private void updateProvidedDependencies(DiscoveredModule module) {
+    //TODO: remove that when no entries have UNKNOWN source
+    dependenciesDao.deleteProvidedDependenciesBySource(module.getId().get(), UNKNOWN);
+
     if (!module.getBuildConfigProvidedDependencies().isEmpty()) {
       dependenciesDao.deleteProvidedDependenciesBySource(module.getId().get(), BUILD_CONFIG);
       dependenciesDao.insertProvidedDependencies(module.getBuildConfigProvidedDependencies());
@@ -200,6 +212,9 @@ public class DependenciesService {
   }
 
   private void updateDependencies(DiscoveredModule module) {
+    //TODO: remove that when no entries have UNKNOWN source
+    dependenciesDao.deleteDependenciesBySource(module.getId().get(), UNKNOWN);
+
     if (!module.getBuildConfigDependencies().isEmpty()) {
       dependenciesDao.deleteDependenciesBySource(module.getId().get(), BUILD_CONFIG);
       dependenciesDao.insertDependencies(module.getBuildConfigDependencies());
