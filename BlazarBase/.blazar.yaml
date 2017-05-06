@@ -1,0 +1,3 @@
+stepActivation:
+  notify:
+    branches: [hs-master, hs-staging]
