@@ -1,4 +1,4 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.visitor.repositorybuild;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,8 +61,31 @@ public class LaunchingRepositoryBuildVisitorTest {
   private static final GitHubHelper gitHubHelper = mock(GitHubHelper.class);
 
   private static final GitInfo branch = new GitInfo(Optional.of(1), "git.example.com", "example", "test", 1337, "master", true, 100L, 100L);
-  private static final Module activeModule = new Module(Optional.of(1), "activeModule", "config", "/activeModule", "/activeModule/*", true, 100L, 100L, Optional.absent());
-  private static final Module inactiveModule = new Module(Optional.of(2), "inactiveModule", "config", "/inactiveModule", "/inactiveModule/*", false, 100L, 100L, Optional.absent());
+  private static final BuildConfig defaultBuildConfig = BuildConfig.makeDefaultBuildConfig();
+
+  private static final Module activeModule = new Module(Optional.of(1),
+      "activeModule",
+      "config",
+      "/activeModule",
+      "/activeModule/*",
+      true,
+      100L,
+      100L,
+      Optional.absent(),
+      Optional.of(defaultBuildConfig),
+      Optional.of(defaultBuildConfig));
+  private static final Module inactiveModule = new Module(Optional.of(2),
+      "inactiveModule",
+      "config",
+      "/inactiveModule",
+      "/inactiveModule/*",
+      false,
+      100L,
+      100L,
+      Optional.absent(),
+      Optional.of(defaultBuildConfig),
+      Optional.of(defaultBuildConfig));
+
   private static final Map<Integer, Set<Integer>> dependencyMap = ImmutableMap.of(
       1, ImmutableSet.of(),
       2, ImmutableSet.of());
@@ -76,8 +99,6 @@ public class LaunchingRepositoryBuildVisitorTest {
 
   private static final LaunchingRepositoryBuildVisitor buildVisitor = new LaunchingRepositoryBuildVisitor(
       repositoryBuildService,
-      buildConfigUtils,
-      branchService,
       moduleBuildService,
       malformedFileService,
       interProjectBuildService,
@@ -89,7 +110,7 @@ public class LaunchingRepositoryBuildVisitorTest {
   @Before
   public void before() throws IOException, NonRetryableBuildException {
     when(branchService.get(anyInt())).thenReturn(Optional.of(branch));
-    when(buildConfigUtils.getConfigAtRefOrDefault(anyObject(), anyString(), anyString())).thenReturn(BuildConfig.makeDefaultBuildConfig());
+    when(buildConfigUtils.getConfigAtRef(anyObject(), anyString(), anyString())).thenReturn(BuildConfig.makeDefaultBuildConfig());
   }
 
   @Test

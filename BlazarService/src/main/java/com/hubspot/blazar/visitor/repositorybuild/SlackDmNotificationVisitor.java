@@ -1,4 +1,4 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.visitor.repositorybuild;
 
 
 import static com.hubspot.blazar.base.RepositoryBuild.State.FAILED;
@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.hubspot.blazar.base.BuildTrigger;
+import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.config.BlazarConfiguration;
@@ -89,9 +90,14 @@ public class SlackDmNotificationVisitor implements RepositoryBuildVisitor {
     }
 
     // Do not send notifications for builds of branches that are explicitly ignored
-    String branchName = branchService.get(build.getBranchId()).get().getBranch();
-    if (slackDirectMessageConfig.getIgnoredBranches().contains(branchName)) {
+    GitInfo branch = branchService.get(build.getBranchId()).get();
+    if (slackDirectMessageConfig.getIgnoredBranches().contains(branch.getBranch())) {
       LOG.info("Not sending messages for build {} because the branch is in the list of ignored branches {}", build, slackDirectMessageConfig.getIgnoredBranches());
+      return false;
+    }
+
+    if (!branch.isActive()) {
+      LOG.info("Branch {} is no longer active, probably was deleted before build finished. Not sending notification for build {}", branch, build);
       return false;
     }
 

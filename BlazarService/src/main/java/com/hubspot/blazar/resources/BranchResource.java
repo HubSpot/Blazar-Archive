@@ -14,18 +14,17 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.common.base.Optional;
 import com.hubspot.blazar.base.BranchSetting;
-import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.MalformedFile;
 import com.hubspot.blazar.base.Module;
+import com.hubspot.blazar.base.ModuleDiscoveryResult;
 import com.hubspot.blazar.base.branch.BranchStatus;
 import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.BranchSettingsService;
 import com.hubspot.blazar.data.service.BranchStatusService;
 import com.hubspot.blazar.data.service.MalformedFileService;
-import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.discovery.ModuleDiscovery;
+import com.hubspot.blazar.discovery.ModuleDiscoveryHandler;
 import com.hubspot.jackson.jaxrs.PropertyFiltering;
 
 @Path("/branches")
@@ -36,8 +35,7 @@ public class BranchResource {
   private final BranchSettingsService branchSettingsService;
   private final ModuleService moduleService;
   private final MalformedFileService malformedFileService;
-  private final ModuleDiscoveryService moduleDiscoveryService;
-  private final ModuleDiscovery moduleDiscovery;
+  private final ModuleDiscoveryHandler moduleDiscoveryHandler;
 
   @Inject
   public BranchResource(BranchService branchService,
@@ -45,15 +43,13 @@ public class BranchResource {
                         BranchSettingsService branchSettingsService,
                         ModuleService moduleService,
                         MalformedFileService malformedFileService,
-                        ModuleDiscoveryService moduleDiscoveryService,
-                        ModuleDiscovery moduleDiscovery) {
+                        ModuleDiscoveryHandler moduleDiscoveryHandler) {
     this.branchService = branchService;
     this.branchStatusService = branchStatusService;
     this.branchSettingsService = branchSettingsService;
     this.moduleService = moduleService;
     this.malformedFileService = malformedFileService;
-    this.moduleDiscoveryService = moduleDiscoveryService;
-    this.moduleDiscovery = moduleDiscovery;
+    this.moduleDiscoveryHandler = moduleDiscoveryHandler;
   }
 
   @GET
@@ -100,19 +96,18 @@ public class BranchResource {
   @POST
   @Path("/{id}/discover")
   @PropertyFiltering
-  public DiscoveryResult discoverModules(@PathParam("id") int branchId) throws IOException {
-    GitInfo gitInfo = get(branchId).get();
-    DiscoveryResult result = moduleDiscovery.discover(gitInfo);
-    moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
-    return result;
+  public ModuleDiscoveryResult discoverModules(@PathParam("id") int branchId) throws IOException {
+    GitInfo branch = get(branchId).get();
+    ModuleDiscoveryResult moduleDiscoveryResult = moduleDiscoveryHandler.updateModules(branch, true);
+    return moduleDiscoveryResult;
   }
 
   @GET
   @Path("{id}/discover")
   @PropertyFiltering
-  public DiscoveryResult sideEffectFreeModuleDiscovery(@PathParam("id") int branchId) throws IOException {
-    GitInfo gitInfo = get(branchId).get();
-    return moduleDiscovery.discover(gitInfo);
+  public ModuleDiscoveryResult discoverModulesWithoutPersistingUpdates(@PathParam("id") int branchId) throws IOException {
+    GitInfo branch = get(branchId).get();
+    return moduleDiscoveryHandler.updateModules(branch, false);
  }
 
   @GET

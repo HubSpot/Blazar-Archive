@@ -23,8 +23,8 @@ import com.hubspot.blazar.data.service.BranchService;
 import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
-import com.hubspot.blazar.discovery.CompositeModuleDiscovery;
-import com.hubspot.blazar.listener.BuildEventDispatcher;
+import com.hubspot.blazar.discovery.ModuleDiscoveryHandler;
+import com.hubspot.blazar.visitor.BuildEventDispatcher;
 
 import io.dropwizard.db.ManagedDataSource;
 
@@ -37,7 +37,7 @@ public class DependencyVersionTest extends BlazarServiceTestBase {
   @Inject
   private BranchService branchService;
   @Inject
-  private CompositeModuleDiscovery compositeModuleDiscovery;
+  private ModuleDiscoveryHandler moduleDiscoveryHandler;
   @Inject
   private ModuleDiscoveryService moduleDiscoveryService;
   @Inject
@@ -54,7 +54,7 @@ public class DependencyVersionTest extends BlazarServiceTestBase {
   public void itHasModuleVersion() throws InterruptedException, IOException {
     // Run discovery on all branches and check that all modules have a version
     for (GitInfo branch : branchService.getAll()) {
-      moduleDiscoveryService.handleDiscoveryResult(branch, compositeModuleDiscovery.discover(branch));
+      moduleDiscoveryHandler.updateModules(branch, true);
       for (Module module : moduleService.getByBranch(branch.getId().get())) {
         Set<Dependency> deps = dependenciesService.getDependencies(module.getId().get());
         Set<Dependency> provided = dependenciesService.getProvided(module.getId().get());

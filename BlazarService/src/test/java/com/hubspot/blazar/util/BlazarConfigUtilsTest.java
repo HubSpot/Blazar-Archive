@@ -77,7 +77,7 @@ public class BlazarConfigUtilsTest {
 
   @Test
   public void itPrefersPrimaryConfigForNonMergableFieldsWhenMergingConfigs() {
-    BuildConfig mergedConfig = configUtils.mergeConfig(primaryConfig, secondaryConfig);
+    BuildConfig mergedConfig = configUtils.mergeBuildConfigs(primaryConfig, secondaryConfig);
     assertThat(mergedConfig.getSteps()).isEqualTo(primaryConfig.getSteps());
     assertThat(mergedConfig.getBefore()).isEqualTo(primaryConfig.getBefore());
     assertThat(mergedConfig.getAfter()).isEqualTo(primaryConfig.getAfter());
@@ -88,14 +88,14 @@ public class BlazarConfigUtilsTest {
 
   @Test
   public void itFallsBackToSecondaryConfigWhenOptionNotPresentInPrimary() {
-    BuildConfig mergedConfig = configUtils.mergeConfig(primaryConfigWithoutOptions, secondaryConfig);
+    BuildConfig mergedConfig = configUtils.mergeBuildConfigs(primaryConfigWithoutOptions, secondaryConfig);
     assertThat(mergedConfig).isEqualTo(secondaryConfig);
   }
 
   @Test
   public void itMergesCollectionFieldsPresentInBothConfigs() {
     // Caveat we don't merge `steps` or `before` and they are collections.
-    BuildConfig mergedConfig = configUtils.mergeConfig(primaryConfig, secondaryConfig);
+    BuildConfig mergedConfig = configUtils.mergeBuildConfigs(primaryConfig, secondaryConfig);
 
     // Union different keys, prefer primary for same keys
     assertThat(mergedConfig.getEnv().get("VAR")).isEqualTo("primary"); // in both configs primary has precedence
@@ -126,7 +126,7 @@ public class BlazarConfigUtilsTest {
   @Test
   public void itReturnsDefaultConfigIfConfigNotFound() throws IOException, NonRetryableBuildException {
     when(gitHubHelper.configAtSha(anyString(), any(), anyString())).thenReturn(Optional.absent());
-    BuildConfig config = configUtils.getConfigAtRefOrDefault(PRIMARY_BRANCH, BuildConfigUtils.BUILDPACK_FILE, "master");
+    BuildConfig config = configUtils.getConfigAtRef(PRIMARY_BRANCH, BuildConfigUtils.BUILDPACK_FILE, "master");
     assertThat(config).isEqualTo(BuildConfig.makeDefaultBuildConfig());
   }
 }

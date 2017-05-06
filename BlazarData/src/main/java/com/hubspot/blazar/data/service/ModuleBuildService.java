@@ -165,14 +165,14 @@ public class ModuleBuildService {
   }
 
   @Transactional
-  public void begin(ModuleBuild build) {
-    beginNoPublish(build);
+  public void setToLaunching(ModuleBuild build) {
+    updateModuleBuildAndModuleInfo(build);
 
     eventBus.post(build);
   }
 
   @Transactional
-  void beginNoPublish(ModuleBuild build) {
+  void updateModuleBuildAndModuleInfo(ModuleBuild build) {
     Preconditions.checkArgument(build.getStartTimestamp().isPresent());
 
     checkAffectedRowCount(moduleBuildDao.begin(build));
@@ -200,7 +200,7 @@ public class ModuleBuildService {
     }
 
     if (build.getState().isWaiting()) {
-      beginNoPublish(build.toBuilder().setState(State.LAUNCHING).setStartTimestamp(Optional.of(System.currentTimeMillis())).build());
+      updateModuleBuildAndModuleInfo(build.toBuilder().setState(State.LAUNCHING).setStartTimestamp(Optional.of(System.currentTimeMillis())).build());
     }
 
     update(build.toBuilder().setState(State.CANCELLED).setEndTimestamp(Optional.of(System.currentTimeMillis())).build());
@@ -213,7 +213,7 @@ public class ModuleBuildService {
     }
 
     if (build.getState().isWaiting()) {
-      beginNoPublish(build.toBuilder()
+      updateModuleBuildAndModuleInfo(build.toBuilder()
           .setState(State.LAUNCHING)
           .setStartTimestamp(Optional.of(System.currentTimeMillis()))
           .build());
@@ -237,16 +237,19 @@ public class ModuleBuildService {
   public ModuleBuild createFailedBuild(RepositoryBuild repositoryBuild, Module module) {
     int nextBuildNumber = repositoryBuild.getBuildNumber();
 
-    LOG.info("Enqueuing build for module {} with build number {}", module.getId().get(), nextBuildNumber);
+    LOG.info("Repository build {} (build # {}) has failed. Will first create an ENQUEUED module build for module {} and then will fail it (will fake module build passing through all intermediate states from ENQUEUED to FAILED).",
+        repositoryBuild.getId().get(), nextBuildNumber, module.getId().get());
     ModuleBuild queued =
         ModuleBuild.queuedBuild(repositoryBuild, module, nextBuildNumber, BuildConfig.makeDefaultBuildConfig(), BuildConfig.makeDefaultBuildConfig());
     long id = moduleBuildDao.enqueue(queued);
     ModuleBuild queuedWithId = queued.toBuilder().setId(Optional.of(id)).build();
     checkAffectedRowCount(moduleDao.updatePendingBuild(queuedWithId));
 
-    LOG.info("Enqueued build for module {} with id {}", module.getId().get(), id);
+    LOG.info("Repository build {} (build # {}) has failed: Persisted module build {} in state ENQUEUED for module {}",
+        repositoryBuild.getId().get(), nextBuildNumber, id, module.getId().get());
     ModuleBuild failed = fail(queuedWithId);
-    LOG.info("Failed build for module {} with id {}", module.getId().get(), id);
+    LOG.info("Repository build {} (build # {}) has failed: Module build {} was set to state LAUNCHING and then to state FAILED for module {}",
+        repositoryBuild.getId().get(), nextBuildNumber, id, module.getId().get());
 
     eventBus.post(failed);
     return failed;

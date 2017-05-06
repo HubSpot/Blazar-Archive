@@ -1,4 +1,4 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.visitor.modulebuild;
 
 import static com.hubspot.blazar.base.InterProjectBuild.State.CANCELLED;
 import static com.hubspot.blazar.base.InterProjectBuild.State.FAILED;

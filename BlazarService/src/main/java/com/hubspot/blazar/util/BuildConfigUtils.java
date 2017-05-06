@@ -44,7 +44,7 @@ public class BuildConfigUtils {
   }
 
   public BuildConfig getConfigForBuildpackOnBranch(GitInfo gitInfo) throws IOException, NonRetryableBuildException {
-    return getConfigAtRefOrDefault(gitInfo, BUILDPACK_FILE, gitInfo.getBranch());
+    return getConfigAtRef(gitInfo, BUILDPACK_FILE, gitInfo.getBranch());
   }
 
   public BuildConfig addMissingBuildConfigSettings(BuildConfig buildConfig) {
@@ -60,96 +60,135 @@ public class BuildConfigUtils {
   }
 
   /**
-   * This merges 2 configurations (primary, secondary) into 1 resolved configuration that is used by a Blazar Executor to build
+   * This merges the build configuration (.blazar.yaml) found inside a source folder (the primary configuration)
+   * with a reusable configuration (the buildpack) which is either specified inside the primary configuration or
+   * is auto-discovered by the module discovery plugins. The final resolved configuration is used by
+   * the build container (Blazar Executor) to execute the build. The following are the rules for merging the primary
+   * build config with the buildpack config
    *
    * Collections of `BuildSteps` are overridden.
    * List<BuildStep> steps
-   *  Overridden so that child builds can define a new build.
+   * No merging. The steps in the primary config are used. If the primary config doesn't specify 'steps' the 'steps'
+   * specified in the buildpack are used. This allows to specify the steps once in a buildpack and reuse them across builds
+   * with the extra flexibility to completely replace the buildpack steps if required.
    *
    * List<BuildStep> before
-   *  Overridden, buildpacks should not define this so child builds can insert their own steps before the 'core' section of the build (`steps` section)
+   * No merging. The 'before' steps in the primary config are used. If the primary config doesn't specify 'before'
+   * steps those specified in the buildpack are used (if any). This allows to specify once the core 'steps' in a
+   * buildpack to reuse them across builds and then use the primary config to insert steps BEFORE the core 'steps'
+   * if required.
    *
    * Optional<PostBuildSteps> after
-   *  Overridden, buildpacks should not define this so child builds can insert their own steps after the 'core' section of the build
+   * No merging. The 'after' steps in the primary config are used. If the primary config doesn't specify 'after'
+   * steps those specified in the buildpack are used (if any). This allows to specify once the core 'steps'
+   * in a buildpack to reuse them across builds and then use the primary config to insert steps AFTER the core 'steps'
+   * if required.
    *
    * Map<String, String> env
-   *  Merged preferring `primary` when there are duplicate values, this lets child builds decide how the build
-   *  tools execute without having to replicate the whole build
+   *  The environment variable map in buildpack is merged with the environment variable map in primary config.
+   *  The enviroment variables in the primary config override those in the buildpack when there are duplicate
+   *  environment variables.
+   *  In this way common environment variables can be kept in the buildpack and resused across builds. Users can add
+   *  more or override the common environment variables by using the primary build config.
    *
    * List<String> buildDeps
-   *  Merged putting `primary` before `secondary`, We turn `buildDeps` into additional values on the $PATH,
-   *  putting primary before secondary effectively overrides secondary values that provide binaries of the same name.
+   *  The two lists of build dependencies are concatenated putting the values in the `primary` config before the
+   *  values in the buildpack. We turn `buildDeps` into additional values on the $PATH, (???????)
+   *  putting primary before secondary effectively overrides secondary values that provide binaries of the same name (????).
    *
    * List<String> webhooks
-   *  Merged putting `primary` before `secondary`, This is not currently used by anything as Blazar does not have Webhooks.
+   * The two lists of webhooks are concatenated.
    *
    * List<String> cache
-   *  Merged putting `primary` before `secondary`, Primary caches will be stored first.
+   * The two lists of caches are concatenated putting the values in the `primary` config before the
+   *  values in the buildpack which means that caches in the primary config will be strored first.
    *
+   * DOES THIS MAKE ANY SENSE since buildpacks cannot be nested???
    * Optional<GitInfo> buildpack
-   *  We override because the child build should be able to specify its own buildpack.
+   *  If the primary build config specifies a 'buildpack' and the buildpack itself specifies another 'buildpack' the
+   *  buildpack in the primary config is kept....what is the purpose of doing that since we are not going to resolve the
+   *  buildpack again? The buildpack in a primary build config is read outside of this method and is then passed to this method
+   *  to be merged with the primary one. So this method which should probably ignore the buildpack field.
    *
    * Optional<String> user
-   *  We override because the child build should be able to specify its own user
+   *  The user in the primary config overrides the user set in the buildpack.
    *
    * Map<String, StepActivationCriteria> stepActivation
-   *  Merged preferring `primary` when there are duplicate values, duplicate values, this lets child builds decide when
-   *  the build tools execute without having to replicate the whole build
+   *  The two maps with stepActivationCriteria in the buildpack and in the primary config are merged.
+   *  The criteria in the primary config override those in the buildpack when there are duplicate keys.
+   *  In this way common criteria can be kept in the buildpack and resused across builds and then by using the primary
+   *  build config users can add more or override the common criteria if required.
    *
    * Optional<BuildCGroupResources> buildResources
-   *  Overridden allows child builds to specify different resource limits
+   * The resources specified in the buildpack are ignored if there are resources specified in the primary config.
    *
    * Set<Dependency> depends
-   *  Merged allows child builds to specify their own additional dependencies
+   * The two sets of dependencies are merged.
    *
    * Set<Dependency> provides
-   *  Merged allows child builds to specify their own names to depend on
+   * The two sets of provided dependencies are merged.
+   *
+   * boolean disabled
+   * This determines if building is completely disabled for the folder that the primary config is located is,
+   * so the value in the primary config is always used and any value in the buildpack is completely ignored.
+   * Actually if the primary config sets this to true (i.e. is disabled) the merging of the build configs is never
+   * called since no building needs to be executed.
+   *
+   * boolean ignoreAutoDiscoveredDependencies
+   * This determines whether dependencies specified in the buildpack should be ignored and only the dependencies
+   * specified in the primary config should be used. Therefore the value in the primary config is always used
+   * and any value in the builpack is ignored.
    *
    */
-  public BuildConfig mergeConfig(BuildConfig primary, BuildConfig secondary) {
-    List<BuildStep> steps = primary.getSteps().isEmpty() ? secondary.getSteps() : primary.getSteps();
-    List<BuildStep> before = primary.getBefore().isEmpty() ? secondary.getBefore() : primary.getBefore();
-    Optional<PostBuildSteps> after = (!primary.getAfter().isPresent()) ? secondary.getAfter() : primary.getAfter();
-    Optional<GitInfo> buildpack = (!primary.getBuildpack().isPresent() ? secondary.getBuildpack() : primary.getBuildpack());
+  public BuildConfig mergeBuildConfigs(BuildConfig primaryConfig, BuildConfig buildpackConfig) {
+    List<BuildStep> steps = primaryConfig.getSteps().isEmpty() ? buildpackConfig.getSteps() : primaryConfig.getSteps();
+    List<BuildStep> before = primaryConfig.getBefore().isEmpty() ? buildpackConfig.getBefore() : primaryConfig.getBefore();
+    Optional<PostBuildSteps> after = (!primaryConfig.getAfter().isPresent()) ? buildpackConfig.getAfter() : primaryConfig.getAfter();
+    Optional<GitInfo> buildpack = (!primaryConfig.getBuildpack().isPresent() ? buildpackConfig.getBuildpack() : primaryConfig.getBuildpack());
     Map<String, String> env = new LinkedHashMap<>();
-    env.putAll(secondary.getEnv());
-    env.putAll(primary.getEnv());
-    List<String> buildDeps = Lists.newArrayList(Iterables.concat(secondary.getBuildDeps(), primary.getBuildDeps()));
-    List<String> webhooks = Lists.newArrayList(Iterables.concat(secondary.getWebhooks(), primary.getWebhooks()));
-    List<String> cache = Lists.newArrayList(Iterables.concat(secondary.getCache(), primary.getCache()));
+    env.putAll(buildpackConfig.getEnv());
+    env.putAll(primaryConfig.getEnv());
+    List<String> buildDeps = Lists.newArrayList(Iterables.concat(buildpackConfig.getBuildDeps(), primaryConfig.getBuildDeps()));
+    List<String> webhooks = Lists.newArrayList(Iterables.concat(buildpackConfig.getWebhooks(), primaryConfig.getWebhooks()));
+    List<String> cache = Lists.newArrayList(Iterables.concat(buildpackConfig.getCache(), primaryConfig.getCache()));
     final Optional<String> user;
-    if (primary.getUser().isPresent()) {
-      user = primary.getUser();
+    if (primaryConfig.getUser().isPresent()) {
+      user = primaryConfig.getUser();
     } else {
-      user = secondary.getUser();
+      user = buildpackConfig.getUser();
     }
 
     Map<String, StepActivationCriteria> stepActivation = new LinkedHashMap<>();
-    stepActivation.putAll(secondary.getStepActivation());
-    stepActivation.putAll(primary.getStepActivation());
+    stepActivation.putAll(buildpackConfig.getStepActivation());
+    stepActivation.putAll(primaryConfig.getStepActivation());
 
     final Optional<BuildCGroupResources> buildResources;
-    if (primary.getBuildResources().isPresent()) {
-      buildResources = primary.getBuildResources();
+    if (primaryConfig.getBuildResources().isPresent()) {
+      buildResources = primaryConfig.getBuildResources();
     } else {
-      buildResources = secondary.getBuildResources();
+      buildResources = buildpackConfig.getBuildResources();
     }
 
     Set<Dependency> depends = new HashSet<>();
-    depends.addAll(primary.getDepends());
-    depends.addAll(secondary.getDepends());
+    depends.addAll(primaryConfig.getDepends());
+    if (!primaryConfig.isIgnorePluginDiscoveredDependencies()) {
+      depends.addAll(buildpackConfig.getDepends());
+    }
 
     Set<Dependency> provides = new HashSet<>();
-    provides.addAll(primary.getProvides());
-    provides.addAll(secondary.getProvides());
+    provides.addAll(primaryConfig.getProvides());
+    if (!primaryConfig.isIgnorePluginDiscoveredDependencies()) {
+      provides.addAll(buildpackConfig.getProvides());
+    }
 
-    return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation, buildResources, depends, provides);
+    return new BuildConfig(steps, before, after, env, buildDeps, webhooks, cache, buildpack, user, stepActivation,
+        buildResources, depends, provides, primaryConfig.isDisabled(), primaryConfig.isIgnorePluginDiscoveredDependencies());
   }
 
-  public BuildConfig getConfigAtRefOrDefault(GitInfo gitInfo, String configPath, String ref) throws IOException, NonRetryableBuildException {
+  public BuildConfig getConfigAtRef(GitInfo gitInfo, String configPath, String ref) throws IOException, NonRetryableBuildException {
 
     String repositoryName = gitInfo.getFullRepositoryName();
-    LOG.info("Going to fetch config for path {} in repo {}@{}", configPath, repositoryName, ref);
+    LOG.info("Going to fetch build config (buildpack) for path {} in repo {}@{}", configPath, repositoryName, ref);
 
     try {
       return gitHubHelper.configAtSha(configPath, gitInfo, ref).or(BuildConfig.makeDefaultBuildConfig());
@@ -157,7 +196,11 @@ public class BuildConfigUtils {
       String message = String.format("Invalid config found for path %s in repo %s@%s, failing build", configPath, repositoryName, ref);
       throw new NonRetryableBuildException(message, e);
     } catch (FileNotFoundException e) {
-      return BuildConfig.makeDefaultBuildConfig();
+      // Doesn't seem a good idea to obscure the fact that the build pack is missing and leave users with the impression
+      // that their buildpack is taken into account
+      //return BuildConfig.makeDefaultBuildConfig();
+      String message = String.format("The specified build config (buildpack) %s was not found in repo %s@%s.", configPath, repositoryName, ref);
+      throw new NonRetryableBuildException(message, e);
     }
   }
 }

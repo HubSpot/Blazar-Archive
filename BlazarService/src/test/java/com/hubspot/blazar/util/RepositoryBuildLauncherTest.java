@@ -28,7 +28,7 @@ import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.discovery.ModuleDiscovery;
+import com.hubspot.blazar.discovery.ModuleDiscoveryHandler;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 
 @RunWith(JukitoRunner.class)
@@ -39,7 +39,7 @@ public class RepositoryBuildLauncherTest {
   private final ModuleService moduleService = mock(ModuleService.class);
   private final DependenciesService dependenciesService = mock(DependenciesService.class);
   private final ModuleDiscoveryService moduleDiscoveryService = mock(ModuleDiscoveryService.class);
-  private final ModuleDiscovery moduleDiscovery = mock(ModuleDiscovery.class);
+  private final ModuleDiscoveryHandler moduleDiscoveryHandler = mock(ModuleDiscoveryHandler.class);
   private final GitHubHelper gitHubHelper = mock(GitHubHelper.class);
 
   @Test
@@ -58,7 +58,7 @@ public class RepositoryBuildLauncherTest {
     BuildOptions ipbBuildOptions = new BuildOptions(ImmutableSet.of(1), BuildOptions.BuildDownstreams.NONE, false);
     RepositoryBuild currentBuild = RepositoryBuild.queuedBuild(branch, BuildTrigger.forInterProjectBuild(1), 2, ipbBuildOptions);
 
-    RepositoryBuildLauncher launcher = new RepositoryBuildLauncher(repositoryBuildService, branchService, moduleService, dependenciesService, moduleDiscoveryService, moduleDiscovery, gitHubHelper);
+    RepositoryBuildLauncher launcher = new RepositoryBuildLauncher(repositoryBuildService, branchService, moduleService, dependenciesService, moduleDiscoveryService, moduleDiscoveryHandler, gitHubHelper);
 
     when(gitHubHelper.commitInfoFor(any(), any(), any())).thenThrow(new IllegalStateException("Previous build is present this should not be called"));
     when(gitHubHelper.shaFor(any(), any())).thenThrow(new IllegalStateException("Previous build is present this should not be called"));
@@ -87,7 +87,7 @@ public class RepositoryBuildLauncherTest {
 
 
     RepositoryBuild currentBuild = RepositoryBuild.queuedBuild(branch, BuildTrigger.forCommit(secondCommitSha), 2, BuildOptions.defaultOptions());
-    RepositoryBuildLauncher launcher = new RepositoryBuildLauncher(repositoryBuildService, branchService, moduleService, dependenciesService, moduleDiscoveryService, moduleDiscovery, gitHubHelper);
+    RepositoryBuildLauncher launcher = new RepositoryBuildLauncher(repositoryBuildService, branchService, moduleService, dependenciesService, moduleDiscoveryService, moduleDiscoveryHandler, gitHubHelper);
 
     GHRepository repository = mock(GHRepository.class);
 
