@@ -102,7 +102,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     assertThat(Sets.newHashSet(1)).isEqualTo(testableBuild.getModuleIds());
     assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(testableBuild.getState());
     assertThat(Arrays.asList(1, 4, 7, 8, 10, 11, 9, 13)).isEqualTo(interProjectBuildService.getWithId(buildId).get().getDependencyGraph().get().getTopologicalSort());
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuildService.getWithId(buildId).get());
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(buildId);
     for (InterProjectBuildMapping mapping : mappings) {
       assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(mapping.getState());
     }
@@ -125,7 +125,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     long buildId = testableBuild.getId().get();
     assertThat(Sets.newHashSet(7)).isEqualTo(testableBuild.getModuleIds());
     assertThat(InterProjectBuild.State.SUCCEEDED).isEqualTo(testableBuild.getState());
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuildService.getWithId(buildId).get());
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(buildId);
     // ensure there is 1 repo build for these modules
     Set<Long> repoBuildIds = new HashSet<>();
     Set<Integer> modulesInOneBuild = ImmutableSet.of(7,8,9);
@@ -161,8 +161,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     RepositoryBuild repositoryBuild = testUtils.runAndWaitForRepositoryBuild(gitInfo, buildTrigger, buildOptions);
     Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getByRepoBuildId(repositoryBuild.getId().get());
     // Here the mappings we have are only for the 1 repo we triggered (and queried on), have to get them all before we can test.
-    InterProjectBuild interProjectBuild = interProjectBuildService.getWithId(mappings.iterator().next().getInterProjectBuildId()).get();
-    mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(interProjectBuild);
+    mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(mappings.iterator().next().getInterProjectBuildId());
     // ensure there is 1 repo build for these modules
     Set<Long> repoBuildIds = new HashSet<>();
     Set<Integer> modulesInOneBuild = ImmutableSet.of(7,8,9);
@@ -211,7 +210,7 @@ public class InterProjectBuildServiceTest extends BlazarServiceTestBase {
     InterProjectBuild testableBuild = testUtils.runInterProjectBuild(1, Optional.absent());
     InterProjectBuild buildRun = interProjectBuildService.getWithId(testableBuild.getId().get()).get();
     assertThat(buildRun.getState()).isEqualTo(InterProjectBuild.State.FAILED);
-    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(buildRun);
+    Set<InterProjectBuildMapping> mappings = interProjectBuildMappingService.getMappingsForInterProjectBuild(testableBuild.getId().get());
     for (InterProjectBuildMapping mapping : mappings) {
       if (expectedFailures.contains(mapping.getModuleId())) {
         assertThat(mapping.getState().equals(InterProjectBuild.State.FAILED));

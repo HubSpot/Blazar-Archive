@@ -1,12 +1,13 @@
 package com.hubspot.blazar.data.service;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.transaction.Transactional;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import com.hubspot.blazar.base.InterProjectBuild;
 import com.hubspot.blazar.base.InterProjectBuildMapping;
 import com.hubspot.blazar.data.dao.InterProjectBuildMappingDao;
 
@@ -19,8 +20,16 @@ public class InterProjectBuildMappingService {
     this.dao = dao;
   }
 
-  public Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(InterProjectBuild interProjectBuild) {
-    return dao.getMappingsForInterProjectBuild(interProjectBuild);
+  /**
+   * Many times when requesting mappings what is really wanted is a map of ModuleId -> Mapping for easier access.
+   */
+  public Map<Integer, InterProjectBuildMapping> getMappingsForInterProjectBuildByModuleId(long interProjectBuildId) {
+    Set<InterProjectBuildMapping> mappingsForInterProjectBuild = getMappingsForInterProjectBuild(interProjectBuildId);
+    return Maps.uniqueIndex(mappingsForInterProjectBuild, InterProjectBuildMapping::getModuleId);
+  }
+
+  public Set<InterProjectBuildMapping> getMappingsForInterProjectBuild(long interProjectBuildId) {
+    return dao.getMappingsForInterProjectBuild(interProjectBuildId);
   }
 
   public Set<InterProjectBuildMapping> getMappingsForRepo(long interProjectBuildId, int branchId) {
