@@ -69,11 +69,9 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
     leader.set(true);
 
     Disposable disposable = getObservableOfAllClustersHealth()
-        .subscribeOn(Schedulers.io())
-        .observeOn(Schedulers.computation())
         .subscribe(clusterHealthCheck -> {
-      clusterHealthCheckMap.put(clusterHealthCheck.getClusterName(), clusterHealthCheck);
-    });
+          clusterHealthCheckMap.put(clusterHealthCheck.getClusterName(), clusterHealthCheck);
+        });
     clusterHealthObserver.getAndSet(disposable);
   }
 
@@ -102,7 +100,9 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
   }
 
   private Observable<ClusterHealthCheck> getObservableSingularityClusterHealth(String clusterName) {
-    return Observable.interval(0, HEALTH_CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS).map(tick -> {
+    return Observable.interval(0, HEALTH_CHECK_INTERVAL_SECONDS, TimeUnit.SECONDS)
+        .observeOn(Schedulers.io())
+        .map(tick -> {
       SingularityClient singularityClient = singularityClusterClients.get(clusterName);
       SingularityState singularityState;
       try {
@@ -124,7 +124,7 @@ public class BuildClusterHealthChecker implements LeaderLatchListener, Managed {
         return new ClusterHealthCheck(clusterName,false);
       }
 
-    }).subscribeOn(Schedulers.io()).observeOn(Schedulers.computation());
+    });
   }
 
   private boolean singularityClusterHasAvailableResources(SingularityState singularityState) {
