@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 
 public class BuildStep {
@@ -19,10 +19,10 @@ public class BuildStep {
                    @JsonProperty("description") Optional<String> description,
                    @JsonProperty("commands") List<BuildCommand> commands,
                    @JsonProperty("activeByDefault") Optional<Boolean> activeByDefault) {
-    this.name = Objects.firstNonNull(name, Optional.<String>absent());
-    this.description = Objects.firstNonNull(description, Optional.<String>absent());
-    this.commands = Objects.firstNonNull(commands, Collections.<BuildCommand>emptyList());
-    this.activeByDefault = Objects.firstNonNull(activeByDefault, Optional.<Boolean>absent()).or(true);
+    this.name = MoreObjects.firstNonNull(name, Optional.<String>absent());
+    this.description = MoreObjects.firstNonNull(description, Optional.<String>absent());
+    this.commands = MoreObjects.firstNonNull(commands, Collections.<BuildCommand>emptyList());
+    this.activeByDefault = MoreObjects.firstNonNull(activeByDefault, Optional.<Boolean>absent()).or(true);
   }
 
   public Optional<String> getName() {

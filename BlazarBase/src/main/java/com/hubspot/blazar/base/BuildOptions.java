@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
@@ -25,7 +26,7 @@ public class BuildOptions {
   public BuildOptions(@JsonProperty("moduleIds") Set<Integer> moduleIds,
                       @JsonProperty("buildDownstreams") BuildDownstreams buildDownstreams,
                       @JsonProperty("resetCaches") boolean resetCaches) {
-    this.moduleIds = com.google.common.base.Objects.firstNonNull(moduleIds, ImmutableSet.<Integer>of());
+    this.moduleIds = MoreObjects.firstNonNull(moduleIds, ImmutableSet.<Integer>of());
     this.buildDownstreams = Preconditions.checkNotNull(buildDownstreams);
     this.resetCaches = resetCaches;
   }

@@ -45,7 +45,7 @@ public class Module {
     this.active = active;
     this.createdTimestamp = createdTimestamp;
     this.updatedTimestamp = updatedTimestamp;
-    this.buildpack = com.google.common.base.Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
+    this.buildpack = MoreObjects.firstNonNull(buildpack, Optional.<GitInfo>absent());
   }
 
   public Optional<Integer> getId() {
