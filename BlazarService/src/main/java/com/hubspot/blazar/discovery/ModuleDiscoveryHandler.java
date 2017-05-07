@@ -153,11 +153,13 @@ public class ModuleDiscoveryHandler {
     boolean dependencySourceIsMissingInBranchModules =
         dependenciesService.getCountOfDependenciesWithoutSourceByBranchId(branch.getId().get()) > 0 ||
             dependenciesService.getCountOfProvidedDependenciesWithoutSourceByBranchId(branch.getId().get()) > 0;
-    LOG.debug("Dependency source is missing for modules in branch {}/{}: {}", branch.getFullRepositoryName(), branch.getBranch(), dependencySourceIsMissingInBranchModules);
-    LOG.debug("Commit info was provided for module discovery in branch {}/{}: {}", branch.getFullRepositoryName(), branch.getBranch(), commitInfo.isPresent());
-    LOG.debug("Commit info for branch {} is truncated: {}", branch.getFullRepositoryName(), branch.getBranch(), commitInfo.isPresent() && commitInfo.get().isTruncated());
+
+    String fullBranchName = String.format("%s/%s",branch.getFullRepositoryName(), branch.getBranch());
+    LOG.debug("Dependency source is missing for modules in branch {}: {}", fullBranchName, dependencySourceIsMissingInBranchModules);
+    LOG.debug("Commit info was provided for module discovery in branch {}: {}", fullBranchName, commitInfo.isPresent());
+    LOG.debug("Commit info for branch {} is truncated: {}", fullBranchName, commitInfo.isPresent() && commitInfo.get().isTruncated());
     boolean rediscoverAllModules = !commitInfo.isPresent() || commitInfo.get().isTruncated() || dependencySourceIsMissingInBranchModules;
-    LOG.debug("Modules for branch {} will be truncated: {}", branch.getFullRepositoryName(), branch.getBranch(), rediscoverAllModules);
+    LOG.debug("Modules for branch {} will be truncated: {}", fullBranchName, rediscoverAllModules);
     Set<ModuleDiscovery> moduleDiscoveryPluginsToUse = new HashSet<>();
     for (ModuleDiscovery moduleDiscoveryPlugin : moduleDiscoveryPlugins) {
       if (moduleDiscoveryPlugin.isEnabled(branch) && (rediscoverAllModules || (commitInfo.isPresent() && moduleDiscoveryPlugin.shouldRediscover(branch, commitInfo.get())))) {
