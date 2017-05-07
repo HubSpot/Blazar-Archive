@@ -69,6 +69,8 @@ public class ModuleService {
 
     Map<String, Module> updatedModulesByName = Maps.uniqueIndex(updatedModules, Module::getName);
     Map<String, Module> registeredActiveModulesByName = Maps.uniqueIndex(registeredActiveModules, Module::getName);
+    LOG.debug("Registered Active Modules: {}", registeredActiveModulesByName.toString());
+    LOG.debug("Updated Modules: {}", updatedModulesByName.toString());
 
     for (String deletedModule : Sets.difference(registeredActiveModulesByName.keySet(), updatedModulesByName.keySet())) {
       Module module = registeredActiveModulesByName.get(deletedModule);
