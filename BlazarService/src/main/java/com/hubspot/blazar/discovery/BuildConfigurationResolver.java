@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -121,7 +122,9 @@ public class BuildConfigurationResolver {
                                                                        Multimap<String, Module> modulesByFolder,
                                                                        Set<String> foldersWithBuildConfigs,
                                                                        Set<MalformedFile> malformedFiles) {
-    for (Entry<String, Module> entry : modulesByFolder.entries()) {
+
+    Multimap<String, Module> modulesByFolderCopy = ArrayListMultimap.create(modulesByFolder);
+    for (Entry<String, Module> entry : modulesByFolderCopy.entries()) {
       if (foldersWithBuildConfigs.contains(entry.getKey())) {
         continue;
       }
