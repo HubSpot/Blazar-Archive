@@ -137,7 +137,7 @@ public class GitHubWebhookHandler {
     } catch (FileNotFoundException e) {
       try {
         String config = gitHubHelper.contentsFor(".blazar.yaml", repository, gitInfo);
-        return config.contains("enabled: true");
+        return config.contains("enabled: true") || !config.contains("disabled: true");
       } catch (FileNotFoundException e1) {
         return false;
       }
