@@ -238,3 +238,6 @@ ALTER TABLE `module_provides` ADD COLUMN `source` VARCHAR(40) NOT NULL DEFAULT '
 ALTER TABLE `module_depends` ADD COLUMN `source` VARCHAR(40) NOT NULL DEFAULT 'UNKNOWN';
 CREATE INDEX moduleId_and_source ON module_provides (moduleId, source);
 CREATE INDEX moduleId_and_source ON module_depends (moduleId, source);
+
+-- changeset gchomatas:19
+ALTER TABLE `modules` MODIFY `name` VARCHAR(250) NOT NULL CHARACTER SET utf8mb4 COLLATE utf8mb4_bin
