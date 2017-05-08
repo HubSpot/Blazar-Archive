@@ -10,6 +10,7 @@ import javax.ws.rs.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -65,47 +66,24 @@ public class ModuleService {
    */
   @Transactional
   public void persistModulesAndDependencies(GitInfo branch, Set<Module> updatedModules) {
-    Set<Module> registeredActiveModules = getByBranch(branch.getId().get()).stream().filter(Module::isActive).collect(Collectors.toSet());
+    Set<Module> registeredActiveModules = getByBranch(branch.getId().get()).stream().filter(Module::isActive)
+        .collect(Collectors.toSet());
 
     Map<String, Module> updatedModulesByName = Maps.uniqueIndex(updatedModules, Module::getName);
     Map<String, Module> registeredActiveModulesByName = Maps.uniqueIndex(registeredActiveModules, Module::getName);
     LOG.debug("Registered Active Modules: {}", registeredActiveModulesByName.toString());
     LOG.debug("Updated Modules: {}", updatedModulesByName.toString());
 
-    for (String deletedModule : Sets.difference(registeredActiveModulesByName.keySet(), updatedModulesByName.keySet())) {
-      Module module = registeredActiveModulesByName.get(deletedModule);
-      checkAffectedRowCount(moduleDao.deactivate(module.getId().get()));
-      dependenciesService.delete(module.getId().get());
-    }
+    deleteRemovedModules(updatedModulesByName, registeredActiveModulesByName);
 
-    // For already registered modules that were not rediscovered we will just update the module in db if the
-    // build config has been refreshed
-    Set<Module> alreadyRegisteredAndNotRediscovedModules = updatedModules.stream()
-        .filter(module -> module.getClass() == Module.class).collect(Collectors.toSet());
+    updateExistingNotRediscoveredModules(updatedModules, registeredActiveModulesByName);
 
-    alreadyRegisteredAndNotRediscovedModules.forEach(existingModule -> {
-      Module previousModuleInstance = registeredActiveModulesByName.get(existingModule.getName());
-      if (!previousModuleInstance.equals(existingModule)) {
-        LOG.debug("Existing module {}(type:{}, id:{}) has a changed build config. We will persist it.", existingModule.getName(), existingModule.getType(), existingModule.getId().get());
-        checkAffectedRowCount(moduleDao.update(existingModule));
-      } else {
-        LOG.debug("Existing module {}(type:{}, id:{}) has no changes in its build config, will not persist it", existingModule.getName(), existingModule.getType(), existingModule.getId().get());
-      }
-    });
+    createNewlyDiscoveredModules(branch, updatedModules, registeredActiveModulesByName);
 
-    // For newly discovered modules we will create module entries and will also create entries in the dependencies
-    // tables.
-    Set<Module> newlyDiscoveredModules = updatedModules.stream()
-        .filter(module -> module.getClass() == DiscoveredModule.class && !registeredActiveModulesByName.containsKey(module.getName())).collect(Collectors.toSet());
-    newlyDiscoveredModules.forEach(newModule -> {
-      LOG.debug("Persisting newly discovered module {}(type:{})", newModule.getName(), newModule.getType());
-      int moduleId = moduleDao.insert(branch.getId().get(), newModule);
-      LOG.debug("Persisted newly discovered module {}:{} with id:{})", newModule.getName(), newModule.getType(), moduleId);
-      LOG.debug("Persisting dependencies for newly discovered module {}(type:{}, id:{})", newModule.getName(), newModule.getType(), moduleId);
-      DiscoveredModule persistedModule = ((DiscoveredModule) newModule).withId(moduleId);
-      dependenciesService.insert(persistedModule);
-    });
+    updateRediscoveredModules(updatedModules, registeredActiveModulesByName);
+  }
 
+  private void updateRediscoveredModules(Set<Module> updatedModules, Map<String, Module> registeredActiveModulesByName) {
     // For re-discovered modules we will update their module entries in db if the
     // build config has been refreshed and also update the relevant entries in the dependencies
     // tables.
@@ -129,6 +107,54 @@ public class ModuleService {
       LOG.debug("Persisting dependencies for rediscovered module {}(type:{}, id:{})", rediscoveredModule.getName(), rediscoveredModule.getType(), moduleId);
       dependenciesService.update(rediscoveredModuleWithId);
     });
+  }
+
+  private void createNewlyDiscoveredModules(GitInfo branch, Set<Module> updatedModules, Map<String, Module> registeredActiveModulesByName) {
+    // For newly discovered modules we will create module entries and will also create entries in the dependencies
+    // tables.
+    Set<Module> newlyDiscoveredModules = updatedModules.stream()
+        .filter(module -> module.getClass() == DiscoveredModule.class && !registeredActiveModulesByName.containsKey(module.getName())).collect(Collectors.toSet());
+    newlyDiscoveredModules.forEach(newModule -> {
+      LOG.debug("Persisting newly discovered module {}(type:{})", newModule.getName(), newModule.getType());
+      int moduleId = moduleDao.insert(branch.getId().get(), newModule);
+      LOG.debug("Persisted newly discovered module {}:{} with id:{})", newModule.getName(), newModule.getType(), moduleId);
+      LOG.debug("Persisting dependencies for newly discovered module {}(type:{}, id:{})", newModule.getName(), newModule.getType(), moduleId);
+      DiscoveredModule persistedModule = ((DiscoveredModule) newModule).withId(moduleId);
+      dependenciesService.insert(persistedModule);
+    });
+  }
+
+  private void updateExistingNotRediscoveredModules(Set<Module> updatedModules, Map<String, Module> registeredActiveModulesByName) {
+    // For already registered modules that were not rediscovered we will just update the module in db if the
+    // build config has been refreshed
+    Set<Module> alreadyRegisteredAndNotRediscovedModules = updatedModules.stream()
+        .filter(module -> module.getClass() == Module.class).collect(Collectors.toSet());
+
+    alreadyRegisteredAndNotRediscovedModules.forEach(existingModule -> {
+      Module previousModuleInstance = registeredActiveModulesByName.get(existingModule.getName());
+      if (!previousModuleInstance.equals(existingModule)) {
+        LOG.debug("Existing module {}(type:{}, id:{}) has a changed build config. We will persist it.", existingModule.getName(), existingModule.getType(), existingModule.getId().get());
+        checkAffectedRowCount(moduleDao.update(existingModule));
+      } else {
+        LOG.debug("Existing module {}(type:{}, id:{}) has no changes in its build config, will not persist it", existingModule.getName(), existingModule.getType(), existingModule.getId().get());
+      }
+    });
+  }
+
+  private void deleteRemovedModules(Map<String, Module> updatedModulesByName, Map<String, Module> registeredActiveModulesByName) {
+    Set<String> deletedModuleNames = Sets.difference(registeredActiveModulesByName.keySet(),
+        updatedModulesByName.keySet());
+    LOG.debug("The following modules were removed from code and will be removed from database: {}",
+        Joiner.on(" ,").join(deletedModuleNames));
+    for (String deletedModuleName : deletedModuleNames) {
+      Module module = registeredActiveModulesByName.get(deletedModuleName);
+      LOG.debug("Module {} has been removed from code. Will delete the module and its dependencies from database",
+          deletedModuleName);
+      checkAffectedRowCount(moduleDao.deactivate(module.getId().get()));
+      LOG.debug("Module {} was deleted from database", deletedModuleName);
+      dependenciesService.delete(module.getId().get());
+      LOG.debug("Dependencies of removed module {} were deleted from database", deletedModuleName);
+    }
   }
 
   private static void checkAffectedRowCount(int affectedRows) {
