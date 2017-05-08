@@ -83,10 +83,10 @@ public class ModuleService {
     updateRediscoveredModules(updatedModules, registeredActiveModulesByName);
   }
 
+  // For re-discovered modules we will update their module entries in db if the
+  // build config has been refreshed and also update the relevant entries in the dependencies
+  // tables.
   private void updateRediscoveredModules(Set<Module> updatedModules, Map<String, Module> registeredActiveModulesByName) {
-    // For re-discovered modules we will update their module entries in db if the
-    // build config has been refreshed and also update the relevant entries in the dependencies
-    // tables.
     Set<Module> rediscoveredModules = updatedModules.stream()
         .filter(module -> module.getClass() == DiscoveredModule.class && registeredActiveModulesByName.containsKey(module.getName())).collect(Collectors.toSet());
     rediscoveredModules.forEach(rediscoveredModule -> {
@@ -109,11 +109,12 @@ public class ModuleService {
     });
   }
 
+  // For newly discovered modules we will create module entries and will also create entries in the dependencies
+  // tables.
   private void createNewlyDiscoveredModules(GitInfo branch, Set<Module> updatedModules, Map<String, Module> registeredActiveModulesByName) {
-    // For newly discovered modules we will create module entries and will also create entries in the dependencies
-    // tables.
     Set<Module> newlyDiscoveredModules = updatedModules.stream()
         .filter(module -> module.getClass() == DiscoveredModule.class && !registeredActiveModulesByName.containsKey(module.getName())).collect(Collectors.toSet());
+
     newlyDiscoveredModules.forEach(newModule -> {
       LOG.debug("Persisting newly discovered module {}(type:{})", newModule.getName(), newModule.getType());
       int moduleId = moduleDao.insert(branch.getId().get(), newModule);
@@ -141,17 +142,18 @@ public class ModuleService {
     });
   }
 
+  // For the modules that were removed we will deactivate them in db and remove their dependencies
   private void deleteRemovedModules(Map<String, Module> updatedModulesByName, Map<String, Module> registeredActiveModulesByName) {
     Set<String> deletedModuleNames = Sets.difference(registeredActiveModulesByName.keySet(),
         updatedModulesByName.keySet());
-    LOG.debug("The following modules were removed from code and will be removed from database: {}",
+    LOG.debug("The following modules were removed from code and will be removed from database: [{}]",
         Joiner.on(" ,").join(deletedModuleNames));
     for (String deletedModuleName : deletedModuleNames) {
       Module module = registeredActiveModulesByName.get(deletedModuleName);
-      LOG.debug("Module {} has been removed from code. Will delete the module and its dependencies from database",
+      LOG.debug("Module '{}' has been removed from code. Will deactivate the module and delete its dependencies from database",
           deletedModuleName);
       checkAffectedRowCount(moduleDao.deactivate(module.getId().get()));
-      LOG.debug("Module {} was deleted from database", deletedModuleName);
+      LOG.debug("Module '{}' was set to inactive in database", deletedModuleName);
       dependenciesService.delete(module.getId().get());
       LOG.debug("Dependencies of removed module {} were deleted from database", deletedModuleName);
     }
