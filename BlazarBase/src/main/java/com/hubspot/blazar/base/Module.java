@@ -53,7 +53,7 @@ public class Module {
     this.updatedTimestamp = updatedTimestamp;
     this.buildpack = MoreObjects.firstNonNull(buildpack, Optional.<GitInfo>absent());
     this.buildConfig = MoreObjects.firstNonNull(buildConfig, Optional.absent());
-    this.resolvedBuildConfig = MoreObjects.firstNonNull(buildConfig, Optional.absent());
+    this.resolvedBuildConfig = MoreObjects.firstNonNull(resolvedBuildConfig, Optional.absent());
   }
 
   public Module(Optional<Integer> id,
