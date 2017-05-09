@@ -102,7 +102,7 @@ public class BuildClusterService {
    *    the module build that the launched container should execute
    * @throws NonRetryableBuildException
    */
-  public synchronized void launchBuildContainer(ModuleBuild moduleBuild) throws BuildClusterException {
+  public synchronized String launchBuildContainer(ModuleBuild moduleBuild) throws BuildClusterException {
     Optional<String> clusterToUseOptional = pickClusterToLaunchBuild(moduleBuild, new HashSet<>());
     if (!clusterToUseOptional.isPresent()) {
       String message = String.format("Could not find a cluster to launch module build %d", moduleBuild.getId().get());
@@ -114,11 +114,14 @@ public class BuildClusterService {
     SingularityClusterConfiguration singularityClusterConfiguration = blazarConfiguration.getSingularityClusterConfigurations().get(clusterToUse);
     try {
       singularityClient.runSingularityRequest(singularityClusterConfiguration.getRequest(), Optional.of(buildRequest(moduleBuild)));
+      LOG.info("Run Blazar executor in Build cluster '{}' for module build {}", clusterToUse, moduleBuild.getId().get());
     } catch (Exception e) {
       String message = String.format("Failed to start build container in cluster %s for module build %d", clusterToUse, moduleBuild.getId().get());
       LOG.error(message, e);
       throw new BuildClusterException(message, e);
     }
+
+    return clusterToUse;
   }
 
   public BuildContainerInfo getBuildContainerInfo(ModuleBuild moduleBuild) throws BuildClusterException {
@@ -127,7 +130,7 @@ public class BuildClusterService {
     }
     String buildClusterName = moduleBuild.getBuildClusterName().get();
     if (isMesosCluster(buildClusterName)) {
-      return getMesosContainerState(moduleBuild);
+      return getMesosContainerInfo(moduleBuild);
     } else {
       throw new BuildClusterException(String.format("Could not find build cluster name: '%s' among the configured build clusters", buildClusterName));
     }
@@ -335,6 +338,7 @@ public class BuildClusterService {
           moduleBuild.getId().get()));
     }
 
+    long moduleBuildId = moduleBuild.getId().get();
     try {
       String singularityTaskId = moduleBuild.getTaskId().get();
       String buildClusterName = moduleBuild.getBuildClusterName().get();
@@ -342,20 +346,20 @@ public class BuildClusterService {
       Optional<SingularityTaskCleanupResult> result = singularityClient.killTask(singularityTaskId,
           Optional.of(singularityKillTaskRequest));
       if (!result.isPresent()) {
-        LOG.info("Tried to kill singularity task for module build {} but the task was not found", moduleBuild.getId().get());
+        LOG.info("Tried to kill singularity task for module build {} but the task was not found", moduleBuildId);
       } else {
         LOG.info("Request to kill singularity task for module build {} was successfully sent. The result is {}",
-            moduleBuild.getId().get(), result.get().toString());
+            moduleBuildId, result.get().toString());
       }
     } catch (Exception e) {
       LOG.error("The request to kill singularity task for module build {} failed. The error is: {}",
-          moduleBuild.getId().get(), e.getMessage(), e);
+          moduleBuildId, e.getMessage(), e);
       throw new BuildClusterException(String.format("The request to kill singularity task for module build %d failed. The error is: %s",
-          moduleBuild.getId().get(), e.getMessage()), e);
+          moduleBuildId, e.getMessage()), e);
     }
   }
 
-  private BuildContainerInfo getMesosContainerState(ModuleBuild moduleBuild) {
+  private BuildContainerInfo getMesosContainerInfo(ModuleBuild moduleBuild) {
     String buildClusterName = moduleBuild.getBuildClusterName().get();
     String singularityRequestId = blazarConfiguration.getSingularityClusterConfigurations().get(buildClusterName).getRequest();
     String runId =  String.valueOf(moduleBuild.getId().get());
@@ -389,16 +393,20 @@ public class BuildClusterService {
       return Optional.absent();
     }
 
+    long moduleBuildId = moduleBuild.getId().get();
     String clusterToUse = getAndSetNextClusterToUse();
     examinedClusters.add(clusterToUse);
     SingularityClusterConfiguration singularityClusterConfiguration = blazarConfiguration.getSingularityClusterConfigurations().get(clusterToUse);
 
     switch (singularityClusterConfiguration.getBuildStrategy()) {
       case ALWAYS:
+        LOG.debug("Strategy for Build Cluster '{}' is ALWAYS. Will check if this cluster is healthy for executing module build {}", clusterToUse, moduleBuildId);
         return checkAvailabilityAndPersistCluster(clusterToUse, moduleBuild, examinedClusters);
       case WHITELIST:
         if (singularityClusterConfiguration.getRepositories().isEmpty()) {
-          LOG.warn("You have selected the 'WHITELIST' build strategy for cluster {} but you have not provided any repositories. So the cluster is considered always available", clusterToUse);
+          LOG.warn("You have selected the 'WHITELIST' build strategy for build cluster {} but you have not provided any repositories. " +
+                  "So the cluster is considered available for any repo build. Will check if it is healthy to execute module build {}",
+              clusterToUse, moduleBuildId);
           return checkAvailabilityAndPersistCluster(clusterToUse, moduleBuild, examinedClusters);
         }
         Optional<String> moduleRepository = getModuleRepository(moduleBuild.getModuleId());
@@ -410,8 +418,12 @@ public class BuildClusterService {
             .anyMatch(whitelistedRepo -> whitelistedRepo.toLowerCase().equals(moduleRepository.get().toLowerCase()));
 
         if (moduleRepositoryIsWhitelisted) {
+          LOG.debug("Strategy for Build Cluster '{}' is WHITELIST and repository {} is in the whitelist. Will check if the cluster is healthy for module build {}",
+              clusterToUse, moduleRepository.get(), moduleBuildId);
           return checkAvailabilityAndPersistCluster(clusterToUse, moduleBuild, examinedClusters);
         }
+        LOG.debug("Strategy for Build Cluster '{}' is WHITELIST but repository {} is NOT in the whitelist. Will try to pick another cluster for module build {}",
+            clusterToUse, moduleRepository.get(), moduleBuildId);
         return pickClusterToLaunchBuild(moduleBuild, examinedClusters);
       case EXCLUSIVE_WHITELIST:
       case EMERGENCY:
@@ -451,11 +463,13 @@ public class BuildClusterService {
   private Optional<String> checkAvailabilityAndPersistCluster(String clusterToUse,
                                                               ModuleBuild moduleBuild,
                                                               Set<String> examinedClusters) throws BuildClusterException {
+    long moduleBuildId = moduleBuild.getId().get();
     if (buildClusterHealthChecker.isClusterAvailable(clusterToUse)) {
-      moduleBuildService.updateBuildClusterName(moduleBuild.getId().get(), clusterToUse);
+      LOG.debug("Build cluster {} is healthy. Will be used to execute module build {}", clusterToUse, moduleBuildId);
+      moduleBuildService.updateBuildClusterName(moduleBuildId, clusterToUse);
       return Optional.of(clusterToUse);
     } else {
-      LOG.warn("Build cluster {} is unavailable. Will look for another cluster", clusterToUse);
+      LOG.warn("Build cluster {} is not healthy for executing module build {}. Will look for another cluster", clusterToUse, moduleBuildId);
       return pickClusterToLaunchBuild(moduleBuild, examinedClusters);
     }
   }

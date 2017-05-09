@@ -1,4 +1,10 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.visitor.repositorybuild;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
@@ -6,11 +12,6 @@ import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.base.visitor.RepositoryBuildVisitor;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
 import com.hubspot.blazar.data.util.BuildNumbers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class CompletedRepositoryBuildVisitor implements RepositoryBuildVisitor {

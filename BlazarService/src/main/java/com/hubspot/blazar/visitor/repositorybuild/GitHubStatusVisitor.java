@@ -1,4 +1,4 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.visitor.repositorybuild;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

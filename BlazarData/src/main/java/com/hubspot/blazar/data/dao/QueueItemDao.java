@@ -22,7 +22,7 @@ public interface QueueItemDao {
   int insert(@BindWithRosetta QueueItem queueItem);
 
   @SqlUpdate("UPDATE queue_items SET retryCount = retryCount + 1, desiredExecutionTimestamp = TIMESTAMPADD(SECOND, 10, NOW()) WHERE id = :id")
-  int retry(@BindWithRosetta QueueItem queueItem);
+  int increaseRetryCounter(@BindWithRosetta QueueItem queueItem);
 
   @SqlUpdate("UPDATE queue_items SET completedTimestamp = NOW() WHERE id = :id")
   int complete(@BindWithRosetta QueueItem queueItem);

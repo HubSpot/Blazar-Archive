@@ -66,23 +66,24 @@ public class RepositoryBuildService {
     List<RepositoryBuild> queuedBuilds = repositoryBuildDao.getByBranchAndState(branchId, State.QUEUED);
     int nextBuildNumber = determineNextBuildNumber(branchId, queuedBuilds);
 
-    // check for existing queued build triggered by push event
+    // If this repository build was queued due to a push and there is already a queued repository build that was triggered by a push this build will be ignored
     if (trigger.getType() == BuildTrigger.Type.PUSH) {
       for (RepositoryBuild build : queuedBuilds) {
         if (build.getBuildTrigger().getType() == BuildTrigger.Type.PUSH) {
           long existingBuildId = build.getId().get();
-          LOG.info("Not enqueuing build for push to {}, pending build {} already exists", branchId, existingBuildId);
+          LOG.info("A push was received for branch {} but will not enqueue a repository build because there is already pending repository build {} that was triggered by a previous push to this branch",
+              branchId, existingBuildId);
           return existingBuildId;
         }
       }
     }
 
     RepositoryBuild build = RepositoryBuild.queuedBuild(gitInfo, trigger, nextBuildNumber, buildOptions);
-    LOG.info("Enqueuing build for repository {} with build number {}", branchId, nextBuildNumber);
-    // if no queued builds, we expect our update to succeed otherwise it shouldn't
+    LOG.info("Enqueuing repository build for branch {} and build number {}", branchId, nextBuildNumber);
+    // if there is no other repository build for the same branch and build number, we expect the update to succeed otherwise it shouldn't
     int expectedUpdateCount = queuedBuilds.isEmpty() ? 1 : 0;
     build = enqueue(build, expectedUpdateCount);
-    LOG.info("Enqueued build for repository {} with id {}", branchId, build.getId().get());
+    LOG.info("Enqueued repository build with id {} for branch {}", build.getId().get(), branchId);
     return build.getId().get();
   }
 

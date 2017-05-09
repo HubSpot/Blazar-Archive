@@ -1,4 +1,4 @@
-package com.hubspot.blazar.listener;
+package com.hubspot.blazar.visitor.repositorybuild;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,13 +31,19 @@ public class QueuedRepositoryBuildVisitor extends AbstractRepositoryBuildVisitor
   protected void visitQueued(RepositoryBuild build) throws Exception {
     BuildNumbers buildNumbers = repositoryBuildService.getBuildNumbers(build.getBranchId());
 
-    if (build.getBuildNumber() != buildNumbers.getPendingBuildNumber().or(-1)) {
+    int pendingBuildNumber = buildNumbers.getPendingBuildNumber().or(-1);
+    int inProgressBuildNumber = buildNumbers.getInProgressBuildNumber().or(-1);
+
+    if (build.getBuildNumber() != pendingBuildNumber) {
       // now that we allow multiple queued builds this will get hit
-      LOG.info("Build {} is not the pending build for branch {}, not launching", build.getId().get(), build.getBranchId());
+      LOG.info("Queued Repository Build {} is not marked as the pending build for branch {}, will not launch it yet. The currently pending build is {}.",
+          build.getId().get(), build.getBranchId(), pendingBuildNumber);
     } else if (buildNumbers.getInProgressBuildId().isPresent()) {
-      LOG.info("In progress build for branch {}, not launching pending build {}", build.getBranchId(), build.getId().get());
+      LOG.info("Queued repository build {} (build# {}) is the next pending build for branch {} but repository build {} (build# {}) is in progress, will not launch queued build yet",
+          build.getId().get(), build.getBuildNumber(), build.getBranchId(), buildNumbers.getInProgressBuildId().get(), inProgressBuildNumber);
     } else {
-      LOG.info("Going to launch pending build {} for branch {}", build.getId().get(), build.getBranchId());
+      LOG.info("Queued Repository Build {} (build# {}) is marked as the next pending build for branch {} and no other build is currently in progress, will launch this build now.",
+          build.getId().get(), build.getBuildNumber(), build.getBranchId());
       final Optional<RepositoryBuild> previous;
       if (buildNumbers.getLastBuildId().isPresent()) {
         previous = Optional.of(repositoryBuildService.get(buildNumbers.getLastBuildId().get()).get());

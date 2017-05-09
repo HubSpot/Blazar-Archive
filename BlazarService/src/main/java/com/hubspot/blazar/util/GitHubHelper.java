@@ -90,22 +90,13 @@ public class GitHubHelper {
     return new CommitInfo(current, previous, newCommits, truncated);
   }
 
-
-  public Optional<BuildConfig> configAtSha(String path, GitInfo gitInfo, String sha) throws IOException {
-    GHContent fileContent = repositoryFor(gitInfo).getFileContent(path, sha);
-    return Optional.of(mapper.readValue(yamlFactory.createParser(fileContent.getContent()), BuildConfig.class));
-  }
-
   public Optional<BuildConfig> getCurrentConfigOnBranch(String path, GitInfo gitInfo) throws IOException {
     return configFor(path, repositoryFor(gitInfo), gitInfo);
   }
 
-  /**
-   * Use {@Link getCurrentConfigOnBranch()} instead
-   */
-  @Deprecated
-  public Optional<BuildConfig> configFor(String path, GitInfo gitInfo) throws IOException {
-    return configFor(path, repositoryFor(gitInfo), gitInfo);
+  public Optional<BuildConfig> configAtSha(String path, GitInfo gitInfo, String sha) throws IOException {
+    GHContent fileContent = repositoryFor(gitInfo).getFileContent(path, sha);
+    return Optional.of(mapper.readValue(yamlFactory.createParser(fileContent.getContent()), BuildConfig.class));
   }
 
   public Optional<BuildConfig> configFor(String path, GHRepository repository, GitInfo gitInfo) throws IOException {
