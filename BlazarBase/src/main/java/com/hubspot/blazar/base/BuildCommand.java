@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
@@ -40,8 +40,8 @@ public class BuildCommand {
       this.args = Arrays.asList(DEFAULT_ARG, command.get());
     }
 
-    this.successfulReturnCodes = Objects.firstNonNull(successfulReturnCodes, DEFAULT_SUCCESSFUL_RETURN_CODES);
-    this.env = Objects.firstNonNull(env, Collections.<String, String>emptyMap());
+    this.successfulReturnCodes = MoreObjects.firstNonNull(successfulReturnCodes, DEFAULT_SUCCESSFUL_RETURN_CODES);
+    this.env = MoreObjects.firstNonNull(env, Collections.<String, String>emptyMap());
   }
 
   public BuildCommand(String executable, List<String> args) {
