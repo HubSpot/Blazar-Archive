@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -88,5 +89,35 @@ public class BuildCommand {
 
   public BuildCommand withDifferentExecutable(String newExecutable) {
     return new BuildCommand(newExecutable, args, successfulReturnCodes, env);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    BuildCommand command = (BuildCommand) o;
+    return Objects.equals(executable, command.executable) &&
+        Objects.equals(args, command.args) &&
+        Objects.equals(successfulReturnCodes, command.successfulReturnCodes) &&
+        Objects.equals(env, command.env);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(executable, args, successfulReturnCodes, env);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("executable", executable)
+        .add("args", args)
+        .add("successfulReturnCodes", successfulReturnCodes)
+        .add("env", env)
+        .toString();
   }
 }

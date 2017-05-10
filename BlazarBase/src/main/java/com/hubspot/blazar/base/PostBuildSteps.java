@@ -2,6 +2,7 @@ package com.hubspot.blazar.base;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,5 +35,33 @@ public class PostBuildSteps {
 
   public List<BuildStep> getAlways() {
     return always;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    PostBuildSteps that = (PostBuildSteps) o;
+    return Objects.equals(onFailure, that.onFailure) &&
+        Objects.equals(onSuccess, that.onSuccess) &&
+        Objects.equals(always, that.always);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(onFailure, onSuccess, always);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("onFailure", onFailure)
+        .add("onSuccess", onSuccess)
+        .add("always", always)
+        .toString();
   }
 }
