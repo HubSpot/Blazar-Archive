@@ -30,12 +30,13 @@ public class BlazarConfigUtilsTest {
   private static final String DEFAULT_BUILD_USER = "DefaultBuildUser";
   private static final BuildCGroupResources DEFAULT_BUILD_BUILD_CGROUP_RESOURCES = new BuildCGroupResources(2, 2560);
   private static final long DEFAULT_BUILD_TIMEOUT = 1000L;
+  private static final long DEFAULT_CONTAINER_LAUNCH_TIMEOUT = 1000L;
   private static final GitInfo PRIMARY_BRANCH = GitInfo.fromString("git.example.com/TestOrg/repo.git#primary");
   private static final GitInfo SECONDARY_BRANCH = GitInfo.fromString("git.example.com/TestOrg/repo.git#secondary");
 
   private static final GitHubHelper gitHubHelper = mock(GitHubHelper.class);
   private static final BlazarConfiguration blazarConfiguration = mock(BlazarConfiguration.class);
-  private static final ExecutorConfiguration exexutorConfiguration = new ExecutorConfiguration(Optional.of(DEFAULT_BUILD_USER), Optional.of(DEFAULT_BUILD_BUILD_CGROUP_RESOURCES), Optional.of(DEFAULT_BUILD_TIMEOUT));
+  private static final ExecutorConfiguration exexutorConfiguration = new ExecutorConfiguration(Optional.of(DEFAULT_BUILD_USER), Optional.of(DEFAULT_BUILD_BUILD_CGROUP_RESOURCES), Optional.of(DEFAULT_BUILD_TIMEOUT), Optional.of(DEFAULT_CONTAINER_LAUNCH_TIMEOUT));
   private static final BuildConfigUtils configUtils = new BuildConfigUtils(blazarConfiguration, gitHubHelper);
 
   private static final BuildConfig primaryConfig = BuildConfig.newBuilder()
