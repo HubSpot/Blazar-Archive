@@ -35,17 +35,18 @@ import com.hubspot.blazar.config.SingularityClusterConfiguration;
 import com.hubspot.blazar.config.SingularityClusterConfiguration.BuildStrategy;
 import com.hubspot.blazar.config.UiConfiguration;
 import com.hubspot.blazar.data.BlazarDataModule;
-import com.hubspot.blazar.guice.DiscoveryModule;
 import com.hubspot.blazar.externalservice.BuildClusterService;
 import com.hubspot.blazar.guice.BlazarEventBusModule;
 import com.hubspot.blazar.guice.BlazarQueueProcessorModule;
 import com.hubspot.blazar.guice.BuildVisitorModule;
-import com.hubspot.blazar.visitor.repositorybuild.GitHubStatusVisitor;
-import com.hubspot.blazar.visitor.modulebuild.TestBuildLauncher;
+import com.hubspot.blazar.guice.DiscoveryModule;
 import com.hubspot.blazar.test.base.service.BlazarGitTestConfiguration;
 import com.hubspot.blazar.test.base.service.BlazarTestModule;
 import com.hubspot.blazar.util.TestBuildClusterService;
+import com.hubspot.blazar.visitor.modulebuild.TestBuildLauncher;
+import com.hubspot.blazar.visitor.repositorybuild.GitHubStatusVisitor;
 import com.hubspot.horizon.AsyncHttpClient;
+import com.hubspot.singularity.SingularityDeployMarker;
 import com.hubspot.singularity.SingularityHostState;
 import com.hubspot.singularity.SingularityState;
 import com.hubspot.singularity.client.SingularityClient;
@@ -161,6 +162,20 @@ public class BlazarServiceTestModule extends AbstractModule {
   }
 
   private SingularityState getSingularityState() {
+    List<SingularityDeployMarker> activeDeploys =
+        ImmutableList.of(
+            new SingularityDeployMarker("one", "one", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("two", "two", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("three", "three", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("four", "four", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("five", "five", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("six", "six", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("seven", "seven", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("eight", "eight", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("nine", "nine", 1491433225641L, Optional.absent(), Optional.absent()),
+            new SingularityDeployMarker("ten", "ten", 1491433225641L, Optional.absent(), Optional.absent())
+        );
+
     return new SingularityState(
         1842,
         3849,
@@ -178,12 +193,15 @@ public class BlazarServiceTestModule extends AbstractModule {
         1,
         0,
         10,
+        0,
         Collections.<SingularityHostState>emptyList(),
         0L,
         10,
         10,
+        activeDeploys,
         10,
-        10,
+        0,
+        1491433225641L,
         1491433225641L,
         Collections.<String>emptyList(),
         Collections.<String>emptyList(),
@@ -193,7 +211,8 @@ public class BlazarServiceTestModule extends AbstractModule {
         0,
         0,
         Optional.absent(),
-        Optional.absent());
+        Optional.absent(),
+        0);
   }
 }
 
