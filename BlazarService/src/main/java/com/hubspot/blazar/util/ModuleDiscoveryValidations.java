@@ -76,8 +76,8 @@ public class ModuleDiscoveryValidations {
     // and turn the map in lines like "duplicateName -> [folderName:moduleType, folderName2:moduleType2, ...]
     String duplicatesEntriesAsString = duplicateModulesPerModuleName.asMap().entrySet().stream().map(entry -> {
       String duplicateModulesInEntry = entry.getValue().stream().map(duplicateModule ->
-          String.format("%s/%s", duplicateModule.getFolder(), duplicateModule.getType())).collect(Collectors.joining(" ,"));
-      return String.format("%s: [%s]%n", duplicateModulesInEntry);
+          String.format("%s:%s", duplicateModule.getFolder(), duplicateModule.getType())).collect(Collectors.joining(" ,"));
+      return String.format("%s: [%s]%n", entry.getKey(), duplicateModulesInEntry);
     }).collect(Collectors.joining(" ,"));
 
     String message = String.format("The following discovered module(s) share the same module name " +
