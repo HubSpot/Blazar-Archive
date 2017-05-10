@@ -32,7 +32,7 @@ public class GitHubConfiguration {
     this.password = password;
     this.setCommitStatus = setCommitStatus.or(true);
     this.oauthToken = oauthToken;
-    this.organizations = Objects.firstNonNull(organizations, Collections.<String>emptyList());
+    this.organizations = MoreObjects.firstNonNull(organizations, Collections.<String>emptyList());
   }
 
   public Optional<String> getUser() {

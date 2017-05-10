@@ -11,7 +11,7 @@ import java.util.Stack;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -89,7 +89,7 @@ public class DependencyGraph {
   }
 
   public Set<Integer> outgoingVertices(int moduleId) {
-    return Objects.firstNonNull(transitiveReduction.get(moduleId), Collections.<Integer>emptySet());
+    return MoreObjects.firstNonNull(transitiveReduction.get(moduleId), Collections.<Integer>emptySet());
   }
 
   @Override
