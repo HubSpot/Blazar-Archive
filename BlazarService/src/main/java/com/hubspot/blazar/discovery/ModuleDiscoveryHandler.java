@@ -135,7 +135,7 @@ public class ModuleDiscoveryHandler {
     List<Module> duplicateModules = getDuplicateModules(modules);
     if (!duplicateModules.isEmpty()) {
       duplicateModules.forEach(module -> modulesByPath.remove(module.getFolder(), module));
-      MalformedFile duplicateModulesMalFormedFile = getDuplicateModulesMalformedFile(branch, modules);
+      MalformedFile duplicateModulesMalFormedFile = getDuplicateModulesMalformedFile(branch, duplicateModules);
       malformedFiles.add(duplicateModulesMalFormedFile);
     }
   }
