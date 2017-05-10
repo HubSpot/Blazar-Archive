@@ -4,11 +4,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
@@ -40,8 +41,8 @@ public class BuildCommand {
       this.args = Arrays.asList(DEFAULT_ARG, command.get());
     }
 
-    this.successfulReturnCodes = Objects.firstNonNull(successfulReturnCodes, DEFAULT_SUCCESSFUL_RETURN_CODES);
-    this.env = Objects.firstNonNull(env, Collections.<String, String>emptyMap());
+    this.successfulReturnCodes = MoreObjects.firstNonNull(successfulReturnCodes, DEFAULT_SUCCESSFUL_RETURN_CODES);
+    this.env = MoreObjects.firstNonNull(env, Collections.<String, String>emptyMap());
   }
 
   public BuildCommand(String executable, List<String> args) {
@@ -88,5 +89,35 @@ public class BuildCommand {
 
   public BuildCommand withDifferentExecutable(String newExecutable) {
     return new BuildCommand(newExecutable, args, successfulReturnCodes, env);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    BuildCommand command = (BuildCommand) o;
+    return Objects.equals(executable, command.executable) &&
+        Objects.equals(args, command.args) &&
+        Objects.equals(successfulReturnCodes, command.successfulReturnCodes) &&
+        Objects.equals(env, command.env);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(executable, args, successfulReturnCodes, env);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("executable", executable)
+        .add("args", args)
+        .add("successfulReturnCodes", successfulReturnCodes)
+        .add("env", env)
+        .toString();
   }
 }

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Predicate;
 
 public class StepActivationCriteria implements Predicate<GitInfo> {
@@ -39,5 +40,12 @@ public class StepActivationCriteria implements Predicate<GitInfo> {
   @Override
   public int hashCode() {
     return Objects.hash(branches);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("branches", branches)
+        .toString();
   }
 }

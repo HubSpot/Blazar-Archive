@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 
 public class GitHubConfiguration {
@@ -32,7 +32,7 @@ public class GitHubConfiguration {
     this.password = password;
     this.setCommitStatus = setCommitStatus.or(true);
     this.oauthToken = oauthToken;
-    this.organizations = Objects.firstNonNull(organizations, Collections.<String>emptyList());
+    this.organizations = MoreObjects.firstNonNull(organizations, Collections.<String>emptyList());
   }
 
   public Optional<String> getUser() {

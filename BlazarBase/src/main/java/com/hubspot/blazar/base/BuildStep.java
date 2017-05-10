@@ -2,10 +2,11 @@ package com.hubspot.blazar.base;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 
 public class BuildStep {
@@ -19,10 +20,10 @@ public class BuildStep {
                    @JsonProperty("description") Optional<String> description,
                    @JsonProperty("commands") List<BuildCommand> commands,
                    @JsonProperty("activeByDefault") Optional<Boolean> activeByDefault) {
-    this.name = Objects.firstNonNull(name, Optional.<String>absent());
-    this.description = Objects.firstNonNull(description, Optional.<String>absent());
-    this.commands = Objects.firstNonNull(commands, Collections.<BuildCommand>emptyList());
-    this.activeByDefault = Objects.firstNonNull(activeByDefault, Optional.<Boolean>absent()).or(true);
+    this.name = MoreObjects.firstNonNull(name, Optional.<String>absent());
+    this.description = MoreObjects.firstNonNull(description, Optional.<String>absent());
+    this.commands = MoreObjects.firstNonNull(commands, Collections.<BuildCommand>emptyList());
+    this.activeByDefault = MoreObjects.firstNonNull(activeByDefault, Optional.<Boolean>absent()).or(true);
   }
 
   public Optional<String> getName() {
@@ -44,10 +45,40 @@ public class BuildStep {
   @JsonCreator
   public static BuildStep fromString(String command) {
     return new BuildStep(
-        Optional.<String>absent(),
-        Optional.<String>absent(),
+        Optional.absent(),
+        Optional.absent(),
         Collections.singletonList(BuildCommand.fromString(command)),
-        Optional.<Boolean>absent()
+        Optional.absent()
     );
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    BuildStep step = (BuildStep) o;
+    return activeByDefault == step.activeByDefault &&
+        Objects.equals(name, step.name) &&
+        Objects.equals(description, step.description) &&
+        Objects.equals(commands, step.commands);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, description, commands, activeByDefault);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("name", name)
+        .add("description", description)
+        .add("commands", commands)
+        .add("activeByDefault", activeByDefault)
+        .toString();
   }
 }
