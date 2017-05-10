@@ -2,6 +2,7 @@ package com.hubspot.blazar.base;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,10 +45,40 @@ public class BuildStep {
   @JsonCreator
   public static BuildStep fromString(String command) {
     return new BuildStep(
-        Optional.<String>absent(),
-        Optional.<String>absent(),
+        Optional.absent(),
+        Optional.absent(),
         Collections.singletonList(BuildCommand.fromString(command)),
-        Optional.<Boolean>absent()
+        Optional.absent()
     );
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    BuildStep step = (BuildStep) o;
+    return activeByDefault == step.activeByDefault &&
+        Objects.equals(name, step.name) &&
+        Objects.equals(description, step.description) &&
+        Objects.equals(commands, step.commands);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, description, commands, activeByDefault);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("name", name)
+        .add("description", description)
+        .add("commands", commands)
+        .add("activeByDefault", activeByDefault)
+        .toString();
   }
 }
