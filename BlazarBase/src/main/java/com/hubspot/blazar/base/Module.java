@@ -25,6 +25,10 @@ public class Module {
   private final long updatedTimestamp;
   @StoredAsJson
   private final Optional<GitInfo> buildpack;
+  @StoredAsJson
+  private final Optional<BuildConfig> buildConfig;
+  @StoredAsJson
+  private final Optional<BuildConfig> resolvedBuildConfig;
 
   @JsonCreator
   public Module(@JsonProperty("id") Optional<Integer> id,
@@ -35,7 +39,9 @@ public class Module {
                 @JsonProperty("active") boolean active,
                 @JsonProperty("createdTimestamp") long createdTimestamp,
                 @JsonProperty("updatedTimestamp") long updatedTimestamp,
-                @JsonProperty("buildpack") Optional<GitInfo> buildpack) {
+                @JsonProperty("buildpack") Optional<GitInfo> buildpack,
+                @JsonProperty("buildConfig") Optional<BuildConfig> buildConfig,
+                @JsonProperty("resolvedBuildConfig") Optional<BuildConfig> resolvedBuildConfig) {
     this.id = id;
     this.name = name;
     this.type = type;
@@ -45,7 +51,22 @@ public class Module {
     this.active = active;
     this.createdTimestamp = createdTimestamp;
     this.updatedTimestamp = updatedTimestamp;
-    this.buildpack = com.google.common.base.Objects.firstNonNull(buildpack, Optional.<GitInfo>absent());
+    this.buildpack = MoreObjects.firstNonNull(buildpack, Optional.<GitInfo>absent());
+    this.buildConfig = MoreObjects.firstNonNull(buildConfig, Optional.absent());
+    this.resolvedBuildConfig = MoreObjects.firstNonNull(resolvedBuildConfig, Optional.absent());
+  }
+
+  public Module(Optional<Integer> id,
+                String name,
+                String type,
+                String path,
+                String glob,
+                boolean active,
+                long createdTimestamp,
+                long updatedTimestamp,
+                Optional<GitInfo> buildpack) {
+
+    this(id, name, type, path, glob, active, createdTimestamp, updatedTimestamp, buildpack, Optional.absent(), Optional.absent());
   }
 
   public Optional<Integer> getId() {
@@ -89,12 +110,20 @@ public class Module {
     return buildpack;
   }
 
+  public Optional<BuildConfig> getBuildConfig() {
+    return buildConfig;
+  }
+
+  public Optional<BuildConfig> getResolvedBuildConfig() {
+    return resolvedBuildConfig;
+  }
+
   public boolean contains(Path path) {
     return matcher.matches(path);
   }
 
   public Module withId(int id) {
-    return new Module(Optional.of(id), name, type, path, glob, active, createdTimestamp, updatedTimestamp, buildpack);
+    return new Module(Optional.of(id), name, type, path, glob, active, createdTimestamp, updatedTimestamp, buildpack, buildConfig, resolvedBuildConfig);
   }
 
   @Override
@@ -105,7 +134,10 @@ public class Module {
         .add("type", type)
         .add("path", path)
         .add("glob", glob)
-        .add("buildpack", buildpack).toString();
+        .add("buildpack", buildpack)
+        .add("buildConfig", buildConfig)
+        .add("resolvedBuildConfig", resolvedBuildConfig)
+        .toString();
   }
 
   @Override
@@ -125,11 +157,13 @@ public class Module {
         Objects.equals(type, module.type) &&
         Objects.equals(path, module.path) &&
         Objects.equals(glob, module.glob) &&
-        Objects.equals(buildpack, module.buildpack);
+        Objects.equals(buildpack, module.buildpack) &&
+        Objects.equals(buildConfig, module.getBuildConfig()) &&
+        Objects.equals(resolvedBuildConfig, module.getResolvedBuildConfig());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, type, path, glob, active, buildpack);
+    return Objects.hash(id, name, type, path, glob, active, buildpack, buildConfig, resolvedBuildConfig);
   }
 }

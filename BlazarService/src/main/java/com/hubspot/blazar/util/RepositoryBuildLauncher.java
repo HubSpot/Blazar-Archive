@@ -5,6 +5,7 @@ import static com.hubspot.blazar.base.BuildTrigger.Type.INTER_PROJECT;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,7 +18,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.hubspot.blazar.base.CommitInfo;
-import com.hubspot.blazar.base.DiscoveryResult;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.Module;
 import com.hubspot.blazar.base.RepositoryBuild;
@@ -27,7 +27,7 @@ import com.hubspot.blazar.data.service.DependenciesService;
 import com.hubspot.blazar.data.service.ModuleDiscoveryService;
 import com.hubspot.blazar.data.service.ModuleService;
 import com.hubspot.blazar.data.service.RepositoryBuildService;
-import com.hubspot.blazar.discovery.ModuleDiscovery;
+import com.hubspot.blazar.discovery.ModuleDiscoveryHandler;
 import com.hubspot.blazar.exception.NonRetryableBuildException;
 import com.hubspot.blazar.github.GitHubProtos.Commit;
 
@@ -40,7 +40,7 @@ public class RepositoryBuildLauncher {
   private final ModuleService moduleService;
   private final DependenciesService dependenciesService;
   private final ModuleDiscoveryService moduleDiscoveryService;
-  private final ModuleDiscovery moduleDiscovery;
+  private final ModuleDiscoveryHandler moduleDiscoveryHandler;
   private final GitHubHelper gitHubHelper;
 
   @Inject
@@ -49,44 +49,35 @@ public class RepositoryBuildLauncher {
                                  ModuleService moduleService,
                                  DependenciesService dependenciesService,
                                  ModuleDiscoveryService moduleDiscoveryService,
-                                 ModuleDiscovery moduleDiscovery,
+                                 ModuleDiscoveryHandler moduleDiscoveryHandler,
                                  GitHubHelper gitHubHelper) {
     this.repositoryBuildService = repositoryBuildService;
     this.branchService = branchService;
     this.moduleService = moduleService;
     this.dependenciesService = dependenciesService;
     this.moduleDiscoveryService = moduleDiscoveryService;
-    this.moduleDiscovery = moduleDiscovery;
+    this.moduleDiscoveryHandler = moduleDiscoveryHandler;
     this.gitHubHelper = gitHubHelper;
   }
 
   public void launch(RepositoryBuild queued, Optional<RepositoryBuild> previous) throws Exception {
-    GitInfo gitInfo = branchService.get(queued.getBranchId()).get();
-    CommitInfo commitInfo = calculateCommitInfoForBuild(gitInfo, queued, previous);
-    Set<Module> modules = getAndUpdateModules(gitInfo, commitInfo);
+    GitInfo branch = branchService.get(queued.getBranchId()).get();
+    CommitInfo commitInfo = calculateCommitInfoForBuild(branch, queued, previous);
+
+    moduleDiscoveryHandler.updateModules(branch, commitInfo, true);
+    // We get the modules from db instead of using the ModuleDiscoveryResult returned by
+    // moduleDiscoveryHandler.updateModules() in order to retrieve the ids of newly discovered modules
+    Set<Module> activeModules = moduleService.getByBranch(branch.getId().get()).stream().filter(Module::isActive).collect(Collectors.toSet());
 
     RepositoryBuild launching = queued.toBuilder()
         .setStartTimestamp(Optional.of(System.currentTimeMillis()))
         .setState(State.LAUNCHING)
         .setCommitInfo(Optional.of(commitInfo))
         .setSha(Optional.of(commitInfo.getCurrent().getId()))
-        .setDependencyGraph(Optional.of(dependenciesService.buildDependencyGraph(gitInfo, modules)))
+        .setDependencyGraph(Optional.of(dependenciesService.buildDependencyGraph(branch, activeModules)))
         .build();
     LOG.info("Updating status of build {} to {}", launching.getId().get(), launching.getState());
     repositoryBuildService.begin(launching);
-  }
-
-  // Runs discovery if the commitInfo has changed any of the modules so we build our graph with the most
-  // up to date dependency data.
-  // If there are 10 or more commits in a compare between 2 shas it is truncated. In this case Blazar re-builds
-  // All modules (on a push) and re-discovers all modules just to be sure that everything is as up to date as possible.
-  private Set<Module> getAndUpdateModules(GitInfo gitInfo, CommitInfo commitInfo) throws IOException {
-    if (commitInfo.isTruncated() || moduleDiscovery.shouldRediscover(gitInfo, commitInfo)) {
-      DiscoveryResult result = moduleDiscovery.discover(gitInfo);
-      return moduleDiscoveryService.handleDiscoveryResult(gitInfo, result);
-    } else {
-      return moduleService.getByBranch(gitInfo.getId().get());
-    }
   }
 
   @VisibleForTesting

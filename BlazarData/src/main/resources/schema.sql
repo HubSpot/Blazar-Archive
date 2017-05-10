@@ -230,3 +230,14 @@ ALTER TABLE inter_project_build_mappings_new ADD UNIQUE INDEX (interProjectBuild
 INSERT IGNORE INTO inter_project_build_mappings_new SELECT * FROM inter_project_build_mappings;
 DROP TABLE inter_project_build_mappings;
 RENAME TABLE inter_project_build_mappings_new TO inter_project_build_mappings;
+
+-- changeset gchomatas:18
+ALTER TABLE `modules` ADD COLUMN `buildConfig` mediumtext;
+ALTER TABLE `modules` ADD COLUMN `resolvedBuildConfig` mediumtext;
+ALTER TABLE `module_provides` ADD COLUMN `source` VARCHAR(40) NOT NULL DEFAULT 'UNKNOWN';
+ALTER TABLE `module_depends` ADD COLUMN `source` VARCHAR(40) NOT NULL DEFAULT 'UNKNOWN';
+CREATE INDEX moduleId_and_source ON module_provides (moduleId, source);
+CREATE INDEX moduleId_and_source ON module_depends (moduleId, source);
+
+-- changeset gchomatas:19
+ALTER TABLE `modules` MODIFY `name` VARCHAR(250) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL;

@@ -15,7 +15,7 @@ import com.hubspot.blazar.BlazarServiceTestModule;
 import com.hubspot.blazar.base.GitInfo;
 import com.hubspot.blazar.base.RepositoryBuild;
 import com.hubspot.blazar.data.service.BranchService;
-import com.hubspot.blazar.listener.BuildEventDispatcher;
+import com.hubspot.blazar.visitor.BuildEventDispatcher;
 
 import io.dropwizard.db.ManagedDataSource;
 

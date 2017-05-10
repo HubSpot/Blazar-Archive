@@ -50,17 +50,19 @@ public class TestBuildClusterService extends BuildClusterService {
   }
 
   @Override
-  public synchronized void launchBuildContainer(ModuleBuild moduleBuild) throws BuildClusterException {
+  public synchronized String launchBuildContainer(ModuleBuild moduleBuild) throws BuildClusterException {
+    String buildClusterToUse = "SingularityCluster1";
     moduleBuild = moduleBuildService.get(moduleBuild.getId().get()).get();
-    moduleBuildService.updateBuildClusterName(moduleBuild.getModuleId(), "SingularityCluster1");
+    moduleBuildService.updateBuildClusterName(moduleBuild.getModuleId(), buildClusterToUse);
     if (moduleBuild.getState().isWaiting()) {
-      return;
+      return buildClusterToUse;
     }
     if (failingModules.contains(moduleBuild.getModuleId())) {
       failBuild(moduleBuild);
     } else {
       passBuild(moduleBuild);
     }
+    return buildClusterToUse;
   }
 
   private void failBuild(ModuleBuild build) {

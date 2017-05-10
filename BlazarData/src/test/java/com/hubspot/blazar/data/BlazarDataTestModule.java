@@ -16,6 +16,8 @@ public class BlazarDataTestModule implements Module {
     binder.bind(EventBus.class).toInstance(buildEventBus());
     binder.install(new BlazarTestModule());
     binder.install(new BlazarDataModule());
+
+    System.setProperty("kill-delay", "10000");
   }
 
   private EventBus buildEventBus() {
