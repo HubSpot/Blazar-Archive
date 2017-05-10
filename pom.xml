@@ -51,9 +51,9 @@
 
   <properties>
     <basepom.check.skip-findbugs>true</basepom.check.skip-findbugs>
-    <dep.horizon.version>0.0.24</dep.horizon.version>
+    <dep.horizon.version>0.0.25</dep.horizon.version>
     <dep.rosetta.version>3.11.0</dep.rosetta.version>
-    <singularity.version>0.10.0-QA-SNAPSHOT</singularity.version>
+    <singularity.version>0.15.0</singularity.version>
     <mesos.version>0.28.2</mesos.version>
     <mesos.docker.tag>0.21.1-1.1.ubuntu1404</mesos.docker.tag>
     <project.build.targetJdk>1.8</project.build.targetJdk>
@@ -123,7 +123,7 @@
       <dependency>
         <groupId>com.hubspot.jackson</groupId>
         <artifactId>jackson-datatype-protobuf</artifactId>
-        <version>0.9.2</version>
+        <version>0.9.3</version>
       </dependency>
       <dependency>
         <groupId>com.hubspot</groupId>
@@ -267,6 +267,23 @@
   <build>
     <pluginManagement>
       <plugins>
+        <!-- This lets us use logback instead of simplelogger with maven -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <dependencies>
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>jcl-over-slf4j</artifactId>
+              <version>1.7.5</version>
+            </dependency>
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>slf4j-jdk14</artifactId>
+              <version>1.7.5</version>
+            </dependency>
+          </dependencies>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -290,7 +307,7 @@
           <artifactId>docker-maven-plugin</artifactId>
           <version>0.13.6</version>
           <configuration>
-            <images />  <!-- default to no images to allow building from parent, let submodules override -->
+            <images/>  <!-- default to no images to allow building from parent, let submodules override -->
           </configuration>
           <executions>
             <execution>
