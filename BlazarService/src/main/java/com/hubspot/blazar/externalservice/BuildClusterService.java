@@ -87,6 +87,7 @@ public class BuildClusterService {
         Optional.of(true),
         Optional.of("The associated Blazar build has been cancelled"),
         Optional.absent(),
+        Optional.absent(),
         Optional.absent());
 
     availableClusters = ImmutableList.<String>builder().addAll(singularityClusterClients.keySet()).build();
