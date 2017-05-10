@@ -52,8 +52,7 @@ public class BuildCGroupResources {
       return false;
     }
     BuildCGroupResources that = (BuildCGroupResources) o;
-    return Double.compare(that.cpus, cpus) == 0 &&
-        Double.compare(that.memoryMb, memoryMb) == 0;
+    return Objects.equals(that.cpus, cpus) && Objects.equals(that.memoryMb, memoryMb);
   }
 
   @Override
