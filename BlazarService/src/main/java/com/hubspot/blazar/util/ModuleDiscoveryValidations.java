@@ -1,12 +1,14 @@
 package com.hubspot.blazar.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
@@ -71,19 +73,23 @@ public class ModuleDiscoveryValidations {
 
   public static MalformedFile getDuplicateModulesMalformedFile(GitInfo branch, List<Module> duplicateModules) {
     // group duplicates by name
-    ListMultimap<String, Module> duplicateModulesPerModuleName = Multimaps.index(duplicateModules, Module::getName);
+    ListMultimap<String, Module> duplicateModulesPerModuleName = Multimaps.index(duplicateModules, (module) -> module.getName().toLowerCase());
 
-    // and turn the map in lines like "duplicateName -> [folderName:moduleType, folderName2:moduleType2, ...]
-    String duplicatesEntriesAsString = duplicateModulesPerModuleName.asMap().entrySet().stream().map(entry -> {
-      String duplicateModulesInEntry = entry.getValue().stream().map(duplicateModule ->
-          String.format("%s:%s", duplicateModule.getFolder(), duplicateModule.getType())).collect(Collectors.joining(" ,"));
-      return String.format("%s: [%s]%n", entry.getKey(), duplicateModulesInEntry);
-    }).collect(Collectors.joining(" ,"));
+    // and turn the map in lines like "duplicateName -> [folder (type:moduleType), folder2 (type: moduleType2, ...]
+    String duplicatesEntriesAsString = duplicateModulesPerModuleName.asMap().entrySet().stream()
+        .map(entry -> String.format("%s -> [%s]%n", entry.getKey(), getDuplicateModulesAsString(entry.getValue())))
+        .collect(Collectors.joining(" ,"));
 
-    String message = String.format("The following discovered module(s) share the same module name " +
-            "(duplicateName -> [folderName:moduleType, folderName2:moduleType2, ...]: %s. Module names should be " +
-            "unique inside each repository branch.", duplicatesEntriesAsString);
+    String message = String.format("The following discovered modules share the same module name: %s. " +
+        "Module names should be unique inside each repository branch.", duplicatesEntriesAsString);
     return new MalformedFile(branch.getId().get(), "duplicate-module-validation", "/", message);
+  }
+
+  private static String getDuplicateModulesAsString(Collection<Module> duplicateModules) {
+    return duplicateModules.stream().map(duplicateModule -> {
+      String folder = Strings.isNullOrEmpty(duplicateModule.getFolder())? "/" : duplicateModule.getFolder();
+      return String.format("%s (type:%s)", folder, duplicateModule.getType());
+    }).collect(Collectors.joining(" ,"));
   }
 
 }
