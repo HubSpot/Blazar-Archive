@@ -18,6 +18,9 @@ public class ExecutorConfiguration {
 
   @Min(0)
   private final long buildTimeoutMillis;
+
+  @Min(0)
+  private final long containerStartTimeoutMillis;
   // This is left as optional because the request that you configure in
   // is the last set of default options
   private final Optional<BuildCGroupResources> defaultBuildResources;
@@ -25,19 +28,22 @@ public class ExecutorConfiguration {
   /**
    * @param defaultBuildUser The default user for builds to run as
    * @param buildTimeoutMillis The time to wait before considering a running build to be stuck and for it to be killed.
+   * @param containerStartTimeoutMillis The time to wait before considering the container launch to have failed. Hitting this limit fails the module build.
    */
   @JsonCreator
   public ExecutorConfiguration(@JsonProperty("defaultBuildUser") Optional<String> defaultBuildUser,
                                @JsonProperty("defaultBuildResources") Optional<BuildCGroupResources> defaultBuildResources,
-                               @JsonProperty("buildTimeoutMillis") Optional<Long> buildTimeoutMillis) {
+                               @JsonProperty("buildTimeoutMillis") Optional<Long> buildTimeoutMillis,
+                               @JsonProperty("containerStartTimeoutMillis") Optional<Long> containerStartTimeoutMillis) {
 
     this.defaultBuildResources = MoreObjects.firstNonNull(defaultBuildResources, Optional.<BuildCGroupResources>absent());
     this.defaultBuildUser = MoreObjects.firstNonNull(defaultBuildUser, Optional.<String>absent()).or("root");
     this.buildTimeoutMillis = MoreObjects.firstNonNull(buildTimeoutMillis, Optional.<Long>absent()).or(TimeUnit.MINUTES.toMillis(20));
+    this.containerStartTimeoutMillis = MoreObjects.firstNonNull(containerStartTimeoutMillis, Optional.<Long>absent()).or(TimeUnit.MINUTES.toMillis(5));
   }
 
   public static ExecutorConfiguration defaultConfiguration() {
-    return new ExecutorConfiguration(Optional.absent(), Optional.absent(), Optional.absent());
+    return new ExecutorConfiguration(Optional.absent(), Optional.absent(), Optional.absent(), Optional.absent());
   }
 
   public String getDefaultBuildUser() {
@@ -50,5 +56,9 @@ public class ExecutorConfiguration {
 
   public Optional<BuildCGroupResources> getDefaultBuildResources() {
     return defaultBuildResources;
+  }
+
+  public long getContainerStartTimeoutMillis() {
+    return containerStartTimeoutMillis;
   }
 }
