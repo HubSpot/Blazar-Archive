@@ -41,7 +41,6 @@ class BranchStateHeadline extends Component {
         <Button id="build-now-button" bsStyle="primary" onClick={this.props.showBuildBranchModal}>
           Build now
         </Button>
-        <Star className="branch-state-headline__star" branchId={this.props.branchId} />
       </div>
     );
   }
@@ -53,6 +52,7 @@ class BranchStateHeadline extends Component {
     const value = this.props.branchInfo.branch;
     return (
       <div className="branch-state-headline__branch-select">
+        <Star className="branch-state-headline__star" branchId={this.props.branchId} />
         <Icon type="octicon" name="git-branch" classNames="headline-icon" />
         <Select
           key={value}
