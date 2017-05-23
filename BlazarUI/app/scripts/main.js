@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 import store from './reduxStore';
 
 import { getUsernameFromCookie } from './components/Helpers.js';
+import { configureSentry } from './sentry';
 
 const username = getUsernameFromCookie();
 
@@ -21,7 +22,7 @@ if (window.config.heapToken) {
 }
 
 if (window.config.sentryDsn) {
-  window.Raven.setUserContext({username});
+  configureSentry();
 }
 
 const browserHistory = useRouterHistory(createHistory)({
