@@ -6,9 +6,39 @@ import Q from 'q';
 
 let pollingTimeoutId = null;
 
-export const loadBranchStatus = (branchId) => {
+const selectModule = (moduleId) => {
   return (dispatch) => {
+    dispatch({
+      type: ActionTypes.SELECT_MODULE,
+      payload: moduleId
+    });
+    dispatch(loadModuleBuildHistory(moduleId));
+  };
+};
+
+const deselectModule = () => ({
+  type: ActionTypes.DESELECT_MODULE
+});
+
+export const handleModuleItemClick = (moduleId) => {
+  return (dispatch, getState) => {
+    const isModuleSelected = isModuleItemSelected(getState(), {moduleId});
+    const action = isModuleSelected ? deselectModule() : selectModule(moduleId);
+    dispatch(action);
+  };
+};
+
+export const loadBranchStatus = (branchId) => {
+  return (dispatch, getState) => {
     return BranchStateApi.fetchBranchStatus(branchId).then((branchStatus) => {
+      const isInitialFetch = getState().branchState.get('loading');
+      const activeModules = branchStatus.moduleStates.filter((moduleState) => moduleState.module.active);
+      if (isInitialFetch && activeModules.length === 1) {
+        // automatically expand the first active module item if
+        // there is only one active module
+        dispatch(selectModule(activeModules[0].module.id));
+      }
+
       dispatch({
         type: ActionTypes.RECEIVE_BRANCH_STATUS,
         payload: branchStatus
@@ -63,28 +93,6 @@ export const pollBranchStatus = (branchId) => {
 export const stopPollingBranchStatus = () => ({
   type: ActionTypes.STOP_POLLING_BRANCH_STATUS
 });
-
-const selectModule = (moduleId) => {
-  return (dispatch) => {
-    dispatch({
-      type: ActionTypes.SELECT_MODULE,
-      payload: moduleId
-    });
-    dispatch(loadModuleBuildHistory(moduleId));
-  };
-};
-
-const deselectModule = () => ({
-  type: ActionTypes.DESELECT_MODULE
-});
-
-export const handleModuleItemClick = (moduleId) => {
-  return (dispatch, getState) => {
-    const isModuleSelected = isModuleItemSelected(getState(), {moduleId});
-    const action = isModuleSelected ? deselectModule() : selectModule(moduleId);
-    dispatch(action);
-  };
-};
 
 export const dismissBetaNotification = () => ({
   type: ActionTypes.DISMISS_BRANCH_STATE_PAGE_BETA_NOTIFICATION

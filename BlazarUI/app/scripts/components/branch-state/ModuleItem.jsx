@@ -33,7 +33,11 @@ const DELAY_BEFORE_SHOWING_LOADING_ICON = 400;
 class ModuleItem extends Component {
   constructor(props) {
     super(props);
-    this.state = {isExpanded: props.isSelected};
+    this.handleClick = this.handleClick.bind(this);
+    this.state = {
+      isExpanded: props.isSelected,
+      selectedByUser: false
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -41,7 +45,7 @@ class ModuleItem extends Component {
     clearTimeout(this.expandTimeoutId);
 
     if (!isSelected) {
-      this.setState({isExpanded: false});
+      this.setState({isExpanded: false, selectedByUser: false});
     } else if (hasPreviouslyLoaded || this.state.isExpanded) {
       this.setState({isExpanded: true});
     } else {
@@ -63,13 +67,18 @@ class ModuleItem extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.isExpanded && !prevProps.hasPreviouslyLoaded) {
+    if (prevState.isExpanded && !prevProps.hasPreviouslyLoaded && this.state.selectedByUser) {
       scrollIntoViewIfNeeded(this.moduleItem);
     }
   }
 
+  handleClick() {
+    this.setState({selectedByUser: !this.props.isSelected});
+    this.props.onClick();
+  }
+
   render() {
-    const {moduleState, onClick} = this.props;
+    const {moduleState} = this.props;
     const {isExpanded} = this.state;
     const module = moduleState.get('module');
     const lastSuccessfulBuildNumber = moduleState.getIn(['lastSuccessfulModuleBuild', 'buildNumber']);
@@ -81,7 +90,7 @@ class ModuleItem extends Component {
           currentModuleBuild={getCurrentModuleBuild(moduleState)}
           currentBranchBuild={getCurrentBranchBuild(moduleState)}
           isExpanded={isExpanded}
-          onClick={onClick}
+          onClick={this.handleClick}
         />
         <Collapse in={isExpanded} onEntered={() => scrollIntoViewIfNeeded(this.moduleItem)}>
           <div className="module-item__details">
