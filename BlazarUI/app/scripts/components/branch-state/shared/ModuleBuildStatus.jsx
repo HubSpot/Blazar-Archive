@@ -33,7 +33,7 @@ const getIcon = (moduleBuildState) => {
   }
 };
 
-const getStatusMessage = (moduleBuild, abbreviateUnits) => {
+const getStatusMessage = (moduleBuild, branchBuildStartTimestamp, abbreviateUnits) => {
   const state = moduleBuild.get('state');
 
   switch (state) {
@@ -51,35 +51,38 @@ const getStatusMessage = (moduleBuild, abbreviateUnits) => {
     }
 
     case ModuleBuildStates.SUCCEEDED:
-    case ModuleBuildStates.FAILED: {
+    case ModuleBuildStates.FAILED:
+    case ModuleBuildStates.CANCELLED: {
       const startTimestamp = moduleBuild.get('startTimestamp');
       const endTimestamp = moduleBuild.get('endTimestamp');
-      const startTime = moment(startTimestamp).fromNow();
+      const endTime = <strong>{moment(endTimestamp).fromNow()}</strong>;
       const duration = <BuildDuration startTimestamp={startTimestamp} endTimestamp={endTimestamp} abbreviateUnits={abbreviateUnits} />;
+
+      if (state === ModuleBuildStates.CANCELLED) {
+        return <span>Cancelled <strong>{endTime}</strong> after {duration}</span>;
+      }
 
       const isSuccessful = state === ModuleBuildStates.SUCCEEDED;
       const buildResult = isSuccessful ? 'Built' : 'Failed';
-
-      return <span>{buildResult} <strong>{startTime}</strong> in {duration}</span>;
+      return <span>{buildResult} <strong>{endTime}</strong> in {duration}</span>;
     }
 
-    case ModuleBuildStates.CANCELLED:
-      return <em>Cancelled</em>;
-
-    case ModuleBuildStates.SKIPPED:
-      return <em>Skipped</em>;
+    case ModuleBuildStates.SKIPPED: {
+      const time = branchBuildStartTimestamp && <strong>{moment(branchBuildStartTimestamp).fromNow()}</strong>;
+      return <span>Skipped {time}</span>;
+    }
 
     default:
       return state;
   }
 };
 
-const ModuleBuildStatus = ({moduleBuild, noIcon, abbreviateUnitsBreakpoint}) => {
+const ModuleBuildStatus = ({moduleBuild, branchBuildStartTimestamp, noIcon, abbreviateUnitsBreakpoint}) => {
   return (
     <Measure>
       {dimensions => {
         const abbreviateUnits = abbreviateUnitsBreakpoint && dimensions.width < abbreviateUnitsBreakpoint;
-        const message = getStatusMessage(moduleBuild, abbreviateUnits);
+        const message = getStatusMessage(moduleBuild, branchBuildStartTimestamp, abbreviateUnits);
 
         return noIcon ? <p className="module-build-status">{message}</p> :
           <p className="module-build-status">{getIcon(moduleBuild.get('state'))} {message}</p>;
@@ -90,6 +93,7 @@ const ModuleBuildStatus = ({moduleBuild, noIcon, abbreviateUnitsBreakpoint}) => 
 
 ModuleBuildStatus.propTypes = {
   moduleBuild: ImmutablePropTypes.map,
+  branchBuildStartTimestamp: PropTypes.number,
   noIcon: PropTypes.bool,
   abbreviateUnitsBreakpoint: PropTypes.number
 };

@@ -16,6 +16,7 @@ function fetchModuleBuildHistory(moduleId, offset, pageSize) {
     'moduleBuildInfos.branchBuild.buildTrigger',
     'moduleBuildInfos.branchBuild.commitInfo',
     'moduleBuildInfos.branchBuild.id',
+    'moduleBuildInfos.branchBuild.startTimestamp',
     'remaining'
   ];
 
