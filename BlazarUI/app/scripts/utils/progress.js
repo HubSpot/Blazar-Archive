@@ -1,5 +1,31 @@
 import {filter} from 'underscore';
-import {std, mean} from 'mathjs';
+
+const sum = array => array.reduce((a, b) => a + b, 0);
+const mean = array => {
+  if (array.length === 0) {
+    throw new SyntaxError('Cannot compute mean of empty array.');
+  }
+
+  return sum(array) / array.length;
+};
+
+const variance = array => {
+  if (array.length === 0) {
+    throw new SyntaxError('Cannot compute variance of empty array.');
+  } else if (array.length === 1) {
+    return 0;
+  }
+
+  const thisMean = mean(array);
+  const result = sum(array.map(x => {
+    const diff = x - thisMean;
+    return diff * diff;
+  }));
+
+  return result / (array.length - 1);
+};
+
+const std = array => Math.sqrt(variance(array));
 
 function _filterOutliers(durations) {
   const values = durations.concat();
